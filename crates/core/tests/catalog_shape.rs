@@ -1,0 +1,1026 @@
+//! The five slots keep their shapes.
+//!
+//! `rating.rs` pins the rarity curve so a batch of new components cannot
+//! quietly make everything legendary. This is the same idea aimed at identity:
+//! so a batch of new components cannot quietly dissolve a slot back into a stat
+//! pile. Each slot is meant to answer one question - weapon conversion, gloves
+//! reaction, greaves tempo, chest reserve, helmet economy - and the rules below
+//! are what "meant to" cashes out as.
+//!
+//! **How this file is red.** The spec asks for a test written red and made
+//! green by the sweep. A suite that stays red for eight pull requests is not a
+//! safety net, though - it is a light nobody looks at, and the sweep needs a
+//! green suite to notice what it breaks. So the rules carry two numbers each: a
+//! `budget`, which is how far the catalogue misses today, and a `target`, which
+//! is where the rewrite has to get it. The default test asserts the budget and
+//! is **green**; it can only ever be tightened, so a new off-axis piece fails it
+//! immediately. `the_catalog_keeps_every_rule` asserts the targets, is
+//! **ignored and red**, and is the one the sweep is finished by:
+//!
+//!     cargo test -p gm2d-core --test catalog_shape -- --ignored --nocapture
+//!
+//! Lower a budget in the same commit that earns it, the way this repo re-pins
+//! anything else. Never raise one.
+//!
+//! **Floating kinds.** `PieceDef::fits` lets a Material sit in gloves or
+//! greaves and a Plating in helmet or greaves - 61 pieces that can be placed
+//! outside the slot they were written for. A rule keyed on `def.slot` therefore
+//! cannot promise a mechanic stays in its grid, only that it was authored
+//! there. So the two floating kinds are barred from carrying identity mechanics
+//! at all (`identity_carriers`), which is what makes the rest of the table mean
+//! something on the board rather than only in the source. They are the bleed
+//! carriers: deliberately neutral, deliberately shared.
+
+mod common;
+
+use common::{does, has};
+use gm2d_core::curse::CurseKind;
+use gm2d_core::piece::{
+    Action, EffectKind, PieceDef, PieceKind, SlotKind, Trigger, CATALOG,
+};
+use gm2d_core::rating::{piece_rating, Rarity};
+
+// ------------------------------------------------------------- vocabulary
+
+fn effect_is(def: &PieceDef, want: fn(&EffectKind) -> bool) -> bool {
+    def.effect.as_ref().map(|e| want(&e.kind)).unwrap_or(false)
+}
+
+/// A kind that `PieceDef::fits` lets into a grid other than its own.
+fn floats(kind: PieceKind) -> bool {
+    matches!(kind, PieceKind::Material | PieceKind::Plating)
+}
+
+/// Anything that reads or answers the board rather than only adding to it.
+fn interacts(def: &PieceDef) -> bool {
+    def.effect.is_some()
+        || def.assembly_bonus.is_some()
+        || has(def, |t| {
+            matches!(
+                t,
+                Trigger::OnAdjacentActivate(_)
+                    | Trigger::OnAlignedActivate(_)
+                    | Trigger::PerAdjacentItem { .. }
+                    | Trigger::PerAdjacentEmpty(_)
+                    | Trigger::OnOtherCast(_)
+                    // The two the interaction fabric added. A watcher reads
+                    // the board's event stream and a diagonal reads past its
+                    // neighbours; both are interactions, and leaving them out
+                    // would have let a slot satisfy the density quota only in
+                    // the vocabulary it had before the primitives landed.
+                    | Trigger::OnDiagonalActivate(_)
+                    | Trigger::Watch { .. }
+            )
+        })
+}
+
+fn spends_a_pool(def: &PieceDef) -> bool {
+    has(def, |t| {
+        matches!(t, Trigger::SpendMana { .. } | Trigger::Spend { .. } | Trigger::Consume { .. })
+    })
+}
+
+/// A stat line and nothing else — nothing on activation, no effect, no bonus.
+///
+/// It counted triggers only, which was already a poor proxy: a piece banking
+/// two nature every time it fires was "plain flat-stat filler" as long as it
+/// spelled that in `Stats`, and a hundred and fifty-eight of them did. T2 moved
+/// thirty-six more into that spelling and this predicate would have called them
+/// filler too — the quota measuring *worse* because the catalogue got tidier.
+///
+/// So it asks `parts_when` instead. Anything handed over on activation, in
+/// either spelling, is not filler.
+fn inert(def: &PieceDef) -> bool {
+    use gm2d_core::stats::When;
+    let acts = def
+        .base
+        .parts_when()
+        .iter()
+        .any(|(_, _, w)| matches!(w, When::OnActivation | When::Damage));
+    def.triggers.is_empty() && def.effect.is_none() && def.assembly_bonus.is_none() && !acts
+}
+
+fn rarity(def: &PieceDef) -> Rarity {
+    Rarity::of(piece_rating(def))
+}
+
+// ------------------------------------------------------- the five axes
+//
+// "Every slot may do defence and every slot may do offence, but only in its own
+// vocabulary." These are those vocabularies, and they are what the axis quotas
+// count. A piece expresses an axis if it speaks any word of it.
+
+fn conversion(def: &PieceDef) -> bool {
+    def.power_bonus != 0
+        || def.base.physical_damage != 0
+        || def.base.magic_damage != 0
+        || def.base.strength != 0
+        || matches!(
+            def.kind,
+            PieceKind::Damaging
+                | PieceKind::Spell
+                | PieceKind::Ink
+                | PieceKind::Alignment
+                | PieceKind::Book
+                | PieceKind::Orb
+        )
+        || does(def, |a| {
+            // Mind damage counts. It is damage - it takes maximum health and
+            // that health does not come back - and §2 names it as exactly the
+            // helmet's bleed into the weapon: mind and magic as cast support.
+            // Leaving it out meant the one slot whose bleed the spec spells
+            // out could not express it.
+            matches!(
+                a,
+                Action::Damage { .. }
+                    | Action::GainForking(_)
+                    | Action::MindDamage { .. }
+                    // Spellblade multiplies a swing, which is conversion's
+                    // word whoever is saying it. Its home is the hands, whose
+                    // own axis it satisfies through the trigger rather than
+                    // through the payout - a reaction that answers with the
+                    // blade is still a reaction.
+                    | Action::GainSpellblade(_)
+                    // And Dread multiplies mind damage, which is already on
+                    // this list and is already named as the helmet's bleed
+                    // into the weapon. A stack that doubles a word counts as
+                    // the word.
+                    | Action::GainDread(_)
+            )
+        })
+}
+
+fn economy(def: &PieceDef) -> bool {
+    def.base.mana != 0
+        || def.base.mind_resist != 0
+        || def.base.rage != 0
+        || def.base.faith != 0
+        || def.base.nature != 0
+        || spends_a_pool(def)
+        || does(def, |a| {
+            matches!(
+                a,
+                Action::GainMana(_)
+                    | Action::Gain { .. }
+                    | Action::GainEmpowerment(_)
+                    | Action::GainShield(_)
+                    | Action::MindDamage { .. }
+                    // Income that reads the balance is still income, and the
+                    // head is where the accounts are kept.
+                    | Action::Accrue { .. }
+            )
+        })
+}
+
+fn reserve(def: &PieceDef) -> bool {
+    def.base.health != 0
+        || def.base.armor != 0
+        || def.base.regen != 0
+        || def.base.physical_harden != 0
+        || def.base.magic_harden != 0
+        || def.base.reflect != 0
+        // Deflection is mitigation, which is what the body's axis is made of.
+        || does(def, |a| {
+            matches!(
+                a,
+                Action::Grow(_)
+                    | Action::GainArmor(_)
+                    | Action::GainDeflection(_)
+                    // Armour spent as growth is the reserve axis turning one
+                    // of its own numbers into another of its own numbers.
+                    | Action::Ballast(_)
+            )
+        })
+}
+
+fn reaction(def: &PieceDef) -> bool {
+    has(def, |t| {
+        matches!(
+            t,
+            Trigger::OnAdjacentActivate(_)
+                | Trigger::OnAlignedActivate(_)
+                | Trigger::PerAdjacentItem { .. }
+        )
+    }) || does(def, |a| {
+        matches!(
+            a,
+            Action::Drain { .. }
+                | Action::StunStrongest { .. }
+                // A hand on the wire: reading the other side's bar and
+                // answering it is the reaction axis exactly.
+                | Action::Derail { .. }
+        )
+    })
+        || effect_is(def, |e| {
+            matches!(
+                e,
+                EffectKind::DoubleAdjacentItemStat { .. }
+                    | EffectKind::DoubleNeighbor { .. }
+                    | EffectKind::SelfPerNeighborKind { .. }
+            )
+        })
+}
+
+fn tempo(def: &PieceDef) -> bool {
+    def.speed_bonus != 0
+        || def.base.curse_resist != 0
+        || has(def, |t| matches!(t, Trigger::OnBattleStart(_)))
+        || does(def, |a| {
+            // Moving time between bars is a cadence tool, whoever ends up
+            // with the second.
+            matches!(a, Action::ReduceCooldown(_) | Action::Shunt { .. })
+                || matches!(
+                    a,
+                    Action::Curse { kind: CurseKind::Frost | CurseKind::Stun | CurseKind::Misfire, .. }
+                )
+        })
+}
+
+/// Each slot's own axis, and the one it is allowed to bleed into. The bleed
+/// relation is the directed cycle W -> G -> Gr -> C -> H -> W.
+fn axes(slot: SlotKind) -> (fn(&PieceDef) -> bool, fn(&PieceDef) -> bool) {
+    match slot {
+        SlotKind::Weapon => (conversion, reaction),
+        SlotKind::Gloves => (reaction, tempo),
+        SlotKind::Greaves => (tempo, reserve),
+        SlotKind::Chest => (reserve, economy),
+        SlotKind::Helmet => (economy, conversion),
+    }
+}
+
+// --------------------------------------------------------------- the rules
+
+#[derive(Copy, Clone)]
+enum Level {
+    /// Only the home slot may carry it.
+    Only,
+    /// At least this percentage of instances live in the home slot.
+    Mostly(usize),
+}
+
+/// One mechanic, where it belongs, and how far the catalogue is from putting it
+/// there. `budget` is today's distance and `target` is the rewrite's.
+struct Rule {
+    what: &'static str,
+    home: SlotKind,
+    level: Level,
+    /// Slots that may also carry it. The weapon keeps cadence tools it already
+    /// had; the spec's wording is "outside the weapon slot".
+    shared_with: &'static [SlotKind],
+    budget: usize,
+    target: usize,
+    carries: fn(&PieceDef) -> bool,
+}
+
+impl Rule {
+    /// Pieces that would have to change for this rule to hold, and their names.
+    fn offenders(&self) -> Vec<&'static str> {
+        let carried: Vec<&PieceDef> = CATALOG.iter().filter(|d| (self.carries)(d)).collect();
+        let allowed = |s: SlotKind| s == self.home || self.shared_with.contains(&s);
+        let mut out: Vec<&'static str> =
+            carried.iter().filter(|d| !allowed(d.slot)).map(|d| d.name).collect();
+        if let Level::Mostly(pct) = self.level {
+            // A majority rule is not broken by any one piece - it is broken by
+            // there being too many of them elsewhere. The distance is how many
+            // would have to come home, so keep that many of the strays.
+            let home = carried.iter().filter(|d| d.slot == self.home).count();
+            let need = carried.len() * pct / 100;
+            let must_move = need.saturating_sub(home);
+            out.truncate(must_move);
+        }
+        out.sort_unstable();
+        out
+    }
+}
+
+const RULES: &[Rule] = &[
+    // Weapon - Conversion. Most of this is already true and the test is here to
+    // keep it true once 170 weapon pieces start being edited.
+    Rule { what: "power_bonus", home: SlotKind::Weapon, level: Level::Only, shared_with: &[],
+        budget: 0, target: 0, carries: |d| d.power_bonus != 0 },
+    Rule { what: "the casting kinds (Ink/Spell/Alignment/Book/Orb)", home: SlotKind::Weapon,
+        level: Level::Only, shared_with: &[], budget: 0, target: 0,
+        carries: |d| matches!(d.kind, PieceKind::Ink | PieceKind::Spell | PieceKind::Alignment
+            | PieceKind::Book | PieceKind::Orb) },
+    Rule { what: "GainForking", home: SlotKind::Weapon, level: Level::Only, shared_with: &[],
+        budget: 0, target: 0, carries: |d| does(d, |a| matches!(a, Action::GainForking(_))) },
+    Rule { what: "OnOtherCast", home: SlotKind::Weapon, level: Level::Only, shared_with: &[],
+        budget: 0, target: 0, carries: |d| has(d, |t| matches!(t, Trigger::OnOtherCast(_))) },
+    Rule { what: "PerAdjacentEmpty", home: SlotKind::Weapon, level: Level::Only, shared_with: &[],
+        budget: 0, target: 0, carries: |d| has(d, |t| matches!(t, Trigger::PerAdjacentEmpty(_))) },
+    // Searing is damage wearing a curse costume - and that is why the feet
+    // share it. Frost, stun and misfire deny tempo but deal nothing, so a slot
+    // built only from them can never move a damage share; burn is how a pair
+    // of boots kills something. Pinned weapon-majority before anyone measured
+    // that the weapon was already dealing ninety-six percent of everything.
+    Rule { what: "searing", home: SlotKind::Weapon, level: Level::Mostly(55),
+        shared_with: &[SlotKind::Greaves],
+        budget: 0, target: 0,
+        carries: |d| does(d, |a| matches!(a, Action::Curse { kind: CurseKind::Searing, .. })) },
+
+    // Helmet - Economy. What the pools are for.
+    Rule { what: "Consume", home: SlotKind::Helmet, level: Level::Only, shared_with: &[],
+        budget: 0, target: 0, carries: |d| has(d, |t| matches!(t, Trigger::Consume { .. })) },
+    Rule { what: "GainEmpowerment", home: SlotKind::Helmet, level: Level::Only, shared_with: &[],
+        budget: 0, target: 0, carries: |d| does(d, |a| matches!(a, Action::GainEmpowerment(_))) },
+    Rule { what: "GainShield", home: SlotKind::Helmet, level: Level::Only, shared_with: &[],
+        budget: 0, target: 0, carries: |d| does(d, |a| matches!(a, Action::GainShield(_))) },
+    // The magic lane's pair is the helmet's and stays there. The physical
+    // lane's twins are somebody else's on purpose - a rewrite that gave one
+    // slot all four amplifiers would have put the whole of both lanes on the
+    // head.
+    Rule { what: "MindDamage", home: SlotKind::Helmet, level: Level::Only, shared_with: &[],
+        budget: 0, target: 0, carries: |d| does(d, |a| matches!(a, Action::MindDamage { .. })) },
+    // The mind lane's pair, on the same terms as the magic lane's. Dread is
+    // the head's outright; Insight income keeps a minority on a book, which is
+    // where a caster would look for it and the one place off the head that a
+    // pool has ever been banked.
+    Rule { what: "GainDread", home: SlotKind::Helmet, level: Level::Only, shared_with: &[],
+        budget: 0, target: 0, carries: |d| does(d, |a| matches!(a, Action::GainDread(_))) },
+    Rule { what: "Insight income", home: SlotKind::Helmet, level: Level::Mostly(80),
+        shared_with: &[], budget: 0, target: 0,
+        carries: |d| does(d, |a| matches!(a, Action::Gain { what: gm2d_core::piece::Resource::Insight, .. })) },
+    Rule { what: "mind_resist", home: SlotKind::Helmet, level: Level::Only, shared_with: &[],
+        budget: 0, target: 0, carries: |d| d.base.mind_resist != 0 },
+
+    // Chest - Reserve. Outlasting is its offence.
+    Rule { what: "Grow", home: SlotKind::Chest, level: Level::Only, shared_with: &[],
+        budget: 0, target: 0, carries: |d| does(d, |a| matches!(a, Action::Grow(_))) },
+    // Reflection is the body's attack and the body's alone. It is the one
+    // offensive verb that *is* outlasting - it pays only what the armour ate,
+    // so it does nothing on a board that dies fast - which is why it belongs
+    // to the slot the spec otherwise gives no way to hurt anybody.
+    Rule { what: "reflect", home: SlotKind::Chest, level: Level::Only, shared_with: &[],
+        budget: 0, target: 0, carries: |d| d.base.reflect != 0 },
+    Rule { what: "harden", home: SlotKind::Chest, level: Level::Only, shared_with: &[],
+        budget: 0, target: 0,
+        carries: |d| d.base.physical_harden != 0 || d.base.magic_harden != 0 },
+    Rule { what: "health above 15", home: SlotKind::Chest, level: Level::Mostly(70),
+        shared_with: &[], budget: 0, target: 0, carries: |d| d.base.health > 15 },
+    // Ballast rides in the `Grow` row rather than in one of its own: both turn
+    // a number into maximum health for the rest of the fight, and the only
+    // difference is where the number came from. A separate row would say the
+    // body has two mechanics here when it has one with two fundings.
+    Rule { what: "Ballast", home: SlotKind::Chest, level: Level::Only, shared_with: &[],
+        budget: 0, target: 0, carries: |d| does(d, |a| matches!(a, Action::Ballast(_))) },
+    // THE HUNDRED's three, each in the slot its chain taxes. A greaves grid
+    // spent on one item, a glove that opens twice, and a chest that makes the
+    // board one continuous thing.
+    Rule { what: "Bearing", home: SlotKind::Greaves, level: Level::Only, shared_with: &[],
+        budget: 0, target: 0,
+        carries: |d| matches!(d.effect.map(|e| e.kind), Some(EffectKind::Bearing)) },
+    Rule { what: "Overtake", home: SlotKind::Gloves, level: Level::Only, shared_with: &[],
+        budget: 0, target: 0,
+        carries: |d| matches!(d.effect.map(|e| e.kind), Some(EffectKind::Overtake)) },
+    Rule { what: "Commons", home: SlotKind::Chest, level: Level::Only, shared_with: &[],
+        budget: 0, target: 0,
+        carries: |d| matches!(d.effect.map(|e| e.kind), Some(EffectKind::Commons)) },
+    // Deflection is the body's, beside reflection and for the same reason:
+    // both are what a slot with no swing does about being hit. The feet keep a
+    // minority share, because footwork is also a way of not being hit.
+    //
+    // The spec asked for that minority on greaves *plating*, and it cannot be
+    // there: Plating floats into the helmet's grid, and a floating kind may
+    // carry no identity mechanic - `identity_carriers` holds that at zero. So
+    // it sits on a greaves mold, which is the feet's and only the feet's.
+    Rule { what: "GainDeflection", home: SlotKind::Chest, level: Level::Mostly(70),
+        shared_with: &[], budget: 0, target: 0,
+        carries: |d| does(d, |a| matches!(a, Action::GainDeflection(_))) },
+
+    // Gloves - Reaction. The hands answer.
+    Rule { what: "OnAdjacentActivate", home: SlotKind::Gloves, level: Level::Only, shared_with: &[],
+        budget: 0, target: 0, carries: |d| has(d, |t| matches!(t, Trigger::OnAdjacentActivate(_))) },
+    Rule { what: "PerAdjacentItem", home: SlotKind::Gloves, level: Level::Only, shared_with: &[],
+        budget: 0, target: 0, carries: |d| has(d, |t| matches!(t, Trigger::PerAdjacentItem { .. })) },
+    Rule { what: "Drain", home: SlotKind::Gloves, level: Level::Only, shared_with: &[],
+        budget: 0, target: 0, carries: |d| does(d, |a| matches!(a, Action::Drain { .. })) },
+    Rule { what: "StunStrongest", home: SlotKind::Gloves, level: Level::Only, shared_with: &[],
+        budget: 0, target: 0, carries: |d| does(d, |a| matches!(a, Action::StunStrongest { .. })) },
+    Rule { what: "DoubleAdjacentItemStat", home: SlotKind::Gloves, level: Level::Only,
+        shared_with: &[], budget: 0, target: 0,
+        carries: |d| effect_is(d, |e| matches!(e, EffectKind::DoubleAdjacentItemStat { .. })) },
+    Rule { what: "OnAlignedActivate", home: SlotKind::Gloves, level: Level::Mostly(70),
+        shared_with: &[], budget: 0, target: 0,
+        carries: |d| has(d, |t| matches!(t, Trigger::OnAlignedActivate(_))) },
+    // Spellblade is reaction-flavoured amplification: the hands answer a
+    // neighbour by sharpening what swings rather than by swinging themselves.
+    // The weapon keeps a minority share, on accessories, and it is counted up
+    // to rather than handed over - the same gate the helmet's empowerment has.
+    Rule { what: "GainSpellblade", home: SlotKind::Gloves, level: Level::Mostly(70),
+        shared_with: &[], budget: 0, target: 0,
+        carries: |d| does(d, |a| matches!(a, Action::GainSpellblade(_))) },
+    // Derail is a hand on the wire. The weapon keeps a minority share, which
+    // is Gloves' upstream in the bleed cycle - the weapon bleeds reaction -
+    // and it is where the Signalman's Orb carries it.
+    Rule { what: "Derail", home: SlotKind::Gloves, level: Level::Mostly(70),
+        shared_with: &[], budget: 0, target: 0,
+        carries: |d| does(d, |a| matches!(a, Action::Derail { .. })) },
+
+    // Greaves - Tempo. Who moves, how often, and first. The weapon keeps its
+    // own cadence tools; everything else gives them up.
+    Rule { what: "OnBattleStart", home: SlotKind::Greaves, level: Level::Only, shared_with: &[],
+        budget: 0, target: 0, carries: |d| has(d, |t| matches!(t, Trigger::OnBattleStart(_))) },
+    Rule { what: "speed_bonus outside the weapon", home: SlotKind::Greaves, level: Level::Only,
+        shared_with: &[SlotKind::Weapon], budget: 0, target: 0, carries: |d| d.speed_bonus != 0 },
+    // Gloves share this one. The bleed cycle has the hands bleeding into the
+    // feet, and §3.4 names the piece that does it: a reaction whose payout is
+    // tempo. Barring gloves outright made the slot's own designed bleed
+    // illegal, which is the table being stricter than the cycle it encodes.
+    Rule { what: "ReduceCooldown outside the weapon", home: SlotKind::Greaves, level: Level::Only,
+        shared_with: &[SlotKind::Weapon, SlotKind::Gloves], budget: 0, target: 0,
+        carries: |d| does(d, |a| matches!(a, Action::ReduceCooldown(_))) },
+    // The same row `ReduceCooldown` has, and for the same reason: the feet own
+    // cadence outside the weapon. The weapon's one is the Shunter's Orb.
+    // Gloves are *not* shared here, unlike the row above - that share exists
+    // because the hands' designed bleed is a reaction whose payout is tempo,
+    // and a shunt is not a reaction to anything.
+    Rule { what: "Shunt outside the weapon", home: SlotKind::Greaves, level: Level::Only,
+        shared_with: &[SlotKind::Weapon], budget: 0, target: 0,
+        carries: |d| does(d, |a| matches!(a, Action::Shunt { .. })) },
+    // Accrue is the head's, because income is. The body keeps a minority
+    // share: the chest is the one grid the cycle lets bleed economy.
+    Rule { what: "Accrue", home: SlotKind::Helmet, level: Level::Mostly(70),
+        shared_with: &[], budget: 0, target: 0,
+        carries: |d| does(d, |a| matches!(a, Action::Accrue { .. })) },
+    // Enchantments are every grid's, which is a change of mind and worth
+    // saying so.
+    //
+    // The table used to read "terrain is the body's and the feet's: a thing to
+    // stand on, or ground to cross. Nothing is laid under a helmet." That was
+    // true of *terrain* and it is why the word was wrong - only the greaves
+    // have ground under them. What the layer actually is, in every slot, is the
+    // thing worked into the gear from underneath, and there is no reason a
+    // helmet may not be enchanted.
+    //
+    // So the rule is kept rather than deleted, and it is kept vacuous on
+    // purpose: the row is here to say the decision was made, not forgotten.
+    Rule { what: "enchantment", home: SlotKind::Chest, level: Level::Only,
+        shared_with: &[SlotKind::Greaves, SlotKind::Helmet, SlotKind::Gloves, SlotKind::Weapon],
+        budget: 0, target: 0,
+        carries: |d| d.kind.is_enchantment() },
+    Rule { what: "frost, stun and misfire", home: SlotKind::Greaves, level: Level::Mostly(70),
+        shared_with: &[], budget: 0, target: 0,
+        carries: |d| does(d, |a| matches!(a, Action::Curse {
+            kind: CurseKind::Frost | CurseKind::Stun | CurseKind::Misfire, .. })) },
+];
+
+// --------------------------------------------------------------- the quotas
+
+/// Which pieces of a slot a quota is taken over.
+///
+/// The spec words the density quotas as "each slot's above-common pieces" and
+/// "every Epic or Legendary non-weapon piece", which reads as though component
+/// rarity had a spread. It does not: `RARE_AT` is 90 on a scale where full
+/// marks is the best a whole *item* can do, so a single component almost never
+/// clears it and only **ten pieces in the catalogue of 469** are above Common
+/// (helmet 2, chest 2, gloves 2, greaves 1, weapon 3). A quota over those ten
+/// would be satisfied by editing ten pieces and would mean nothing.
+///
+/// So the intent - "the more a component is worth, the more it should interact"
+/// - is kept and the measure is changed: the dearest third of each slot by
+/// `piece_rating`. That is the same sentence in a currency the catalogue
+/// actually has. The literal rarity rule survives as its own small test, which
+/// costs nothing and starts meaning something the day component ratings spread.
+#[derive(Copy, Clone)]
+enum Scope {
+    Whole,
+    /// The top `n` percent of the slot by component rating.
+    Dearest(usize),
+}
+
+/// A share of one slot that has to hold some property.
+struct Quota {
+    what: &'static str,
+    slot: SlotKind,
+    /// Inclusive percentage band the share must land in.
+    want: (usize, usize),
+    budget: usize,
+    target: usize,
+    holds: fn(&PieceDef) -> bool,
+    scope: Scope,
+}
+
+impl Quota {
+    fn pool(&self) -> Vec<&'static PieceDef> {
+        let mut mine: Vec<&'static PieceDef> =
+            CATALOG.iter().filter(|d| d.slot == self.slot).collect();
+        match self.scope {
+            Scope::Whole => mine,
+            Scope::Dearest(pct) => {
+                // Descending by rating, then by name so ties break the same way
+                // on every run - a quota that shuffles under itself is not a
+                // pin.
+                mine.sort_by(|a, b| {
+                    piece_rating(b).cmp(&piece_rating(a)).then_with(|| a.name.cmp(b.name))
+                });
+                mine.truncate((mine.len() * pct / 100).max(1));
+                mine
+            }
+        }
+    }
+
+    /// How many pieces would have to change for the share to land in the band.
+    fn distance(&self) -> usize {
+        let pool = self.pool();
+        if pool.is_empty() {
+            return 0;
+        }
+        let held = pool.iter().filter(|d| (self.holds)(d)).count();
+        let (lo, hi) = self.want;
+        let least = pool.len() * lo / 100;
+        let most = pool.len() * hi / 100;
+        if held < least {
+            least - held
+        } else {
+            held.saturating_sub(most)
+        }
+    }
+
+    fn share(&self) -> f64 {
+        let pool = self.pool();
+        if pool.is_empty() {
+            return 0.0;
+        }
+        100.0 * pool.iter().filter(|d| (self.holds)(d)).count() as f64 / pool.len() as f64
+    }
+}
+
+/// The filler quota this rewrite has to reach is 30%. The one it is aiming at
+/// afterwards is this, and getting there means writing mechanical content for
+/// roughly a hundred and forty pieces - which is a job of its own, not a rider
+/// on this one.
+const EVENTUAL_FILLER_PCT: usize = 15;
+
+/// How far each slot is from each quota today, read off `report_shape`. Lower a
+/// figure in the commit that earns it; never raise one.
+const QUOTA_BUDGETS: &[(SlotKind, &str, usize)] = &[
+    (SlotKind::Helmet, "expresses its own axis", 0),
+    (SlotKind::Helmet, "expresses its bleed axis", 0),
+    (SlotKind::Helmet, "plain flat-stat filler", 0),
+    (SlotKind::Helmet, "the dearest third interacts", 0),
+    (SlotKind::Chest, "expresses its own axis", 0),
+    (SlotKind::Chest, "expresses its bleed axis", 0),
+    (SlotKind::Chest, "plain flat-stat filler", 0),
+    (SlotKind::Chest, "the dearest third interacts", 0),
+    (SlotKind::Chest, "pool-spend texture", 0),
+    (SlotKind::Gloves, "expresses its own axis", 0),
+    (SlotKind::Gloves, "expresses its bleed axis", 0),
+    (SlotKind::Gloves, "plain flat-stat filler", 0),
+    (SlotKind::Gloves, "the dearest third interacts", 0),
+    (SlotKind::Gloves, "pool-spend texture", 0),
+    (SlotKind::Greaves, "expresses its own axis", 0),
+    (SlotKind::Greaves, "expresses its bleed axis", 0),
+    (SlotKind::Greaves, "plain flat-stat filler", 0),
+    (SlotKind::Greaves, "the dearest third interacts", 0),
+    (SlotKind::Greaves, "pool-spend texture", 0),
+    (SlotKind::Weapon, "the dearest third interacts", 0),
+    (SlotKind::Weapon, "pool-spend texture", 0),
+];
+
+fn budget_for(slot: SlotKind, what: &str) -> usize {
+    QUOTA_BUDGETS
+        .iter()
+        .find(|(s, w, _)| *s == slot && *w == what)
+        .map(|(_, _, n)| *n)
+        .unwrap_or_else(|| panic!("no budget recorded for {:?} {}", slot, what))
+}
+
+/// Built rather than declared, because every non-weapon slot gets the same four
+/// quotas and only the axis differs. Spelling them out five times invites the
+/// copy that says "gloves" and means greaves.
+fn quotas() -> Vec<Quota> {
+    let mut out = Vec::new();
+    for slot in SlotKind::ALL {
+        let (primary, bleed) = axes(slot);
+        if slot != SlotKind::Weapon {
+            let what = "expresses its own axis";
+            out.push(Quota { what, slot, want: (60, 100),
+                budget: budget_for(slot, what), target: 0, holds: primary, scope: Scope::Whole });
+            let what = "expresses its bleed axis";
+            out.push(Quota { what, slot, want: (20, 25),
+                budget: budget_for(slot, what), target: 0, holds: bleed, scope: Scope::Whole });
+            // The settled figure is 30% now and 15% when the rewrite is done.
+            // Holding 15% from the start means writing mechanical content for
+            // about 140 pieces before any axis lands, which is the wrong order.
+            let what = "plain flat-stat filler";
+            out.push(Quota { what, slot, want: (0, 30),
+                budget: budget_for(slot, what), target: 0, holds: inert, scope: Scope::Whole });
+        }
+        // Part II's density quotas apply to every slot, weapon included.
+        let what = "the dearest third interacts";
+        out.push(Quota { what, slot, want: (35, 100),
+            budget: budget_for(slot, what), target: 0, holds: interacts, scope: Scope::Dearest(33) });
+        if slot != SlotKind::Helmet {
+            let what = "pool-spend texture";
+            out.push(Quota { what, slot, want: (0, 15),
+                budget: budget_for(slot, what), target: 0, holds: spends_a_pool, scope: Scope::Whole });
+        }
+    }
+    out
+}
+
+// ---------------------------------------------------------------- the tests
+
+/// Identity mechanics may not ride a kind that can leave its grid.
+///
+/// This is the rule that makes the exclusivity table mean something on the
+/// board. Without it "greaves-exclusive" is a claim about where a piece was
+/// written, and a greaves Material carrying `OnBattleStart` sits in the gloves
+/// grid making a liar of it.
+fn identity_carriers() -> Vec<(&'static str, &'static str)> {
+    let mut out = Vec::new();
+    for d in CATALOG.iter().filter(|d| floats(d.kind)) {
+        for r in RULES {
+            if (r.carries)(d) {
+                out.push((d.name, r.what));
+            }
+        }
+    }
+    out.sort_unstable();
+    out
+}
+
+/// Pieces of a floating kind carrying something the table calls an identity
+/// mechanic. It was forty-three, and it is none - which is what makes the rest
+/// of the table a claim about the board rather than about the source. Keep it
+/// at zero: a Material or a Plating may carry stats, pools, resistances and
+/// `Watch`, and nothing that belongs to a slot.
+const FLOATING_CARRIER_BUDGET: usize = 0;
+
+/// §10.2 as written: rarity buys interestingness. Exactly four non-weapon
+/// pieces are epic or better - two helmets, one chest, one greave - and today
+/// all four are dull, which is the whole of this rule's distance. A small rule,
+/// but it is the exact sentence the spec asks for and it costs nothing to hold.
+fn dull_treasures() -> Vec<&'static str> {
+    let mut out: Vec<&'static str> = CATALOG
+        .iter()
+        .filter(|d| d.slot != SlotKind::Weapon)
+        .filter(|d| matches!(rarity(d), Rarity::Epic | Rarity::Legendary))
+        .filter(|d| !interacts(d))
+        .map(|d| d.name)
+        .collect();
+    out.sort_unstable();
+    out
+}
+
+const DULL_TREASURE_BUDGET: usize = 0;
+
+#[test]
+fn the_catalog_stays_within_its_budgets() {
+    let mut over = Vec::new();
+    for r in RULES {
+        let n = r.offenders().len();
+        if n > r.budget {
+            over.push(format!(
+                "{} ({:?}): {} pieces out of place, budget {} - {}",
+                r.what,
+                r.home,
+                n,
+                r.budget,
+                r.offenders().join(", ")
+            ));
+        }
+    }
+    for q in quotas() {
+        let d = q.distance();
+        if d > q.budget {
+            over.push(format!(
+                "{:?} {}: {:.1}% against a wanted {}-{}%, {} pieces away, budget {}",
+                q.slot, q.what, q.share(), q.want.0, q.want.1, d, q.budget
+            ));
+        }
+    }
+    let floating = identity_carriers();
+    if floating.len() > FLOATING_CARRIER_BUDGET {
+        over.push(format!(
+            "{} floating pieces carry an identity mechanic, budget {} - {}",
+            floating.len(),
+            FLOATING_CARRIER_BUDGET,
+            floating.iter().map(|(n, w)| format!("{n} ({w})")).collect::<Vec<_>>().join(", ")
+        ));
+    }
+    let dull = dull_treasures();
+    if dull.len() > DULL_TREASURE_BUDGET {
+        over.push(format!(
+            "{} epic or legendary non-weapon pieces do nothing positional, budget {} - {}",
+            dull.len(),
+            DULL_TREASURE_BUDGET,
+            dull.join(", ")
+        ));
+    }
+    assert!(over.is_empty(), "the catalogue moved away from its shape:\n  {}", over.join("\n  "));
+}
+
+#[test]
+#[ignore]
+fn the_catalog_keeps_every_rule() {
+    // The finish line. Red until the sweep lands, and the thing that says it
+    // has.
+    let mut broken = Vec::new();
+    for r in RULES {
+        let o = r.offenders();
+        if o.len() > r.target {
+            broken.push(format!("{} belongs to {:?}: {}", r.what, r.home, o.join(", ")));
+        }
+    }
+    for q in quotas() {
+        if q.distance() > q.target {
+            broken.push(format!(
+                "{:?} {}: {:.1}%, wanted {}-{}%",
+                q.slot, q.what, q.share(), q.want.0, q.want.1
+            ));
+        }
+    }
+    for (name, what) in identity_carriers() {
+        broken.push(format!("{name} is a floating kind carrying {what}"));
+    }
+    for name in dull_treasures() {
+        broken.push(format!("{name} is epic or better and does nothing positional"));
+    }
+    assert!(broken.is_empty(), "{} rules unmet:\n  {}", broken.len(), broken.join("\n  "));
+}
+
+#[test]
+fn no_budget_is_slack() {
+    // A budget above the real distance is a rule with nothing behind it: two
+    // pieces could go off-axis before anything complained. So every budget has
+    // to be exactly today's figure, which also means this test fails the moment
+    // a sweep improves something - on purpose. It is the same re-pinning the
+    // rarity distribution asks for, and the message says what to write.
+    let mut slack = Vec::new();
+    for r in RULES {
+        let n = r.offenders().len();
+        if n < r.budget {
+            slack.push(format!("{} is budgeted {} and costs {n} - lower it", r.what, r.budget));
+        }
+    }
+    for q in quotas() {
+        let d = q.distance();
+        if d < q.budget {
+            slack.push(format!(
+                "{:?} {} is budgeted {} and costs {d} - lower it",
+                q.slot, q.what, q.budget
+            ));
+        }
+    }
+    if identity_carriers().len() < FLOATING_CARRIER_BUDGET {
+        slack.push(format!(
+            "FLOATING_CARRIER_BUDGET is {} and costs {} - lower it",
+            FLOATING_CARRIER_BUDGET,
+            identity_carriers().len()
+        ));
+    }
+    if dull_treasures().len() < DULL_TREASURE_BUDGET {
+        slack.push(format!(
+            "DULL_TREASURE_BUDGET is {} and costs {} - lower it",
+            DULL_TREASURE_BUDGET,
+            dull_treasures().len()
+        ));
+    }
+    assert!(
+        slack.is_empty(),
+        "the catalogue improved and the budgets did not follow:\n  {}",
+        slack.join("\n  ")
+    );
+}
+
+/// Rules landed before the pieces that will satisfy them.
+///
+/// The Switchyard lands its four verbs one milestone ahead of the six
+/// components that speak them, so that the weights price nothing while they
+/// are being settled and no creature re-gears
+/// (`design/the-switchyard.md` A2.5, Part D M4). A row with no carriers is
+/// exactly what `every_rule_names_a_mechanic_that_exists` exists to catch, so
+/// the exemption is written down with the milestone that ends it rather than
+/// the lint being loosened.
+///
+/// **M5 empties this list.** It cannot be left behind by accident:
+/// `no_rule_waits_for_a_piece_that_has_arrived` goes red the moment any of
+/// these finds a carrier.
+/// Empty since M5, and it stays empty.
+///
+/// It held the yard's four verbs for exactly one milestone, which is what it
+/// was for: M4 landed the rows so the weights could be settled while they
+/// priced nothing, and M5 landed the six components that speak them. The list
+/// is kept rather than deleted because the next mission that wants to settle
+/// a weight before its carriers exist should find the mechanism already here
+/// and already ratcheted, rather than reinventing it or loosening the lint.
+/// **Three, until F6.** THE HUNDRED lands its effects at F5 and the five
+/// components that speak them at F6, for the reason the Switchyard landed four
+/// verbs before their six: a weight settled after a creature is geared against
+/// it re-gears every creature on three settings. The mirror below goes red the
+/// day any of them finds a carrier, which puts the rows back under the lint.
+/// **Empty since F6.** It held THE HUNDRED's three for one milestone, which is
+/// what the mechanism is for.
+const RULES_AWAITING_THEIR_PIECES: &[&str] = &[];
+
+#[test]
+fn every_rule_names_a_mechanic_that_exists() {
+    // A rule matching nothing at all is a typo that would sit here reading
+    // green forever.
+    for r in RULES.iter().filter(|r| !RULES_AWAITING_THEIR_PIECES.contains(&r.what)) {
+        assert!(
+            CATALOG.iter().any(|d| (r.carries)(d)),
+            "no piece in the catalogue carries {} - is the predicate right?",
+            r.what
+        );
+    }
+    for q in quotas() {
+        assert!(!q.pool().is_empty(), "{:?} {} scores an empty pool", q.slot, q.what);
+    }
+}
+
+/// The other half of the exemption, and the half that expires.
+///
+/// A name stays on `RULES_AWAITING_THEIR_PIECES` only while nothing carries
+/// it. The moment a component speaks one of the yard's verbs this goes red and
+/// the name has to come off, which puts the row back under the lint it was
+/// exempted from. An exemption that outlives its reason is a lint with a hole
+/// in it.
+#[test]
+fn no_rule_waits_for_a_piece_that_has_arrived() {
+    for name in RULES_AWAITING_THEIR_PIECES {
+        let r = RULES
+            .iter()
+            .find(|r| &r.what == name)
+            .unwrap_or_else(|| panic!("{name} is exempted and is not a rule"));
+        assert!(
+            !CATALOG.iter().any(|d| (r.carries)(d)),
+            "{name} has its pieces now - take it off RULES_AWAITING_THEIR_PIECES"
+        );
+    }
+}
+
+#[test]
+#[ignore]
+fn report_shape() {
+    println!("\n## Exclusivity - pieces out of place\n");
+    println!("{:<44}{:>9}{:>9}{:>9}", "mechanic", "home", "away", "budget");
+    for r in RULES {
+        let carried = CATALOG.iter().filter(|d| (r.carries)(d)).count();
+        let home = CATALOG.iter().filter(|d| (r.carries)(d) && d.slot == r.home).count();
+        println!(
+            "{:<44}{:>4}/{:<4}{:>9}{:>9}",
+            r.what,
+            home,
+            carried,
+            r.offenders().len(),
+            r.budget
+        );
+    }
+
+    println!("\n## Rarity of the catalogue, per slot\n");
+    println!("{:<12}{:>9}{:>9}{:>9}{:>9}{:>9}", "slot", "common", "rare", "epic", "legend", "total");
+    for slot in SlotKind::ALL {
+        let mine: Vec<_> = CATALOG.iter().filter(|d| d.slot == slot).collect();
+        let n = |r: Rarity| mine.iter().filter(|d| rarity(d) == r).count();
+        println!(
+            "{:<12}{:>9}{:>9}{:>9}{:>9}{:>9}",
+            format!("{:?}", slot),
+            n(Rarity::Common),
+            n(Rarity::Rare),
+            n(Rarity::Epic),
+            n(Rarity::Legendary),
+            mine.len()
+        );
+    }
+
+    println!(
+        "\n## Quotas  (filler is held at 30% for this rewrite, {}% after it)\n",
+        EVENTUAL_FILLER_PCT
+    );
+    println!(
+        "{:<12}{:<34}{:>7}{:>9}{:>11}{:>7}",
+        "slot", "quota", "of", "share", "wanted", "away"
+    );
+    for q in quotas() {
+        println!(
+            "{:<12}{:<34}{:>7}{:>8.1}%{:>10}{:>7}",
+            format!("{:?}", q.slot),
+            q.what,
+            q.pool().len(),
+            q.share(),
+            format!("{}-{}%", q.want.0, q.want.1),
+            q.distance()
+        );
+    }
+
+    let floating = identity_carriers();
+    println!("\n## Identity mechanics on floating kinds: {}\n", floating.len());
+    for (name, what) in &floating {
+        println!("  {:<32}{}", name, what);
+    }
+}
+
+// ------------------------------------------------- what every creature wears
+
+/// Every creature's gear at every difficulty, as one line per placement.
+///
+/// This exists because "landed inert" is a claim about the ladder and needs a
+/// measurement rather than an argument. `stepped_component` sorts a footprint
+/// family by `monster_value` and steps along it (`combat.rs:292`), so a single
+/// appended sibling can re-dress every creature in that family on Easy, Hard
+/// and Insane without touching a line of any monster's own table
+/// (`the-unwinding.md` #19). Medium is gear-as-written and is dumped too, so
+/// the fixture is the whole of what a creature fights in.
+///
+/// Written by `report_gear_at`, which is the only way to re-baseline it.
+fn gear_at_every_difficulty() -> String {
+    use gm2d_core::combat::{Difficulty, ALTERNATES, CREVICE, LADDER};
+
+    let mut out = String::new();
+    for (table, whence) in
+        [(LADDER, "LADDER"), (ALTERNATES, "ALTERNATES"), (CREVICE, "CREVICE")]
+    {
+        for (i, m) in table.iter().enumerate() {
+            for d in Difficulty::ALL {
+                for (name, slot, x, y, rot) in m.gear_at(*d) {
+                    out.push_str(&format!(
+                        "{whence}[{i}] {} {} {:?} {},{} r{}\n",
+                        m.name,
+                        d.name(),
+                        slot,
+                        x,
+                        y,
+                        rot
+                    ));
+                    out.push_str(&format!("    {name}\n"));
+                }
+            }
+        }
+    }
+    out
+}
+
+/// The ladder is dressed exactly as it was when this fixture was taken.
+///
+/// Re-baseline only by running `report_gear_at` and saying in the commit which
+/// creature moved and why. A diff here is never noise: it means a creature is
+/// fighting in different equipment than it was, on some setting, and nothing
+/// in a creature's own table said so.
+///
+/// **Re-baselined once, at the Switchyard's M9**, when nine creatures went
+/// from no board to a packed one. Every changed line in that diff named one of
+/// those nine and no `LADDER` creature moved at all - which is the thing the
+/// fixture is for, because a catalogue that grew by eight components between
+/// M0 and M9 had eight chances to re-sort a footprint family underneath
+/// somebody nobody was editing.
+/// **Re-baselined at THE HUNDRED's F12**, and it is the second legitimate one.
+/// The fixture grew from 6,216 placements to **6,744** and **nothing was
+/// removed**: all 528 new lines belong to THE SURVEYOR, THE DROVER, THE
+/// DRIVEN, THE COMMISSIONER and THE PARISH, who had no board until that
+/// milestone borrowed one for each of them. No creature that had a board
+/// changed what it wears, on any of the four settings.
+///
+#[test]
+fn no_creature_changed_what_it_wears() {
+    let want = include_str!("fixtures/gear_at.txt");
+    let got = gear_at_every_difficulty();
+    if want != got {
+        let (mut first, mut n) = (String::new(), 0usize);
+        for (a, b) in want.lines().zip(got.lines()) {
+            if a != b {
+                n += 1;
+                if first.is_empty() {
+                    first = format!("fixture: {a}\n     now: {b}");
+                }
+            }
+        }
+        panic!(
+            "{n} placements moved (fixture {} lines, now {}). First:\n{first}\n\
+             Re-baseline with:\n  cargo test -p gm2d-core --test catalog_shape \
+             -- --ignored --nocapture report_gear_at",
+            want.lines().count(),
+            got.lines().count()
+        );
+    }
+}
+
+/// Re-baseline the fixture above - and only when asked twice.
+///
+/// `--ignored` on this binary is the ratchet's own printer command
+/// (`CLAUDE.md` §5), so a printer that wrote a fixture as a side effect would
+/// erase the evidence every time somebody measured the catalogue. It writes
+/// only under `REBASELINE_GEAR_AT=1`, and says what it would have written
+/// otherwise:
+///
+///     REBASELINE_GEAR_AT=1 cargo test -p gm2d-core --test catalog_shape \
+///       -- --ignored --nocapture report_gear_at
+#[test]
+#[ignore]
+fn report_gear_at() {
+    let path = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/fixtures/gear_at.txt");
+    let body = gear_at_every_difficulty();
+    let placements = body.lines().count() / 2;
+    if std::env::var("REBASELINE_GEAR_AT").as_deref() != Ok("1") {
+        println!(
+            "{placements} placements; fixture holds {}. \
+             Set REBASELINE_GEAR_AT=1 to overwrite {path}",
+            include_str!("fixtures/gear_at.txt").lines().count() / 2
+        );
+        return;
+    }
+    std::fs::create_dir_all(concat!(env!("CARGO_MANIFEST_DIR"), "/tests/fixtures")).unwrap();
+    std::fs::write(path, &body).unwrap();
+    println!("wrote {placements} placements to {path}");
+}

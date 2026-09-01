@@ -1,0 +1,2038 @@
+# gm2d golden combat fixture, version 1
+#
+# Captured from sgilson7/gear-master @ e93a391, before GM2D deleted the
+# campaign. Every board below is written as placements so it can be rebuilt
+# without `Run`; `golden_combat.rs` does exactly that and asserts the
+# transcript still comes out character for character.
+#
+# A diff here means combat changed. That is either the bug or the commit
+# message.
+
+== scenario: preset-vs-cave-rat
+-- monster: Cave Rat
+-- difficulty: Easy
+-- name_seed: 6840143426475589633
+-- board
+Steel Frame|Helmet|0|0|0
+Crest of Vigor|Helmet|3|0|0
+Iron Plating|Helmet|0|2|0
+Visor of Focus|Helmet|0|4|0
+Padded Base|Chest|0|0|0
+Hollow Weave|Chest|5|2|1
+Chain Layer|Chest|0|3|0
+Woven Underlayer|Chest|0|4|0
+Hide Base|Chest|3|6|0
+Keystone Base|Chest|0|0|0
+Leather Material|Gloves|0|0|0
+Gripping Mold|Gloves|2|0|0
+Steel Material|Gloves|0|4|0
+Gauntlet Mold|Gloves|2|4|0
+Runed Material|Greaves|0|0|0
+Greave Mold|Greaves|2|0|0
+Boiled Leather|Greaves|0|4|0
+Runner's Mold|Greaves|3|4|0
+Balanced Grip|Weapon|0|0|0
+Runed Edge|Weapon|1|0|0
+Ruby Inlay|Weapon|2|0|0
+Balance Weight|Weapon|2|2|0
+-- locks
+-- log
+   900 0 Activate { side: Enemy, item: "bite", index: 0 }
+   900 0 Hit { by: Enemy, damage: 6, absorbed: 0, target_health: 489, target_armor: 0 }
+  1250 0 Regen { side: Player, amount: 1, health: 490 }
+  1500 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+  1500 0 Hit { by: Player, damage: 61, absorbed: 0, target_health: -14, target_armor: 0 }
+  1500 0 Fell { side: Enemy }
+  1500 0 End { outcome: Victory }
+outcome Victory in 1500ms
+
+== scenario: preset-vs-rust-golem
+-- monster: Rust Golem
+-- difficulty: Easy
+-- name_seed: 6840143426475589633
+-- board
+Steel Frame|Helmet|0|0|0
+Crest of Vigor|Helmet|3|0|0
+Iron Plating|Helmet|0|2|0
+Visor of Focus|Helmet|0|4|0
+Padded Base|Chest|0|0|0
+Hollow Weave|Chest|5|2|1
+Chain Layer|Chest|0|3|0
+Woven Underlayer|Chest|0|4|0
+Hide Base|Chest|3|6|0
+Keystone Base|Chest|0|0|0
+Leather Material|Gloves|0|0|0
+Gripping Mold|Gloves|2|0|0
+Steel Material|Gloves|0|4|0
+Gauntlet Mold|Gloves|2|4|0
+Runed Material|Greaves|0|0|0
+Greave Mold|Greaves|2|0|0
+Boiled Leather|Greaves|0|4|0
+Runner's Mold|Greaves|3|4|0
+Balanced Grip|Weapon|0|0|0
+Runed Edge|Weapon|1|0|0
+Ruby Inlay|Weapon|2|0|0
+Balance Weight|Weapon|2|2|0
+-- locks
+-- log
+  1500 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+  1500 0 Hit { by: Player, damage: 61, absorbed: 0, target_health: 196, target_armor: 0 }
+  3000 0 Activate { side: Player, item: "Chained Finger", index: 3 }
+  3000 0 GainArmor { side: Player, amount: 6, total: 6 }
+  3000 0 GainMana { side: Player, amount: 2, total: 2, accrued: false }
+  3000 0 Activate { side: Player, item: "Shielded Bracer", index: 4 }
+  3000 0 GainArmor { side: Player, amount: 9, total: 15 }
+  3000 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+  3000 0 Hit { by: Player, damage: 61, absorbed: 0, target_health: 140, target_armor: 0 }
+  3200 0 Activate { side: Player, item: "Hastening Walker", index: 6 }
+  3200 0 GainArmor { side: Player, amount: 17, total: 32 }
+  3200 0 GainMana { side: Player, amount: 2, total: 4, accrued: false }
+  3200 0 Hastened { side: Player, item: "Hastening Walker", by_ms: 150 }
+  3200 0 Cast { side: Enemy, paid: false, cost: 3, remaining: 0 }
+  3200 0 Activate { side: Enemy, item: "Martyr's Sliver", index: 0 }
+  3200 0 Hit { by: Enemy, damage: 61, absorbed: 32, target_health: 466, target_armor: 0 }
+  3200 0 Hit { by: Enemy, damage: 4, absorbed: 0, target_health: 462, target_armor: 0 }
+  3200 0 Hit { by: Enemy, damage: 4, absorbed: 0, target_health: 458, target_armor: 0 }
+  3200 0 Hit { by: Enemy, damage: 4, absorbed: 0, target_health: 454, target_armor: 0 }
+  3200 0 Hit { by: Enemy, damage: 4, absorbed: 0, target_health: 450, target_armor: 0 }
+  3200 0 Hit { by: Enemy, damage: 4, absorbed: 0, target_health: 446, target_armor: 0 }
+  3200 0 Hit { by: Enemy, damage: 4, absorbed: 0, target_health: 442, target_armor: 0 }
+  3350 0 Activate { side: Player, item: "Rimebound Sole", index: 5 }
+  3350 0 GainArmor { side: Player, amount: 12, total: 12 }
+  3350 0 Hastened { side: Player, item: "Rimebound Sole", by_ms: 200 }
+  3350 0 Cursed { on: Enemy, kind: Frost, duration_ms: 1000, stacks: 1 }
+  3550 0 Regen { side: Player, amount: 1, health: 443 }
+  3900 0 Regen { side: Player, amount: 1, health: 444 }
+  4000 0 Activate { side: Player, item: "Charged Brow", index: 0 }
+  4000 0 GainArmor { side: Player, amount: 29, total: 41 }
+  4000 0 GainMana { side: Player, amount: 9, total: 13, accrued: false }
+  4200 0 Regen { side: Player, amount: 1, health: 445 }
+  4500 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+  4500 0 Hit { by: Player, damage: 61, absorbed: 0, target_health: 84, target_armor: 0 }
+  4550 0 Regen { side: Player, amount: 1, health: 446 }
+  4900 0 Regen { side: Player, amount: 1, health: 447 }
+  5000 0 Activate { side: Player, item: "Warded Chassis", index: 1 }
+  5000 0 GainArmor { side: Player, amount: 46, total: 87 }
+  5000 0 GainArmor { side: Player, amount: 6, total: 93 }
+  5000 0 GainArmor { side: Player, amount: 6, total: 99 }
+  5000 0 Activate { side: Player, item: "Hollow Chassis", index: 2 }
+  5000 0 GainArmor { side: Player, amount: 12, total: 111 }
+  5000 0 GainArmor { side: Player, amount: 3, total: 114 }
+  5200 0 Regen { side: Player, amount: 1, health: 448 }
+  5550 0 Regen { side: Player, amount: 1, health: 449 }
+  5900 0 Regen { side: Player, amount: 1, health: 450 }
+  6000 0 Activate { side: Player, item: "Chained Finger", index: 3 }
+  6000 0 GainArmor { side: Player, amount: 6, total: 120 }
+  6000 0 GainMana { side: Player, amount: 2, total: 15, accrued: false }
+  6000 0 Activate { side: Player, item: "Shielded Bracer", index: 4 }
+  6000 0 GainArmor { side: Player, amount: 9, total: 129 }
+  6000 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+  6000 0 Hit { by: Player, damage: 61, absorbed: 0, target_health: 28, target_armor: 0 }
+  6200 0 Regen { side: Player, amount: 1, health: 451 }
+  6250 0 Activate { side: Player, item: "Hastening Walker", index: 6 }
+  6250 0 GainArmor { side: Player, amount: 17, total: 146 }
+  6250 0 GainMana { side: Player, amount: 2, total: 17, accrued: false }
+  6250 0 Hastened { side: Player, item: "Hastening Walker", by_ms: 150 }
+  6450 0 Activate { side: Player, item: "Rimebound Sole", index: 5 }
+  6450 0 GainArmor { side: Player, amount: 12, total: 158 }
+  6450 0 Hastened { side: Player, item: "Rimebound Sole", by_ms: 200 }
+  6450 0 Cursed { on: Enemy, kind: Frost, duration_ms: 1000, stacks: 1 }
+  6550 0 Regen { side: Player, amount: 1, health: 452 }
+  6900 0 Regen { side: Player, amount: 1, health: 453 }
+  7200 0 Regen { side: Player, amount: 1, health: 454 }
+  7400 0 Cast { side: Enemy, paid: false, cost: 3, remaining: 0 }
+  7400 0 Activate { side: Enemy, item: "Martyr's Sliver", index: 0 }
+  7400 0 Hit { by: Enemy, damage: 61, absorbed: 61, target_health: 454, target_armor: 97 }
+  7400 0 Hit { by: Enemy, damage: 4, absorbed: 4, target_health: 454, target_armor: 93 }
+  7400 0 Hit { by: Enemy, damage: 4, absorbed: 4, target_health: 454, target_armor: 89 }
+  7400 0 Hit { by: Enemy, damage: 4, absorbed: 4, target_health: 454, target_armor: 85 }
+  7400 0 Hit { by: Enemy, damage: 4, absorbed: 4, target_health: 454, target_armor: 81 }
+  7400 0 Hit { by: Enemy, damage: 4, absorbed: 4, target_health: 454, target_armor: 77 }
+  7400 0 Hit { by: Enemy, damage: 4, absorbed: 4, target_health: 454, target_armor: 73 }
+  7500 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+  7500 0 Hit { by: Player, damage: 61, absorbed: 0, target_health: -28, target_armor: 0 }
+  7500 0 Fell { side: Enemy }
+  7500 0 End { outcome: Victory }
+outcome Victory in 7500ms
+
+== scenario: preset-vs-warded-idol
+-- monster: Warded Idol
+-- difficulty: Easy
+-- name_seed: 6840143426475589633
+-- board
+Steel Frame|Helmet|0|0|0
+Crest of Vigor|Helmet|3|0|0
+Iron Plating|Helmet|0|2|0
+Visor of Focus|Helmet|0|4|0
+Padded Base|Chest|0|0|0
+Hollow Weave|Chest|5|2|1
+Chain Layer|Chest|0|3|0
+Woven Underlayer|Chest|0|4|0
+Hide Base|Chest|3|6|0
+Keystone Base|Chest|0|0|0
+Leather Material|Gloves|0|0|0
+Gripping Mold|Gloves|2|0|0
+Steel Material|Gloves|0|4|0
+Gauntlet Mold|Gloves|2|4|0
+Runed Material|Greaves|0|0|0
+Greave Mold|Greaves|2|0|0
+Boiled Leather|Greaves|0|4|0
+Runner's Mold|Greaves|3|4|0
+Balanced Grip|Weapon|0|0|0
+Runed Edge|Weapon|1|0|0
+Ruby Inlay|Weapon|2|0|0
+Balance Weight|Weapon|2|2|0
+-- locks
+-- log
+  1500 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+  1500 0 Hit { by: Player, damage: 61, absorbed: 0, target_health: 331, target_armor: 0 }
+  2000 0 Regen { side: Enemy, amount: 1, health: 332 }
+  2500 0 Regen { side: Enemy, amount: 1, health: 333 }
+  3000 0 Regen { side: Enemy, amount: 1, health: 334 }
+  3000 0 Activate { side: Player, item: "Chained Finger", index: 3 }
+  3000 0 GainArmor { side: Player, amount: 6, total: 6 }
+  3000 0 GainMana { side: Player, amount: 2, total: 2, accrued: false }
+  3000 0 Activate { side: Player, item: "Shielded Bracer", index: 4 }
+  3000 0 GainArmor { side: Player, amount: 9, total: 15 }
+  3000 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+  3000 0 Hit { by: Player, damage: 61, absorbed: 0, target_health: 278, target_armor: 0 }
+  3200 0 Activate { side: Player, item: "Hastening Walker", index: 6 }
+  3200 0 GainArmor { side: Player, amount: 17, total: 32 }
+  3200 0 GainMana { side: Player, amount: 2, total: 4, accrued: false }
+  3200 0 Hastened { side: Player, item: "Hastening Walker", by_ms: 150 }
+  3350 0 Activate { side: Player, item: "Rimebound Sole", index: 5 }
+  3350 0 GainArmor { side: Player, amount: 12, total: 44 }
+  3350 0 Hastened { side: Player, item: "Rimebound Sole", by_ms: 200 }
+  3350 0 Cursed { on: Enemy, kind: Frost, duration_ms: 150, stacks: 1 }
+  3500 0 Regen { side: Enemy, amount: 1, health: 279 }
+  3500 0 Activate { side: Enemy, item: "Clustered Visage", index: 0 }
+  3500 0 GainArmor { side: Enemy, amount: 17, total: 17 }
+  3500 0 GainMana { side: Enemy, amount: 2, total: 2, accrued: false }
+  4000 0 Regen { side: Enemy, amount: 1, health: 280 }
+  4000 0 Activate { side: Player, item: "Charged Brow", index: 0 }
+  4000 0 GainArmor { side: Player, amount: 29, total: 73 }
+  4000 0 GainMana { side: Player, amount: 9, total: 13, accrued: false }
+  4500 0 Regen { side: Enemy, amount: 1, health: 281 }
+  4500 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+  4500 0 Hit { by: Player, damage: 61, absorbed: 17, target_health: 242, target_armor: 0 }
+  4600 0 Activate { side: Enemy, item: "Searing Chassis", index: 1 }
+  4600 0 GainArmor { side: Enemy, amount: 10, total: 10 }
+  4600 0 ManaCheck { side: Enemy, cost: 4, paid: false, remaining: 2 }
+  4600 0 GainArmor { side: Enemy, amount: 4, total: 14 }
+  4600 0 Activate { side: Enemy, item: "Heavy Blade", index: 2 }
+  4600 0 Hit { by: Enemy, damage: 53, absorbed: 53, target_health: 495, target_armor: 20 }
+  5000 0 Regen { side: Enemy, amount: 1, health: 243 }
+  5000 0 Activate { side: Player, item: "Warded Chassis", index: 1 }
+  5000 0 GainArmor { side: Player, amount: 46, total: 66 }
+  5000 0 GainArmor { side: Player, amount: 6, total: 72 }
+  5000 0 GainArmor { side: Player, amount: 6, total: 78 }
+  5000 0 Activate { side: Player, item: "Hollow Chassis", index: 2 }
+  5000 0 GainArmor { side: Player, amount: 12, total: 90 }
+  5000 0 GainArmor { side: Player, amount: 3, total: 93 }
+  5500 0 Regen { side: Enemy, amount: 1, health: 244 }
+  6000 0 Regen { side: Enemy, amount: 1, health: 245 }
+  6000 0 Activate { side: Player, item: "Chained Finger", index: 3 }
+  6000 0 GainArmor { side: Player, amount: 6, total: 99 }
+  6000 0 GainMana { side: Player, amount: 2, total: 15, accrued: false }
+  6000 0 Activate { side: Player, item: "Shielded Bracer", index: 4 }
+  6000 0 GainArmor { side: Player, amount: 9, total: 108 }
+  6000 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+  6000 0 Hit { by: Player, damage: 61, absorbed: 14, target_health: 203, target_armor: 0 }
+  6250 0 Activate { side: Player, item: "Hastening Walker", index: 6 }
+  6250 0 GainArmor { side: Player, amount: 17, total: 125 }
+  6250 0 GainMana { side: Player, amount: 2, total: 17, accrued: false }
+  6250 0 Hastened { side: Player, item: "Hastening Walker", by_ms: 150 }
+  6450 0 Activate { side: Player, item: "Rimebound Sole", index: 5 }
+  6450 0 GainArmor { side: Player, amount: 12, total: 137 }
+  6450 0 Hastened { side: Player, item: "Rimebound Sole", by_ms: 200 }
+  6450 0 Cursed { on: Enemy, kind: Frost, duration_ms: 150, stacks: 1 }
+  6500 0 Regen { side: Enemy, amount: 1, health: 204 }
+  6950 0 Activate { side: Enemy, item: "Clustered Visage", index: 0 }
+  6950 0 GainArmor { side: Enemy, amount: 17, total: 17 }
+  6950 0 GainMana { side: Enemy, amount: 2, total: 4, accrued: false }
+  7000 0 Regen { side: Enemy, amount: 1, health: 205 }
+  7500 0 Regen { side: Enemy, amount: 1, health: 206 }
+  7500 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+  7500 0 Hit { by: Player, damage: 61, absorbed: 17, target_health: 167, target_armor: 0 }
+  8000 0 Regen { side: Enemy, amount: 1, health: 168 }
+  8000 0 Activate { side: Player, item: "Charged Brow", index: 0 }
+  8000 0 GainArmor { side: Player, amount: 29, total: 166 }
+  8000 0 GainMana { side: Player, amount: 9, total: 26, accrued: false }
+  8500 0 Regen { side: Enemy, amount: 1, health: 169 }
+  9000 0 Regen { side: Enemy, amount: 1, health: 170 }
+  9000 0 Activate { side: Player, item: "Chained Finger", index: 3 }
+  9000 0 GainArmor { side: Player, amount: 6, total: 172 }
+  9000 0 GainMana { side: Player, amount: 2, total: 28, accrued: false }
+  9000 0 Activate { side: Player, item: "Shielded Bracer", index: 4 }
+  9000 0 GainArmor { side: Player, amount: 9, total: 181 }
+  9000 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+  9000 0 Hit { by: Player, damage: 61, absorbed: 0, target_health: 114, target_armor: 0 }
+  9150 0 Activate { side: Enemy, item: "Searing Chassis", index: 1 }
+  9150 0 GainArmor { side: Enemy, amount: 10, total: 10 }
+  9150 0 ManaCheck { side: Enemy, cost: 4, paid: true, remaining: 0 }
+  9150 0 Cursed { on: Player, kind: Searing, duration_ms: 9000, stacks: 1 }
+  9150 0 Activate { side: Enemy, item: "Heavy Blade", index: 2 }
+  9150 0 Hit { by: Enemy, damage: 53, absorbed: 53, target_health: 495, target_armor: 128 }
+  9250 0 Burn { side: Player, damage: 1, health: 494 }
+  9250 0 Activate { side: Player, item: "Hastening Walker", index: 6 }
+  9250 0 GainArmor { side: Player, amount: 17, total: 145 }
+  9250 0 GainMana { side: Player, amount: 2, total: 30, accrued: false }
+  9250 0 Hastened { side: Player, item: "Hastening Walker", by_ms: 150 }
+  9500 0 Regen { side: Enemy, amount: 1, health: 115 }
+  9550 0 Regen { side: Player, amount: 1, health: 492 }
+  9550 0 Activate { side: Player, item: "Rimebound Sole", index: 5 }
+  9550 0 GainArmor { side: Player, amount: 12, total: 157 }
+  9550 0 Hastened { side: Player, item: "Rimebound Sole", by_ms: 200 }
+  9550 0 Cursed { on: Enemy, kind: Frost, duration_ms: 150, stacks: 1 }
+  9900 0 Regen { side: Player, amount: 1, health: 490 }
+ 10000 0 Regen { side: Enemy, amount: 1, health: 116 }
+ 10000 0 Activate { side: Player, item: "Warded Chassis", index: 1 }
+ 10000 0 GainArmor { side: Player, amount: 46, total: 203 }
+ 10000 0 GainArmor { side: Player, amount: 6, total: 209 }
+ 10000 0 GainArmor { side: Player, amount: 6, total: 215 }
+ 10000 0 Activate { side: Player, item: "Hollow Chassis", index: 2 }
+ 10000 0 GainArmor { side: Player, amount: 12, total: 227 }
+ 10000 0 GainArmor { side: Player, amount: 3, total: 230 }
+ 10200 0 Regen { side: Player, amount: 1, health: 488 }
+ 10250 0 Burn { side: Player, damage: 10, health: 487 }
+ 10450 0 Activate { side: Enemy, item: "Clustered Visage", index: 0 }
+ 10450 0 GainArmor { side: Enemy, amount: 17, total: 27 }
+ 10450 0 GainMana { side: Enemy, amount: 2, total: 2, accrued: false }
+ 10500 0 Regen { side: Enemy, amount: 1, health: 117 }
+ 10500 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+ 10500 0 Hit { by: Player, damage: 61, absorbed: 27, target_health: 88, target_armor: 0 }
+ 10550 0 Regen { side: Player, amount: 1, health: 485 }
+ 10900 0 Regen { side: Player, amount: 1, health: 483 }
+ 11000 0 Regen { side: Enemy, amount: 1, health: 89 }
+ 11200 0 Regen { side: Player, amount: 1, health: 481 }
+ 11250 0 Burn { side: Player, damage: 10, health: 480 }
+ 11500 0 Regen { side: Enemy, amount: 1, health: 90 }
+ 11550 0 Regen { side: Player, amount: 1, health: 478 }
+ 11900 0 Regen { side: Player, amount: 1, health: 476 }
+ 12000 0 Regen { side: Enemy, amount: 1, health: 91 }
+ 12000 0 Activate { side: Player, item: "Charged Brow", index: 0 }
+ 12000 0 GainArmor { side: Player, amount: 29, total: 259 }
+ 12000 0 GainMana { side: Player, amount: 9, total: 39, accrued: false }
+ 12000 0 Activate { side: Player, item: "Chained Finger", index: 3 }
+ 12000 0 GainArmor { side: Player, amount: 6, total: 265 }
+ 12000 0 GainMana { side: Player, amount: 2, total: 41, accrued: false }
+ 12000 0 Activate { side: Player, item: "Shielded Bracer", index: 4 }
+ 12000 0 GainArmor { side: Player, amount: 9, total: 274 }
+ 12000 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+ 12000 0 Hit { by: Player, damage: 61, absorbed: 0, target_health: 35, target_armor: 0 }
+ 12200 0 Regen { side: Player, amount: 1, health: 474 }
+ 12250 0 Burn { side: Player, damage: 10, health: 473 }
+ 12300 0 Activate { side: Player, item: "Hastening Walker", index: 6 }
+ 12300 0 GainArmor { side: Player, amount: 17, total: 291 }
+ 12300 0 GainMana { side: Player, amount: 2, total: 43, accrued: false }
+ 12300 0 Hastened { side: Player, item: "Hastening Walker", by_ms: 150 }
+ 12500 0 Regen { side: Enemy, amount: 1, health: 36 }
+ 12550 0 Regen { side: Player, amount: 1, health: 471 }
+ 12650 0 Activate { side: Player, item: "Rimebound Sole", index: 5 }
+ 12650 0 GainArmor { side: Player, amount: 12, total: 303 }
+ 12650 0 Hastened { side: Player, item: "Rimebound Sole", by_ms: 200 }
+ 12650 0 Cursed { on: Enemy, kind: Frost, duration_ms: 150, stacks: 1 }
+ 12900 0 Regen { side: Player, amount: 1, health: 469 }
+ 13000 0 Regen { side: Enemy, amount: 1, health: 37 }
+ 13200 0 Regen { side: Player, amount: 1, health: 467 }
+ 13250 0 Burn { side: Player, damage: 10, health: 466 }
+ 13500 0 Regen { side: Enemy, amount: 1, health: 38 }
+ 13500 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+ 13500 0 Hit { by: Player, damage: 61, absorbed: 0, target_health: -18, target_armor: 0 }
+ 13500 0 Fell { side: Enemy }
+ 13500 0 End { outcome: Victory }
+outcome Victory in 13500ms
+
+== scenario: preset-vs-rust-colossus
+-- monster: Rust Colossus
+-- difficulty: Easy
+-- name_seed: 6840143426475589633
+-- board
+Steel Frame|Helmet|0|0|0
+Crest of Vigor|Helmet|3|0|0
+Iron Plating|Helmet|0|2|0
+Visor of Focus|Helmet|0|4|0
+Padded Base|Chest|0|0|0
+Hollow Weave|Chest|5|2|1
+Chain Layer|Chest|0|3|0
+Woven Underlayer|Chest|0|4|0
+Hide Base|Chest|3|6|0
+Keystone Base|Chest|0|0|0
+Leather Material|Gloves|0|0|0
+Gripping Mold|Gloves|2|0|0
+Steel Material|Gloves|0|4|0
+Gauntlet Mold|Gloves|2|4|0
+Runed Material|Greaves|0|0|0
+Greave Mold|Greaves|2|0|0
+Boiled Leather|Greaves|0|4|0
+Runner's Mold|Greaves|3|4|0
+Balanced Grip|Weapon|0|0|0
+Runed Edge|Weapon|1|0|0
+Ruby Inlay|Weapon|2|0|0
+Balance Weight|Weapon|2|2|0
+-- locks
+-- log
+     0 0 Cursed { on: Player, kind: Misfire, duration_ms: 5400, stacks: 1 }
+  1500 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+  1500 0 Hit { by: Player, damage: 61, absorbed: 0, target_health: 684, target_armor: 0 }
+  2000 0 Regen { side: Enemy, amount: 1, health: 685 }
+  2500 0 Regen { side: Enemy, amount: 1, health: 686 }
+  2500 0 Activate { side: Enemy, item: "Hastening Finger", index: 2 }
+  2500 0 GainMana { side: Enemy, amount: 3, total: 3, accrued: false }
+  2650 0 Activate { side: Enemy, item: "Quickened Spur", index: 4 }
+  2650 0 GainArmor { side: Enemy, amount: 3, total: 3 }
+  2650 0 GainMana { side: Enemy, amount: 3, total: 6, accrued: false }
+  2650 0 Hastened { side: Enemy, item: "Hastening Finger", by_ms: 450 }
+  3000 0 Regen { side: Enemy, amount: 1, health: 687 }
+  3000 0 Activate { side: Player, item: "Chained Finger", index: 3 }
+  3000 0 GainArmor { side: Player, amount: 6, total: 6 }
+  3000 0 GainMana { side: Player, amount: 2, total: 2, accrued: false }
+  3000 0 Misfired { side: Player, item: "Shielded Bracer" }
+  3000 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+  3000 0 Hit { by: Player, damage: 61, absorbed: 3, target_health: 642, target_armor: 0 }
+  3000 0 Cast { side: Enemy, paid: true, cost: 3, remaining: 3 }
+  3000 0 Activate { side: Enemy, item: "Hastening Glaive", index: 5 }
+  3000 0 Hit { by: Enemy, damage: 88, absorbed: 6, target_health: 413, target_armor: 0 }
+  3000 0 ResourceCheck { side: Enemy, what: "rage", cost: 5, paid: false, remaining: 0 }
+  3000 0 GainResource { side: Enemy, what: "rage", amount: 7, total: 7, accrued: false }
+  3000 0 Hastened { side: Enemy, item: "Hastening Finger", by_ms: 450 }
+  3200 0 Activate { side: Player, item: "Hastening Walker", index: 6 }
+  3200 0 GainArmor { side: Player, amount: 17, total: 17 }
+  3200 0 GainMana { side: Player, amount: 2, total: 4, accrued: false }
+  3200 0 Hastened { side: Player, item: "Hastening Walker", by_ms: 150 }
+  3200 0 Activate { side: Enemy, item: "Hastening Crusher", index: 3 }
+  3200 0 GainArmor { side: Enemy, amount: 4, total: 4 }
+  3200 0 GainMana { side: Enemy, amount: 3, total: 6, accrued: false }
+  3200 0 ManaCheck { side: Enemy, cost: 3, paid: true, remaining: 3 }
+  3200 0 Hit { by: Enemy, damage: 24, absorbed: 17, target_health: 406, target_armor: 0 }
+  3200 0 ManaCheck { side: Enemy, cost: 3, paid: true, remaining: 0 }
+  3200 0 Hastened { side: Enemy, item: "Hastening Crusher", by_ms: 400 }
+  3350 0 Regen { side: Player, amount: 1, health: 407 }
+  3350 0 Misfired { side: Player, item: "Rimebound Sole" }
+  3500 0 Regen { side: Enemy, amount: 1, health: 643 }
+  3700 0 Regen { side: Player, amount: 1, health: 408 }
+  4000 0 Regen { side: Player, amount: 1, health: 409 }
+  4000 0 Regen { side: Enemy, amount: 1, health: 644 }
+  4000 0 Activate { side: Player, item: "Charged Brow", index: 0 }
+  4000 0 GainArmor { side: Player, amount: 29, total: 29 }
+  4000 0 GainMana { side: Player, amount: 9, total: 13, accrued: false }
+  4000 0 Activate { side: Enemy, item: "Bulwark Wreath", index: 0 }
+  4000 0 GainArmor { side: Enemy, amount: 12, total: 16 }
+  4000 0 GainMana { side: Enemy, amount: 3, total: 3, accrued: false }
+  4000 0 GainResource { side: Enemy, what: "nature", amount: 1, total: 1, accrued: false }
+  4000 0 Hastened { side: Enemy, item: "Hastening Finger", by_ms: 450 }
+  4000 0 Activate { side: Enemy, item: "Hastening Finger", index: 2 }
+  4000 0 GainMana { side: Enemy, amount: 3, total: 6, accrued: false }
+  4350 0 Regen { side: Player, amount: 1, health: 410 }
+  4350 0 Regen { side: Enemy, amount: 1, health: 645 }
+  4500 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+  4500 0 Hit { by: Player, damage: 61, absorbed: 16, target_health: 613, target_armor: 0 }
+  4700 0 Regen { side: Player, amount: 1, health: 411 }
+  4700 0 Regen { side: Enemy, amount: 1, health: 614 }
+  5000 0 Regen { side: Player, amount: 1, health: 412 }
+  5000 0 Regen { side: Enemy, amount: 1, health: 615 }
+  5000 0 Misfired { side: Player, item: "Warded Chassis" }
+  5000 0 Activate { side: Player, item: "Hollow Chassis", index: 2 }
+  5000 0 GainArmor { side: Player, amount: 12, total: 41 }
+  5000 0 GainArmor { side: Player, amount: 3, total: 44 }
+  5000 0 Activate { side: Enemy, item: "Warded Bulwark", index: 1 }
+  5000 0 GainArmor { side: Enemy, amount: 20, total: 20 }
+  5000 0 GainArmor { side: Enemy, amount: 3, total: 23 }
+  5000 0 GainArmor { side: Enemy, amount: 4, total: 27 }
+  5000 0 Hastened { side: Enemy, item: "Hastening Finger", by_ms: 450 }
+  5250 0 Activate { side: Enemy, item: "Quickened Spur", index: 4 }
+  5250 0 GainArmor { side: Enemy, amount: 3, total: 30 }
+  5250 0 GainMana { side: Enemy, amount: 3, total: 9, accrued: false }
+  5250 0 Hastened { side: Enemy, item: "Hastening Finger", by_ms: 450 }
+  5350 0 Regen { side: Player, amount: 1, health: 413 }
+  5350 0 Regen { side: Enemy, amount: 1, health: 616 }
+  5600 0 Activate { side: Enemy, item: "Hastening Finger", index: 2 }
+  5600 0 GainMana { side: Enemy, amount: 3, total: 12, accrued: false }
+  5700 0 Regen { side: Player, amount: 1, health: 414 }
+  5700 0 Regen { side: Enemy, amount: 1, health: 617 }
+  6000 0 Regen { side: Player, amount: 1, health: 415 }
+  6000 0 Regen { side: Enemy, amount: 1, health: 618 }
+  6000 0 Activate { side: Player, item: "Chained Finger", index: 3 }
+  6000 0 GainArmor { side: Player, amount: 6, total: 50 }
+  6000 0 GainMana { side: Player, amount: 2, total: 15, accrued: false }
+  6000 0 Activate { side: Player, item: "Shielded Bracer", index: 4 }
+  6000 0 GainArmor { side: Player, amount: 9, total: 59 }
+  6000 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+  6000 0 Hit { by: Player, damage: 61, absorbed: 30, target_health: 600, target_armor: 0 }
+  6000 0 Activate { side: Enemy, item: "Hastening Crusher", index: 3 }
+  6000 0 GainArmor { side: Enemy, amount: 4, total: 4 }
+  6000 0 GainMana { side: Enemy, amount: 3, total: 15, accrued: false }
+  6000 0 ManaCheck { side: Enemy, cost: 3, paid: true, remaining: 12 }
+  6000 0 Hit { by: Enemy, damage: 24, absorbed: 24, target_health: 415, target_armor: 35 }
+  6000 0 ManaCheck { side: Enemy, cost: 3, paid: true, remaining: 9 }
+  6000 0 Hastened { side: Enemy, item: "Hastening Crusher", by_ms: 400 }
+  6000 0 Cast { side: Enemy, paid: true, cost: 3, remaining: 6 }
+  6000 0 Activate { side: Enemy, item: "Hastening Glaive", index: 5 }
+  6000 0 Hit { by: Enemy, damage: 104, absorbed: 35, target_health: 346, target_armor: 0 }
+  6000 0 ResourceCheck { side: Enemy, what: "rage", cost: 5, paid: true, remaining: 2 }
+  6000 0 Hit { by: Enemy, damage: 51, absorbed: 0, target_health: 295, target_armor: 0 }
+  6000 0 Hastened { side: Enemy, item: "Hastening Finger", by_ms: 450 }
+  6250 0 Activate { side: Player, item: "Hastening Walker", index: 6 }
+  6250 0 GainArmor { side: Player, amount: 17, total: 17 }
+  6250 0 GainMana { side: Player, amount: 2, total: 17, accrued: false }
+  6250 0 Hastened { side: Player, item: "Hastening Walker", by_ms: 150 }
+  6350 0 Regen { side: Player, amount: 1, health: 296 }
+  6350 0 Regen { side: Enemy, amount: 1, health: 601 }
+  6650 0 Activate { side: Player, item: "Rimebound Sole", index: 5 }
+  6650 0 GainArmor { side: Player, amount: 12, total: 29 }
+  6650 0 Hastened { side: Player, item: "Rimebound Sole", by_ms: 200 }
+  6650 0 Cursed { on: Enemy, kind: Frost, duration_ms: 800, stacks: 1 }
+  6700 0 Regen { side: Player, amount: 1, health: 297 }
+  6700 0 Regen { side: Enemy, amount: 1, health: 602 }
+  7000 0 Regen { side: Player, amount: 1, health: 298 }
+  7000 0 Regen { side: Enemy, amount: 1, health: 603 }
+  7350 0 Regen { side: Player, amount: 1, health: 299 }
+  7350 0 Regen { side: Enemy, amount: 1, health: 604 }
+  7500 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+  7500 0 Hit { by: Player, damage: 61, absorbed: 4, target_health: 560, target_armor: 0 }
+  7700 0 Regen { side: Player, amount: 1, health: 300 }
+  7700 0 Regen { side: Enemy, amount: 1, health: 561 }
+  8000 0 Regen { side: Player, amount: 1, health: 301 }
+  8000 0 Regen { side: Enemy, amount: 1, health: 562 }
+  8000 0 Activate { side: Player, item: "Charged Brow", index: 0 }
+  8000 0 GainArmor { side: Player, amount: 29, total: 58 }
+  8000 0 GainMana { side: Player, amount: 9, total: 26, accrued: false }
+  8050 0 Activate { side: Enemy, item: "Hastening Finger", index: 2 }
+  8050 0 GainMana { side: Enemy, amount: 3, total: 9, accrued: false }
+  8250 0 Activate { side: Enemy, item: "Quickened Spur", index: 4 }
+  8250 0 GainArmor { side: Enemy, amount: 3, total: 3 }
+  8250 0 GainMana { side: Enemy, amount: 3, total: 12, accrued: false }
+  8250 0 Hastened { side: Enemy, item: "Hastening Finger", by_ms: 450 }
+  8350 0 Regen { side: Player, amount: 1, health: 302 }
+  8350 0 Regen { side: Enemy, amount: 1, health: 563 }
+  8400 0 Activate { side: Enemy, item: "Bulwark Wreath", index: 0 }
+  8400 0 GainArmor { side: Enemy, amount: 12, total: 15 }
+  8400 0 GainMana { side: Enemy, amount: 3, total: 15, accrued: false }
+  8400 0 GainResource { side: Enemy, what: "nature", amount: 1, total: 2, accrued: false }
+  8400 0 Hastened { side: Enemy, item: "Hastening Finger", by_ms: 450 }
+  8600 0 Regen { side: Enemy, amount: 1, health: 564 }
+  8700 0 Regen { side: Player, amount: 1, health: 303 }
+  8850 0 Regen { side: Enemy, amount: 1, health: 565 }
+  9000 0 Regen { side: Player, amount: 1, health: 304 }
+  9000 0 Activate { side: Player, item: "Chained Finger", index: 3 }
+  9000 0 GainArmor { side: Player, amount: 6, total: 64 }
+  9000 0 GainMana { side: Player, amount: 2, total: 28, accrued: false }
+  9000 0 Activate { side: Player, item: "Shielded Bracer", index: 4 }
+  9000 0 GainArmor { side: Player, amount: 9, total: 73 }
+  9000 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+  9000 0 Hit { by: Player, damage: 61, absorbed: 15, target_health: 532, target_armor: 0 }
+  9100 0 Regen { side: Enemy, amount: 1, health: 533 }
+  9200 0 Activate { side: Enemy, item: "Hastening Crusher", index: 3 }
+  9200 0 GainArmor { side: Enemy, amount: 4, total: 4 }
+  9200 0 GainMana { side: Enemy, amount: 3, total: 18, accrued: false }
+  9200 0 ManaCheck { side: Enemy, cost: 3, paid: true, remaining: 15 }
+  9200 0 Hit { by: Enemy, damage: 24, absorbed: 24, target_health: 304, target_armor: 49 }
+  9200 0 ManaCheck { side: Enemy, cost: 3, paid: true, remaining: 12 }
+  9200 0 Hastened { side: Enemy, item: "Hastening Crusher", by_ms: 400 }
+  9250 0 Activate { side: Player, item: "Hastening Walker", index: 6 }
+  9250 0 GainArmor { side: Player, amount: 17, total: 66 }
+  9250 0 GainMana { side: Player, amount: 2, total: 30, accrued: false }
+  9250 0 Hastened { side: Player, item: "Hastening Walker", by_ms: 150 }
+  9350 0 Regen { side: Player, amount: 1, health: 305 }
+  9350 0 Regen { side: Enemy, amount: 1, health: 534 }
+  9400 0 Cast { side: Enemy, paid: true, cost: 3, remaining: 9 }
+  9400 0 Activate { side: Enemy, item: "Hastening Glaive", index: 5 }
+  9400 0 Hit { by: Enemy, damage: 93, absorbed: 66, target_health: 278, target_armor: 0 }
+  9400 0 ResourceCheck { side: Enemy, what: "rage", cost: 5, paid: false, remaining: 2 }
+  9400 0 GainResource { side: Enemy, what: "rage", amount: 7, total: 9, accrued: false }
+  9400 0 Hastened { side: Enemy, item: "Hastening Finger", by_ms: 450 }
+  9450 0 Activate { side: Enemy, item: "Hastening Finger", index: 2 }
+  9450 0 GainMana { side: Enemy, amount: 3, total: 12, accrued: false }
+  9600 0 Regen { side: Enemy, amount: 1, health: 535 }
+  9700 0 Regen { side: Player, amount: 1, health: 279 }
+  9750 0 Activate { side: Player, item: "Rimebound Sole", index: 5 }
+  9750 0 GainArmor { side: Player, amount: 12, total: 12 }
+  9750 0 Hastened { side: Player, item: "Rimebound Sole", by_ms: 200 }
+  9750 0 Cursed { on: Enemy, kind: Frost, duration_ms: 800, stacks: 1 }
+  9850 0 Regen { side: Enemy, amount: 1, health: 536 }
+ 10000 0 Regen { side: Player, amount: 1, health: 280 }
+ 10000 0 Activate { side: Player, item: "Warded Chassis", index: 1 }
+ 10000 0 GainArmor { side: Player, amount: 46, total: 58 }
+ 10000 0 GainArmor { side: Player, amount: 6, total: 64 }
+ 10000 0 GainArmor { side: Player, amount: 6, total: 70 }
+ 10000 0 Activate { side: Player, item: "Hollow Chassis", index: 2 }
+ 10000 0 GainArmor { side: Player, amount: 12, total: 82 }
+ 10000 0 GainArmor { side: Player, amount: 3, total: 85 }
+ 10100 0 Regen { side: Enemy, amount: 1, health: 537 }
+ 10350 0 Regen { side: Player, amount: 1, health: 281 }
+ 10350 0 Regen { side: Enemy, amount: 1, health: 538 }
+ 10500 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+ 10500 0 Hit { by: Player, damage: 61, absorbed: 4, target_health: 494, target_armor: 0 }
+ 10600 0 Regen { side: Enemy, amount: 1, health: 495 }
+ 10700 0 Regen { side: Player, amount: 1, health: 282 }
+ 10800 0 Activate { side: Enemy, item: "Warded Bulwark", index: 1 }
+ 10800 0 GainArmor { side: Enemy, amount: 20, total: 20 }
+ 10800 0 GainArmor { side: Enemy, amount: 3, total: 23 }
+ 10800 0 GainArmor { side: Enemy, amount: 4, total: 27 }
+ 10800 0 Hastened { side: Enemy, item: "Hastening Finger", by_ms: 450 }
+ 10850 0 Regen { side: Enemy, amount: 1, health: 496 }
+ 11000 0 Regen { side: Player, amount: 1, health: 283 }
+ 11100 0 Regen { side: Enemy, amount: 1, health: 497 }
+ 11250 0 Activate { side: Enemy, item: "Quickened Spur", index: 4 }
+ 11250 0 GainArmor { side: Enemy, amount: 3, total: 30 }
+ 11250 0 GainMana { side: Enemy, amount: 3, total: 15, accrued: false }
+ 11250 0 Hastened { side: Enemy, item: "Hastening Finger", by_ms: 450 }
+ 11350 0 Regen { side: Player, amount: 1, health: 284 }
+ 11350 0 Regen { side: Enemy, amount: 1, health: 498 }
+ 11450 0 Activate { side: Enemy, item: "Hastening Finger", index: 2 }
+ 11450 0 GainMana { side: Enemy, amount: 3, total: 18, accrued: false }
+ 11600 0 Regen { side: Enemy, amount: 1, health: 499 }
+ 11700 0 Regen { side: Player, amount: 1, health: 285 }
+ 11850 0 Regen { side: Enemy, amount: 1, health: 500 }
+ 12000 0 Regen { side: Player, amount: 1, health: 286 }
+ 12000 0 Activate { side: Player, item: "Charged Brow", index: 0 }
+ 12000 0 GainArmor { side: Player, amount: 29, total: 114 }
+ 12000 0 GainMana { side: Player, amount: 9, total: 39, accrued: false }
+ 12000 0 Activate { side: Player, item: "Chained Finger", index: 3 }
+ 12000 0 GainArmor { side: Player, amount: 6, total: 120 }
+ 12000 0 GainMana { side: Player, amount: 2, total: 41, accrued: false }
+ 12000 0 Activate { side: Player, item: "Shielded Bracer", index: 4 }
+ 12000 0 GainArmor { side: Player, amount: 9, total: 129 }
+ 12000 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+ 12000 0 Hit { by: Player, damage: 61, absorbed: 30, target_health: 482, target_armor: 0 }
+ 12100 0 Regen { side: Enemy, amount: 1, health: 483 }
+ 12300 0 Activate { side: Player, item: "Hastening Walker", index: 6 }
+ 12300 0 GainArmor { side: Player, amount: 17, total: 146 }
+ 12300 0 GainMana { side: Player, amount: 2, total: 43, accrued: false }
+ 12300 0 Hastened { side: Player, item: "Hastening Walker", by_ms: 150 }
+ 12350 0 Regen { side: Player, amount: 1, health: 287 }
+ 12350 0 Regen { side: Enemy, amount: 1, health: 484 }
+ 12400 0 Activate { side: Enemy, item: "Hastening Crusher", index: 3 }
+ 12400 0 GainArmor { side: Enemy, amount: 4, total: 4 }
+ 12400 0 GainMana { side: Enemy, amount: 3, total: 21, accrued: false }
+ 12400 0 ManaCheck { side: Enemy, cost: 3, paid: true, remaining: 18 }
+ 12400 0 Hit { by: Enemy, damage: 24, absorbed: 24, target_health: 287, target_armor: 122 }
+ 12400 0 ManaCheck { side: Enemy, cost: 3, paid: true, remaining: 15 }
+ 12400 0 Hastened { side: Enemy, item: "Hastening Crusher", by_ms: 400 }
+ 12600 0 Regen { side: Enemy, amount: 1, health: 485 }
+ 12700 0 Regen { side: Player, amount: 1, health: 288 }
+ 12800 0 Activate { side: Enemy, item: "Bulwark Wreath", index: 0 }
+ 12800 0 GainArmor { side: Enemy, amount: 12, total: 16 }
+ 12800 0 GainMana { side: Enemy, amount: 3, total: 18, accrued: false }
+ 12800 0 GainResource { side: Enemy, what: "nature", amount: 1, total: 3, accrued: false }
+ 12800 0 Hastened { side: Enemy, item: "Hastening Finger", by_ms: 450 }
+ 12800 0 Cast { side: Enemy, paid: true, cost: 3, remaining: 15 }
+ 12800 0 Activate { side: Enemy, item: "Hastening Glaive", index: 5 }
+ 12800 0 Hit { by: Enemy, damage: 109, absorbed: 109, target_health: 288, target_armor: 13 }
+ 12800 0 ResourceCheck { side: Enemy, what: "rage", cost: 5, paid: true, remaining: 4 }
+ 12800 0 Hit { by: Enemy, damage: 51, absorbed: 13, target_health: 250, target_armor: 0 }
+ 12800 0 Hastened { side: Enemy, item: "Hastening Finger", by_ms: 450 }
+ 12850 0 Regen { side: Enemy, amount: 1, health: 486 }
+ 12850 0 Activate { side: Player, item: "Rimebound Sole", index: 5 }
+ 12850 0 GainArmor { side: Player, amount: 12, total: 12 }
+ 12850 0 Hastened { side: Player, item: "Rimebound Sole", by_ms: 200 }
+ 12850 0 Cursed { on: Enemy, kind: Frost, duration_ms: 800, stacks: 1 }
+ 13000 0 Regen { side: Player, amount: 1, health: 251 }
+ 13050 0 Regen { side: Enemy, amount: 1, health: 487 }
+ 13250 0 Regen { side: Enemy, amount: 1, health: 488 }
+ 13250 0 Activate { side: Enemy, item: "Hastening Finger", index: 2 }
+ 13250 0 GainMana { side: Enemy, amount: 3, total: 18, accrued: false }
+ 13350 0 Regen { side: Player, amount: 1, health: 252 }
+ 13450 0 Regen { side: Enemy, amount: 1, health: 489 }
+ 13500 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+ 13500 0 Hit { by: Player, damage: 61, absorbed: 16, target_health: 457, target_armor: 0 }
+ 13650 0 Regen { side: Enemy, amount: 1, health: 458 }
+ 13700 0 Regen { side: Player, amount: 1, health: 253 }
+ 13850 0 Regen { side: Enemy, amount: 1, health: 459 }
+ 14000 0 Regen { side: Player, amount: 1, health: 254 }
+ 14050 0 Regen { side: Enemy, amount: 1, health: 460 }
+ 14250 0 Regen { side: Enemy, amount: 1, health: 461 }
+ 14250 0 Activate { side: Enemy, item: "Quickened Spur", index: 4 }
+ 14250 0 GainArmor { side: Enemy, amount: 3, total: 3 }
+ 14250 0 GainMana { side: Enemy, amount: 3, total: 21, accrued: false }
+ 14250 0 Hastened { side: Enemy, item: "Hastening Finger", by_ms: 450 }
+ 14350 0 Regen { side: Player, amount: 1, health: 255 }
+ 14450 0 Regen { side: Enemy, amount: 1, health: 462 }
+ 14650 0 Regen { side: Enemy, amount: 1, health: 463 }
+ 14700 0 Regen { side: Player, amount: 1, health: 256 }
+ 14850 0 Regen { side: Enemy, amount: 1, health: 464 }
+ 15000 0 Regen { side: Player, amount: 1, health: 257 }
+ 15000 0 Activate { side: Player, item: "Warded Chassis", index: 1 }
+ 15000 0 GainArmor { side: Player, amount: 46, total: 58 }
+ 15000 0 GainArmor { side: Player, amount: 6, total: 64 }
+ 15000 0 GainArmor { side: Player, amount: 6, total: 70 }
+ 15000 0 Activate { side: Player, item: "Hollow Chassis", index: 2 }
+ 15000 0 GainArmor { side: Player, amount: 12, total: 82 }
+ 15000 0 GainArmor { side: Player, amount: 3, total: 85 }
+ 15000 0 Activate { side: Player, item: "Chained Finger", index: 3 }
+ 15000 0 GainArmor { side: Player, amount: 6, total: 91 }
+ 15000 0 GainMana { side: Player, amount: 2, total: 45, accrued: false }
+ 15000 0 Activate { side: Player, item: "Shielded Bracer", index: 4 }
+ 15000 0 GainArmor { side: Player, amount: 9, total: 100 }
+ 15000 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+ 15000 0 Hit { by: Player, damage: 61, absorbed: 3, target_health: 419, target_armor: 0 }
+ 15050 0 Regen { side: Enemy, amount: 1, health: 420 }
+ 15250 0 Regen { side: Enemy, amount: 1, health: 421 }
+ 15350 0 Regen { side: Player, amount: 1, health: 258 }
+ 15350 0 Activate { side: Player, item: "Hastening Walker", index: 6 }
+ 15350 0 GainArmor { side: Player, amount: 17, total: 117 }
+ 15350 0 GainMana { side: Player, amount: 2, total: 47, accrued: false }
+ 15350 0 Hastened { side: Player, item: "Hastening Walker", by_ms: 150 }
+ 15450 0 Regen { side: Enemy, amount: 1, health: 422 }
+ 15500 0 Activate { side: Enemy, item: "Hastening Finger", index: 2 }
+ 15500 0 GainMana { side: Enemy, amount: 3, total: 24, accrued: false }
+ 15600 0 Activate { side: Enemy, item: "Hastening Crusher", index: 3 }
+ 15600 0 GainArmor { side: Enemy, amount: 4, total: 4 }
+ 15600 0 GainMana { side: Enemy, amount: 3, total: 27, accrued: false }
+ 15600 0 ManaCheck { side: Enemy, cost: 3, paid: true, remaining: 24 }
+ 15600 0 Hit { by: Enemy, damage: 24, absorbed: 24, target_health: 258, target_armor: 93 }
+ 15600 0 ManaCheck { side: Enemy, cost: 3, paid: true, remaining: 21 }
+ 15600 0 Hastened { side: Enemy, item: "Hastening Crusher", by_ms: 400 }
+ 15650 0 Regen { side: Enemy, amount: 1, health: 423 }
+ 15700 0 Regen { side: Player, amount: 1, health: 259 }
+ 15850 0 Regen { side: Enemy, amount: 1, health: 424 }
+ 15950 0 Activate { side: Player, item: "Rimebound Sole", index: 5 }
+ 15950 0 GainArmor { side: Player, amount: 12, total: 105 }
+ 15950 0 Hastened { side: Player, item: "Rimebound Sole", by_ms: 200 }
+ 15950 0 Cursed { on: Enemy, kind: Frost, duration_ms: 800, stacks: 1 }
+ 16000 0 Regen { side: Player, amount: 1, health: 260 }
+ 16000 0 Activate { side: Player, item: "Charged Brow", index: 0 }
+ 16000 0 GainArmor { side: Player, amount: 29, total: 134 }
+ 16000 0 GainMana { side: Player, amount: 9, total: 56, accrued: false }
+ 16050 0 Regen { side: Enemy, amount: 1, health: 425 }
+ 16250 0 Regen { side: Enemy, amount: 1, health: 426 }
+ 16350 0 Regen { side: Player, amount: 1, health: 261 }
+ 16450 0 Regen { side: Enemy, amount: 1, health: 427 }
+ 16500 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+ 16500 0 Hit { by: Player, damage: 61, absorbed: 4, target_health: 383, target_armor: 0 }
+ 16500 0 Activate { side: Enemy, item: "Warded Bulwark", index: 1 }
+ 16500 0 GainArmor { side: Enemy, amount: 20, total: 20 }
+ 16500 0 GainArmor { side: Enemy, amount: 3, total: 23 }
+ 16500 0 GainArmor { side: Enemy, amount: 4, total: 27 }
+ 16500 0 Hastened { side: Enemy, item: "Hastening Finger", by_ms: 450 }
+ 16500 0 Cast { side: Enemy, paid: true, cost: 3, remaining: 18 }
+ 16500 0 Activate { side: Enemy, item: "Hastening Glaive", index: 5 }
+ 16500 0 Hit { by: Enemy, damage: 97, absorbed: 97, target_health: 261, target_armor: 37 }
+ 16500 0 ResourceCheck { side: Enemy, what: "rage", cost: 5, paid: false, remaining: 4 }
+ 16500 0 GainResource { side: Enemy, what: "rage", amount: 7, total: 11, accrued: false }
+ 16500 0 Hastened { side: Enemy, item: "Hastening Finger", by_ms: 450 }
+ 16650 0 Regen { side: Enemy, amount: 1, health: 384 }
+ 16700 0 Regen { side: Player, amount: 1, health: 262 }
+ 16850 0 Regen { side: Enemy, amount: 1, health: 385 }
+ 17000 0 Regen { side: Player, amount: 1, health: 263 }
+ 17050 0 Regen { side: Enemy, amount: 1, health: 386 }
+ 17250 0 Regen { side: Enemy, amount: 1, health: 387 }
+ 17250 0 Activate { side: Enemy, item: "Quickened Spur", index: 4 }
+ 17250 0 GainArmor { side: Enemy, amount: 3, total: 30 }
+ 17250 0 GainMana { side: Enemy, amount: 3, total: 21, accrued: false }
+ 17250 0 Hastened { side: Enemy, item: "Hastening Finger", by_ms: 450 }
+ 17300 0 Activate { side: Enemy, item: "Hastening Finger", index: 2 }
+ 17300 0 GainMana { side: Enemy, amount: 3, total: 24, accrued: false }
+ 17350 0 Regen { side: Player, amount: 1, health: 264 }
+ 17450 0 Regen { side: Enemy, amount: 1, health: 388 }
+ 17600 0 Activate { side: Enemy, item: "Bulwark Wreath", index: 0 }
+ 17600 0 GainArmor { side: Enemy, amount: 12, total: 42 }
+ 17600 0 GainMana { side: Enemy, amount: 3, total: 27, accrued: false }
+ 17600 0 GainResource { side: Enemy, what: "nature", amount: 1, total: 4, accrued: false }
+ 17600 0 Hastened { side: Enemy, item: "Hastening Finger", by_ms: 450 }
+ 17650 0 Regen { side: Enemy, amount: 1, health: 389 }
+ 17700 0 Regen { side: Player, amount: 1, health: 265 }
+ 17800 0 Regen { side: Enemy, amount: 1, health: 390 }
+ 18000 0 Regen { side: Player, amount: 1, health: 266 }
+ 18000 0 Regen { side: Enemy, amount: 1, health: 391 }
+ 18000 0 Activate { side: Player, item: "Chained Finger", index: 3 }
+ 18000 0 GainArmor { side: Player, amount: 6, total: 43 }
+ 18000 0 GainMana { side: Player, amount: 2, total: 58, accrued: false }
+ 18000 0 Activate { side: Player, item: "Shielded Bracer", index: 4 }
+ 18000 0 GainArmor { side: Player, amount: 9, total: 52 }
+ 18000 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+ 18000 0 Hit { by: Player, damage: 61, absorbed: 42, target_health: 385, target_armor: 0 }
+ 18150 0 Regen { side: Enemy, amount: 1, health: 386 }
+ 18300 0 Regen { side: Enemy, amount: 1, health: 387 }
+ 18350 0 Regen { side: Player, amount: 1, health: 267 }
+ 18350 0 Activate { side: Player, item: "Hastening Walker", index: 6 }
+ 18350 0 GainArmor { side: Player, amount: 17, total: 69 }
+ 18350 0 GainMana { side: Player, amount: 2, total: 60, accrued: false }
+ 18350 0 Hastened { side: Player, item: "Hastening Walker", by_ms: 150 }
+ 18500 0 Regen { side: Enemy, amount: 1, health: 388 }
+ 18650 0 Regen { side: Enemy, amount: 1, health: 389 }
+ 18700 0 Regen { side: Player, amount: 1, health: 268 }
+ 18800 0 Regen { side: Enemy, amount: 1, health: 390 }
+ 18800 0 Activate { side: Enemy, item: "Hastening Crusher", index: 3 }
+ 18800 0 GainArmor { side: Enemy, amount: 4, total: 4 }
+ 18800 0 GainMana { side: Enemy, amount: 3, total: 30, accrued: false }
+ 18800 0 ManaCheck { side: Enemy, cost: 3, paid: true, remaining: 27 }
+ 18800 0 Hit { by: Enemy, damage: 24, absorbed: 24, target_health: 268, target_armor: 45 }
+ 18800 0 ManaCheck { side: Enemy, cost: 3, paid: true, remaining: 24 }
+ 18800 0 Hastened { side: Enemy, item: "Hastening Crusher", by_ms: 400 }
+ 19000 0 Regen { side: Player, amount: 1, health: 269 }
+ 19000 0 Regen { side: Enemy, amount: 1, health: 391 }
+ 19050 0 Activate { side: Player, item: "Rimebound Sole", index: 5 }
+ 19050 0 GainArmor { side: Player, amount: 12, total: 57 }
+ 19050 0 Hastened { side: Player, item: "Rimebound Sole", by_ms: 200 }
+ 19050 0 Cursed { on: Enemy, kind: Frost, duration_ms: 800, stacks: 1 }
+ 19150 0 Regen { side: Enemy, amount: 1, health: 392 }
+ 19300 0 Regen { side: Enemy, amount: 1, health: 393 }
+ 19350 0 Regen { side: Player, amount: 1, health: 270 }
+ 19500 0 Regen { side: Enemy, amount: 1, health: 394 }
+ 19500 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+ 19500 0 Hit { by: Player, damage: 61, absorbed: 4, target_health: 350, target_armor: 0 }
+ 19650 0 Regen { side: Enemy, amount: 1, health: 351 }
+ 19650 0 Activate { side: Enemy, item: "Hastening Finger", index: 2 }
+ 19650 0 GainMana { side: Enemy, amount: 3, total: 27, accrued: false }
+ 19700 0 Regen { side: Player, amount: 1, health: 271 }
+ 19800 0 Regen { side: Enemy, amount: 1, health: 352 }
+ 20000 0 Regen { side: Player, amount: 1, health: 272 }
+ 20000 0 Regen { side: Enemy, amount: 1, health: 353 }
+ 20000 0 Activate { side: Player, item: "Charged Brow", index: 0 }
+ 20000 0 GainArmor { side: Player, amount: 29, total: 86 }
+ 20000 0 GainMana { side: Player, amount: 9, total: 69, accrued: false }
+ 20000 0 Activate { side: Player, item: "Warded Chassis", index: 1 }
+ 20000 0 GainArmor { side: Player, amount: 46, total: 132 }
+ 20000 0 GainArmor { side: Player, amount: 6, total: 138 }
+ 20000 0 GainArmor { side: Player, amount: 6, total: 144 }
+ 20000 0 Activate { side: Player, item: "Hollow Chassis", index: 2 }
+ 20000 0 GainArmor { side: Player, amount: 12, total: 156 }
+ 20000 0 GainArmor { side: Player, amount: 3, total: 159 }
+ 20000 0 Cast { side: Enemy, paid: true, cost: 3, remaining: 24 }
+ 20000 0 Activate { side: Enemy, item: "Hastening Glaive", index: 5 }
+ 20000 0 Hit { by: Enemy, damage: 114, absorbed: 114, target_health: 272, target_armor: 45 }
+ 20000 0 ResourceCheck { side: Enemy, what: "rage", cost: 5, paid: true, remaining: 6 }
+ 20000 0 Hit { by: Enemy, damage: 51, absorbed: 45, target_health: 266, target_armor: 0 }
+ 20000 0 Hastened { side: Enemy, item: "Hastening Finger", by_ms: 450 }
+ 20150 0 Regen { side: Enemy, amount: 1, health: 354 }
+ 20300 0 Regen { side: Enemy, amount: 1, health: 355 }
+ 20300 0 Activate { side: Enemy, item: "Quickened Spur", index: 4 }
+ 20300 0 GainArmor { side: Enemy, amount: 3, total: 3 }
+ 20300 0 GainMana { side: Enemy, amount: 3, total: 27, accrued: false }
+ 20300 0 Hastened { side: Enemy, item: "Hastening Finger", by_ms: 450 }
+ 20350 0 Regen { side: Player, amount: 1, health: 267 }
+ 20500 0 Regen { side: Enemy, amount: 1, health: 356 }
+ 20650 0 Regen { side: Enemy, amount: 1, health: 357 }
+ 20700 0 Regen { side: Player, amount: 1, health: 268 }
+ 20800 0 Regen { side: Enemy, amount: 1, health: 358 }
+ 21000 0 Regen { side: Player, amount: 1, health: 269 }
+ 21000 0 Regen { side: Enemy, amount: 1, health: 359 }
+ 21000 0 Activate { side: Player, item: "Chained Finger", index: 3 }
+ 21000 0 GainArmor { side: Player, amount: 6, total: 6 }
+ 21000 0 GainMana { side: Player, amount: 2, total: 71, accrued: false }
+ 21000 0 Activate { side: Player, item: "Shielded Bracer", index: 4 }
+ 21000 0 GainArmor { side: Player, amount: 9, total: 15 }
+ 21000 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+ 21000 0 Hit { by: Player, damage: 61, absorbed: 3, target_health: 314, target_armor: 0 }
+ 21150 0 Regen { side: Enemy, amount: 1, health: 315 }
+ 21300 0 Regen { side: Enemy, amount: 1, health: 316 }
+ 21350 0 Regen { side: Player, amount: 1, health: 270 }
+ 21350 0 Activate { side: Enemy, item: "Hastening Finger", index: 2 }
+ 21350 0 GainMana { side: Enemy, amount: 3, total: 30, accrued: false }
+ 21400 0 Activate { side: Player, item: "Hastening Walker", index: 6 }
+ 21400 0 GainArmor { side: Player, amount: 17, total: 32 }
+ 21400 0 GainMana { side: Player, amount: 2, total: 73, accrued: false }
+ 21400 0 Hastened { side: Player, item: "Hastening Walker", by_ms: 150 }
+ 21500 0 Regen { side: Enemy, amount: 1, health: 317 }
+ 21650 0 Regen { side: Enemy, amount: 1, health: 318 }
+ 21700 0 Regen { side: Player, amount: 1, health: 271 }
+ 21800 0 Regen { side: Enemy, amount: 1, health: 319 }
+ 22000 0 Regen { side: Player, amount: 1, health: 272 }
+ 22000 0 Regen { side: Enemy, amount: 1, health: 320 }
+ 22000 0 Activate { side: Enemy, item: "Bulwark Wreath", index: 0 }
+ 22000 0 GainArmor { side: Enemy, amount: 12, total: 12 }
+ 22000 0 GainMana { side: Enemy, amount: 3, total: 33, accrued: false }
+ 22000 0 GainResource { side: Enemy, what: "nature", amount: 1, total: 5, accrued: false }
+ 22000 0 Hastened { side: Enemy, item: "Hastening Finger", by_ms: 450 }
+ 22000 0 Activate { side: Enemy, item: "Warded Bulwark", index: 1 }
+ 22000 0 GainArmor { side: Enemy, amount: 20, total: 32 }
+ 22000 0 GainArmor { side: Enemy, amount: 3, total: 35 }
+ 22000 0 GainArmor { side: Enemy, amount: 4, total: 39 }
+ 22000 0 Hastened { side: Enemy, item: "Hastening Finger", by_ms: 450 }
+ 22000 0 Activate { side: Enemy, item: "Hastening Crusher", index: 3 }
+ 22000 0 GainArmor { side: Enemy, amount: 4, total: 43 }
+ 22000 0 GainMana { side: Enemy, amount: 3, total: 36, accrued: false }
+ 22000 0 ManaCheck { side: Enemy, cost: 3, paid: true, remaining: 33 }
+ 22000 0 Hit { by: Enemy, damage: 24, absorbed: 24, target_health: 272, target_armor: 8 }
+ 22000 0 ManaCheck { side: Enemy, cost: 3, paid: true, remaining: 30 }
+ 22000 0 Hastened { side: Enemy, item: "Hastening Crusher", by_ms: 400 }
+ 22150 0 Regen { side: Enemy, amount: 1, health: 321 }
+ 22150 0 Activate { side: Player, item: "Rimebound Sole", index: 5 }
+ 22150 0 GainArmor { side: Player, amount: 12, total: 20 }
+ 22150 0 Hastened { side: Player, item: "Rimebound Sole", by_ms: 200 }
+ 22150 0 Cursed { on: Enemy, kind: Frost, duration_ms: 800, stacks: 1 }
+ 22300 0 Regen { side: Enemy, amount: 1, health: 322 }
+ 22350 0 Regen { side: Player, amount: 1, health: 273 }
+ 22400 0 Regen { side: Enemy, amount: 1, health: 323 }
+ 22500 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+ 22500 0 Hit { by: Player, damage: 61, absorbed: 43, target_health: 318, target_armor: 0 }
+ 22550 0 Regen { side: Enemy, amount: 1, health: 319 }
+ 22700 0 Regen { side: Player, amount: 1, health: 274 }
+ 22700 0 Regen { side: Enemy, amount: 1, health: 320 }
+ 22850 0 Regen { side: Enemy, amount: 1, health: 321 }
+ 23000 0 Regen { side: Player, amount: 1, health: 275 }
+ 23000 0 Regen { side: Enemy, amount: 1, health: 322 }
+ 23150 0 Regen { side: Enemy, amount: 1, health: 323 }
+ 23300 0 Regen { side: Enemy, amount: 1, health: 324 }
+ 23300 0 Activate { side: Enemy, item: "Quickened Spur", index: 4 }
+ 23300 0 GainArmor { side: Enemy, amount: 3, total: 3 }
+ 23300 0 GainMana { side: Enemy, amount: 3, total: 33, accrued: false }
+ 23300 0 Hastened { side: Enemy, item: "Hastening Finger", by_ms: 450 }
+ 23350 0 Regen { side: Player, amount: 1, health: 276 }
+ 23350 0 Activate { side: Enemy, item: "Hastening Finger", index: 2 }
+ 23350 0 GainMana { side: Enemy, amount: 3, total: 36, accrued: false }
+ 23400 0 Regen { side: Enemy, amount: 1, health: 325 }
+ 23400 0 Cast { side: Enemy, paid: true, cost: 3, remaining: 33 }
+ 23400 0 Activate { side: Enemy, item: "Hastening Glaive", index: 5 }
+ 23400 0 Hit { by: Enemy, damage: 102, absorbed: 20, target_health: 194, target_armor: 0 }
+ 23400 0 ResourceCheck { side: Enemy, what: "rage", cost: 5, paid: true, remaining: 1 }
+ 23400 0 Hit { by: Enemy, damage: 51, absorbed: 0, target_health: 143, target_armor: 0 }
+ 23400 0 Hastened { side: Enemy, item: "Hastening Finger", by_ms: 450 }
+ 23550 0 Regen { side: Enemy, amount: 1, health: 326 }
+ 23700 0 Regen { side: Player, amount: 1, health: 144 }
+ 23700 0 Regen { side: Enemy, amount: 1, health: 327 }
+ 23850 0 Regen { side: Enemy, amount: 1, health: 328 }
+ 24000 0 Regen { side: Player, amount: 1, health: 145 }
+ 24000 0 Regen { side: Enemy, amount: 1, health: 329 }
+ 24000 0 Activate { side: Player, item: "Charged Brow", index: 0 }
+ 24000 0 GainArmor { side: Player, amount: 29, total: 29 }
+ 24000 0 GainMana { side: Player, amount: 9, total: 82, accrued: false }
+ 24000 0 Activate { side: Player, item: "Chained Finger", index: 3 }
+ 24000 0 GainArmor { side: Player, amount: 6, total: 35 }
+ 24000 0 GainMana { side: Player, amount: 2, total: 84, accrued: false }
+ 24000 0 Activate { side: Player, item: "Shielded Bracer", index: 4 }
+ 24000 0 GainArmor { side: Player, amount: 9, total: 44 }
+ 24000 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+ 24000 0 Hit { by: Player, damage: 61, absorbed: 3, target_health: 284, target_armor: 0 }
+ 24150 0 Regen { side: Enemy, amount: 1, health: 285 }
+ 24300 0 Regen { side: Enemy, amount: 1, health: 286 }
+ 24350 0 Regen { side: Player, amount: 1, health: 146 }
+ 24400 0 Regen { side: Enemy, amount: 1, health: 287 }
+ 24400 0 Activate { side: Player, item: "Hastening Walker", index: 6 }
+ 24400 0 GainArmor { side: Player, amount: 17, total: 61 }
+ 24400 0 GainMana { side: Player, amount: 2, total: 86, accrued: false }
+ 24400 0 Hastened { side: Player, item: "Hastening Walker", by_ms: 150 }
+ 24550 0 Regen { side: Enemy, amount: 1, health: 288 }
+ 24700 0 Regen { side: Player, amount: 1, health: 147 }
+ 24700 0 Regen { side: Enemy, amount: 1, health: 289 }
+ 24850 0 Regen { side: Enemy, amount: 1, health: 290 }
+ 25000 0 Regen { side: Player, amount: 1, health: 148 }
+ 25000 0 Regen { side: Enemy, amount: 1, health: 291 }
+ 25000 0 Activate { side: Player, item: "Warded Chassis", index: 1 }
+ 25000 0 GainArmor { side: Player, amount: 46, total: 107 }
+ 25000 0 GainArmor { side: Player, amount: 6, total: 113 }
+ 25000 0 GainArmor { side: Player, amount: 6, total: 119 }
+ 25000 0 Activate { side: Player, item: "Hollow Chassis", index: 2 }
+ 25000 0 GainArmor { side: Player, amount: 12, total: 131 }
+ 25000 0 GainArmor { side: Player, amount: 3, total: 134 }
+ 25150 0 Regen { side: Enemy, amount: 1, health: 292 }
+ 25200 0 Activate { side: Enemy, item: "Hastening Crusher", index: 3 }
+ 25200 0 GainArmor { side: Enemy, amount: 4, total: 4 }
+ 25200 0 GainMana { side: Enemy, amount: 3, total: 36, accrued: false }
+ 25200 0 ManaCheck { side: Enemy, cost: 3, paid: true, remaining: 33 }
+ 25200 0 Hit { by: Enemy, damage: 24, absorbed: 24, target_health: 148, target_armor: 110 }
+ 25200 0 ManaCheck { side: Enemy, cost: 3, paid: true, remaining: 30 }
+ 25200 0 Hastened { side: Enemy, item: "Hastening Crusher", by_ms: 400 }
+ 25250 0 Activate { side: Player, item: "Rimebound Sole", index: 5 }
+ 25250 0 GainArmor { side: Player, amount: 12, total: 122 }
+ 25250 0 Hastened { side: Player, item: "Rimebound Sole", by_ms: 200 }
+ 25250 0 Cursed { on: Enemy, kind: Frost, duration_ms: 800, stacks: 1 }
+ 25300 0 Regen { side: Enemy, amount: 1, health: 293 }
+ 25350 0 Regen { side: Player, amount: 1, health: 149 }
+ 25400 0 Regen { side: Enemy, amount: 1, health: 294 }
+ 25500 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+ 25500 0 Hit { by: Player, damage: 61, absorbed: 4, target_health: 250, target_armor: 0 }
+ 25550 0 Regen { side: Enemy, amount: 1, health: 251 }
+ 25550 0 Activate { side: Enemy, item: "Hastening Finger", index: 2 }
+ 25550 0 GainMana { side: Enemy, amount: 3, total: 33, accrued: false }
+ 25700 0 Regen { side: Player, amount: 1, health: 150 }
+ 25700 0 Regen { side: Enemy, amount: 1, health: 252 }
+ 25850 0 Regen { side: Enemy, amount: 1, health: 253 }
+ 26000 0 Regen { side: Player, amount: 1, health: 151 }
+ 26000 0 Regen { side: Enemy, amount: 1, health: 254 }
+ 26150 0 Regen { side: Enemy, amount: 1, health: 255 }
+ 26300 0 Regen { side: Enemy, amount: 1, health: 256 }
+ 26300 0 Activate { side: Enemy, item: "Quickened Spur", index: 4 }
+ 26300 0 GainArmor { side: Enemy, amount: 3, total: 3 }
+ 26300 0 GainMana { side: Enemy, amount: 3, total: 36, accrued: false }
+ 26300 0 Hastened { side: Enemy, item: "Hastening Finger", by_ms: 450 }
+ 26350 0 Regen { side: Player, amount: 1, health: 152 }
+ 26400 0 Regen { side: Enemy, amount: 1, health: 257 }
+ 26550 0 Regen { side: Enemy, amount: 1, health: 258 }
+ 26700 0 Regen { side: Player, amount: 1, health: 153 }
+ 26700 0 Regen { side: Enemy, amount: 1, health: 259 }
+ 26800 0 Activate { side: Enemy, item: "Bulwark Wreath", index: 0 }
+ 26800 0 GainArmor { side: Enemy, amount: 12, total: 15 }
+ 26800 0 GainMana { side: Enemy, amount: 3, total: 39, accrued: false }
+ 26800 0 GainResource { side: Enemy, what: "nature", amount: 1, total: 6, accrued: false }
+ 26800 0 Hastened { side: Enemy, item: "Hastening Finger", by_ms: 450 }
+ 26800 0 Cast { side: Enemy, paid: true, cost: 3, remaining: 36 }
+ 26800 0 Activate { side: Enemy, item: "Hastening Glaive", index: 5 }
+ 26800 0 Hit { by: Enemy, damage: 90, absorbed: 90, target_health: 153, target_armor: 32 }
+ 26800 0 ResourceCheck { side: Enemy, what: "rage", cost: 5, paid: false, remaining: 1 }
+ 26800 0 GainResource { side: Enemy, what: "rage", amount: 7, total: 8, accrued: false }
+ 26800 0 Hastened { side: Enemy, item: "Hastening Finger", by_ms: 450 }
+ 26850 0 Regen { side: Enemy, amount: 1, health: 260 }
+ 26950 0 Regen { side: Enemy, amount: 1, health: 261 }
+ 26950 0 Activate { side: Enemy, item: "Hastening Finger", index: 2 }
+ 26950 0 GainMana { side: Enemy, amount: 3, total: 39, accrued: false }
+ 27000 0 Regen { side: Player, amount: 1, health: 154 }
+ 27000 0 Activate { side: Player, item: "Chained Finger", index: 3 }
+ 27000 0 GainArmor { side: Player, amount: 6, total: 38 }
+ 27000 0 GainMana { side: Player, amount: 2, total: 88, accrued: false }
+ 27000 0 Activate { side: Player, item: "Shielded Bracer", index: 4 }
+ 27000 0 GainArmor { side: Player, amount: 9, total: 47 }
+ 27000 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+ 27000 0 Hit { by: Player, damage: 61, absorbed: 15, target_health: 228, target_armor: 0 }
+ 27100 0 Regen { side: Enemy, amount: 1, health: 229 }
+ 27200 0 Regen { side: Enemy, amount: 1, health: 230 }
+ 27350 0 Regen { side: Player, amount: 1, health: 155 }
+ 27350 0 Regen { side: Enemy, amount: 1, health: 231 }
+ 27450 0 Regen { side: Enemy, amount: 1, health: 232 }
+ 27450 0 Activate { side: Player, item: "Hastening Walker", index: 6 }
+ 27450 0 GainArmor { side: Player, amount: 17, total: 64 }
+ 27450 0 GainMana { side: Player, amount: 2, total: 90, accrued: false }
+ 27450 0 Hastened { side: Player, item: "Hastening Walker", by_ms: 150 }
+ 27600 0 Regen { side: Enemy, amount: 1, health: 233 }
+ 27700 0 Regen { side: Player, amount: 1, health: 156 }
+ 27700 0 Regen { side: Enemy, amount: 1, health: 234 }
+ 27800 0 Activate { side: Enemy, item: "Warded Bulwark", index: 1 }
+ 27800 0 GainArmor { side: Enemy, amount: 20, total: 20 }
+ 27800 0 GainArmor { side: Enemy, amount: 3, total: 23 }
+ 27800 0 GainArmor { side: Enemy, amount: 4, total: 27 }
+ 27800 0 Hastened { side: Enemy, item: "Hastening Finger", by_ms: 450 }
+ 27850 0 Regen { side: Enemy, amount: 1, health: 235 }
+ 27950 0 Regen { side: Enemy, amount: 1, health: 236 }
+ 28000 0 Regen { side: Player, amount: 1, health: 157 }
+ 28000 0 Activate { side: Player, item: "Charged Brow", index: 0 }
+ 28000 0 GainArmor { side: Player, amount: 29, total: 93 }
+ 28000 0 GainMana { side: Player, amount: 9, total: 99, accrued: false }
+ 28100 0 Regen { side: Enemy, amount: 1, health: 237 }
+ 28200 0 Regen { side: Enemy, amount: 1, health: 238 }
+ 28350 0 Regen { side: Player, amount: 1, health: 158 }
+ 28350 0 Regen { side: Enemy, amount: 1, health: 239 }
+ 28350 0 Activate { side: Player, item: "Rimebound Sole", index: 5 }
+ 28350 0 GainArmor { side: Player, amount: 12, total: 105 }
+ 28350 0 Hastened { side: Player, item: "Rimebound Sole", by_ms: 200 }
+ 28350 0 Cursed { on: Enemy, kind: Frost, duration_ms: 800, stacks: 1 }
+ 28450 0 Regen { side: Enemy, amount: 1, health: 240 }
+ 28500 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+ 28500 0 Hit { by: Player, damage: 61, absorbed: 27, target_health: 219, target_armor: 0 }
+ 28500 0 Activate { side: Enemy, item: "Hastening Crusher", index: 3 }
+ 28500 0 GainArmor { side: Enemy, amount: 4, total: 4 }
+ 28500 0 GainMana { side: Enemy, amount: 3, total: 42, accrued: false }
+ 28500 0 ManaCheck { side: Enemy, cost: 3, paid: true, remaining: 39 }
+ 28500 0 Hit { by: Enemy, damage: 24, absorbed: 24, target_health: 158, target_armor: 81 }
+ 28500 0 ManaCheck { side: Enemy, cost: 3, paid: true, remaining: 36 }
+ 28500 0 Hastened { side: Enemy, item: "Hastening Crusher", by_ms: 400 }
+ 28600 0 Regen { side: Enemy, amount: 1, health: 220 }
+ 28700 0 Regen { side: Player, amount: 1, health: 159 }
+ 28700 0 Regen { side: Enemy, amount: 1, health: 221 }
+ 28850 0 Regen { side: Enemy, amount: 1, health: 222 }
+ 28950 0 Regen { side: Enemy, amount: 1, health: 223 }
+ 29000 0 Regen { side: Player, amount: 1, health: 160 }
+ 29100 0 Regen { side: Enemy, amount: 1, health: 224 }
+ 29200 0 Regen { side: Enemy, amount: 1, health: 225 }
+ 29300 0 Activate { side: Enemy, item: "Quickened Spur", index: 4 }
+ 29300 0 GainArmor { side: Enemy, amount: 3, total: 7 }
+ 29300 0 GainMana { side: Enemy, amount: 3, total: 39, accrued: false }
+ 29300 0 Hastened { side: Enemy, item: "Hastening Finger", by_ms: 450 }
+ 29350 0 Regen { side: Player, amount: 1, health: 161 }
+ 29350 0 Regen { side: Enemy, amount: 1, health: 226 }
+ 29350 0 Activate { side: Enemy, item: "Hastening Finger", index: 2 }
+ 29350 0 GainMana { side: Enemy, amount: 3, total: 42, accrued: false }
+ 29450 0 Regen { side: Enemy, amount: 1, health: 227 }
+ 29600 0 Regen { side: Enemy, amount: 1, health: 228 }
+ 29700 0 Regen { side: Player, amount: 1, health: 162 }
+ 29700 0 Regen { side: Enemy, amount: 1, health: 229 }
+ 29850 0 Regen { side: Enemy, amount: 1, health: 230 }
+ 29950 0 Regen { side: Enemy, amount: 1, health: 231 }
+ 30000 0 Regen { side: Player, amount: 1, health: 163 }
+ 30000 0 SuddenDeath { pct: 1 }
+ 30000 0 Activate { side: Player, item: "Warded Chassis", index: 1 }
+ 30000 0 GainArmor { side: Player, amount: 46, total: 127 }
+ 30000 0 GainArmor { side: Player, amount: 6, total: 133 }
+ 30000 0 GainArmor { side: Player, amount: 6, total: 139 }
+ 30000 0 Activate { side: Player, item: "Hollow Chassis", index: 2 }
+ 30000 0 GainArmor { side: Player, amount: 12, total: 151 }
+ 30000 0 GainArmor { side: Player, amount: 3, total: 154 }
+ 30000 0 Activate { side: Player, item: "Chained Finger", index: 3 }
+ 30000 0 GainArmor { side: Player, amount: 6, total: 160 }
+ 30000 0 GainMana { side: Player, amount: 2, total: 101, accrued: false }
+ 30000 0 Activate { side: Player, item: "Shielded Bracer", index: 4 }
+ 30000 0 GainArmor { side: Player, amount: 9, total: 169 }
+ 30000 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+ 30000 0 Hit { by: Player, damage: 61, absorbed: 7, target_health: 183, target_armor: 0 }
+ 30100 0 Regen { side: Enemy, amount: 1, health: 184 }
+ 30200 0 Regen { side: Enemy, amount: 1, health: 185 }
+ 30200 0 Cast { side: Enemy, paid: true, cost: 3, remaining: 39 }
+ 30200 0 Activate { side: Enemy, item: "Hastening Glaive", index: 5 }
+ 30200 0 Hit { by: Enemy, damage: 107, absorbed: 107, target_health: 159, target_armor: 62 }
+ 30200 0 ResourceCheck { side: Enemy, what: "rage", cost: 5, paid: true, remaining: 3 }
+ 30200 0 Hit { by: Enemy, damage: 51, absorbed: 51, target_health: 159, target_armor: 11 }
+ 30200 0 Hastened { side: Enemy, item: "Hastening Finger", by_ms: 450 }
+ 30350 0 Regen { side: Player, amount: 1, health: 160 }
+ 30350 0 Regen { side: Enemy, amount: 1, health: 186 }
+ 30450 0 Regen { side: Enemy, amount: 1, health: 187 }
+ 30500 0 Activate { side: Player, item: "Hastening Walker", index: 6 }
+ 30500 0 GainArmor { side: Player, amount: 17, total: 28 }
+ 30500 0 GainMana { side: Player, amount: 2, total: 103, accrued: false }
+ 30500 0 Hastened { side: Player, item: "Hastening Walker", by_ms: 150 }
+ 30600 0 Regen { side: Enemy, amount: 1, health: 188 }
+ 30700 0 Regen { side: Player, amount: 1, health: 161 }
+ 30700 0 Regen { side: Enemy, amount: 1, health: 189 }
+ 30850 0 Regen { side: Enemy, amount: 1, health: 190 }
+ 30950 0 Regen { side: Enemy, amount: 1, health: 191 }
+ 31000 0 Regen { side: Player, amount: 1, health: 162 }
+ 31000 0 SuddenDeath { pct: 2 }
+ 31100 0 Regen { side: Enemy, amount: 1, health: 178 }
+ 31200 0 Regen { side: Enemy, amount: 1, health: 179 }
+ 31200 0 Activate { side: Enemy, item: "Bulwark Wreath", index: 0 }
+ 31200 0 GainArmor { side: Enemy, amount: 12, total: 12 }
+ 31200 0 GainMana { side: Enemy, amount: 3, total: 42, accrued: false }
+ 31200 0 GainResource { side: Enemy, what: "nature", amount: 1, total: 7, accrued: false }
+ 31200 0 Hastened { side: Enemy, item: "Hastening Finger", by_ms: 450 }
+ 31200 0 Activate { side: Enemy, item: "Hastening Finger", index: 2 }
+ 31200 0 GainMana { side: Enemy, amount: 3, total: 45, accrued: false }
+ 31350 0 Regen { side: Player, amount: 1, health: 154 }
+ 31350 0 Regen { side: Enemy, amount: 1, health: 180 }
+ 31450 0 Regen { side: Enemy, amount: 1, health: 181 }
+ 31450 0 Activate { side: Player, item: "Rimebound Sole", index: 5 }
+ 31450 0 GainArmor { side: Player, amount: 12, total: 40 }
+ 31450 0 Hastened { side: Player, item: "Rimebound Sole", by_ms: 200 }
+ 31450 0 Cursed { on: Enemy, kind: Frost, duration_ms: 800, stacks: 1 }
+ 31500 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+ 31500 0 Hit { by: Player, damage: 61, absorbed: 12, target_health: 145, target_armor: 0 }
+ 31550 0 Regen { side: Enemy, amount: 1, health: 146 }
+ 31650 0 Regen { side: Enemy, amount: 1, health: 147 }
+ 31700 0 Regen { side: Player, amount: 1, health: 155 }
+ 31800 0 Regen { side: Enemy, amount: 1, health: 148 }
+ 31800 0 Activate { side: Enemy, item: "Hastening Crusher", index: 3 }
+ 31800 0 GainArmor { side: Enemy, amount: 4, total: 4 }
+ 31800 0 GainMana { side: Enemy, amount: 3, total: 48, accrued: false }
+ 31800 0 ManaCheck { side: Enemy, cost: 3, paid: true, remaining: 45 }
+ 31800 0 Hit { by: Enemy, damage: 24, absorbed: 24, target_health: 155, target_armor: 16 }
+ 31800 0 ManaCheck { side: Enemy, cost: 3, paid: true, remaining: 42 }
+ 31800 0 Hastened { side: Enemy, item: "Hastening Crusher", by_ms: 400 }
+ 31900 0 Regen { side: Enemy, amount: 1, health: 149 }
+ 32000 0 Regen { side: Player, amount: 1, health: 156 }
+ 32000 0 Regen { side: Enemy, amount: 1, health: 150 }
+ 32000 0 SuddenDeath { pct: 3 }
+ 32000 0 Activate { side: Player, item: "Charged Brow", index: 0 }
+ 32000 0 GainArmor { side: Player, amount: 29, total: 45 }
+ 32000 0 GainMana { side: Player, amount: 9, total: 112, accrued: false }
+ 32100 0 Regen { side: Enemy, amount: 1, health: 130 }
+ 32200 0 Regen { side: Enemy, amount: 1, health: 131 }
+ 32300 0 Activate { side: Enemy, item: "Quickened Spur", index: 4 }
+ 32300 0 GainArmor { side: Enemy, amount: 3, total: 7 }
+ 32300 0 GainMana { side: Enemy, amount: 3, total: 45, accrued: false }
+ 32300 0 Hastened { side: Enemy, item: "Hastening Finger", by_ms: 450 }
+ 32350 0 Regen { side: Player, amount: 1, health: 143 }
+ 32350 0 Regen { side: Enemy, amount: 1, health: 132 }
+ 32450 0 Regen { side: Enemy, amount: 1, health: 133 }
+ 32550 0 Regen { side: Enemy, amount: 1, health: 134 }
+ 32650 0 Regen { side: Enemy, amount: 1, health: 135 }
+ 32700 0 Regen { side: Player, amount: 1, health: 144 }
+ 32800 0 Regen { side: Enemy, amount: 1, health: 136 }
+ 32900 0 Regen { side: Enemy, amount: 1, health: 137 }
+ 33000 0 Regen { side: Player, amount: 1, health: 145 }
+ 33000 0 Regen { side: Enemy, amount: 1, health: 138 }
+ 33000 0 SuddenDeath { pct: 4 }
+ 33000 0 Activate { side: Player, item: "Chained Finger", index: 3 }
+ 33000 0 GainArmor { side: Player, amount: 6, total: 51 }
+ 33000 0 GainMana { side: Player, amount: 2, total: 114, accrued: false }
+ 33000 0 Activate { side: Player, item: "Shielded Bracer", index: 4 }
+ 33000 0 GainArmor { side: Player, amount: 9, total: 60 }
+ 33000 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+ 33000 0 Hit { by: Player, damage: 61, absorbed: 7, target_health: 68, target_armor: 0 }
+ 33100 0 Regen { side: Enemy, amount: 1, health: 69 }
+ 33200 0 Regen { side: Enemy, amount: 1, health: 70 }
+ 33350 0 Regen { side: Player, amount: 1, health: 127 }
+ 33350 0 Regen { side: Enemy, amount: 1, health: 71 }
+ 33450 0 Regen { side: Enemy, amount: 1, health: 72 }
+ 33500 0 Activate { side: Player, item: "Hastening Walker", index: 6 }
+ 33500 0 GainArmor { side: Player, amount: 17, total: 77 }
+ 33500 0 GainMana { side: Player, amount: 2, total: 116, accrued: false }
+ 33500 0 Hastened { side: Player, item: "Hastening Walker", by_ms: 150 }
+ 33550 0 Regen { side: Enemy, amount: 1, health: 73 }
+ 33600 0 Activate { side: Enemy, item: "Warded Bulwark", index: 1 }
+ 33600 0 GainArmor { side: Enemy, amount: 20, total: 20 }
+ 33600 0 GainArmor { side: Enemy, amount: 3, total: 23 }
+ 33600 0 GainArmor { side: Enemy, amount: 4, total: 27 }
+ 33600 0 Hastened { side: Enemy, item: "Hastening Finger", by_ms: 450 }
+ 33600 0 Activate { side: Enemy, item: "Hastening Finger", index: 2 }
+ 33600 0 GainMana { side: Enemy, amount: 3, total: 48, accrued: false }
+ 33600 0 Cast { side: Enemy, paid: true, cost: 3, remaining: 45 }
+ 33600 0 Activate { side: Enemy, item: "Hastening Glaive", index: 5 }
+ 33600 0 Hit { by: Enemy, damage: 95, absorbed: 77, target_health: 109, target_armor: 0 }
+ 33600 0 ResourceCheck { side: Enemy, what: "rage", cost: 5, paid: false, remaining: 3 }
+ 33600 0 GainResource { side: Enemy, what: "rage", amount: 7, total: 10, accrued: false }
+ 33600 0 Hastened { side: Enemy, item: "Hastening Finger", by_ms: 450 }
+ 33650 0 Regen { side: Enemy, amount: 1, health: 74 }
+ 33700 0 Regen { side: Player, amount: 1, health: 110 }
+ 33800 0 Regen { side: Enemy, amount: 1, health: 75 }
+ 33900 0 Regen { side: Enemy, amount: 1, health: 76 }
+ 34000 0 Regen { side: Player, amount: 1, health: 111 }
+ 34000 0 Regen { side: Enemy, amount: 1, health: 77 }
+ 34000 0 SuddenDeath { pct: 5 }
+ 34100 0 Regen { side: Enemy, amount: 1, health: 42 }
+ 34200 0 Regen { side: Enemy, amount: 1, health: 43 }
+ 34350 0 Regen { side: Player, amount: 1, health: 88 }
+ 34350 0 Regen { side: Enemy, amount: 1, health: 44 }
+ 34450 0 Regen { side: Enemy, amount: 1, health: 45 }
+ 34500 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+ 34500 0 Hit { by: Player, damage: 61, absorbed: 27, target_health: 24, target_armor: 0 }
+ 34550 0 Regen { side: Enemy, amount: 1, health: 25 }
+ 34550 0 Activate { side: Player, item: "Rimebound Sole", index: 5 }
+ 34550 0 GainArmor { side: Player, amount: 12, total: 12 }
+ 34550 0 Hastened { side: Player, item: "Rimebound Sole", by_ms: 200 }
+ 34550 0 Cursed { on: Enemy, kind: Frost, duration_ms: 800, stacks: 1 }
+ 34650 0 Regen { side: Enemy, amount: 1, health: 26 }
+ 34700 0 Regen { side: Player, amount: 1, health: 89 }
+ 34800 0 Regen { side: Enemy, amount: 1, health: 27 }
+ 34900 0 Regen { side: Enemy, amount: 1, health: 28 }
+ 35000 0 Regen { side: Player, amount: 1, health: 90 }
+ 35000 0 Regen { side: Enemy, amount: 1, health: 29 }
+ 35000 0 SuddenDeath { pct: 6 }
+ 35000 0 Fell { side: Enemy }
+ 35000 0 End { outcome: Victory }
+outcome Victory in 35000ms
+
+== scenario: preset-vs-vermin-sovereign
+-- monster: Vermin Sovereign
+-- difficulty: Easy
+-- name_seed: 6840143426475589633
+-- board
+Steel Frame|Helmet|0|0|0
+Crest of Vigor|Helmet|3|0|0
+Iron Plating|Helmet|0|2|0
+Visor of Focus|Helmet|0|4|0
+Padded Base|Chest|0|0|0
+Hollow Weave|Chest|5|2|1
+Chain Layer|Chest|0|3|0
+Woven Underlayer|Chest|0|4|0
+Hide Base|Chest|3|6|0
+Keystone Base|Chest|0|0|0
+Leather Material|Gloves|0|0|0
+Gripping Mold|Gloves|2|0|0
+Steel Material|Gloves|0|4|0
+Gauntlet Mold|Gloves|2|4|0
+Runed Material|Greaves|0|0|0
+Greave Mold|Greaves|2|0|0
+Boiled Leather|Greaves|0|4|0
+Runner's Mold|Greaves|3|4|0
+Balanced Grip|Weapon|0|0|0
+Runed Edge|Weapon|1|0|0
+Ruby Inlay|Weapon|2|0|0
+Balance Weight|Weapon|2|2|0
+-- locks
+-- log
+  1500 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+  1500 0 Hit { by: Player, damage: 61, absorbed: 0, target_health: 2616, target_armor: 0 }
+  1600 0 Regen { side: Enemy, amount: 1, health: 2617 }
+  1700 0 Regen { side: Enemy, amount: 1, health: 2618 }
+  1800 0 Regen { side: Enemy, amount: 1, health: 2619 }
+  2200 0 Activate { side: Enemy, item: "Hastening Snare", index: 0 }
+  2200 0 GainResource { side: Enemy, what: "faith", amount: 2, total: 2, accrued: false }
+  2200 0 GainArmor { side: Enemy, amount: 15, total: 15 }
+  2200 0 GainArmor { side: Enemy, amount: 3, total: 18 }
+  2200 0 Whetted { side: Enemy, total: 1, power_bonus: 50 }
+  2600 0 Activate { side: Enemy, item: "Hastening Sole", index: 5 }
+  2600 0 GainArmor { side: Enemy, amount: 26, total: 44 }
+  2600 0 GainMana { side: Enemy, amount: 2, total: 2, accrued: false }
+  2600 0 Hastened { side: Enemy, item: "Hastening Sole", by_ms: 448 }
+  2600 0 Hastened { side: Enemy, item: "Hastening Snare", by_ms: 375 }
+  2600 0 Hit { by: Enemy, damage: 5, absorbed: 0, target_health: 490, target_armor: 0 }
+  2600 0 Hastened { side: Enemy, item: "Hastening Talons", by_ms: 375 }
+  2600 0 Hastened { side: Enemy, item: "Hastening Knuckles", by_ms: 375 }
+  2600 0 Activate { side: Enemy, item: "Hastening Lope", index: 7 }
+  2600 0 GainArmor { side: Enemy, amount: 24, total: 68 }
+  2600 0 GainResource { side: Enemy, what: "rage", amount: 2, total: 2, accrued: false }
+  2600 0 Hastened { side: Enemy, item: "Hastening Lope", by_ms: 400 }
+  2600 0 Hastened { side: Enemy, item: "Hastening Knuckles", by_ms: 375 }
+  2650 0 Activate { side: Enemy, item: "Hastening Talons", index: 1 }
+  2650 0 GainArmor { side: Enemy, amount: 26, total: 94 }
+  2650 0 Whetted { side: Enemy, total: 2, power_bonus: 100 }
+  2650 0 GainArmor { side: Enemy, amount: 3, total: 97 }
+  2650 0 Whetted { side: Enemy, total: 3, power_bonus: 150 }
+  2650 0 Activate { side: Enemy, item: "Hastening Knuckles", index: 2 }
+  2650 0 GainArmor { side: Enemy, amount: 26, total: 123 }
+  2650 0 Whetted { side: Enemy, total: 4, power_bonus: 200 }
+  2800 0 Activate { side: Enemy, item: "Hastening Sabaton", index: 4 }
+  2800 0 GainArmor { side: Enemy, amount: 24, total: 147 }
+  2800 0 Hastened { side: Enemy, item: "Hastening Sabaton", by_ms: 400 }
+  2800 0 Hastened { side: Enemy, item: "Hastening Snare", by_ms: 375 }
+  2800 0 Hit { by: Enemy, damage: 5, absorbed: 0, target_health: 485, target_armor: 0 }
+  2800 0 Hastened { side: Enemy, item: "Hastening Talons", by_ms: 375 }
+  2800 0 Hastened { side: Enemy, item: "Hastening Knuckles", by_ms: 375 }
+  2950 0 Regen { side: Player, amount: 1, health: 486 }
+  3000 0 Activate { side: Player, item: "Chained Finger", index: 3 }
+  3000 0 GainArmor { side: Player, amount: 6, total: 6 }
+  3000 0 GainMana { side: Player, amount: 2, total: 2, accrued: false }
+  3000 0 Activate { side: Player, item: "Shielded Bracer", index: 4 }
+  3000 0 GainArmor { side: Player, amount: 9, total: 15 }
+  3000 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+  3000 0 Hit { by: Player, damage: 61, absorbed: 3, target_health: 2619, target_armor: 144 }
+  3200 0 Activate { side: Player, item: "Hastening Walker", index: 6 }
+  3200 0 GainArmor { side: Player, amount: 17, total: 32 }
+  3200 0 GainMana { side: Player, amount: 2, total: 4, accrued: false }
+  3200 0 Hastened { side: Player, item: "Hastening Walker", by_ms: 150 }
+  3200 0 Activate { side: Enemy, item: "Heavy Cuff", index: 3 }
+  3200 0 GainMana { side: Enemy, amount: 2, total: 4, accrued: false }
+  3200 0 GainArmor { side: Enemy, amount: 3, total: 147 }
+  3200 0 Whetted { side: Enemy, total: 5, power_bonus: 250 }
+  3200 0 Activate { side: Enemy, item: "Searing Trudge", index: 6 }
+  3200 0 GainMana { side: Enemy, amount: 2, total: 6, accrued: false }
+  3200 0 GainResource { side: Enemy, what: "faith", amount: 1, total: 3, accrued: false }
+  3200 0 Cursed { on: Player, kind: Searing, duration_ms: 9000, stacks: 1 }
+  3200 0 Hastened { side: Enemy, item: "Hastening Talons", by_ms: 375 }
+  3200 0 Hastened { side: Enemy, item: "Hastening Knuckles", by_ms: 375 }
+  3300 0 Burn { side: Player, damage: 1, health: 485 }
+  3300 0 Regen { side: Player, amount: 1, health: 486 }
+  3350 0 Activate { side: Player, item: "Rimebound Sole", index: 5 }
+  3350 0 GainArmor { side: Player, amount: 12, total: 44 }
+  3350 0 Hastened { side: Player, item: "Rimebound Sole", by_ms: 200 }
+  3350 0 Cursed { on: Enemy, kind: Frost, duration_ms: 150, stacks: 1 }
+  3600 0 Regen { side: Player, amount: 1, health: 484 }
+  3750 0 Activate { side: Enemy, item: "Hastening Snare", index: 0 }
+  3750 0 GainResource { side: Enemy, what: "faith", amount: 2, total: 5, accrued: false }
+  3750 0 GainArmor { side: Enemy, amount: 15, total: 162 }
+  3750 0 GainArmor { side: Enemy, amount: 3, total: 165 }
+  3750 0 Whetted { side: Enemy, total: 6, power_bonus: 300 }
+  3950 0 Regen { side: Player, amount: 1, health: 482 }
+  4000 0 Activate { side: Player, item: "Charged Brow", index: 0 }
+  4000 0 GainArmor { side: Player, amount: 29, total: 73 }
+  4000 0 GainMana { side: Player, amount: 9, total: 13, accrued: false }
+  4300 0 Burn { side: Player, damage: 10, health: 478 }
+  4300 0 Regen { side: Player, amount: 1, health: 479 }
+  4500 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+  4500 0 Hit { by: Player, damage: 61, absorbed: 3, target_health: 2619, target_armor: 162 }
+  4600 0 Regen { side: Player, amount: 1, health: 477 }
+  4750 0 Activate { side: Enemy, item: "Hastening Sole", index: 5 }
+  4750 0 GainArmor { side: Enemy, amount: 26, total: 188 }
+  4750 0 GainMana { side: Enemy, amount: 2, total: 8, accrued: false }
+  4750 0 Hastened { side: Enemy, item: "Hastening Sole", by_ms: 448 }
+  4750 0 Hastened { side: Enemy, item: "Hastening Snare", by_ms: 375 }
+  4750 0 Hit { by: Enemy, damage: 5, absorbed: 5, target_health: 476, target_armor: 68 }
+  4750 0 Hastened { side: Enemy, item: "Hastening Talons", by_ms: 375 }
+  4750 0 Hastened { side: Enemy, item: "Hastening Knuckles", by_ms: 375 }
+  4800 0 Activate { side: Enemy, item: "Hastening Talons", index: 1 }
+  4800 0 GainArmor { side: Enemy, amount: 26, total: 214 }
+  4800 0 Whetted { side: Enemy, total: 7, power_bonus: 350 }
+  4800 0 GainArmor { side: Enemy, amount: 3, total: 217 }
+  4800 0 Whetted { side: Enemy, total: 8, power_bonus: 400 }
+  4800 0 Activate { side: Enemy, item: "Hastening Knuckles", index: 2 }
+  4800 0 GainArmor { side: Enemy, amount: 26, total: 243 }
+  4800 0 Whetted { side: Enemy, total: 9, power_bonus: 450 }
+  4800 0 Activate { side: Enemy, item: "Hastening Lope", index: 7 }
+  4800 0 GainArmor { side: Enemy, amount: 24, total: 267 }
+  4800 0 GainResource { side: Enemy, what: "rage", amount: 2, total: 4, accrued: false }
+  4800 0 Hastened { side: Enemy, item: "Hastening Lope", by_ms: 400 }
+  4800 0 Hastened { side: Enemy, item: "Hastening Knuckles", by_ms: 375 }
+  4950 0 Regen { side: Player, amount: 1, health: 475 }
+  5000 0 Activate { side: Player, item: "Warded Chassis", index: 1 }
+  5000 0 GainArmor { side: Player, amount: 46, total: 114 }
+  5000 0 GainArmor { side: Player, amount: 6, total: 120 }
+  5000 0 GainArmor { side: Player, amount: 6, total: 126 }
+  5000 0 Activate { side: Player, item: "Hollow Chassis", index: 2 }
+  5000 0 GainArmor { side: Player, amount: 12, total: 138 }
+  5000 0 GainArmor { side: Player, amount: 3, total: 141 }
+  5300 0 Burn { side: Player, damage: 10, health: 471 }
+  5300 0 Regen { side: Player, amount: 1, health: 472 }
+  5300 0 Activate { side: Enemy, item: "Hastening Sabaton", index: 4 }
+  5300 0 GainArmor { side: Enemy, amount: 24, total: 291 }
+  5300 0 Hastened { side: Enemy, item: "Hastening Sabaton", by_ms: 400 }
+  5300 0 Hastened { side: Enemy, item: "Hastening Snare", by_ms: 375 }
+  5300 0 Hit { by: Enemy, damage: 5, absorbed: 5, target_health: 472, target_armor: 136 }
+  5300 0 Hastened { side: Enemy, item: "Hastening Talons", by_ms: 375 }
+  5300 0 Hastened { side: Enemy, item: "Hastening Knuckles", by_ms: 375 }
+  5350 0 Activate { side: Enemy, item: "Hastening Snare", index: 0 }
+  5350 0 GainResource { side: Enemy, what: "faith", amount: 2, total: 7, accrued: false }
+  5350 0 GainArmor { side: Enemy, amount: 15, total: 306 }
+  5350 0 GainArmor { side: Enemy, amount: 3, total: 309 }
+  5350 0 Whetted { side: Enemy, total: 10, power_bonus: 500 }
+  5600 0 Regen { side: Player, amount: 1, health: 470 }
+  5950 0 Regen { side: Player, amount: 1, health: 468 }
+  6000 0 Activate { side: Player, item: "Chained Finger", index: 3 }
+  6000 0 GainArmor { side: Player, amount: 6, total: 142 }
+  6000 0 GainMana { side: Player, amount: 2, total: 15, accrued: false }
+  6000 0 Activate { side: Player, item: "Shielded Bracer", index: 4 }
+  6000 0 GainArmor { side: Player, amount: 9, total: 151 }
+  6000 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+  6000 0 Hit { by: Player, damage: 61, absorbed: 3, target_health: 2619, target_armor: 306 }
+  6250 0 Activate { side: Player, item: "Hastening Walker", index: 6 }
+  6250 0 GainArmor { side: Player, amount: 17, total: 168 }
+  6250 0 GainMana { side: Player, amount: 2, total: 17, accrued: false }
+  6250 0 Hastened { side: Player, item: "Hastening Walker", by_ms: 150 }
+  6300 0 Burn { side: Player, damage: 10, health: 464 }
+  6300 0 Regen { side: Player, amount: 1, health: 465 }
+  6450 0 Activate { side: Player, item: "Rimebound Sole", index: 5 }
+  6450 0 GainArmor { side: Player, amount: 12, total: 180 }
+  6450 0 Hastened { side: Player, item: "Rimebound Sole", by_ms: 200 }
+  6450 0 Cursed { on: Enemy, kind: Frost, duration_ms: 150, stacks: 1 }
+  6550 0 Activate { side: Enemy, item: "Heavy Cuff", index: 3 }
+  6550 0 GainMana { side: Enemy, amount: 2, total: 10, accrued: false }
+  6550 0 GainArmor { side: Enemy, amount: 3, total: 309 }
+  6550 0 Whetted { side: Enemy, total: 11, power_bonus: 550 }
+  6550 0 Activate { side: Enemy, item: "Searing Trudge", index: 6 }
+  6550 0 GainMana { side: Enemy, amount: 2, total: 12, accrued: false }
+  6550 0 GainResource { side: Enemy, what: "faith", amount: 1, total: 8, accrued: false }
+  6550 0 Cursed { on: Player, kind: Searing, duration_ms: 9000, stacks: 2 }
+  6550 0 Hastened { side: Enemy, item: "Hastening Talons", by_ms: 375 }
+  6550 0 Hastened { side: Enemy, item: "Hastening Knuckles", by_ms: 375 }
+  6600 0 Regen { side: Player, amount: 1, health: 463 }
+  6750 0 Activate { side: Enemy, item: "Hastening Knuckles", index: 2 }
+  6750 0 GainArmor { side: Enemy, amount: 26, total: 335 }
+  6750 0 Whetted { side: Enemy, total: 12, power_bonus: 600 }
+  6950 0 Regen { side: Player, amount: 1, health: 457 }
+  6950 0 Activate { side: Enemy, item: "Hastening Sole", index: 5 }
+  6950 0 GainArmor { side: Enemy, amount: 26, total: 361 }
+  6950 0 GainMana { side: Enemy, amount: 2, total: 14, accrued: false }
+  6950 0 Hastened { side: Enemy, item: "Hastening Sole", by_ms: 448 }
+  6950 0 Hastened { side: Enemy, item: "Hastening Snare", by_ms: 375 }
+  6950 0 Hit { by: Enemy, damage: 5, absorbed: 5, target_health: 457, target_armor: 175 }
+  6950 0 Hastened { side: Enemy, item: "Hastening Talons", by_ms: 375 }
+  6950 0 Hastened { side: Enemy, item: "Hastening Knuckles", by_ms: 375 }
+  7000 0 Activate { side: Enemy, item: "Hastening Talons", index: 1 }
+  7000 0 GainArmor { side: Enemy, amount: 26, total: 387 }
+  7000 0 Whetted { side: Enemy, total: 13, power_bonus: 650 }
+  7000 0 GainArmor { side: Enemy, amount: 3, total: 390 }
+  7000 0 Whetted { side: Enemy, total: 14, power_bonus: 700 }
+  7050 0 Activate { side: Enemy, item: "Hastening Lope", index: 7 }
+  7050 0 GainArmor { side: Enemy, amount: 24, total: 414 }
+  7050 0 GainResource { side: Enemy, what: "rage", amount: 2, total: 6, accrued: false }
+  7050 0 Hastened { side: Enemy, item: "Hastening Lope", by_ms: 400 }
+  7050 0 Hastened { side: Enemy, item: "Hastening Knuckles", by_ms: 375 }
+  7250 0 Activate { side: Enemy, item: "Hastening Snare", index: 0 }
+  7250 0 GainResource { side: Enemy, what: "faith", amount: 2, total: 10, accrued: false }
+  7250 0 GainArmor { side: Enemy, amount: 15, total: 429 }
+  7250 0 GainArmor { side: Enemy, amount: 3, total: 432 }
+  7250 0 Whetted { side: Enemy, total: 15, power_bonus: 750 }
+  7300 0 Burn { side: Player, damage: 17, health: 450 }
+  7300 0 Regen { side: Player, amount: 1, health: 451 }
+  7500 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+  7500 0 Hit { by: Player, damage: 61, absorbed: 3, target_health: 2619, target_armor: 429 }
+  7600 0 Regen { side: Player, amount: 1, health: 446 }
+  7750 0 Activate { side: Enemy, item: "Hastening Sabaton", index: 4 }
+  7750 0 GainArmor { side: Enemy, amount: 24, total: 453 }
+  7750 0 Hastened { side: Enemy, item: "Hastening Sabaton", by_ms: 400 }
+  7750 0 Hastened { side: Enemy, item: "Hastening Snare", by_ms: 375 }
+  7750 0 Hit { by: Enemy, damage: 5, absorbed: 5, target_health: 443, target_armor: 170 }
+  7750 0 Hastened { side: Enemy, item: "Hastening Talons", by_ms: 375 }
+  7750 0 Hastened { side: Enemy, item: "Hastening Knuckles", by_ms: 375 }
+  7950 0 Regen { side: Player, amount: 1, health: 440 }
+  8000 0 Activate { side: Player, item: "Charged Brow", index: 0 }
+  8000 0 GainArmor { side: Player, amount: 29, total: 199 }
+  8000 0 GainMana { side: Player, amount: 9, total: 26, accrued: false }
+  8300 0 Burn { side: Player, damage: 20, health: 433 }
+  8300 0 Regen { side: Player, amount: 1, health: 434 }
+  8600 0 Regen { side: Player, amount: 1, health: 429 }
+  8600 0 Activate { side: Enemy, item: "Hastening Knuckles", index: 2 }
+  8600 0 GainArmor { side: Enemy, amount: 26, total: 479 }
+  8600 0 Whetted { side: Enemy, total: 16, power_bonus: 800 }
+  8950 0 Regen { side: Player, amount: 1, health: 423 }
+  9000 0 Activate { side: Player, item: "Chained Finger", index: 3 }
+  9000 0 GainArmor { side: Player, amount: 6, total: 205 }
+  9000 0 GainMana { side: Player, amount: 2, total: 28, accrued: false }
+  9000 0 Activate { side: Player, item: "Shielded Bracer", index: 4 }
+  9000 0 GainArmor { side: Player, amount: 9, total: 214 }
+  9000 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+  9000 0 Hit { by: Player, damage: 61, absorbed: 3, target_health: 2619, target_armor: 476 }
+  9050 0 Activate { side: Enemy, item: "Hastening Snare", index: 0 }
+  9050 0 GainResource { side: Enemy, what: "faith", amount: 2, total: 12, accrued: false }
+  9050 0 GainArmor { side: Enemy, amount: 15, total: 491 }
+  9050 0 GainArmor { side: Enemy, amount: 3, total: 494 }
+  9050 0 Whetted { side: Enemy, total: 17, power_bonus: 850 }
+  9050 0 Activate { side: Enemy, item: "Hastening Sole", index: 5 }
+  9050 0 GainArmor { side: Enemy, amount: 26, total: 520 }
+  9050 0 GainMana { side: Enemy, amount: 2, total: 16, accrued: false }
+  9050 0 Hastened { side: Enemy, item: "Hastening Sole", by_ms: 448 }
+  9050 0 Hastened { side: Enemy, item: "Hastening Snare", by_ms: 375 }
+  9050 0 Hit { by: Enemy, damage: 5, absorbed: 5, target_health: 421, target_armor: 209 }
+  9050 0 Hastened { side: Enemy, item: "Hastening Talons", by_ms: 375 }
+  9050 0 Hastened { side: Enemy, item: "Hastening Knuckles", by_ms: 375 }
+  9200 0 Activate { side: Enemy, item: "Hastening Lope", index: 7 }
+  9200 0 GainArmor { side: Enemy, amount: 24, total: 544 }
+  9200 0 GainResource { side: Enemy, what: "rage", amount: 2, total: 8, accrued: false }
+  9200 0 Hastened { side: Enemy, item: "Hastening Lope", by_ms: 400 }
+  9200 0 Hastened { side: Enemy, item: "Hastening Knuckles", by_ms: 375 }
+  9250 0 Activate { side: Player, item: "Hastening Walker", index: 6 }
+  9250 0 GainArmor { side: Player, amount: 17, total: 226 }
+  9250 0 GainMana { side: Player, amount: 2, total: 30, accrued: false }
+  9250 0 Hastened { side: Player, item: "Hastening Walker", by_ms: 150 }
+  9250 0 Activate { side: Enemy, item: "Hastening Talons", index: 1 }
+  9250 0 GainArmor { side: Enemy, amount: 26, total: 570 }
+  9250 0 Whetted { side: Enemy, total: 18, power_bonus: 900 }
+  9250 0 GainArmor { side: Enemy, amount: 3, total: 573 }
+  9250 0 Whetted { side: Enemy, total: 19, power_bonus: 950 }
+  9300 0 Burn { side: Player, damage: 20, health: 416 }
+  9300 0 Regen { side: Player, amount: 1, health: 417 }
+  9550 0 Activate { side: Player, item: "Rimebound Sole", index: 5 }
+  9550 0 GainArmor { side: Player, amount: 12, total: 238 }
+  9550 0 Hastened { side: Player, item: "Rimebound Sole", by_ms: 200 }
+  9550 0 Cursed { on: Enemy, kind: Frost, duration_ms: 150, stacks: 1 }
+  9600 0 Regen { side: Player, amount: 1, health: 412 }
+  9850 0 Activate { side: Enemy, item: "Heavy Cuff", index: 3 }
+  9850 0 GainMana { side: Enemy, amount: 2, total: 18, accrued: false }
+  9850 0 GainArmor { side: Enemy, amount: 3, total: 576 }
+  9850 0 Whetted { side: Enemy, total: 20, power_bonus: 1000 }
+  9850 0 Activate { side: Enemy, item: "Searing Trudge", index: 6 }
+  9850 0 GainMana { side: Enemy, amount: 2, total: 20, accrued: false }
+  9850 0 GainResource { side: Enemy, what: "faith", amount: 1, total: 13, accrued: false }
+  9850 0 Cursed { on: Player, kind: Searing, duration_ms: 9000, stacks: 3 }
+  9850 0 Hastened { side: Enemy, item: "Hastening Talons", by_ms: 375 }
+  9850 0 Hastened { side: Enemy, item: "Hastening Knuckles", by_ms: 375 }
+  9950 0 Regen { side: Player, amount: 1, health: 405 }
+ 10000 0 Activate { side: Player, item: "Warded Chassis", index: 1 }
+ 10000 0 GainArmor { side: Player, amount: 46, total: 284 }
+ 10000 0 GainArmor { side: Player, amount: 6, total: 290 }
+ 10000 0 GainArmor { side: Player, amount: 6, total: 296 }
+ 10000 0 Activate { side: Player, item: "Hollow Chassis", index: 2 }
+ 10000 0 GainArmor { side: Player, amount: 12, total: 308 }
+ 10000 0 GainArmor { side: Player, amount: 3, total: 311 }
+ 10250 0 Activate { side: Enemy, item: "Hastening Sabaton", index: 4 }
+ 10250 0 GainArmor { side: Enemy, amount: 24, total: 600 }
+ 10250 0 Hastened { side: Enemy, item: "Hastening Sabaton", by_ms: 400 }
+ 10250 0 Hastened { side: Enemy, item: "Hastening Snare", by_ms: 375 }
+ 10250 0 Hit { by: Enemy, damage: 5, absorbed: 5, target_health: 396, target_armor: 306 }
+ 10250 0 Hastened { side: Enemy, item: "Hastening Talons", by_ms: 375 }
+ 10250 0 Hastened { side: Enemy, item: "Hastening Knuckles", by_ms: 375 }
+ 10300 0 Burn { side: Player, damage: 25, health: 394 }
+ 10300 0 Regen { side: Player, amount: 1, health: 395 }
+ 10300 0 Activate { side: Enemy, item: "Hastening Knuckles", index: 2 }
+ 10300 0 GainArmor { side: Enemy, amount: 26, total: 626 }
+ 10300 0 Whetted { side: Enemy, total: 21, power_bonus: 1050 }
+ 10500 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+ 10500 0 Hit { by: Player, damage: 61, absorbed: 3, target_health: 2619, target_armor: 623 }
+ 10600 0 Regen { side: Player, amount: 1, health: 387 }
+ 10600 0 Activate { side: Enemy, item: "Hastening Snare", index: 0 }
+ 10600 0 GainResource { side: Enemy, what: "faith", amount: 2, total: 15, accrued: false }
+ 10600 0 GainArmor { side: Enemy, amount: 15, total: 638 }
+ 10600 0 GainArmor { side: Enemy, amount: 3, total: 641 }
+ 10600 0 Whetted { side: Enemy, total: 22, power_bonus: 1100 }
+ 10950 0 Regen { side: Player, amount: 1, health: 378 }
+ 11250 0 Activate { side: Enemy, item: "Hastening Sole", index: 5 }
+ 11250 0 GainArmor { side: Enemy, amount: 26, total: 667 }
+ 11250 0 GainMana { side: Enemy, amount: 2, total: 22, accrued: false }
+ 11250 0 Hastened { side: Enemy, item: "Hastening Sole", by_ms: 448 }
+ 11250 0 Hastened { side: Enemy, item: "Hastening Snare", by_ms: 375 }
+ 11250 0 Hit { by: Enemy, damage: 5, absorbed: 5, target_health: 369, target_armor: 301 }
+ 11250 0 Hastened { side: Enemy, item: "Hastening Talons", by_ms: 375 }
+ 11250 0 Hastened { side: Enemy, item: "Hastening Knuckles", by_ms: 375 }
+ 11300 0 Burn { side: Player, damage: 30, health: 367 }
+ 11300 0 Regen { side: Player, amount: 1, health: 368 }
+ 11300 0 Activate { side: Enemy, item: "Hastening Talons", index: 1 }
+ 11300 0 GainArmor { side: Enemy, amount: 26, total: 693 }
+ 11300 0 Whetted { side: Enemy, total: 23, power_bonus: 1150 }
+ 11300 0 GainArmor { side: Enemy, amount: 3, total: 696 }
+ 11300 0 Whetted { side: Enemy, total: 24, power_bonus: 1200 }
+ 11450 0 Activate { side: Enemy, item: "Hastening Lope", index: 7 }
+ 11450 0 GainArmor { side: Enemy, amount: 24, total: 720 }
+ 11450 0 GainResource { side: Enemy, what: "rage", amount: 2, total: 10, accrued: false }
+ 11450 0 Hastened { side: Enemy, item: "Hastening Lope", by_ms: 400 }
+ 11450 0 Hastened { side: Enemy, item: "Hastening Knuckles", by_ms: 375 }
+ 11600 0 Regen { side: Player, amount: 1, health: 360 }
+ 11950 0 Regen { side: Player, amount: 1, health: 351 }
+ 12000 0 Activate { side: Player, item: "Charged Brow", index: 0 }
+ 12000 0 GainArmor { side: Player, amount: 29, total: 330 }
+ 12000 0 GainMana { side: Player, amount: 9, total: 39, accrued: false }
+ 12000 0 Activate { side: Player, item: "Chained Finger", index: 3 }
+ 12000 0 GainArmor { side: Player, amount: 6, total: 336 }
+ 12000 0 GainMana { side: Player, amount: 2, total: 41, accrued: false }
+ 12000 0 Activate { side: Player, item: "Shielded Bracer", index: 4 }
+ 12000 0 GainArmor { side: Player, amount: 9, total: 345 }
+ 12000 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+ 12000 0 Hit { by: Player, damage: 61, absorbed: 3, target_health: 2619, target_armor: 717 }
+ 12300 0 Burn { side: Player, damage: 30, health: 340 }
+ 12300 0 Regen { side: Player, amount: 1, health: 341 }
+ 12300 0 Activate { side: Player, item: "Hastening Walker", index: 6 }
+ 12300 0 GainArmor { side: Player, amount: 17, total: 362 }
+ 12300 0 GainMana { side: Player, amount: 2, total: 43, accrued: false }
+ 12300 0 Hastened { side: Player, item: "Hastening Walker", by_ms: 150 }
+ 12400 0 Activate { side: Enemy, item: "Hastening Snare", index: 0 }
+ 12400 0 GainResource { side: Enemy, what: "faith", amount: 2, total: 17, accrued: false }
+ 12400 0 GainArmor { side: Enemy, amount: 15, total: 732 }
+ 12400 0 GainArmor { side: Enemy, amount: 3, total: 735 }
+ 12400 0 Whetted { side: Enemy, total: 25, power_bonus: 1250 }
+ 12550 0 Activate { side: Enemy, item: "Hastening Knuckles", index: 2 }
+ 12550 0 GainArmor { side: Enemy, amount: 26, total: 761 }
+ 12550 0 Whetted { side: Enemy, total: 26, power_bonus: 1300 }
+ 12600 0 Regen { side: Player, amount: 1, health: 333 }
+ 12650 0 Activate { side: Player, item: "Rimebound Sole", index: 5 }
+ 12650 0 GainArmor { side: Player, amount: 12, total: 374 }
+ 12650 0 Hastened { side: Player, item: "Rimebound Sole", by_ms: 200 }
+ 12650 0 Cursed { on: Enemy, kind: Frost, duration_ms: 150, stacks: 1 }
+ 12650 0 Activate { side: Enemy, item: "Hastening Sabaton", index: 4 }
+ 12650 0 GainArmor { side: Enemy, amount: 24, total: 785 }
+ 12650 0 Hastened { side: Enemy, item: "Hastening Sabaton", by_ms: 400 }
+ 12650 0 Hastened { side: Enemy, item: "Hastening Snare", by_ms: 375 }
+ 12650 0 Hit { by: Enemy, damage: 5, absorbed: 5, target_health: 332, target_armor: 369 }
+ 12650 0 Hastened { side: Enemy, item: "Hastening Talons", by_ms: 375 }
+ 12650 0 Hastened { side: Enemy, item: "Hastening Knuckles", by_ms: 375 }
+ 12950 0 Regen { side: Player, amount: 1, health: 324 }
+ 13100 0 Activate { side: Enemy, item: "Heavy Cuff", index: 3 }
+ 13100 0 GainMana { side: Enemy, amount: 2, total: 24, accrued: false }
+ 13100 0 GainArmor { side: Enemy, amount: 3, total: 788 }
+ 13100 0 Whetted { side: Enemy, total: 27, power_bonus: 1350 }
+ 13100 0 Activate { side: Enemy, item: "Searing Trudge", index: 6 }
+ 13100 0 GainMana { side: Enemy, amount: 2, total: 26, accrued: false }
+ 13100 0 GainResource { side: Enemy, what: "faith", amount: 1, total: 18, accrued: false }
+ 13100 0 Cursed { on: Player, kind: Searing, duration_ms: 9000, stacks: 4 }
+ 13100 0 Hastened { side: Enemy, item: "Hastening Talons", by_ms: 375 }
+ 13100 0 Hastened { side: Enemy, item: "Hastening Knuckles", by_ms: 375 }
+ 13300 0 Burn { side: Player, damage: 32, health: 311 }
+ 13300 0 Regen { side: Player, amount: 1, health: 312 }
+ 13450 0 Activate { side: Enemy, item: "Hastening Sole", index: 5 }
+ 13450 0 GainArmor { side: Enemy, amount: 26, total: 814 }
+ 13450 0 GainMana { side: Enemy, amount: 2, total: 28, accrued: false }
+ 13450 0 Hastened { side: Enemy, item: "Hastening Sole", by_ms: 448 }
+ 13450 0 Hastened { side: Enemy, item: "Hastening Snare", by_ms: 375 }
+ 13450 0 Hit { by: Enemy, damage: 5, absorbed: 5, target_health: 306, target_armor: 364 }
+ 13450 0 Hastened { side: Enemy, item: "Hastening Talons", by_ms: 375 }
+ 13450 0 Hastened { side: Enemy, item: "Hastening Knuckles", by_ms: 375 }
+ 13500 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+ 13500 0 Hit { by: Player, damage: 61, absorbed: 3, target_health: 2619, target_armor: 811 }
+ 13500 0 Activate { side: Enemy, item: "Hastening Talons", index: 1 }
+ 13500 0 GainArmor { side: Enemy, amount: 26, total: 837 }
+ 13500 0 Whetted { side: Enemy, total: 28, power_bonus: 1400 }
+ 13500 0 GainArmor { side: Enemy, amount: 3, total: 840 }
+ 13500 0 Whetted { side: Enemy, total: 29, power_bonus: 1450 }
+ 13600 0 Regen { side: Player, amount: 1, health: 301 }
+ 13700 0 Activate { side: Enemy, item: "Hastening Lope", index: 7 }
+ 13700 0 GainArmor { side: Enemy, amount: 24, total: 864 }
+ 13700 0 GainResource { side: Enemy, what: "rage", amount: 2, total: 12, accrued: false }
+ 13700 0 Hastened { side: Enemy, item: "Hastening Lope", by_ms: 400 }
+ 13700 0 Hastened { side: Enemy, item: "Hastening Knuckles", by_ms: 375 }
+ 13950 0 Regen { side: Player, amount: 1, health: 288 }
+ 13950 0 Activate { side: Enemy, item: "Hastening Snare", index: 0 }
+ 13950 0 GainResource { side: Enemy, what: "faith", amount: 2, total: 20, accrued: false }
+ 13950 0 GainArmor { side: Enemy, amount: 15, total: 879 }
+ 13950 0 GainArmor { side: Enemy, amount: 3, total: 882 }
+ 13950 0 Whetted { side: Enemy, total: 30, power_bonus: 1500 }
+ 14100 0 Activate { side: Enemy, item: "Hastening Knuckles", index: 2 }
+ 14100 0 GainArmor { side: Enemy, amount: 26, total: 908 }
+ 14100 0 Whetted { side: Enemy, total: 31, power_bonus: 1550 }
+ 14300 0 Burn { side: Player, damage: 40, health: 274 }
+ 14300 0 Regen { side: Player, amount: 1, health: 275 }
+ 14600 0 Regen { side: Player, amount: 1, health: 264 }
+ 14950 0 Regen { side: Player, amount: 1, health: 251 }
+ 15000 0 Activate { side: Player, item: "Warded Chassis", index: 1 }
+ 15000 0 GainArmor { side: Player, amount: 46, total: 410 }
+ 15000 0 GainArmor { side: Player, amount: 6, total: 416 }
+ 15000 0 GainArmor { side: Player, amount: 6, total: 422 }
+ 15000 0 Activate { side: Player, item: "Hollow Chassis", index: 2 }
+ 15000 0 GainArmor { side: Player, amount: 12, total: 434 }
+ 15000 0 GainArmor { side: Player, amount: 3, total: 437 }
+ 15000 0 Activate { side: Player, item: "Chained Finger", index: 3 }
+ 15000 0 GainArmor { side: Player, amount: 6, total: 443 }
+ 15000 0 GainMana { side: Player, amount: 2, total: 45, accrued: false }
+ 15000 0 Activate { side: Player, item: "Shielded Bracer", index: 4 }
+ 15000 0 GainArmor { side: Player, amount: 9, total: 452 }
+ 15000 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+ 15000 0 Hit { by: Player, damage: 61, absorbed: 3, target_health: 2619, target_armor: 905 }
+ 15100 0 Activate { side: Enemy, item: "Hastening Sabaton", index: 4 }
+ 15100 0 GainArmor { side: Enemy, amount: 24, total: 929 }
+ 15100 0 Hastened { side: Enemy, item: "Hastening Sabaton", by_ms: 400 }
+ 15100 0 Hastened { side: Enemy, item: "Hastening Snare", by_ms: 375 }
+ 15100 0 Hit { by: Enemy, damage: 5, absorbed: 5, target_health: 245, target_armor: 447 }
+ 15100 0 Hastened { side: Enemy, item: "Hastening Talons", by_ms: 375 }
+ 15100 0 Hastened { side: Enemy, item: "Hastening Knuckles", by_ms: 375 }
+ 15300 0 Burn { side: Player, damage: 40, health: 237 }
+ 15300 0 Regen { side: Player, amount: 1, health: 238 }
+ 15350 0 Activate { side: Player, item: "Hastening Walker", index: 6 }
+ 15350 0 GainArmor { side: Player, amount: 17, total: 464 }
+ 15350 0 GainMana { side: Player, amount: 2, total: 47, accrued: false }
+ 15350 0 Hastened { side: Player, item: "Hastening Walker", by_ms: 150 }
+ 15550 0 Activate { side: Enemy, item: "Hastening Sole", index: 5 }
+ 15550 0 GainArmor { side: Enemy, amount: 26, total: 955 }
+ 15550 0 GainMana { side: Enemy, amount: 2, total: 30, accrued: false }
+ 15550 0 Hastened { side: Enemy, item: "Hastening Sole", by_ms: 448 }
+ 15550 0 Hastened { side: Enemy, item: "Hastening Snare", by_ms: 375 }
+ 15550 0 Hit { by: Enemy, damage: 5, absorbed: 5, target_health: 228, target_armor: 459 }
+ 15550 0 Hastened { side: Enemy, item: "Hastening Talons", by_ms: 375 }
+ 15550 0 Hastened { side: Enemy, item: "Hastening Knuckles", by_ms: 375 }
+ 15600 0 Regen { side: Player, amount: 1, health: 227 }
+ 15600 0 Activate { side: Enemy, item: "Hastening Snare", index: 0 }
+ 15600 0 GainResource { side: Enemy, what: "faith", amount: 2, total: 22, accrued: false }
+ 15600 0 GainArmor { side: Enemy, amount: 15, total: 970 }
+ 15600 0 GainArmor { side: Enemy, amount: 3, total: 973 }
+ 15600 0 Whetted { side: Enemy, total: 32, power_bonus: 1600 }
+ 15750 0 Activate { side: Player, item: "Rimebound Sole", index: 5 }
+ 15750 0 GainArmor { side: Player, amount: 12, total: 471 }
+ 15750 0 Hastened { side: Player, item: "Rimebound Sole", by_ms: 200 }
+ 15750 0 Cursed { on: Enemy, kind: Frost, duration_ms: 150, stacks: 1 }
+ 15750 0 Activate { side: Enemy, item: "Hastening Talons", index: 1 }
+ 15750 0 GainArmor { side: Enemy, amount: 26, total: 999 }
+ 15750 0 Whetted { side: Enemy, total: 33, power_bonus: 1650 }
+ 15750 0 GainArmor { side: Enemy, amount: 3, total: 1002 }
+ 15750 0 Whetted { side: Enemy, total: 34, power_bonus: 1700 }
+ 15900 0 Activate { side: Enemy, item: "Hastening Lope", index: 7 }
+ 15900 0 GainArmor { side: Enemy, amount: 24, total: 1026 }
+ 15900 0 GainResource { side: Enemy, what: "rage", amount: 2, total: 14, accrued: false }
+ 15900 0 Hastened { side: Enemy, item: "Hastening Lope", by_ms: 400 }
+ 15900 0 Hastened { side: Enemy, item: "Hastening Knuckles", by_ms: 375 }
+ 15950 0 Regen { side: Player, amount: 1, health: 214 }
+ 16000 0 Activate { side: Player, item: "Charged Brow", index: 0 }
+ 16000 0 GainArmor { side: Player, amount: 29, total: 500 }
+ 16000 0 GainMana { side: Player, amount: 9, total: 56, accrued: false }
+ 16050 0 Activate { side: Enemy, item: "Hastening Knuckles", index: 2 }
+ 16050 0 GainArmor { side: Enemy, amount: 26, total: 1052 }
+ 16050 0 Whetted { side: Enemy, total: 35, power_bonus: 1750 }
+ 16300 0 Burn { side: Player, damage: 40, health: 200 }
+ 16300 0 Regen { side: Player, amount: 1, health: 201 }
+ 16400 0 Activate { side: Enemy, item: "Heavy Cuff", index: 3 }
+ 16400 0 GainMana { side: Enemy, amount: 2, total: 32, accrued: false }
+ 16400 0 GainArmor { side: Enemy, amount: 3, total: 1055 }
+ 16400 0 Whetted { side: Enemy, total: 36, power_bonus: 1800 }
+ 16400 0 Activate { side: Enemy, item: "Searing Trudge", index: 6 }
+ 16400 0 GainMana { side: Enemy, amount: 2, total: 34, accrued: false }
+ 16400 0 GainResource { side: Enemy, what: "faith", amount: 1, total: 23, accrued: false }
+ 16400 0 Cursed { on: Player, kind: Searing, duration_ms: 9000, stacks: 5 }
+ 16400 0 Hastened { side: Enemy, item: "Hastening Talons", by_ms: 375 }
+ 16400 0 Hastened { side: Enemy, item: "Hastening Knuckles", by_ms: 375 }
+ 16500 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+ 16500 0 Hit { by: Player, damage: 61, absorbed: 3, target_health: 2619, target_armor: 1052 }
+ 16600 0 Regen { side: Player, amount: 1, health: 188 }
+ 16950 0 Regen { side: Player, amount: 1, health: 172 }
+ 17300 0 Burn { side: Player, damage: 49, health: 154 }
+ 17300 0 Regen { side: Player, amount: 1, health: 155 }
+ 17600 0 Regen { side: Player, amount: 1, health: 141 }
+ 17600 0 Activate { side: Enemy, item: "Hastening Sabaton", index: 4 }
+ 17600 0 GainArmor { side: Enemy, amount: 24, total: 1076 }
+ 17600 0 Hastened { side: Enemy, item: "Hastening Sabaton", by_ms: 400 }
+ 17600 0 Hastened { side: Enemy, item: "Hastening Snare", by_ms: 375 }
+ 17600 0 Hit { by: Enemy, damage: 5, absorbed: 5, target_health: 141, target_armor: 495 }
+ 17600 0 Hastened { side: Enemy, item: "Hastening Talons", by_ms: 375 }
+ 17600 0 Hastened { side: Enemy, item: "Hastening Knuckles", by_ms: 375 }
+ 17650 0 Activate { side: Enemy, item: "Hastening Snare", index: 0 }
+ 17650 0 GainResource { side: Enemy, what: "faith", amount: 2, total: 25, accrued: false }
+ 17650 0 GainArmor { side: Enemy, amount: 15, total: 1091 }
+ 17650 0 GainArmor { side: Enemy, amount: 3, total: 1094 }
+ 17650 0 Whetted { side: Enemy, total: 37, power_bonus: 1850 }
+ 17750 0 Activate { side: Enemy, item: "Hastening Sole", index: 5 }
+ 17750 0 GainArmor { side: Enemy, amount: 26, total: 1120 }
+ 17750 0 GainMana { side: Enemy, amount: 2, total: 36, accrued: false }
+ 17750 0 Hastened { side: Enemy, item: "Hastening Sole", by_ms: 448 }
+ 17750 0 Hastened { side: Enemy, item: "Hastening Snare", by_ms: 375 }
+ 17750 0 Hit { by: Enemy, damage: 5, absorbed: 5, target_health: 134, target_armor: 490 }
+ 17750 0 Hastened { side: Enemy, item: "Hastening Talons", by_ms: 375 }
+ 17750 0 Hastened { side: Enemy, item: "Hastening Knuckles", by_ms: 375 }
+ 17800 0 Activate { side: Enemy, item: "Hastening Talons", index: 1 }
+ 17800 0 GainArmor { side: Enemy, amount: 26, total: 1146 }
+ 17800 0 Whetted { side: Enemy, total: 38, power_bonus: 1900 }
+ 17800 0 GainArmor { side: Enemy, amount: 3, total: 1149 }
+ 17800 0 Whetted { side: Enemy, total: 39, power_bonus: 1950 }
+ 17950 0 Regen { side: Player, amount: 1, health: 125 }
+ 17950 0 Activate { side: Enemy, item: "Hastening Knuckles", index: 2 }
+ 17950 0 GainArmor { side: Enemy, amount: 26, total: 1175 }
+ 17950 0 Whetted { side: Enemy, total: 40, power_bonus: 2000 }
+ 18000 0 Activate { side: Player, item: "Chained Finger", index: 3 }
+ 18000 0 GainArmor { side: Player, amount: 6, total: 496 }
+ 18000 0 GainMana { side: Player, amount: 2, total: 58, accrued: false }
+ 18000 0 Activate { side: Player, item: "Shielded Bracer", index: 4 }
+ 18000 0 GainArmor { side: Player, amount: 9, total: 505 }
+ 18000 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+ 18000 0 Hit { by: Player, damage: 61, absorbed: 3, target_health: 2619, target_armor: 1172 }
+ 18100 0 Activate { side: Enemy, item: "Hastening Lope", index: 7 }
+ 18100 0 GainArmor { side: Enemy, amount: 24, total: 1196 }
+ 18100 0 GainResource { side: Enemy, what: "rage", amount: 2, total: 16, accrued: false }
+ 18100 0 Hastened { side: Enemy, item: "Hastening Lope", by_ms: 400 }
+ 18100 0 Hastened { side: Enemy, item: "Hastening Knuckles", by_ms: 375 }
+ 18300 0 Burn { side: Player, damage: 50, health: 107 }
+ 18300 0 Regen { side: Player, amount: 1, health: 108 }
+ 18350 0 Activate { side: Player, item: "Hastening Walker", index: 6 }
+ 18350 0 GainArmor { side: Player, amount: 17, total: 522 }
+ 18350 0 GainMana { side: Player, amount: 2, total: 60, accrued: false }
+ 18350 0 Hastened { side: Player, item: "Hastening Walker", by_ms: 150 }
+ 18600 0 Regen { side: Player, amount: 1, health: 94 }
+ 18850 0 Activate { side: Player, item: "Rimebound Sole", index: 5 }
+ 18850 0 GainArmor { side: Player, amount: 12, total: 534 }
+ 18850 0 Hastened { side: Player, item: "Rimebound Sole", by_ms: 200 }
+ 18850 0 Cursed { on: Enemy, kind: Frost, duration_ms: 150, stacks: 1 }
+ 18950 0 Regen { side: Player, amount: 1, health: 78 }
+ 19300 0 Burn { side: Player, damage: 50, health: 60 }
+ 19300 0 Regen { side: Player, amount: 1, health: 61 }
+ 19500 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+ 19500 0 Hit { by: Player, damage: 61, absorbed: 3, target_health: 2619, target_armor: 1193 }
+ 19550 0 Activate { side: Enemy, item: "Hastening Snare", index: 0 }
+ 19550 0 GainResource { side: Enemy, what: "faith", amount: 2, total: 27, accrued: false }
+ 19550 0 GainArmor { side: Enemy, amount: 15, total: 1208 }
+ 19550 0 GainArmor { side: Enemy, amount: 3, total: 1211 }
+ 19550 0 Whetted { side: Enemy, total: 41, power_bonus: 2050 }
+ 19600 0 Regen { side: Player, amount: 1, health: 47 }
+ 19650 0 Activate { side: Enemy, item: "Heavy Cuff", index: 3 }
+ 19650 0 GainMana { side: Enemy, amount: 2, total: 38, accrued: false }
+ 19650 0 GainArmor { side: Enemy, amount: 3, total: 1214 }
+ 19650 0 Whetted { side: Enemy, total: 42, power_bonus: 2100 }
+ 19650 0 Activate { side: Enemy, item: "Searing Trudge", index: 6 }
+ 19650 0 GainMana { side: Enemy, amount: 2, total: 40, accrued: false }
+ 19650 0 GainResource { side: Enemy, what: "faith", amount: 1, total: 28, accrued: false }
+ 19650 0 Cursed { on: Player, kind: Searing, duration_ms: 9000, stacks: 6 }
+ 19650 0 Hastened { side: Enemy, item: "Hastening Talons", by_ms: 375 }
+ 19650 0 Hastened { side: Enemy, item: "Hastening Knuckles", by_ms: 375 }
+ 19950 0 Regen { side: Player, amount: 1, health: 28 }
+ 19950 0 Activate { side: Enemy, item: "Hastening Sole", index: 5 }
+ 19950 0 GainArmor { side: Enemy, amount: 26, total: 1240 }
+ 19950 0 GainMana { side: Enemy, amount: 2, total: 42, accrued: false }
+ 19950 0 Hastened { side: Enemy, item: "Hastening Sole", by_ms: 448 }
+ 19950 0 Hastened { side: Enemy, item: "Hastening Snare", by_ms: 375 }
+ 19950 0 Hit { by: Enemy, damage: 5, absorbed: 5, target_health: 28, target_armor: 529 }
+ 19950 0 Hastened { side: Enemy, item: "Hastening Talons", by_ms: 375 }
+ 19950 0 Hastened { side: Enemy, item: "Hastening Knuckles", by_ms: 375 }
+ 20000 0 Activate { side: Player, item: "Charged Brow", index: 0 }
+ 20000 0 GainArmor { side: Player, amount: 29, total: 558 }
+ 20000 0 GainMana { side: Player, amount: 9, total: 69, accrued: false }
+ 20000 0 Activate { side: Player, item: "Warded Chassis", index: 1 }
+ 20000 0 GainArmor { side: Player, amount: 46, total: 604 }
+ 20000 0 GainArmor { side: Player, amount: 6, total: 610 }
+ 20000 0 GainArmor { side: Player, amount: 6, total: 616 }
+ 20000 0 Activate { side: Player, item: "Hollow Chassis", index: 2 }
+ 20000 0 GainArmor { side: Player, amount: 12, total: 628 }
+ 20000 0 GainArmor { side: Player, amount: 3, total: 631 }
+ 20000 0 Activate { side: Enemy, item: "Hastening Knuckles", index: 2 }
+ 20000 0 GainArmor { side: Enemy, amount: 26, total: 1266 }
+ 20000 0 Whetted { side: Enemy, total: 43, power_bonus: 2150 }
+ 20050 0 Activate { side: Enemy, item: "Hastening Sabaton", index: 4 }
+ 20050 0 GainArmor { side: Enemy, amount: 24, total: 1290 }
+ 20050 0 Hastened { side: Enemy, item: "Hastening Sabaton", by_ms: 400 }
+ 20050 0 Hastened { side: Enemy, item: "Hastening Snare", by_ms: 375 }
+ 20050 0 Hit { by: Enemy, damage: 5, absorbed: 5, target_health: 22, target_armor: 626 }
+ 20050 0 Hastened { side: Enemy, item: "Hastening Talons", by_ms: 375 }
+ 20050 0 Hastened { side: Enemy, item: "Hastening Knuckles", by_ms: 375 }
+ 20100 0 Activate { side: Enemy, item: "Hastening Talons", index: 1 }
+ 20100 0 GainArmor { side: Enemy, amount: 26, total: 1316 }
+ 20100 0 Whetted { side: Enemy, total: 44, power_bonus: 2200 }
+ 20100 0 GainArmor { side: Enemy, amount: 3, total: 1319 }
+ 20100 0 Whetted { side: Enemy, total: 45, power_bonus: 2250 }
+ 20300 0 Burn { side: Player, damage: 56, health: 7 }
+ 20300 0 Regen { side: Player, amount: 1, health: 8 }
+ 20300 0 Activate { side: Enemy, item: "Hastening Lope", index: 7 }
+ 20300 0 GainArmor { side: Enemy, amount: 24, total: 1343 }
+ 20300 0 GainResource { side: Enemy, what: "rage", amount: 2, total: 18, accrued: false }
+ 20300 0 Hastened { side: Enemy, item: "Hastening Lope", by_ms: 400 }
+ 20300 0 Hastened { side: Enemy, item: "Hastening Knuckles", by_ms: 375 }
+ 20450 0 Burn { side: Player, damage: 9, health: -1 }
+ 20450 0 Fell { side: Player }
+ 20450 0 End { outcome: Defeat }
+outcome Defeat in 20450ms
+
+== scenario: preset-vs-the-tallow-saint
+-- monster: The Tallow Saint
+-- difficulty: Easy
+-- name_seed: 6840143426475589633
+-- board
+Steel Frame|Helmet|0|0|0
+Crest of Vigor|Helmet|3|0|0
+Iron Plating|Helmet|0|2|0
+Visor of Focus|Helmet|0|4|0
+Padded Base|Chest|0|0|0
+Hollow Weave|Chest|5|2|1
+Chain Layer|Chest|0|3|0
+Woven Underlayer|Chest|0|4|0
+Hide Base|Chest|3|6|0
+Keystone Base|Chest|0|0|0
+Leather Material|Gloves|0|0|0
+Gripping Mold|Gloves|2|0|0
+Steel Material|Gloves|0|4|0
+Gauntlet Mold|Gloves|2|4|0
+Runed Material|Greaves|0|0|0
+Greave Mold|Greaves|2|0|0
+Boiled Leather|Greaves|0|4|0
+Runner's Mold|Greaves|3|4|0
+Balanced Grip|Weapon|0|0|0
+Runed Edge|Weapon|1|0|0
+Ruby Inlay|Weapon|2|0|0
+Balance Weight|Weapon|2|2|0
+-- locks
+-- log
+  1500 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+  1500 0 Hit { by: Player, damage: 61, absorbed: 0, target_health: 3100, target_armor: 0 }
+  1600 0 Regen { side: Enemy, amount: 1, health: 3101 }
+  1700 0 Regen { side: Enemy, amount: 1, health: 3102 }
+  1750 0 Regen { side: Enemy, amount: 1, health: 3103 }
+  1850 0 Regen { side: Enemy, amount: 1, health: 3104 }
+  1900 0 Regen { side: Enemy, amount: 1, health: 3105 }
+  2000 0 Regen { side: Enemy, amount: 1, health: 3106 }
+  2050 0 Regen { side: Enemy, amount: 1, health: 3107 }
+  2150 0 Regen { side: Enemy, amount: 1, health: 3108 }
+  2150 0 Cast { side: Enemy, paid: false, cost: 3, remaining: 0 }
+  2150 0 Activate { side: Enemy, item: "Searing Hewer (Sunder)", index: 4 }
+  2150 0 Hit { by: Enemy, damage: 337, absorbed: 0, target_health: 158, target_armor: 0 }
+  2150 0 GainMana { side: Enemy, amount: 6, total: 6, accrued: false }
+  2150 0 GainResource { side: Enemy, what: "nature", amount: 20, total: 20, accrued: false }
+  2150 0 Hit { by: Enemy, damage: 81, absorbed: 0, target_health: 77, target_armor: 0 }
+  2150 0 ManaCheck { side: Enemy, cost: 5, paid: true, remaining: 1 }
+  2150 0 Stunned { on: Player, index: 2, item: "Hollow Chassis", duration_ms: 1050, aimed: false }
+  2150 0 Hit { by: Enemy, damage: 81, absorbed: 0, target_health: -4, target_armor: 0 }
+  2150 0 Watched { side: Enemy, item: "Shielded Eye", what: AnyActivation, seen: 1, count: 6, paid: false }
+  2150 0 Fell { side: Player }
+  2150 0 End { outcome: Defeat }
+outcome Defeat in 2150ms
+
+== scenario: preset-vs-francis
+-- monster: Francis
+-- difficulty: Easy
+-- name_seed: 6840143426475589633
+-- board
+Steel Frame|Helmet|0|0|0
+Crest of Vigor|Helmet|3|0|0
+Iron Plating|Helmet|0|2|0
+Visor of Focus|Helmet|0|4|0
+Padded Base|Chest|0|0|0
+Hollow Weave|Chest|5|2|1
+Chain Layer|Chest|0|3|0
+Woven Underlayer|Chest|0|4|0
+Hide Base|Chest|3|6|0
+Keystone Base|Chest|0|0|0
+Leather Material|Gloves|0|0|0
+Gripping Mold|Gloves|2|0|0
+Steel Material|Gloves|0|4|0
+Gauntlet Mold|Gloves|2|4|0
+Runed Material|Greaves|0|0|0
+Greave Mold|Greaves|2|0|0
+Boiled Leather|Greaves|0|4|0
+Runner's Mold|Greaves|3|4|0
+Balanced Grip|Weapon|0|0|0
+Runed Edge|Weapon|1|0|0
+Ruby Inlay|Weapon|2|0|0
+Balance Weight|Weapon|2|2|0
+-- locks
+-- log
+  1500 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+  1500 0 Hit { by: Player, damage: 61, absorbed: 0, target_health: 10134, target_armor: 0 }
+  1550 0 Regen { side: Enemy, amount: 2, health: 10136 }
+  1600 0 Regen { side: Enemy, amount: 1, health: 10137 }
+  2400 0 Activate { side: Enemy, item: "Jagged Kris", index: 14 }
+  2400 0 Hit { by: Enemy, damage: 253, absorbed: 0, target_health: 242, target_armor: 0 }
+  2600 0 Activate { side: Enemy, item: "Warded Plating", index: 3 }
+  2600 0 GainArmor { side: Enemy, amount: 90, total: 90 }
+  2600 0 GainArmor { side: Enemy, amount: 70, total: 160 }
+  2600 0 Hit { by: Enemy, damage: 40, absorbed: 0, target_health: 202, target_armor: 0 }
+  2600 0 GainArmor { side: Enemy, amount: 3, total: 163 }
+  2750 0 Regen { side: Player, amount: 1, health: 203 }
+  3000 0 Activate { side: Player, item: "Chained Finger", index: 3 }
+  3000 0 GainArmor { side: Player, amount: 6, total: 6 }
+  3000 0 GainMana { side: Player, amount: 2, total: 2, accrued: false }
+  3000 0 Activate { side: Player, item: "Shielded Bracer", index: 4 }
+  3000 0 GainArmor { side: Player, amount: 9, total: 15 }
+  3000 0 Activate { side: Player, item: "Resonant Sliver", index: 7 }
+  3000 0 Hit { by: Player, damage: 61, absorbed: 3, target_health: 10137, target_armor: 160 }
+  3000 0 Activate { side: Enemy, item: "Chained Hold", index: 6 }
+  3000 0 GainArmor { side: Enemy, amount: 10, total: 170 }
+  3000 0 Hit { by: Enemy, damage: 6, absorbed: 6, target_health: 203, target_armor: 9 }
+  3000 0 Hastened { side: Enemy, item: "Hastening Gauntlet", by_ms: 240 }
+  3000 0 Activate { side: Enemy, item: "Hastening Gauntlet", index: 7 }
+  3000 0 GainArmor { side: Enemy, amount: 10, total: 180 }
+  3000 0 GainResource { side: Enemy, what: "nature", amount: 2, total: 2, accrued: false }
+  3000 0 Hit { by: Enemy, damage: 21, absorbed: 9, target_health: 191, target_armor: 0 }
+  3000 0 Hit { by: Enemy, damage: 21, absorbed: 0, target_health: 170, target_armor: 0 }
+  3000 0 Hit { by: Enemy, damage: 21, absorbed: 0, target_health: 149, target_armor: 0 }
+  3000 0 Hit { by: Enemy, damage: 6, absorbed: 0, target_health: 143, target_armor: 0 }
+  3000 0 Hit { by: Enemy, damage: 6, absorbed: 0, target_health: 137, target_armor: 0 }
+  3000 0 Hastened { side: Enemy, item: "Hastening Grapple", by_ms: 240 }
+  3000 0 Hit { by: Enemy, damage: 6, absorbed: 0, target_health: 131, target_armor: 0 }
+  3000 0 Activate { side: Enemy, item: "Chained Cinch", index: 8 }
+  3000 0 GainArmor { side: Enemy, amount: 10, total: 190 }
+  3000 0 Hit { by: Enemy, damage: 6, absorbed: 0, target_health: 125, target_armor: 0 }
+  3000 0 Hastened { side: Enemy, item: "Hastening Gauntlet", by_ms: 240 }
+  3000 0 Hastened { side: Enemy, item: "Hastening Grapple", by_ms: 240 }
+  3000 0 Hit { by: Enemy, damage: 6, absorbed: 0, target_health: 119, target_armor: 0 }
+  3000 0 Activate { side: Enemy, item: "Hastening Grapple", index: 9 }
+  3000 0 GainArmor { side: Enemy, amount: 10, total: 200 }
+  3000 0 GainResource { side: Enemy, what: "nature", amount: 2, total: 4, accrued: false }
+  3000 0 Hit { by: Enemy, damage: 21, absorbed: 0, target_health: 98, target_armor: 0 }
+  3000 0 Hit { by: Enemy, damage: 21, absorbed: 0, target_health: 77, target_armor: 0 }
+  3000 0 Hit { by: Enemy, damage: 21, absorbed: 0, target_health: 56, target_armor: 0 }
+  3000 0 Hit { by: Enemy, damage: 6, absorbed: 0, target_health: 50, target_armor: 0 }
+  3000 0 Hastened { side: Enemy, item: "Hastening Gauntlet", by_ms: 240 }
+  3000 0 Hit { by: Enemy, damage: 6, absorbed: 0, target_health: 44, target_armor: 0 }
+  3000 0 Hit { by: Enemy, damage: 6, absorbed: 0, target_health: 38, target_armor: 0 }
+  3000 0 Activate { side: Enemy, item: "Chained Palm", index: 10 }
+  3000 0 GainArmor { side: Enemy, amount: 10, total: 210 }
+  3000 0 Hastened { side: Enemy, item: "Hastening Grapple", by_ms: 240 }
+  3000 0 Hit { by: Enemy, damage: 6, absorbed: 0, target_health: 32, target_armor: 0 }
+  3100 0 Regen { side: Player, amount: 1, health: 33 }
+  3200 0 Activate { side: Player, item: "Hastening Walker", index: 6 }
+  3200 0 GainArmor { side: Player, amount: 17, total: 17 }
+  3200 0 GainMana { side: Player, amount: 2, total: 4, accrued: false }
+  3200 0 Hastened { side: Player, item: "Hastening Walker", by_ms: 150 }
+  3200 0 Activate { side: Enemy, item: "Unbound Step", index: 12 }
+  3200 0 GainArmor { side: Enemy, amount: 28, total: 238 }
+  3200 0 GainMana { side: Enemy, amount: 4, total: 4, accrued: false }
+  3200 0 Cursed { on: Player, kind: Misfire, duration_ms: 5400, stacks: 1 }
+  3350 0 Misfired { side: Player, item: "Rimebound Sole" }
+  3400 0 Regen { side: Player, amount: 1, health: 34 }
+  3500 0 Activate { side: Enemy, item: "Faltering Tread", index: 11 }
+  3500 0 GainArmor { side: Enemy, amount: 36, total: 274 }
+  3500 0 GainMana { side: Enemy, amount: 4, total: 8, accrued: false }
+  3500 0 Cursed { on: Player, kind: Misfire, duration_ms: 5400, stacks: 2 }
+  3500 0 Activate { side: Enemy, item: "Faltering Prowl", index: 13 }
+  3500 0 GainArmor { side: Enemy, amount: 36, total: 310 }
+  3500 0 GainMana { side: Enemy, amount: 4, total: 12, accrued: false }
+  3500 0 Cursed { on: Player, kind: Misfire, duration_ms: 5400, stacks: 3 }
+  3750 0 Regen { side: Player, amount: 1, health: 35 }
+  4000 0 Activate { side: Player, item: "Charged Brow", index: 0 }
+  4000 0 GainArmor { side: Player, amount: 29, total: 46 }
+  4000 0 GainMana { side: Player, amount: 9, total: 13, accrued: false }
+  4000 0 Activate { side: Enemy, item: "Attuned Vigil", index: 0 }
+  4000 0 GainArmor { side: Enemy, amount: 44, total: 354 }
+  4000 0 GainMana { side: Enemy, amount: 5, total: 17, accrued: false }
+  4000 0 ResourceCheck { side: Enemy, what: "mana", cost: 4, paid: true, remaining: 13 }
+  4000 0 GainResource { side: Enemy, what: "faith", amount: 7, total: 7, accrued: false }
+  4000 0 Activate { side: Enemy, item: "Unbound Coif", index: 1 }
+  4000 0 GainArmor { side: Enemy, amount: 19, total: 373 }
+  4000 0 GainMana { side: Enemy, amount: 5, total: 18, accrued: false }
+  4000 0 GainResource { side: Enemy, what: "nature", amount: 5, total: 9, accrued: false }
+  4000 0 ResourceCheck { side: Enemy, what: "mana", cost: 4, paid: true, remaining: 14 }
+  4000 0 GainResource { side: Enemy, what: "faith", amount: 7, total: 14, accrued: false }
+  4000 0 Activate { side: Enemy, item: "Attuned Coif", index: 2 }
+  4000 0 GainArmor { side: Enemy, amount: 44, total: 417 }
+  4000 0 GainMana { side: Enemy, amount: 5, total: 19, accrued: false }
+  4000 0 GainResource { side: Enemy, what: "nature", amount: 5, total: 14, accrued: false }
+  4000 0 ResourceCheck { side: Enemy, what: "mana", cost: 4, paid: true, remaining: 15 }
+  4000 0 GainResource { side: Enemy, what: "faith", amount: 7, total: 21, accrued: false }
+  4100 0 Regen { side: Player, amount: 1, health: 36 }
+  4400 0 Regen { side: Player, amount: 1, health: 37 }
+  4500 0 Misfired { side: Player, item: "Resonant Sliver" }
+  4750 0 Regen { side: Player, amount: 1, health: 38 }
+  4800 0 Activate { side: Enemy, item: "Jagged Kris", index: 14 }
+  4800 0 Hit { by: Enemy, damage: 253, absorbed: 46, target_health: -169, target_armor: 0 }
+  4800 0 Fell { side: Player }
+  4800 0 End { outcome: Defeat }
+outcome Defeat in 4800ms
+
+== scenario: bare-hands-vs-cave-rat
+-- monster: Cave Rat
+-- difficulty: Easy
+-- name_seed: 6840143426475589633
+-- board
+-- locks
+-- log
+   900 0 Activate { side: Enemy, item: "bite", index: 0 }
+   900 0 Hit { by: Enemy, damage: 6, absorbed: 0, target_health: 94, target_armor: 0 }
+  1800 0 Activate { side: Enemy, item: "bite", index: 0 }
+  1800 0 Hit { by: Enemy, damage: 6, absorbed: 0, target_health: 88, target_armor: 0 }
+  2700 0 Activate { side: Enemy, item: "bite", index: 0 }
+  2700 0 Hit { by: Enemy, damage: 6, absorbed: 0, target_health: 82, target_armor: 0 }
+  3600 0 Activate { side: Enemy, item: "bite", index: 0 }
+  3600 0 Hit { by: Enemy, damage: 6, absorbed: 0, target_health: 76, target_armor: 0 }
+  4500 0 Activate { side: Enemy, item: "bite", index: 0 }
+  4500 0 Hit { by: Enemy, damage: 6, absorbed: 0, target_health: 70, target_armor: 0 }
+  5400 0 Activate { side: Enemy, item: "bite", index: 0 }
+  5400 0 Hit { by: Enemy, damage: 6, absorbed: 0, target_health: 64, target_armor: 0 }
+  6300 0 Activate { side: Enemy, item: "bite", index: 0 }
+  6300 0 Hit { by: Enemy, damage: 6, absorbed: 0, target_health: 58, target_armor: 0 }
+  7200 0 Activate { side: Enemy, item: "bite", index: 0 }
+  7200 0 Hit { by: Enemy, damage: 6, absorbed: 0, target_health: 52, target_armor: 0 }
+  8100 0 Activate { side: Enemy, item: "bite", index: 0 }
+  8100 0 Hit { by: Enemy, damage: 6, absorbed: 0, target_health: 46, target_armor: 0 }
+  9000 0 Activate { side: Enemy, item: "bite", index: 0 }
+  9000 0 Hit { by: Enemy, damage: 6, absorbed: 0, target_health: 40, target_armor: 0 }
+  9900 0 Activate { side: Enemy, item: "bite", index: 0 }
+  9900 0 Hit { by: Enemy, damage: 6, absorbed: 0, target_health: 34, target_armor: 0 }
+ 10800 0 Activate { side: Enemy, item: "bite", index: 0 }
+ 10800 0 Hit { by: Enemy, damage: 6, absorbed: 0, target_health: 28, target_armor: 0 }
+ 11700 0 Activate { side: Enemy, item: "bite", index: 0 }
+ 11700 0 Hit { by: Enemy, damage: 6, absorbed: 0, target_health: 22, target_armor: 0 }
+ 12600 0 Activate { side: Enemy, item: "bite", index: 0 }
+ 12600 0 Hit { by: Enemy, damage: 6, absorbed: 0, target_health: 16, target_armor: 0 }
+ 13500 0 Activate { side: Enemy, item: "bite", index: 0 }
+ 13500 0 Hit { by: Enemy, damage: 6, absorbed: 0, target_health: 10, target_armor: 0 }
+ 14400 0 Activate { side: Enemy, item: "bite", index: 0 }
+ 14400 0 Hit { by: Enemy, damage: 6, absorbed: 0, target_health: 4, target_armor: 0 }
+ 15300 0 Activate { side: Enemy, item: "bite", index: 0 }
+ 15300 0 Hit { by: Enemy, damage: 6, absorbed: 0, target_health: -2, target_armor: 0 }
+ 15300 0 Fell { side: Player }
+ 15300 0 End { outcome: Defeat }
+outcome Defeat in 15300ms

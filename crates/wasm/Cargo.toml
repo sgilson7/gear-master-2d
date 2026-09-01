@@ -1,0 +1,14 @@
+[package]
+name = "gm2d-wasm"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+# Shim only. Every rule lives in core; this crate exists to move strings
+# across the wasm boundary and must never grow a decision of its own.
+[dependencies]
+gm2d-core = { path = "../core" }
+wasm-bindgen = "0.2"

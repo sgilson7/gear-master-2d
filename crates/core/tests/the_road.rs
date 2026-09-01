@@ -1,0 +1,326 @@
+//! Nothing on the road gets walked past.
+//!
+//! A town gate, an event and a fountain are all drawn on the loadout screen,
+//! and for a while there was one way to start a fight that never went back to
+//! it: REMATCH, straight off the battle replay. By then the rung had already
+//! advanced, so it was not a rematch at all - it was the next creature, begun
+//! from a screen that never asked whether anything was waiting.
+//!
+//! A board good enough to keep pressing it stood on rung seven with the
+//! fountain due and the town set, and arrived at rung ten with no class at
+//! all. `Run::road_is_blocked` is the answer and this file is the guard.
+
+use gm2d_core::combat::Difficulty;
+use gm2d_core::route::Fill;
+use gm2d_core::run::{Mode, Run};
+use gm2d_core::share;
+
+/// A board that can actually clear the early rungs. The auto-builder cannot -
+/// it oscillates around rung six and never reaches the first fountain, which
+/// makes it useless for asking questions about rung seven.
+fn a_climbing_run(difficulty: Difficulty) -> Run {
+    let sh = share::import(share::A_WINNING_RUN).expect("reads");
+    let mut run = Run::new();
+    run.difficulty = difficulty;
+    run.mode = Mode::Grinder;
+    for (d, sl, x, y, rot) in &sh.placed {
+        let id = run.registry.alloc(*d);
+        run.owned.push(id);
+        run.registry.set_rotation(id, *rot);
+        if run.equip(id, *sl, *x, *y).is_err() {
+            run.owned.pop();
+        }
+    }
+    run
+}
+
+#[test]
+fn a_fountain_that_is_due_blocks_the_road() {
+    let mut run = a_climbing_run(Difficulty::Easy);
+    run.rung = Run::FOUNTAINS[0];
+    assert!(run.at_fountain(), "the fixture is not standing where it thinks it is");
+    assert_eq!(run.road_is_blocked(), Some("a fountain"));
+}
+
+#[test]
+fn a_town_gate_blocks_the_road_even_mid_replay() {
+    // The phase gate is the whole point: `pending_town` says "should this
+    // screen be drawn", which is no during a fight. `road_is_blocked` says
+    // "may a fight start", which has to be answerable from the battle screen.
+    let mut run = a_climbing_run(Difficulty::Easy);
+    run.rung = gm2d_core::town::TOWNS[0].after;
+    run.force_win();
+    run.settle();
+    assert!(run.town.is_some(), "clearing the rung before a town did not reach it");
+    assert_eq!(run.road_is_blocked(), Some("a town"));
+    // Still blocked while the replay is up, which `pending_town` would deny.
+    run.fight_next();
+    assert!(run.pending_town().is_none(), "the gate should not be drawn over a fight");
+    assert!(run.road_is_blocked().is_some(), "and it must still stop the next one starting");
+    // Named, not merely non-empty. Sump Bottom's gate stands at rung seven and
+    // so does the first fountain, so "something is blocking the road" was
+    // answerable by the wrong one of the two - and was, the first time the
+    // road stack read the phase-gated question here.
+    assert!(
+        run.road_stack().iter().any(|i| i.kind() == "town"),
+        "the gate itself has to still be on the stack, not just something else"
+    );
+}
+
+#[test]
+fn an_open_road_is_open() {
+    let mut run = a_climbing_run(Difficulty::Easy);
+    run.rung = 4;
+    assert_eq!(run.road_is_blocked(), None, "rung four has nothing on it");
+}
+
+#[test]
+fn a_run_that_only_ever_fights_still_meets_its_first_fountain() {
+    // The reproduction, as a test. Fight, settle, fight again - never going
+    // back to the loadout, which is what REMATCH did. The run must come to a
+    // stop in front of the fountain rather than walking through it.
+    let mut run = a_climbing_run(Difficulty::Easy);
+    let mut fought = 0;
+    for _ in 0..12 {
+        if run.road_is_blocked().is_some() {
+            break;
+        }
+        run.fight_next();
+        run.settle();
+        fought += 1;
+    }
+    let stopped_by = run.road_is_blocked();
+    assert!(stopped_by.is_some(), "fought {fought} times and nothing ever stopped it");
+    assert!(
+        run.rung <= Run::FOUNTAINS[0],
+        "walked to rung {} before anything stopped it; the first fountain is on {}",
+        run.rung,
+        Run::FOUNTAINS[0]
+    );
+}
+
+#[test]
+fn the_road_clears_once_the_thing_on_it_is_answered() {
+    // A guard that stops the fix becoming a soft-lock: whatever blocks has to
+    // be answerable, and answering it has to let the run move again.
+    let mut run = a_climbing_run(Difficulty::Easy);
+    run.rung = Run::FOUNTAINS[0];
+    assert!(run.road_is_blocked().is_some());
+
+    let pick = run.class_outlook().into_iter().find(|m| m.eligible).expect("a fountain always offers");
+    run.drink_choosing(pick.class).expect("and it can always be drunk");
+    assert_eq!(run.road_is_blocked(), None, "drank and the fountain is still standing there");
+}
+
+#[test]
+fn every_fountain_rung_can_actually_be_stood_on() {
+    // The quiet version of the same bug: a fountain scheduled onto a rung the
+    // ladder does not have, or onto the same rung as a town, would never be
+    // offered and nothing would say so.
+    for (n, &rung) in Run::FOUNTAINS.iter().enumerate() {
+        assert!(
+            rung < gm2d_core::combat::LADDER.len(),
+            "fountain {n} stands past the end of the road"
+        );
+    }
+    assert!(
+        Run::DOUBLING_FOUNTAIN < gm2d_core::combat::LADDER.len(),
+        "the deep fountain stands past the end of the road"
+    );
+}
+
+// ------------------------------------------- the map says what is happening
+//
+// Reported from a real run: on rung three the yellow dot was on TWO BY TWO
+// while the door actually being answered was THE CASINO, and the casino's dot
+// was nine rungs away. Both halves of that are the map reading `LadderEvent::at`
+// and `fill_for` as if an earned event stood on one rung, which it does not.
+
+fn a_shallow_run() -> Run {
+    let mut run = Run::seeded(0x51DE_0001);
+    run.difficulty = Difficulty::Medium;
+    // A quick kill anywhere in the shallow end opens the casino.
+    run.best_fight_ms = Some(1_000);
+    run.rung = 2;
+    run
+}
+
+fn node<'a>(map: &'a gm2d_core::route::RouteMap, id: &str) -> &'a gm2d_core::route::Node {
+    map.nodes.iter().find(|n| n.id == id).unwrap_or_else(|| panic!("{id} is not on the map"))
+}
+
+#[test]
+fn an_earned_door_is_drawn_on_the_rung_it_is_standing_on() {
+    let run = a_shallow_run();
+    let map = gm2d_core::route::route(&run);
+    let casino = node(&map, "the-casino");
+    assert_eq!(
+        casino.at, 2,
+        "the casino is standing on rung three; its `at` is 8, which is its deadline"
+    );
+    assert_eq!(casino.fill, Fill::Current, "and it is one of the doors being asked");
+}
+
+#[test]
+fn only_a_door_that_is_standing_is_ringed() {
+    let mut run = a_shallow_run();
+    // Both stand on rung three. The toad is asked first, so both are Current.
+    let map = gm2d_core::route::route(&run);
+    assert_eq!(node(&map, "the-toads-offer").fill, Fill::Current);
+    assert_eq!(node(&map, "the-casino").fill, Fill::Current);
+
+    // A door on a rung behind you that never happened is not "cleared".
+    run.rung = 6;
+    run.best_fight_ms = None;
+    let map = gm2d_core::route::route(&run);
+    assert_eq!(
+        node(&map, "the-toads-offer").fill,
+        Fill::Ahead,
+        "an unanswered door did not happen, whichever rung it was on"
+    );
+    assert_eq!(
+        node(&map, "back-in-a-minute").fill,
+        Fill::Ahead,
+        "and nor did this one, which is two rungs behind"
+    );
+}
+
+#[test]
+fn an_answered_door_is_drawn_where_it_was_answered() {
+    let mut run = a_shallow_run();
+    let casino = gm2d_core::event::EVENTS.iter().find(|e| e.id == "the-casino").unwrap();
+    let toad = gm2d_core::event::EVENTS.iter().find(|e| e.id == "the-toads-offer").unwrap();
+    run.take_choice(toad.choices.iter().find(|c| c.label == "FIGHT IT ANYWAY").unwrap());
+    run.take_choice(casino.choices.iter().find(|c| c.label == "Keep out of it").unwrap());
+    assert!(run.answered.contains(&"the-casino"));
+
+    // Walk on. The casino stays where it happened rather than jumping to its
+    // deadline or following the run up the road.
+    run.rung = 9;
+    let map = gm2d_core::route::route(&run);
+    let n = node(&map, "the-casino");
+    assert_eq!(n.at, 2, "answered on rung three, drawn on rung three");
+    assert_eq!(n.fill, Fill::Cleared);
+}
+
+#[test]
+fn a_door_nobody_has_earned_is_drawn_where_it_could_first_appear() {
+    let mut run = Run::seeded(0x51DE_0001);
+    run.difficulty = Difficulty::Medium;
+    let map = gm2d_core::route::route(&run);
+    // The casino's window is rungs two to nine. Its `at` is the deadline.
+    assert_eq!(
+        node(&map, "the-casino").at,
+        1,
+        "an unearned window is drawn at its opening, not at the rung it shuts on"
+    );
+    // A scheduled door has one rung and it is `at`.
+    assert_eq!(node(&map, "the-toads-offer").at, 2);
+}
+
+// ------------------------------------------------- the road, drawn and kept
+//
+// THE HUNDRED's F0 baseline. Three whole maps, byte for byte, at a rung in
+// each third of the ladder. `dungeons.rs` already pins one map as a
+// *subsequence*, which is the right shape for the question it asks - did M1's
+// graph move any line the pre-graph road had - and the wrong shape for this
+// one, which is "did the road change at all".
+//
+// A8 has `route::ascii` growing a county half at F9. When it does, this
+// fixture is the road half and this test must say so in its own assertion -
+// `&got[..want.len()]`, with the reason named - rather than be re-baselined
+// to include a county nobody could read at F0.
+
+/// A run with no history, standing on `rung`: the road as the tables write it.
+///
+/// No flags, no dungeons entered, no towns found - so the map is the road
+/// every run meets rather than one run's road. A fixture of a *played* run
+/// would pin the play as much as the road, and the play is what every other
+/// binary in this suite is for.
+fn a_bare_run_at(rung: usize) -> Run {
+    let mut run = Run::seeded(0x1_00D);
+    run.mode = Mode::Grinder;
+    run.difficulty = Difficulty::Medium;
+    run.rung = rung;
+    run
+}
+
+/// Re-baselined twice, at THE HUNDRED's F7 and F8.
+///
+/// **F7 added one line to each of the three**, and it is the same line:
+/// `. -- THE COUNTY SURVEYED (event, between 12 and 13)`. That is the one road
+/// door the county opens - `Whispered` on a word a charcoal burner hands over,
+/// with a window from rung 12 - and a door nobody has earned is drawn where it
+/// could first appear.
+///
+/// **F8 added five more**, and every one is a door the mission wrote:
+///
+/// ```text
+/// . -- THE CONSTABLE (event, between 8 and 9)
+/// . -- THE THEODOLITE (event, between 11 and 12)
+/// . -- THE STOCKMAN (event, between 13 and 14)
+/// . -- THE WASTE (event, between 16 and 17)
+/// . -- THE COMMONS (event, between 17 and 18)
+/// ```
+///
+/// Three on-ramps on rungs 11, 13 and 17; the constable, drawn at rung 8
+/// because that is the earliest his window opens; and Vessey, drawn at 16
+/// because that is the first rung past `WASTE_FROM`. Nothing that was on the
+/// road before has moved on any of the three fixtures - the additions are
+/// insertions into a list that is otherwise line for line what F0 recorded.
+const ROAD_AT: &[(usize, &str)] = &[
+    (5, include_str!("fixtures/road-at-5.txt")),
+    (20, include_str!("fixtures/road-at-20.txt")),
+    (40, include_str!("fixtures/road-at-40.txt")),
+];
+
+#[test]
+fn the_road_is_drawn_the_way_it_was_drawn_at_f0() {
+    for (rung, want) in ROAD_AT {
+        let got = gm2d_core::route::ascii_road(&a_bare_run_at(*rung));
+        let want: Vec<&str> = want.lines().collect();
+        for (i, (g, w)) in got.iter().zip(&want).enumerate() {
+            assert_eq!(
+                g, w,
+                "rung {rung}, line {i}: the road moved. Re-baseline with \
+                 REBASELINE_ROAD_AT=1 only after naming here what started \
+                 saying something different"
+            );
+        }
+        assert_eq!(
+            got.len(),
+            want.len(),
+            "rung {rung}: the road is {} lines and the fixture is {}",
+            got.len(),
+            want.len()
+        );
+
+        // And the whole map opens with it, line for line. This is the prefix
+        // assertion F0 wrote down: `ascii` is the road and then the county,
+        // and the road half does not move because a county was added under it.
+        let whole = gm2d_core::route::ascii(&a_bare_run_at(*rung));
+        assert!(whole.len() > got.len(), "rung {rung}: the map lost its county half");
+        assert_eq!(&whole[..got.len()], &got[..], "rung {rung}: the county moved the road");
+    }
+}
+
+/// Re-baselines the three, and only under `REBASELINE_ROAD_AT=1`.
+///
+/// The guard is `catalog_shape::report_gear_at`'s, for its reason: this
+/// binary's `--ignored` set would otherwise let a printer silently overwrite
+/// the evidence that nothing had moved.
+#[test]
+#[ignore]
+fn report_road_at() {
+    let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures");
+    for (rung, _) in ROAD_AT {
+        let text = gm2d_core::route::ascii(&a_bare_run_at(*rung)).join("\n") + "\n";
+        let path = dir.join(format!("road-at-{rung}.txt"));
+        if std::env::var("REBASELINE_ROAD_AT").as_deref() == Ok("1") {
+            std::fs::write(&path, &text).expect("writes");
+            println!("wrote {}", path.display());
+        } else {
+            print!("{text}");
+        }
+    }
+}

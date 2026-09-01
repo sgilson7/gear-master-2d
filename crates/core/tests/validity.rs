@@ -1,0 +1,1588 @@
+//! Can a real build actually get to every door, and through it?
+//!
+//! The repository's answer to "is this road walkable" has always been
+//! `force_win` and `skip_to`: assign a rung, win by fiat, assert the door is
+//! standing. That proves the road *graph* and says nothing about whether a
+//! build anybody could have can fight its way there
+//! (`post-unwinding.md` §10.6, and the gap `design/rl-agent-plan.md` exists to
+//! close).
+//!
+//! This file is the other answer. A **validity solver**: load a strong board,
+//! hand it a path, and make it fight. A test passes when the door it was
+//! written for was reached, was standing, and was answered - with the fights
+//! actually simulated by the oracle rather than granted.
+//!
+//! Two halves:
+//!
+//! * `Walk` - the solver. It fights, answers, visits, throws levers and feeds
+//!   orbs, and records everything it met. It never calls `force_win`.
+//! * The audit - every event in the game with its access conditions spelled
+//!   out, and lints over the shapes those conditions can take.
+//!
+//! What it cannot do is prove a door is *un*reachable: a walk that fails to
+//! reach one may be a bad path rather than a shut door. So the lints are about
+//! conditions that are impossible in principle, and the walks are existence
+//! proofs.
+
+mod common;
+
+use gm2d_core::combat::{Difficulty, Outcome};
+use gm2d_core::event::{Requirement, Trigger, EVENTS};
+use gm2d_core::run::{Mode, Phase, Run};
+
+// ---------------------------------------------------------------- the solver
+
+/// One instruction in a path.
+#[derive(Clone, Debug)]
+pub enum Step {
+    /// Fight whatever is standing in front of you, and expect to win.
+    Fight,
+    /// Fight until the run is standing on this rung index.
+    FightTo(usize),
+    /// Answer the door with this id by the choice with this label.
+    Answer(&'static str, &'static str),
+    /// Answer whatever door is standing, by the first choice that is open.
+    AnswerAnything,
+    /// Walk into the town standing here and take this door.
+    Town(gm2d_core::town::Action),
+    /// Walk past the town standing here.
+    PastTheTown,
+    /// Throw the points down the road with this label.
+    Throw(&'static str),
+    /// Feed a pedestal this orb.
+    Feed(&'static str),
+    /// Take what the fountain is offering.
+    Drink,
+    /// Buy the named word off the bar, paying with whatever it wants.
+    Barter(&'static str),
+}
+
+/// What a walk saw.
+#[derive(Default, Debug)]
+pub struct Seen {
+    pub doors: Vec<&'static str>,
+    pub answered: Vec<&'static str>,
+    pub fights: usize,
+    pub losses: usize,
+    pub stopped_at: usize,
+    pub why: Option<String>,
+}
+
+/// A strong board, walking the road for real.
+///
+/// The board is `A_WINNING_RUN` - a finished run's, 48 of 50 rungs at Medium -
+/// because the question is "can this be reached at all", and a build that
+/// cannot clear the ladder cannot answer it. Difficulty is Medium, which is
+/// gear as written and the setting the curve is defined at.
+pub struct Walk {
+    pub run: Run,
+    pub seen: Seen,
+}
+
+impl Walk {
+    pub fn new() -> Self {
+        let mut run = common::run_from(gm2d_core::share::A_WINNING_RUN);
+        run.mode = Mode::Grinder;
+        run.difficulty = Difficulty::Medium;
+        run.rung = 0;
+        run.gold = 100_000;
+        // A spare of every kind the bar can ask for.
+        //
+        // `A_WINNING_RUN` is a *finished* board: every piece it owns is worn,
+        // so its tray is empty and `payment_for` finds nothing to hand over.
+        // That is a true fact about that board and the wrong one to measure a
+        // door by - a player who wants a word off the bar keeps a spare mold
+        // for it, and the question here is whether the door can be reached at
+        // all. So the walk starts with one loose piece of each kind the bar
+        // prices anything in, and nothing else.
+        let mut wants: Vec<gm2d_core::piece::PieceKind> = Vec::new();
+        for r in gm2d_core::rumour::RUMOURS {
+            if let gm2d_core::rumour::Barter::Kind(k) = r.price {
+                if !wants.contains(&k) {
+                    wants.push(k);
+                }
+            }
+        }
+        for k in wants {
+            if let Some(d) = gm2d_core::piece::CATALOG
+                .iter()
+                .find(|d| d.kind == k && !gm2d_core::piece::is_event_only(d.name))
+            {
+                run.give(d.name);
+            }
+        }
+        Walk { run, seen: Seen::default() }
+    }
+
+    fn note_doors(&mut self) {
+        if let Some(e) = self.run.pending_event() {
+            if !self.seen.doors.contains(&e.id) {
+                self.seen.doors.push(e.id);
+            }
+        }
+    }
+
+    /// Fight the thing in front of you. Returns false if it was not a win.
+    fn fight(&mut self) -> bool {
+        if self.run.phase != Phase::Loadout {
+            self.run.back_to_loadout();
+        }
+        self.run.pending_scene = None;
+        let before = self.run.rung;
+        let log = self.run.fight_next().clone();
+        self.run.settle();
+        self.run.take_receipt();
+        self.run.pending_scene = None;
+        self.run.back_to_loadout();
+        self.seen.fights += 1;
+        if log.outcome != Outcome::Victory {
+            self.seen.losses += 1;
+            // A loss in a dungeon leaves you in the dungeon. The way out is
+            // the verb, not the defeat.
+            if self.run.dungeon.is_some() {
+                self.run.leave_dungeon();
+                self.run.take_receipt();
+            }
+            self.seen.why = Some(format!(
+                "lost to {} at rung {} after {:.1}s",
+                log.enemy().name,
+                before + 1,
+                log.duration_ms as f32 / 1000.0
+            ));
+            return false;
+        }
+        true
+    }
+
+    pub fn step(&mut self, s: &Step) -> bool {
+        self.note_doors();
+        match s {
+            Step::Fight => {
+                if !self.clear_the_road() {
+                    return false;
+                }
+                self.fight()
+            }
+            Step::FightTo(rung) => {
+                let mut guard = 0;
+                while self.run.rung < *rung {
+                    guard += 1;
+                    if guard > 200 {
+                        self.seen.why = Some(format!(
+                            "stuck at rung {} trying to reach {}",
+                            self.run.rung + 1,
+                            rung + 1
+                        ));
+                        return false;
+                    }
+                    self.note_doors();
+                    if !self.clear_the_road() {
+                        return false;
+                    }
+                    if self.run.rung >= *rung {
+                        break;
+                    }
+                    if !self.fight() {
+                        return false;
+                    }
+                }
+                true
+            }
+            Step::Answer(id, label) => {
+                let Some(e) = self.run.pending_event() else {
+                    self.seen.why =
+                        Some(format!("no door at rung {} to answer", self.run.rung + 1));
+                    return false;
+                };
+                if e.id != *id {
+                    self.seen.why = Some(format!(
+                        "expected {id} at rung {}, found {}",
+                        self.run.rung + 1,
+                        e.id
+                    ));
+                    return false;
+                }
+                let Some(c) = e.choices.iter().find(|c| c.label == *label) else {
+                    self.seen.why = Some(format!("{id} has no choice {label:?}"));
+                    return false;
+                };
+                if !self.run.choice_open(c) {
+                    self.seen.why = Some(format!(
+                        "{id}/{label:?} was shut: {}",
+                        c.requires.describe()
+                    ));
+                    return false;
+                }
+                self.run.take_choice(c);
+                self.run.take_receipt();
+                self.seen.answered.push(id);
+                true
+            }
+            Step::AnswerAnything => {
+                let Some(e) = self.run.pending_event() else { return true };
+                let id = e.id;
+                let Some(c) = e.choices.iter().find(|c| self.run.choice_open(c)) else {
+                    self.seen.why = Some(format!("{id} has no choice anybody can take"));
+                    return false;
+                };
+                self.run.take_choice(c);
+                self.run.take_receipt();
+                self.seen.answered.push(id);
+                true
+            }
+            Step::Town(a) => {
+                if self.run.pending_town().is_none() {
+                    self.seen.why =
+                        Some(format!("no town gate at rung {}", self.run.rung + 1));
+                    return false;
+                }
+                self.run.visit_town(*a);
+                self.run.take_receipt();
+                true
+            }
+            Step::PastTheTown => {
+                if self.run.town.is_some() {
+                    self.run.skip_town();
+                }
+                true
+            }
+            Step::Throw(label) => {
+                let Some((d, floor)) = self.run.dungeon else {
+                    self.seen.why = Some("not in a dungeon".into());
+                    return false;
+                };
+                let Some(i) = d.floors[floor].exits.iter().position(|e| e.label == *label) else {
+                    self.seen.why = Some(format!("no road called {label:?}"));
+                    return false;
+                };
+                let ok = self.run.throw_points(i);
+                self.run.take_receipt();
+                ok
+            }
+            Step::Feed(orb) => {
+                let Some(id) = self
+                    .run
+                    .owned
+                    .iter()
+                    .copied()
+                    .find(|&i| self.run.registry.def(i).name == *orb)
+                else {
+                    self.seen.why = Some(format!("{orb} is not held"));
+                    return false;
+                };
+                if self.run.feed_pedestal(id).is_none() {
+                    self.seen.why = Some(format!("the pedestal refused {orb}"));
+                    return false;
+                }
+                self.run.take_receipt();
+                true
+            }
+            Step::Barter(word) => {
+                // A word can be priced in another word - the ledger is bought
+                // with the crownwright - so the chain is walked back to
+                // something the tray can pay for, then bought forwards.
+                let mut chain: Vec<&'static str> = vec![*word];
+                let mut guard = 0;
+                while let Some(r) = gm2d_core::rumour::by_name(chain[chain.len() - 1]) {
+                    guard += 1;
+                    if guard > 8 {
+                        self.seen.why = Some(format!("{word:?} is priced in a circle"));
+                        return false;
+                    }
+                    match r.price {
+                        gm2d_core::rumour::Barter::Rumour(other)
+                            if !self.run.holds(other) =>
+                        {
+                            chain.push(other)
+                        }
+                        _ => break,
+                    }
+                }
+                for want in chain.iter().rev() {
+                    let Some(slot) = (0..gm2d_core::shop::SHOP_SIZE)
+                        .find(|&i| self.run.rumour_on(i).is_some_and(|r| r.name == *want))
+                    else {
+                        self.seen.why = Some(format!("{want:?} is not on this bar"));
+                        return false;
+                    };
+                    let Some(&pay) = self.run.payment_for(slot).first() else {
+                        self.seen.why =
+                            Some(format!("nothing in the tray pays for {want:?}"));
+                        return false;
+                    };
+                    if self.run.barter(slot, pay).is_err() {
+                        self.seen.why = Some(format!("the bar refused to trade for {want:?}"));
+                        return false;
+                    }
+                }
+                true
+            }
+            Step::Drink => {
+                let offer: Vec<_> = self.run.fountain_offer().to_vec();
+                let Some(c) = offer.first() else {
+                    self.seen.why = Some("no fountain here".into());
+                    return false;
+                };
+                self.run.drink_choosing(c);
+                self.run.take_receipt();
+                true
+            }
+        }
+    }
+
+    /// Answer or walk past anything standing between here and the fight.
+    ///
+    /// A gate, a fountain and a door all block a fight, and a walk that is
+    /// trying to get *somewhere* has to get past the ones it did not come for.
+    /// Takes the first open choice, which is deliberately dumb: a path that
+    /// needs a particular answer says so with `Answer`.
+    fn clear_the_road(&mut self) -> bool {
+        let mut guard = 0;
+        while let Some(what) = self.run.road_is_blocked() {
+            guard += 1;
+            if guard > 20 {
+                self.seen.why = Some(format!("{what} would not clear at rung {}", self.run.rung + 1));
+                return false;
+            }
+            self.note_doors();
+            if self.run.pending_town().is_some() {
+                self.run.skip_town();
+                continue;
+            }
+            // The third fountain doubles a class you already hold rather than
+            // pouring a new one, so `fountain_offer` is empty there and
+            // `drink_choosing` has nothing to choose. A walker that only knew
+            // how to drink stood in front of it until its guard ran out.
+            if self.run.at_doubling_fountain() {
+                let held: Vec<_> = self.run.classes.clone();
+                let took = held.iter().any(|c| self.run.double_class(c));
+                self.run.take_receipt();
+                if !took {
+                    self.seen.why =
+                        Some(format!("the doubling fountain at rung {} would not pour", self.run.rung + 1));
+                    return false;
+                }
+                continue;
+            }
+            if self.run.at_fountain() {
+                if !self.step(&Step::Drink) {
+                    return false;
+                }
+                continue;
+            }
+            if self.run.at_points {
+                let (d, floor) = self.run.dungeon.expect("at points");
+                let open = d.floors[floor]
+                    .exits
+                    .iter()
+                    .position(|e| d.fights_ahead(e.to, &self.run.cleared_floors) > 0)
+                    .unwrap_or(0);
+                self.run.throw_points(open);
+                self.run.take_receipt();
+                continue;
+            }
+            if self.run.pending_event().is_some() {
+                if !self.step(&Step::AnswerAnything) {
+                    return false;
+                }
+                continue;
+            }
+            if let Some(specs) = self.run.pending_brawl() {
+                self.run.fight_party(&specs);
+                self.run.settle();
+                self.run.take_receipt();
+                continue;
+            }
+            self.seen.why = Some(format!("{what} blocks the road and nothing here can clear it"));
+            return false;
+        }
+        true
+    }
+
+    /// Follow a path. Returns whether every step was taken.
+    pub fn follow(&mut self, path: &[Step]) -> bool {
+        for s in path {
+            if !self.step(s) {
+                self.seen.stopped_at = self.run.rung;
+                return false;
+            }
+        }
+        self.note_doors();
+        self.seen.stopped_at = self.run.rung;
+        true
+    }
+}
+
+// ------------------------------------------------------------- the conditions
+
+/// Every way a door can be reached, in words.
+pub fn access(e: &'static gm2d_core::event::LadderEvent) -> String {
+    let where_ = match e.trigger {
+        Trigger::Rung => format!("rung {}", e.at + 1),
+        Trigger::QuickKill { within_ms, from } => format!(
+            "rungs {} to {}, after a win under {:.1}s",
+            from + 1,
+            e.at + 1,
+            within_ms as f32 / 1000.0
+        ),
+        Trigger::SlowKill { over_ms, from } => format!(
+            "rungs {} to {}, after a win over {:.1}s",
+            from + 1,
+            e.at + 1,
+            over_ms as f32 / 1000.0
+        ),
+        Trigger::Whispered { rumour, from } => {
+            format!("rungs {} to {}, carrying {rumour:?}", from + 1, e.at + 1)
+        }
+        Trigger::WhenFlagged { flag, from } => {
+            format!("rungs {} to {}, having done {flag:?}", from + 1, e.at + 1)
+        }
+    };
+    let shut = if e.blocked_by.is_empty() {
+        String::new()
+    } else {
+        format!("; shut by {:?}", e.blocked_by)
+    };
+    format!("{where_}{shut}")
+}
+
+// ----------------------------------------------------------------- the audit
+
+/// What has to be true for a choice to be takeable, in words.
+fn asks(r: &Requirement) -> String {
+    match r {
+        Requirement::None => "-".into(),
+        other => other.describe(),
+    }
+}
+
+/// Every door in the game, with the conditions to reach it, the conditions to
+/// get through, **and what each answer actually does**.
+///
+/// The outcomes are `Outcome::describe` - what a choice *is*, statically,
+/// which is what a tooltip shows before it is taken. What it *did*, with the
+/// run's own numbers in it, is `Run::receipt`, and a bounty depends on the
+/// rung and a gamble on the roll, so neither is knowable from here.
+///
+/// Two sections: the road's forty-four doors, and THE HUNDRED's nine tiles.
+/// Kept apart because a tile is not a rung - a county event stands on ground
+/// rather than in front of a fight, and the columns a road door needs
+/// (`stands`, `expects`, `its key`) are all dead for one.
+#[test]
+#[ignore]
+fn report_every_door_and_what_it_wants() {
+    let choices = |e: &'static gm2d_core::event::LadderEvent| {
+        for c in e.choices {
+            println!("    - {:<38} {}", c.label, asks(&c.requires));
+            for line in c.outcome.describe() {
+                println!("        -> {line}");
+            }
+            // And the mechanical truth, where the player-facing line hides it
+            // on purpose. A silent counter says "nothing you could point to",
+            // which is the whole of that mechanic and exactly wrong for a
+            // reference: this file exists to spell out what a decision does.
+            use gm2d_core::event::Outcome as Out;
+            for o in gm2d_core::event::every_outcome(&c.outcome) {
+                match o {
+                    Out::Count(what) => println!("           [counter {what} +1]"),
+                    Out::Flag(what) => println!("           [flag {what}]"),
+                    Out::Give(n) => println!("           [hands over {n}]"),
+                    Out::Claim(n) => println!("           [class {n}]"),
+                    Out::RevealTown(n) => println!("           [reveals town {n}]"),
+                    Out::Enter(n) | Out::StartDungeon(n) => {
+                        println!("           [enters {n}]")
+                    }
+                    Out::FightInstead(n) => println!("           [fights {n}]"),
+                    Out::Step(b) => println!("           [brawl {:?}]", b.with),
+                    Out::SurrenderOrb => {
+                        println!("           [takes an Orb-kind piece, worn or loose]")
+                    }
+                    _ => {}
+                }
+            }
+            if !c.unmet.is_empty() {
+                println!("        (shut) {}", c.unmet);
+            }
+        }
+    };
+
+    println!("\n## Every door, and how a run reaches it\n");
+    println!(
+        "Regenerate with:\n\
+         \x20 cargo test -p gm2d-core --test validity -- --ignored --nocapture \\\n\
+         \x20     report_every_door_and_what_it_wants\n\
+         \n\
+         Under each answer: `->` is what the player is told it does, which is\n\
+         `Outcome::describe` and is what a tooltip shows before it is taken.\n\
+         `[...]` is the mechanical truth where the player-facing line hides it -\n\
+         a silent counter says \"nothing you could point to\", which is the whole\n\
+         of that mechanic and exactly wrong for a reference.\n\
+         \n\
+         What an answer *did*, with the run's own numbers in it, is\n\
+         `Run::receipt`: a bounty depends on the rung and a gamble on the roll,\n\
+         and neither is knowable from here.\n"
+    );
+    for e in EVENTS {
+        println!("\n{}  [{}]", e.title, e.id);
+        println!("  stands: {}", access(e));
+        println!("  expects: {} (rung {})", e.expects, e.at + 1);
+        if let Some(w) = opens_it(e) {
+            println!("  its key: {w}");
+        }
+        choices(e);
+    }
+
+    println!("\n\n## THE HUNDRED, tile by tile\n");
+    println!(
+        "A county event stands on a tile rather than in front of a fight. Eight of\n\
+         the nine are dealt onto eleven of the county's tiles - every one of them\n\
+         once before any of them twice - and the ninth is the pale, which the\n\
+         generator places. A tile is walked onto during a trip: five moves, ten\n\
+         trips a run, and what you clear stays cleared for the rest of it.\n\
+         \n\
+         None of them fights. The county's only fights are its three pinnacles\n\
+         and THE PARISH, and `county::county_events_never_fight` is what keeps\n\
+         that true.\n"
+    );
+    for e in gm2d_core::event::COUNTY_EVENTS {
+        println!("\n{}  [{}]", e.title, e.id);
+        println!("  stands: {}", where_it_sits(e.id));
+        choices(e);
+    }
+}
+
+/// How a county tile gets onto a county, and what decides it.
+fn where_it_sits(id: &str) -> String {
+    use gm2d_core::county;
+    if id == county::PALE {
+        return "placed, not dealt: off the edge and off the circuit (V5), at least two tiles from every gate, one a county"
+            .into();
+    }
+    format!(
+        "dealt from the pool onto one or two of the county's {} arranged tiles",
+        county::ARRANGED
+    )
+}
+
+/// `analysis/every-door.txt` names every door in the game and every county
+/// tile, and every answer on each of them.
+///
+/// The file is written by hand from `report_every_door_and_what_it_wants`, so
+/// nothing regenerates it when a door is added - which is exactly how a
+/// reference document goes quietly stale. This is what refuses that: the file
+/// has to mention every event id in both tables, and every choice label under
+/// them.
+#[test]
+fn the_every_door_reference_names_every_door() {
+    let doc = include_str!("../../../analysis/every-door.txt");
+    let mut missing: Vec<String> = Vec::new();
+    for e in EVENTS.iter().chain(gm2d_core::event::COUNTY_EVENTS.iter()) {
+        if !doc.contains(&format!("[{}]", e.id)) {
+            missing.push(e.id.to_string());
+            continue;
+        }
+        for c in e.choices {
+            if !doc.contains(c.label) {
+                missing.push(format!("{}/{}", e.id, c.label));
+            }
+        }
+    }
+    assert!(
+        missing.is_empty(),
+        "analysis/every-door.txt has gone stale - it does not mention {missing:?}.\n\
+         Regenerate it with:\n  \
+         cargo test -p gm2d-core --test validity -- --ignored --nocapture \
+         report_every_door_and_what_it_wants"
+    );
+}
+
+/// What hands over the key a whispered or flagged door waits on.
+fn opens_it(e: &'static gm2d_core::event::LadderEvent) -> Option<String> {
+    match e.trigger {
+        Trigger::Whispered { rumour, .. } => {
+            let mut from: Vec<String> = Vec::new();
+            for o in EVENTS {
+                for c in o.choices {
+                    for out in gm2d_core::event::every_outcome(&c.outcome) {
+                        if matches!(out, gm2d_core::event::Outcome::Give(n) if *n == rumour)
+                        {
+                            from.push(format!("{} rung {}", o.id, o.at + 1));
+                        }
+                    }
+                }
+            }
+            for t in gm2d_core::town::TOWNS {
+                for a in t.actions {
+                    if a.gives() == Some(rumour) {
+                        from.push(format!("{} ({:?})", t.id, a));
+                    }
+                }
+            }
+            if gm2d_core::rumour::by_name(rumour).is_some_and(|r| r.on_the_bar) {
+                from.push("the pub's bar".into());
+            }
+            Some(format!("{rumour:?} from {from:?}"))
+        }
+        Trigger::WhenFlagged { flag, .. } => {
+            let mut from: Vec<String> = gm2d_core::event::set_by(flag)
+                .iter()
+                .map(|(id, label)| format!("{id}/{label:?}"))
+                .collect();
+            for d in gm2d_core::dungeon::DUNGEONS {
+                if d.also.iter().any(|o| {
+                    matches!(o, gm2d_core::event::Outcome::Flag(n) if *n == flag)
+                }) {
+                    from.push(format!("{} (on any way out)", d.id));
+                }
+                for f in d.floors {
+                    if f.also.iter().any(|o| {
+                        matches!(o, gm2d_core::event::Outcome::Flag(n) if *n == flag)
+                    }) {
+                        from.push(format!("{} floor {}", d.id, f.creature));
+                    }
+                }
+            }
+            Some(format!("{flag:?} from {from:?}"))
+        }
+        _ => None,
+    }
+}
+
+/// Every door that waits on a key has somewhere the key comes from, and that
+/// somewhere is inside the window.
+///
+/// `completable.rs` asks this of the shapes it knows. This asks it of every
+/// door at once and prints the whole chain when it fails, because a door whose
+/// key arrives one rung late is indistinguishable from a door nobody wrote.
+#[test]
+fn every_door_that_waits_on_a_key_can_be_handed_one_in_time() {
+    let mut bad: Vec<String> = Vec::new();
+    for e in EVENTS {
+        // A door a pedestal pushes onto the stack stands on no rung at all.
+        // `"never"` is the sentinel that says so, and asking when its key
+        // arrives is asking the wrong question - the orb is the key, and
+        // `pedestal.rs` lints that.
+        if matches!(e.trigger, Trigger::WhenFlagged { flag: "never", .. }) {
+            continue;
+        }
+        let (key, earliest) = match e.trigger {
+            Trigger::Whispered { rumour, from: _ } => {
+                let mut soonest: Option<usize> = None;
+                for o in EVENTS {
+                    for c in o.choices {
+                        for out in gm2d_core::event::every_outcome(&c.outcome) {
+                            if matches!(out, gm2d_core::event::Outcome::Give(n) if *n == rumour)
+                            {
+                                let at = o.trigger.from().min(o.at);
+                                soonest = Some(soonest.map_or(at, |s: usize| s.min(at)));
+                            }
+                        }
+                    }
+                }
+                // A town door or the bar can hand one over the moment a run
+                // reaches either, and both are earlier than any window here.
+                let by_town = gm2d_core::town::TOWNS.iter().any(|t| {
+                    t.actions.iter().any(|a| a.gives() == Some(rumour))
+                });
+                let on_bar =
+                    gm2d_core::rumour::by_name(rumour).is_some_and(|r| r.on_the_bar);
+                // And a county tile, which is the fourth way and no later than
+                // the first town's gate: THE HUNDRED's steps are not a door
+                // and do not cost the visit, so a run standing at that gate
+                // can be down there on the same rung.
+                let dug_up = gm2d_core::event::COUNTY_EVENTS.iter().any(|o| {
+                    o.choices.iter().any(|c| {
+                        gm2d_core::event::every_outcome(&c.outcome).iter().any(|out| {
+                            matches!(out, gm2d_core::event::Outcome::Give(n) if *n == rumour)
+                        })
+                    })
+                });
+                if by_town || on_bar || dug_up {
+                    continue;
+                }
+                (rumour, soonest)
+            }
+            // A flag the engine raises rather than a door. `county-business`
+            // is set by `Run::close_the_trip` when a trip into THE HUNDRED
+            // clears nothing, and no walk of `EVENTS` can see that - so the
+            // earliest it can arrive is the earliest a run can be down there,
+            // which is the first town's gate.
+            Trigger::WhenFlagged { flag, from: _ }
+                if flag == gm2d_core::run::COUNTY_BUSINESS =>
+            {
+                continue;
+            }
+            Trigger::WhenFlagged { flag, from: _ } => {
+                let mut soonest: Option<usize> = gm2d_core::event::set_by(flag)
+                    .iter()
+                    .filter_map(|(id, _)| EVENTS.iter().find(|o| o.id == *id))
+                    .map(|o| o.trigger.from().min(o.at))
+                    .min();
+                for d in gm2d_core::dungeon::DUNGEONS {
+                    // A dungeon sets a flag two ways: on any way out (`also`)
+                    // or at a particular buffer stop (`Floor::also`). The
+                    // first is how THE THRESHOLD hands over `threshold-cleared`
+                    // and the second is how the yard hands over
+                    // `switchyard-cleared`; a lint that knew only the second
+                    // called the Unwinding's whole back half unreachable.
+                    let by_dungeon = d.also.iter().any(|o| {
+                        matches!(o, gm2d_core::event::Outcome::Flag(n) if *n == flag)
+                    });
+                    let by_floor = d.floors.iter().any(|f| {
+                        f.also.iter().any(|o| {
+                            matches!(o, gm2d_core::event::Outcome::Flag(n) if *n == flag)
+                        })
+                    });
+                    if by_dungeon || by_floor {
+                        // A dungeon is entered three ways: an event's choice, a
+                        // town door, or a pedestal. THE THRESHOLD is a town
+                        // door - `Action::CellarDoor` - and a lint that knew
+                        // only about events called the Unwinding's back half
+                        // unreachable.
+                        for t in gm2d_core::town::TOWNS {
+                            if t.actions.iter().any(|a| a.opens() == Some(d.id)) {
+                                let at = t.after + 1;
+                                soonest = Some(soonest.map_or(at, |s: usize| s.min(at)));
+                            }
+                        }
+                        for x in gm2d_core::pedestal::DESTINATIONS {
+                            let goes_here = match x.kind {
+                                gm2d_core::pedestal::Where::Dungeon(id) => id == d.id,
+                                gm2d_core::pedestal::Where::Siding { dungeon, .. } => {
+                                    dungeon == d.id
+                                }
+                                _ => false,
+                            };
+                            if goes_here {
+                                // A pedestal stands in a town, so the earliest
+                                // is that town's gate.
+                                for t in gm2d_core::town::TOWNS {
+                                    if t.actions.iter().any(|a| {
+                                        matches!(a, gm2d_core::town::Action::Pedestal)
+                                    }) {
+                                        let at = t.after + 1;
+                                        soonest = Some(soonest.map_or(at, |s: usize| s.min(at)));
+                                    }
+                                }
+                            }
+                        }
+                        for o in EVENTS {
+                            for c in o.choices {
+                                for out in gm2d_core::event::every_outcome(&c.outcome) {
+                                    if matches!(
+                                        out,
+                                        gm2d_core::event::Outcome::Enter(x)
+                                            | gm2d_core::event::Outcome::StartDungeon(x)
+                                            if *x == d.id
+                                    ) {
+                                        let at = o.trigger.from().min(o.at);
+                                        soonest =
+                                            Some(soonest.map_or(at, |s: usize| s.min(at)));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                (flag, soonest)
+            }
+            _ => continue,
+        };
+        match earliest {
+            None => bad.push(format!("{}: nothing anywhere hands over {key:?}", e.id)),
+            Some(when) if when > e.at => bad.push(format!(
+                "{}: waits on {key:?} from rung {}, and the earliest anything hands one over is rung {}",
+                e.id,
+                e.trigger.from() + 1,
+                when + 1
+            )),
+            _ => {}
+        }
+    }
+    assert!(bad.is_empty(), "doors whose key cannot arrive in time:\n  {}", bad.join("\n  "));
+}
+
+/// No door is shut by something that stands after it.
+///
+/// `blocked_by` is "answering that one closes this one for good". A door
+/// blocked by one that stands *later* is a door that can never be closed,
+/// which is harmless - and one blocked by a door on the same rung is a
+/// coin-toss nobody can see. Both are worth knowing about.
+#[test]
+fn nothing_is_shut_by_a_door_that_comes_after_it() {
+    for e in EVENTS {
+        for b in e.blocked_by {
+            let other = EVENTS.iter().find(|o| o.id == *b).unwrap_or_else(|| {
+                panic!("{} is shut by {b:?}, which is not a door", e.id)
+            });
+            assert!(
+                other.trigger.from() <= e.at,
+                "{} stands from rung {} and is shut by {}, which cannot stand before rung {}",
+                e.id,
+                e.trigger.from() + 1,
+                b,
+                other.trigger.from() + 1
+            );
+        }
+    }
+}
+
+/// Every door has a way through that a build can actually satisfy.
+///
+/// Not "a free choice" - `every_event_has_a_way_through_that_costs_nothing`
+/// already says that. This asks the harder half: of the choices that *are*
+/// gated, is each one gated on something a run can come by? A door whose only
+/// interesting answers want a component nothing sells is a door that is
+/// decorative.
+#[test]
+fn every_gated_choice_wants_something_a_run_can_get() {
+    use gm2d_core::piece::CATALOG;
+    let mut bad: Vec<String> = Vec::new();
+    for e in EVENTS {
+        for c in e.choices {
+            match c.requires {
+                Requirement::Holding(name) => {
+                    if !CATALOG.iter().any(|d| d.name == name) {
+                        bad.push(format!("{}/{:?} wants {name:?}, which is not a component", e.id, c.label));
+                    }
+                }
+                Requirement::Flag(f) => {
+                    if gm2d_core::event::set_by(f).is_empty()
+                        && !gm2d_core::dungeon::DUNGEONS.iter().any(|d| {
+                            d.floors.iter().any(|fl| {
+                                fl.also.iter().any(|o| {
+                                    matches!(o, gm2d_core::event::Outcome::Flag(n) if *n == f)
+                                })
+                            })
+                        })
+                    {
+                        bad.push(format!("{}/{:?} waits on {f:?}, which nothing sets", e.id, c.label));
+                    }
+                }
+                Requirement::Took(label) => {
+                    if !EVENTS.iter().any(|o| o.choices.iter().any(|k| k.label == label)) {
+                        bad.push(format!("{}/{:?} wants {label:?} taken, and no door offers it", e.id, c.label));
+                    }
+                }
+                _ => {}
+            }
+        }
+    }
+    assert!(bad.is_empty(), "gated on the unobtainable:\n  {}", bad.join("\n  "));
+}
+
+// ------------------------------------------------------------- the walks
+
+/// Walk the road from rung one, fighting everything, and see what it meets.
+///
+/// The greedy walk: answer whatever is standing by the first open choice, take
+/// whatever a fountain offers, walk past every town, and fight. No `force_win`
+/// and no `skip_to` - every rung is a simulated fight against the creature
+/// actually standing there.
+fn greedy_walk(to: usize) -> Walk {
+    let mut w = Walk::new();
+    w.follow(&[Step::FightTo(to)]);
+    w
+}
+
+#[test]
+#[ignore]
+fn report_what_a_strong_build_meets_on_the_way_down() {
+    let w = greedy_walk(45);
+    println!("\n## A greedy walk from rung 1, fighting every rung\n");
+    println!("  reached rung {}", w.seen.stopped_at + 1);
+    println!("  fights {}, losses {}", w.seen.fights, w.seen.losses);
+    if let Some(why) = &w.seen.why {
+        println!("  stopped because: {why}");
+    }
+    println!("\n  doors met ({}):", w.seen.doors.len());
+    for d in &w.seen.doors {
+        println!("    {d}");
+    }
+    let missed: Vec<&str> = EVENTS
+        .iter()
+        .filter(|e| !w.seen.doors.contains(&e.id))
+        .map(|e| e.id)
+        .collect();
+    println!("\n  doors not met ({}):", missed.len());
+    for d in &missed {
+        let e = EVENTS.iter().find(|e| e.id == *d).expect("a door");
+        println!("    {:<26} {}", d, access(e));
+    }
+}
+
+/// A build good enough to clear the ladder can fight its way to the deep end.
+///
+/// The floor under every other walk in this file. If this fails, nothing below
+/// it means anything: a door "unreachable" by a walk that could not get past
+/// rung twelve is a statement about the walk.
+#[test]
+fn a_strong_build_can_fight_its_way_down_the_road() {
+    let w = greedy_walk(45);
+    assert!(
+        w.seen.stopped_at >= 45,
+        "stopped at rung {} after {} fights ({} lost): {:?}",
+        w.seen.stopped_at + 1,
+        w.seen.fights,
+        w.seen.losses,
+        w.seen.why
+    );
+    assert_eq!(w.seen.losses, 0, "the walk lost a fight: {:?}", w.seen.why);
+}
+
+/// Every door that stands on a rung is met by a run that walks past it.
+///
+/// `Trigger::Rung` is "stands on `at`, every run, no questions", and this is
+/// that sentence measured rather than trusted: a greedy walk from rung one to
+/// the deep end meets every scheduled door on the way, by fighting.
+///
+/// Not the earned ones - a `QuickKill` door needs a fast fight and a
+/// `Whispered` one needs a word this walk may have sold - and not the two a
+/// pedestal pushes, which stand on no rung. Those have walks of their own.
+#[test]
+fn every_scheduled_door_is_met_by_a_run_that_fights_past_it() {
+    let w = greedy_walk(45);
+    let mut missed: Vec<String> = Vec::new();
+    for e in EVENTS.iter().filter(|e| matches!(e.trigger, Trigger::Rung)) {
+        if e.at > 45 {
+            continue;
+        }
+        if !w.seen.doors.contains(&e.id) {
+            missed.push(format!("{} (rung {})", e.id, e.at + 1));
+        }
+    }
+    assert!(
+        missed.is_empty(),
+        "a run that fought past their rungs never saw:\n  {}\n(reached rung {}, met {} doors)",
+        missed.join("\n  "),
+        w.seen.stopped_at + 1,
+        w.seen.doors.len()
+    );
+}
+
+/// A word bought at the bar opens the door it is a word about.
+///
+/// The rumour-gated half of the road, proved the same way as the scheduled
+/// half: fight to the first town, buy the word, fight on, and find the door
+/// standing. Every fight is simulated.
+///
+/// Sump Bottom stands after rung 7 and has the bar in it, so this is also the
+/// earliest any of them can be reached - which is what
+/// `every_door_that_waits_on_a_key_can_be_handed_one_in_time` argues from the
+/// tables and this measures by walking.
+#[test]
+fn a_word_bought_at_the_bar_opens_the_door_it_is_about() {
+    // Every word the pub sells, and the door each one opens.
+    let sold: Vec<(&str, &str)> = gm2d_core::rumour::RUMOURS
+        .iter()
+        .filter(|r| r.on_the_bar)
+        .map(|r| (r.name, r.opens))
+        .collect();
+    assert!(sold.len() >= 2, "the bar sells {} words", sold.len());
+
+    let first_town = gm2d_core::town::TOWNS
+        .iter()
+        .filter(|t| matches!(t.unlock, gm2d_core::town::Unlock::Pinned))
+        .map(|t| t.after)
+        .min()
+        .expect("a pinned town");
+
+    let mut unreachable: Vec<String> = Vec::new();
+    for (word, opens) in sold {
+        let door = EVENTS.iter().find(|e| e.id == opens).expect("a real door");
+        let mut w = Walk::new();
+        // To the gate, into the pub, buy the word, then on to the door.
+        let ok = w.follow(&[
+            Step::FightTo(first_town + 1),
+            Step::Town(gm2d_core::town::Action::Pub),
+        ]);
+        if !ok {
+            unreachable.push(format!("{word}: could not reach the bar - {:?}", w.seen.why));
+            continue;
+        }
+        if !w.step(&Step::Barter(word)) {
+            // The bar is a rotating six and a seed may not stock this one on
+            // the visit; that is a fact about the shelf and not about the door.
+            unreachable.push(format!("{word}: {:?}", w.seen.why));
+            continue;
+        }
+        assert!(w.run.holds(word), "{word} was bought and is not held");
+
+        // Walk to the first rung its window covers and look for it.
+        let target = door.trigger.from().max(w.run.rung);
+        if !w.follow(&[Step::FightTo(target)]) {
+            unreachable.push(format!("{word}: could not reach rung {} - {:?}", target + 1, w.seen.why));
+            continue;
+        }
+        let standing = w.run.pending_event().map(|e| e.id);
+        assert_eq!(
+            standing,
+            Some(opens),
+            "{word} was in the tray at rung {} and {opens} did not stand; {:?} did",
+            w.run.rung + 1,
+            standing
+        );
+    }
+    assert!(unreachable.is_empty(), "{}", unreachable.join("\n  "));
+}
+
+/// The Switchyard's four doors, reached by a build that fights for them.
+///
+/// The chain this mission added, walked without `force_win` for the first
+/// time: every rung between the timetable and the last train is a simulated
+/// fight, the yard's four floors are simulated fights, and the door at the end
+/// reads a counter that only real clearings could have moved.
+///
+/// This is the test `post-unwinding.md` §10.6 says the repository did not
+/// have. `switchyard::the_chain_can_be_walked_in_one_run_in_either_mode`
+/// proves the road *graph* with fights won by fiat; this proves a board can
+/// get there.
+#[test]
+fn the_switchyard_chain_is_walkable_by_a_build_that_fights_for_it() {
+    let mut w = Walk::new();
+
+    let ok = w.follow(&[
+        // Rung 21, and Hesketh is standing there for every run.
+        Step::FightTo(20),
+        Step::Answer("the-timetable", "Buy a timetable"),
+    ]);
+    assert!(ok, "could not reach THE TIMETABLE: {:?}", w.seen.why);
+    assert!(w.run.holds("A Word About the Sidings"), "the sheet bought nothing");
+
+    // The box stands on the first rung of its window a run carrying the word
+    // arrives at, which is 22.
+    assert!(
+        w.follow(&[Step::FightTo(21)]),
+        "could not reach the signal box's window: {:?}",
+        w.seen.why
+    );
+    assert!(
+        w.follow(&[Step::Answer("the-signal-box", "Ask him to throw the points")]),
+        "THE SIGNAL BOX did not stand at rung {}: {:?}",
+        w.run.rung + 1,
+        w.seen.why
+    );
+    assert!(w.run.holds("A Word About the Points"));
+
+    assert!(
+        w.follow(&[Step::FightTo(25), Step::Answer("the-turntable", "Step onto the turntable")]),
+        "could not step onto the turntable: {:?}",
+        w.seen.why
+    );
+    assert_eq!(w.run.dungeon.map(|(d, _)| d.id), Some("the-switchyard"));
+
+    // Down the yard. Every floor is a real fight against a packed board.
+    let before = w.seen.fights;
+    assert!(
+        // No throw at the mouth since A7 - it is a corridor onto the down
+        // line, and the up line is a mile of nothing you need a ticket for.
+        w.follow(&[Step::Fight, Step::Fight, Step::Fight]),
+        "the yard beat the board: {:?}",
+        w.seen.why
+    );
+    assert!(w.run.at_points, "not at the pit points");
+    assert!(
+        w.follow(&[Step::Throw("The coal road"), Step::Fight]),
+        "the coal stage beat the board: {:?}",
+        w.seen.why
+    );
+    assert!(w.run.dungeon.is_none(), "still in the yard");
+    assert_eq!(w.seen.fights - before, 4, "a line of the yard is four fights");
+
+    assert!(w.run.holds("Ballast Bed"), "the coal stage paid no ground");
+    assert!(w.run.holds("Shunter's Orb"), "the coal stage paid no ticket");
+    assert_eq!(w.run.counted("sidings-cleared"), 1);
+
+    // High Wick stands after rung 32 and its pedestal costs no visit.
+    assert!(
+        w.follow(&[Step::FightTo(31), Step::Feed("Shunter's Orb")]),
+        "could not spend the ticket: {:?}",
+        w.seen.why
+    );
+    assert_eq!(w.run.dungeon.map(|(d, _)| d.id), Some("the-switchyard"));
+    assert_eq!(w.run.dungeon.map(|(_, f)| f), Some(5), "the siding lands on the Up line");
+
+    assert!(
+        w.follow(&[
+            Step::Fight,
+            Step::Fight,
+            Step::Throw("The roundhouse road"),
+            Step::Fight,
+        ]),
+        "the Up line beat the board: {:?}",
+        w.seen.why
+    );
+    assert_eq!(w.run.counted("sidings-cleared"), 2, "both lines");
+    assert!(w.run.holds("Signal Wire"));
+
+    // And Ambrose, who reads the count.
+    assert!(
+        w.follow(&[Step::PastTheTown, Step::FightTo(33)]),
+        "could not reach THE LAST TRAIN: {:?}",
+        w.seen.why
+    );
+    assert!(
+        w.follow(&[Step::Answer("the-last-train", "Tell him both lines")]),
+        "the door that reads the count was shut: {:?}",
+        w.seen.why
+    );
+    assert!(w.run.underwritten_until.is_some(), "the underwriter did not sign");
+    assert_eq!(w.seen.losses, 0, "the walk lost a fight: {:?}", w.seen.why);
+}
+
+/// The yard's floors are fights a real board wins, one at a time.
+///
+/// M10 measured this against the four reference boards by calling the oracle
+/// directly. This walks in through the door and out the other side, so the
+/// board that fights each floor is the board the run actually has when it
+/// gets there - carrying whatever the road handed it, at whatever the shop
+/// let it build.
+#[test]
+fn every_floor_of_the_yard_is_won_on_the_way_through() {
+    let d = gm2d_core::dungeon::by_id("the-switchyard").expect("the yard");
+    // Only the down line is walkable from the mouth since A7. The up line's
+    // floors are reached by the Up Line orb, which is what
+    // `every_floor_is_reachable_from_the_mouth` now counts as a way in.
+    for line in [("The coal road", "The coal road")] {
+        let mut w = Walk::new();
+        assert!(
+            w.follow(&[
+                Step::FightTo(20),
+                Step::Answer("the-timetable", "Buy a timetable"),
+                Step::FightTo(21),
+                Step::Answer("the-signal-box", "Ask him to throw the points"),
+                Step::FightTo(25),
+                Step::Answer("the-turntable", "Step onto the turntable"),
+                Step::Fight,
+                Step::Fight,
+                Step::Fight,
+                Step::Throw(line.1),
+                Step::Fight,
+            ]),
+            "{}: {:?}",
+            line.0,
+            w.seen.why
+        );
+        assert!(w.run.dungeon.is_none(), "{}: never came out", line.0);
+        assert_eq!(w.seen.losses, 0, "{}: lost a fight", line.0);
+        assert!(w.run.flags.contains(&"switchyard-cleared"));
+    }
+    let _ = d;
+}
+
+/// What the route map says about the yard.
+#[test]
+#[ignore]
+fn report_the_map() {
+    let mut run = Walk::new().run;
+    run.rung = 27;
+    for line in gm2d_core::route::ascii(&run) {
+        println!("{line}");
+    }
+}
+
+/// Every dungeon a door opens is drawn on the map, once.
+///
+/// The map draws a dungeon by scanning each door's outcomes for one that
+/// enters it, and it used to scan `c.outcome` rather than `every_outcome` -
+/// so a door that opens a dungeon *and* does something else drew nothing.
+/// THE UNDER-MINE has been in the game since the Unwinding and had never once
+/// been on the map, because both of the choices that open it buy you a shelf
+/// on the way past.
+///
+/// That is the Unwinding's own most expensive lesson (`HANDOFF.md` §4: every
+/// lint over `EVENTS` stopped at the top of an outcome) reaching the one place
+/// it had not been applied.
+#[test]
+fn every_dungeon_a_door_opens_is_on_the_map() {
+    use gm2d_core::event::{every_outcome, Outcome};
+    use gm2d_core::route::{route, NodeKind};
+
+    let mut want: Vec<&str> = Vec::new();
+    for e in EVENTS {
+        for c in e.choices {
+            for o in every_outcome(&c.outcome) {
+                if let Outcome::Enter(id) | Outcome::StartDungeon(id) = o {
+                    if !want.contains(id) {
+                        want.push(id);
+                    }
+                }
+            }
+        }
+    }
+    assert!(want.len() >= 3, "only {} dungeons are opened by a door", want.len());
+
+    let mut run = Walk::new().run;
+    run.rung = 45;
+    let map = route(&run);
+    let drawn: Vec<&str> = map
+        .nodes
+        .iter()
+        .filter(|n| matches!(n.kind, NodeKind::Dungeon { .. }))
+        .map(|n| n.id)
+        .collect();
+
+    for id in &want {
+        assert!(drawn.contains(id), "{id} is opened by a door and is not on the map");
+    }
+    // And once each: two choices of one door that both open the same dungeon
+    // are two ways through one door.
+    let mut seen = drawn.clone();
+    seen.sort_unstable();
+    let n = seen.len();
+    seen.dedup();
+    assert_eq!(seen.len(), n, "a dungeon is drawn twice: {drawn:?}");
+}
+
+/// The Switchyard's own content is on the map, and says how deep it goes.
+#[test]
+fn the_yards_content_is_on_the_map() {
+    use gm2d_core::route::{ascii, route, NodeKind};
+
+    let mut run = Walk::new().run;
+    run.rung = 27;
+    let map = route(&run);
+
+    for id in ["the-timetable", "the-signal-box", "the-turntable", "the-last-train"] {
+        assert!(
+            map.nodes.iter().any(|n| n.id == id && n.kind == NodeKind::Event),
+            "{id} is not on the map"
+        );
+    }
+    let yard = map
+        .nodes
+        .iter()
+        .find(|n| n.id == "the-switchyard")
+        .expect("the yard is not on the map");
+    assert_eq!(yard.kind, NodeKind::// Two since A7: the yard is two islands with no track
+            // between them and the Up Line orb is the only crossing, so the
+            // throat's fork is gone and what is left is one set of points
+            // down each line.
+            Dungeon { fights: 4, forks: 2 });
+
+    // And the label says both numbers, which is the one thing the ascii map
+    // gained: a straight line still says only its fights.
+    let lines = ascii(&run).join("\n");
+    assert!(
+        lines.contains("THE SWITCHYARD (4 fights, 2 points)"),
+        "the map does not say how deep the yard goes"
+    );
+    assert!(
+        lines.contains("THE CREVICE IN THE ROCK (3 fights)"),
+        "a straight line grew a points clause"
+    );
+}
+
+/// A dungeon entered while inside a dungeon must not erase the one you are in.
+///
+/// The Manse stands after rung 24, so its cellar door is taken at rung 25 -
+/// and THE TURNTABLE's window is rungs 26 to 28, `at` 27, opening at 25. So a
+/// run that walks into THE THRESHOLD carrying A Word About the Points is
+/// standing in one dungeon with the door to another open in front of it.
+#[test]
+fn a_second_dungeon_does_not_swallow_the_first() {
+    let mut run = Walk::new().run;
+    run.rung = 25;
+    run.enter_dungeon("the-threshold");
+    assert_eq!(run.dungeon.map(|(d, _)| d.id), Some("the-threshold"));
+
+    // Down a floor, so there is something to lose.
+    run.pending_scene = None;
+    run.force_win();
+    run.settle();
+    run.back_to_loadout();
+    assert_eq!(run.dungeon.map(|(_, f)| f), Some(1), "one floor down");
+
+    run.enter_dungeon("the-switchyard");
+    assert_eq!(run.dungeon.map(|(d, _)| d.id), Some("the-switchyard"), "in the yard");
+
+    // Walking out of the yard has to put you back in the staircase, one floor
+    // down, where you left it.
+    assert!(run.leave_dungeon(), "could not walk out of the yard");
+    assert_eq!(
+        run.dungeon.map(|(d, f)| (d.id, f)),
+        Some(("the-threshold", 1)),
+        "THE THRESHOLD was swallowed by the dungeon opened inside it"
+    );
+}
+
+/// Finishing the inner dungeon comes back up into the outer one.
+#[test]
+fn finishing_a_nested_dungeon_comes_back_up_into_the_one_under_it() {
+    let mut w = Walk::new();
+    w.run.rung = 25;
+    w.run.enter_dungeon("the-threshold");
+    w.run.pending_scene = None;
+    w.run.force_win();
+    w.run.settle();
+    w.run.back_to_loadout();
+
+    // Into the under-mine, which is two floors and ends.
+    w.run.enter_dungeon("the-under-mine");
+    assert_eq!(w.run.outer_dungeons.len(), 1, "the staircase is underneath");
+    for _ in 0..2 {
+        w.run.pending_scene = None;
+        w.run.force_win();
+        w.run.settle();
+        w.run.take_receipt();
+        w.run.back_to_loadout();
+    }
+    assert_eq!(
+        w.run.dungeon.map(|(d, f)| (d.id, f)),
+        Some(("the-threshold", 1)),
+        "finishing the inner one did not come back up"
+    );
+    assert!(w.run.outer_dungeons.is_empty());
+    // And the inner one still paid: the Prospector is its reward.
+    assert!(w.run.classes.iter().any(|c| c.name == "Prospector"), "the inner one paid nothing");
+}
+
+/// The stack says what a run is standing in, all of it.
+///
+/// The second half of the bug: a run two dungeons deep had nowhere to read
+/// that. `road_stack` carries every one of them, innermost first, so the strip
+/// and the panel can both say so.
+#[test]
+fn the_stack_names_every_dungeon_a_run_is_standing_in() {
+    let mut run = Walk::new().run;
+    run.rung = 25;
+    run.enter_dungeon("the-threshold");
+    run.enter_dungeon("the-switchyard");
+
+    let names: Vec<&str> = run
+        .road_stack()
+        .iter()
+        .filter(|i| i.kind() == "dungeon")
+        .map(|i| i.name())
+        .collect();
+    assert_eq!(names, vec!["THE SWITCHYARD", "THE THRESHOLD"], "innermost first");
+}
+
+/// A Rogue carried out of the inner one is still standing in the outer one.
+#[test]
+fn being_carried_out_of_the_inner_dungeon_leaves_you_in_the_outer() {
+    let mut run = Walk::new().run;
+    run.mode = Mode::Rogue;
+    run.lives = 2;
+    run.rung = 25;
+    run.enter_dungeon("the-threshold");
+    run.enter_dungeon("the-switchyard");
+
+    // A fight this board cannot win, inside the inner one.
+    run.pending_scene = None;
+    run.fight(gm2d_core::combat::LADDER.last().expect("a hard one"));
+    run.settle();
+
+    assert_eq!(run.lives, 1);
+    assert_eq!(
+        run.dungeon.map(|(d, _)| d.id),
+        Some("the-threshold"),
+        "carried out of the yard and out of the staircase with it"
+    );
+}
+
+/// Wiping forgets the whole nest.
+#[test]
+fn a_wipe_forgets_every_dungeon_underneath() {
+    let mut run = Walk::new().run;
+    run.mode = Mode::Rogue;
+    run.rung = 25;
+    run.enter_dungeon("the-threshold");
+    run.enter_dungeon("the-switchyard");
+    assert_eq!(run.outer_dungeons.len(), 1);
+    run.wipe();
+    assert!(run.dungeon.is_none());
+    assert!(run.outer_dungeons.is_empty(), "a new run is standing in a dungeon");
+}
+
+/// A door that asks for something small cannot be paid in keys.
+///
+/// `offerings` filtered on shape alone, and every quest item in the game is
+/// one cell - so "hand her a loose one-by-one" would happily take a rumour
+/// word, the Platinum Chip, or An Unwound Mainspring, which is the key to the
+/// only rung past Francis. Losing the ending to pay for a timetable.
+#[test]
+fn a_loose_item_door_will_not_take_a_key() {
+    use gm2d_core::event::Requirement;
+
+    let mut run = Walk::new().run;
+    for name in [
+        "An Unwound Mainspring",
+        "Platinum Chip",
+        "A Word About the Sidings",
+        "The Stranger's Parcel",
+    ] {
+        run.give(name);
+    }
+    let small = Requirement::LooseItemOfSize { w: 1, h: 1 };
+    let offered: Vec<&str> =
+        run.offerings(small).iter().map(|&id| run.registry.def(id).name).collect();
+
+    for name in ["An Unwound Mainspring", "Platinum Chip", "A Word About the Sidings"] {
+        assert!(run.holds(name), "{name} is not in the tray to begin with");
+        assert!(!offered.contains(&name), "{name} was offered up as a loose one-by-one");
+    }
+    assert!(
+        !offered.contains(&"The Stranger's Parcel"),
+        "somebody's parcel was offered as payment"
+    );
+}
+
+/// The road past Francis opens for a run that looked, and is carrying the key.
+///
+/// Rung 51 was a creature in `ALTERNATES`, a label on the route map, a theme
+/// entry and a `past_the_top()` that **nothing called**. There was no door and
+/// no way to fight it: a run that finished the chain, beat Francis and was
+/// holding An Unwound Mainspring was simply told the game was over.
+///
+/// Two questions, and they are asked separately on purpose. **Either** having
+/// earned the mainspring or having looked through the cracked lens makes the
+/// door stand; only the mainspring opens it.
+///
+/// It asked for the lens *alone* until it was reported from play: the only
+/// thing that sets `looked-through-the-lens` is one choice in THROUGH THE
+/// CRACKED LENS, which stands on exactly one rung and wants a second
+/// collectible to take. So a run could finish the entire chain, hold the
+/// mainspring, put Francis down and be told the game was over - which is the
+/// bug this file's first paragraph describes, arriving a second time by a
+/// different route.
+#[test]
+fn the_road_past_francis_opens_for_a_run_that_earned_it_or_looked() {
+    use gm2d_core::combat::LADDER;
+
+    let door = || EVENTS.iter().find(|e| e.id == "the-unwound").expect("the ending");
+
+    // A run that never looked, but did the work, is shown the way down.
+    let mut blind = Walk::new().run;
+    blind.rung = LADDER.len() - 1;
+    blind.give("An Unwound Mainspring");
+    blind.force_win();
+    blind.settle();
+    blind.back_to_loadout();
+    assert_eq!(blind.rung, LADDER.len(), "Francis is down");
+    let e = blind
+        .pending_event()
+        .expect("a run holding the mainspring was told the game was over");
+    assert_eq!(e.id, "the-unwound");
+    let down = door().choices.iter().find(|c| c.label == "Go down").expect("a way down");
+    assert!(blind.choice_open(down), "it did the chain and the way down is shut");
+
+    // And a run that did neither is told nothing, which is still the rule.
+    let mut nobody = Walk::new().run;
+    nobody.rung = LADDER.len() - 1;
+    nobody.force_win();
+    nobody.settle();
+    nobody.back_to_loadout();
+    assert!(
+        nobody.pending_event().is_none(),
+        "a run with no key and no idea it was there was shown the way down"
+    );
+
+    // A run that looked, and is carrying it.
+    let mut seer = Walk::new().run;
+    seer.rung = LADDER.len() - 1;
+    seer.flags.push("looked-through-the-lens");
+    seer.give("An Unwound Mainspring");
+    seer.force_win();
+    seer.settle();
+    seer.back_to_loadout();
+
+    let e = seer.pending_event().expect("the road past Francis");
+    assert_eq!(e.id, "the-unwound");
+    assert!(seer.past_the_top(), "the road past the top is not open");
+
+    let down = door().choices.iter().find(|c| c.label == "Go down").expect("a way down");
+    assert!(seer.choice_open(down), "the key is in hand and the way down is shut");
+    seer.take_choice(down);
+    seer.take_receipt();
+    assert_eq!(seer.monster().name, "THE UNWOUND", "it did not put the thing in front of you");
+
+    // And beating it finishes the run rather than leaving it standing there.
+    seer.force_win();
+    seer.settle();
+    assert!(seer.rung > LADDER.len(), "the ladder did not move past the top");
+    assert!(!seer.past_the_top(), "still standing in front of a thing it beat");
+    assert!(seer.ladder_complete(), "beating the last thing did not finish the run");
+}
+
+/// A run that looked but spent the key is shown the door and cannot take it.
+///
+/// The point of the door standing for a run that cannot open it: being told
+/// what you missed is the thing that makes you go looking next run. It is the
+/// VIP area's shape - the rope does not move - at the end of the road.
+#[test]
+fn the_way_down_is_shut_for_a_run_that_let_the_mainspring_go() {
+    use gm2d_core::combat::LADDER;
+
+    let mut run = Walk::new().run;
+    run.rung = LADDER.len() - 1;
+    run.flags.push("looked-through-the-lens");
+    run.force_win();
+    run.settle();
+    run.back_to_loadout();
+
+    let e = run.pending_event().expect("the door stands anyway");
+    assert_eq!(e.id, "the-unwound");
+    let down = e.choices.iter().find(|c| c.label == "Go down").expect("a way down");
+    assert!(!run.choice_open(down), "it opened for a run holding nothing");
+    assert!(!down.unmet.is_empty(), "a shut door that says nothing about why");
+    assert!(!run.past_the_top(), "past the top without the key");
+}
+
+/// The passenger pays, and only if it was carried rather than pocketed.
+///
+/// Reported from play: took the parcel, and nothing ever happened. The
+/// mechanic works - `settle` delivers five rungs on and hands over An Unwound
+/// Mainspring - but **only if the parcel is seated on a board**, and neither
+/// interface said so, nor that a parcel was being carried at all. A run that
+/// left it in the tray got no fare, no warning and no explanation, which is
+/// indistinguishable from a mechanic that does nothing.
+#[test]
+fn a_seated_passenger_pays_and_a_pocketed_one_does_not() {
+    use gm2d_core::piece::SlotKind;
+
+    let fare = "An Unwound Mainspring";
+    let door = EVENTS.iter().find(|e| e.id == "the-passenger").expect("the door");
+    let take = door.choices.iter().find(|c| c.label == "Take it aboard").expect("a choice");
+
+    // Seated: it pays.
+    let mut w = Walk::new();
+    // The door waits on the staircase having been walked.
+    w.run.flags.push("threshold-cleared");
+    w.run.rung = door.at;
+    w.run.take_choice(take);
+    w.run.take_receipt();
+    let (id, until) = w.run.passenger.expect("somebody is riding");
+    let slot = w.run.registry.def(id).slot;
+    let seated = (0..8u8)
+        .flat_map(|y| (0..6u8).map(move |x| (x, y)))
+        .any(|(x, y)| w.run.equip(id, slot, x, y).is_ok());
+    assert!(seated, "nowhere on the board for a parcel");
+    assert!(w.run.passenger_is_seated());
+    let _ = SlotKind::ALL;
+
+    while w.run.rung < until {
+        assert!(w.follow(&[Step::Fight]), "{:?}", w.seen.why);
+    }
+    assert!(w.run.holds(fare), "carried it the whole way and the courier paid nothing");
+    assert!(w.run.passenger.is_none(), "still riding after it was delivered");
+
+    // Pocketed: it does not, and that is the rule rather than a bug.
+    let mut p = Walk::new();
+    p.run.flags.push("threshold-cleared");
+    p.run.rung = door.at;
+    p.run.take_choice(take);
+    p.run.take_receipt();
+    let (_, until) = p.run.passenger.expect("riding");
+    assert!(!p.run.passenger_is_seated(), "it seated itself");
+    while p.run.rung < until {
+        assert!(p.follow(&[Step::Fight]), "{:?}", p.seen.why);
+    }
+    // Checked by whether it was *delivered*, not by whether the run is
+    // holding the fare: THE HERALD's brawl pays An Unwound Mainspring too, and
+    // a greedy walk down these rungs can win one on the way past. Two roads to
+    // one piece, which is the road being generous rather than the courier.
+    assert!(p.run.passenger.is_some(), "a parcel that rode in the tray was delivered");
+    assert!(!p.run.passenger_is_seated(), "it seated itself somewhere along the way");
+    let _ = fare;
+}

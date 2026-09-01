@@ -1,0 +1,13 @@
+sgilson7/gear-master
+commit  e93a391cefc135a166aec4f5c5ecfe1a0506f01b
+subject M4: everything worked, and the rung did not move
+path    crates/engine
+vendored 2026-08-31
+
+This is a permanent fork, not a mirror. GM2D deletes the campaign (the 49-rung
+ladder and everything hung off it), de-'statics the public types so the save
+layer can resolve ids, and adds serde throughout. It diverges in M0 and never
+converges, which is why this is a copy with a provenance file rather than a
+git subtree: a subtree you never pull from is a worse copy with extra commands.
+
+See PLAN.md 1.1 for the keep/drop table.

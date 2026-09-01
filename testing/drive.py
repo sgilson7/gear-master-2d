@@ -132,6 +132,58 @@ def check_fit_preview(page, name, fails):
         fails.append(f"{name}: none of {len(got)} loose components fits anywhere at all")
 
 
+def check_a_stale_autosave(browser, name):
+    """A save from an older build does not wedge the player in the scenery.
+
+    Reported from a real session. `world` is `#[serde(default)]` so that saves
+    written before M2 still open, and a default `WorldState` stands at (0, 0) —
+    which on this map is rock in the top-left corner. A returning player whose
+    browser held one of those arrived unable to move in any direction.
+
+    Planted rather than waited for: this is the exact file, and the check is
+    that the game repairs it rather than trusting it.
+    """
+    fails = []
+    ctx = browser.new_context()
+    page = ctx.new_page()
+    page.on("pageerror", lambda e: fails.append(f"{name}: pageerror: {e}"))
+    page.goto(ORIGIN + "/", wait_until="networkidle")
+    page.wait_for_function("document.getElementById('coords').textContent !== '—'", timeout=20000)
+
+    # One step, so an autosave exists, then strip its world the way an older
+    # build's file has it.
+    page.keyboard.press("ArrowRight")
+    leave_town(page) or dismiss_card(page)
+    if page.is_visible("#fight"):
+        page.click("#run")
+        page.wait_for_selector("#fight", state="hidden", timeout=8000)
+    stale = page.evaluate("""() => {
+      const v = JSON.parse(localStorage.getItem('gm2d.autosave'));
+      delete v.state.world;
+      return JSON.stringify(v);
+    }""")
+    page.evaluate("s => localStorage.setItem('gm2d.autosave', s)", stale)
+    page.reload(wait_until="networkidle")
+    page.wait_for_function("document.getElementById('coords').textContent !== '—'", timeout=20000)
+
+    terrain = page.text_content("#terrain")
+    if terrain in ("rock", "water"):
+        fails.append(f"{name}: a stale autosave spawned the player in {terrain}")
+
+    walked = page.text_content("#walked")
+    for key in ("ArrowRight", "ArrowUp", "ArrowLeft", "ArrowDown"):
+        page.keyboard.press(key)
+        if page.is_visible("#fight"):
+            page.click("#run")
+            page.wait_for_selector("#fight", state="hidden", timeout=8000)
+        leave_town(page) or dismiss_card(page)
+    if page.text_content("#walked") == walked:
+        fails.append(f"{name}: after a stale autosave the player could not move "
+                     f"in any direction from {page.text_content('#coords')}")
+    ctx.close()
+    return fails
+
+
 def walk_the_gate(browser, name):
     """Returns a list of failures; empty means the gate is passed."""
     fails, problems, offsite = [], [], []
@@ -445,6 +497,7 @@ def main():
                     # two of them rot.
                     fails.append(f"{name}: could not launch ({e})")
                     continue
+                fails += check_a_stale_autosave(b, name)
                 fails += walk_the_gate(b, name)
                 b.close()
                 if not any(f.startswith(name + ":") for f in fails):
@@ -462,6 +515,7 @@ def main():
     print("ok: a mid-fight save reopens the same fight")
     print("ok: walk, download, reload, upload — position and stream both came back")
     print("ok: a wrong file was refused with a sentence and changed nothing")
+    print("ok: a save from an older build does not wedge the player in the scenery")
     print("ok: no console errors, no off-origin requests")
 
 

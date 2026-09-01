@@ -340,6 +340,38 @@ impl World {
         scaled.clamp(0, MAX_ENCOUNTER_PER_MILLE as i64) as i32
     }
 
+    /// Put a player back somewhere they can stand.
+    ///
+    /// A save should never place you where you cannot be, and this is what
+    /// makes that true regardless of why it happened. Returns `Some` naming
+    /// where they were moved from, or `None` if they were already fine.
+    ///
+    /// **This exists because they were not.** `WorldState::world` is
+    /// `#[serde(default)]` so that saves written before M2 still open — and a
+    /// default `WorldState` stands at `(0, 0)`, which on this map is rock in
+    /// the top-left corner. A player carrying an autosave from an older build
+    /// arrived wedged in it, unable to move in any direction, with no way out
+    /// but a new game. Anything that loads a position runs this.
+    ///
+    /// The order is deliberate: the last town first, because that is where the
+    /// player *was* in any sense that survives, and the map's start only if
+    /// that fails too.
+    pub fn repair(&self, state: &mut WorldState) -> Option<[u8; 2]> {
+        let [x, y] = state.at;
+        if self.in_bounds(x as i32, y as i32) && self.passable(x, y) {
+            return None;
+        }
+        let was = state.at;
+        let home = self
+            .places
+            .iter()
+            .find(|p| p.id == state.last_town && self.passable(p.at[0], p.at[1]))
+            .map(|p| p.at)
+            .unwrap_or([self.start.0, self.start.1]);
+        state.at = home;
+        Some(was)
+    }
+
     /// Draw an opponent from this tile's region.
     ///
     /// Weighted by `(max + 1 − rating)`, so the hardest creature in a pool is

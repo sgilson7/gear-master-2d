@@ -57,7 +57,12 @@ pub fn save_json() -> String {
 #[wasm_bindgen]
 pub fn load_json(text: &str) -> Result<(), JsValue> {
     match save::load(text) {
-        Ok(g) => {
+        Ok(mut g) => {
+            // A loaded position is checked against the map before it is
+            // trusted. A save from before M2 carries no position at all and
+            // defaults to (0, 0), which on this map is rock — and a player who
+            // arrived there could not move in any direction.
+            map(|w| w.repair(&mut g.world));
             with_mut(|slot| *slot = g);
             Ok(())
         }

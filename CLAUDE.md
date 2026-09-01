@@ -171,6 +171,21 @@ Two things now stop it happening again:
    is a win. The version that assumed wins measured how much the map offers
    rather than how much a player gets, and would have gone on passing.
 
+## A save never places you where you cannot stand
+
+`WorldState` is `#[serde(default)]` in the save so that files written before M2
+still open — and a default `WorldState` stands at `(0, 0)`, which on this map is
+rock. A player carrying an autosave from an older build spawned inside it and
+could not move in any direction.
+
+**Anything that loads a position runs `World::repair`.** It puts the player at
+their last town if one is known and walkable, and at the map's start otherwise.
+Two core tests and one browser check hold it, the last of which plants the exact
+file rather than waiting for one.
+
+The general rule: a field defaulted for backward compatibility is a field that
+will arrive wrong, and the loader is where that is caught.
+
 ## Classes
 
 - **Three, and they are upstream's.** Gorillathon, Funnel Sergeant and

@@ -361,3 +361,69 @@ fn a_long_walk_starts_some_fights() {
     }
     assert!(met > 5, "four hundred steps started {met} fights");
 }
+
+// ------------------------------------------------------------- being stuck
+
+/// A position that cannot be stood on is repaired rather than trusted.
+///
+/// Reported from a real session: a player carrying an autosave from before M2
+/// spawned inside the rock in the top-left corner and could not move. The
+/// `world` field is `#[serde(default)]` so that older saves still open, and a
+/// default `WorldState` stands at `(0, 0)`.
+#[test]
+fn a_position_off_the_walkable_map_is_repaired() {
+    let w = world();
+
+    // The exact reported case: an older save, no world at all.
+    let mut state = WorldState::default();
+    assert_eq!(state.at, [0, 0]);
+    assert!(!w.passable(0, 0), "the corner is walkable, so this test proves nothing");
+    let was = w.repair(&mut state);
+    assert_eq!(was, Some([0, 0]), "the repair did not report moving anybody");
+    assert!(w.passable(state.at[0], state.at[1]), "repaired onto {:?}", state.at);
+    assert_eq!(state.at, [w.start.0, w.start.1], "with no town known, go to the start");
+
+    // With a town remembered, that is where they wake up.
+    let mut state = WorldState::default();
+    state.last_town = "kettleworks".into();
+    w.repair(&mut state);
+    let town = w.places.iter().find(|p| p.id == "kettleworks").unwrap();
+    assert_eq!(state.at, town.at, "a remembered town is a better answer than the start");
+
+    // Off the map entirely.
+    let mut state = WorldState::default();
+    state.at = [200, 200];
+    w.repair(&mut state);
+    assert!(w.in_bounds(state.at[0] as i32, state.at[1] as i32));
+    assert!(w.passable(state.at[0], state.at[1]));
+
+    // And somebody standing somewhere fine is left alone.
+    let mut state = WorldState::at_start(&w);
+    assert_eq!(w.repair(&mut state), None, "a good position was moved");
+    assert_eq!(state.at, [w.start.0, w.start.1]);
+}
+
+/// An old save, loaded, leaves the player somewhere they can walk.
+///
+/// The end-to-end version: this is the file the player actually had.
+#[test]
+fn a_save_from_before_the_world_existed_still_walks() {
+    use gm2d_core::game::Game;
+    use gm2d_core::save;
+
+    let text = save::save(&Game::new(7, "td"));
+    let mut v: serde_json::Value = serde_json::from_str(&text).unwrap();
+    v["state"].as_object_mut().unwrap().remove("world");
+    let old = serde_json::to_string(&v).unwrap();
+
+    let mut g = save::load(&old).expect("an old save still opens");
+    let w = world();
+    w.repair(&mut g.world);
+
+    // And they can actually go somewhere.
+    let mut rng = Rng::new(1);
+    let moved = [Dir::North, Dir::South, Dir::East, Dir::West]
+        .into_iter()
+        .any(|d| step(&w, &mut g.world.clone(), &mut rng, D, d).moved);
+    assert!(moved, "the player is walled in at {:?}", g.world.at);
+}

@@ -611,6 +611,7 @@ Elided with `…` for length; the shape is complete.
   "state": {
     "rng_state": 15241094284759029579,
     "theme": "td",
+    "name_seed": 6510615555426900570,
 
     "character": {
       "level": 4,
@@ -641,6 +642,8 @@ Elided with `…` for length; the shape is complete.
       "greaves": { "rows": 3, "placed": [] }
     },
 
+    "locks": [ { "slot": "weapon", "pieces": [0, 1], "offsets": [[0,0],[1,0]] } ],
+
     "world": {
       "at": [7, 12],
       "last_town": "the-end-of-all-gears",
@@ -669,6 +672,14 @@ Elided with `…` for length; the shape is complete.
 - `catalog.fingerprint` hashes the catalogue's canonical names in order. A mismatch produces
   *"This save was made with an older catalogue (374 pieces, b1946ac9). Load it in that
   version, or start a new game."* — a sentence, not a panic.
+- **`name_seed` and `locks` are not optional, and M0 found out why.** Item names
+  are hashed from the arrangement *and* the seed, so a save without it restores
+  every stat correctly and renames every item — the golden fixture came back
+  with "Resonant Thorn" where "Resonant Sliver" went in, and nothing else
+  looked wrong. Locks are state rather than geometry: two pieces that touch are
+  one item unless a lock says otherwise, and a rebuild that re-derived them
+  produced a board with more items than it started with. Both are in
+  `CLAUDE.md` under "things the fork learned the expensive way".
 - `boards[slot].rows` is stored **and** checked: `rows == 3 + rotation_rows(level) +
   granted_rows[slot]`. Storing it makes the save readable; checking it makes it honest.
 - `theme` is an id. The theme's contents are content and live in `data/`, never in a save.

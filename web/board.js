@@ -74,6 +74,17 @@ export class Board {
       this.c.height = h;
       this.layout();
     }
+    // A canvas is a replaced element, so `height: auto` re-derives its box from
+    // the intrinsic aspect ratio — which squashed a 414px backing store into
+    // 374 CSS pixels and drew every cell a tenth short. Pin the CSS height to
+    // the backing height instead.
+    //
+    // Through the border, not around it: the page sets `box-sizing: border-box`
+    // everywhere, so a bare `height: 372px` is a *border* box of 372 and a
+    // content box of 370. Measured rather than assumed, so a change to the
+    // border width cannot quietly bring the squash back.
+    const chrome = this.c.offsetHeight - this.c.clientHeight;
+    this.c.style.height = `${h + chrome}px`;
   }
 
   layout() {

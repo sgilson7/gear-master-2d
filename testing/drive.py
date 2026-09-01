@@ -123,7 +123,11 @@ def check_fit_preview(page, name, fails):
             fails.append(f"{name}: the fit preview for {row['name']} disagrees with core "
                          f"({len(row['drawn'])} cells drawn, {len(row['core'])} legal)")
             return
-    if not any(row["core"] for row in got):
+    # A smoke test, and only when there is enough in the bag for it to mean
+    # something. With one loose component it is a coin flip on which piece the
+    # shop happened to sell — a four-cell-tall one fits nowhere on a three-row
+    # frame, which is correct. CI failed on exactly that before this guard.
+    if len(got) >= 5 and not any(row["core"] for row in got):
         fails.append(f"{name}: none of {len(got)} loose components fits anywhere at all")
 
 

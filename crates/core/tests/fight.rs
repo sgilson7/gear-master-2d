@@ -57,7 +57,7 @@ fn winning_pays_and_losing_does_not() {
     assert_eq!(won.character.gold, purse + s.gold);
     assert!(s.sent_home.is_none(), "a win sent the player home");
     assert!(won.encounter.is_none(), "the encounter outlived its settlement");
-    assert!(won.world.count("xp") > 0, "a win banked no experience");
+    assert!(won.character.xp > 0, "a win banked no experience");
 
     let mut lost = facing("Francis");
     let log = fight::run(&lost, D).unwrap();

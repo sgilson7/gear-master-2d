@@ -810,3 +810,90 @@ pub fn pin(slot: usize) -> bool {
 pub fn packing() -> bool {
     with(|g| g.encounter.is_none())
 }
+
+// ---------------------------------------------------------------- levels
+
+/// Where the character stands: level, experience, points, and the boards the
+/// level implies.
+#[wasm_bindgen]
+pub fn character_json() -> String {
+    use gm2d_core::piece::SlotKind;
+    with(|g| {
+        let c = &g.character;
+        let level = c.level();
+        let (into, needed) = gm2d_core::progression::progress(c.xp);
+        let rows: Vec<_> = SlotKind::ALL
+            .iter()
+            .map(|&k| {
+                serde_json::json!({ "slot": slot_name(k), "rows": c.loadout.slot(k).rows() })
+            })
+            .collect();
+        let stats = c.player_stats();
+        serde_json::json!({
+            "level": level,
+            "xp": c.xp,
+            "into": into,
+            "needed": needed,
+            "points": c.skill_points,
+            "taken": c.skills_taken,
+            "gold": c.gold,
+            "rows": rows,
+            "next_grows": gm2d_core::progression::grows_at(level + 1).map(slot_name),
+            "stats": {
+                "health": stats.health, "strength": stats.strength,
+                "armor": stats.armor, "mana": stats.mana, "regen": stats.regen,
+                "mind_resist": stats.mind_resist, "curse_resist": stats.curse_resist,
+            },
+        })
+        .to_string()
+    })
+}
+
+/// The base tree, with every node already judged against what the player has.
+///
+/// `takeable` and `why` are worked out here for the same reason legality is on
+/// the board: a screen that greys a button out for its own reasons is a fourth
+/// rule nobody tested.
+#[wasm_bindgen]
+pub fn skills_json() -> String {
+    with(|g| {
+        let tree = gm2d_core::data::skills();
+        let Some(base) = tree.base() else { return "null".into() };
+        let nodes: Vec<_> = base
+            .nodes
+            .iter()
+            .map(|n| {
+                let taken = g.character.skills_taken.iter().any(|t| *t == n.id);
+                let verdict = tree.can_take(&n.id, &g.character.skills_taken, g.character.skill_points);
+                serde_json::json!({
+                    "id": n.id,
+                    "name": n.name,
+                    "blurb": n.blurb,
+                    "cost": n.cost,
+                    "requires": n.requires,
+                    "taken": taken,
+                    "takeable": verdict.is_ok(),
+                    "why": verdict.err().map(|e| e.to_string()).unwrap_or_default(),
+                })
+            })
+            .collect();
+        serde_json::json!({
+            "name": base.name,
+            "points": g.character.skill_points,
+            "nodes": nodes,
+        })
+        .to_string()
+    })
+}
+
+/// Spend a point. Returns an empty string, or the sentence core refused with.
+#[wasm_bindgen]
+pub fn take_skill(id: &str) -> String {
+    with_mut(|g| {
+        let tree = gm2d_core::data::skills();
+        match g.character.take_skill(&tree, id) {
+            Ok(()) => String::new(),
+            Err(e) => e.to_string(),
+        }
+    })
+}

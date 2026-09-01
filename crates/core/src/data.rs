@@ -13,6 +13,7 @@ pub const TERRAIN_JSON: &str = include_str!("../../../data/terrain.json");
 pub const TILES_JSON: &str = include_str!("../../../data/tiles.json");
 pub const EVENTS_JSON: &str = include_str!("../../../data/events.json");
 pub const THEME_TD_JSON: &str = include_str!("../../../data/theme.td.json");
+pub const SKILLS_JSON: &str = include_str!("../../../data/skills.json");
 
 /// The shipped map, loaded and checked.
 ///
@@ -26,4 +27,13 @@ pub fn world(difficulty: crate::combat::Difficulty) -> crate::world::World {
 
 pub fn events() -> crate::tile_event::EventsData {
     crate::tile_event::EventsData::parse(EVENTS_JSON).expect("the shipped events are broken")
+}
+
+/// The shipped skill tree.
+///
+/// Parsed on every call rather than cached in a `OnceLock`: it is read when a
+/// screen opens or a node is bought, never in a loop, and a cache would be a
+/// second place for it to be stale.
+pub fn skills() -> crate::skills::SkillsData {
+    crate::skills::SkillsData::parse(SKILLS_JSON).expect("the shipped skill tree is broken")
 }

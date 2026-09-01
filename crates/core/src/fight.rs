@@ -46,6 +46,12 @@ pub struct Settlement {
     pub outcome: Outcome,
     pub gold: i32,
     pub xp: i32,
+    /// Levels crossed. More than one is possible off a single fight, and a
+    /// receipt that only named the last would swallow a point and a row.
+    pub levels: Vec<u32>,
+    /// Which grids grew, and by how much. The plan asks the level-up to say
+    /// *which* board grew, so it is recorded rather than left to be inferred.
+    pub grew: Vec<(String, u8)>,
     /// Set when a loss sent the player home, naming the town.
     pub sent_home: Option<String>,
     /// One line each, in the order they happened, for the result card.
@@ -82,18 +88,34 @@ pub fn settle(game: &mut Game, log: &CombatLog, difficulty: Difficulty) -> Optio
     let spec = spec(&e)?;
 
     let gold = reward::bounty_for(log.outcome, spec.bounty);
-    let xp = reward::xp_for(log.outcome, crate::rating::creature_rating(spec, difficulty));
+    let rating = crate::rating::creature_rating(spec, difficulty);
+    let xp = reward::xp_for(log.outcome, crate::progression::xp_for_rating(rating));
 
     let mut receipt = Vec::new();
     let mut sent_home = None;
+    let mut levels = Vec::new();
+    let mut grew = Vec::new();
 
     match log.outcome {
         Outcome::Victory => {
             game.character.gold += gold;
             receipt.push(format!("+{gold} Fnorp"));
             if xp > 0 {
-                game.world.add("xp", xp as u32);
-                receipt.push(format!("+{xp} toward the next level"));
+                levels = game.character.gain_xp(xp);
+                receipt.push(format!("+{xp} experience"));
+            }
+            for level in &levels {
+                receipt.push(format!("Level {level}. One point to spend."));
+            }
+            if !levels.is_empty() {
+                let granted = crate::data::skills().granted_rows(&game.character.skills_taken);
+                for (slot, rows) in game.character.resize_boards(granted) {
+                    let name = format!("{slot:?}").to_lowercase();
+                    receipt.push(format!(
+                        "+{rows} row on the {name} frame",
+                    ));
+                    grew.push((name, rows));
+                }
             }
             game.world.bump("wins");
         }
@@ -104,11 +126,8 @@ pub fn settle(game: &mut Game, log: &CombatLog, difficulty: Difficulty) -> Optio
             // and this is not one.
             receipt.push("No bounty. Nothing was beaten.".into());
             if xp < 0 {
-                let lost = (-xp) as u32;
-                let had = game.world.count("xp");
-                game.world.counters.retain(|(k, _)| k != "xp");
-                game.world.add("xp", had.saturating_sub(lost));
-                receipt.push(format!("−{lost} toward the next level"));
+                game.character.gain_xp(xp);
+                receipt.push(format!("−{} experience", -xp));
             }
             sent_home = Some(game.world.last_town.clone()).filter(|t| !t.is_empty());
             receipt.push(match &sent_home {
@@ -118,5 +137,5 @@ pub fn settle(game: &mut Game, log: &CombatLog, difficulty: Difficulty) -> Optio
         }
     }
 
-    Some(Settlement { outcome: log.outcome, gold, xp, sent_home, receipt })
+    Some(Settlement { outcome: log.outcome, gold, xp, levels, grew, sent_home, receipt })
 }

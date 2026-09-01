@@ -1,0 +1,117 @@
+{
+  "format": "gm2d-skills",
+  "version": 1,
+  "trees": [
+    {
+      "id": "base",
+      "name": "A Sprocketman's craft",
+      "class": null,
+      "nodes": [
+        {
+          "id": "frame-sense",
+          "name": "Frame Sense",
+          "blurb": "One more row on the weapon frame, out of turn.",
+          "cost": 1,
+          "requires": [],
+          "effect": { "grow_slot_rows": { "slot": "weapon", "rows": 1 } }
+        },
+        {
+          "id": "second-frame",
+          "name": "The Second Frame",
+          "blurb": "And one on the chest. Your people cut brackets before they cut anything else.",
+          "cost": 1,
+          "requires": ["frame-sense"],
+          "effect": { "grow_slot_rows": { "slot": "chest", "rows": 1 } }
+        },
+        {
+          "id": "flush-fit",
+          "name": "Flush Fit",
+          "blurb": "Every finished item pays a tenth more. Nothing is wasted at the joins.",
+          "cost": 1,
+          "requires": ["frame-sense"],
+          "effect": { "assembly_pct": { "pct": 10 } }
+        },
+        {
+          "id": "tighter-still",
+          "name": "Tighter Still",
+          "blurb": "Another tenth. There is a point past which it stops being packing and starts being pride.",
+          "cost": 2,
+          "requires": ["flush-fit"],
+          "effect": { "assembly_pct": { "pct": 10 } }
+        },
+        {
+          "id": "thick-skull",
+          "name": "Thick Skull",
+          "blurb": "Songil is survivable. Barely, and not twice in a week.",
+          "cost": 1,
+          "requires": [],
+          "effect": { "stat": { "mind_resist": 8 } }
+        },
+        {
+          "id": "corked",
+          "name": "Corked",
+          "blurb": "A strip of it, wedged where a blow lands. It comes back every fight.",
+          "cost": 1,
+          "requires": [],
+          "effect": { "stat": { "armor": 12 } }
+        },
+        {
+          "id": "cave-lungs",
+          "name": "Cave Lungs",
+          "blurb": "Nine hundred feet of Deep Chocolate mine, and you never once came up early.",
+          "cost": 1,
+          "requires": [],
+          "effect": { "stat": { "health": 60 } }
+        },
+        {
+          "id": "the-long-shift",
+          "name": "The Long Shift",
+          "blurb": "Fourteen hours is a shift. Sixteen is a shift somebody is counting.",
+          "cost": 2,
+          "requires": ["cave-lungs"],
+          "effect": { "stat": { "health": 120, "regen": 2 } }
+        },
+        {
+          "id": "handspan",
+          "name": "Handspan",
+          "blurb": "You can still judge a gear by putting a hand across it. It is not a skill anybody taught you.",
+          "cost": 1,
+          "requires": [],
+          "effect": { "stat": { "strength": 6 } }
+        },
+        {
+          "id": "anvil-armed",
+          "name": "Anvil-Armed",
+          "blurb": "The pit had one anvil and four hundred of you. You got your turn at it.",
+          "cost": 2,
+          "requires": ["handspan"],
+          "effect": { "stat": { "strength": 10 } }
+        },
+        {
+          "id": "funnel-drill",
+          "name": "Funnel Drill",
+          "blurb": "Army-issue, and it has somebody else's name filed off the side of it.",
+          "cost": 1,
+          "requires": [],
+          "effect": { "stat": { "mana": 20 } }
+        },
+        {
+          "id": "jinx-read",
+          "name": "Jinx Read",
+          "blurb": "You can tell which of the four it is before it lands. Knowing does not stop it.",
+          "cost": 1,
+          "requires": ["thick-skull"],
+          "effect": { "stat": { "curse_resist": 15 } }
+        },
+        {
+          "id": "the-fifth-frame",
+          "name": "The Fifth Frame",
+          "blurb": "A row on the greaves. You walked out of the pit; you may as well arrive.",
+          "cost": 2,
+          "requires": ["second-frame"],
+          "effect": { "grow_slot_rows": { "slot": "greaves", "rows": 1 } }
+        }
+      ]
+    }
+  ]
+}

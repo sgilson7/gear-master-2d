@@ -7,6 +7,7 @@ import init, {
   world_json, position, try_step, event_json, answer,
   save_json, load_json, new_game, apply_preset,
   shop_json, buy, reroll, pin,
+  character_json, skills_json, take_skill,
   gold, piece_count, version, save_version,
   board_json, legal_anchors, place, pick_up, rotate, toggle_lock, undo, clear_board,
   encounter_json, fight_json, settle_fight, flee,
@@ -151,6 +152,11 @@ function drawDebug(g, pos) {
 
 function paintPanel() {
   const p = JSON.parse(position());
+  const c = JSON.parse(character_json());
+  $('level').textContent = c.level;
+  $('xp').textContent = `${c.into} / ${c.needed}`;
+  $('points').textContent = c.points;
+  $('skills').classList.toggle('primary', c.points > 0);
   $('region').textContent = p.region ?? '—';
   $('terrain').textContent = p.terrain;
   $('coords').textContent = `${p.x}, ${p.y}`;
@@ -280,6 +286,55 @@ function boardSays(text) {
   boardSays.t = setTimeout(() => { el.hidden = true; }, 2600);
 }
 
+// ---------------------------------------------------------------- the tree
+
+function openTree() {
+  const c = JSON.parse(character_json());
+  $('tree-level').textContent = c.level;
+  $('tree-points').textContent = c.points;
+  $('tree-next').textContent = c.next_grows ?? '—';
+  paintTree();
+  $('tree').hidden = false;
+}
+
+function paintTree() {
+  const t = JSON.parse(skills_json());
+  $('tree-points').textContent = t.points;
+  const box = $('nodes');
+  box.replaceChildren();
+  for (const n of t.nodes) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'wares' + (n.taken ? ' pinned' : '');
+    b.disabled = n.taken || !n.takeable;
+    const foot = n.taken ? 'taken'
+      : n.takeable ? `${n.cost} point${n.cost > 1 ? 's' : ''}`
+      : n.why;
+    b.innerHTML = `<b>${n.name}</b><span class="meta">${n.blurb}</span>` +
+                  `<span class="cost">${foot}</span>`;
+    b.onclick = () => {
+      const why = take_skill(n.id);
+      treeSays(why, !!why);
+      paintTree(); paintPanel(); autosave();
+      const c = JSON.parse(character_json());
+      $('tree-level').textContent = c.level;
+      $('tree-next').textContent = c.next_grows ?? '—';
+    };
+    box.appendChild(b);
+  }
+}
+
+function treeSays(text, bad = false) {
+  const el = $('tree-says');
+  el.textContent = text; el.hidden = !text;
+  el.classList.toggle('bad', bad);
+}
+
+function closeTree() {
+  $('tree').hidden = true;
+  paintPanel(); draw(); $('map').focus();
+}
+
 // ---------------------------------------------------------------- the town
 
 function openTown(id) {
@@ -334,7 +389,7 @@ function closeTown() {
 // ---------------------------------------------------------------- walking
 
 function walk(dir) {
-  if (!$('card').hidden || !$('fight').hidden || !$('town').hidden) return;
+  if (!$('card').hidden || !$('fight').hidden || !$('town').hidden || !$('tree').hidden) return;
   const r = JSON.parse(try_step(dir));
   blocked = r.moved ? null : r.blocked;
   paintPanel(); draw(); autosave();
@@ -389,6 +444,10 @@ async function main() {
       if (e.key === 'Escape') closeTown();
       return;
     }
+    if (!$('tree').hidden) {
+      if (e.key === 'Escape') closeTree();
+      return;
+    }
     if (e.key === 'Escape' && !$('card').hidden) { closeCard(); return; }
     // `d` is east on WASD, so the overlay gets its own key and a button.
     if (e.key === '`') { e.preventDefault(); toggleDebug(); return; }
@@ -415,6 +474,9 @@ async function main() {
   // check compares the page's answer against core's rather than against itself.
   window.__board = board;
   window.__legalAnchors = legal_anchors;
+
+  $('skills').onclick = openTree;
+  $('tree-done').onclick = closeTree;
 
   $('reroll').onclick = () => { const why = reroll(); townSays(why, !!why); paintShelf(); };
   $('leave').onclick = closeTown;

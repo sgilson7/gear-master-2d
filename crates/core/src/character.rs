@@ -35,6 +35,26 @@ use crate::piece::{PieceId, PieceRegistry, SlotKind, CATALOG};
 use crate::slot::{PlaceError, SLOT_W};
 use crate::stats::Stats;
 
+/// What a Sprocketman climbs out of the pit with, and where it sits.
+///
+/// Every component here is at most three cells tall, because the frames start
+/// at three rows. A whole weapon, most of a helmet, and a pair of molds — no
+/// chest, because a chest wants a base and a layer and there is no room for
+/// both. The chest is the first thing a player buys into.
+const STARTER: &[(&str, SlotKind, u8, u8, u8)] = &[
+    ("Oak Handle", SlotKind::Weapon, 0, 0, 0),
+    ("Runed Edge", SlotKind::Weapon, 1, 0, 0),
+    ("Ruby Inlay", SlotKind::Weapon, 3, 0, 0),
+    ("Balance Weight", SlotKind::Weapon, 3, 1, 0),
+    ("Steel Frame", SlotKind::Helmet, 0, 0, 0),
+    ("Iron Plating", SlotKind::Helmet, 3, 0, 0),
+    ("Visor of Focus", SlotKind::Helmet, 0, 2, 0),
+    ("Leather Material", SlotKind::Gloves, 0, 0, 0),
+    ("Gripping Mold", SlotKind::Gloves, 2, 0, 0),
+    ("Runed Material", SlotKind::Greaves, 0, 0, 0),
+    ("Greave Mold", SlotKind::Greaves, 2, 0, 0),
+];
+
 /// How many board changes can be taken back.
 pub const UNDO_DEPTH: usize = 40;
 
@@ -96,6 +116,14 @@ pub struct Character {
     /// Maximum health earned outside the boards — the one stat a reward can
     /// add to the character rather than to a grid.
     pub grown_health: i32,
+    /// Experience banked, ever. **Not per level**: the level is derived from
+    /// this, so the two cannot disagree, and a save carrying both would have a
+    /// pair of numbers that could contradict each other.
+    pub xp: i32,
+    /// Points earned and not yet spent. One a level.
+    pub skill_points: u32,
+    /// Node ids taken, in the order they were taken.
+    pub skills_taken: Vec<String>,
     /// **Not serialised.** Undo is a session's history of its own edits, not
     /// part of the character: a save that restored forty snapshots would be a
     /// save that let you undo your way back into a previous session's board.
@@ -124,6 +152,9 @@ impl Character {
             loadout: Loadout::new(),
             gold: 0,
             grown_health: 0,
+            xp: 0,
+            skill_points: 0,
+            skills_taken: Vec::new(),
             undo_stack: Vec::new(),
         }
     }
@@ -159,12 +190,27 @@ impl Character {
     /// catalogue and is a test fixture, not a starting point.
     pub fn starting() -> Self {
         let mut c = Self::new();
+        // Six by three, not the engine's six by eight. `Loadout::new` keeps the
+        // full height because that is what a *creature* wears — `enemies.json`
+        // seats gear as low as row 6 — and shrinking it globally would put
+        // every monster in a frame it does not fit. The player grows into
+        // theirs; that asymmetry is the early game.
+        for k in SlotKind::ALL {
+            *c.loadout.slot_mut(k) =
+                crate::slot::Slot::with_rows(k, crate::progression::STARTING_ROWS);
+        }
         c.gold = crate::shop::STARTING_GOLD;
-        for name in [
-            "Oak Handle", "Balanced Grip", "Iron Blade", "Serrated Edge",
-            "Steel Frame", "Iron Plating", "Padded Base", "Leather Material",
-            "Gripping Mold", "Boiled Leather", "Runner\'s Mold",
-        ] {
+        // **The preset's own components, and only the ones that fit in three
+        // rows.** The kit and the auto-pack button have to agree or the button
+        // seats nothing: the first version of this handed out a different set
+        // of scrap, `apply_preset` found almost none of it, and a starting
+        // character walked out of the pit wearing one glove and no weapon. It
+        // lost every fight, and a loss pays nothing, so there was no way out of
+        // the first region at all.
+        //
+        // A whole weapon, most of a helmet, and a pair of molds. Enough to win
+        // in the pit and nowhere else.
+        for name in STARTER.iter().map(|(n, ..)| *n) {
             c.give(name);
         }
         c.forget_undo();
@@ -551,6 +597,85 @@ impl Character {
         self.undo_stack.clear();
     }
 
+    // ------------------------------------------------------------ levels
+
+    /// The level this character's experience buys.
+    ///
+    /// Derived, never stored. A level and a total that could disagree is a
+    /// save with two answers to the same question.
+    pub fn level(&self) -> u32 {
+        crate::progression::level_for(self.xp)
+    }
+
+    /// Bank experience, returning every level crossed.
+    ///
+    /// Returns the levels rather than just the new one, because a single fight
+    /// can cross two and a screen that only said "you reached 7" would have
+    /// swallowed a skill point and a row.
+    pub fn gain_xp(&mut self, by: i32) -> Vec<u32> {
+        if by <= 0 {
+            self.xp = (self.xp + by).max(0);
+            return Vec::new();
+        }
+        let before = self.level();
+        self.xp += by;
+        let after = self.level();
+        let crossed: Vec<u32> = (before + 1..=after).collect();
+        self.skill_points += crossed.len() as u32;
+        crossed
+    }
+
+    /// Rebuild every grid to the height this level and these skills imply.
+    ///
+    /// **Grows only.** Called after a level-up and after a skill is taken, and
+    /// it must never shrink a board: a board that got shorter would drop
+    /// whatever was seated in the rows it lost, silently, and the player would
+    /// find out in a fight.
+    pub fn resize_boards(&mut self, granted: [u8; 5]) -> Vec<(SlotKind, u8)> {
+        let level = self.level();
+        let mut grew = Vec::new();
+        for k in SlotKind::ALL {
+            let want = crate::progression::board_rows(k, level, granted[k.index()]);
+            let have = self.loadout.slot(k).rows();
+            if want > have {
+                self.loadout.grow_one(k, want - have);
+                grew.push((k, want - have));
+            }
+        }
+        grew
+    }
+
+    /// Spend a point on a node.
+    ///
+    /// Every refusal comes from `SkillsData::can_take`, which is the one place
+    /// the three rules live — bought twice, without its prerequisite, without a
+    /// point. Taking a node re-applies its effects immediately: rows appear,
+    /// stats appear, and the assembly percentage moves, so a player sees what
+    /// they bought rather than what they will have after the next fight.
+    pub fn take_skill(
+        &mut self,
+        tree: &crate::skills::SkillsData,
+        id: &str,
+    ) -> Result<(), crate::skills::Refusal> {
+        let cost = tree.can_take(id, &self.skills_taken, self.skill_points)?.cost;
+        self.skill_points -= cost;
+        self.skills_taken.push(id.to_string());
+        self.apply_skills(tree);
+        Ok(())
+    }
+
+    /// Re-derive everything the taken nodes imply.
+    ///
+    /// Idempotent, and called after loading as well as after buying: the save
+    /// carries which nodes were taken, not what they did, so what they did is
+    /// worked out from the tree every time. A save that stored the consequences
+    /// would go stale the first time a node was retuned.
+    pub fn apply_skills(&mut self, tree: &crate::skills::SkillsData) {
+        self.loadout.assembly_pct = tree.assembly_pct(&self.skills_taken);
+        let granted = tree.granted_rows(&self.skills_taken);
+        self.resize_boards(granted);
+    }
+
     // ------------------------------------------------------------ growth
 
     /// Give every grid another row.
@@ -594,6 +719,21 @@ impl Character {
     /// `with_all_pieces`, which is what the tests use — gets the whole preset,
     /// so nothing about the fixtures changed.
     pub fn apply_preset(&mut self) {
+        // Six by eight or six by three: two layouts, because an arrangement is
+        // only an arrangement of a particular board.
+        //
+        // This is the bug M4 shipped and then found. `PRESET` is an eight-row
+        // arrangement, and `Balanced Grip` is one cell wide and **four tall** —
+        // on a three-row frame it does not fit, so a starting character seated
+        // an edge, an inlay and a weight with no handle under them, assembled
+        // nothing, and lost every fight. A loss pays nothing, so there was no
+        // way out of the first region at all: the game was unwinnable from its
+        // own first tile. `a_starting_character_can_win_in_the_pit` is the test
+        // that would have caught it, and now does.
+        if self.loadout.slot(SlotKind::Weapon).rows() < 8 {
+            self.seat(STARTER);
+            return;
+        }
         const PRESET: &[(&str, SlotKind, u8, u8, u8)] = &[
     ("Steel Frame", SlotKind::Helmet, 0, 0, 0),
     ("Crest of Vigor", SlotKind::Helmet, 3, 0, 0),
@@ -618,10 +758,17 @@ impl Character {
     ("Ruby Inlay", SlotKind::Weapon, 2, 0, 0),
     ("Balance Weight", SlotKind::Weapon, 2, 2, 0),
         ];
+        self.seat(PRESET);
+    }
+
+    /// Clear every grid and seat a layout, skipping anything not owned or not
+    /// fitting. Shared by both arrangements so they cannot diverge in how they
+    /// are applied.
+    fn seat(&mut self, layout: &[(&str, SlotKind, u8, u8, u8)]) {
         for k in SlotKind::ALL {
             self.loadout.slot_mut(k).clear();
         }
-        for &(name, kind, ax, ay, rot) in PRESET {
+        for &(name, kind, ax, ay, rot) in layout {
             let Some(id) = self.find_by_name(name) else { continue };
             self.registry.set_rotation(id, rot);
             self.loadout.remove_anywhere(id);
@@ -641,10 +788,18 @@ impl Character {
         self.loadout.report(&self.registry, kind)
     }
 
-    /// Every grid's contribution, plus health earned off the boards.
+    /// Every grid's contribution, plus health earned off the boards, plus
+    /// whatever the skill tree adds.
+    ///
+    /// The tree is read here rather than folded in when a node is bought,
+    /// because a bought node's *effect* is not state — the node is. Reading it
+    /// every time means retuning a node retunes every save that took it.
     pub fn player_stats(&self) -> Stats {
         let mut base = self.loadout.total_stats(&self.registry);
         base.health += self.grown_health;
+        if !self.skills_taken.is_empty() {
+            base += crate::data::skills().stats_from(&self.skills_taken);
+        }
         base
     }
 

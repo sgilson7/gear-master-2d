@@ -114,6 +114,14 @@ pub struct CharacterSave {
     pub name_seed: u64,
     #[serde(default, skip_serializing_if = "is_zero_i32")]
     pub assembly_pct: i32,
+    /// Experience banked, ever. The level is derived from it and is **not**
+    /// stored: two numbers that could disagree is two answers to one question.
+    #[serde(default)]
+    pub xp: i32,
+    #[serde(default)]
+    pub skill_points: u32,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub skills_taken: Vec<String>,
 }
 
 fn is_zero_i32(n: &i32) -> bool {
@@ -186,7 +194,17 @@ impl SaveFile {
     /// compiling.
     pub fn of(game: &Game) -> Self {
         let Game { rng, theme, character, world, encounter, shop } = game;
-        let Character { registry, owned, loadout, gold, grown_health, undo_stack: _ } = character;
+        let Character {
+            registry,
+            owned,
+            loadout,
+            gold,
+            grown_health,
+            xp,
+            skill_points,
+            skills_taken,
+            undo_stack: _,
+        } = character;
         let Loadout { slots, locks, name_seed, naming: _, assembly_pct } = loadout;
 
         // `naming` is skipped on purpose: it is a pointer into a theme's word
@@ -254,6 +272,9 @@ impl SaveFile {
                         .collect(),
                     name_seed: *name_seed,
                     assembly_pct: *assembly_pct,
+                    xp: *xp,
+                    skill_points: *skill_points,
+                    skills_taken: skills_taken.clone(),
                 },
             },
         }
@@ -358,6 +379,9 @@ impl SaveFile {
             locks,
             name_seed,
             assembly_pct,
+            xp,
+            skill_points,
+            skills_taken,
         } = character;
 
         // The registry first, in order, so `PieceId(i)` means what it meant.
@@ -423,6 +447,9 @@ impl SaveFile {
         character.loadout = loadout;
         character.gold = gold;
         character.grown_health = grown_health;
+        character.xp = xp;
+        character.skill_points = skill_points;
+        character.skills_taken = skills_taken;
 
         // The shelf. A component the shelf names and this build has not got
         // is dropped rather than refused: a stale shelf is a smaller problem

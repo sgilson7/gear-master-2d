@@ -73,7 +73,9 @@ def leave_town(page):
 # East, north, west, north: a serpentine that keeps finding new ground. A path
 # that walks into a wall would stall the search, because a blocked step draws
 # nothing — which is correct, and would make this loop run forever.
-PATROL = ["ArrowRight"] * 6 + ["ArrowUp"] * 2 + ["ArrowLeft"] * 6 + ["ArrowUp"] * 2
+# East and west along the pit's road: where a starting kit can actually win,
+# which is where a player grinds and where the pacing was calibrated.
+PATROL = ["ArrowRight"] * 6 + ["ArrowLeft"] * 6
 
 
 def walk_until_a_fight(page, limit=200):
@@ -89,29 +91,40 @@ def walk_until_a_fight(page, limit=200):
 def check_fit_preview(page, name, fails):
     """The fit preview comes from core, not from the page.
 
-    Picks a piece up and asks the page what it painted green. The list has to be
-    the one `legal_anchors` returned — if the page ever works out for itself
-    which cells are legal, there are two rulebooks and this is where it shows.
+    Picks up each loose piece in turn and compares what the board painted green
+    against what `legal_anchors` returned. If the page ever works out for itself
+    which cells are legal there are two rulebooks, and this is where it shows.
+
+    A piece that fits nowhere is a fine answer and not a failure: the frames
+    start three rows tall and plenty of components are four cells long. What
+    would be a failure is the two lists disagreeing.
     """
     got = page.evaluate("""() => {
       const b = window.__board; if (!b || !b.state) return null;
-      const loose = b.state.bag[0]; if (!loose) return null;
-      b.held = { id: loose.id, from: null, name: loose.name, slot: loose.slot };
-      b.askLegal(loose.slot);
-      const drawn = [...b.legal];
-      const core = JSON.parse(window.__legalAnchors(loose.id, loose.slot))
-                     .map(([x, y]) => `${x},${y}`);
+      const out = [];
+      for (const loose of b.state.bag.slice(0, 12)) {
+        b.held = { id: loose.id, from: null, name: loose.name, slot: loose.slot };
+        b.askLegal(loose.slot);
+        const drawn = [...b.legal].sort();
+        const core = JSON.parse(window.__legalAnchors(loose.id, loose.slot))
+                       .map(([x, y]) => `${x},${y}`).sort();
+        out.push({ name: loose.name, drawn, core });
+      }
       b.held = null; b.legal = null;
-      return { drawn, core };
+      return out;
     }""")
     if got is None:
         fails.append(f"{name}: could not reach the board to check the fit preview")
         return
-    if sorted(got["drawn"]) != sorted(got["core"]):
-        fails.append(f"{name}: the fit preview disagrees with core "
-                     f"({len(got['drawn'])} cells drawn, {len(got['core'])} legal)")
-    if not got["core"]:
-        fails.append(f"{name}: core says a loose piece fits nowhere on an empty board")
+    if not got:
+        return  # nothing loose to check with; the board tests cover the rest
+    for row in got:
+        if row["drawn"] != row["core"]:
+            fails.append(f"{name}: the fit preview for {row['name']} disagrees with core "
+                         f"({len(row['drawn'])} cells drawn, {len(row['core'])} legal)")
+            return
+    if not any(row["core"] for row in got):
+        fails.append(f"{name}: none of {len(got)} loose components fits anywhere at all")
 
 
 def walk_the_gate(browser, name):
@@ -226,6 +239,8 @@ def walk_the_gate(browser, name):
     gold_before = page.text_content("#gold")
     pos_before = page.text_content("#coords")
     walked_before = page.text_content("#walked")
+    level_before = page.text_content("#level")
+    points_before = page.text_content("#points")
 
     # --- download ------------------------------------------------------------
     with page.expect_download(timeout=20000) as dl:
@@ -257,6 +272,12 @@ def walk_the_gate(browser, name):
                      f"{page.text_content('#walked')}, not {walked_before}")
     if page.text_content("#gold") != gold_before:
         fails.append(f"{name}: the purse came back as {page.text_content('#gold')}")
+    if page.text_content("#level") != level_before:
+        fails.append(f"{name}: the level came back as {page.text_content('#level')}, "
+                     f"not {level_before}")
+    if page.text_content("#points") != points_before:
+        fails.append(f"{name}: the unspent points came back as "
+                     f"{page.text_content('#points')}, not {points_before}")
 
     # --- a bad file is refused with a sentence -------------------------------
     junk = ROOT / "dist" / "not-a-save.json"
@@ -269,6 +290,60 @@ def walk_the_gate(browser, name):
     junk.unlink()
     if page.text_content("#coords") != pos_before:
         fails.append(f"{name}: a refused file still moved the player")
+
+    # --- levelling and the tree ----------------------------------------------
+    # Grind the pit until a level lands. The receipt has to name which frame
+    # grew, because "you levelled" without saying what it bought is the thing
+    # the plan asks the level-up to say.
+    grew_line = None
+    for i in range(300):
+        if int(page.text_content("#level")) >= 2:
+            break
+        if page.is_visible("#fight"):
+            page.click("#preset")
+            page.click("#go")
+            page.wait_for_selector("#stage-replay", state="visible", timeout=10000)
+            page.click("#skip")
+            page.wait_for_selector("#stage-result", state="visible", timeout=20000)
+            lines = page.locator("#result-receipt p").all_text_contents()
+            for line in lines:
+                if "row on the" in line:
+                    grew_line = line
+            page.click("#done")
+            page.wait_for_selector("#fight", state="hidden", timeout=8000)
+            continue
+        if leave_town(page) or dismiss_card(page):
+            continue
+        page.keyboard.press(PATROL[i % len(PATROL)])
+
+    level = int(page.text_content("#level"))
+    if level < 2:
+        fails.append(f"{name}: three hundred steps of grinding the pit and still level {level}")
+    else:
+        if grew_line is None:
+            fails.append(f"{name}: a level-up never said which frame grew")
+        if int(page.text_content("#points")) < 1:
+            fails.append(f"{name}: level {level} and no point to spend")
+
+        page.click("#skills")
+        page.wait_for_selector("#tree", state="visible", timeout=8000)
+        nodes = page.locator("#nodes .wares").count()
+        if not (10 <= nodes <= 15):
+            fails.append(f"{name}: the tree shows {nodes} nodes and the plan asks for 10 to 15")
+        buyable = page.locator("#nodes .wares:not(:disabled)")
+        if buyable.count() == 0:
+            fails.append(f"{name}: a point to spend and nothing to spend it on")
+        else:
+            before = int(page.text_content("#tree-points"))
+            buyable.first.click()
+            after = int(page.text_content("#tree-points"))
+            if after >= before:
+                fails.append(f"{name}: buying a node cost no points ({before} -> {after})")
+            # And it cannot be bought twice: the same node is now disabled.
+            if page.locator("#nodes .wares.pinned:not(:disabled)").count():
+                fails.append(f"{name}: a taken node is still clickable")
+        page.click("#tree-done")
+        page.wait_for_selector("#tree", state="hidden", timeout=8000)
 
     # --- the numbers overlay -------------------------------------------------
     page.click("#numbers")
@@ -316,6 +391,7 @@ def main():
         print("\n".join(f"FAIL: {f}" for f in fails))
         sys.exit(1)
     print("ok: town, shop, pack, walk, fight, replay, receipt — the whole loop")
+    print("ok: a level-up named the frame it grew, and the point could be spent")
     print("ok: the fit preview is core's answer, not the page's")
     print("ok: a mid-fight save reopens the same fight")
     print("ok: walk, download, reload, upload — position and stream both came back")

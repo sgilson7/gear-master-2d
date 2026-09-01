@@ -9,10 +9,11 @@
 <body>
   <main class="wide">
     <header>
-      <p class="eyebrow">M3 &middot; fights on the map</p>
+      <p class="eyebrow">M4 &middot; levels and the tree</p>
       <h1>Gear Master 2D</h1>
       <p class="sub">Arrow keys or WASD, one tile a press. Something stops you, you pack your frames,
-        and the fight runs itself. Press <kbd>`</kbd>, or the button, for the numbers behind the map.</p>
+        and the fight runs itself. Every level adds a row to one frame and a point to spend.
+        Press <kbd>`</kbd> for the numbers behind the map.</p>
     </header>
 
     <div class="board">
@@ -32,8 +33,12 @@
             <div><dt>walked</dt><dd id="walked">&mdash;</dd></div>
             <div><dt>fights</dt><dd id="fights">&mdash;</dd></div>
             <div><dt>Fnorp</dt><dd id="gold">&mdash;</dd></div>
+            <div><dt>level</dt><dd id="level">&mdash;</dd></div>
+            <div><dt>experience</dt><dd id="xp">&mdash;</dd></div>
+            <div><dt>points</dt><dd id="points">&mdash;</dd></div>
           </dl>
           <div class="row">
+            <button id="skills" type="button">The tree</button>
             <button id="numbers" type="button" aria-pressed="false">Show the numbers</button>
           </div>
         </div>
@@ -59,6 +64,27 @@
         <div id="card-choices" class="choices"></div>
         <div id="card-receipt" class="receipt" hidden></div>
         <button id="card-close" type="button" hidden>Walk on</button>
+      </div>
+    </div>
+
+    <div id="tree" class="screen" hidden>
+      <div class="screenbox">
+        <header class="fighthead">
+          <div>
+            <p class="eyebrow">a Sprocketman's craft</p>
+            <h2>The tree</h2>
+            <p class="note">One point a level. A Sprocketman's craft is making working gear out
+              of loose pieces; everything here is a way of being better at that.</p>
+          </div>
+          <dl class="figures">
+            <div><dt>level</dt><dd id="tree-level">&mdash;</dd></div>
+            <div><dt>points</dt><dd id="tree-points">&mdash;</dd></div>
+            <div><dt>next row</dt><dd id="tree-next">&mdash;</dd></div>
+          </dl>
+        </header>
+        <div id="nodes" class="shelf"></div>
+        <p id="tree-says" class="says" hidden></p>
+        <div class="row"><button id="tree-done" type="button" class="primary">Back out</button></div>
       </div>
     </div>
 

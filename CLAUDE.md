@@ -9,10 +9,10 @@ from `sgilson7/gear-master`. `PLANNING-BRIEF.md` is the brief; `PLAN.md` is the
 plan and **wins where the two disagree**; `TONE.md` governs every string a
 player reads.
 
-**Milestone: M3 complete. Deploy gate 4 is live** at
-<https://sgilson7.github.io/gear-master-2d/> — the whole loop: walk, get
-stopped, pack your frames, watch the fight, take the receipt. M4 has not
-started.
+**Milestone: M4 complete. Deploy gate 5 is live** at
+<https://sgilson7.github.io/gear-master-2d/> — the grind has a reason. Every
+level adds a row to one frame in a fixed rotation and a point to spend on a
+thirteen-node tree. M5 has not started.
 
 **No rest point, and there should not be one.** M2 carried it forward; M3 is
 where it turns out to be nothing. Combat health resets every fight, so a rest
@@ -135,6 +135,40 @@ weapon pieces came back as one item.
 - **A loss pays nothing and walks you home.** Visible in play now, not just in
   `reward.rs`.
 
+## Levels
+
+- **The level is derived from experience, never stored.** Two numbers that
+  could disagree is two answers to one question, and a hand-edited save should
+  produce a consistent character rather than a contradictory one.
+- **Board size is a pure function of level plus granted rows.** So it can be
+  checked rather than trusted. `resize_boards` only ever grows: a board that
+  got shorter would drop whatever was seated in the rows it lost, silently.
+- **A skill's *effect* is not state — the node is.** The tree is re-read on
+  every load and every stat query, so retuning a node retunes every save that
+  took it.
+- **`XP_DIVISOR` is set by a test, not by taste.** It is 5 because that puts
+  level 5 at a mean of ~27 fights across nine seeded walks of the pit. Moving
+  the map's regions moves this; the band is the contract.
+
+## The soft-lock M4 shipped and then found
+
+For an afternoon the game was **unwinnable from its own first tile**, and every
+test passed.
+
+`apply_preset` is an eight-row arrangement and `Balanced Grip` is one cell wide
+and four tall, so on a three-row starting frame the weapon had no handle and
+assembled nothing. A starting character walked out of the pit with one glove,
+lost every fight, and — because a loss pays neither gold nor experience — had
+no way to buy or grind out of it.
+
+Two things now stop it happening again:
+
+1. `a_starting_character_can_win_in_the_pit` asserts the starting kit assembles
+   a weapon and beats something in the region it starts in.
+2. The calibration test **fights for real** instead of assuming every encounter
+   is a win. The version that assumed wins measured how much the map offers
+   rather than how much a player gets, and would have gone on passing.
+
 ## Inherited on purpose — do not "simplify"
 
 No RNG in combat. 50 ms ticks. Monsters are loadouts wearing catalogue pieces.
@@ -172,6 +206,7 @@ and M5's trees may spend them again.
 | M1 | 346 passing |
 | M2 | 359 passing |
 | M3 | 369 passing |
+| M4 | 382 passing |
 | Catalogue | 523 components |
 | Ladder | 50 creatures |
 | `crates/core` | ~33k lines, down from ~50k |
@@ -179,7 +214,9 @@ and M5's trees may spend them again.
 | Save format | v1 |
 | Map | 20×20, 5 regions, 3 towns, 6 events |
 | Bestiary | 50 creatures, rated 16 to 2958 |
-| Starting kit | 11 components, 28 Fnorp |
+| Starting kit | 11 components, 28 Fnorp, 4 assembled items |
+| Boards | 6×3 at level 1, one row a level, 6×8 ceiling |
+| Level 5 | ~27 fights, mean of nine seeded walks |
 
 Note the catalogue is **523**, not the 374 the retheme document counts — it
 grew upstream after that document was written. Any content work that quotes a

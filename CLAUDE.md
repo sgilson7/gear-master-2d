@@ -206,6 +206,37 @@ against a genuine mismatch looping anyway.
 
 `packaging/package-web.sh` fails the build if the stamp is not applied.
 
+## How the board reads
+
+Lifted from upstream's `crates/gui`, which had a documented, tested,
+colourblind-safe design GM2D's first board ignored. **Three channels, any two of
+which can be lost:**
+
+| channel | carries | where |
+|---|---|---|
+| a motif stamped on every cell | the slot | `look::motif` |
+| brightness | the role — **cores darkest** | `look::kind_luminance` |
+| an Okabe-Ito hue | the slot again | `look::slot_hue` |
+
+- **The palette lives in `core::look`, not in the page.** It is numbers and an
+  enum, not graphics, so core stays graphics-free — and the accessibility
+  contract is enforced by `cargo test` rather than by looking at a screenshot.
+  `tests/look.rs` is ten tests, seven of them ported near-verbatim from upstream.
+- **The one number: `ROLE_SEPARATION = 0.08`.** Consecutive role steps must
+  differ by that much in luminance *in every hue*. It is why `slot_color`
+  bisects for a brightness target instead of picking three HSL lightnesses —
+  the same lightness lands at wildly different brightness per hue, and yellow
+  flattens its top two steps into one.
+- **Assembled versus not is brightness and weight, never gold against red.**
+  That pair is the one distinction red-green colour blindness is worst at, and
+  the gold collides with the greaves hue. GM2D shipped the rejected pairing for
+  two milestones before the original's comment was read.
+- **A component is one shape, not a row of tiles.** Cells fill edge to edge; the
+  dark edge traces only the true boundary. So a four-cell blade reads as one
+  blade, and the lines inside an item are the seams between its parts.
+- **A shared component is grey until it is placed**, and takes its grid's colour
+  and mark as it crosses in — which shows the rule without stating it.
+
 ## Classes
 
 - **Three, and they are upstream's.** Gorillathon, Funnel Sergeant and

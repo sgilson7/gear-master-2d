@@ -466,11 +466,26 @@ pub fn board_json() -> String {
                     .into_iter()
                     .filter_map(|p| {
                         let (x, y) = slot.anchor_of(p)?;
+                        let def = ch.registry.def(p);
+                        // How it reads is core's answer, not the page's: the
+                        // fill carries the role in brightness and the slot in
+                        // hue, and the motif carries the slot again in shape.
+                        // A page that chose its own colours would be a page
+                        // with its own, untested, accessibility story.
+                        let look = gm2d_core::look::look(def, Some(k));
+                        let (ink, ink_a) = gm2d_core::look::motif_ink(look.fill);
                         Some(serde_json::json!({
                             "id": p.0, "x": x, "y": y,
-                            "name": theme.piece(ch.registry.def(p).name),
+                            "name": theme.piece(def.name),
                             "cells": slot.cells_of(p),
                             "locked": ch.is_locked_item(p),
+                            "fill": gm2d_core::look::hex(look.fill),
+                            "motif": look.motif.name(),
+                            "ink": gm2d_core::look::hex(ink),
+                            "ink_alpha": ink_a,
+                            "kind": format!("{:?}", def.kind),
+                            "effect": def.effect.is_some(),
+                            "trigger": !def.triggers.is_empty(),
                         }))
                     })
                     .collect();
@@ -507,14 +522,25 @@ pub fn board_json() -> String {
             .into_iter()
             .map(|p| {
                 let d = ch.registry.def(p);
+                // Loose, and it fits more than one grid: no hue and the shared
+                // diamond, because it is not a glove or a greave until it is in
+                // one. Role brightness still reads.
+                let look = gm2d_core::look::look(d, None);
+                let (ink, ink_a) = gm2d_core::look::motif_ink(look.fill);
                 serde_json::json!({
                     "id": p.0,
                     "name": theme.piece(d.name),
                     "slot": slot_name(d.slot),
+                    "slots": d.slots().iter().map(|&s| slot_name(s)).collect::<Vec<_>>(),
                     "kind": format!("{:?}", d.kind),
                     "cells": ch.registry.shape(p).cells(),
                     "rotation": ch.registry.rotation(p),
                     "price": d.price,
+                    "fill": gm2d_core::look::hex(look.fill),
+                    "motif": look.motif.name(),
+                    "ink": gm2d_core::look::hex(ink),
+                    "ink_alpha": ink_a,
+                    "shared": d.shared(),
                 })
             })
             .collect();
@@ -1007,5 +1033,60 @@ pub fn all_trees_json() -> String {
             })
             .collect();
         serde_json::json!({ "points": g.character.skill_points, "trees": trees }).to_string()
+    })
+}
+
+// ---------------------------------------------------------------- the look
+
+/// Every constant a board renderer needs, so none of them is typed twice.
+///
+/// The page draws what this says. It does not choose a colour, a stroke width
+/// or a pulse rate — those are `core::look`'s, and `tests/look.rs` is what
+/// holds them to the accessibility contract they were derived from.
+#[wasm_bindgen]
+pub fn look_json() -> String {
+    use gm2d_core::look::board;
+    serde_json::json!({
+        "cell_a": board::CELL_A,
+        "cell_b": board::CELL_B,
+        "piece_edge": board::PIECE_EDGE,
+        "assembled": board::ASSEMBLED,
+        "assembled_width": board::ASSEMBLED_WIDTH,
+        "assembled_alpha": [board::ASSEMBLED_ALPHA.0, board::ASSEMBLED_ALPHA.1],
+        "pulse_hz": board::PULSE_HZ,
+        "unassembled": board::UNASSEMBLED,
+        "unassembled_width": board::UNASSEMBLED_WIDTH,
+        "locked": board::LOCKED,
+        "locked_width": board::LOCKED_WIDTH,
+        "legal": board::LEGAL,
+        "illegal": board::ILLEGAL,
+        "footprint_alpha": board::FOOTPRINT_ALPHA,
+        "effect": board::EFFECT,
+        "trigger": board::TRIGGER,
+    })
+    .to_string()
+}
+
+/// How one loose component would read if it were dropped into `slot`.
+///
+/// A component on the cursor is grey until it is over a grid that will take it,
+/// and takes that grid's colour and mark as it crosses in — which shows the
+/// rule without anywhere having to state it.
+#[wasm_bindgen]
+pub fn look_over(piece: u32, slot: &str) -> String {
+    use gm2d_core::piece::PieceId;
+    with(|g| {
+        let def = g.character.registry.def(PieceId(piece));
+        let over = slot_of(slot).filter(|&k| def.fits(k));
+        let look = gm2d_core::look::look(def, over);
+        let (ink, a) = gm2d_core::look::motif_ink(look.fill);
+        serde_json::json!({
+            "fill": gm2d_core::look::hex(look.fill),
+            "motif": look.motif.name(),
+            "ink": gm2d_core::look::hex(ink),
+            "ink_alpha": a,
+            "fits": over.is_some(),
+        })
+        .to_string()
     })
 }

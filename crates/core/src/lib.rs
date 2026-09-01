@@ -21,6 +21,7 @@ pub mod data;
 pub mod fight;
 pub mod game;
 pub mod loadout;
+pub mod look;
 pub mod naming;
 pub mod piece;
 pub mod progression;

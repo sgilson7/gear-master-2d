@@ -11,6 +11,7 @@ import init, {
   class_offer_json, choose_class, class_name, all_trees_json,
   gold, piece_count, version, save_version,
   board_json, legal_anchors, place, pick_up, rotate, toggle_lock, undo, clear_board,
+  look_json, look_over,
   encounter_json, fight_json, settle_fight, flee,
 } from './pkg/gm2d_wasm.js';
 import { Board } from './board.js';
@@ -541,6 +542,7 @@ async function main() {
     boardJson: board_json,
     legalAnchors: legal_anchors,
     place, pickUp: pick_up, rotate, toggleLock: toggle_lock,
+    look: look_json, lookOver: look_over,
   });
   board.onsay = boardSays;
   board.onchange = (st) => {

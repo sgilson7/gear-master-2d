@@ -540,6 +540,81 @@ def check_both_boards_are_in_the_replay(page, name, fails):
         fails.append(f"{name}: an item with cells on a board went off and nothing moved")
 
 
+def check_the_sheet_says_what_you_are(page, name, fails):
+    """A point spent shows up somewhere.
+
+    Reported from a real session: four skills taken, and no way to tell whether
+    any of them had landed. The tree grants +6 strength and +60 max health, and
+    there was nowhere in the game showing either — which is indistinguishable
+    from a skill that does nothing.
+    """
+    got = page.evaluate("""() => {
+      const c = window.__character();
+      return { rows: [...document.querySelectorAll('#sheet li')].map(li => li.textContent.trim()),
+               stats: c.stats ?? [], held: c.held ?? {} };
+    }""")
+    if not got["rows"]:
+        fails.append(f"{name}: the sheet says nothing about the character")
+        return
+    text = " ".join(got["rows"]).lower()
+    for want in ("max health", "strength"):
+        if want not in text:
+            fails.append(f"{name}: the sheet never mentions {want}: {got['rows']}")
+    # Every non-zero stat core reports has to be on it.
+    for st in got["stats"]:
+        if st["n"] and st["label"].lower() not in text:
+            fails.append(f"{name}: core reports {st['label']!r} and the sheet drops it")
+
+
+def check_a_starting_balance_is_on_the_bar(page, name, fails):
+    """What you begin a fight holding is on screen from the first frame.
+
+    The armour bar opened at zero however much the tree had granted, because
+    the only armour event in the log reports what is *left* after a hit —
+    nothing announces a balance nobody had to earn. A player with `Corked`
+    watched an empty bar and concluded the skill was broken.
+    """
+    got = page.evaluate("""() => {
+      const r = window.__replay, log = r.log;
+      const opened = r.track.player[0];
+      return {
+        armor: log.player.armor ?? null,
+        pools: log.player.pools ?? null,
+        trackArmor: opened[3], trackPools: opened[4],
+        enemyArmor: log.enemy?.armor ?? null,
+      };
+    }""")
+    if got["armor"] is None or got["pools"] is None:
+        fails.append(f"{name}: the log does not say what the fight opened with")
+        return
+    if got["trackArmor"] != got["armor"]:
+        fails.append(f"{name}: the fight opened holding {got['armor']} armour and the bar "
+                     f"drew {got['trackArmor']}")
+    if got["trackPools"] != got["pools"]:
+        fails.append(f"{name}: the fight opened holding {got['pools']} and the row "
+                     f"drew {got['trackPools']}")
+
+    # **And prove the seeding rather than comparing zero with zero.**
+    #
+    # A character on this walk has usually banked nothing, so the check above
+    # is satisfied by a replay that hard-codes an empty bar — which is exactly
+    # the bug it exists to catch, and it passed a deliberately reverted build.
+    # Feed the same log back with a balance on it and read the opening row.
+    seeded = page.evaluate("""() => {
+      const r = window.__replay;
+      const log = JSON.parse(JSON.stringify(r.log));
+      log.player.armor = 37;
+      log.player.pools = [11, 5, 3, 2];
+      r.load(log);
+      const row = r.track.player[0];
+      r.t = 0;
+      return { armor: row[3], pools: row[4] };
+    }""")
+    if seeded["armor"] != 37 or seeded["pools"] != [11, 5, 3, 2]:
+        fails.append(f"{name}: a fight opening with 37 armour drew {seeded} — the bar is "
+                     f"not reading what the fight began with")
+
+
 def check_turning_in_hand(page, name, fails):
     """A component turned in hand actually turns.
 
@@ -763,6 +838,7 @@ def walk_the_gate(browser, name):
     # The tree lives on the map, behind nothing — checked here rather than up
     # in the packing block, where the fight screen is over the top of it.
     check_every_skill_says_what_it_does(page, name, fails)
+    check_the_sheet_says_what_you_are(page, name, fails)
 
     # --- a fight -------------------------------------------------------------
     if not walk_until_a_fight(page):
@@ -784,6 +860,7 @@ def walk_the_gate(browser, name):
         page.wait_for_selector("#stage-replay", state="visible", timeout=10000)
         check_the_replay_shows_both_sides(page, name, fails)
         check_both_boards_are_in_the_replay(page, name, fails)
+        check_a_starting_balance_is_on_the_bar(page, name, fails)
         page.click("#skip")
         page.wait_for_selector("#stage-result", state="visible", timeout=15000)
         receipt = page.locator("#result-receipt p").all_text_contents()
@@ -975,11 +1052,24 @@ def walk_the_gate(browser, name):
         if not page.is_visible("#fork"):
             fails.append(f"{name}: Escape dismissed the class fork")
 
+        before = page.get_attribute("#player-art", "src")
         page.locator("#fork-choices .wares").first.click()
         page.wait_for_selector("#fork", state="hidden", timeout=8000)
         chosen = page.text_content("#class")
         if not chosen or chosen == "—":
             fails.append(f"{name}: a class was chosen and the sheet still says {chosen!r}")
+
+        # And your own figure becomes that class's. The Sprocketman is who you
+        # are before anybody decided; the fork is where that stops being true.
+        wait_for_images(page, "#player-art")
+        art = page.evaluate("""() => {
+          const a = document.getElementById('player-art');
+          return { src: a.getAttribute('src'), w: a.naturalWidth, hidden: a.hidden };
+        }""")
+        if art["src"] == before:
+            fails.append(f"{name}: took a class and the panel still draws {before}")
+        if art["hidden"] or not art["w"]:
+            fails.append(f"{name}: the class figure did not load: {art}")
 
         # The class tree opened, and it is bigger than the base tree alone.
         page.wait_for_selector("#tree", state="visible", timeout=8000)
@@ -1056,6 +1146,8 @@ def main():
     print("ok: every class is offered with its own figure")
     print("ok: a component is a shape, on the shelf and in the bag, and it explains itself")
     print("ok: both boards are drawn in the replay, and what fires jolts")
+    print("ok: the sheet says what you are, and a fight opens holding what the tree granted")
+    print("ok: your own figure becomes your class's when you take one")
     print("ok: a mid-fight save reopens the same fight")
     print("ok: walk, download, reload, upload — position and stream both came back")
     print("ok: a wrong file was refused with a sentence and changed nothing")

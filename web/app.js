@@ -179,6 +179,45 @@ function paintPanel() {
   $('walked').textContent = p.walked;
   $('fights').textContent = p.fights;
   $('gold').textContent = gold();
+  paintSheet(c);
+  paintYou(c.class);
+}
+
+/// The character sheet: what you are, and what you walk into a fight holding.
+///
+/// Reported by core and printed unchanged. Nothing showed this before, so a
+/// point spent on strength or max health produced no visible change anywhere —
+/// which is indistinguishable from a skill that does nothing.
+/// Your own figure, which becomes your class's once you have one.
+///
+/// The Sprocketman is who you are before anybody has decided what you are; the
+/// fork is where that stops being true, and it does not come off. A panel that
+/// went on drawing the generic figure afterwards would be the one screen in
+/// the game that had not noticed.
+function paintYou(canonical) {
+  const cls = canonical ?? JSON.parse(character_json()).class;
+  const src = (cls && figure('classes', cls)) || (art.player ? `assets/${art.player}.svg` : null);
+  portrait($('player-art'), src, cls ? class_name() : 'you');
+}
+
+function paintSheet(c) {
+  const rows = (c.stats ?? [])
+    .filter((s) => s.n)
+    .map((s) => `<li><b>${s.n}${s.unit}</b> ${s.label}</li>`);
+  // Armour and mana are the odd pair: at the character level they are only
+  // meaningful as what you *begin* a fight with, which is the tree's doing.
+  //
+  // **The engine's words, matching the node exactly.** A node that reads
+  // "start every fight with 12 armor" and a sheet that reads "12 cork" are the
+  // same number wearing two names, and the entire job of this line is to let
+  // somebody who spent a point confirm they got what it said. An item card
+  // still says Cork, because a card is about the item rather than about a
+  // promise somebody is checking.
+  const held = c.held ?? {};
+  for (const [n, label] of [[held.armor, 'armor'], [held.mana, 'mana']]) {
+    if (n) rows.push(`<li class="dim">you start every fight holding <b>${n}</b> ${label}</li>`);
+  }
+  $('sheet').innerHTML = rows.join('') || `<li class="none">nothing yet</li>`;
 }
 
 function toggleDebug() {
@@ -498,6 +537,7 @@ function offerClass() {
         return;
       }
       $('fork').hidden = true;
+      paintYou(c.canonical);
       paintPanel(); draw(); autosave();
       openTree();
     };
@@ -815,9 +855,7 @@ async function main() {
   world = JSON.parse(world_json());
   try {
     art = await (await fetch('data/art.json')).json();
-    // You, in the panel that is always up. `art.player` has existed since M6
-    // and nothing read it.
-    if (art.player) portrait($('player-art'), `assets/${art.player}.svg`, 'you');
+    paintYou();
   } catch {
     // No art file, or it will not parse. The game draws headings instead,
     // which is exactly what it did before there was any art at all.
@@ -909,6 +947,7 @@ async function main() {
   window.__replay = replay;
   window.__classOffer = () => JSON.parse(class_offer_json());
   window.__encounter = () => JSON.parse(encounter_json());
+  window.__character = () => JSON.parse(character_json());
   window.__fightJson = () => fight_json();
 
   $('skills').onclick = openTree;

@@ -284,3 +284,71 @@ fn no_component_line_speaks_the_theme() {
     }
     assert!(bad.is_empty(), "themed words in a spec:\n  {}", bad.join("\n  "));
 }
+
+/// **The log reports what the fight opened with, and the replay reads it.**
+///
+/// Reported from a real session: a character holding `Corked` and `Funnel
+/// Drill` watched a fight begin with an empty armour bar and no mana, and
+/// concluded the two skills did nothing. They were working — twelve armour was
+/// soaking blows the whole time. Nothing *announced* the opening balance,
+/// because nothing had to gain it, and the only armour event is one that
+/// reports what is left after a hit.
+///
+/// `CombatLog::player` is the fighter as the bell went. This is the assertion
+/// that it carries the balance, which is what the fight screen now seeds from.
+#[test]
+fn the_log_opens_holding_what_the_tree_granted() {
+    use gm2d_core::character::Character;
+    use gm2d_core::combat::{simulate_holding, Difficulty, Event, MonsterSpec, Side};
+
+    let mut c = Character::starting();
+    c.apply_preset();
+    for id in ["corked", "funnel-drill"] {
+        c.skill_points += 4;
+        c.take_skill(&data::skills(), id).expect("a base node with a point in hand");
+    }
+    let held = c.start_with();
+    assert_eq!(held, Held { armor: 12, mana: 20 }, "the two nodes as shipped");
+
+    let spec: &MonsterSpec =
+        gm2d_core::combat::LADDER.iter().find(|s| s.name == "Bog Toad").expect("a toad");
+    let log = simulate_holding(
+        c.player_stats(),
+        &c.combat_items(),
+        spec,
+        Difficulty::Easy,
+        &[],
+        0,
+        held,
+    );
+
+    assert_eq!(log.player.armor, held.armor, "the opening frame's armour");
+    assert_eq!(log.player.mana, held.mana, "the opening frame's mana");
+
+    // And it is real armour, not a number on a bar: it soaks.
+    let soaked: i32 = log
+        .entries
+        .iter()
+        .filter_map(|e| match e.event {
+            Event::Hit { by, absorbed, .. } if by == Side::Enemy => Some(absorbed),
+            _ => None,
+        })
+        .sum();
+    assert_eq!(soaked, held.armor, "all twelve points should be spent soaking, and no more");
+}
+
+/// The four nodes from that session, and what each is worth.
+#[test]
+fn the_four_nodes_a_player_took_all_do_something() {
+    use gm2d_core::character::Character;
+    let mut c = Character::starting();
+    let before = c.player_stats();
+    for id in ["corked", "funnel-drill", "cave-lungs", "handspan"] {
+        c.skill_points += 4;
+        c.take_skill(&data::skills(), id).expect("takeable");
+    }
+    let after = c.player_stats();
+    assert_eq!(after.health - before.health, 60, "Cave Lungs");
+    assert_eq!(after.strength - before.strength, 6, "Handspan");
+    assert_eq!(c.start_with(), Held { armor: 12, mana: 20 }, "Corked and Funnel Drill");
+}

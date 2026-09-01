@@ -579,6 +579,55 @@ of thing it is, and explains itself on hover.
   the bite went off rather than failing one. Which activations are shakeable is
   a property of the fight.
 
+## A skill that works and cannot be seen is a skill that does not work
+
+Reported from a real session: four nodes taken — `Corked`, `Funnel Drill`,
+`Cave Lungs`, `Handspan` — and *"I am receiving none of the start of combat
+bonuses and I cannot tell whether I have received the strength or not."*
+
+**Every one of them was working.** Twelve armour soaked blows for the whole
+fight. The engine was right and the screen said nothing, which from where the
+player sits is the same thing as a broken skill.
+
+Two faults, and they are the same fault twice:
+
+1. **The fight opened at zero.** `fight_json` seeded its running snapshot with
+   `armor = 0` and empty pools, then updated on events — and *nothing announces
+   a balance nobody had to earn.* The only armour event reports what is **left
+   after a hit**. So the bar sat empty until something took a swing at it.
+   `CombatLog::player` is `start_player`, the fighter as the bell went, and it
+   has carried the answer all along; the snapshot seeds from it now.
+2. **Nothing showed the character sheet.** `character_json` had emitted stats
+   since M5 and no line of code read them. +6 strength and +60 max health
+   landed in a number no screen printed. `#sheet` prints it, and prints what
+   the tree says you begin a fight holding.
+
+Rules that came out of it:
+
+- **A derived number needs a place it is shown**, or it cannot be told from a
+  bug. The test that would have caught this is not a unit test — core was
+  correct — it is `check_the_sheet_says_what_you_are`, which fails when core
+  reports a non-zero stat the sheet drops.
+- **The sheet speaks the node's words**, not the theme's: a node reading "start
+  every fight with 12 armor" against a sheet reading "12 cork" is one number
+  with two names, and the whole job of the line is to let somebody confirm they
+  got what was promised. An item card still says Cork — a card is about the
+  item, not about a promise being checked.
+- **A check that compares zero with zero is not a check.** The first version of
+  `check_a_starting_balance_is_on_the_bar` compared the log's opening armour
+  with the bar's, and a character on the gate's walk holds nothing, so a build
+  with the bug hard-coded to zero passed it. It feeds a log back with a balance
+  on it and reads the opening row now. Negative-test every new check by
+  breaking the thing it guards.
+
+## Your figure is your class's
+
+`art.player` is the Sprocketman — who you are before anybody has decided what
+you are. The fork is where that stops being true and it does not come off, so
+the panel draws `art.classes[canonical]` from then on. Repainted on every
+`paintPanel`, so a loaded save arrives wearing its own figure rather than
+waiting for the next fork.
+
 ## Tone, as a lint
 
 `tests/tone.rs` holds the eight rules from `TONE.md` a machine can check. Not
@@ -636,6 +685,7 @@ and M5's trees may spend them again.
 | The other side's gear, and a tree that says what it does | 419 passing |
 | Shops, errands and a replay of both sides | 425 passing |
 | Components that show their shape and explain themselves | 427 passing |
+| The sheet, and a fight that opens holding what it holds | 429 passing |
 | Catalogue | 528 components |
 | Ladder | 50 creatures |
 | `crates/core` | ~33k lines, down from ~50k |

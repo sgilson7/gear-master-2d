@@ -1006,9 +1006,22 @@ pub fn fight_json() -> String {
         let mut pmax = log.player.max_health;
         let mut eh = log.enemies.first().map(|c| c.max_health).unwrap_or(1);
         let mut emax = eh;
-        let (mut pa, mut ea) = (0i32, 0i32);
+        // **Seeded from the combatants the fight began with, not from zero.**
+        //
+        // `CombatLog::player` is `start_player` — the fighter as the bell went,
+        // armour and pools included. Starting these at zero meant a character
+        // who had taken `Corked` watched a fight open with an empty armour bar
+        // and concluded the skill did nothing; it was soaking blows the whole
+        // time, and the only event that mentions armour is one that reports
+        // what is *left* after a hit. Nothing ever announced the opening
+        // balance because nothing had to gain it.
+        let e0 = log.enemies.first();
+        let (mut pa, mut ea) = (log.player.armor, e0.map(|c| c.armor).unwrap_or(0));
         // mana, rage, faith, nature — the four a board actually banks.
-        let (mut pp, mut ep) = ([0i32; 4], [0i32; 4]);
+        let mut pp = [log.player.mana, log.player.rage, log.player.faith, log.player.nature];
+        let mut ep = e0
+            .map(|c| [c.mana, c.rage, c.faith, c.nature])
+            .unwrap_or([0; 4]);
         let pool_index = |what: &str| match what {
             "mana" => Some(0),
             "rage" => Some(1),
@@ -1109,11 +1122,15 @@ pub fn fight_json() -> String {
             "pools": ["the Funny", "fury", "devotion", "harvest"],
             "player": {
                 "name": "you", "max_health": log.player.max_health,
+                "armor": log.player.armor,
+                "pools": [log.player.mana, log.player.rage, log.player.faith, log.player.nature],
                 "items": mine, "slots": my_board,
             },
             "enemy": log.enemies.first().map(|c| serde_json::json!({
                 "name": g.theme_name(gm2d_core::combat::creature(&c.name).map(|s| s.name).unwrap_or("")),
                 "max_health": c.max_health,
+                "armor": c.armor,
+                "pools": [c.mana, c.rage, c.faith, c.nature],
                 "items": theirs,
                 "slots": their_board,
             })),
@@ -1360,11 +1377,30 @@ pub fn character_json() -> String {
             "gold": c.gold,
             "rows": rows,
             "next_grows": gm2d_core::progression::grows_at(level + 1).map(slot_name),
-            "stats": {
-                "health": stats.health, "strength": stats.strength,
-                "armor": stats.armor, "mana": stats.mana, "regen": stats.regen,
-                "mind_resist": stats.mind_resist, "curse_resist": stats.curse_resist,
+            // What the character actually is. Nothing read this before, which
+            // is why a player who took +6 strength had no way to tell whether
+            // they had got it.
+            //
+            // `stats.armor` and `stats.mana` are **not** here on purpose: at
+            // the character level they are the sum of what the *items* grant
+            // per activation, which is a number that describes nothing a
+            // player holds. What you hold at the bell is `held`, below.
+            "stats": [
+                { "n": stats.health, "label": "max health", "unit": "" },
+                { "n": stats.strength, "label": "strength", "unit": "" },
+                { "n": stats.regen, "label": "regen a second", "unit": "" },
+                { "n": stats.power, "label": "weapon power", "unit": "%" },
+                { "n": stats.mind_resist, "label": "mind resist", "unit": "%" },
+                { "n": stats.curse_resist, "label": "curse resist", "unit": "%" },
+                { "n": stats.physical_resist, "label": "physical resist", "unit": "%" },
+                { "n": stats.magic_resist, "label": "magic resist", "unit": "%" },
+            ],
+            // What the tree says you begin every fight already holding.
+            "held": {
+                "armor": c.start_with().armor,
+                "mana": c.start_with().mana,
             },
+            "class": c.class.clone(),
         })
         .to_string()
     })

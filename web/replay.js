@@ -49,10 +49,14 @@ export class Replay {
     this.playing = false;
     const p = log.player, e = log.enemy;
     // [t, health, max, armour, [four pools]] for each side.
+    //
+    // The opening row is what each fighter *began* holding, off the log's own
+    // starting combatants — not zero. A character who had taken Corked watched
+    // the bar open empty and concluded the skill did nothing.
     const zero = [0, 0, 0, 0];
     this.track = {
-      player: [[0, p.max_health, p.max_health, 0, zero]],
-      enemy: [[0, e?.max_health ?? 1, e?.max_health ?? 1, 0, zero]],
+      player: [[0, p.max_health, p.max_health, p.armor ?? 0, p.pools ?? zero]],
+      enemy: [[0, e?.max_health ?? 1, e?.max_health ?? 1, e?.armor ?? 0, e?.pools ?? zero]],
     };
     for (const x of log.entries) {
       this.track.player.push([x.at, x.ph, x.pmax, x.pa, x.pp]);

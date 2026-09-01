@@ -390,3 +390,10 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
 .fight-grid canvas { display: block; }
 /* The shape sits beside the name in the hover card, not above it. */
 #piece-card .made-item { display: grid; gap: 2px; }
+
+/* The character sheet on the standing panel. */
+#sheet { list-style: none; margin: 0 0 14px; padding: 0; font-size: 13px; line-height: 1.55; }
+#sheet li { position: relative; padding-left: 11px; }
+#sheet li::before { content: "·"; position: absolute; left: 0; color: var(--ink-3); }
+#sheet li.dim { color: var(--ink-3); }
+#sheet li.none { color: var(--ink-3); font-style: italic; }

@@ -150,3 +150,8 @@ pub fn preset_board() -> Character {
 pub fn all_def_indices() -> Vec<usize> {
     (0..CATALOG.len()).collect()
 }
+
+/// Upstream's name for the preset. Kept so ported tests read as they did.
+pub fn build_full_loadout(ch: &mut Character) {
+    ch.apply_preset();
+}

@@ -1,0 +1,117 @@
+//! Classes have to reach the simulation.
+//!
+//! Every other class test asks whether a build *qualifies* for one. Nothing
+//! asked whether holding it changes a fight, and the answer is not obvious
+//! from the code: `Standing` powers are folded into the character sheet by the
+//! ch, and the rest are fields on `Combatant` that the tick loop has to
+//! actually read. A power added to `ClassPower` but never read would pass the
+//! whole suite.
+
+use gm2d_core::class::{ClassPower, CLASSES};
+use gm2d_core::combat::{simulate_with_class, CombatLog, Difficulty, Event, Side, LADDER};
+use gm2d_core::piece::SlotKind;
+use gm2d_core::character::Character;
+
+/// Health on both sides when the fight ended.
+///
+/// `CombatLog::player` and `::enemy` are the combatants as they *started* -
+/// the interface lays the two boards out from them - so reading health off
+/// them gives the pre-fight number. A build that loses at rung 41 still
+/// reports full health there.
+fn final_health(log: &CombatLog) -> (i32, i32) {
+    let mut player = log.player.health;
+    let mut enemy = log.enemy().health;
+    for e in &log.entries {
+        match &e.event {
+            Event::Hit { by, target_health, .. } => match by {
+                Side::Player => enemy = *target_health,
+                Side::Enemy => player = *target_health,
+            },
+            Event::Burn { side, health, .. } | Event::Regen { side, health, .. } => match side {
+                Side::Player => player = *health,
+                Side::Enemy => enemy = *health,
+            },
+            Event::Fell { side } => match side {
+                Side::Player => player = 0,
+                Side::Enemy => enemy = 0,
+            },
+            _ => {}
+        }
+    }
+    (player, enemy)
+}
+
+/// A board that fights: enough gear to swing, not enough to be safe.
+fn a_fighting_run() -> Character {
+    let mut ch = Character::with_all_pieces();
+    let ids: Vec<_> = ch.owned.iter().copied().take(60).collect();
+    for id in ids {
+        'placed: for slot in SlotKind::ALL {
+            for y in 0..8u8 {
+                for x in 0..6u8 {
+                    if ch.equip(id, slot, x, y).is_ok() {
+                        break 'placed;
+                    }
+                }
+            }
+        }
+    }
+    ch
+}
+
+#[test]
+fn bastion_actually_reduces_damage() {
+    let ch = a_fighting_run();
+    let (stats, items) = (ch.player_stats(), ch.combat_items());
+    let bulwark = *CLASSES.iter().find(|c| c.name == "Bulwark").expect("Bulwark exists");
+    assert!(matches!(bulwark.power, ClassPower::Bastion(_)), "{:?}", bulwark.power);
+
+    // Across the ladder rather than at one rung. A soak cannot show up in a
+    // fight nothing lands in, nor in one the player loses to a single blow
+    // either way - so the question is whether it *ever* matters, not whether
+    // it matters here.
+    let mut moved = Vec::new();
+    for (i, spec) in LADDER.iter().enumerate() {
+        let bare = simulate_with_class(stats, &items, spec, Difficulty::Medium, &[]);
+        let with = simulate_with_class(stats, &items, spec, Difficulty::Medium, &[bulwark]);
+        let (bare_hp, _) = final_health(&bare);
+        let (with_hp, _) = final_health(&with);
+        if with_hp != bare_hp || with.duration_ms != bare.duration_ms {
+            moved.push((i + 1, bare_hp, with_hp));
+        }
+    }
+    assert!(
+        !moved.is_empty(),
+        "Bastion(35) changed nothing at any of the {} rungs - the power is not \
+         reaching the simulation",
+        LADDER.len()
+    );
+    println!("Bastion moved {} of {} rungs, e.g. {:?}", moved.len(), LADDER.len(), &moved[..3.min(moved.len())]);
+}
+
+#[test]
+fn the_log_records_the_fight_not_the_setup() {
+    // The guard for the mistake above: if this ever passes trivially again,
+    // every margin measured off `log.player` is measuring the character sheet.
+    // Asked of the ladder rather than of one rung. What has to be true is that
+    // *somewhere* a fight leaves the player on less health than it started
+    // them with, and that the log says so. Naming rung 41 was naming a
+    // creature strong enough to do it in August, which is a fact about that
+    // creature's gear and not about the log.
+    let ch = a_fighting_run();
+    let (stats, items) = (ch.player_stats(), ch.combat_items());
+    let hurt = LADDER.iter().find_map(|spec| {
+        let log = simulate_with_class(stats, &items, spec, Difficulty::Medium, &[]);
+        let (player, _) = final_health(&log);
+        (player < log.player.health).then_some((spec.name, player, log.player.health))
+    });
+    let (name, player, started) = hurt.expect(
+        "nothing on the ladder took a point off this build, so either the fixture is \
+         invincible or `log.player` is the starting snapshot being read as the end state",
+    );
+    assert!(
+        player < started,
+        "{name} left the player on {player} of {started} health - `log.player` is the \
+         starting snapshot, so end state has to be read from the events"
+    );
+}

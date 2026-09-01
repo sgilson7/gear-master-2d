@@ -32,7 +32,7 @@
 
 use crate::loadout::{Loadout, LockedItem, SlotReport};
 use crate::piece::{PieceId, PieceRegistry, SlotKind, CATALOG};
-use crate::slot::PlaceError;
+use crate::slot::{PlaceError, SLOT_W};
 use crate::stats::Stats;
 
 /// How many board changes can be taken back.
@@ -265,6 +265,30 @@ impl Character {
         Ok(())
     }
 
+    /// Strip every grid and reset every rotation.
+    pub fn clear_all(&mut self) {
+        self.remember("clearing every slot");
+        for kind in SlotKind::ALL {
+            self.loadout.slot_mut(kind).clear();
+        }
+        let owned = self.owned.clone();
+        for id in owned {
+            self.registry.set_rotation(id, 0);
+        }
+    }
+
+    /// Rows every grid has beyond the eight it started with.
+    ///
+    /// Read off the boards rather than tracked, so it cannot disagree with
+    /// them — upstream kept a counter beside them and the two could drift.
+    pub fn extra_rows(&self) -> u8 {
+        SlotKind::ALL
+            .iter()
+            .map(|&k| self.loadout.slot(k).rows().saturating_sub(crate::slot::SLOT_H))
+            .min()
+            .unwrap_or(0)
+    }
+
     // ------------------------------------------------------------ locks
 
     /// Lock the assembled item `piece` belongs to, or release it if it is
@@ -323,6 +347,140 @@ impl Character {
                 .map(|(&p, &(dx, dy))| (p, dx, dy))
                 .collect(),
         )
+    }
+
+    /// Is this piece part of a locked item?
+    pub fn is_locked_item(&self, piece: PieceId) -> bool {
+        self.locked_set(piece).is_some()
+    }
+
+    pub fn equip_locked_at(
+        &mut self,
+        piece: PieceId,
+        kind: SlotKind,
+        ax: u8,
+        ay: u8,
+    ) -> Result<(), RuleError> {
+        let Some(shape) = self.locked_shape(piece) else {
+            return Err(RuleError::NotEquipped);
+        };
+        // Every piece has to fit before any of them is placed, or a rejected
+        // drop would leave the item scattered across the grid.
+        for &(p, dx, dy) in &shape {
+            let (x, y) = (ax as u32 + dx as u32, ay as u32 + dy as u32);
+            // The slot's own height, not the tallest board's. Same shape of
+            // fault as the one `branching-events.md` records: "anything
+            // comparing against the constant is asking the wrong question",
+            // and the constant grew into a per-board number that has now grown
+            // into a per-slot one.
+            if x >= SLOT_W as u32 || y >= self.loadout.slot(kind).rows() as u32 {
+                return Err(RuleError::Place(PlaceError::OutOfBounds));
+            }
+            self.loadout.can_place(&self.registry, p, kind, x as u8, y as u8)?;
+        }
+        self.remember("placing a locked item");
+        for &(p, dx, dy) in &shape {
+            self.loadout.slot_mut(kind).place(&self.registry, p, ax + dx, ay + dy);
+        }
+        Ok(())
+    }
+
+    pub fn unequip_locked(&mut self, piece: PieceId) -> Result<(), RuleError> {
+        let Some(set) = self.locked_set(piece).map(|s| s.to_vec()) else {
+            return Err(RuleError::NotEquipped);
+        };
+        self.remember("removing a locked item");
+        for p in set {
+            self.loadout.remove_anywhere(p);
+        }
+        Ok(())
+    }
+
+    pub fn rotate_locked(&mut self, piece: PieceId) -> Result<(), RuleError> {
+        let Some(set) = self.locked_set(piece).map(|s| s.to_vec()) else {
+            return Err(RuleError::NotEquipped);
+        };
+        let Some(kind) = self.loadout.slot_holding(piece) else {
+            return Err(RuleError::NotEquipped);
+        };
+
+        let slot = self.loadout.slot(kind);
+        let cells: Vec<(PieceId, Vec<(u8, u8)>)> =
+            set.iter().map(|&p| (p, slot.cells_of(p))).collect();
+        let minx = cells.iter().flat_map(|(_, c)| c.iter().map(|(x, _)| *x)).min().unwrap_or(0);
+        let miny = cells.iter().flat_map(|(_, c)| c.iter().map(|(_, y)| *y)).min().unwrap_or(0);
+        let maxy = cells.iter().flat_map(|(_, c)| c.iter().map(|(_, y)| *y)).max().unwrap_or(0);
+        let height = maxy - miny + 1;
+
+        // Where each piece's own footprint lands once the item has turned.
+        let mut want: Vec<(PieceId, u8, u8)> = Vec::new();
+        for (p, cs) in &cells {
+            let turned: Vec<(u8, u8)> = cs
+                .iter()
+                .map(|&(x, y)| (minx + (height - 1 - (y - miny)), miny + (x - minx)))
+                .collect();
+            let ax = turned.iter().map(|(x, _)| *x).min().unwrap_or(0);
+            let ay = turned.iter().map(|(_, y)| *y).min().unwrap_or(0);
+            want.push((*p, ax, ay));
+        }
+
+        self.remember("turning a locked item");
+        let before: Vec<(PieceId, u8, u8, u8)> = cells
+            .iter()
+            .map(|(p, _)| {
+                let a = self.loadout.slot(kind).anchor_of(*p).unwrap_or((0, 0));
+                (*p, a.0, a.1, self.registry.rotation(*p))
+            })
+            .collect();
+
+        for &(p, ..) in &before {
+            self.loadout.slot_mut(kind).remove(p);
+            self.registry.rotate_cw(p);
+        }
+        let mut ok = true;
+        for &(p, ax, ay) in &want {
+            if self.loadout.can_place(&self.registry, p, kind, ax, ay).is_ok() {
+                self.loadout.slot_mut(kind).place(&self.registry, p, ax, ay);
+            } else {
+                ok = false;
+                break;
+            }
+        }
+        if !ok {
+            for &(p, ax, ay, rot) in &before {
+                self.loadout.slot_mut(kind).remove(p);
+                self.registry.set_rotation(p, rot);
+                self.loadout.slot_mut(kind).place(&self.registry, p, ax, ay);
+            }
+            self.undo_stack.pop();
+            return Err(RuleError::Place(PlaceError::OutOfBounds));
+        }
+        // The item has a new shape now, and the stored one is what puts it back
+        // down if it is lifted into the inventory.
+        let offsets = self.shape_of(kind, &set);
+        if let Some(l) = self.loadout.locks.iter_mut().find(|l| l.pieces.contains(&piece)) {
+            l.offsets = offsets;
+        }
+        Ok(())
+    }
+
+    pub fn inventory_groups(&self) -> Vec<Vec<PieceId>> {
+        let loose = self.inventory();
+        let mut out: Vec<Vec<PieceId>> = Vec::new();
+        let mut taken: Vec<PieceId> = Vec::new();
+        for &id in &loose {
+            if taken.contains(&id) {
+                continue;
+            }
+            match self.locked_set(id) {
+                Some(set) if set.iter().all(|p| loose.contains(p)) => {
+                    taken.extend(set.iter().copied());
+                    out.push(set.to_vec());
+                }
+                _ => out.push(vec![id]),
+            }
+        }
+        out
     }
 
     // ------------------------------------------------------------ undo
@@ -386,6 +544,63 @@ impl Character {
         out
     }
 
+    /// A complete, legal loadout that assembles all five slots and lights
+    /// every assembly bonus.
+    ///
+    /// The auto-build button and the test fixture at once, which is how
+    /// upstream kept them from drifting: a demo arrangement nobody exercises
+    /// stops being a demo of anything. Deliberately shows off the mechanics
+    /// rather than maxing the numbers — chest, gloves and greaves each carry
+    /// two separate finished items, the weapon's Runed Edge doubles the Ruby
+    /// Inlay beside it, and the Hollow Weave sits in open space where its
+    /// empty-cell bonus counts.
+    ///
+    /// Seats what it can and skips what it cannot, so a character who does not
+    /// own the whole preset gets the part of it they can wear.
+    pub fn apply_preset(&mut self) {
+        const PRESET: &[(&str, SlotKind, u8, u8, u8)] = &[
+    ("Steel Frame", SlotKind::Helmet, 0, 0, 0),
+    ("Crest of Vigor", SlotKind::Helmet, 3, 0, 0),
+    ("Iron Plating", SlotKind::Helmet, 0, 2, 0),
+    ("Visor of Focus", SlotKind::Helmet, 0, 4, 0),
+    ("Padded Base", SlotKind::Chest, 0, 0, 0),
+    ("Keystone Base", SlotKind::Chest, 0, 0, 0),
+    ("Hollow Weave", SlotKind::Chest, 5, 2, 1),
+    ("Chain Layer", SlotKind::Chest, 0, 3, 0),
+    ("Woven Underlayer", SlotKind::Chest, 0, 4, 0),
+    ("Hide Base", SlotKind::Chest, 3, 6, 0),
+    ("Leather Material", SlotKind::Gloves, 0, 0, 0),
+    ("Gripping Mold", SlotKind::Gloves, 2, 0, 0),
+    ("Steel Material", SlotKind::Gloves, 0, 4, 0),
+    ("Gauntlet Mold", SlotKind::Gloves, 2, 4, 0),
+    ("Runed Material", SlotKind::Greaves, 0, 0, 0),
+    ("Greave Mold", SlotKind::Greaves, 2, 0, 0),
+    ("Boiled Leather", SlotKind::Greaves, 0, 4, 0),
+    ("Runner's Mold", SlotKind::Greaves, 3, 4, 0),
+    ("Balanced Grip", SlotKind::Weapon, 0, 0, 0),
+    ("Runed Edge", SlotKind::Weapon, 1, 0, 0),
+    ("Ruby Inlay", SlotKind::Weapon, 2, 0, 0),
+    ("Balance Weight", SlotKind::Weapon, 2, 2, 0),
+        ];
+        for k in SlotKind::ALL {
+            self.loadout.slot_mut(k).clear();
+        }
+        for &(name, kind, ax, ay, rot) in PRESET {
+            let id = match self.find_by_name(name) {
+                Some(id) => id,
+                None => match self.give(name) {
+                    Some(id) => id,
+                    None => continue,
+                },
+            };
+            self.registry.set_rotation(id, rot);
+            self.loadout.remove_anywhere(id);
+            if self.loadout.can_place(&self.registry, id, kind, ax, ay).is_ok() {
+                self.loadout.slot_mut(kind).place(&self.registry, id, ax, ay);
+            }
+        }
+    }
+
     // ------------------------------------------------------------ readings
 
     pub fn reports(&self) -> Vec<SlotReport> {
@@ -401,6 +616,23 @@ impl Character {
         let mut base = self.loadout.total_stats(&self.registry);
         base.health += self.grown_health;
         base
+    }
+
+    /// The board's shape, as the class ranker reads it.
+    ///
+    /// Upstream hung class *acquisition* off this — fountains, axis
+    /// thresholds, a ranking. GM2D chooses a class at level 5 from a tree in
+    /// data (M5), so what survives here is the reading itself, which is a
+    /// property of the board and belongs with the board.
+    pub fn fingerprint(&self) -> crate::class::Fingerprint {
+        let filled: usize = SlotKind::ALL
+            .iter()
+            .map(|&k| {
+                let slot = self.loadout.slot(k);
+                slot.pieces().iter().map(|&p| slot.cells_of(p).len()).sum::<usize>()
+            })
+            .sum();
+        crate::class::Fingerprint::of(&self.registry, &self.combat_items(), filled)
     }
 
     /// Activation profiles for every assembled item — what combat runs on.

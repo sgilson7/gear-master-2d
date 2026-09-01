@@ -9,9 +9,10 @@ from `sgilson7/gear-master`. `PLANNING-BRIEF.md` is the brief; `PLAN.md` is the
 plan and **wins where the two disagree**; `TONE.md` governs every string a
 player reads.
 
-**Milestone: M0 complete. Deploy gate 1 is live** at
-<https://sgilson7.github.io/gear-master-2d/> — the page loads the wasm and
-answers `core: 523 pieces`. M1 has not started.
+**Milestone: M1 complete. Deploy gate 2 is live** at
+<https://sgilson7.github.io/gear-master-2d/> — change a number, download the
+save, reload, load it back, and both the number and the random stream's
+position come back. M2 has not started.
 
 ## Rules
 
@@ -23,8 +24,13 @@ answers `core: 523 pieces`. M1 has not started.
 - Content lives in `data/*.json`. **If you are editing a `.rs` file to change
   what a player reads, you are in the wrong file.**
 - Never write a game string without `TONE.md` open.
-- Save round-trip tests run on every commit from M1. A red round-trip blocks
-  everything.
+- **Save round-trip tests run on every commit. A red round-trip blocks
+  everything.** `tests/save.rs` is that suite; `testing/drive.py` walks the same
+  property through three real browsers.
+- **Adding a field to `Game` is a compile error until the save carries it.**
+  `SaveFile::of` and `into_game` destructure exhaustively. Two fields are
+  skipped on purpose and each says so where it is skipped. Do not "fix" a
+  destructure by adding `..`.
 - **The agent does not run `git push` or `make publish`.** Only a human
   deploys. (The one exception was the repo's creation and first push, which the
   human asked for explicitly. The rule is back in force.)
@@ -122,10 +128,12 @@ and M5's trees may spend them again.
 | Upstream suite, pristine fork | 1075 passing |
 | After the campaign was cut | 128 passing |
 | After the simulation tests were ported to `Character` | 329 passing |
+| M1 | 346 passing |
 | Catalogue | 523 components |
 | Ladder | 50 creatures |
 | `crates/core` | ~33k lines, down from ~50k |
-| wasm | 346 KB |
+| wasm | 502 KB |
+| Save format | v1 |
 
 Note the catalogue is **523**, not the 374 the retheme document counts — it
 grew upstream after that document was written. Any content work that quotes a

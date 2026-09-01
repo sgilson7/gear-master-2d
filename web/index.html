@@ -9,20 +9,46 @@
 <body>
   <main>
     <header>
-      <p class="eyebrow">M0 &middot; foundation</p>
+      <p class="eyebrow">M1 &middot; save and load</p>
       <h1>Gear Master 2D</h1>
-      <p class="sub">The engine compiles to wasm and answers. Nothing here is the game yet.</p>
+      <p class="sub">Change something, download the save, reload this page, load it back.
+        Everything below comes back, including where the random stream is standing.</p>
     </header>
 
-    <section class="counts">
-      <div><b id="pieces">&hellip;</b><span>components in the catalogue</span></div>
-      <div><b id="monsters">&hellip;</b><span>creatures on the ladder</span></div>
+    <section class="state">
+      <div>
+        <b id="gold">&hellip;</b><span>Fnorp</span>
+        <div class="row">
+          <button id="minus" type="button">&minus;10</button>
+          <button id="plus" type="button">+10</button>
+        </div>
+      </div>
+      <div>
+        <b id="draw">&mdash;</b><span>last draw from the run's stream</span>
+        <div class="row"><button id="roll" type="button">Draw</button></div>
+      </div>
+      <div>
+        <b class="small" id="rng">&hellip;</b><span>stream position &mdash; this is the part a seed would lose</span>
+      </div>
+    </section>
+
+    <section class="save">
+      <h2>The save</h2>
+      <p class="note">A file you keep. The browser also remembers the last state in
+        <code>localStorage</code> as a convenience &mdash; <strong>that is not the real save</strong>
+        and a cleared browser loses it.</p>
+      <div class="row">
+        <button id="download" type="button" class="primary">Download save</button>
+        <label class="btn">Load a save<input type="file" id="file" accept="application/json,.json" hidden></label>
+        <button id="reset" type="button">New game</button>
+      </div>
+      <p id="says" class="says" hidden></p>
     </section>
 
     <section>
-      <h2>The preset board, assembled</h2>
-      <p class="note">Placing pieces, assembling items, naming them and rating them &mdash;
-        run in core, in the browser. The board screen that draws this is M3.</p>
+      <h2>The board</h2>
+      <p class="note">The preset, assembled by core. Saved and restored with everything else &mdash;
+        the same pieces have to come back as the same <em>items</em>, which is what the locks are for.</p>
       <table id="items"><tbody></tbody></table>
     </section>
 

@@ -49,16 +49,21 @@ jobs:
       - name: Build the site
         run: ./packaging/package-web.sh
 
-      # The half `cargo test` cannot reach: whether the module instantiates in
-      # a browser, whether the imports resolve after cache-busting rewrote the
-      # URLs, and whether the page says what the deploy gate asks it to. Fails
-      # on any console error or any request that leaves the origin.
-      - name: Drive the real page in a browser
+      # The half `cargo test` cannot reach, walked as a sequence rather than
+      # checked as a state: change a number, download the save, reload, upload,
+      # and see both the number and the random stream's position come back.
+      # All three engines, because the gate names three browsers and a save
+      # that downloads in one of them is not a save. Fails on any console error
+      # or any request that leaves the origin.
+      #
+      # `--with-deps` rather than the plain install the Makefile does: a laptop
+      # already has the shared libraries these want and a fresh runner does not.
+      - name: Walk the deploy gate in three browsers
         run: |
           python3 -m venv .venv-test
           ./.venv-test/bin/pip -q install playwright
-          ./.venv-test/bin/playwright install --with-deps chromium
-          ./.venv-test/bin/python testing/drive.py
+          ./.venv-test/bin/playwright install --with-deps chromium firefox webkit
+          ./.venv-test/bin/python testing/drive.py chromium firefox webkit
 
       - uses: actions/upload-pages-artifact@v3
         with:

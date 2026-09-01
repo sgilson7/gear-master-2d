@@ -73,7 +73,7 @@ impl From<PlaceError> for RuleError {
 
 /// One step of board history.
 #[derive(Clone, Debug)]
-struct BoardSnapshot {
+pub(crate) struct BoardSnapshot {
     loadout: Loadout,
     registry: PieceRegistry,
     /// What you owned. Buying and selling are board changes too, and upstream's
@@ -100,7 +100,7 @@ pub struct Character {
     /// part of the character: a save that restored forty snapshots would be a
     /// save that let you undo your way back into a previous session's board.
     #[serde(skip)]
-    undo_stack: Vec<BoardSnapshot>,
+    pub(crate) undo_stack: Vec<BoardSnapshot>,
 }
 
 impl Default for Character {

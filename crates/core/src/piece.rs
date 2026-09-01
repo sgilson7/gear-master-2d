@@ -1358,7 +1358,7 @@ impl std::fmt::Display for PieceId {
     }
 }
 
-#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize, PartialEq, Eq)]
 struct Instance {
     def: usize,
     /// Quarter turns clockwise applied to the definition's shape.
@@ -1367,7 +1367,7 @@ struct Instance {
 
 /// Single source of truth for every component in play: which definition it
 /// is, and how it is currently rotated.
-#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, Default, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct PieceRegistry {
     instances: Vec<Instance>,
 }

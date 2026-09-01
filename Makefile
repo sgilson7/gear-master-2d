@@ -10,15 +10,15 @@ test:
 check:
 	@cargo check --workspace --all-targets
 
-## test-ui: drive the built page in a real browser
+## test-ui: walk the deploy gate in all three browser engines
 test-ui: web
-	@$(ROOT)/.venv-test/bin/python $(ROOT)/testing/drive.py
+	@$(ROOT)/.venv-test/bin/python $(ROOT)/testing/drive.py chromium firefox webkit
 
 ## test-ui-setup: one-time install of headless Chromium for test-ui
 test-ui-setup:
 	@python3 -m venv $(ROOT)/.venv-test
 	@$(ROOT)/.venv-test/bin/pip -q install playwright
-	@$(ROOT)/.venv-test/bin/playwright install chromium
+	@$(ROOT)/.venv-test/bin/playwright install chromium firefox webkit
 	@echo "ready: make test-ui"
 
 ## web: build the browser app into dist/web/

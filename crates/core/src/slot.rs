@@ -29,7 +29,7 @@ impl std::fmt::Display for PlaceError {
 
 /// One 6x8 equipment grid. Cells hold piece ids, so a multi-cell piece is the
 /// same id repeated; the piece's data lives in the `PieceRegistry`.
-#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize, PartialEq, Eq)]
 pub struct Slot {
     pub kind: SlotKind,
     /// How many rows this grid has. Starts at `SLOT_H` and can be grown.
@@ -105,6 +105,21 @@ impl Slot {
     }
 
     /// Every cell `id` occupies on the enchantment layer.
+    /// Every distinct piece sitting in the enchantment layer.
+    ///
+    /// `pieces()` walks the gear layer only — that separation is what stops an
+    /// enchantment joining an item — so anything that needs the whole board,
+    /// the save file included, has to ask for both.
+    pub fn enchantments(&self) -> Vec<PieceId> {
+        let mut out: Vec<PieceId> = Vec::new();
+        for cell in self.enchant.iter().flatten() {
+            if !out.contains(cell) {
+                out.push(*cell);
+            }
+        }
+        out
+    }
+
     pub fn enchant_cells(&self, id: PieceId) -> Vec<(u8, u8)> {
         let mut out = Vec::new();
         for y in 0..self.rows {

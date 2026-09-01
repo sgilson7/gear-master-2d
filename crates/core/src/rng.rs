@@ -5,7 +5,7 @@
 //! run seeded with a known number has to replay identically in a test.
 
 /// xorshift64*. Small, fast, and good enough for stocking a shop.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Rng {
     state: u64,
 }
@@ -14,6 +14,25 @@ impl Rng {
     pub fn new(seed: u64) -> Self {
         // A zero state would stick at zero forever.
         Rng { state: if seed == 0 { 0x9E3779B97F4A7C15 } else { seed } }
+    }
+
+    /// The stream's position right now.
+    ///
+    /// **Not the seed.** A save that stored the seed would restore a stream
+    /// that has not yet produced the draws the player already saw, so the next
+    /// encounter after a load would be the first encounter of the run again.
+    /// The brief asks for the RNG state and this is it.
+    pub fn state(&self) -> u64 {
+        self.state
+    }
+
+    /// Put a stream back where [`Rng::state`] found it.
+    ///
+    /// Distinct from `new`, which folds a zero away — a state read back off a
+    /// live stream is never zero, and silently rewriting it would be a load
+    /// that lands somewhere other than where it saved.
+    pub fn from_state(state: u64) -> Self {
+        Rng { state }
     }
 
     pub fn next_u64(&mut self) -> u64 {

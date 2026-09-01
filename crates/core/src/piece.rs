@@ -4,7 +4,7 @@ use crate::shape::Shape;
 use crate::stats::{StatKind, Stats};
 
 /// The five equipment slots. Each is its own 6x8 grid.
-#[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
+#[derive(Copy, Clone, Eq, PartialEq, Hash, Debug, serde::Serialize, serde::Deserialize)]
 pub enum SlotKind {
     Helmet,
     Chest,
@@ -1349,7 +1349,7 @@ pub fn default_cooldown_ms(slot: SlotKind) -> u32 {
 
 /// Handle to one physical component the player owns. Grids store these, never
 /// the definition, so a multi-cell piece is the same id repeated across cells.
-#[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
+#[derive(Copy, Clone, Eq, PartialEq, Hash, Debug, serde::Serialize, serde::Deserialize)]
 pub struct PieceId(pub u32);
 
 impl std::fmt::Display for PieceId {
@@ -1358,7 +1358,7 @@ impl std::fmt::Display for PieceId {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 struct Instance {
     def: usize,
     /// Quarter turns clockwise applied to the definition's shape.
@@ -1367,7 +1367,7 @@ struct Instance {
 
 /// Single source of truth for every component in play: which definition it
 /// is, and how it is currently rotated.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
 pub struct PieceRegistry {
     instances: Vec<Instance>,
 }

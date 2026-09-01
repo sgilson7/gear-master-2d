@@ -29,7 +29,7 @@ impl std::fmt::Display for PlaceError {
 
 /// One 6x8 equipment grid. Cells hold piece ids, so a multi-cell piece is the
 /// same id repeated; the piece's data lives in the `PieceRegistry`.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Slot {
     pub kind: SlotKind,
     /// How many rows this grid has. Starts at `SLOT_H` and can be grown.

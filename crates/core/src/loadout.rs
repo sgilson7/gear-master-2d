@@ -109,10 +109,20 @@ impl ItemProfile {
         if self.slot != SlotKind::Weapon {
             return 0;
         }
-        (((self.stats.physical_damage + self.stats.magic_damage + strength) as i64
-            * self.power as i64)
-            / 100)
-            .max(0) as i32
+        // **Power is applied once, and only to what the wearer brings.**
+        //
+        // `stats` here is `scaled_stats` — the item's own numbers were already
+        // multiplied by `power` when the profile was built. Upstream multiplied
+        // them again here, so a weapon that hit for 30 in the log advertised 46
+        // on the card. `combat.rs` has the rule in its own words, at the one
+        // place a blow is actually worked out: "The item's own numbers already
+        // carry its power [...] What the wearer brings does not, so it picks
+        // the multiplier up here."
+        //
+        // This is that line, read off the same way, so the card and the fight
+        // agree by construction. `hit_for_matches_the_log` holds them to it.
+        let from_wearer = ((strength as i64 * self.power as i64) / 100).max(0) as i32;
+        (self.stats.physical_damage + self.stats.magic_damage + from_wearer).max(0)
     }
 
     /// Damage a second, in thousandths, so a slow heavy weapon and a fast
@@ -343,7 +353,7 @@ impl SlotReport {
 /// locked item travels as one thing. Once it is lifted into the inventory the
 /// board no longer knows how its pieces sat, and without that there is nothing
 /// to put back down.
-#[derive(Clone, Debug, Default, Eq, PartialEq)]
+#[derive(Clone, Debug, Default, Eq, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct LockedItem {
     pub pieces: Vec<PieceId>,
     /// Anchor of `pieces[i]` relative to the item's own top-left corner.
@@ -412,8 +422,13 @@ pub fn lock_assembled_in(
     n
 }
 
+/// Where a deserialised loadout points until its theme is re-applied.
+fn plain_naming() -> &'static crate::naming::Naming {
+    &crate::naming::PLAIN_NAMING
+}
+
 /// The character's five equipment grids.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Loadout {
     pub slots: Vec<Slot>,
     /// Items the player has fixed in place. Nothing else may join one and it
@@ -425,6 +440,14 @@ pub struct Loadout {
     /// The words items are named out of. A display concern like the rest of
     /// the theme, but it has to live here: names are generated where items
     /// are, not where they are drawn.
+    ///
+    /// **Not serialised.** It is a pointer into a theme's tables, and a save
+    /// carries the theme's *id* instead — the whole of decision 1.9. A loaded
+    /// loadout comes back pointing at the plain corpus and whoever loaded it
+    /// re-points it from the id it read. Rebuilding it here would mean the
+    /// save file carried a copy of the corpus, which is content, and content
+    /// lives in `data/`.
+    #[serde(skip, default = "plain_naming")]
     pub naming: &'static crate::naming::Naming,
     /// Extra percent on every assembly bonus, from Recycler.
     ///

@@ -20,6 +20,7 @@ pub mod loadout;
 pub mod naming;
 pub mod piece;
 pub mod rating;
+pub mod reward;
 pub mod rng;
 pub mod shop;
 pub mod shape;

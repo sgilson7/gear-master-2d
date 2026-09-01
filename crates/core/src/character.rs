@@ -86,7 +86,7 @@ struct BoardSnapshot {
 }
 
 /// The player: five grids, what is on them, and what is in the bag.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Character {
     pub registry: PieceRegistry,
     /// Every component this character has, worn or not.
@@ -96,6 +96,10 @@ pub struct Character {
     /// Maximum health earned outside the boards — the one stat a reward can
     /// add to the character rather than to a grid.
     pub grown_health: i32,
+    /// **Not serialised.** Undo is a session's history of its own edits, not
+    /// part of the character: a save that restored forty snapshots would be a
+    /// save that let you undo your way back into a previous session's board.
+    #[serde(skip)]
     undo_stack: Vec<BoardSnapshot>,
 }
 

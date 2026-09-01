@@ -4,7 +4,7 @@
 /// Normalization is what lets the anchor of a placed piece be recovered as
 /// "the min x and min y of the cells it occupies" — no separate bookkeeping,
 /// so the grid and the anchor can never disagree.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct Shape {
     cells: Vec<(i8, i8)>,
 }

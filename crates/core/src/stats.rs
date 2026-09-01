@@ -6,7 +6,7 @@ use std::ops::{Add, AddAssign};
 /// `power` is the weapon damage multiplier expressed in **hundredths** — a
 /// character with `power = 250` swings at 2.50x. Integers keep combat exactly
 /// reproducible, which is what lets the tests assert on damage numbers.
-#[derive(Copy, Clone, Debug, Default, PartialEq, Eq)]
+#[derive(Copy, Clone, Debug, Default, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct Stats {
     pub health: i32,
     pub strength: i32,

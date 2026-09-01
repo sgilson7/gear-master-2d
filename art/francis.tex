@@ -1,0 +1,48 @@
+% Francis. The top of the ladder, and the only figure in the set that is not
+% shaped like a creature — he condensed a plane to a point once, and the
+% drawing is what that leaves behind.
+%
+% Written by filling in tikz_figure_prompt.md.
+\documentclass[tikz,border=4pt]{standalone}
+\usetikzlibrary{calc}
+\providecommand{\Main}{2B2436}
+\providecommand{\Dark}{171223}
+\providecommand{\Accent}{E8D24A}
+
+\newcommand{\Unit}{0.055cm}
+\newcommand{\Edge}{2.4pt}
+\newcommand{\Rays}{12}
+\newcommand{\Rings}{3}
+
+\definecolor{main}{HTML}{\Main}
+\definecolor{dark}{HTML}{\Dark}
+\definecolor{accent}{HTML}{\Accent}
+\definecolor{ink}{HTML}{101018}
+
+\begin{document}
+\begin{tikzpicture}[x=\Unit,y=\Unit, line join=round, line cap=round]
+
+  % ---- rays, first and behind everything ---------------------------------
+  \foreach \i in {1,...,\Rays} {
+    \pgfmathsetmacro\a{\i*(360/\Rays)}
+    \draw[accent,line width=2.0pt]
+      ({32+16*cos(\a)},{32+16*sin(\a)}) -- ({32+31*cos(\a)},{32+31*sin(\a)});
+  }
+
+  % ---- the rings it did not quite finish collapsing ----------------------
+  \foreach \i in {1,...,\Rings} {
+    \pgfmathsetmacro\r{16-(\i-1)*4}
+    \draw[main,line width=2.6pt] (32,32) circle (\r);
+  }
+
+  % ---- the point ----------------------------------------------------------
+  \fill[dark,draw=ink,line width=\Edge] (32,32) circle (7);
+  \fill[accent] (32,32) circle (2.4);
+
+  % ---- and the suggestion of a face on it, which is worse ---------------
+  \fill[accent] (28,35) circle (1.4);
+  \fill[accent] (36,35) circle (1.4);
+  \draw[accent,line width=1.6pt] (28,28) .. controls (32,25) .. (36,28);
+
+\end{tikzpicture}
+\end{document}

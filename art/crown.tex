@@ -1,0 +1,43 @@
+% A crowned hollow — a crown, and under it the shape of somebody who is no
+% longer wearing it. The silhouette is deliberately empty in the middle.
+%
+% Written by filling in tikz_figure_prompt.md.
+\documentclass[tikz,border=4pt]{standalone}
+\usetikzlibrary{calc}
+\providecommand{\Main}{3A3F4A}
+\providecommand{\Dark}{22252C}
+\providecommand{\Accent}{D3A05A}
+
+\newcommand{\Unit}{0.055cm}
+\newcommand{\Edge}{2.2pt}
+\newcommand{\Points}{5}       % points on the crown
+
+\definecolor{main}{HTML}{\Main}
+\definecolor{dark}{HTML}{\Dark}
+\definecolor{accent}{HTML}{\Accent}
+\definecolor{ink}{HTML}{101018}
+
+\begin{document}
+\begin{tikzpicture}[x=\Unit,y=\Unit, line join=round, line cap=round]
+
+  % ---- the shoulders of a robe that has nobody in it ---------------------
+  \fill[main,draw=ink,line width=\Edge] (12,2) -- (52,2) -- (44,36) -- (20,36) -- cycle;
+  \fill[dark] (24,2) rectangle (40,26);   % the hollow, straight through
+
+  % ---- collar -------------------------------------------------------------
+  \fill[dark,draw=ink,line width=\Edge] (20,34) rectangle (44,42);
+
+  % ---- head: outline only, so there is nothing inside it -----------------
+  \draw[main,line width=3.0pt] (32,50) circle (10);
+  \fill[accent] (28,52) circle (2.0);
+  \fill[accent] (36,52) circle (2.0);
+
+  % ---- the crown, which is the only solid thing above the collar ---------
+  \fill[accent,draw=ink,line width=1.8pt] (21,58) rectangle (43,62);
+  \foreach \i in {1,...,\Points} {
+    \pgfmathsetmacro\x{21+(\i-1)*(22/(\Points-1))}
+    \fill[accent,draw=ink,line width=1.4pt] (\x-2,62) -- (\x,68) -- (\x+2,62) -- cycle;
+  }
+
+\end{tikzpicture}
+\end{document}

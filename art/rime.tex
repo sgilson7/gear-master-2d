@@ -1,0 +1,51 @@
+% Rime — the cold one. A head under a crown of icicles, and a beard that has
+% stopped being hair.
+%
+% Written by filling in tikz_figure_prompt.md.
+\documentclass[tikz,border=4pt]{standalone}
+\usetikzlibrary{calc}
+\providecommand{\Main}{A9C6D6}
+\providecommand{\Dark}{5D8095}
+\providecommand{\Accent}{FFFFFF}
+
+\newcommand{\Unit}{0.055cm}
+\newcommand{\Edge}{2.2pt}
+\newcommand{\Spikes}{6}
+\newcommand{\Icicles}{5}
+
+\definecolor{main}{HTML}{\Main}
+\definecolor{dark}{HTML}{\Dark}
+\definecolor{accent}{HTML}{\Accent}
+\definecolor{ink}{HTML}{101018}
+
+\begin{document}
+\begin{tikzpicture}[x=\Unit,y=\Unit, line join=round, line cap=round]
+
+  % ---- the beard, which is the body --------------------------------------
+  \fill[accent,draw=ink,line width=\Edge] (16,2) -- (48,2) -- (44,34) -- (20,34) -- cycle;
+  \foreach \i in {1,...,\Icicles} {
+    \pgfmathsetmacro\x{18+(\i-1)*7}
+    \fill[accent,draw=ink,line width=1.4pt] (\x,2) -- (\x+3,-6) -- (\x+6,2) -- cycle;
+  }
+  \foreach \i in {1,...,\Icicles} {
+    \pgfmathsetmacro\x{20+(\i-1)*6}
+    \draw[dark,line width=1.8pt] (\x,6) -- (\x+1,30);
+  }
+
+  % ---- head ---------------------------------------------------------------
+  \fill[main,draw=ink,line width=\Edge] (32,44) circle (13);
+  \fill[dark,draw=ink,line width=1.4pt] (26,46) circle (3.2);
+  \fill[dark,draw=ink,line width=1.4pt] (38,46) circle (3.2);
+  \draw[ink,line width=2.4pt] (24,38) -- (40,38);       % the mouth, shut
+
+  % ---- the crown of ice ---------------------------------------------------
+  \foreach \i in {1,...,\Spikes} {
+    \pgfmathsetmacro\a{180-(\i-0.5)*(180/\Spikes)}
+    \pgfmathsetmacro\l{\i==3 || \i==4 ? 15 : 10}
+    \draw[accent,draw=ink,line width=1.8pt]
+      ({32+13*cos(\a)},{44+13*sin(\a)}) --
+      ({32+(13+\l)*cos(\a)},{44+(13+\l)*sin(\a)});
+  }
+
+\end{tikzpicture}
+\end{document}

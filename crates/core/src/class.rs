@@ -596,7 +596,9 @@ impl ClassPower {
             ClassPower::WrongSense(pct) => {
                 format!("your mind damage pierces {}% of mind resist", pct)
             }
-            ClassPower::Prospector(n) => format!("named creatures drop {} more piece(s)", n),
+            ClassPower::Prospector(n) => {
+                format!("named creatures drop {n} more piece{}", if n == 1 { "" } else { "s" })
+            }
             ClassPower::Unionized { armor } => format!("start every fight with {} armor", armor),
             ClassPower::Showstopper { pct, under_ms } => {
                 format!("+{}% bounty on a win under {}s", pct, under_ms / 1000)
@@ -682,9 +684,9 @@ impl ClassPower {
                 pct
             ),
             ClassPower::Contagion(n) => format!(
-                "every curse you land brings its opposite with it {} time(s) over - searing \
-                 pulls in frost, a stun pulls in a misfire",
-                n
+                "every curse you land brings its opposite with it {} - searing pulls in frost, \
+                 a stun pulls in a misfire",
+                if n == 1 { "as well".to_string() } else { format!("{n} times over") }
             ),
             ClassPower::Reprisal(n) => {
                 format!("every hit that lands on you banks {} faith", n)

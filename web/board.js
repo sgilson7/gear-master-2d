@@ -18,6 +18,39 @@ const CELL = 34;
 const GAP = 2;
 const PAD = 8;
 
+/// The mark, at the fractions the original uses so it reads at any size.
+///
+/// Module-level rather than a method: the motif is the shape half of the
+/// colourblind triple-encoding, and everything that draws a cell — this board,
+/// and the read-only grids on the fight screen — has to draw the same one.
+export function paintMotif(g, x, y, cell, kind, ink, alpha) {
+  const t = Math.max(cell * 0.11, 1.5);
+  g.save();
+  g.globalAlpha = alpha ?? 0.4;
+  g.strokeStyle = ink ?? '#fff';
+  g.fillStyle = ink ?? '#fff';
+  g.lineWidth = t;
+  g.lineCap = 'butt';
+  const f = (n) => n * cell;
+  const line = (x1, y1, x2, y2) => {
+    g.beginPath(); g.moveTo(x + f(x1), y + f(y1)); g.lineTo(x + f(x2), y + f(y2)); g.stroke();
+  };
+  if (kind === 'diagonal') line(0.24, 0.76, 0.76, 0.24);
+  else if (kind === 'dome') {
+    g.beginPath(); g.arc(x + f(0.5), y + f(0.52), f(0.20), 0, Math.PI * 2); g.fill();
+  } else if (kind === 'bands') { line(0.22, 0.34, 0.78, 0.34); line(0.22, 0.64, 0.78, 0.64); }
+  else if (kind === 'weave') { line(0.5, 0.22, 0.5, 0.78); line(0.22, 0.5, 0.78, 0.5); }
+  else if (kind === 'straps') { line(0.34, 0.22, 0.34, 0.78); line(0.64, 0.22, 0.64, 0.78); }
+  else if (kind === 'shared') {
+    const r = 0.26, p = [[0.5, 0.5 - r], [0.5 + r, 0.5], [0.5, 0.5 + r], [0.5 - r, 0.5]];
+    for (let i = 0; i < 4; i++) {
+      const a = p[i], b = p[(i + 1) % 4];
+      line(a[0], a[1], b[0], b[1]);
+    }
+  }
+  g.restore();
+}
+
 export class Board {
   constructor(canvas, api) {
     this.c = canvas;
@@ -280,33 +313,11 @@ export class Board {
     this.motif(g, px, py, CELL, look.motif, look.ink, look.ink_alpha);
   }
 
-  /// The mark, at the fractions the original uses so it reads at any size.
+  /// The mark. Delegates, because the fight screen paints the creature's
+  /// board with the same marks and two copies of this would be two answers to
+  /// "what does a helmet cell look like".
   motif(g, x, y, cell, kind, ink, alpha) {
-    const t = Math.max(cell * 0.11, 1.5);
-    g.save();
-    g.globalAlpha = alpha ?? 0.4;
-    g.strokeStyle = ink ?? '#fff';
-    g.fillStyle = ink ?? '#fff';
-    g.lineWidth = t;
-    g.lineCap = 'butt';
-    const f = (n) => n * cell;
-    const line = (x1, y1, x2, y2) => {
-      g.beginPath(); g.moveTo(x + f(x1), y + f(y1)); g.lineTo(x + f(x2), y + f(y2)); g.stroke();
-    };
-    if (kind === 'diagonal') line(0.24, 0.76, 0.76, 0.24);
-    else if (kind === 'dome') {
-      g.beginPath(); g.arc(x + f(0.5), y + f(0.52), f(0.20), 0, Math.PI * 2); g.fill();
-    } else if (kind === 'bands') { line(0.22, 0.34, 0.78, 0.34); line(0.22, 0.64, 0.78, 0.64); }
-    else if (kind === 'weave') { line(0.5, 0.22, 0.5, 0.78); line(0.22, 0.5, 0.78, 0.5); }
-    else if (kind === 'straps') { line(0.34, 0.22, 0.34, 0.78); line(0.64, 0.22, 0.64, 0.78); }
-    else if (kind === 'shared') {
-      const r = 0.26, p = [[0.5, 0.5 - r], [0.5 + r, 0.5], [0.5, 0.5 + r], [0.5 - r, 0.5]];
-      for (let i = 0; i < 4; i++) {
-        const a = p[i], b = p[(i + 1) % 4];
-        line(a[0], a[1], b[0], b[1]);
-      }
-    }
-    g.restore();
+    paintMotif(g, x, y, cell, kind, ink, alpha);
   }
 
   /// Trace the outside edge of a set of cells and nothing else.

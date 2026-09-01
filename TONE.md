@@ -170,6 +170,28 @@ authors write the themed word; code never does.
 *Check:* does any string in `data/` use a canonical stat name where a themed one
 exists?
 
+### 13a. A spec is not prose, and does not get themed
+
+The exception to 13, and the only one. A **mechanical description** — what a
+skill node does, what a class power does, what an item contributes — goes out
+in the engine's own words with the number in it: *"+12% mind resist"*, not
+*"+12% Thick Skull"*. Two registers, kept apart on purpose:
+
+| | written by | speaks | example |
+|---|---|---|---|
+| **name / blurb** | a person, in `data/` | the book | *Corked* — "A strip of it, wedged where a blow lands." |
+| **spec** | derived in code from the effect | the engine | `start every fight with 12 armor` |
+
+The reason is not consistency, it is arithmetic. Somebody choosing between two
+nodes is comparing numbers, and a number wearing a joke has to be translated
+before it can be compared. It is also the only defence against a description
+that is *wrong*: a spec nobody writes by hand is a spec that cannot disagree
+with the effect, and the tree shipped eight nodes whose blurbs described armour
+and mana they did not grant.
+
+*Check:* is the mechanical half derived from the effect rather than typed? And
+does it contain a themed word? Both are lints — `tests/skills_read.rs`.
+
 ### 14. The title gag is handled once and then left alone
 
 The book's best story does it as a boy and his turtle. The loading line may say

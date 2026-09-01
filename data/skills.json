@@ -82,7 +82,7 @@
           "cost": 1,
           "requires": [],
           "effect": {
-            "stat": {
+            "start_with": {
               "armor": 12
             }
           }
@@ -147,7 +147,7 @@
           "cost": 1,
           "requires": [],
           "effect": {
-            "stat": {
+            "start_with": {
               "mana": 20
             }
           }
@@ -223,12 +223,18 @@
           "requires": [
             "g-figure-eight"
           ],
-          "effect": {
-            "stat": {
-              "strength": 16,
-              "armor": 10
+          "effect": [
+            {
+              "stat": {
+                "strength": 16
+              }
+            },
+            {
+              "start_with": {
+                "armor": 10
+              }
             }
-          }
+          ]
         },
         {
           "id": "g-plaid",
@@ -237,7 +243,7 @@
           "cost": 1,
           "requires": [],
           "effect": {
-            "stat": {
+            "start_with": {
               "armor": 22
             }
           }
@@ -315,7 +321,7 @@
           "cost": 1,
           "requires": [],
           "effect": {
-            "stat": {
+            "start_with": {
               "mana": 30
             }
           }
@@ -358,12 +364,18 @@
           "requires": [
             "f-drillbook"
           ],
-          "effect": {
-            "stat": {
-              "mana": 25,
-              "strength": 6
+          "effect": [
+            {
+              "stat": {
+                "strength": 6
+              }
+            },
+            {
+              "start_with": {
+                "mana": 25
+              }
             }
-          }
+          ]
         },
         {
           "id": "f-anvil",
@@ -373,12 +385,18 @@
           "requires": [
             "f-banana"
           ],
-          "effect": {
-            "stat": {
-              "mana": 40,
-              "health": 80
+          "effect": [
+            {
+              "stat": {
+                "health": 80
+              }
+            },
+            {
+              "start_with": {
+                "mana": 40
+              }
             }
-          }
+          ]
         },
         {
           "id": "f-pie",
@@ -417,12 +435,18 @@
           "requires": [
             "f-pie"
           ],
-          "effect": {
-            "stat": {
-              "mana": 60,
-              "mind_resist": 15
+          "effect": [
+            {
+              "stat": {
+                "mind_resist": 15
+              }
+            },
+            {
+              "start_with": {
+                "mana": 60
+              }
             }
-          }
+          ]
         }
       ]
     },

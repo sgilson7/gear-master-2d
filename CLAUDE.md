@@ -298,10 +298,136 @@ which can be lost:**
 - **The house style, which is the prompt's "audience" field:** flat fills, heavy
   outlines, no gradients; a figure must read at 64px on the map and again at 4×
   in a panel.
-- `data/art.json` maps a canonical creature name or place id to a figure. **A
-  subject with no entry draws nothing**, which is what makes the file safe to be
-  incomplete — and it will be, because there are fifty creatures and seven
-  figures.
+- `data/art.json` maps a canonical creature name or place id to a figure. A
+  subject with no entry draws nothing.
+- **The creature half of that file is generated — do not hand-edit it.**
+  `art/creatures.json` says which family drawing each creature is cut from and
+  in what colours; `make art` compiles a figure per creature and rewrites
+  `data/art.json` from it. Deriving the map from the manifest is the point: the
+  map and the files it names cannot drift, because only one of them is written
+  by a person.
+- **Families, not fifty drawings.** Thirteen silhouettes — sentinel, bone,
+  wisp, hound, idol, mirror, clergy, crown, court, wright, ash, rime, vermin,
+  plus the four drawn for themselves — each compiled once per creature with
+  `\def\Main{...}\def\Dark{...}\def\Accent{...}` on the pdflatex command
+  line, against a `\providecommand` default inside the figure. Two creatures in
+  a family share a silhouette and never a palette.
+- **`.tex` count ≠ `.svg` count, and that is fine.** A creature whose slug
+  equals its family name (Francis) compiles twice to the same file. The check
+  that matters is `every_creature_has_a_figure_and_every_figure_has_a_file`.
+- **Draw it, then look at it.** Three of the thirteen compiled cleanly and did
+  not read: `bone`'s ribs came out as a spring, `clergy` collapsed into a single
+  triangle because the mitre sat straight on the robe, `ash` was a stack of
+  circles. A figure that compiles is not a figure that works — rasterise the
+  set and put your eyes on it.
+
+## The art was drawn and shown nowhere
+
+Reported by the human as *"the png representation of them that we built;
+nowhere ever shows it"*, and they were exactly right.
+
+`data/art.json` shipped mapping **three creatures out of fifty**. So a portrait
+appeared on the fight screen roughly one time in twenty, and `art.player` —
+`sprocketman.svg`, compiled and deployed since M6 — was read by no line of code
+at all. Nothing was broken; the map was just almost empty, and an empty map is
+indistinguishable from a feature that does not exist.
+
+Two things came out of it, and the second is the one that matters:
+
+1. Every creature has a figure now, and the player's own is in the panel that
+   is always up.
+2. **Coverage is a test.** `every_creature_has_a_figure_and_every_figure_has_a_file`
+   fails when a creature is added without art, when the map names a file that
+   is not there, and when the map names a creature that is not in the ladder.
+   `check_the_portrait_shows` says the same thing from the browser, including
+   `naturalWidth != 0` — a portrait that 404s is not a portrait.
+
+## Eight skill nodes that cost a point and did nothing
+
+Found while making the tree describe itself, and the reason that job was worth
+doing properly.
+
+`Effect::Stat` carried `armor` and `mana`. Both are **grants an item makes on
+its own tick** everywhere else in the engine — `RunningItem` pays them on every
+activation — so a *character-level* total of them has no tick to hang off, and
+`Combatant::player` had always started both at zero and thrown the total away.
+Eight nodes granted one or the other. They parsed, they cost points, they
+showed as taken, and they changed nothing: `Corked`, `Funnel Drill`,
+`Bedazzled Plaid`, `The Five`, and the whole spine of the Hexweaver tree —
+`Army Issue`, `The Banana Standard`, `Anvil, Own Foot`, `A Funny Undone`.
+
+The fix is a separate effect that says what it means:
+
+- `Effect::StartWith { armor, mana }` — what you are already holding at the
+  bell — and `combat::Held`, passed beside `Stats` rather than inside it,
+  because folding it in would pay every item's armour again as a balance.
+- One more rung on the simulate ladder (`simulate_holding` /
+  `simulate_party_holding`), which is how every other run-only concern has been
+  added: the existing signatures are untouched and no test had to say it holds
+  nothing.
+- `Node.effects` is a list now, since four of the eight granted a stat **and**
+  a balance. It reads as one object or an array in the JSON, because most nodes
+  do one thing.
+
+**Why serde let this happen, and the lint that catches the next one:**
+`deny_unknown_fields` is a container attribute, not a variant one, so it cannot
+be put on `Effect::Stat`. serde therefore drops a key it does not know without
+a word. `every_effect_key_is_one_the_engine_actually_reads` in
+`tests/skills_read.rs` reads the raw `data/skills.json` and refuses any effect
+key outside the vocabulary. Reading the parsed struct could never have found
+this — the whole failure is that the parse succeeded.
+
+## A skill has to say what it does
+
+The tree described itself only in the world's words. *"Nine hundred feet of
+Deep Chocolate mine, and you never once came up early"* is a good sentence
+about a character and tells nobody it is sixty max health. Reported by the
+human as *"completely unintelligible as to what they do"*.
+
+Two registers, kept apart, and `TONE.md` rule 13a is the written version:
+
+| | written by | speaks |
+|---|---|---|
+| `name`, `blurb` | a person, in `data/skills.json` | the book |
+| `Node::line()`, `Node::detail()` | **derived in core from the effect** | the engine |
+
+- **Derived, never typed.** A spec nobody writes by hand cannot disagree with
+  the effect it describes. Retuning a node retunes its description.
+- **Unthemed on purpose** — the one exception to rule 13. Somebody choosing
+  between two nodes is comparing numbers, and a number wearing a joke has to be
+  translated first. `no_mechanical_line_speaks_the_theme` enforces the inverse
+  of rule 13 over exactly this text.
+- `line()` is the one-liner on the button; `detail()` explains the words in it
+  and appears on hover **and on focus**, so a keyboard reaches it.
+- The class fork prints `power.describe()` raw. It used to go through
+  `theme.retell`, which turned the one sentence somebody reads before an
+  irreversible choice into a sentence about the Roast and the Nut Freeze.
+- Check every number you put in a description. `SPELL_MANA_COST` is **3**, not
+  30; the first draft of the mana line said "that many casts", which is not a
+  number at all.
+
+## What you are about to fight
+
+Only the Cave Rat has innate attacks. **All forty-nine other creatures fight
+purely out of their gear** — so a fight screen that printed a name and a rating
+was hiding the entire fight. `encounter_json` had carried the creature's item
+names since M1 and the page rendered none of them.
+
+- The creature's cards come off the same `item_card` in `crates/wasm` that the
+  player's do, and render through the same `cards()` in `app.js`. Two copies
+  would be two answers to "is cork a standing stat", which is the question the
+  two halves exist to settle.
+- `web/theirs.js` draws its board read-only. It imports `paintMotif` from
+  `board.js` rather than reimplementing it — the motif is the *shape* half of
+  the colourblind triple-encoding, and everything that draws a cell must draw
+  the same one.
+- A new module in the chain needs cache-busting too. `theirs.js` imports
+  `board.js`, and a module two hops down is exactly where a stale mix hides,
+  because the entry point looks fresh. `package-web.sh` stamps it and dies if
+  the stamp did not apply.
+- `#made` holds two panels now, so anything querying `.made-item` must scope
+  itself — an unscoped query lit a creature's card when you pointed at your own
+  blade.
 
 ## Tone, as a lint
 
@@ -356,17 +482,21 @@ and M5's trees may spend them again.
 | M3 | 369 passing |
 | M4 | 382 passing |
 | M5 / MVP | 391 passing |
+| Board rebuilt against the original | 411 passing |
+| The other side's gear, and a tree that says what it does | 419 passing |
 | Catalogue | 523 components |
 | Ladder | 50 creatures |
 | `crates/core` | ~33k lines, down from ~50k |
-| wasm | 502 KB |
+| wasm | 888 KB |
 | Save format | v1 |
 | Map | 20×20, 5 regions, 3 towns, 6 events |
 | Bestiary | 50 creatures, rated 16 to 2958 |
 | Starting kit | 11 components, 28 Fnorp, 4 assembled items |
 | Boards | 6×3 at level 1, one row a level, 6×8 ceiling |
 | Level 5 | ~27 fights, mean of nine seeded walks |
-| Skill trees | 13 base nodes + 3 × 8 class nodes |
+| Skill trees | 13 base nodes + 3 × 8 class nodes, every one stating its effect |
+| Figures | 13 family drawings + 4 drawn for themselves → 68 SVGs |
+| Art coverage | 50 of 50 creatures, 3 of 3 towns, and you |
 
 Note the catalogue is **523**, not the 374 the retheme document counts — it
 grew upstream after that document was written. Any content work that quotes a

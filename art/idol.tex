@@ -1,0 +1,44 @@
+% An idol — a carved thing that was put here on purpose and has not moved
+% since. Wider at the base than the head, because the family is about weight.
+%
+% Written by filling in tikz_figure_prompt.md.
+\documentclass[tikz,border=4pt]{standalone}
+\usetikzlibrary{calc}
+\providecommand{\Main}{A79B84}
+\providecommand{\Dark}{6E6555}
+\providecommand{\Accent}{2E6E8E}
+
+\newcommand{\Unit}{0.055cm}
+\newcommand{\Edge}{2.2pt}
+\newcommand{\Marks}{3}         % carved bands across the body
+
+\definecolor{main}{HTML}{\Main}
+\definecolor{dark}{HTML}{\Dark}
+\definecolor{accent}{HTML}{\Accent}
+\definecolor{ink}{HTML}{101018}
+
+\begin{document}
+\begin{tikzpicture}[x=\Unit,y=\Unit, line join=round, line cap=round]
+
+  % ---- plinth -------------------------------------------------------------
+  \fill[dark,draw=ink,line width=\Edge] (8,2) rectangle (56,10);
+
+  % ---- body: a tapered slab ----------------------------------------------
+  \fill[main,draw=ink,line width=\Edge] (14,10) -- (50,10) -- (44,44) -- (20,44) -- cycle;
+  \foreach \i in {1,...,\Marks} {
+    \pgfmathsetmacro\y{16+(\i-1)*9}
+    \draw[dark,line width=2.2pt] (18,\y) -- (46,\y);
+  }
+
+  % ---- head ---------------------------------------------------------------
+  \fill[main,draw=ink,line width=\Edge] (22,44) rectangle (42,60);
+  % Two sunk eyes and a closed mouth: carved, not alive, and looking anyway.
+  \fill[accent,draw=ink,line width=1.4pt] (27,54) circle (3.0);
+  \fill[accent,draw=ink,line width=1.4pt] (37,54) circle (3.0);
+  \draw[ink,line width=2.0pt] (26,47) -- (38,47);
+
+  % ---- the offering ledge -------------------------------------------------
+  \fill[dark,draw=ink,line width=1.6pt] (24,10) rectangle (40,14);
+
+\end{tikzpicture}
+\end{document}

@@ -24,6 +24,9 @@
 
       <aside>
         <div class="panel" id="here">
+          <!-- You. Drawn in M6 and shown nowhere until now, which is a strange
+               thing to be true of the only figure that is always on screen. -->
+          <img id="player-art" class="portrait mine" hidden alt="">
           <h3 id="region">&hellip;</h3>
           <dl>
             <div><dt>standing on</dt><dd id="terrain">&mdash;</dd></div>
@@ -163,7 +166,25 @@
                 <button id="fight-save" type="button">Download save</button>
               </div>
             </div>
-            <aside class="made" id="made"></aside>
+            <aside class="made" id="made">
+              <!-- Two boards, one panel. Yours and its, side by side in the
+                   same cards, because the question on this screen is which of
+                   the two is better packed. -->
+              <div class="tabs" role="tablist">
+                <button id="tab-yours" type="button" role="tab" class="on"
+                        aria-selected="true">What you made</button>
+                <button id="tab-theirs" type="button" role="tab"
+                        aria-selected="false">What it is wearing</button>
+              </div>
+              <div id="panel-yours" role="tabpanel"></div>
+              <div id="panel-theirs" role="tabpanel" hidden>
+                <h4 id="theirs-title">&mdash;</h4>
+                <img id="theirs-art" class="portrait wide" hidden alt="">
+                <ul id="theirs-body" class="stats"></ul>
+                <div class="theirs-grids"><canvas id="theirs-board"></canvas></div>
+                <div id="theirs-cards"></div>
+              </div>
+            </aside>
           </div>
         </div>
 
@@ -188,5 +209,8 @@
     </footer>
   </main>
   <script type="module" src="app.js"></script>
+  <!-- The skill hover card. Outside every screen, because it is pinned to the
+       viewport and a screen that hides itself must not take it along. -->
+  <div id="node-detail" hidden></div>
 </body>
 </html>

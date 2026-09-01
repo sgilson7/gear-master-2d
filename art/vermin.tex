@@ -1,0 +1,53 @@
+% Vermin, crowned. The bottom of the ladder wearing what the top of it wears —
+% the same rat, at a scale nobody let it reach.
+%
+% Written by filling in tikz_figure_prompt.md.
+\documentclass[tikz,border=4pt]{standalone}
+\usetikzlibrary{calc}
+\providecommand{\Main}{8E8A82}
+\providecommand{\Dark}{5C594F}
+\providecommand{\Accent}{C8B36A}
+
+\newcommand{\Unit}{0.055cm}
+\newcommand{\Edge}{2.2pt}
+\newcommand{\Whiskers}{3}
+\newcommand{\Points}{3}
+
+\definecolor{main}{HTML}{\Main}
+\definecolor{dark}{HTML}{\Dark}
+\definecolor{accent}{HTML}{\Accent}
+\definecolor{ink}{HTML}{101018}
+\definecolor{pink}{HTML}{C98B96}
+
+\begin{document}
+\begin{tikzpicture}[x=\Unit,y=\Unit, line join=round, line cap=round]
+
+  % ---- tail, first so the body laps over its root ------------------------
+  \draw[dark,line width=3.6pt] (16,14) .. controls (2,6) and (2,34) .. (12,36);
+
+  % ---- body ---------------------------------------------------------------
+  \fill[main,draw=ink,line width=\Edge] (28,20) circle (17);
+
+  % ---- head ---------------------------------------------------------------
+  \fill[main,draw=ink,line width=\Edge] (48,26) circle (12);
+  \fill[pink,draw=ink,line width=1.6pt] (43,38) circle (5.2);
+  \fill[pink,draw=ink,line width=1.6pt] (54,37) circle (5.2);
+  \fill[ink] (53,27) circle (2.0);
+  \fill[pink,draw=ink,line width=1.4pt] (58,22) circle (2.4);
+  \foreach \x in {53,57} {
+    \fill[white,draw=ink,line width=1.0pt] (\x,13) rectangle ++(3.2,5.6);
+  }
+  \foreach \i in {1,...,\Whiskers} {
+    \pgfmathsetmacro\dy{(\i-2)*3.6}
+    \draw[ink,line width=1.0pt] (58,21) -- ++(10,\dy);
+  }
+
+  % ---- the crown, which is the whole joke --------------------------------
+  \fill[accent,draw=ink,line width=1.6pt] (40,38) rectangle (56,42);
+  \foreach \i in {1,...,\Points} {
+    \pgfmathsetmacro\x{40+(\i-1)*(16/(\Points-1))}
+    \fill[accent,draw=ink,line width=1.2pt] (\x-2,42) -- (\x,48) -- (\x+2,42) -- cycle;
+  }
+
+\end{tikzpicture}
+\end{document}

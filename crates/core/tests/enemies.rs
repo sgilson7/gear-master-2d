@@ -105,3 +105,40 @@ fn the_bestiary_file_reads_back() {
     let e = BestiaryData::parse(&serde_json::to_string(&wrong).unwrap()).unwrap_err();
     assert!(e.contains(FORMAT) && e.contains("gm2d-save"), "{e}");
 }
+
+/// Every creature has a portrait, and every portrait is a file.
+///
+/// `data/art.json` shipped with three creatures in it against fifty in the
+/// ladder, so the fight screen drew a heading and nothing else for ninety-four
+/// percent of the game — art that had been drawn, compiled and deployed and
+/// was reachable from nowhere. The map is generated from `art/creatures.json`
+/// by `make art` now; this is what makes adding a creature without drawing it
+/// a failing test rather than a silence.
+#[test]
+fn every_creature_has_a_figure_and_every_figure_has_a_file() {
+    let art: serde_json::Value =
+        serde_json::from_str(include_str!("../../../data/art.json")).unwrap();
+    let creatures = art["creatures"].as_object().expect("art.json has creatures");
+
+    let mut bad = Vec::new();
+    for spec in gm2d_core::combat::LADDER {
+        match creatures.get(spec.name) {
+            None => bad.push(format!("{}: no figure", spec.name)),
+            Some(f) => {
+                let f = f.as_str().unwrap_or_default();
+                let path = concat!(env!("CARGO_MANIFEST_DIR"), "/../../web/assets/");
+                if !std::path::Path::new(&format!("{path}{f}.svg")).exists() {
+                    bad.push(format!("{}: names {f}.svg, which is not there", spec.name));
+                }
+            }
+        }
+    }
+    // And nothing in the map points at a creature that no longer exists — a
+    // stale entry is a figure being shipped for nobody.
+    for name in creatures.keys() {
+        if !gm2d_core::combat::LADDER.iter().any(|s| s.name == name) {
+            bad.push(format!("{name}: in the art map and not in the ladder"));
+        }
+    }
+    assert!(bad.is_empty(), "the art map and the ladder disagree:\n  {}", bad.join("\n  "));
+}

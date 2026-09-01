@@ -15,6 +15,7 @@ import init, {
   encounter_json, fight_json, settle_fight, flee,
 } from './pkg/gm2d_wasm.js';
 import { Board } from './board.js';
+import { Theirs } from './theirs.js';
 import { Replay } from './replay.js';
 
 const $ = (id) => document.getElementById(id);
@@ -247,6 +248,7 @@ function openEvent(id) {
 
 let board = null;
 let replay = null;
+let theirs = null;
 
 function stage(which) {
   for (const s of ['board', 'replay', 'result']) $(`stage-${s}`).hidden = s !== which;
@@ -261,9 +263,69 @@ function openFight() {
   $('fight-note').textContent = m.note ?? '';
   $('fight-rating').textContent = m.rating;
   $('fight-bounty').textContent = m.bounty;
+  paintTheirs(m);
+  showTab('yours');
   $('fight').hidden = false;
   stage('board');
   board.refresh();
+}
+
+/// What you are about to fight, in the same cards as your own gear.
+///
+/// A creature packs a board through the identical pipeline in core — it seats
+/// components, they assemble or they do not, and what comes out is items with
+/// stats and a cadence. For six milestones the page threw all of that away and
+/// printed a name.
+function paintTheirs(m) {
+  $('theirs-title').textContent = m.name;
+  portrait($('theirs-art'), figure('creatures', m.canonical), m.name);
+
+  const secs = (ms) => (ms / 1000).toFixed(2);
+  const body = [
+    `<li><b>${m.health}</b> health</li>`,
+    `<li><b>${m.strength}</b> strength</li>`,
+  ];
+  if (m.regen) body.push(`<li><b>${m.regen}</b> health a second</li>`);
+  // Its own teeth, which stand on no gear and are the one thing it always has.
+  for (const a of m.attacks ?? []) {
+    const what = [
+      a.damage ? `${a.damage} damage` : null,
+      a.mind ? `${a.mind} to your maximum health` : null,
+      a.armor ? `${a.armor} armor for itself` : null,
+    ].filter(Boolean).join(', ') || 'nothing';
+    body.push(`<li>${a.name} — <b>${what}</b> <span class="dim">every ${secs(a.cooldown_ms)}s</span></li>`);
+  }
+  $('theirs-body').innerHTML = body.join('');
+
+  const { html, any } = cards(m.slots ?? []);
+  $('theirs-cards').innerHTML = any ? html
+    : `<p class="empty">It is wearing nothing. Everything it does, it does with its own body.</p>`;
+  theirs.load(m.slots ?? []);
+  // A creature with no gear gets no grid: an empty black box under the stats
+  // says "something failed to draw", not "it is wearing nothing".
+  $('theirs-board').closest('.theirs-grids').hidden = !theirs.slots.length;
+  $('tab-theirs').textContent =
+    `What it is wearing${any ? ` (${(m.items ?? []).length})` : ''}`;
+}
+
+/// Light the card for the item being pointed at, on either side.
+function lightCard(root, key) {
+  let target = null;
+  for (const el of root.querySelectorAll('.made-item')) {
+    const on = el.dataset.key === key;
+    el.classList.toggle('pointed', on);
+    if (on) target = el;
+  }
+  if (target) target.scrollIntoView({ block: 'nearest' });
+}
+
+function showTab(which) {
+  for (const w of ['yours', 'theirs']) {
+    const on = w === which;
+    $(`panel-${w}`).hidden = !on;
+    $(`tab-${w}`).classList.toggle('on', on);
+    $(`tab-${w}`).setAttribute('aria-selected', String(on));
+  }
 }
 
 function closeFight() {
@@ -298,14 +360,26 @@ function runFight() {
 // did not. The panel renders `status` unchanged — that sentence is the engine's
 // and it is better than any summary of it.
 function paintMade(st) {
-  const box = $('made');
+  const { html, any } = cards(st.slots);
+  $('panel-yours').innerHTML = `<h4>What the frames made</h4>` +
+    (any ? html
+         : `<p class="empty">Nothing seated yet. Click a component in the bag, then click a cell.</p>`);
+}
+
+/// Every item on a set of grids, as cards.
+///
+/// One builder for both sides. The creature's gear goes through the identical
+/// pipeline in core, so it deserves the identical card — and a second copy of
+/// this would be a second answer to "is cork a standing stat", which is the
+/// question the two halves below exist to settle.
+function cards(slots) {
   const parts = [];
   let any = false;
 
   const sign = (n, unit) => `${n > 0 ? '+' : ''}${n}${unit}`;
   const secs = (ms) => (ms / 1000).toFixed(2);
 
-  for (const slot of st.slots) {
+  for (const slot of slots) {
     if (!slot.items.length) continue;
     any = true;
     parts.push(`<p class="grid-of">${slot.slot}</p>`);
@@ -367,9 +441,7 @@ function paintMade(st) {
         </div>`);
     }
   }
-  box.innerHTML = `<h4>What the frames made</h4>` +
-    (any ? parts.join('')
-         : `<p class="empty">Nothing seated yet. Click a component in the bag, then click a cell.</p>`);
+  return { html: parts.join(''), any };
 }
 
 function boardSays(text) {
@@ -395,9 +467,16 @@ function offerClass() {
     const b = document.createElement('button');
     b.type = 'button';
     b.className = 'wares';
-    b.innerHTML = `<b>${c.name}</b><span class="meta">${c.blurb}</span>` +
-                  `<span class="cost">${c.promise}</span>` +
-                  `<span class="meta">${c.nodes} of its own to spend on</span>`;
+    // The spec first and the flavour after it. `promise` is the engine's own
+    // sentence, unthemed and with the numbers in it — this is the screen where
+    // somebody picks a class for the rest of the run, and "Fury, and something
+    // heavy to spend it on" is not a thing anybody can decide on.
+    b.innerHTML = `<b>${c.name}</b>` +
+                  // `promise`, not `short`: this choice does not come off, and
+                  // the compact version only repeated the first clause of it.
+                  `<span class="promise">${c.promise}</span>` +
+                  `<span class="flavour">${c.blurb}</span>` +
+                  `<span class="meta">${c.nodes} skills of its own to spend points on</span>`;
     b.onclick = () => {
       const why = choose_class(c.canonical);
       if (why) {
@@ -440,10 +519,23 @@ function paintTree() {
     const foot = n.taken ? 'taken'
       : n.takeable ? `${n.cost} point${n.cost > 1 ? 's' : ''}`
       : n.why;
-    b.innerHTML = `<b>${n.name}</b><span class="meta">${n.blurb}</span>` +
+    // **The name is the world's and the line under it is the engine's.**
+    // A tree that described itself only in the world's words — "Nine hundred
+    // feet of Deep Chocolate mine, and you never once came up early" — is a
+    // tree nobody can spend a point in. The blurb still exists; it has just
+    // stopped being the only thing on the button.
+    b.innerHTML = `<b>${n.name}</b>` +
+                  `<span class="spec">${n.effect}</span>` +
                   `<span class="cost">${foot}</span>` +
                   (nodes.some((o) => o.tree !== n.tree)
                     ? `<span class="meta">${n.tree}</span>` : '');
+    // The rest — what those words mean, and the flavour — on hover and on
+    // focus, so the button stays one line per node and a keyboard reaches it.
+    const detail = () => hoverNode(b, n);
+    b.onpointerenter = detail;
+    b.onfocus = detail;
+    b.onpointerleave = hideNode;
+    b.onblur = hideNode;
     b.onclick = () => {
       const why = take_skill(n.id);
       treeSays(why, !!why);
@@ -456,6 +548,36 @@ function paintTree() {
   }
 }
 
+/// What a node means, for somebody who has not read the source.
+///
+/// The button carries the arithmetic; this carries the definitions behind it —
+/// what mind resistance actually resists, what an assembly bonus actually is —
+/// and, last and in italics, the sentence about the mine.
+function hoverNode(button, n) {
+  const box = $('node-detail');
+  box.innerHTML =
+    `<b>${n.name}</b>` +
+    `<p class="spec">${n.effect}</p>` +
+    (n.detail ?? []).map((d) => `<p>${d}</p>`).join('') +
+    `<p class="flavour">${n.blurb}</p>` +
+    (n.taken ? '' : `<p class="cost">${n.cost} point${n.cost > 1 ? 's' : ''}${
+      n.takeable ? '' : ` — ${n.why}`}</p>`);
+  box.hidden = false;
+  // Pinned to the button, then nudged back inside the viewport. Fixed rather
+  // than absolute because the tree scrolls and the card must not scroll with
+  // the row it is describing.
+  const r = button.getBoundingClientRect();
+  const w = box.offsetWidth, h = box.offsetHeight;
+  const left = Math.min(Math.max(8, r.left), window.innerWidth - w - 8);
+  const top = r.bottom + 8 + h > window.innerHeight ? Math.max(8, r.top - h - 8) : r.bottom + 8;
+  box.style.left = `${left}px`;
+  box.style.top = `${top}px`;
+}
+
+function hideNode() {
+  $('node-detail').hidden = true;
+}
+
 function treeSays(text, bad = false) {
   const el = $('tree-says');
   el.textContent = text; el.hidden = !text;
@@ -463,6 +585,7 @@ function treeSays(text, bad = false) {
 }
 
 function closeTree() {
+  hideNode();
   $('tree').hidden = true;
   paintPanel(); draw(); $('map').focus();
 }
@@ -604,6 +727,9 @@ async function main() {
   world = JSON.parse(world_json());
   try {
     art = await (await fetch('data/art.json')).json();
+    // You, in the panel that is always up. `art.player` has existed since M6
+    // and nothing read it.
+    if (art.player) portrait($('player-art'), `assets/${art.player}.svg`, 'you');
   } catch {
     // No art file, or it will not parse. The game draws headings instead,
     // which is exactly what it did before there was any art at all.
@@ -655,15 +781,13 @@ async function main() {
     $('undo').disabled = !st.undoable;
     paintMade(st);
   };
-  board.onpoint = (key) => {
-    let target = null;
-    for (const el of $('made').querySelectorAll('.made-item')) {
-      const on = el.dataset.key === key;
-      el.classList.toggle('pointed', on);
-      if (on) target = el;
-    }
-    if (target) target.scrollIntoView({ block: 'nearest' });
-  };
+  // Scoped to its own panel: both sides draw `.made-item` now, and an
+  // unscoped query lit a creature's card when you pointed at your own blade.
+  board.onpoint = (key) => lightCard($('panel-yours'), key);
+  theirs = new Theirs($('theirs-board'));
+  theirs.onpoint = (key) => lightCard($('panel-theirs'), key);
+  $('tab-yours').onclick = () => showTab('yours');
+  $('tab-theirs').onclick = () => showTab('theirs');
   board.onhold = (name) => {
     $('holding').textContent = name ? `carrying ${name} — right-click to turn it` : '';
   };
@@ -675,6 +799,7 @@ async function main() {
   window.__legalAnchors = legal_anchors;
   window.__replay = replay;
   window.__classOffer = () => JSON.parse(class_offer_json());
+  window.__encounter = () => JSON.parse(encounter_json());
 
   $('skills').onclick = openTree;
   $('tree-done').onclick = closeTree;

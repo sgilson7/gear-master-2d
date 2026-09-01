@@ -2,6 +2,10 @@
 :root {
   --ground: #e9eae4;
   --surface: #f4f5ef;
+  /* One step off `surface`, for a row under the pointer. Used since M5 and
+     never defined, so every `.wares:hover` resolved to nothing and the tree
+     had no hover state at all. */
+  --surface-2: #e2e4db;
   --line: #c9ccc2;
   --ink: #171a19;
   --ink-2: #464c46;
@@ -12,7 +16,7 @@
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --ground: #131614; --surface: #1b1f1c; --line: #333a35;
+    --ground: #131614; --surface: #1b1f1c; --surface-2: #262b27; --line: #333a35;
     --ink: #dfe1da; --ink-2: #acb1a9; --ink-3: #858b83;
     --brass: #d3a05a; --rust: #d28563;
   }
@@ -232,3 +236,78 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
 .made .stats li .dim { color: var(--ink-3); }
 .made .stats li.dim { color: var(--ink-3); }
 @media (prefers-reduced-motion: reduce) { .made .made-item { transition: none; } }
+
+/* --- what a skill actually does ----------------------------------------- */
+/* The button carries two registers and they must not be confused for one
+   another: `spec` is the engine's, unthemed and with a number in it, and
+   `flavour` is the world's. Monospace and full-strength ink for the first,
+   italic and dimmed for the second — so the half you compare two nodes on is
+   the half that reads first. */
+.wares .spec {
+  font-family: var(--mono); font-size: 12.5px; color: var(--ink);
+  letter-spacing: -.01em;
+}
+.wares .flavour { font-size: 12.5px; color: var(--ink-3); font-style: italic; }
+.wares:disabled .spec { color: var(--ink-2); }
+
+/* The hover card. Pinned to the viewport by script, so nothing here positions
+   it — this only says what it looks like once it is somewhere. */
+#node-detail {
+  position: fixed; z-index: 20; max-width: 34ch;
+  background: var(--surface); border: 1px solid var(--line);
+  box-shadow: 0 6px 24px rgb(0 0 0 / .28);
+  padding: 12px 14px; display: grid; gap: 7px;
+  font-size: 13px; line-height: 1.45; color: var(--ink-2);
+  pointer-events: none;   /* it must never eat the pointer that summoned it */
+}
+#node-detail[hidden] { display: none; }
+#node-detail b { font-size: 14px; color: var(--ink); }
+#node-detail p { margin: 0; }
+#node-detail .spec { font-family: var(--mono); font-size: 12.5px; color: var(--ink); }
+#node-detail .flavour { font-style: italic; color: var(--ink-3); }
+#node-detail .cost { font-family: var(--mono); font-size: 12px; color: var(--brass); }
+
+/* --- the other side's board --------------------------------------------- */
+/* Two tabs over one panel: your gear and its gear, in the same cards, because
+   the question this screen asks is which of the two boards is better packed. */
+.made .tabs { display: flex; gap: 2px; margin-bottom: 12px; }
+.made .tabs button {
+  flex: 1; font-family: var(--mono); font-size: 10.5px; font-weight: 600;
+  letter-spacing: .08em; text-transform: uppercase;
+  padding: 7px 8px; border: 1px solid var(--line); background: transparent;
+  color: var(--ink-3); border-radius: 0; text-align: center;
+}
+.made .tabs button.on {
+  background: var(--surface-2); color: var(--ink);
+  border-color: var(--brass); box-shadow: inset 0 -2px 0 var(--brass);
+}
+.made .tabs button:hover:not(.on) { color: var(--ink-2); }
+
+#panel-theirs > h4 { margin: 0 0 8px; font-size: 15px; color: var(--ink);
+  font-family: inherit; letter-spacing: 0; text-transform: none; }
+#panel-theirs .portrait.wide {
+  width: 100%; height: 132px; margin-bottom: 10px; order: 0;
+}
+#panel-theirs > .stats { list-style: none; margin: 0 0 12px; padding: 0;
+  font-size: 13px; line-height: 1.55; }
+#panel-theirs > .stats li { position: relative; padding-left: 11px; }
+#panel-theirs > .stats li::before {
+  content: "·"; position: absolute; left: 0; color: var(--ink-3);
+}
+#panel-theirs .dim { color: var(--ink-3); }
+.theirs-grids { overflow-x: auto; margin: 0 0 14px; background: #101018;
+  border: 1px solid var(--line); padding: 10px; }
+.theirs-grids canvas { display: block; }
+
+/* You, in the standing panel. Wider than tall because the panel is a column
+   and a square portrait would push the numbers off the fold. */
+.portrait.mine { width: 100%; height: 96px; margin-bottom: 10px; order: 0; }
+.theirs-grids[hidden] { display: none; }
+
+/* The class fork. A sentence rather than a spec, so it is set in the reading
+   face — and it is the last thing on this screen that comes off, so it is not
+   behind a hover. */
+.wares .promise { font-size: 13.5px; line-height: 1.5; color: var(--ink); }
+/* Three classes are offered and `auto-fill` left the row padded out with empty
+   track. `auto-fit` collapses the empty tracks and the three share the width. */
+#fork-choices { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }

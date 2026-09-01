@@ -136,7 +136,7 @@ def check_hovering_an_item(page, name, fails):
       if (!s) return { skipped: true };
       const item = s.items.find(i => i.assembled);
       b.point({ slot: s.slot, x: item.cells[0][0], y: item.cells[0][1] }, 0, 0);
-      const lit = [...document.querySelectorAll('#made .made-item.pointed')]
+      const lit = [...document.querySelectorAll('#panel-yours .made-item.pointed')]
         .map(e => e.dataset.key);
       return { key: item.pieces.join(','), lit, ring: b.pointed };
     }""")
@@ -146,6 +146,117 @@ def check_hovering_an_item(page, name, fails):
         fails.append(f"{name}: the board rings {got['ring']!r}, not the item under the cursor")
     if got["lit"] != [got["key"]]:
         fails.append(f"{name}: hovering lit {got['lit']!r}, expected [{got['key']!r}]")
+
+
+def check_their_gear_is_on_the_screen(page, name, fails):
+    """You can see what you are about to fight, item by item.
+
+    Reported from a real session. `encounter_json` carried the creature's item
+    names from the first milestone and the page printed none of them — which
+    for forty-nine of the fifty creatures meant the entire fight was invisible
+    before it started, because only the Cave Rat has innate attacks and every
+    other one fights purely out of its gear.
+    """
+    page.click("#tab-theirs")
+    got = page.evaluate("""() => {
+      const cards = [...document.querySelectorAll('#theirs-cards .made-item')];
+      const c = document.getElementById('theirs-board');
+      return {
+        shown: !document.getElementById('panel-theirs').hidden,
+        cards: cards.length,
+        named: cards.map(e => e.querySelector('b')?.textContent ?? ''),
+        body: [...document.querySelectorAll('#theirs-body li')].map(li => li.textContent),
+        title: document.getElementById('theirs-title').textContent,
+        grid: { w: c.width, h: c.height },
+        art: (() => { const a = document.getElementById('theirs-art');
+                      return a.hidden ? null : a.getAttribute('src'); })(),
+      };
+    }""")
+    if not got["shown"]:
+        fails.append(f"{name}: the other side's panel would not open")
+    if got["title"] != page.text_content("#fight-name"):
+        fails.append(f"{name}: the panel is headed {got['title']!r}, "
+                     f"not {page.text_content('#fight-name')!r}")
+    if not got["body"]:
+        fails.append(f"{name}: nothing said about the creature's own body")
+    # A creature with gear must show it; one with none says so rather than
+    # printing an empty panel. Which of the two is a property of the creature,
+    # so the check is that the two agree.
+    # What core says it is wearing, against what the panel drew. Two sources,
+    # so the check compares the page's answer with the engine's rather than
+    # with itself.
+    listed = page.evaluate("() => window.__encounter()?.items.length ?? 0")
+    if listed and not got["cards"]:
+        fails.append(f"{name}: it is wearing {listed} items and the panel shows none")
+    if got["cards"] and got["grid"]["w"] < 40:
+        fails.append(f"{name}: it has {got['cards']} items and its board drew "
+                     f"{got['grid']['w']}px wide")
+    if got["cards"] and not got["art"]:
+        fails.append(f"{name}: no portrait for {got['title']!r} — every creature has one")
+    page.click("#tab-yours")
+
+
+def check_the_portrait_shows(page, name, fails):
+    """Every creature has a figure, and the figure is on the screen.
+
+    `data/art.json` mapped three creatures out of fifty, so the art compiled by
+    `make art` was reachable from almost nowhere. The map is generated from
+    `art/creatures.json` now and this is what says so from the browser's side.
+    """
+    got = page.evaluate("""() => {
+      const a = document.getElementById('fight-art');
+      return { hidden: a.hidden, src: a.getAttribute('src'),
+               w: a.naturalWidth, name: document.getElementById('fight-name').textContent };
+    }""")
+    if got["hidden"] or not got["src"]:
+        fails.append(f"{name}: no portrait drawn for {got['name']!r}")
+    elif got["w"] == 0:
+        fails.append(f"{name}: {got['name']!r} points at {got['src']}, which did not load")
+
+
+def check_every_skill_says_what_it_does(page, name, fails):
+    """A node states its effect in numbers, unthemed, and explains it on hover.
+
+    Reported from a real session: the tree described itself only in the world's
+    words, so "Nine hundred feet of Deep Chocolate mine" was the whole of what
+    a player had to decide sixty max health on. The spec is derived from the
+    effect in core, never typed, which is also why it cannot be wrong.
+    """
+    THEMED = ("fnorp", "the funny", "cork", "fury", "devotion", "harvest")
+    page.click("#skills")
+    page.wait_for_selector("#tree", state="visible", timeout=8000)
+    got = page.evaluate("""() => [...document.querySelectorAll('#nodes .wares')].map(b => ({
+      name: b.querySelector('b')?.textContent ?? '?',
+      spec: b.querySelector('.spec')?.textContent ?? null,
+    }))""")
+    if not got:
+        fails.append(f"{name}: the tree has no nodes")
+    for n in got:
+        if not n["spec"]:
+            fails.append(f"{name}: {n['name']!r} says nothing about what it does")
+            continue
+        if not any(c.isdigit() for c in n["spec"]):
+            fails.append(f"{name}: {n['name']!r} spec {n['spec']!r} names no number")
+        for w in THEMED:
+            if w in n["spec"].lower():
+                fails.append(f"{name}: {n['name']!r} spec is themed: {n['spec']!r}")
+
+    # And hovering one opens the card that explains the words in it.
+    page.hover("#nodes .wares")
+    page.wait_for_selector("#node-detail", state="visible", timeout=4000)
+    detail = page.evaluate("""() => {
+      const d = document.getElementById('node-detail');
+      const r = d.getBoundingClientRect();
+      return { text: d.textContent.trim(), paras: d.querySelectorAll('p').length,
+               inside: r.left >= 0 && r.top >= 0
+                    && r.right <= innerWidth + 1 && r.bottom <= innerHeight + 1 };
+    }""")
+    if detail["paras"] < 2:
+        fails.append(f"{name}: the hover card explains nothing: {detail['text']!r}")
+    if not detail["inside"]:
+        fails.append(f"{name}: the hover card is drawn off the edge of the window")
+    page.click("#tree-done")
+    page.wait_for_selector("#tree", state="hidden", timeout=8000)
 
 
 def check_turning_in_hand(page, name, fails):
@@ -364,6 +475,10 @@ def walk_the_gate(browser, name):
         page.click("#run")
         page.wait_for_selector("#fight", state="hidden", timeout=8000)
 
+    # The tree lives on the map, behind nothing — checked here rather than up
+    # in the packing block, where the fight screen is over the top of it.
+    check_every_skill_says_what_it_does(page, name, fails)
+
     # --- a fight -------------------------------------------------------------
     if not walk_until_a_fight(page):
         fails.append(f"{name}: never met anything in 200 steps")
@@ -371,6 +486,8 @@ def walk_the_gate(browser, name):
         creature = page.text_content("#fight-name")
         if not creature or creature == "—":
             fails.append(f"{name}: a fight opened against nothing")
+        check_the_portrait_shows(page, name, fails)
+        check_their_gear_is_on_the_screen(page, name, fails)
         # A save taken here has to reopen the same fight.
         with page.expect_download(timeout=20000) as dl:
             page.click("#fight-save")
@@ -619,6 +736,9 @@ def main():
     print("ok: a component turned in hand turns on the board too")
     print("ok: cork is per activation, not a standing stat")
     print("ok: pointing at an item on the board reads it in the panel")
+    print("ok: every skill states its effect in numbers, unthemed, and explains it on hover")
+    print("ok: the creature has a portrait, and the portrait loaded")
+    print("ok: what it is wearing is on the screen — its board, its items, its own body")
     print("ok: a mid-fight save reopens the same fight")
     print("ok: walk, download, reload, upload — position and stream both came back")
     print("ok: a wrong file was refused with a sentence and changed nothing")

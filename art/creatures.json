@@ -1,0 +1,70 @@
+{
+  "_note": "Canonical creature name -> the family figure it is drawn from, and its own colourway. One .tex per family, compiled once per creature with these three colours defined on the command line, so two creatures in a family share a silhouette and never a palette. `make art` writes web/assets/<slug>.svg and regenerates the creature half of data/art.json from this file — so a creature added to enemies.json without an entry here fails `cargo test`, which is the whole point.",
+  "_palette": "Fills are chosen off the Okabe-Ito-adjacent ladder the rest of the game uses. Within a family the hues separate; across the ladder the later rungs run darker and more saturated, so rating reads as weight even in greyscale.",
+
+  "Cave Rat":            { "family": "a-rat" },
+  "Vermin Sovereign":    { "family": "vermin",   "main": "8E8A82", "dark": "5C594F", "accent": "C8B36A" },
+
+  "Bog Toad":            { "family": "bengulon-toad" },
+  "Mire Behemoth":       { "family": "behemoth",  "main": "5A7448", "dark": "33452A", "accent": "C9B23F" },
+
+  "Rust Golem":          { "family": "the-crimper" },
+  "Rust Colossus":       { "family": "sentinel",  "main": "8B4225", "dark": "5A2A17", "accent": "E0913A" },
+  "Obsidian Colossus":   { "family": "sentinel",  "main": "2E2B33", "dark": "17151B", "accent": "8E7FD0" },
+  "Anvilheart":          { "family": "sentinel",  "main": "4A4E55", "dark": "26292E", "accent": "D94F3D" },
+  "Verdigris":           { "family": "sentinel",  "main": "4E9184", "dark": "2C5A51", "accent": "C8E6D4" },
+
+  "Iron Sentinel":       { "family": "sentinel",  "main": "6E7278", "dark": "43464B", "accent": "D3A05A" },
+  "The Iron Warden":     { "family": "sentinel",  "main": "5F6B78", "dark": "38414A", "accent": "E5C07B" },
+  "Null Sentinel":       { "family": "sentinel",  "main": "3A3D45", "dark": "1E2026", "accent": "7FDBDA" },
+  "Slag Warden":         { "family": "sentinel",  "main": "7A5A3A", "dark": "4A3522", "accent": "F0A03A" },
+  "Gallowglass":         { "family": "sentinel",  "main": "434A5C", "dark": "252A38", "accent": "B7C7E8" },
+
+  "Bone Archer":         { "family": "bone",      "main": "DFDCCF", "dark": "9C9787", "accent": "8B4225" },
+  "Bone Cantor":         { "family": "bone",      "main": "D6D2C2", "dark": "928D7C", "accent": "6A8FC0" },
+  "Grave Chorus":        { "family": "bone",      "main": "C9C6BA", "dark": "84806F", "accent": "8E6FC0" },
+  "The Iron Choir":      { "family": "bone",      "main": "A9AFB6", "dark": "666D75", "accent": "E0B03A" },
+
+  "Frost Wisp":          { "family": "wisp",      "main": "9FD3E8", "dark": "4F7E96", "accent": "FFFFFF" },
+  "Ember Wisp":          { "family": "wisp",      "main": "E8A05A", "dark": "9A5220", "accent": "FFE9A8" },
+  "The Last Light":      { "family": "wisp",      "main": "F0E2A0", "dark": "9A8B3E", "accent": "FFFFFF" },
+  "Whisperling":         { "family": "wisp",      "main": "C6BEE0", "dark": "6E6690", "accent": "F2EEFF" },
+  "Silence":             { "family": "wisp",      "main": "8A8E96", "dark": "44484F", "accent": "D8DCE4" },
+  "The Quiet Hour":      { "family": "wisp",      "main": "6C6F86", "dark": "383A4C", "accent": "C4C7E0" },
+
+  "Plague Hound":        { "family": "hound",     "main": "7E8C63", "dark": "4E5940", "accent": "C4D84A" },
+  "Ruin Hound":          { "family": "hound",     "main": "6E5B4E", "dark": "42352C", "accent": "E07A3A" },
+
+  "Warded Idol":         { "family": "idol",      "main": "A79B84", "dark": "6E6555", "accent": "2E6E8E" },
+  "Salt Idol":           { "family": "idol",      "main": "DCD8CC", "dark": "9A9488", "accent": "5A9AA8" },
+  "Weeping Idol":        { "family": "idol",      "main": "8E8878", "dark": "56514A", "accent": "5A7FC0" },
+
+  "Mirror Fiend":        { "family": "mirror",    "main": "B9C4CC", "dark": "5A6570", "accent": "D8CFE4" },
+  "The Long Mirror":     { "family": "mirror",    "main": "9FB0BC", "dark": "48545E", "accent": "E4DCEE" },
+  "Pale Twin":           { "family": "mirror",    "main": "D4D8DC", "dark": "737C86", "accent": "F0E4E4" },
+
+  "Cog Priest":          { "family": "clergy",    "main": "7A6E86", "dark": "4C4457", "accent": "D3A05A" },
+  "Iron Abbot":          { "family": "clergy",    "main": "5C6470", "dark": "343A44", "accent": "C9A94A" },
+  "The Tallow Saint":    { "family": "clergy",    "main": "D8C89A", "dark": "8E8058", "accent": "F0C85A" },
+
+  "The Hollow King":     { "family": "crown",     "main": "3A3F4A", "dark": "22252C", "accent": "D3A05A" },
+  "Crowned Hollow":      { "family": "crown",     "main": "45404E", "dark": "26232D", "accent": "C0A0D8" },
+  "Gilt":                { "family": "crown",     "main": "5A4A28", "dark": "332A16", "accent": "F5CE4A" },
+
+  "The Drowned Court":   { "family": "court",     "main": "3E6A78", "dark": "224049", "accent": "8FD0DA" },
+  "The Rust Parliament": { "family": "court",     "main": "7A4526", "dark": "492917", "accent": "E0913A" },
+  "Hollowmarch":         { "family": "court",     "main": "43485A", "dark": "252838", "accent": "B0B8E0" },
+  "The Salt Wedding":    { "family": "court",     "main": "C2BCAE", "dark": "7A756A", "accent": "D8A0A8" },
+
+  "The Gearwright":      { "family": "wright",    "main": "9A7B4F", "dark": "5E4A2E", "accent": "6FB7C6" },
+  "The Last Gearwright": { "family": "wright",    "main": "7E6A54", "dark": "4A3E30", "accent": "D3A05A" },
+  "The Curator":         { "family": "wright",    "main": "5E6A78", "dark": "363E48", "accent": "C0D0DC" },
+
+  "Ashen Marshal":       { "family": "ash",       "main": "6B6560", "dark": "3B3733", "accent": "E0713A" },
+  "Sootmother":          { "family": "ash",       "main": "4A4642", "dark": "26241F", "accent": "D95A3A" },
+  "Nine of Ashes":       { "family": "ash",       "main": "55504A", "dark": "2A2724", "accent": "F0A83A" },
+
+  "Rimefather":          { "family": "rime",      "main": "A9C6D6", "dark": "5D8095", "accent": "FFFFFF" },
+
+  "Francis":             { "family": "francis",   "main": "2B2436", "dark": "171223", "accent": "E8D24A" }
+}

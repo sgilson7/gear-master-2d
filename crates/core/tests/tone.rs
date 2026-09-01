@@ -224,9 +224,11 @@ fn a_row_granting_skill_names_its_frame() {
     let mut bad = Vec::new();
     for t in &tree.trees {
         for n in &t.nodes {
-            if let Effect::GrowSlotRows { slot, .. } = &n.effect {
-                if !n.blurb.to_lowercase().contains(&slot.to_lowercase()) {
-                    bad.push(format!("{}: grants {slot:?} and says {:?}", n.id, n.blurb));
+            for e in &n.effects {
+                if let Effect::GrowSlotRows { slot, .. } = e {
+                    if !n.blurb.to_lowercase().contains(&slot.to_lowercase()) {
+                        bad.push(format!("{}: grants {slot:?} and says {:?}", n.id, n.blurb));
+                    }
                 }
             }
         }

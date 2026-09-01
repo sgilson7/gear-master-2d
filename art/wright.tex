@@ -1,0 +1,50 @@
+% A wright — the one family that made its own gear rather than being issued
+% it. Goggles, two working arms, and the gear it is halfway through.
+%
+% Written by filling in tikz_figure_prompt.md.
+\documentclass[tikz,border=4pt]{standalone}
+\usetikzlibrary{calc}
+\providecommand{\Main}{9A7B4F}
+\providecommand{\Dark}{5E4A2E}
+\providecommand{\Accent}{6FB7C6}
+
+\newcommand{\Unit}{0.055cm}
+\newcommand{\Edge}{2.2pt}
+\newcommand{\Teeth}{8}         % on the gear it is holding
+\newcommand{\GearR}{11}
+
+\definecolor{main}{HTML}{\Main}
+\definecolor{dark}{HTML}{\Dark}
+\definecolor{accent}{HTML}{\Accent}
+\definecolor{ink}{HTML}{101018}
+
+\begin{document}
+\begin{tikzpicture}[x=\Unit,y=\Unit, line join=round, line cap=round]
+
+  % ---- apron --------------------------------------------------------------
+  \fill[main,draw=ink,line width=\Edge] (16,2) -- (48,2) -- (44,38) -- (20,38) -- cycle;
+  \draw[dark,line width=2.0pt] (26,38) -- (30,20);
+  \draw[dark,line width=2.0pt] (38,38) -- (34,20);
+
+  % ---- arms, reaching in --------------------------------------------------
+  \draw[dark,line width=3.6pt] (18,34) -- (10,22) -- (20,16);
+  \draw[dark,line width=3.6pt] (46,34) -- (54,22) -- (44,16);
+
+  % ---- the gear it is holding, over the apron ----------------------------
+  \fill[accent,draw=ink,line width=1.8pt] (32,18) circle (\GearR);
+  \foreach \i in {1,...,\Teeth} {
+    \pgfmathsetmacro\a{\i*(360/\Teeth)}
+    \fill[accent,draw=ink,line width=1.2pt]
+      ({32+\GearR*cos(\a)-2.2},{18+\GearR*sin(\a)-2.2}) rectangle ++(4.4,4.4);
+  }
+  \fill[ink] (32,18) circle (3.4);
+
+  % ---- head and goggles ---------------------------------------------------
+  \fill[main,draw=ink,line width=\Edge] (32,48) circle (10);
+  \fill[dark,draw=ink,line width=1.8pt] (21,48) rectangle (43,55);
+  \fill[accent,draw=ink,line width=1.4pt] (26,51.5) circle (3.4);
+  \fill[accent,draw=ink,line width=1.4pt] (38,51.5) circle (3.4);
+  \draw[ink,line width=2.0pt] (27,42) -- (37,42);
+
+\end{tikzpicture}
+\end{document}

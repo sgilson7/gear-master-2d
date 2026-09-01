@@ -1,0 +1,60 @@
+% Ash — a column of it with a shoulder line and two coals in the middle, so
+% there is a figure in the smoke rather than a stack of circles. The embers
+% now leave from outside the silhouette, which is where they were going.
+%
+% Written by filling in tikz_figure_prompt.md.
+\documentclass[tikz,border=4pt]{standalone}
+\usetikzlibrary{calc}
+\providecommand{\Main}{6B6560}
+\providecommand{\Dark}{3B3733}
+\providecommand{\Accent}{E0713A}
+
+\newcommand{\Unit}{0.055cm}
+\newcommand{\Edge}{2.2pt}
+\newcommand{\Embers}{8}
+\newcommand{\Curls}{4}
+
+\definecolor{main}{HTML}{\Main}
+\definecolor{dark}{HTML}{\Dark}
+\definecolor{accent}{HTML}{\Accent}
+\definecolor{ink}{HTML}{101018}
+
+\begin{document}
+\begin{tikzpicture}[x=\Unit,y=\Unit, line join=round, line cap=round]
+
+  % ---- the bed it is coming off ------------------------------------------
+  \fill[dark,draw=ink,line width=\Edge] (10,2) -- (54,2) -- (48,11) -- (16,11) -- cycle;
+  \foreach \x in {20,28,36,44} { \fill[accent] (\x,6) circle (1.8); }
+
+  % ---- the column: one silhouette, narrow at the waist -------------------
+  \fill[main,draw=ink,line width=\Edge]
+    (18,11) .. controls (14,24) and (22,30) .. (20,38)
+            .. controls (18,48) and (26,52) .. (32,60)
+            .. controls (38,52) and (46,48) .. (44,38)
+            .. controls (42,30) and (50,24) .. (46,11) -- cycle;
+
+  % ---- shoulders, which are what make it a figure ------------------------
+  \draw[dark,line width=3.0pt] (21,36) -- (43,36);
+
+  % ---- the two coals still looking ---------------------------------------
+  \fill[accent,draw=ink,line width=1.6pt] (27,45) circle (3.6);
+  \fill[accent,draw=ink,line width=1.6pt] (37,45) circle (3.6);
+
+  % ---- curls off the shoulders -------------------------------------------
+  \foreach \i in {1,...,\Curls} {
+    \pgfmathsetmacro\s{mod(\i,2)==0 ? 1 : -1}
+    \pgfmathsetmacro\y{20+\i*5}
+    \draw[dark,line width=2.0pt]
+      ({32+\s*13},\y) .. controls ({32+\s*22},{\y+3}) .. ({32+\s*17},{\y+8});
+  }
+
+  % ---- embers, leaving from the top --------------------------------------
+  \foreach \i in {1,...,\Embers} {
+    \pgfmathsetmacro\x{14+\i*5}
+    \pgfmathsetmacro\y{62+mod(\i*7,9)}
+    \pgfmathsetmacro\r{2.0-mod(\i,3)*0.5}
+    \fill[accent] (\x,\y) circle (\r);
+  }
+
+\end{tikzpicture}
+\end{document}

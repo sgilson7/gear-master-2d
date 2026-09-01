@@ -1,0 +1,44 @@
+% A wisp — a light with an opinion. Nothing here has a body: the family is a
+% core, a halo it cannot quite hold, and the motes it has already shed.
+%
+% Written by filling in tikz_figure_prompt.md.
+\documentclass[tikz,border=4pt]{standalone}
+\usetikzlibrary{calc}
+\providecommand{\Main}{9FD3E8}
+\providecommand{\Dark}{4F7E96}
+\providecommand{\Accent}{FFFFFF}
+
+\newcommand{\Unit}{0.055cm}
+\newcommand{\Edge}{2.0pt}
+\newcommand{\Motes}{7}
+\newcommand{\CoreR}{13}
+
+\definecolor{main}{HTML}{\Main}
+\definecolor{dark}{HTML}{\Dark}
+\definecolor{accent}{HTML}{\Accent}
+\definecolor{ink}{HTML}{101018}
+
+\begin{document}
+\begin{tikzpicture}[x=\Unit,y=\Unit, line join=round, line cap=round]
+
+  % ---- halo, drawn first so the core laps over it -------------------------
+  \draw[dark,line width=2.4pt] (32,36) circle (21);
+  \draw[dark,line width=1.6pt,dash pattern=on 4pt off 5pt] (32,36) circle (26);
+
+  % ---- the core -----------------------------------------------------------
+  \fill[main,draw=ink,line width=\Edge] (32,36) circle (\CoreR);
+  \fill[accent,draw=ink,line width=1.4pt] (32,36) circle (5.5);
+
+  % ---- motes, thrown off around the ring ----------------------------------
+  \foreach \i in {1,...,\Motes} {
+    \pgfmathsetmacro\a{\i*(360/\Motes)+12}
+    \pgfmathsetmacro\r{2.6-mod(\i,3)*0.6}
+    \fill[main,draw=ink,line width=1.0pt]
+      ({32+24*cos(\a)},{36+24*sin(\a)}) circle (\r);
+  }
+
+  % ---- the trail: what is left of where it has been -----------------------
+  \draw[dark,line width=2.8pt] (32,23) .. controls (26,14) and (38,10) .. (31,3);
+
+\end{tikzpicture}
+\end{document}

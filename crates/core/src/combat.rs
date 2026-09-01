@@ -4222,6 +4222,20 @@ impl CombatLog {
 ///   4. deaths are checked
 ///
 /// Nothing here consults a random number generator.
+/// What the player is already holding when the bell goes.
+///
+/// Armour and mana are grants an *item* makes on its own tick everywhere else
+/// in the engine, so the character-level totals of them describe nothing and
+/// [`Combatant::player`] has always started both at zero. The skill tree is the
+/// one thing that hands them out standing rather than per activation, so it
+/// passes them here — beside `Stats` rather than inside it, because folding
+/// them in would pay every item's armour a second time as a starting balance.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct Held {
+    pub armor: i32,
+    pub mana: i32,
+}
+
 pub fn simulate(player_stats: Stats, profiles: &[ItemProfile], spec: &MonsterSpec) -> CombatLog {
     simulate_at(player_stats, profiles, spec, Difficulty::Easy)
 }
@@ -4261,7 +4275,33 @@ pub fn simulate_with_purse(
     classes: &[crate::class::ClassDef],
     purse: i32,
 ) -> CombatLog {
-    simulate_party(player_stats, profiles, std::slice::from_ref(spec), difficulty, classes, purse)
+    simulate_holding(player_stats, profiles, spec, difficulty, classes, purse, Held::default())
+}
+
+/// The same, starting with armour or mana already banked.
+///
+/// The last rung, and the one the run uses. Split off rather than added to
+/// `simulate_with_purse` for the reason every rung here is split off: only the
+/// run has a skill tree, and no test or analysis tool should have to say it
+/// holds nothing.
+pub fn simulate_holding(
+    player_stats: Stats,
+    profiles: &[ItemProfile],
+    spec: &MonsterSpec,
+    difficulty: Difficulty,
+    classes: &[crate::class::ClassDef],
+    purse: i32,
+    held: Held,
+) -> CombatLog {
+    simulate_party_holding(
+        player_stats,
+        profiles,
+        std::slice::from_ref(spec),
+        difficulty,
+        classes,
+        purse,
+        held,
+    )
 }
 
 /// Fight everything in `specs` at once.
@@ -4277,9 +4317,26 @@ pub fn simulate_party(
     classes: &[crate::class::ClassDef],
     purse: i32,
 ) -> CombatLog {
+    simulate_party_holding(player_stats, profiles, specs, difficulty, classes, purse, Held::default())
+}
+
+/// The same, starting with armour or mana already banked.
+pub fn simulate_party_holding(
+    player_stats: Stats,
+    profiles: &[ItemProfile],
+    specs: &[MonsterSpec],
+    difficulty: Difficulty,
+    classes: &[crate::class::ClassDef],
+    purse: i32,
+    held: Held,
+) -> CombatLog {
     assert!(!specs.is_empty(), "a fight needs something to fight");
     let mut start_player = Combatant::player(player_stats, profiles);
     start_player.purse = purse;
+    // Before the class powers, so `Tired`'s debt and `Unionized`'s plate still
+    // add to and subtract from what the tree granted rather than replacing it.
+    start_player.armor += held.armor;
+    start_player.mana += held.mana;
     // Every class you hold applies at once. The fountains hand out different
     // classes, never the same one twice, so two powers never fight over the
     // same field.

@@ -873,6 +873,18 @@ impl Character {
     }
 
     /// Activation profiles for every assembled item — what combat runs on.
+    /// Armour and mana the skill tree says you begin a fight already holding.
+    ///
+    /// Read every time rather than banked when the node is bought, for the same
+    /// reason `player_stats` reads the tree: a bought node's *effect* is not
+    /// state, the node is.
+    pub fn start_with(&self) -> crate::combat::Held {
+        if self.skills_taken.is_empty() {
+            return crate::combat::Held::default();
+        }
+        crate::data::skills().start_with(&self.skills_taken)
+    }
+
     pub fn combat_items(&self) -> Vec<crate::loadout::ItemProfile> {
         self.loadout.combat_items(&self.registry)
     }

@@ -16,25 +16,49 @@ use crate::piece::SlotKind;
 use crate::stats::Stats;
 
 /// What a node does.
+///
+/// Every variant has to be describable in one unthemed line with a number in
+/// it — see [`Effect::line`]. That is not a documentation rule, it is the
+/// reason the vocabulary stays small: an effect nobody can state plainly is an
+/// effect nobody can decide about.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Effect {
     /// Flat stats, added to the character sheet.
+    ///
+    /// **Armour and mana are deliberately not here.** Everywhere else in the
+    /// engine they are grants an item makes on its own tick, so a
+    /// character-level total of them has no tick to hang off — and
+    /// `Combatant::player` has always thrown that total away. Eight nodes
+    /// shipped granting one or the other and did nothing at all. What they
+    /// meant is [`Effect::StartWith`], which is a different rule and says so.
+    ///
+    /// serde ignores a key it does not know, so a node left saying `armor`
+    /// here would go on quietly doing nothing — which is the exact failure
+    /// this split exists to end. `tests/tone.rs` reads the raw JSON and
+    /// refuses any effect key the vocabulary has never had.
     Stat {
         #[serde(default)]
         health: i32,
         #[serde(default)]
         strength: i32,
         #[serde(default)]
-        armor: i32,
-        #[serde(default)]
-        mana: i32,
-        #[serde(default)]
         regen: i32,
         #[serde(default)]
         mind_resist: i32,
         #[serde(default)]
         curse_resist: i32,
+    },
+    /// What the player is already holding when the bell goes.
+    ///
+    /// Armour soaks before health and is gone when the fight ends; mana is
+    /// what a casting item spends. Both start at zero for everybody, so this
+    /// is the only way to begin a fight with either.
+    StartWith {
+        #[serde(default)]
+        armor: i32,
+        #[serde(default)]
+        mana: i32,
     },
     /// Rows on one grid, out of the level rotation's turn.
     GrowSlotRows { slot: String, rows: u8 },
@@ -44,6 +68,110 @@ pub enum Effect {
     /// Recycler wrote it. A rule change rather than a stat, and the cheapest
     /// one to express, because the fight already reads it.
     AssemblyPct { pct: i32 },
+}
+
+/// One line saying exactly what taking this node does.
+///
+/// **No theme and no flavour.** The name carries the world; this carries the
+/// arithmetic, and a player deciding where to spend a point is reading it to
+/// compare two numbers. `blurb` is where the mine and the plaid suit live.
+///
+/// Every branch names a number, because a description without one is the
+/// vagueness this exists to remove.
+impl Effect {
+    pub fn line(&self) -> String {
+        match self {
+            Effect::Stat { health, strength, regen, mind_resist, curse_resist } => join(&[
+                num(*health, "max health", ""),
+                num(*strength, "strength", ""),
+                num(*regen, "health a second", ""),
+                num(*mind_resist, "mind resist", "%"),
+                num(*curse_resist, "curse resist", "%"),
+            ]),
+            Effect::StartWith { armor, mana } => join(&[
+                (*armor != 0).then(|| format!("start every fight with {armor} armor")),
+                (*mana != 0).then(|| format!("start every fight with {mana} mana")),
+            ]),
+            Effect::GrowSlotRows { slot, rows } => {
+                format!("+{rows} row{} on the {slot} grid", if *rows == 1 { "" } else { "s" })
+            }
+            Effect::AssemblyPct { pct } => format!("+{pct}% to every assembly bonus"),
+        }
+    }
+
+    /// What the words in [`Effect::line`] mean, for the hover.
+    ///
+    /// One entry per term the line actually used, so a node granting health
+    /// does not explain curse resistance at somebody who did not ask.
+    pub fn detail(&self) -> Vec<String> {
+        let mut out = Vec::new();
+        match self {
+            Effect::Stat { health, strength, regen, mind_resist, curse_resist } => {
+                if *health != 0 {
+                    out.push(
+                        "Max health: damage comes off health, and you lose at zero.".into(),
+                    );
+                }
+                if *strength != 0 {
+                    out.push(
+                        "Strength: added to every physical hit you land, then scaled by the                          power of the item landing it — so it is worth more on a strong weapon."
+                            .into(),
+                    );
+                }
+                if *regen != 0 {
+                    out.push("Regeneration: health restored once a second, all fight.".into());
+                }
+                if *mind_resist != 0 {
+                    out.push(
+                        "Mind resist: cuts incoming mind damage by that percent. Mind damage                          takes maximum health rather than health, and nothing heals it back."
+                            .into(),
+                    );
+                }
+                if *curse_resist != 0 {
+                    out.push(
+                        "Curse resist: cuts how long a curse landed on you lasts by that                          percent. It does not stop the curse landing."
+                            .into(),
+                    );
+                }
+            }
+            Effect::StartWith { armor, mana } => {
+                if *armor != 0 {
+                    out.push(
+                        "Armor: absorbs damage before health does. Everybody starts a fight                          with none, and whatever is left is gone when the fight ends."
+                            .into(),
+                    );
+                }
+                if *mana != 0 {
+                    let cost = crate::combat::SPELL_MANA_COST;
+                    out.push(format!(
+                        "Mana: what a casting item spends, {cost} a cast. Everybody starts a \
+                         fight with none, so this is {} casts before anything on the board has \
+                         to earn them.",
+                        mana / cost.max(1),
+                    ));
+                }
+            }
+            Effect::GrowSlotRows { slot, .. } => out.push(format!(
+                "A row is {} more cells to pack the {slot} grid with, granted out of turn — on                  top of the row that grid gets when the level rotation reaches it. No grid goes                  past {} rows.",
+                crate::slot::SLOT_W,
+                crate::progression::MAX_ROWS,
+            )),
+            Effect::AssemblyPct { .. } => out.push(
+                "An assembly bonus is the lump a component pays only when the item it is part                  of is complete. This raises every one of them, on all five grids — so it pays                  a board that finishes what it seats and nothing at all to one that does not."
+                    .into(),
+            ),
+        }
+        out
+    }
+}
+
+/// `+3 strength`, or nothing at all when the field is zero.
+fn num(n: i32, label: &str, unit: &str) -> Option<String> {
+    (n != 0).then(|| format!("{n:+}{unit} {label}"))
+}
+
+fn join(parts: &[Option<String>]) -> String {
+    parts.iter().flatten().cloned().collect::<Vec<_>>().join(", ")
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -57,7 +185,49 @@ pub struct Node {
     /// Node ids that must be taken first.
     #[serde(default)]
     pub requires: Vec<String>,
-    pub effect: Effect,
+    /// What it does.
+    ///
+    /// Written in the JSON as one object, or as an array for a node that does
+    /// two things — most do one, and reading `"effect": {...}` is what a
+    /// person writing a tree expects to be able to type.
+    #[serde(
+        rename = "effect",
+        deserialize_with = "one_or_many",
+        serialize_with = "many_or_one"
+    )]
+    pub effects: Vec<Effect>,
+}
+
+fn one_or_many<'de, D: serde::Deserializer<'de>>(d: D) -> Result<Vec<Effect>, D::Error> {
+    #[derive(Deserialize)]
+    #[serde(untagged)]
+    enum OneOrMany {
+        One(Effect),
+        Many(Vec<Effect>),
+    }
+    Ok(match OneOrMany::deserialize(d)? {
+        OneOrMany::One(e) => vec![e],
+        OneOrMany::Many(v) => v,
+    })
+}
+
+fn many_or_one<S: serde::Serializer>(v: &[Effect], s: S) -> Result<S::Ok, S::Error> {
+    match v {
+        [one] => one.serialize(s),
+        many => many.serialize(s),
+    }
+}
+
+impl Node {
+    /// Every effect's [`Effect::line`], in one unthemed sentence.
+    pub fn line(&self) -> String {
+        self.effects.iter().map(Effect::line).collect::<Vec<_>>().join(", ")
+    }
+
+    /// Every effect's [`Effect::detail`], for the hover.
+    pub fn detail(&self) -> Vec<String> {
+        self.effects.iter().flat_map(|e| e.detail()).collect()
+    }
 }
 
 fn one() -> u32 {
@@ -198,23 +368,14 @@ impl SkillsData {
         let mut out = Stats::default();
         for id in taken {
             let Some(n) = self.node(id) else { continue };
-            if let Effect::Stat {
-                health,
-                strength,
-                armor,
-                mana,
-                regen,
-                mind_resist,
-                curse_resist,
-            } = &n.effect
-            {
-                out.health += health;
-                out.strength += strength;
-                out.armor += armor;
-                out.mana += mana;
-                out.regen += regen;
-                out.mind_resist += mind_resist;
-                out.curse_resist += curse_resist;
+            for e in &n.effects {
+                if let Effect::Stat { health, strength, regen, mind_resist, curse_resist } = e {
+                    out.health += health;
+                    out.strength += strength;
+                    out.regen += regen;
+                    out.mind_resist += mind_resist;
+                    out.curse_resist += curse_resist;
+                }
             }
         }
         out
@@ -225,9 +386,31 @@ impl SkillsData {
         let mut out = [0u8; 5];
         for id in taken {
             let Some(n) = self.node(id) else { continue };
-            if let Effect::GrowSlotRows { slot, rows } = &n.effect {
-                if let Some(k) = slot_of(slot) {
-                    out[k.index()] += rows;
+            for e in &n.effects {
+                if let Effect::GrowSlotRows { slot, rows } = e {
+                    if let Some(k) = slot_of(slot) {
+                        out[k.index()] += rows;
+                    }
+                }
+            }
+        }
+        out
+    }
+
+    /// Armour and mana the player begins every fight already holding.
+    ///
+    /// Separate from [`stats_from`](Self::stats_from) because it has to be:
+    /// the character's stat total already carries the *per activation* armour
+    /// and mana its items grant, and adding that to what a fight starts with
+    /// would pay every item twice.
+    pub fn start_with(&self, taken: &[String]) -> crate::combat::Held {
+        let mut out = crate::combat::Held::default();
+        for id in taken {
+            let Some(n) = self.node(id) else { continue };
+            for e in &n.effects {
+                if let Effect::StartWith { armor, mana } = e {
+                    out.armor += armor;
+                    out.mana += mana;
                 }
             }
         }
@@ -239,7 +422,8 @@ impl SkillsData {
         taken
             .iter()
             .filter_map(|id| self.node(id))
-            .filter_map(|n| match &n.effect {
+            .flat_map(|n| &n.effects)
+            .filter_map(|e| match e {
                 Effect::AssemblyPct { pct } => Some(*pct),
                 _ => None,
             })

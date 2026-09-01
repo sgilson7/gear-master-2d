@@ -78,12 +78,14 @@ pub fn run(game: &Game, difficulty: Difficulty) -> Option<CombatLog> {
     // before M5, and the golden fixture says so.
     let worn: Vec<crate::class::ClassDef> =
         game.character.class_def().into_iter().cloned().collect();
-    Some(combat::simulate_with_class(
+    Some(combat::simulate_holding(
         game.character.player_stats(),
         &game.character.combat_items(),
         spec,
         difficulty,
         &worn,
+        0,
+        game.character.start_with(),
     ))
 }
 

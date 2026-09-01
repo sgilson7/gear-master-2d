@@ -1,0 +1,52 @@
+% Clergy — a mitre, a robe, and a staff held out to the side. The first draft
+% stacked the mitre straight on the robe and the whole figure came out as one
+% triangle; the shoulders are narrower than the hem now, and the head is a
+% circle in front of them, so there are three shapes instead of one.
+%
+% Written by filling in tikz_figure_prompt.md.
+\documentclass[tikz,border=4pt]{standalone}
+\usetikzlibrary{calc}
+\providecommand{\Main}{7A6E86}
+\providecommand{\Dark}{4C4457}
+\providecommand{\Accent}{D3A05A}
+
+\newcommand{\Unit}{0.055cm}
+\newcommand{\Edge}{2.2pt}
+\newcommand{\Folds}{3}
+
+\definecolor{main}{HTML}{\Main}
+\definecolor{dark}{HTML}{\Dark}
+\definecolor{accent}{HTML}{\Accent}
+\definecolor{ink}{HTML}{101018}
+
+\begin{document}
+\begin{tikzpicture}[x=\Unit,y=\Unit, line join=round, line cap=round]
+
+  % ---- the staff, off to the side where it can be seen -------------------
+  \draw[dark,line width=3.2pt] (56,4) -- (56,54);
+  \draw[accent,draw=ink,line width=1.8pt] (56,56) circle (5.5);
+  \draw[accent,line width=2.0pt] (51,56) -- (61,56);
+
+  % ---- robe: narrow at the shoulders, wide at the hem --------------------
+  \fill[main,draw=ink,line width=\Edge] (8,2) -- (46,2) -- (34,42) -- (20,42) -- cycle;
+  \foreach \i in {1,...,\Folds} {
+    \pgfmathsetmacro\x{16+(\i-1)*8}
+    \draw[dark,line width=2.0pt] (\x,4) -- ({\x+4},38);
+  }
+  % The hem, a straight band, so the bottom of the figure is not a point.
+  \fill[accent,draw=ink,line width=1.4pt] (8,2) rectangle (46,7);
+
+  % ---- the sleeve reaching for the staff ---------------------------------
+  \draw[main,line width=5.0pt] (32,34) -- (46,30) -- (56,34);
+
+  % ---- head, in front of the shoulders -----------------------------------
+  \fill[dark,draw=ink,line width=\Edge] (27,50) circle (9);
+  \fill[accent] (23,52) circle (1.8);
+  \fill[accent] (31,52) circle (1.8);
+
+  % ---- the mitre, narrower than the head so it reads as worn -------------
+  \fill[main,draw=ink,line width=\Edge] (19,56) -- (35,56) -- (27,72) -- cycle;
+  \draw[accent,line width=2.2pt] (22,60) -- (32,60);
+
+\end{tikzpicture}
+\end{document}

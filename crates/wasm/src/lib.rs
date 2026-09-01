@@ -438,6 +438,162 @@ fn slot_name(s: gm2d_core::piece::SlotKind) -> String {
     format!("{s:?}").to_lowercase()
 }
 
+/// One item's card, in the shape upstream's tooltip used.
+///
+/// Lifted out of `board_json` the moment the fight screen needed the same
+/// thing for the creature you are looking at. Two copies of this would have
+/// been two answers to "is cork a standing stat", and the whole point of the
+/// split below is that there is one.
+fn item_card(
+    i: &gm2d_core::loadout::GearItem,
+    slot: &gm2d_core::slot::Slot,
+    profiles: &[gm2d_core::loadout::ItemProfile],
+    stats: gm2d_core::stats::Stats,
+) -> serde_json::Value {
+    use gm2d_core::piece::{Action, SlotKind, Trigger};
+        // The full card, in the shape upstream's tooltip used:
+        // what it is, what it is worth, what it does standing
+        // still, and what it does every time it comes round.
+        //
+        // The assembled half comes from the `ItemProfile` the
+        // *fight* runs on rather than from the report, so the
+        // cadence, power and damage a player reads are the ones
+        // that will actually happen — matched by piece set,
+        // which is what identifies an item.
+        let profile = profiles.iter().find(|p| p.pieces == i.pieces);
+        let st = i.stats;
+        let rarity = gm2d_core::rating::Rarity::of(i.rating);
+
+        // **Two halves, and which stat goes in which is not a
+        // presentation choice.** Upstream splits them at the
+        // one place a blow is worked out, and getting it wrong
+        // tells the player something false: cork is laid down
+        // *per activation* and resets each fight, so listing it
+        // beside max health reads as armour you are wearing.
+        //
+        // Standing still: what it contributes whether or not a
+        // fight is happening.
+        let passive: Vec<serde_json::Value> = [
+            (st.health, "max health", ""),
+            (st.strength, "strength", ""),
+            (st.regen, "regen a second", ""),
+            (st.power, "weapon power", "%"),
+            (st.mind_resist, "thick skull", "%"),
+            (st.curse_resist, "curse resist", "%"),
+            (st.physical_resist, "physical resist", "%"),
+            (st.magic_resist, "magic resist", "%"),
+            (st.physical_pierce, "physical piercing", "%"),
+            (st.magic_pierce, "magic piercing", "%"),
+            (st.physical_harden, "physical hardening", "%"),
+            (st.magic_harden, "magic hardening", "%"),
+            // Not in upstream's list. It is a standing share of
+            // what armour soaks rather than something the item
+            // does on its tick, so it sits here.
+            (st.reflect, "reflected", "%"),
+        ]
+        .iter()
+        .filter(|(v, ..)| *v != 0)
+        .map(|(v, label, unit)| {
+            serde_json::json!({ "n": v, "label": label, "unit": unit })
+        })
+        .collect();
+
+        // An unconditional pool gain is a stat wearing a
+        // trigger's clothes. Folded into the figures below, so
+        // a piece that banks two Fury reads like every other
+        // piece that banks two Fury — anything *conditional*
+        // keeps its own line, because there the wording is the
+        // information.
+        let mut banked = [0i32; 4];
+        if let Some(pr) = profile {
+            for t in &pr.triggers {
+                match t {
+                    Trigger::OnActivate(Action::GainMana(n)) => banked[0] += n,
+                    Trigger::OnActivate(Action::Gain { what, amount }) => {
+                        banked[what.index().min(3)] += amount
+                    }
+                    _ => {}
+                }
+            }
+        }
+
+        let hit = profile.map(|p| p.hit_for(stats.strength)).unwrap_or(0);
+        let dps = profile
+            .filter(|_| hit > 0)
+            // `dps_milli` is damage a second in thousandths.
+            .map(|p| p.dps_milli(stats.strength) as f64 / 1_000.0);
+
+        // What answers the blow. "Hits for 61" says how hard
+        // and nothing about what resists it.
+        let mut damage_kinds: Vec<String> = Vec::new();
+        if let Some(pr) = profile {
+            let carried =
+                if pr.slot == SlotKind::Weapon { stats.strength } else { 0 };
+            for (v, name) in [
+                (st.physical_damage + carried, "physical"),
+                (st.magic_damage, "magic"),
+            ] {
+                if v > 0 {
+                    // Through the item's own multiplier, so the
+                    // parts add up to the total beside them.
+                    let scaled = (v as i64 * pr.power as i64 / 100) as i32;
+                    damage_kinds.push(format!("{scaled} {name}"));
+                }
+            }
+        }
+
+        // Every activation: what one tick of it does.
+        let mut active: Vec<serde_json::Value> = Vec::new();
+        let mut push = |n: i32, label: &str| {
+            if n > 0 {
+                active.push(serde_json::json!({ "n": n, "label": label, "unit": "" }));
+            }
+        };
+        // Only when the item does not already print a swing.
+        // A weapon's "hits for 35" *is* its physical damage
+        // plus the wearer's strength, through its own power —
+        // listing "5 physical damage" beside it says the item
+        // does five, which is the misreading this card exists
+        // to prevent.
+        if hit == 0 {
+            push(st.physical_damage, "physical damage");
+            push(st.magic_damage, "magic damage");
+        }
+        push(st.mind, "idiot mode");
+        push(st.armor, "cork");
+        push(banked[0] + st.mana, "the Funny");
+        push(banked[1] + st.rage, "fury");
+        push(banked[2] + st.faith, "devotion");
+        push(banked[3] + st.nature, "harvest");
+
+        serde_json::json!({
+            "pieces": i.pieces.iter().map(|p| p.0).collect::<Vec<_>>(),
+            "cells": i.pieces.iter()
+                .flat_map(|&p| slot.cells_of(p))
+                .collect::<Vec<_>>(),
+            "assembled": i.assembled,
+            "status": i.status,
+            "name": i.name.full,
+            "short": i.name.short,
+            "rating": i.rating,
+            "notes": i.notes,
+            "rarity": rarity.name(),
+            "marks": rarity.marks(),
+            "next_at": rarity.next_at().map(|n| n - i.rating),
+            "core": profile.map(|p| p.core.clone()),
+            "cooldown_ms": profile.map(|p| p.cooldown_ms),
+            "power": profile.map(|p| p.power),
+            "hit_for": hit,
+            "dps": dps,
+            "damage_kinds": damage_kinds,
+            "casts": profile.map(|p| p.casts.len()).unwrap_or(0),
+            "cast_cost": gm2d_core::combat::SPELL_MANA_COST,
+            "passive": passive,
+            "active": active,
+        })
+
+}
+
 /// The five grids, everything on them, and what it all assembles into.
 ///
 /// One call rather than a dozen getters, because the board is drawn as a whole
@@ -449,7 +605,7 @@ fn slot_name(s: gm2d_core::piece::SlotKind) -> String {
 /// if it did not — the page draws these and does not compute any of them.
 #[wasm_bindgen]
 pub fn board_json() -> String {
-    use gm2d_core::piece::{Action, SlotKind, Trigger};
+    use gm2d_core::piece::SlotKind;
     with(|g| {
         let ch = &g.character;
         // The profiles the fight runs on, so a card quotes the cadence and the
@@ -496,148 +652,7 @@ pub fn board_json() -> String {
                 let items: Vec<_> = report
                     .items
                     .iter()
-                    .map(|i| {
-                        // The full card, in the shape upstream's tooltip used:
-                        // what it is, what it is worth, what it does standing
-                        // still, and what it does every time it comes round.
-                        //
-                        // The assembled half comes from the `ItemProfile` the
-                        // *fight* runs on rather than from the report, so the
-                        // cadence, power and damage a player reads are the ones
-                        // that will actually happen — matched by piece set,
-                        // which is what identifies an item.
-                        let profile = profiles.iter().find(|p| p.pieces == i.pieces);
-                        let st = i.stats;
-                        let rarity = gm2d_core::rating::Rarity::of(i.rating);
-
-                        // **Two halves, and which stat goes in which is not a
-                        // presentation choice.** Upstream splits them at the
-                        // one place a blow is worked out, and getting it wrong
-                        // tells the player something false: cork is laid down
-                        // *per activation* and resets each fight, so listing it
-                        // beside max health reads as armour you are wearing.
-                        //
-                        // Standing still: what it contributes whether or not a
-                        // fight is happening.
-                        let passive: Vec<serde_json::Value> = [
-                            (st.health, "max health", ""),
-                            (st.strength, "strength", ""),
-                            (st.regen, "regen a second", ""),
-                            (st.power, "weapon power", "%"),
-                            (st.mind_resist, "thick skull", "%"),
-                            (st.curse_resist, "curse resist", "%"),
-                            (st.physical_resist, "physical resist", "%"),
-                            (st.magic_resist, "magic resist", "%"),
-                            (st.physical_pierce, "physical piercing", "%"),
-                            (st.magic_pierce, "magic piercing", "%"),
-                            (st.physical_harden, "physical hardening", "%"),
-                            (st.magic_harden, "magic hardening", "%"),
-                            // Not in upstream's list. It is a standing share of
-                            // what armour soaks rather than something the item
-                            // does on its tick, so it sits here.
-                            (st.reflect, "reflected", "%"),
-                        ]
-                        .iter()
-                        .filter(|(v, ..)| *v != 0)
-                        .map(|(v, label, unit)| {
-                            serde_json::json!({ "n": v, "label": label, "unit": unit })
-                        })
-                        .collect();
-
-                        // An unconditional pool gain is a stat wearing a
-                        // trigger's clothes. Folded into the figures below, so
-                        // a piece that banks two Fury reads like every other
-                        // piece that banks two Fury — anything *conditional*
-                        // keeps its own line, because there the wording is the
-                        // information.
-                        let mut banked = [0i32; 4];
-                        if let Some(pr) = profile {
-                            for t in &pr.triggers {
-                                match t {
-                                    Trigger::OnActivate(Action::GainMana(n)) => banked[0] += n,
-                                    Trigger::OnActivate(Action::Gain { what, amount }) => {
-                                        banked[what.index().min(3)] += amount
-                                    }
-                                    _ => {}
-                                }
-                            }
-                        }
-
-                        let hit = profile.map(|p| p.hit_for(stats.strength)).unwrap_or(0);
-                        let dps = profile
-                            .filter(|_| hit > 0)
-                            // `dps_milli` is damage a second in thousandths.
-                            .map(|p| p.dps_milli(stats.strength) as f64 / 1_000.0);
-
-                        // What answers the blow. "Hits for 61" says how hard
-                        // and nothing about what resists it.
-                        let mut damage_kinds: Vec<String> = Vec::new();
-                        if let Some(pr) = profile {
-                            let carried =
-                                if pr.slot == SlotKind::Weapon { stats.strength } else { 0 };
-                            for (v, name) in [
-                                (st.physical_damage + carried, "physical"),
-                                (st.magic_damage, "magic"),
-                            ] {
-                                if v > 0 {
-                                    // Through the item's own multiplier, so the
-                                    // parts add up to the total beside them.
-                                    let scaled = (v as i64 * pr.power as i64 / 100) as i32;
-                                    damage_kinds.push(format!("{scaled} {name}"));
-                                }
-                            }
-                        }
-
-                        // Every activation: what one tick of it does.
-                        let mut active: Vec<serde_json::Value> = Vec::new();
-                        let mut push = |n: i32, label: &str| {
-                            if n > 0 {
-                                active.push(serde_json::json!({ "n": n, "label": label, "unit": "" }));
-                            }
-                        };
-                        // Only when the item does not already print a swing.
-                        // A weapon's "hits for 35" *is* its physical damage
-                        // plus the wearer's strength, through its own power —
-                        // listing "5 physical damage" beside it says the item
-                        // does five, which is the misreading this card exists
-                        // to prevent.
-                        if hit == 0 {
-                            push(st.physical_damage, "physical damage");
-                            push(st.magic_damage, "magic damage");
-                        }
-                        push(st.mind, "idiot mode");
-                        push(st.armor, "cork");
-                        push(banked[0] + st.mana, "the Funny");
-                        push(banked[1] + st.rage, "fury");
-                        push(banked[2] + st.faith, "devotion");
-                        push(banked[3] + st.nature, "harvest");
-
-                        serde_json::json!({
-                            "pieces": i.pieces.iter().map(|p| p.0).collect::<Vec<_>>(),
-                            "cells": i.pieces.iter()
-                                .flat_map(|&p| slot.cells_of(p))
-                                .collect::<Vec<_>>(),
-                            "assembled": i.assembled,
-                            "status": i.status,
-                            "name": i.name.full,
-                            "short": i.name.short,
-                            "rating": i.rating,
-                            "notes": i.notes,
-                            "rarity": rarity.name(),
-                            "marks": rarity.marks(),
-                            "next_at": rarity.next_at().map(|n| n - i.rating),
-                            "core": profile.map(|p| p.core.clone()),
-                            "cooldown_ms": profile.map(|p| p.cooldown_ms),
-                            "power": profile.map(|p| p.power),
-                            "hit_for": hit,
-                            "dps": dps,
-                            "damage_kinds": damage_kinds,
-                            "casts": profile.map(|p| p.casts.len()).unwrap_or(0),
-                            "cast_cost": gm2d_core::combat::SPELL_MANA_COST,
-                            "passive": passive,
-                            "active": active,
-                        })
-                    })
+                    .map(|i| item_card(i, slot, &profiles, stats))
                     .collect();
                 serde_json::json!({
                     "slot": slot_name(k),
@@ -775,14 +790,75 @@ pub fn encounter_json() -> String {
         let Some(e) = g.encounter.as_ref() else { return "null".into() };
         let Some(spec) = gm2d_core::fight::spec(e) else { return "null".into() };
         let (reg, lo) = spec.loadout_at(DIFFICULTY);
+        // The creature's own stats and profiles, off the same pipeline the
+        // fight runs — so a card on its side quotes the cadence and the swing
+        // that will actually land, exactly as the player's do.
+        let (stats, profiles) = spec.outfit_at(DIFFICULTY);
+        let theme = gm2d_core::theme::by_id(&g.theme);
+
+        // Its five grids, in the same shape `board_json` reports the player's.
+        // A creature packs a board like anybody else, and until now the only
+        // thing the page could see of it was a list of names.
+        let slots: Vec<_> = gm2d_core::piece::SlotKind::ALL
+            .iter()
+            .map(|&k| {
+                let slot = lo.slot(k);
+                let placed: Vec<_> = slot
+                    .pieces()
+                    .into_iter()
+                    .filter_map(|p| {
+                        let (x, y) = slot.anchor_of(p)?;
+                        let def = reg.def(p);
+                        let look = gm2d_core::look::look(def, Some(k));
+                        let (ink, ink_a) = gm2d_core::look::motif_ink(look.fill);
+                        Some(serde_json::json!({
+                            "id": p.0, "x": x, "y": y,
+                            "name": theme.piece(def.name),
+                            "cells": slot.cells_of(p),
+                            "fill": gm2d_core::look::hex(look.fill),
+                            "motif": look.motif.name(),
+                            "ink": gm2d_core::look::hex(ink),
+                            "ink_alpha": ink_a,
+                            "kind": format!("{:?}", def.kind),
+                        }))
+                    })
+                    .collect();
+                let items: Vec<_> = lo
+                    .report(&reg, k)
+                    .items
+                    .iter()
+                    .map(|i| item_card(i, slot, &profiles, stats))
+                    .collect();
+                serde_json::json!({
+                    "slot": slot_name(k),
+                    "rows": slot.rows(),
+                    "cols": gm2d_core::slot::SLOT_W,
+                    "placed": placed,
+                    "items": items,
+                })
+            })
+            .collect();
+
         serde_json::json!({
             "name": g.theme_name(spec.name),
             "canonical": spec.name,
-            "note": gm2d_core::theme::by_id(&g.theme).note(spec.name),
+            "note": theme.note(spec.name),
             "rank": format!("{:?}", spec.rank).to_lowercase(),
-            "health": spec.health,
+            "health": stats.health,
+            "strength": stats.strength,
+            "regen": stats.regen,
             "bounty": spec.bounty,
             "rating": gm2d_core::rating::creature_rating(spec, DIFFICULTY),
+            "attacks": spec.attacks.iter()
+                .map(|a| serde_json::json!({
+                    "name": a.name,
+                    "cooldown_ms": a.cooldown_ms,
+                    "damage": a.damage,
+                    "mind": a.mind,
+                    "armor": a.armor,
+                }))
+                .collect::<Vec<_>>(),
+            "slots": slots,
             "items": lo.combat_items(&reg).iter()
                 .map(|i| serde_json::json!({ "name": i.name, "rating": i.rating }))
                 .collect::<Vec<_>>(),
@@ -1126,12 +1202,19 @@ pub fn class_offer_json() -> String {
                 Some(serde_json::json!({
                     "canonical": def.name,
                     "name": theme.class(def.name),
-                    // `retell` swaps the engine's words for the theme's, whole
-                    // word at a time — so a promise about curses arrives
-                    // talking about the Roast and Nut Freeze rather than
-                    // searing and frost. TONE.md rule 13.
+                    // The blurb is the world's: `retell` swaps the engine's
+                    // words for the theme's, whole word at a time, so a line
+                    // about curses arrives talking about the Roast and the Nut
+                    // Freeze. TONE.md rule 13.
                     "blurb": theme.retell(def.blurb),
-                    "promise": theme.retell(&def.power.describe()),
+                    // **The promise is not.** It goes out in the engine's own
+                    // words, deliberately — this is the sentence somebody
+                    // reads to decide which class to be, and a spec retold in
+                    // jokes is a spec you have to translate before you can
+                    // compare two of them. Rule 13 is about prose; this is not
+                    // prose.
+                    "promise": def.power.describe(),
+                    "short": def.power.short(),
                     "nodes": t.map(|t| t.nodes.len()).unwrap_or(0),
                     "first": t.and_then(|t| t.nodes.first()).map(|n| n.name.clone()),
                 }))
@@ -1186,6 +1269,14 @@ pub fn all_trees_json() -> String {
                         );
                         serde_json::json!({
                             "id": n.id, "name": n.name, "blurb": n.blurb, "cost": n.cost,
+                            // The two halves the panel keeps apart: the name
+                            // and blurb are the world's, `effect` and `detail`
+                            // are the engine's, unthemed and with a number in
+                            // them. Neither is written in `skills.json` —
+                            // `effect` is derived from what the node actually
+                            // does, so a node cannot describe itself wrongly.
+                            "effect": n.line(),
+                            "detail": n.detail(),
                             "taken": taken,
                             "takeable": v.is_ok(),
                             "why": v.err().map(|e| e.to_string()).unwrap_or_default(),

@@ -1,0 +1,47 @@
+% A mirror — a tall glass in a frame, and something standing in it that is not
+% standing in front of it. The family's whole trick is on the wrong side.
+%
+% Written by filling in tikz_figure_prompt.md.
+\documentclass[tikz,border=4pt]{standalone}
+\usetikzlibrary{calc}
+\providecommand{\Main}{B9C4CC}
+\providecommand{\Dark}{5A6570}
+\providecommand{\Accent}{D8CFE4}
+
+\newcommand{\Unit}{0.055cm}
+\newcommand{\Edge}{2.2pt}
+\newcommand{\Glints}{3}
+
+\definecolor{main}{HTML}{\Main}
+\definecolor{dark}{HTML}{\Dark}
+\definecolor{accent}{HTML}{\Accent}
+\definecolor{ink}{HTML}{101018}
+
+\begin{document}
+\begin{tikzpicture}[x=\Unit,y=\Unit, line join=round, line cap=round]
+
+  % ---- feet ---------------------------------------------------------------
+  \fill[dark,draw=ink,line width=\Edge] (16,2) rectangle (48,7);
+
+  % ---- frame --------------------------------------------------------------
+  \fill[dark,draw=ink,line width=\Edge] (14,7) rectangle (50,62);
+
+  % ---- the glass ----------------------------------------------------------
+  \fill[main,draw=ink,line width=1.8pt] (19,12) rectangle (45,57);
+
+  % ---- what is in it ------------------------------------------------------
+  % Drawn in the accent and cut off at the frame, so it reads as standing
+  % behind the surface rather than painted on it.
+  \fill[accent,draw=ink,line width=1.4pt] (32,44) circle (7);
+  \fill[accent,draw=ink,line width=1.4pt] (24,14) -- (40,14) -- (37,38) -- (27,38) -- cycle;
+  \fill[ink] (29,45) circle (1.5);
+  \fill[ink] (35,45) circle (1.5);
+
+  % ---- glints, which are the only thing telling you it is glass -----------
+  \foreach \i in {1,...,\Glints} {
+    \pgfmathsetmacro\o{(\i-1)*7}
+    \draw[white,line width=2.0pt,opacity=0.75] (21+\o,54) -- (30+\o,40);
+  }
+
+\end{tikzpicture}
+\end{document}

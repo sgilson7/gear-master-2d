@@ -233,12 +233,14 @@ fn the_shipped_tree_is_coherent() {
             assert!(ids.contains(&r.as_str()), "{} requires {r:?}, which is not in the tree", n.id);
             assert_ne!(r, &n.id, "{} requires itself", n.id);
         }
-        if let gm2d_core::skills::Effect::GrowSlotRows { slot, .. } = &n.effect {
-            assert!(
-                gm2d_core::skills::slot_of(slot).is_some(),
-                "{} grows {slot:?}, which is not a slot",
-                n.id
-            );
+        for e in &n.effects {
+            if let gm2d_core::skills::Effect::GrowSlotRows { slot, .. } = e {
+                assert!(
+                    gm2d_core::skills::slot_of(slot).is_some(),
+                    "{} grows {slot:?}, which is not a slot",
+                    n.id
+                );
+            }
         }
     }
 

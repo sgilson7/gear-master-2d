@@ -1,0 +1,53 @@
+% A behemoth — the toad, grown past the point where anything eats it. Squat,
+% wide, and mostly mouth.
+%
+% Written by filling in tikz_figure_prompt.md.
+\documentclass[tikz,border=4pt]{standalone}
+\usetikzlibrary{calc}
+\providecommand{\Main}{6E8A5A}
+\providecommand{\Dark}{40542F}
+\providecommand{\Accent}{D9C24A}
+
+\newcommand{\Unit}{0.055cm}
+\newcommand{\Edge}{2.4pt}
+\newcommand{\Warts}{7}
+\newcommand{\Teeth}{6}
+
+\definecolor{main}{HTML}{\Main}
+\definecolor{dark}{HTML}{\Dark}
+\definecolor{accent}{HTML}{\Accent}
+\definecolor{ink}{HTML}{101018}
+
+\begin{document}
+\begin{tikzpicture}[x=\Unit,y=\Unit, line join=round, line cap=round]
+
+  % ---- haunches, behind ---------------------------------------------------
+  \fill[dark,draw=ink,line width=\Edge] (8,6) circle (12);
+  \fill[dark,draw=ink,line width=\Edge] (56,6) circle (12);
+
+  % ---- body ---------------------------------------------------------------
+  \fill[main,draw=ink,line width=\Edge] (6,6) rectangle (58,38);
+  \fill[main,draw=ink,line width=\Edge] (32,38) circle (26);
+
+  % ---- the mouth, straight across -----------------------------------------
+  \draw[ink,line width=3.0pt] (10,22) -- (54,22);
+  \foreach \i in {1,...,\Teeth} {
+    \pgfmathsetmacro\x{13+(\i-1)*(38/(\Teeth-1))}
+    \fill[white,draw=ink,line width=1.0pt] (\x-2,22) -- (\x,16) -- (\x+2,22) -- cycle;
+  }
+
+  % ---- eyes, up on top where a toad keeps them ---------------------------
+  \fill[accent,draw=ink,line width=1.8pt] (22,50) circle (7);
+  \fill[accent,draw=ink,line width=1.8pt] (42,50) circle (7);
+  \fill[ink] (22,50) ellipse (1.6 and 4.4);
+  \fill[ink] (42,50) ellipse (1.6 and 4.4);
+
+  % ---- warts --------------------------------------------------------------
+  \foreach \i in {1,...,\Warts} {
+    \pgfmathsetmacro\x{10+\i*6}
+    \pgfmathsetmacro\y{28+mod(\i*5,8)}
+    \fill[dark] (\x,\y) circle (2.0);
+  }
+
+\end{tikzpicture}
+\end{document}

@@ -11,6 +11,7 @@
 import { paintMotif } from './board.js';
 
 const CELL = 20;
+const SHAKE_PX = 3.2;   // how far a component moves on the tick it fires
 const GAP = 16;          // between one grid and the next
 const LABEL = 19;        // room above a grid for its name
 const INK = '#e8e8f0';
@@ -29,6 +30,9 @@ export class Theirs {
     this.slots = [];
     this.pointed = null;
     this.onpoint = null;
+    /// `key -> [cells]` for anything currently going off, with how far through
+    /// its shake it is. Set by whoever is driving; this file only draws it.
+    this.shaking = [];
     canvas.addEventListener('pointermove', (e) => this.point(e));
     canvas.addEventListener('pointerleave', () => this.point(null));
   }
@@ -87,8 +91,14 @@ export class Theirs {
         }
       }
       for (const p of s.placed) {
+        // **The jolt an item gives when it goes off.** A decaying wobble
+        // rather than a flash: a fight is five or six items on two boards all
+        // coming round at their own rates, and colour would be five things
+        // changing at once. Movement reads as "that one, now" and nothing else
+        // on the board moves.
+        const [ox, oy] = this.jolt(p.cells);
         for (const [cx, cy] of p.cells) {
-          const px = box.x + cx * CELL, py = box.y + cy * CELL;
+          const px = box.x + cx * CELL + ox, py = box.y + cy * CELL + oy;
           g.fillStyle = p.fill;
           g.fillRect(px, py, CELL, CELL);
           paintMotif(g, px, py, CELL, p.motif, p.ink, p.ink_alpha);
@@ -101,6 +111,23 @@ export class Theirs {
         this.edge(i.cells, box, i.pieces.join(',') === this.pointed ? '#69cdeb' : '#ffffff');
       }
     }
+  }
+
+  /// How far to push a component this frame, if its item just fired.
+  ///
+  /// Amplitude decays over the shake so it settles rather than stopping dead,
+  /// and the phase is driven off the cell so two items firing together do not
+  /// move in lockstep.
+  jolt(cells) {
+    if (!this.shaking.length) return [0, 0];
+    const key = `${cells[0]?.[0]},${cells[0]?.[1]}`;
+    for (const sh of this.shaking) {
+      if (!sh.cells.some(([x, y]) => `${x},${y}` === key)) continue;
+      const a = SHAKE_PX * (1 - sh.at);
+      const t = sh.at * Math.PI * 6;
+      return [Math.sin(t) * a, Math.cos(t * 1.3) * a * 0.5];
+    }
+    return [0, 0];
   }
 
   edge(cells, box, colour) {

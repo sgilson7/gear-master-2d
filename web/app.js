@@ -16,6 +16,7 @@ import init, {
 } from './pkg/gm2d_wasm.js';
 import { Board } from './board.js';
 import { Theirs } from './theirs.js';
+import { shapeCanvas, pieceCardHtml } from './shape.js';
 import { Replay } from './replay.js';
 
 const $ = (id) => document.getElementById(id);
@@ -639,9 +640,18 @@ function paintShelf() {
     // just how a shop reads: the gap is the memory of what you took.
     b.className = 'wares' + (w.sold ? ' sold' : '');
     b.disabled = !w.afford;
-    b.innerHTML = `<b>${w.name}</b>` +
-      `<span class="meta">${w.for} · ${w.kind.toLowerCase()} · rates ${w.rating}</span>` +
+    // **The shape, because a component is a shape.** Two blades at one price
+    // are not the same purchase when one is four cells in a line and the other
+    // is a cross, and the shelf used to say the price and not the shape.
+    b.innerHTML = `<span class="ware-top"></span><b>${w.name}</b>` +
+      `<span class="meta">${w.for} · ${w.kind} · rates ${w.rating}</span>` +
       `<span class="cost">${w.sold ? 'yours' : `${w.price} Fnorp`}</span>`;
+    b.querySelector('.ware-top').appendChild(shapeCanvas(w));
+    const read = () => showPiece(b, w);
+    b.onpointerenter = read;
+    b.onfocus = read;
+    b.onpointerleave = hidePiece;
+    b.onblur = hidePiece;
     b.onclick = () => {
       const why = buy(w.slot);
       townSays(why || `Bought ${w.name}.`, !!why);
@@ -693,6 +703,26 @@ function paintQuests() {
   }
 }
 
+/// What one component is, pinned near whatever is being pointed at.
+///
+/// The same card wherever a component appears — on a shelf, in the bag, or
+/// seated on a grid — because it is the same question.
+function showPiece(anchor, p) {
+  const box = $('piece-card');
+  box.innerHTML = pieceCardHtml(p);
+  box.hidden = false;
+  const r = anchor instanceof Element ? anchor.getBoundingClientRect() : anchor;
+  const w = box.offsetWidth, h = box.offsetHeight;
+  const left = Math.min(Math.max(8, r.left), window.innerWidth - w - 8);
+  const top = r.bottom + 8 + h > window.innerHeight ? Math.max(8, r.top - h - 8) : r.bottom + 8;
+  box.style.left = `${left}px`;
+  box.style.top = `${top}px`;
+}
+
+function hidePiece() {
+  $('piece-card').hidden = true;
+}
+
 function townSays(text, bad = false) {
   const el = $('town-says');
   el.textContent = text; el.hidden = !text;
@@ -700,6 +730,7 @@ function townSays(text, bad = false) {
 }
 
 function closeTown() {
+  hidePiece();
   $('town').hidden = true;
   paintPanel(); draw(); autosave();
   $('map').focus();
@@ -841,6 +872,14 @@ async function main() {
   // Scoped to its own panel: both sides draw `.made-item` now, and an
   // unscoped query lit a creature's card when you pointed at your own blade.
   board.onpoint = (key) => lightCard($('panel-yours'), key);
+  // And the component itself, wherever the cursor is on it.
+  board.onpiece = (p, box, px, py) => {
+    if (!p) { hidePiece(); return; }
+    // Anchored to the cursor rather than to the canvas: a board is one element
+    // and the thing being described is a few cells of it.
+    showPiece({ left: box.left + px + 14, right: box.left + px + 14,
+                top: box.top + py, bottom: box.top + py + 8 }, p);
+  };
   theirs = new Theirs($('theirs-board'));
   theirs.onpoint = (key) => lightCard($('panel-theirs'), key);
   $('tab-yours').onclick = () => showTab('yours');
@@ -851,6 +890,8 @@ async function main() {
   replay = new Replay($('replay'), {
     you: $('ticks-you'),
     them: $('ticks-them'),
+    // Both boards, drawn read-only by the same painter the creature panel uses.
+    boards: { player: new Theirs($('board-you')), enemy: new Theirs($('board-them')) },
   });
   // Pointing at a row on either side reads that item, in the same card the
   // packing panel draws.

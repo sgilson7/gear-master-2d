@@ -202,10 +202,12 @@
           <div class="ticks">
             <div>
               <h4 class="sub-h">Yours</h4>
+              <div class="fight-grid"><canvas id="board-you"></canvas></div>
               <div id="ticks-you" class="tick-list"></div>
             </div>
             <div>
               <h4 class="sub-h" id="ticks-them-name">Theirs</h4>
+              <div class="fight-grid"><canvas id="board-them"></canvas></div>
               <div id="ticks-them" class="tick-list"></div>
             </div>
           </div>
@@ -234,5 +236,8 @@
   <!-- The skill hover card. Outside every screen, because it is pinned to the
        viewport and a screen that hides itself must not take it along. -->
   <div id="node-detail" hidden></div>
+  <!-- What one component is. Outside every screen, because it is pinned to the
+       viewport and the shelf, the bag and the board all summon it. -->
+  <div id="piece-card" class="made" hidden></div>
 </body>
 </html>

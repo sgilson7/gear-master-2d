@@ -222,3 +222,65 @@ fn show_cheap() {
         println!("{:>4}  {:<10?} {:<12?} {:<28} {:?}", d.price, d.slot, d.kind, d.name, d.cells);
     }
 }
+
+/// Every component in the catalogue explains itself.
+///
+/// The last thing in the game that could not: a card said what an *item* did,
+/// and a piece on the board said its name. `piece_lines` is what the hover
+/// reads, and a piece with nothing to say is either a bug or a component that
+/// should not be for sale.
+#[test]
+fn every_component_says_something_about_itself() {
+    use gm2d_core::piece::{is_event_only, PieceKind, CATALOG};
+    let mut bad = Vec::new();
+    for d in CATALOG {
+        // A quest token is a tally and is meant to do nothing at all.
+        if d.kind == PieceKind::Quest {
+            continue;
+        }
+        // **The six orphaned relics.** Their own comment says it: "their stat
+        // lines are empty on purpose: what they are worth is a function of the
+        // run, and it lives in `relic.rs`" — and `relic.rs` went with the
+        // campaign in `48203ee`. They are `EVENT_ONLY`, they are on no town
+        // shelf, and the events that handed them out left with the module, so
+        // nothing in GM2D can put one in a bag. Skipped rather than fixed:
+        // giving six unreachable components stats would be inventing content
+        // to satisfy a lint.
+        if is_event_only(d.name) {
+            continue;
+        }
+        if gm2d_core::explain::piece_lines(d).is_empty() {
+            bad.push(d.name);
+        }
+    }
+    assert!(bad.is_empty(), "components that explain nothing:\n  {}", bad.join("\n  "));
+}
+
+/// And what it says is the engine's words, not the book's.
+#[test]
+fn no_component_line_speaks_the_theme() {
+    use gm2d_core::piece::CATALOG;
+    const THEMED: &[&str] = &["fnorp", "the funny", "cork", "fury", "devotion", "harvest"];
+    let mut bad = Vec::new();
+    for d in CATALOG {
+        for (_, line) in gm2d_core::explain::piece_lines(d) {
+            let low = line.to_lowercase();
+            for w in THEMED {
+                // **Fnorp is the exception, and only Fnorp.** Every other word
+                // on this list has an engine name a player also meets — armour
+                // is armour on the card, mana is mana in the tree. The
+                // currency does not: the panel says Fnorp, the shelf says
+                // Fnorp, and a spec that said "5 gold" would be the only place
+                // in the game using a word for money that appears nowhere
+                // else.
+                if *w == "fnorp" {
+                    continue;
+                }
+                if low.contains(w) {
+                    bad.push(format!("{}: {line:?}", d.name));
+                }
+            }
+        }
+    }
+    assert!(bad.is_empty(), "themed words in a spec:\n  {}", bad.join("\n  "));
+}

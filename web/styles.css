@@ -365,3 +365,28 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
 /* The replay panel is dark, like the board, so give the box round it the same
    edge rather than letting a light border frame a black canvas. */
 #stage-replay canvas { border: 1px solid var(--line); }
+
+/* --- a component is a shape ---------------------------------------------- */
+.shape { display: block; image-rendering: pixelated; }
+.ware-top { display: flex; align-items: flex-end; min-height: 46px; margin-bottom: 6px; }
+
+/* The component hover card, wherever it was summoned from. */
+#piece-card {
+  position: fixed; z-index: 21; width: min(34ch, 92vw);
+  background: var(--surface); border: 1px solid var(--line);
+  box-shadow: 0 6px 24px rgb(0 0 0 / .28); padding: 12px 14px;
+  pointer-events: none;
+}
+#piece-card[hidden] { display: none; }
+#piece-card > b { font-size: 14.5px; }
+
+/* The two boards in the replay. Scroll rather than shrink: a grid drawn small
+   enough to always fit would stop reading as the board you packed. */
+/* Shrink to the board it holds. Full width left a black expanse beside a
+   one-item board, which reads as something failing to draw. */
+.fight-grid { overflow-x: auto; margin-bottom: 10px; background: #101018;
+  border: 1px solid var(--line); padding: 8px;
+  width: fit-content; max-width: 100%; }
+.fight-grid canvas { display: block; }
+/* The shape sits beside the name in the hover card, not above it. */
+#piece-card .made-item { display: grid; gap: 2px; }

@@ -406,6 +406,121 @@ def check_the_replay_shows_both_sides(page, name, fails):
         fails.append(f"{name}: the replay card leads with {card['heads'][0]!r}")
 
 
+def check_a_component_is_a_shape(page, name, fails):
+    """The shelf shows what you are actually buying.
+
+    A component is a shape: two blades at one price are not the same purchase
+    when one is four cells in a line and the other is a cross. The shelf used
+    to give a name, a slot and a price, which is everything except that.
+    """
+    got = page.evaluate("""() => [...document.querySelectorAll('#shelf .wares')].map(b => ({
+      name: b.querySelector('b')?.textContent ?? '',
+      shape: !!b.querySelector('canvas.shape'),
+      w: b.querySelector('canvas.shape')?.width ?? 0,
+      meta: b.querySelector('.meta')?.textContent ?? '',
+    }))""")
+    if not got:
+        fails.append(f"{name}: nothing on the shelf to look at")
+        return
+    for w in got:
+        if not w["shape"] or w["w"] == 0:
+            fails.append(f"{name}: {w['name']!r} is for sale with no shape drawn")
+        # slot · kind · rating, and the kind is the word the engine uses.
+        if w["meta"].count("·") < 2:
+            fails.append(f"{name}: {w['name']!r} says {w['meta']!r}, not slot and type")
+
+    # And hovering one reads the component, not the item it might become.
+    page.locator("#shelf .wares").first.hover()
+    page.wait_for_selector("#piece-card", state="visible", timeout=4000)
+    card = page.evaluate("""() => {
+      const b = document.getElementById('piece-card');
+      return { name: b.querySelector('b')?.textContent ?? '',
+               built: b.querySelector('.built')?.textContent ?? '',
+               lines: b.querySelectorAll('.stats li').length };
+    }""")
+    if card["name"] != got[0]["name"]:
+        fails.append(f"{name}: hovering {got[0]['name']!r} read {card['name']!r}")
+    if not card["built"].strip():
+        fails.append(f"{name}: the component card does not say what kind of thing it is")
+    if card["lines"] == 0:
+        fails.append(f"{name}: {card['name']!r} explains nothing at all")
+
+
+def check_the_bag_shows_shapes(page, name, fails):
+    """And so does the bag under the board.
+
+    It drew a single-cell swatch for everything, so a one-cell ring and a
+    twelve-cell base looked identical — hiding the only property of a loose
+    component that decides where it can go.
+    """
+    got = page.evaluate("""() => {
+      const b = window.__board;
+      const bag = b.state?.bag ?? [];
+      return { n: bag.length,
+               cells: bag.map(p => (p.cells ?? []).length),
+               kinds: bag.map(p => p.kind ?? ''),
+               lines: bag.map(p => (p.lines ?? []).length) };
+    }""")
+    if not got["n"]:
+        return
+    if any(c == 0 for c in got["cells"]):
+        fails.append(f"{name}: a loose component arrived with no shape")
+    if any(not k for k in got["kinds"]):
+        fails.append(f"{name}: a loose component arrived with no type")
+    if all(l == 0 for l in got["lines"]):
+        fails.append(f"{name}: no loose component can explain itself")
+
+
+def check_both_boards_are_in_the_replay(page, name, fails):
+    """A fight is two boards, and the one that fires jolts.
+
+    The shake is what makes six cooldown bars legible: it says *that one, now*
+    on the board itself, and nothing else on the board moves.
+    """
+    got = page.evaluate("""() => {
+      const r = window.__replay;
+      const w = (id) => document.getElementById(id)?.width ?? 0;
+      return { you: w('board-you'), them: w('board-them'),
+               mine: (r.log.player.slots ?? []).length,
+               theirs: (r.log.enemy?.slots ?? []).length };
+    }""")
+    if got["mine"] == 0:
+        fails.append(f"{name}: the replay did not carry your board")
+    if got["theirs"] == 0:
+        fails.append(f"{name}: the replay did not carry the creature's board")
+    if got["you"] == 0:
+        fails.append(f"{name}: your board drew nothing in the replay")
+
+    # Park the head just after something fired and check it is shaking.
+    #
+    # Only activations that *have* cells count. A creature's innate attack —
+    # the Cave Rat's bite — stands on no gear, so there is nothing on a board
+    # for it to move, and a fight short enough that only the bite went off is a
+    # fight with nothing to assert. That is a property of the fight, not a
+    # failure, so it skips rather than fails.
+    shook = page.evaluate("""() => {
+      const r = window.__replay;
+      r.playing = false;
+      const shakeable = new Set();
+      for (const side of ['player', 'enemy']) {
+        r.rows[side].forEach((row, i) => { if (row.cells?.length) shakeable.add(`${side}:${i}`); });
+      }
+      const fired = r.log.entries.filter(
+        e => e.kind === 'activate' && e.at > 0 && shakeable.has(`${e.side}:${e.index}`));
+      if (!fired.length) return null;
+      for (const e of fired) {
+        r.t = e.at + 40;
+        r.draw();
+        const n = (r.boards.player?.shaking.length ?? 0)
+                + (r.boards.enemy?.shaking.length ?? 0);
+        if (n > 0) return n;
+      }
+      return 0;
+    }""")
+    if shook == 0:
+        fails.append(f"{name}: an item with cells on a board went off and nothing moved")
+
+
 def check_turning_in_hand(page, name, fails):
     """A component turned in hand actually turns.
 
@@ -600,6 +715,7 @@ def walk_the_gate(browser, name):
     if not page.is_visible("#town"):
         fails.append(f"{name}: stepping back onto the starting town opened no town")
     else:
+        check_a_component_is_a_shape(page, name, fails)
         check_the_errand_board(page, name, fails)
         check_the_shelf_is_the_shelf(page, name, fails)
         purse = int(page.text_content("#town-gold"))
@@ -621,6 +737,7 @@ def walk_the_gate(browser, name):
         check_turning_in_hand(page, name, fails)
         check_the_card_halves(page, name, fails)
         check_hovering_an_item(page, name, fails)
+        check_the_bag_shows_shapes(page, name, fails)
         page.click("#run")
         page.wait_for_selector("#fight", state="hidden", timeout=8000)
 
@@ -647,6 +764,7 @@ def walk_the_gate(browser, name):
         page.click("#go")
         page.wait_for_selector("#stage-replay", state="visible", timeout=10000)
         check_the_replay_shows_both_sides(page, name, fails)
+        check_both_boards_are_in_the_replay(page, name, fails)
         page.click("#skip")
         page.wait_for_selector("#stage-result", state="visible", timeout=15000)
         receipt = page.locator("#result-receipt p").all_text_contents()
@@ -923,6 +1041,8 @@ def main():
     print("ok: a town's shelf is that town's shelf, and what you buy is gone from it")
     print("ok: the starting town asks for five toads, in a number rather than a mood")
     print("ok: every class is offered with its own figure")
+    print("ok: a component is a shape, on the shelf and in the bag, and it explains itself")
+    print("ok: both boards are drawn in the replay, and what fires jolts")
     print("ok: a mid-fight save reopens the same fight")
     print("ok: walk, download, reload, upload — position and stream both came back")
     print("ok: a wrong file was refused with a sentence and changed nothing")

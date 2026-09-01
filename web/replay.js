@@ -17,17 +17,23 @@
 // records when an item activated, and a bar is the gap between one activation
 // and the next filling up. That is a rendering of the log, not a second clock.
 
+/// How long a component wobbles after its item goes off.
+const SHAKE_MS = 260;
+
 const POOL_COLOUR = ['#5aa8d8', '#c0553f', '#c8a33f', '#4f9e63'];
 
 export class Replay {
   /// `card(item)` renders one item as a card. Passed in rather than imported
   /// so this file does not reach back into `app.js` — and so the fight screen
   /// and the packing panel cannot end up with two card builders.
-  constructor(canvas, { you, them, card } = {}) {
+  constructor(canvas, { you, them, card, boards } = {}) {
     this.c = canvas;
     this.you = you;          // the element holding your item rows
     this.them = them;        // and theirs
     this.card = card;
+    // The two read-only boards, if the page gave us any. A fight is two boards
+    // and the replay used to show neither.
+    this.boards = boards ?? {};
     this.log = null;
     this.t = 0;
     this.speed = 1;
@@ -54,6 +60,8 @@ export class Replay {
     }
     this.buildRows('player', this.you, log.player?.items ?? []);
     this.buildRows('enemy', this.them, e?.items ?? []);
+    this.boards.player?.load(log.player?.slots ?? []);
+    this.boards.enemy?.load(e?.slots ?? []);
     this.fit();
     this.draw();
   }
@@ -89,7 +97,8 @@ export class Replay {
       const acts = this.log.entries
         .filter((e) => e.kind === 'activate' && e.side === side && e.index === i)
         .map((e) => e.at);
-      return { el: row, fill: row.querySelector('i'), cd: item.cooldown_ms || 1, acts };
+      return { el: row, fill: row.querySelector('i'), cd: item.cooldown_ms || 1, acts,
+               cells: item.cells ?? [] };
     });
   }
 
@@ -267,17 +276,28 @@ export class Replay {
     g.textAlign = 'left';
 
     this.ticks();
+    this.boards.player?.draw();
+    this.boards.enemy?.draw();
   }
 
-  /// Both sides' cooldown tracks, filled to where the head is.
+  /// Both sides' cooldown tracks, filled to where the head is — and the
+  /// components on the two boards jolting on the tick their item goes off.
   ticks() {
     for (const side of ['player', 'enemy']) {
+      const shaking = [];
       for (const r of this.rows[side]) {
         const last = r.acts.filter((t) => t <= this.t).pop() ?? 0;
         const frac = Math.max(0, Math.min(1, (this.t - last) / r.cd));
         r.fill.style.width = `${(frac * 100).toFixed(1)}%`;
         r.el.classList.toggle('ready', frac >= 1);
+        // Fired within the shake window, and it has cells on a board.
+        const since = this.t - last;
+        if (last > 0 && since >= 0 && since < SHAKE_MS && r.cells?.length) {
+          shaking.push({ cells: r.cells, at: since / SHAKE_MS });
+        }
       }
+      const board = this.boards[side];
+      if (board) board.shaking = shaking;
     }
   }
 }

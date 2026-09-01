@@ -14,6 +14,9 @@
 // brightness.** Any two of those three channels can be lost and the board still
 // says which grid a piece belongs to and which part of a recipe it is.
 
+const BAG_THUMB = 34;   // a bag thumbnail's box
+const BAG_COL = 190;    // one bag entry's width
+const BAG_ROW = 42;     // and its height
 const CELL = 34;
 const GAP = 2;
 const PAD = 8;
@@ -71,6 +74,7 @@ export class Board {
     canvas.addEventListener('mouseleave', () => {
       this.hover = null;
       if (this.pointed) { this.pointed = null; this.onpoint(null); }
+      if (this.pointedPiece) { this.pointedPiece = null; this.onpiece?.(null); }
       this.draw();
     });
     canvas.addEventListener('mousedown', (e) => this.press(e));
@@ -105,7 +109,7 @@ export class Board {
     if (this.c.width !== w) this.c.width = w;
     this.layout();
     // The bag is the last thing on the board, so its final row sets the height.
-    const COL = 168, ROW = CELL + 8;
+    const COL = BAG_COL, ROW = BAG_ROW;
     const perRow = Math.max(1, Math.floor((w - PAD * 2) / COL));
     const rows = Math.ceil(this.state.bag.length / perRow);
     const h = Math.round(this.bagY + rows * ROW + PAD);
@@ -157,7 +161,7 @@ export class Board {
 
   bagAt(px, py) {
     if (py < this.bagY) return null;
-    const COL = 168, ROW = CELL + 8;
+    const COL = BAG_COL, ROW = BAG_ROW;
     const perRow = Math.max(1, Math.floor((this.c.width - PAD * 2) / COL));
     const i = Math.floor((py - this.bagY) / ROW) * perRow + Math.floor((px - PAD) / COL);
     return this.state.bag[i] ?? null;
@@ -207,22 +211,36 @@ export class Board {
   /// by its piece list, which is what identifies one.
   point(cell, px, py) {
     let key = null;
+    // **Two answers, not one.** The card in the panel is about the *item*,
+    // because pointing at a blade is asking about the weapon it is part of.
+    // The hover card is about the *component* under the cursor, because that
+    // is the thing you are about to pick up. Both are true at once and neither
+    // replaces the other, so both are reported.
+    let piece = null;
     if (!this.held && cell) {
       const p = this.pieceAt(cell.slot, cell.x, cell.y);
       if (p) {
+        piece = p;
         const slot = this.state.slots.find((s) => s.slot === cell.slot);
         const item = slot.items.find((i) => i.pieces.includes(p.id));
         if (item) key = item.pieces.join(',');
       }
     }
     // The bag, too — a loose component has no item, so it names itself.
-    if (!key && !this.held && py >= this.bagY) {
+    if (!this.held && py >= this.bagY) {
       const loose = this.bagAt(px, py);
-      if (loose) key = `bag:${loose.id}`;
+      if (loose) {
+        piece = loose;
+        key = key ?? `bag:${loose.id}`;
+      }
     }
     if (key !== this.pointed) {
       this.pointed = key;
       this.onpoint(key);
+    }
+    if ((piece?.id ?? null) !== (this.pointedPiece?.id ?? null)) {
+      this.pointedPiece = piece;
+      this.onpiece?.(piece, this.c.getBoundingClientRect(), px, py);
     }
   }
 
@@ -325,7 +343,9 @@ export class Board {
   /// Used for a component's own edge, for an item's outline, and for a lock —
   /// all three want "where does this shape end", and none of them wants a line
   /// through the middle of it.
-  edge(g, cells, origin, colour, width, inset = 0, dash = null) {
+  /// `cell` defaults to the board's, and is passed in only by the bag's
+  /// thumbnails, which draw the same shapes smaller.
+  edge(g, cells, origin, colour, width, inset = 0, dash = null, cell = CELL) {
     const own = new Set(cells.map(([x, y]) => `${x},${y}`));
     g.save();
     g.strokeStyle = colour;
@@ -334,7 +354,7 @@ export class Board {
     g.beginPath();
     for (const [x, y] of cells) {
       const [px, py] = origin(x, y);
-      const a = px - inset, b = py - inset, w = CELL + inset * 2;
+      const a = px - inset, b = py - inset, w = cell + inset * 2;
       if (!own.has(`${x},${y - 1}`)) { g.moveTo(a, b); g.lineTo(a + w, b); }
       if (!own.has(`${x},${y + 1}`)) { g.moveTo(a, b + w); g.lineTo(a + w, b + w); }
       if (!own.has(`${x - 1},${y}`)) { g.moveTo(a, b); g.lineTo(a, b + w); }
@@ -520,11 +540,35 @@ export class Board {
     g.restore();
   }
 
+  /// One component at its own shape, in a box `box` pixels a side.
+  ///
+  /// The same three channels as a cell on a grid — fill, mark, traced edge —
+  /// because it is the same component; only the scale changes.
+  thumb(g, ox, oy, p, box) {
+    const cells = p.cells ?? [[0, 0]];
+    const xs = cells.map(([x]) => x), ys = cells.map(([, y]) => y);
+    const x0 = Math.min(...xs), y0 = Math.min(...ys);
+    const w = Math.max(...xs) - x0 + 1, h = Math.max(...ys) - y0 + 1;
+    const cell = Math.max(3, Math.min(11, Math.floor(box / Math.max(w, h))));
+    // Centred in its box, so a row of thumbnails has a common baseline rather
+    // than every shape starting at a different height.
+    const ax = ox + (box - w * cell) / 2, ay = oy + (box - h * cell) / 2;
+    for (const [cx, cy] of cells) {
+      const px = ax + (cx - x0) * cell, py = ay + (cy - y0) * cell;
+      g.fillStyle = p.fill;
+      g.fillRect(px, py, cell, cell);
+      paintMotif(g, px, py, cell, p.motif, p.ink, p.ink_alpha);
+    }
+    this.edge(g, cells.map(([cx, cy]) => [cx - x0, cy - y0]),
+              (cx, cy) => [ax + cx * cell, ay + cy * cell],
+              this.look.piece_edge, Math.max(1, cell * 0.11), 0, null, cell);
+  }
+
   drawBag(g, C) {
     const L = this.look;
     g.fillStyle = C.ink3;
     g.fillText(`THE BAG — ${this.state.bag.length} loose`, PAD, this.bagY - 10);
-    const COL = 168, ROW = CELL + 8;
+    const COL = BAG_COL, ROW = BAG_ROW;
     const perRow = Math.max(1, Math.floor((this.c.width - PAD * 2) / COL));
     this.state.bag.forEach((p, i) => {
       const x = PAD + (i % perRow) * COL;
@@ -535,16 +579,19 @@ export class Board {
         g.fillStyle = 'rgba(240,200,90,.16)';
         g.fillRect(x - 3, y - 3, COL - 8, CELL + 6);
       }
-      // A swatch showing what it is: grey and a diamond while it is ambiguous,
-      // its grid's colour and mark when it only ever goes one place.
-      this.cellFill(g, x, y, p);
-      this.edge(g, [[0, 0]], () => [x, y], L.piece_edge, 1.5);
+      // **Its actual shape, not a swatch.** A one-cell ring and a twelve-cell
+      // base drew the same square before this, which hid the only thing about
+      // a loose component that decides where it can go.
+      this.thumb(g, x, y, p, BAG_THUMB);
       g.fillStyle = on ? '#f0c85a' : C.ink;
-      const room = COL - CELL - 20;
+      const tx = x + BAG_THUMB + 8;
+      const room = COL - BAG_THUMB - 22;
       let label = p.name;
       while (g.measureText(label).width > room && label.length > 2) label = label.slice(0, -1);
       if (label !== p.name) label = `${label.slice(0, -1)}…`;
-      g.fillText(label, x + CELL + 7, y + CELL * 0.5 + 4);
+      g.fillText(label, tx, y + 12);
+      g.fillStyle = C.ink3;
+      g.fillText(p.kind ?? '', tx, y + 26);
     });
   }
 }

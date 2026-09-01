@@ -438,6 +438,39 @@ fn slot_name(s: gm2d_core::piece::SlotKind) -> String {
     format!("{s:?}").to_lowercase()
 }
 
+/// What one component is, for a hover.
+///
+/// Name, kind, where it goes, the shape it takes up, and what it does — the
+/// last of which is `explain::piece_lines`, so the sentence is the engine's
+/// and every screen that shows a component shows the same one.
+fn piece_payload(
+    def: &'static gm2d_core::piece::PieceDef,
+    theme: &'static gm2d_core::theme::Theme,
+    // Absolute board cells from one caller, a shape's own relative cells from
+    // another. Both are pairs of numbers by the time they reach the page, and
+    // neither caller should have to convert to suit the other.
+    cells: serde_json::Value,
+    over: Option<gm2d_core::piece::SlotKind>,
+) -> serde_json::Value {
+    let look = gm2d_core::look::look(def, over);
+    let (ink, ink_a) = gm2d_core::look::motif_ink(look.fill);
+    serde_json::json!({
+        "name": theme.piece(def.name),
+        "canonical": def.name,
+        "kind": def.kind.name(),
+        "slots": def.slots().iter().map(|&s| slot_name(s)).collect::<Vec<_>>(),
+        "cells": cells,
+        "fill": gm2d_core::look::hex(look.fill),
+        "motif": look.motif.name(),
+        "ink": gm2d_core::look::hex(ink),
+        "ink_alpha": ink_a,
+        "lines": gm2d_core::explain::piece_lines(def)
+            .into_iter()
+            .map(|(where_, text)| serde_json::json!({ "where": where_, "text": text }))
+            .collect::<Vec<_>>(),
+    })
+}
+
 /// One item's card, in the shape upstream's tooltip used.
 ///
 /// Lifted out of `board_json` the moment the fight screen needed the same
@@ -634,19 +667,16 @@ pub fn board_json() -> String {
                         // with its own, untested, accessibility story.
                         let look = gm2d_core::look::look(def, Some(k));
                         let (ink, ink_a) = gm2d_core::look::motif_ink(look.fill);
-                        Some(serde_json::json!({
-                            "id": p.0, "x": x, "y": y,
-                            "name": theme.piece(def.name),
-                            "cells": slot.cells_of(p),
-                            "locked": ch.is_locked_item(p),
-                            "fill": gm2d_core::look::hex(look.fill),
-                            "motif": look.motif.name(),
-                            "ink": gm2d_core::look::hex(ink),
-                            "ink_alpha": ink_a,
-                            "kind": format!("{:?}", def.kind),
-                            "effect": def.effect.is_some(),
-                            "trigger": !def.triggers.is_empty(),
-                        }))
+                        let mut v = piece_payload(def, theme, serde_json::json!(slot.cells_of(p)), Some(k));
+                        let o = v.as_object_mut().expect("an object");
+                        o.insert("id".into(), p.0.into());
+                        o.insert("x".into(), x.into());
+                        o.insert("y".into(), y.into());
+                        o.insert("locked".into(), ch.is_locked_item(p).into());
+                        o.insert("effect".into(), def.effect.is_some().into());
+                        o.insert("trigger".into(), (!def.triggers.is_empty()).into());
+                        let _ = (look, ink, ink_a);
+                        Some(v)
                     })
                     .collect();
                 let items: Vec<_> = report
@@ -674,21 +704,15 @@ pub fn board_json() -> String {
                 // one. Role brightness still reads.
                 let look = gm2d_core::look::look(d, None);
                 let (ink, ink_a) = gm2d_core::look::motif_ink(look.fill);
-                serde_json::json!({
-                    "id": p.0,
-                    "name": theme.piece(d.name),
-                    "slot": slot_name(d.slot),
-                    "slots": d.slots().iter().map(|&s| slot_name(s)).collect::<Vec<_>>(),
-                    "kind": format!("{:?}", d.kind),
-                    "cells": ch.registry.shape(p).cells(),
-                    "rotation": ch.registry.rotation(p),
-                    "price": d.price,
-                    "fill": gm2d_core::look::hex(look.fill),
-                    "motif": look.motif.name(),
-                    "ink": gm2d_core::look::hex(ink),
-                    "ink_alpha": ink_a,
-                    "shared": d.shared(),
-                })
+                let mut v = piece_payload(d, theme, serde_json::json!(ch.registry.shape(p).cells()), None);
+                let o = v.as_object_mut().expect("an object");
+                o.insert("id".into(), p.0.into());
+                o.insert("slot".into(), slot_name(d.slot).into());
+                o.insert("rotation".into(), ch.registry.rotation(p).into());
+                o.insert("price".into(), d.price.into());
+                o.insert("shared".into(), d.shared().into());
+                let _ = (look, ink, ink_a);
+                v
             })
             .collect();
 
@@ -799,45 +823,7 @@ pub fn encounter_json() -> String {
         // Its five grids, in the same shape `board_json` reports the player's.
         // A creature packs a board like anybody else, and until now the only
         // thing the page could see of it was a list of names.
-        let slots: Vec<_> = gm2d_core::piece::SlotKind::ALL
-            .iter()
-            .map(|&k| {
-                let slot = lo.slot(k);
-                let placed: Vec<_> = slot
-                    .pieces()
-                    .into_iter()
-                    .filter_map(|p| {
-                        let (x, y) = slot.anchor_of(p)?;
-                        let def = reg.def(p);
-                        let look = gm2d_core::look::look(def, Some(k));
-                        let (ink, ink_a) = gm2d_core::look::motif_ink(look.fill);
-                        Some(serde_json::json!({
-                            "id": p.0, "x": x, "y": y,
-                            "name": theme.piece(def.name),
-                            "cells": slot.cells_of(p),
-                            "fill": gm2d_core::look::hex(look.fill),
-                            "motif": look.motif.name(),
-                            "ink": gm2d_core::look::hex(ink),
-                            "ink_alpha": ink_a,
-                            "kind": format!("{:?}", def.kind),
-                        }))
-                    })
-                    .collect();
-                let items: Vec<_> = lo
-                    .report(&reg, k)
-                    .items
-                    .iter()
-                    .map(|i| item_card(i, slot, &profiles, stats))
-                    .collect();
-                serde_json::json!({
-                    "slot": slot_name(k),
-                    "rows": slot.rows(),
-                    "cols": gm2d_core::slot::SLOT_W,
-                    "placed": placed,
-                    "items": items,
-                })
-            })
-            .collect();
+        let slots = side_slots(&reg, &lo, &profiles, stats, theme);
 
         serde_json::json!({
             "name": g.theme_name(spec.name),
@@ -865,6 +851,54 @@ pub fn encounter_json() -> String {
         })
         .to_string()
     })
+}
+
+/// One side's five grids, in the shape the read-only board painter takes.
+///
+/// The creature's panel wanted this first; the replay wants it for both sides,
+/// because a fight is two boards and showing one of them is showing half. One
+/// builder, so the three cannot disagree about what a cell looks like.
+fn side_slots(
+    reg: &gm2d_core::piece::PieceRegistry,
+    lo: &gm2d_core::loadout::Loadout,
+    profiles: &[gm2d_core::loadout::ItemProfile],
+    stats: gm2d_core::stats::Stats,
+    theme: &'static gm2d_core::theme::Theme,
+) -> Vec<serde_json::Value> {
+    gm2d_core::piece::SlotKind::ALL
+        .iter()
+        .map(|&k| {
+            let slot = lo.slot(k);
+            let placed: Vec<_> = slot
+                .pieces()
+                .into_iter()
+                .filter_map(|p| {
+                    let (x, y) = slot.anchor_of(p)?;
+                    let def = reg.def(p);
+                    let mut v =
+                        piece_payload(def, theme, serde_json::json!(slot.cells_of(p)), Some(k));
+                    let o = v.as_object_mut().expect("an object");
+                    o.insert("id".into(), p.0.into());
+                    o.insert("x".into(), x.into());
+                    o.insert("y".into(), y.into());
+                    Some(v)
+                })
+                .collect();
+            let items: Vec<_> = lo
+                .report(reg, k)
+                .items
+                .iter()
+                .map(|i| item_card(i, slot, profiles, stats))
+                .collect();
+            serde_json::json!({
+                "slot": slot_name(k),
+                "rows": slot.rows(),
+                "cols": gm2d_core::slot::SLOT_W,
+                "placed": placed,
+                "items": items,
+            })
+        })
+        .collect()
 }
 
 /// Every item on one side, in the order combat indexed them.
@@ -913,6 +947,10 @@ fn side_items(
             "hit_for": p.hit_for(stats.strength),
             "slot": slot_name(p.slot),
             "card": cards.iter().find(|(ps, _)| *ps == p.pieces).map(|(_, c)| c.clone()),
+            // Where it sits, so the board can shake it on the tick it fires.
+            "cells": p.pieces.iter()
+                .flat_map(|&id| lo.slot(p.slot).cells_of(id))
+                .collect::<Vec<_>>(),
         })
     }));
     out
@@ -938,16 +976,22 @@ pub fn fight_json() -> String {
             return serde_json::json!({ "error": "there is nothing to fight" }).to_string();
         };
 
+        let theme = gm2d_core::theme::by_id(&g.theme);
+        let mprofiles = g.character.combat_items();
+        let mstats = g.character.player_stats();
         let mine = side_items(
             &g.character.registry,
             &g.character.loadout,
-            &g.character.combat_items(),
-            g.character.player_stats(),
+            &mprofiles,
+            mstats,
             &[],
         );
+        let my_board =
+            side_slots(&g.character.registry, &g.character.loadout, &mprofiles, mstats, theme);
         let (ereg, elo) = spec.loadout_at(DIFFICULTY);
         let (estats, eprofiles) = spec.outfit_at(DIFFICULTY);
         let theirs = side_items(&ereg, &elo, &eprofiles, estats, spec.attacks);
+        let their_board = side_slots(&ereg, &elo, &eprofiles, estats, theme);
 
         // **A running snapshot of both sides, read and never derived.**
         //
@@ -1063,11 +1107,15 @@ pub fn fight_json() -> String {
             "outcome": format!("{:?}", log.outcome).to_lowercase(),
             "duration_ms": log.duration_ms,
             "pools": ["the Funny", "fury", "devotion", "harvest"],
-            "player": { "name": "you", "max_health": log.player.max_health, "items": mine },
+            "player": {
+                "name": "you", "max_health": log.player.max_health,
+                "items": mine, "slots": my_board,
+            },
             "enemy": log.enemies.first().map(|c| serde_json::json!({
                 "name": g.theme_name(gm2d_core::combat::creature(&c.name).map(|s| s.name).unwrap_or("")),
                 "max_health": c.max_health,
                 "items": theirs,
+                "slots": their_board,
             })),
             // Kept under its old name so nothing that read the player's list
             // has to change; `player.items` is the same array.
@@ -1142,21 +1190,21 @@ pub fn shop_json() -> String {
         let shelf: Vec<_> = gm2d_core::shop::shelf(&shops, &town, &g.world.bought)
             .into_iter()
             .map(|o| {
-                serde_json::json!({
-                    "slot": o.index,
-                    "name": theme.piece(o.def.name),
-                    "canonical": o.def.name,
-                    "for": slot_name(o.def.slot),
-                    "kind": format!("{:?}", o.def.kind),
+                let mut v = piece_payload(o.def, theme, serde_json::json!(o.def.cells), None);
+                let m = v.as_object_mut().expect("an object");
+                m.insert("slot".into(), o.index.into());
+                m.insert("for".into(), slot_name(o.def.slot).into());
+                let _unused = serde_json::json!({
                     // §C.3, and the reason it is now trivially true: there is
                     // one price and this is it. Nothing discounts, nothing
                     // marks up, and the screen cannot show a figure other than
                     // the one `buy` charges because they read the same field.
-                    "price": o.price,
-                    "rating": gm2d_core::rating::piece_rating(o.def),
-                    "afford": !o.sold && g.character.gold >= o.price,
-                    "sold": o.sold,
-                })
+                });
+                m.insert("price".into(), o.price.into());
+                m.insert("rating".into(), gm2d_core::rating::piece_rating(o.def).into());
+                m.insert("afford".into(), (!o.sold && g.character.gold >= o.price).into());
+                m.insert("sold".into(), o.sold.into());
+                v
             })
             .collect();
         serde_json::json!({ "gold": g.character.gold, "town": town, "shelf": shelf }).to_string()

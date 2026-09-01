@@ -528,6 +528,53 @@ called quest; this is the only one a town hands out.
   creature's panel and both sides of the replay. Four places, one answer to "is
   cork a standing stat".
 
+## A component is a shape
+
+Everywhere a component appears it now shows the shape it takes up and the kind
+of thing it is, and explains itself on hover.
+
+- **Two blades at one price are not the same purchase** when one is four cells
+  in a line and the other is a cross. The shelf gave a name, a slot and a
+  price, which is everything about a component except the thing you are buying.
+- The bag under the board drew a **one-cell swatch for everything**, so a ring
+  and a twelve-cell base looked identical — hiding the only property of a loose
+  component that decides where it can go.
+- `explain::piece_lines` is what a hover reads. It uses `Action::describe` and
+  `Trigger::describe`, **which already existed in `piece.rs`** — the first
+  draft of `explain.rs` wrote both again, which is the "engine owns the
+  sentence" principle failed from the other direction. Check before writing a
+  describer.
+- `every_component_says_something_about_itself` covers the catalogue. It skips
+  quest tokens (a tally does nothing on purpose) and the six `EVENT_ONLY`
+  relics — **whose value lived in `relic.rs`, deleted with the campaign.** They
+  are on no shelf and no surviving event grants one, so they are unreachable
+  content rather than a lint to satisfy with invented stats.
+- **Two answers on one hover, and neither replaces the other.** The panel card
+  is about the *item*, because pointing at a blade is asking about the weapon;
+  the hover card is about the *component*, because that is what you are about
+  to pick up. `board.onpoint` and `board.onpiece` are both reported.
+- `shape.js` and `Board.thumb` both draw through `paintMotif`. The mark is the
+  shape half of the colourblind triple-encoding, so everything that draws a
+  cell draws the same one — at 34px on the board, 11px in the bag, 14px on a
+  shelf.
+
+## Both boards, and the jolt
+
+- **A fight is two boards.** The replay drew neither; it now draws both,
+  read-only, through the same `Theirs` painter the creature panel uses.
+  `side_slots` in the wasm shim builds them for the panel and for both sides of
+  the replay — one builder, so three screens cannot disagree about a cell.
+- **What fires jolts.** A decaying wobble, 260ms, driven off the same
+  activation times the cooldown bars are: six items on two boards all coming
+  round at their own rates is unreadable, and movement says *that one, now*
+  where a colour change would be five things happening at once.
+- The shake is set from outside — `Theirs.shaking` is a list the replay writes
+  and the painter reads. The painter decides nothing about when.
+- **An innate attack has no cells.** A creature's bite stands on no gear, so
+  nothing on a board moves for it; the browser check skips a fight where only
+  the bite went off rather than failing one. Which activations are shakeable is
+  a property of the fight.
+
 ## Tone, as a lint
 
 `tests/tone.rs` holds the eight rules from `TONE.md` a machine can check. Not
@@ -584,6 +631,7 @@ and M5's trees may spend them again.
 | Board rebuilt against the original | 411 passing |
 | The other side's gear, and a tree that says what it does | 419 passing |
 | Shops, errands and a replay of both sides | 425 passing |
+| Components that show their shape and explain themselves | 427 passing |
 | Catalogue | 528 components |
 | Ladder | 50 creatures |
 | `crates/core` | ~33k lines, down from ~50k |

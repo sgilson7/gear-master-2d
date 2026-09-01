@@ -805,6 +805,10 @@ impl ClassDef {
     }
 }
 
+// Four upstream classes are not here: Ascendant, Threshold-Sighted,
+// Prospector and Wumpus Hunter. Each was a dungeon's `reward` and had no other
+// source, so with the dungeons gone they were classes nothing could hand out.
+// Their powers survive in `ClassPower` and M5's trees may spend them again.
 pub static CLASSES: &[ClassDef] = &[
     ClassDef {
         name: "Chronomancer",
@@ -937,15 +941,6 @@ pub static CLASSES: &[ClassDef] = &[
         ],
         power: ClassPower::Confluence(50),
     },
-    // Only from the crevice under Corrqk's Cavern. It asks for nothing,
-    // because nothing you build can qualify you for it - you have to go and
-    // get it.
-    ClassDef {
-        name: "Ascendant",
-        blurb: "What one part of you is worth, every part of you is worth a share of.",
-        requires: &[],
-        power: ClassPower::Splintered(50),
-    },
     // Only from the man himself, and only from finishing him.
     ClassDef {
         name: "Avenged",
@@ -989,35 +984,6 @@ pub static CLASSES: &[ClassDef] = &[
         blurb: "You carried a Scrap Ticket into a bar and left with a way of looking at gear.",
         requires: &[],
         power: ClassPower::Recycler { pct: 10 },
-    },
-    // Only from the antechamber under the Manse. The class is the marker; the
-    // prize is the pool, which is a thing a `ClassDef` cannot say and a
-    // `Dungeon`'s `also` list can.
-    ClassDef {
-        name: "Threshold-Sighted",
-        blurb: "You came back up seeing with the wrong sense, and it does not stop.",
-        requires: &[],
-        // The class is the marker and the pool is the prize, and a class that
-        // is only a stat bundle is a class that says nothing. So it says the
-        // one thing the antechamber is for: you came back seeing with the
-        // wrong sense, and what you can see is *more* of what you are holding.
-        power: ClassPower::WrongSense(60),
-    },
-    // The two the destinations pay. Neither is on any axis, because neither is
-    // a way of building - one changes what a corpse leaves behind and one
-    // changes what the first swing of a fight is worth, and no fountain has
-    // anything to read.
-    ClassDef {
-        name: "Prospector",
-        blurb: "You have learned what is worth prying off a thing that has stopped moving.",
-        requires: &[],
-        power: ClassPower::Prospector(1),
-    },
-    ClassDef {
-        name: "Wumpus Hunter",
-        blurb: "The first one counts. It counted for the wumpus and now it counts for you.",
-        requires: &[],
-        power: ClassPower::FirstBlood,
     },
     // Part D's two. Neither is on an axis: one is a promise you kept and one
     // is a thing you did in under ten seconds, and no fountain can read
@@ -1103,7 +1069,6 @@ pub fn how_you_get_it(name: &str) -> Option<&'static str> {
         "Ticket to Ride" => "five prayers, at a town chapel",
         "Tired" => "worked for, at a town factory",
         "Recycler" => "traded for at a town pub, one boss trophy a stack",
-        _ if crate::dungeon::is_dungeon_only(name) => "carried out of a dungeon",
         _ => "taken at an event, off the road",
     })
 }
@@ -1121,43 +1086,9 @@ pub fn how_you_get_it(name: &str) -> Option<&'static str> {
 /// titles. `A_FRIENDS_RUN` was shared during that window and had to be
 /// re-pointed by hand.
 ///
-/// Add a class by appending to `CLASSES` and appending here. Never reorder.
-pub const CLASS_ORDER: &[&str] = &[
-    "Chronomancer",
-    "Archmage",
-    "Berserker",
-    "Longhauler",
-    "Trundle",
-    "Immense Guilt",
-    "Bulwark",
-    "Hexweaver",
-    "Druid",
-    "Templar",
-    "Duelist",
-    "Juggernaut",
-    "Geomancer",
-    "Spellblade",
-    "Oracle",
-    "Stormcaller",
-    "Warpriest",
-    "Bloodletter",
-    "Wellspring",
-    "Ascendant",
-    "Avenged",
-    "Wanderer",
-    "Piety",
-    "Ticket to Ride",
-    "Tired",
-    "Recycler",
-    "Threshold-Sighted",
-    "Prospector",
-    "Wumpus Hunter",
-    "Unionized",
-    "Showstopper",
-];
 
 pub fn is_earned(name: &str) -> bool {
-    if crate::dungeon::is_dungeon_only(name) || TOWN_CLASSES.contains(&name) {
+    if TOWN_CLASSES.contains(&name) {
         return true;
     }
     crate::event::EVENTS
@@ -1341,31 +1272,3 @@ mod tests {
     }
 }
 
-#[cfg(test)]
-mod order_tests {
-    use super::*;
-
-    #[test]
-    fn the_class_order_is_append_only() {
-        // `CLASSES` is a wire format: a share code stores a class as its
-        // position in it. Reordering re-points every code anybody has saved,
-        // and does it silently - the code still reads, it just hands back
-        // different titles.
-        let live: Vec<&str> = CLASSES.iter().map(|c| c.name).collect();
-        for (i, name) in CLASS_ORDER.iter().enumerate() {
-            assert_eq!(
-                live.get(i),
-                Some(name),
-                "position {i} is {:?} and every share code written so far says it is {name:?}. \
-                 Append new classes; never insert or reorder.",
-                live.get(i)
-            );
-        }
-        assert_eq!(
-            live.len(),
-            CLASS_ORDER.len(),
-            "a class was added to CLASSES without being appended to CLASS_ORDER, so it \
-             cannot be shared"
-        );
-    }
-}

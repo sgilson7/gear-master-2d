@@ -1367,7 +1367,7 @@ struct Instance {
 
 /// Single source of truth for every component in play: which definition it
 /// is, and how it is currently rotated.
-#[derive(Clone, Default)]
+#[derive(Clone, Debug, Default)]
 pub struct PieceRegistry {
     instances: Vec<Instance>,
 }
@@ -11620,20 +11620,20 @@ mod tests {
     /// the same orb back as four separate items.
     #[test]
     fn a_hollow_piece_placed_alone_is_still_one_item() {
-        use crate::run::Run;
+        use crate::character::Character;
         let holey: Vec<&str> = CATALOG
             .iter()
             .filter(|d| !one_blob(d.cells))
             .map(|d| d.name)
             .collect();
         for name in holey {
-            let mut run = Run::new();
+            let mut ch = Character::new();
             let idx = CATALOG.iter().position(|d| d.name == name).unwrap();
-            let id = run.registry.alloc(idx);
-            run.owned.push(id);
+            let id = ch.registry.alloc(idx);
+            ch.owned.push(id);
             let slot = CATALOG[idx].slot;
-            run.equip(id, slot, 1, 1).expect("placed");
-            let items = run.loadout.slot(slot).items(&run.registry);
+            ch.equip(id, slot, 1, 1).expect("placed");
+            let items = ch.loadout.slot(slot).items(&ch.registry);
             assert_eq!(items.len(), 1, "{} placed alone came back as {} items", name, items.len());
         }
     }

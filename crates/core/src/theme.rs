@@ -371,17 +371,13 @@ pub static TURTLE_DICK: Theme = Theme {
         // The bottom rung of the theme's speed ladder, from the 45th Annual
         // Thrumbus Race - which is exactly what this is.
         ("Trundle", "Slow Trundler"),
-        ("Ascendant", "Boyetano, Ascended"),
         // The antechamber under Eggbert's Mansion. You come back up seeing
         // with the wrong sense - residents of the Mansus are seen with the
         // ears and heard with the eyes, pp. 64-67.
-        ("Threshold-Sighted", "Mansus-Sighted"),
         // The vein under the seam the Sprocketmen were told was empty, p. 44.
-        ("Prospector", "Deep Chocolatier"),
         // CSV #12 gives the place its name and keeps it; the sibling title
         // *How to Train Your Wumpus* gives the class one of its own, which is
         // a better joke and stops a canonical name mapping to itself.
-        ("Wumpus Hunter", "Wumpus Trainer"),
         // The gortball players' union, which shuts a stadium over sand, p. 29.
         ("Unionized", "Gortball Organized"),
         // What Hanglo Chiemstar was called for eleven seasons, p. 31.
@@ -2095,22 +2091,11 @@ mod tests {
         for n in KEPT {
             assert_eq!(TURTLE_DICK.monster(n), *n, "{n} grew a themed name; add it above");
         }
-        // The yard's own four floors that are places rather than things are
-        // exactly the ones kept, which is what makes the split a rule.
-        let d = crate::dungeon::by_id("the-switchyard").expect("M6");
-        for f in d.floors {
-            assert!(
-                RENAMED.contains(&f.creature) || KEPT.contains(&f.creature),
-                "{} is a floor nothing here knows about",
-                f.creature
-            );
-        }
-        // And the four doors and the dungeon are retitled.
+        // And the four doors are retitled.
         for id in ["the-timetable", "the-signal-box", "the-turntable", "the-last-train"] {
             let e = crate::event::EVENTS.iter().find(|e| e.id == id).expect("a door");
             assert_ne!(TURTLE_DICK.place(id, e.title), e.title, "{id} is untitled");
         }
-        assert_ne!(TURTLE_DICK.place(d.id, d.name), d.name, "the yard is untitled");
     }
 
     /// Two creatures sharing a themed name would be two rungs the player

@@ -222,6 +222,17 @@ fn per_second_milli(stat: i32, cooldown_ms: u32) -> i64 {
     stat as i64 * 1_000_000 / cooldown_ms as i64
 }
 
+/// Which damage lane a figure is being read in.
+///
+/// Lived in `county.rs` upstream, where a ford named the lane it wanted. GM2D
+/// has no fords; the distinction is still the one every damage figure is split
+/// along, so it lives next to the figures instead of next to the geography.
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+pub enum Lane {
+    Physical,
+    Magic,
+}
+
 impl Figures {
     /// Read a board's six figures off its assembled items.
     pub fn of(items: &[ItemProfile]) -> Figures {
@@ -240,10 +251,10 @@ impl Figures {
     }
 
     /// The damage figure a ford in one lane asks for.
-    pub fn dps(&self, lane: crate::county::Lane) -> i64 {
+    pub fn dps(&self, lane: Lane) -> i64 {
         match lane {
-            crate::county::Lane::Physical => self.physical_dps,
-            crate::county::Lane::Magic => self.magic_dps,
+            Lane::Physical => self.physical_dps,
+            Lane::Magic => self.magic_dps,
         }
     }
 }

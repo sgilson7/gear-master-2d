@@ -89,6 +89,48 @@ def walk_until_a_fight(page, limit=200):
     return False
 
 
+def check_turning_in_hand(page, name, fails):
+    """A component turned in hand actually turns.
+
+    Reported from a real session: picking a piece up and right-clicking left it
+    the shape it was. Core rotated it correctly every time — the board had
+    copied the shape at pick-up and never read it again, so the cursor and the
+    footprint kept drawing the old one.
+
+    Checked against core rather than against a previous frame, because "it
+    changed" is not the claim; "it is what core says it is" is.
+    """
+    got = page.evaluate("""() => {
+      const b = window.__board;
+      if (!b || !b.state) return null;
+      // Take something off the board so there is a multi-cell piece loose.
+      for (const s of b.state.slots) {
+        const p = s.placed.find(p => p.cells.length > 1);
+        if (p) { b.api.pickUp(p.id); b.refresh(); break; }
+      }
+      const loose = b.state.bag.find(p => p.cells.length > 1);
+      if (!loose) return { skipped: true };
+      b.held = { id: loose.id, from: null, name: loose.name, slot: loose.slot };
+      const before = JSON.stringify(b.heldCells());
+      b.rotateHeld();
+      const after = JSON.stringify(b.heldCells());
+      const core = JSON.stringify(
+        b.state.bag.find(p => p.id === loose.id)?.cells ?? null);
+      b.held = null; b.legal = null; b.refresh();
+      return { before, after, core, name: loose.name };
+    }""")
+    if got is None:
+        fails.append(f"{name}: could not reach the board to turn anything")
+        return
+    if got.get("skipped"):
+        return
+    if got["after"] != got["core"]:
+        fails.append(f"{name}: turning {got['name']} in hand left the board drawing "
+                     f"{got['after']} while core says {got['core']}")
+    elif got["after"] == got["before"]:
+        fails.append(f"{name}: turning {got['name']} changed nothing ({got['before']})")
+
+
 def check_fit_preview(page, name, fails):
     """The fit preview comes from core, not from the page.
 
@@ -257,6 +299,7 @@ def walk_the_gate(browser, name):
         if made in (None, "", "0", "—"):
             fails.append(f"{name}: auto-packing the starting kit assembled {made}")
         check_fit_preview(page, name, fails)
+        check_turning_in_hand(page, name, fails)
         page.click("#run")
         page.wait_for_selector("#fight", state="hidden", timeout=8000)
 
@@ -512,6 +555,7 @@ def main():
     print("ok: a level-up named the frame it grew, and the point could be spent")
     print("ok: level five forked the character, and the fork does not come off")
     print("ok: the fit preview is core's answer, not the page's")
+    print("ok: a component turned in hand turns on the board too")
     print("ok: a mid-fight save reopens the same fight")
     print("ok: walk, download, reload, upload — position and stream both came back")
     print("ok: a wrong file was refused with a sentence and changed nothing")

@@ -14,7 +14,7 @@
 // brightness.** Any two of those three channels can be lost and the board still
 // says which grid a piece belongs to and which part of a recipe it is.
 
-const CELL = 26;
+const CELL = 34;
 const GAP = 2;
 const PAD = 8;
 
@@ -29,6 +29,7 @@ export class Board {
     this.legalSlot = null;
     this.hover = null;
     this.onchange = () => {};
+    this.onhold = () => {};
     this.slotOrder = ['weapon', 'helmet', 'chest', 'gloves', 'greaves'];
 
     canvas.addEventListener('mousemove', (e) => this.move(e));
@@ -39,28 +40,56 @@ export class Board {
     // The assembled outline pulses, so the board has to keep drawing.
     const tick = () => { if (this.state) this.draw(); requestAnimationFrame(tick); };
     requestAnimationFrame(tick);
+
+    // And it has to re-fit when the window changes, or the cells go back to
+    // being scaled by CSS.
+    addEventListener('resize', () => { this.fit(); this.draw(); });
   }
 
   refresh() {
     this.state = JSON.parse(this.api.boardJson());
-    this.layout();
+    this.fit();
     this.draw();
     this.onchange(this.state);
+    this.onhold(this.held?.name ?? null);
+  }
+
+  /// Size the canvas to the room it actually has, then lay out into it.
+  ///
+  /// A fixed intrinsic size is a fixed intrinsic size *scaled by CSS*: the
+  /// canvas was 1240 wide displayed at 800, so every 34px cell arrived as 22
+  /// and there was a third of a screen of dead space underneath. One backing
+  /// pixel per CSS pixel, and a height that is whatever the content came to.
+  fit() {
+    if (!this.state) return;
+    const w = Math.max(560, Math.round(this.c.clientWidth || this.c.width));
+    if (this.c.width !== w) this.c.width = w;
+    this.layout();
+    // The bag is the last thing on the board, so its final row sets the height.
+    const COL = 168, ROW = CELL + 8;
+    const perRow = Math.max(1, Math.floor((w - PAD * 2) / COL));
+    const rows = Math.ceil(this.state.bag.length / perRow);
+    const h = Math.round(this.bagY + rows * ROW + PAD);
+    if (this.c.height !== h) {
+      this.c.height = h;
+      this.layout();
+    }
   }
 
   layout() {
+    if (!this.state) return;
     const gw = 6 * (CELL + GAP) + PAD * 2;
     this.boxes = {};
     let x = PAD, y = 30, rowH = 0;
     for (const name of this.slotOrder) {
       const s = this.state.slots.find((s) => s.slot === name);
       const gh = s.rows * (CELL + GAP) + PAD * 2;
-      if (x + gw > this.c.width - PAD && x > PAD) { x = PAD; y += rowH + 84; rowH = 0; }
+      if (x + gw > this.c.width - PAD && x > PAD) { x = PAD; y += rowH + 40; rowH = 0; }
       this.boxes[name] = { x, y, w: gw, h: gh, rows: s.rows };
       rowH = Math.max(rowH, gh);
       x += gw + PAD;
     }
-    this.bagY = y + rowH + 84;
+    this.bagY = y + rowH + 46;
   }
 
   cellAt(px, py) {
@@ -87,6 +116,23 @@ export class Board {
   pieceAt(slot, x, y) {
     const s = this.state.slots.find((s) => s.slot === slot);
     return s.placed.find((p) => p.cells.some(([cx, cy]) => cx === x && cy === y)) ?? null;
+  }
+
+  /// The component in hand, as core currently describes it.
+  ///
+  /// **Looked up every time rather than cached at pick-up.** A copy taken when
+  /// the piece was lifted goes stale the moment anything changes it, and the
+  /// thing that changes it most is the player turning it: rotating in hand
+  /// moved the shape in core and left the cursor drawing the old one. Picking
+  /// a piece up unequips it, so it is always in the bag while it is in hand.
+  heldPiece() {
+    if (!this.held) return null;
+    return this.state?.bag.find((p) => p.id === this.held.id) ?? null;
+  }
+
+  /// The cells it would occupy, relative to wherever it is dropped.
+  heldCells() {
+    return this.heldPiece()?.cells ?? [[0, 0]];
   }
 
   // --------------------------------------------------------------- input
@@ -139,12 +185,7 @@ export class Board {
       if (e.shiftKey) { this.api.toggleLock(p.id); this.refresh(); return; }
       const why = this.api.pickUp(p.id);
       if (why) { this.say(why); return; }
-      // Shape relative to its own anchor, so the footprint preview and the
-      // cursor draw the piece rather than a single square.
-      const anchor = p.cells.reduce((a, b) => (b[1] < a[1] || (b[1] === a[1] && b[0] < a[0]) ? b : a));
-      const rel = p.cells.map(([x, y]) => [x - p.x, y - p.y]);
-      this.held = { id: p.id, from: cell.slot, name: p.name, slot: cell.slot, cells: rel };
-      void anchor;
+      this.held = { id: p.id, from: cell.slot, name: p.name, slot: cell.slot };
       this.refresh();
       this.askLegal(cell.slot);
       this.draw();
@@ -153,11 +194,9 @@ export class Board {
 
     const loose = this.bagAt(px, py);
     if (loose) {
-      this.held = {
-        id: loose.id, from: null, name: loose.name, slot: loose.slot,
-        look: loose, cells: loose.cells,
-      };
+      this.held = { id: loose.id, from: null, name: loose.name, slot: loose.slot };
       this.askLegal(loose.slot);
+      this.onhold(this.held.name);
       this.draw();
     }
   }
@@ -167,7 +206,10 @@ export class Board {
       ?? (this.hover && this.pieceAt(this.hover.slot, this.hover.x, this.hover.y)?.id);
     if (id === undefined || id === null) return;
     const why = this.api.rotate(id);
-    if (why) this.say(why);
+    if (why) { this.say(why); return; }
+    // Re-read the board, then re-ask where the *turned* shape fits. Both, in
+    // that order: the legal anchors for a piece on its side are a different
+    // set, and asking before the refresh would answer about the old shape.
     this.refresh();
     if (this.held) this.askLegal(this.legalSlot ?? this.held.slot);
     this.draw();
@@ -282,23 +324,6 @@ export class Board {
         }
       }
 
-      // The drag footprint: the cells this drop would actually claim, not
-      // every cell it could go in. Green only when the whole shape lands.
-      if (this.held && this.legalSlot === name && this.hover?.slot === name) {
-        const ok = this.legal.has(`${this.hover.x},${this.hover.y}`);
-        const shape = this.held.cells ?? [[0, 0]];
-        g.save();
-        g.globalAlpha = L.footprint_alpha;
-        g.fillStyle = ok ? L.legal : L.illegal;
-        for (const [dx, dy] of shape) {
-          const cx = this.hover.x + dx, cy = this.hover.y + dy;
-          if (cx < 0 || cy < 0 || cx >= 6 || cy >= s.rows) continue;
-          const [px, py] = origin(cx, cy);
-          g.fillRect(px, py, CELL, CELL);
-        }
-        g.restore();
-      }
-
       // Components. Fill and mark first with no inset, then each one's own
       // outer edge — so a piece reads as one shape and the lines you see
       // inside an item are the seams between its parts.
@@ -340,6 +365,28 @@ export class Board {
         }
       }
 
+      // The drag footprint goes on last, over the pieces.
+      //
+      // It used to be painted onto the empty grid before anything was drawn on
+      // it, so every occupied cell covered it — and the cells you most need an
+      // answer about are the occupied ones, because those are where a drop
+      // fails.
+      if (this.held && this.legalSlot === name && this.hover?.slot === name) {
+        const ok = this.legal.has(`${this.hover.x},${this.hover.y}`);
+        const inside = this.heldCells()
+          .map(([dx, dy]) => [this.hover.x + dx, this.hover.y + dy])
+          .filter(([cx, cy]) => cx >= 0 && cy >= 0 && cx < 6 && cy < s.rows);
+        g.save();
+        g.globalAlpha = L.footprint_alpha;
+        g.fillStyle = ok ? L.legal : L.illegal;
+        for (const [cx, cy] of inside) {
+          const [px, py] = origin(cx, cy);
+          g.fillRect(px, py, CELL, CELL);
+        }
+        g.restore();
+        this.edge(g, inside, origin, ok ? L.legal : L.illegal, 2.5, 1);
+      }
+
       // A lock is solid gold, so "I decided this" reads differently from "this
       // happens to be assembled".
       const locked = s.placed.filter((p) => p.locked);
@@ -356,34 +403,35 @@ export class Board {
         }
       }
 
-      // What the grid made, under it.
-      let ty = b.y + b.h + 14;
-      for (const item of s.items) {
-        if (ty > b.y + b.h + 52) break;
-        g.fillStyle = item.assembled ? C.ink : C.ink3;
-        const label = item.assembled ? `${item.short}  ${item.rating}` : item.status;
-        g.fillText(label.length > 26 ? `${label.slice(0, 25)}…` : label, b.x, ty);
-        ty += 13;
-      }
+      // What the grid made is listed beside the board in HTML, where it can
+      // wrap and be read. Canvas text at 11px under a grid could hold one
+      // item and cut off the second.
     }
 
     this.drawBag(g, C);
 
     // The held component rides the cursor wearing what it would become.
     if (this.held && this.mouse) {
-      const look = this.held.over ?? this.held.look ?? { fill: '#888', motif: 'shared', ink: '#fff', ink_alpha: 0.4 };
+      // Grey and a diamond in the open; the grid's colour and mark once it is
+      // over one that will take it. `over` is core's answer to "what would this
+      // become there", asked in `askLegal`.
+      const look = this.held.over ?? this.heldPiece()
+        ?? { fill: '#888888', motif: 'shared', ink: '#ffffff', ink_alpha: 0.4 };
       const { px, py } = this.mouse;
       g.save();
-      g.globalAlpha = 0.92;
-      const shape = this.held.cells ?? [[0, 0]];
+      // Translucent, so whatever it is hovering over still reads through it.
+      g.globalAlpha = 0.62;
+      const shape = this.heldCells();
+      // Offset down-right of the pointer so the cell being aimed at is never
+      // completely under the thing being aimed with.
+      const ox = px + 13, oy = py + 13;
       for (const [dx, dy] of shape) {
-        this.cellFill(g, px + 10 + dx * CELL, py + 10 + dy * CELL, look);
+        this.cellFill(g, ox + dx * CELL, oy + dy * CELL, look);
       }
-      this.edge(g, shape, (x, y) => [px + 10 + x * CELL, py + 10 + y * CELL],
-                L.piece_edge, 2);
+      this.edge(g, shape, (x, y) => [ox + x * CELL, oy + y * CELL], L.piece_edge, 2);
       g.restore();
-      g.fillStyle = C.ink;
-      g.fillText(`${this.held.name} — right-click to turn`, px + 14, py - 6);
+      // The name goes under the board, not across it. It used to be drawn at
+      // the cursor, which put it over whichever grid you were aiming at.
     }
   }
 

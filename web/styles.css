@@ -126,7 +126,10 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
 .screen { position: fixed; inset: 0; background: var(--ground); z-index: 20;
   overflow-y: auto; padding: 28px 24px 40px; }
 .screen[hidden] { display: none; }
-.screenbox { max-width: 940px; margin: 0 auto; }
+/* The board is the game's main screen and was being squeezed into the same
+   column as a paragraph of prose. The original ran at 1600x980 with 36px
+   cells; this gets as close as the viewport allows. */
+.screenbox { max-width: min(1560px, 97vw); margin: 0 auto; }
 .fighthead { display: flex; flex-wrap: wrap; justify-content: space-between;
   gap: 20px; align-items: flex-start; border-bottom: 2px solid var(--ink);
   padding-bottom: 18px; margin-bottom: 20px; }
@@ -137,8 +140,39 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
   text-transform: uppercase; color: var(--ink-3); }
 .figures dd { margin: 2px 0 0; font-family: var(--mono); font-size: 20px;
   font-variant-numeric: tabular-nums; color: var(--brass); }
-#board, #replay { display: block; width: 100%; height: auto; margin: 14px 0 4px;
+/* The board sizes its own backing store to its box — see Board#fit — so it must
+   not also be scaled by CSS. Width fills the column; height follows content. */
+#board { display: block; width: 100%; background: #101018;
+  border: 1px solid var(--line); margin: 0; }
+#replay { display: block; width: 100%; height: auto; margin: 0;
   background: #101018; border: 1px solid var(--line); }
+
+/* Board on the left, what it made on the right. The item list was 11px canvas
+   text crammed under each grid, where two items overlapped and a third was cut
+   off; it is HTML now, so it can wrap, scroll and be read. */
+.packing { display: grid; grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 20px; align-items: start; margin: 14px 0 6px; }
+.made { background: var(--surface); border: 1px solid var(--line); padding: 16px 18px;
+  max-height: 720px; overflow-y: auto; }
+.made h4 { font-family: var(--mono); font-size: 10.5px; font-weight: 600;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3);
+  margin: 0 0 10px; }
+.made .grid-of { font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--brass); margin: 14px 0 6px; }
+.made .grid-of:first-of-type { margin-top: 0; }
+.made .item { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px;
+  padding: 7px 0; border-bottom: 1px dotted var(--line); }
+.made .item:last-child { border-bottom: none; }
+.made .item b { font-weight: 600; font-size: 14px; }
+.made .item .n { font-family: var(--mono); font-variant-numeric: tabular-nums;
+  color: var(--brass); font-size: 14px; }
+.made .item .why { grid-column: 1 / -1; font-size: 12.5px; color: var(--rust); }
+.made .item.short b { color: var(--ink-3); font-weight: 400; }
+.made .empty { font-size: 13px; color: var(--ink-3); }
+.holding { font-family: var(--mono); font-size: 13px; color: var(--brass);
+  margin: 8px 0 0; min-height: 1.4em; }
+
+@media (max-width: 1080px) { .packing { grid-template-columns: 1fr; } }
 #board { cursor: pointer; }
 #stage-result h3 { font-family: var(--mono); font-size: 15px; letter-spacing: .12em;
   text-transform: uppercase; color: var(--brass); margin: 8px 0 14px; }

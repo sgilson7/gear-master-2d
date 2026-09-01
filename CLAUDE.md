@@ -234,6 +234,25 @@ which can be lost:**
 - **A shared component is grey until it is placed**, and takes its grid's colour
   and mark as it crosses in — which shows the rule without stating it.
 
+## Board rendering — the rules that were learned by breaking them
+
+- **Never cache what core can be asked.** The held component is looked up by id
+  every frame, not copied at pick-up. The copy went stale the moment the player
+  turned it: core rotated correctly and the board kept drawing the old shape.
+- **The drag footprint is painted last, over the pieces.** It used to go onto
+  the empty grid before anything was drawn on it, so every occupied cell covered
+  it — and occupied cells are exactly where a drop fails and an answer is
+  wanted.
+- **The ghost on the cursor is translucent and offset.** At 92% alpha sitting
+  square on the target it hid the green-or-red answer at the moment it was
+  being asked.
+- **The canvas sizes its own backing store to its box.** A fixed intrinsic width
+  is a fixed width *scaled by CSS*: 1240 displayed at 800 turned every 34px cell
+  into 22px and left a third of a screen empty underneath.
+- **Text belongs in HTML, not on the canvas.** The item list was 11px canvas
+  text crammed under each grid, where a second item overlapped and a third was
+  cut off.
+
 ## Classes
 
 - **Three, and they are upstream's.** Gorillathon, Funnel Sergeant and

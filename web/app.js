@@ -291,6 +291,31 @@ function runFight() {
   replay.play();
 }
 
+// What the five grids made, beside the board rather than crammed under it.
+//
+// Every judgement here is core's: which pieces form an item, whether it came
+// together, what it is called, what it is worth, and what it is missing if it
+// did not. The panel renders `status` unchanged — that sentence is the engine's
+// and it is better than any summary of it.
+function paintMade(st) {
+  const box = $('made');
+  const parts = [];
+  let any = false;
+  for (const slot of st.slots) {
+    if (!slot.items.length) continue;
+    any = true;
+    parts.push(`<p class="grid-of">${slot.slot}</p>`);
+    for (const i of slot.items) {
+      parts.push(i.assembled
+        ? `<div class="item"><b>${i.name}</b><span class="n">${i.rating}</span></div>`
+        : `<div class="item short"><b>${i.short || 'loose pieces'}</b><span class="n">—</span>` +
+          `<span class="why">${i.status}</span></div>`);
+    }
+  }
+  box.innerHTML = `<h4>What the frames made</h4>` +
+    (any ? parts.join('') : `<p class="empty">Nothing seated yet. Click a component in the bag, then click a cell.</p>`);
+}
+
 function boardSays(text) {
   const el = $('board-says');
   el.textContent = text;
@@ -572,6 +597,10 @@ async function main() {
     const made = st.slots.reduce((n, s) => n + s.items.filter((i) => i.assembled).length, 0);
     $('fight-yours').textContent = made;
     $('undo').disabled = !st.undoable;
+    paintMade(st);
+  };
+  board.onhold = (name) => {
+    $('holding').textContent = name ? `carrying ${name} — right-click to turn it` : '';
   };
   replay = new Replay($('replay'));
   // Handles for testing/drive.py, which checks that what the board paints green
@@ -596,6 +625,10 @@ async function main() {
     $('fight-note').textContent = 'Nothing is waiting. Pack, then go back out.';
     $('fight-rating').textContent = '—';
     $('fight-bounty').textContent = '—';
+    // Nothing is waiting, so nothing is pictured. The screen is shared with
+    // encounters and was keeping the last creature's portrait up while you
+    // packed in a town.
+    portrait($('fight-art'), null, '');
     $('go').hidden = true;
     $('run').textContent = 'Done';
     $('fight').hidden = false;

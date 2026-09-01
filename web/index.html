@@ -149,7 +149,13 @@
         <div id="stage-board">
           <p class="note">Click a piece to pick it up, click a cell to seat it, right-click to turn it.
             Shift-click a finished item to lock it. Green is where it fits &mdash; core decides that, not the page.</p>
-          <canvas id="board" width="960" height="620"></canvas>
+          <div class="packing">
+            <div>
+              <canvas id="board" width="900" height="420"></canvas>
+              <p id="holding" class="holding"></p>
+            </div>
+            <aside class="made" id="made"></aside>
+          </div>
           <p id="board-says" class="says" hidden></p>
           <div class="row">
             <button id="go" type="button" class="primary">Fight</button>
@@ -162,7 +168,7 @@
         </div>
 
         <div id="stage-replay" hidden>
-          <canvas id="replay" width="960" height="430"></canvas>
+          <canvas id="replay" width="1240" height="470"></canvas>
           <div class="row">
             <button id="skip" type="button">Skip to the end</button>
           </div>

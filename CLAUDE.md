@@ -431,10 +431,14 @@ names since M1 and the page rendered none of them.
   `board.js` rather than reimplementing it — the motif is the *shape* half of
   the colourblind triple-encoding, and everything that draws a cell must draw
   the same one.
-- A new module in the chain needs cache-busting too. `theirs.js` imports
-  `board.js`, and a module two hops down is exactly where a stale mix hides,
-  because the entry point looks fresh. `package-web.sh` stamps it and dies if
-  the stamp did not apply.
+- **Every relative import in every shipped module is stamped, by pattern.**
+  The stamping was a list of module names written out by hand, and both times a
+  module was added it was left off — `theirs.js` first, then `shape.js`, each
+  importing `board.js` two hops from the entry point, which is exactly where a
+  stale mix hides because the page itself looks fresh. `package-web.sh` now
+  rewrites every `from './x.js'` it finds and **dies if any bare import
+  survives**, which is the check that catches the next one rather than the last
+  one.
 - `#made` holds two panels now, so anything querying `.made-item` must scope
   itself — an unscoped query lit a creature's card when you pointed at your own
   blade.

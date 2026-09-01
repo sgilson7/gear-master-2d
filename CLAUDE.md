@@ -9,10 +9,12 @@ from `sgilson7/gear-master`. `PLANNING-BRIEF.md` is the brief; `PLAN.md` is the
 plan and **wins where the two disagree**; `TONE.md` governs every string a
 player reads.
 
-**Milestone: M4 complete. Deploy gate 5 is live** at
-<https://sgilson7.github.io/gear-master-2d/> — the grind has a reason. Every
-level adds a row to one frame in a fixed rotation and a point to spend on a
-thirteen-node tree. M5 has not started.
+**MVP complete, tagged `v0.1.0-mvp`.** Deploy gate 6 is live at
+<https://sgilson7.github.io/gear-master-2d/>. Every line of
+`PLANNING-BRIEF.md` §0 was walked against the deployed build and every one is a
+yes.
+
+M6 — art and a second tone pass — is post-MVP and optional. It has not started.
 
 **No rest point, and there should not be one.** M2 carried it forward; M3 is
 where it turns out to be nothing. Combat health resets every fight, so a rest
@@ -169,6 +171,22 @@ Two things now stop it happening again:
    is a win. The version that assumed wins measured how much the map offers
    rather than how much a player gets, and would have gone on passing.
 
+## Classes
+
+- **Three, and they are upstream's.** Gorillathon, Funnel Sergeant and
+  Worm-Fact Keeper are `Berserker`, `Hexweaver` and `Bloodletter` with the
+  theme talking, so the powers — Leeching, Contagion, Bloodscent — are already
+  tuned and already tested. Nothing new was invented in combat at the last
+  milestone, deliberately.
+- **The promise is the rule.** Each class's one-line mechanical promise is
+  `ClassPower::describe()` put through `theme.retell`, so it cannot go stale and
+  it speaks the game's language rather than the engine's.
+- **The fork is permanent and offered until answered.** There is no path that
+  clears a class; the screen is the only one in the game that does not take
+  Escape. A save made at level three arrives at five and is asked, and one made
+  at nine without a class is still asked — the question was never answered
+  rather than declined.
+
 ## Inherited on purpose — do not "simplify"
 
 No RNG in combat. 50 ms ticks. Monsters are loadouts wearing catalogue pieces.
@@ -207,6 +225,7 @@ and M5's trees may spend them again.
 | M2 | 359 passing |
 | M3 | 369 passing |
 | M4 | 382 passing |
+| M5 / MVP | 391 passing |
 | Catalogue | 523 components |
 | Ladder | 50 creatures |
 | `crates/core` | ~33k lines, down from ~50k |
@@ -217,6 +236,7 @@ and M5's trees may spend them again.
 | Starting kit | 11 components, 28 Fnorp, 4 assembled items |
 | Boards | 6×3 at level 1, one row a level, 6×8 ceiling |
 | Level 5 | ~27 fights, mean of nine seeded walks |
+| Skill trees | 13 base nodes + 3 × 8 class nodes |
 
 Note the catalogue is **523**, not the 374 the retheme document counts — it
 grew upstream after that document was written. Any content work that quotes a

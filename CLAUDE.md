@@ -156,7 +156,7 @@ and M5's trees may spend them again.
 | After the campaign was cut | 128 passing |
 | After the simulation tests were ported to `Character` | 329 passing |
 | M1 | 346 passing |
-| M2 | 372 passing |
+| M2 | 359 passing |
 | Catalogue | 523 components |
 | Ladder | 50 creatures |
 | `crates/core` | ~33k lines, down from ~50k |

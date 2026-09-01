@@ -301,19 +301,59 @@ function paintMade(st) {
   const box = $('made');
   const parts = [];
   let any = false;
+
+  const sign = (n, unit) => `${n > 0 ? '+' : ''}${n}${unit}`;
+  const secs = (ms) => (ms / 1000).toFixed(2);
+
   for (const slot of st.slots) {
     if (!slot.items.length) continue;
     any = true;
     parts.push(`<p class="grid-of">${slot.slot}</p>`);
     for (const i of slot.items) {
-      parts.push(i.assembled
-        ? `<div class="item"><b>${i.name}</b><span class="n">${i.rating}</span></div>`
-        : `<div class="item short"><b>${i.short || 'loose pieces'}</b><span class="n">—</span>` +
+      if (!i.assembled) {
+        parts.push(
+          `<div class="made-item short"><b>${i.short || 'loose pieces'}</b>` +
           `<span class="why">${i.status}</span></div>`);
+        continue;
+      }
+      // Rarity as pips as well as a word, so the tier reads without the
+      // colours needing to be told apart — same rule as on the board.
+      const pips = '◆'.repeat(i.marks) + '◇'.repeat(3 - i.marks);
+      const next = i.next_at !== null && i.next_at !== undefined
+        ? `<span class="next">${i.next_at} more for the next mark</span>` : '';
+
+      // Standing still.
+      const passive = i.passive.length
+        ? i.passive.map((s) => `<li>${sign(s.n, s.unit)} ${s.label}</li>`).join('')
+        : `<li class="none">nothing — it only acts in a fight</li>`;
+
+      // And every time it comes round.
+      const active = [];
+      if (i.hit_for > 0) {
+        active.push(`<li>hits for <b>${i.hit_for}</b></li>`);
+        if (i.dps) active.push(`<li>${i.dps.toFixed(1)} damage a second</li>`);
+      }
+      if (i.casts > 0) active.push(`<li>${i.casts} cast${i.casts > 1 ? 's' : ''}</li>`);
+      for (const n of i.notes) active.push(`<li>${n}</li>`);
+      if (!active.length) active.push(`<li class="none">it holds its shape and nothing else</li>`);
+
+      parts.push(`
+        <div class="made-item">
+          <b>${i.name}</b>
+          <span class="built">${slot.slot} · built on a ${i.core ?? '—'}</span>
+          <span class="rank"><span class="pips">${pips}</span> ${i.rarity.toUpperCase()}
+            · rating ${i.rating}${next}</span>
+          <span class="head">out of combat</span>
+          <ul class="stats">${passive}</ul>
+          <span class="head">in combat — every ${secs(i.cooldown_ms ?? 0)}s${
+            i.power && i.power !== 100 ? ` · ${(i.power / 100).toFixed(2)}× power` : ''}</span>
+          <ul class="stats">${active.join('')}</ul>
+        </div>`);
     }
   }
   box.innerHTML = `<h4>What the frames made</h4>` +
-    (any ? parts.join('') : `<p class="empty">Nothing seated yet. Click a component in the bag, then click a cell.</p>`);
+    (any ? parts.join('')
+         : `<p class="empty">Nothing seated yet. Click a component in the bag, then click a cell.</p>`);
 }
 
 function boardSays(text) {
@@ -608,6 +648,7 @@ async function main() {
   // check compares the page's answer against core's rather than against itself.
   window.__board = board;
   window.__legalAnchors = legal_anchors;
+  window.__replay = replay;
   window.__classOffer = () => JSON.parse(class_offer_json());
 
   $('skills').onclick = openTree;

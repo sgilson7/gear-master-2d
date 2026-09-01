@@ -25,21 +25,15 @@ export class Replay {
     this.log = log;
     this.t = 0;
     this.playing = false;
-    // Health over time, sampled from the log so the bars can be drawn at any
-    // moment without re-deriving the fight.
-    this.track = { player: [], enemy: [] };
-    let ph = log.player.max_health;
-    let eh = log.enemy?.max_health ?? 1;
-    this.track.player.push([0, ph]);
-    this.track.enemy.push([0, eh]);
+    // Health comes off the log, which reports it. The previous version
+    // subtracted damage from a running total it kept itself and ignored
+    // `absorbed`, so armour soaked a blow, the bar dropped anyway, and both
+    // sides could sit at zero for the rest of a fight that was still going.
+    this.track = { player: [[0, log.player.max_health, log.player.max_health]],
+                   enemy:  [[0, log.enemy?.max_health ?? 1, log.enemy?.max_health ?? 1]] };
     for (const e of log.entries) {
-      if (e.kind === 'hit' || e.kind === 'burn') {
-        if (e.side === 'player') { eh -= e.amount; this.track.enemy.push([e.at, Math.max(0, eh)]); }
-        else { ph -= e.amount; this.track.player.push([e.at, Math.max(0, ph)]); }
-      } else if (e.kind === 'regen') {
-        if (e.side === 'player') { ph += e.amount; this.track.player.push([e.at, ph]); }
-        else { eh += e.amount; this.track.enemy.push([e.at, eh]); }
-      }
+      this.track.player.push([e.at, e.ph, e.pmax]);
+      this.track.enemy.push([e.at, e.eh, e.emax]);
     }
     this.draw();
   }
@@ -72,9 +66,12 @@ export class Replay {
     this.onend();
   }
 
+  /// `[health, max]` at the playback head. Both are read, because mind damage
+  /// takes the maximum down and a bar drawn against a stale maximum reads as a
+  /// wound that healed.
   at(track) {
-    let v = track[0]?.[1] ?? 0;
-    for (const [t, h] of track) { if (t <= this.t) v = h; else break; }
+    let v = [track[0]?.[1] ?? 0, track[0]?.[2] ?? 1];
+    for (const [t, h, m] of track) { if (t <= this.t) v = [h, m]; else break; }
     return v;
   }
 
@@ -93,7 +90,7 @@ export class Replay {
     g.font = '12px ui-monospace, Menlo, monospace';
 
     // Two health bars.
-    const bar = (y, label, now, max, colour) => {
+    const bar = (y, label, [now, max], colour) => {
       g.fillStyle = ink3;
       g.fillText(label, 0, y - 6);
       g.fillStyle = surface;
@@ -108,9 +105,8 @@ export class Replay {
       g.fillText(`${Math.max(0, Math.round(now))} / ${max}`, W - 6, y + 13);
       g.textAlign = 'left';
     };
-    bar(20, 'you', this.at(this.track.player), this.log.player.max_health, verd);
-    bar(62, this.log.enemy?.name ?? 'it', this.at(this.track.enemy),
-        this.log.enemy?.max_health ?? 1, rust);
+    bar(20, 'you', this.at(this.track.player), verd);
+    bar(62, this.log.enemy?.name ?? 'it', this.at(this.track.enemy), rust);
 
     // The clock.
     g.fillStyle = ink3;

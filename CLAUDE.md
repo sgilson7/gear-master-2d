@@ -252,6 +252,15 @@ which can be lost:**
 - **Text belongs in HTML, not on the canvas.** The item list was 11px canvas
   text crammed under each grid, where a second item overlapped and a third was
   cut off.
+- **The replay reads health, it does not compute it.** The log reports
+  `target_health` on a hit and `health` on a burn or a regen. Subtracting
+  `damage` from a running total ignores `absorbed`, so armour soaked a blow, the
+  bar dropped anyway, and both sides could sit at zero for the rest of a fight
+  that was still going. `fight_json` carries a snapshot per entry.
+- **Do not reuse a class name.** `.card` is the event dialog — `position: fixed`,
+  `inset: 0`, `z-index: 10`. The item cards were given the same class and every
+  one of them became a full-viewport overlay pinned over the game. Found by
+  measuring `elementFromPoint`, not by reading.
 
 ## Classes
 

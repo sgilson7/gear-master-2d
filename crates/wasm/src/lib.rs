@@ -452,6 +452,10 @@ pub fn board_json() -> String {
     use gm2d_core::piece::SlotKind;
     with(|g| {
         let ch = &g.character;
+        // The profiles the fight runs on, so a card quotes the cadence and the
+        // damage that will actually happen rather than a report's estimate.
+        let profiles = ch.combat_items();
+        let stats = ch.player_stats();
         // Every component name a player reads goes through the theme, the same
         // as every other one. The engine still says "Oak Handle" everywhere,
         // because everything it decides depends on that name meaning one thing.
@@ -493,6 +497,55 @@ pub fn board_json() -> String {
                     .items
                     .iter()
                     .map(|i| {
+                        // The full card, in the shape upstream's tooltip used:
+                        // what it is, what it is worth, what it does standing
+                        // still, and what it does every time it comes round.
+                        //
+                        // The assembled half comes from the `ItemProfile` the
+                        // *fight* runs on rather than from the report, so the
+                        // cadence, power and damage a player reads are the ones
+                        // that will actually happen — matched by piece set,
+                        // which is what identifies an item.
+                        let profile = profiles.iter().find(|p| p.pieces == i.pieces);
+                        let st = i.stats;
+                        let rarity = gm2d_core::rating::Rarity::of(i.rating);
+                        let passive: Vec<serde_json::Value> = [
+                            (st.health, "max health", ""),
+                            (st.strength, "strength", ""),
+                            (st.armor, "cork", ""),
+                            (st.mana, "the Funny", ""),
+                            (st.regen, "regen a second", ""),
+                            (st.mind, "idiot mode", ""),
+                            (st.power, "weapon power", "%"),
+                            (st.mind_resist, "thick skull", "%"),
+                            (st.curse_resist, "curse resist", "%"),
+                            (st.physical_resist, "physical resist", "%"),
+                            (st.magic_resist, "magic resist", "%"),
+                            (st.physical_pierce, "physical piercing", "%"),
+                            (st.magic_pierce, "magic piercing", "%"),
+                            (st.physical_harden, "physical hardening", "%"),
+                            (st.magic_harden, "magic hardening", "%"),
+                            (st.reflect, "reflected", "%"),
+                            (st.rage, "fury", ""),
+                            (st.faith, "devotion", ""),
+                            (st.nature, "harvest", ""),
+                        ]
+                        .iter()
+                        .filter(|(v, ..)| *v != 0)
+                        .map(|(v, label, unit)| {
+                            serde_json::json!({ "n": v, "label": label, "unit": unit })
+                        })
+                        .collect();
+
+                        let hit = profile.map(|p| p.hit_for(stats.strength)).unwrap_or(0);
+                        // `dps_milli` is damage a second in *thousandths* — the
+                        // engine keeps it that way so a slow heavy weapon and a
+                        // fast light one compare without floating point. A
+                        // weapon hitting 35 every 1.5s is 23.3, not 0.0.
+                        let dps = profile
+                            .filter(|_| hit > 0)
+                            .map(|p| p.dps_milli(stats.strength) as f64 / 1_000.0);
+
                         serde_json::json!({
                             "pieces": i.pieces.iter().map(|p| p.0).collect::<Vec<_>>(),
                             "cells": i.pieces.iter()
@@ -504,6 +557,16 @@ pub fn board_json() -> String {
                             "short": i.name.short,
                             "rating": i.rating,
                             "notes": i.notes,
+                            "rarity": rarity.name(),
+                            "marks": rarity.marks(),
+                            "next_at": rarity.next_at().map(|n| n - i.rating),
+                            "core": profile.map(|p| p.core.clone()),
+                            "cooldown_ms": profile.map(|p| p.cooldown_ms),
+                            "power": profile.map(|p| p.power),
+                            "hit_for": hit,
+                            "dps": dps,
+                            "casts": profile.map(|p| p.casts.len()).unwrap_or(0),
+                            "passive": passive,
                         })
                     })
                     .collect();
@@ -685,6 +748,20 @@ pub fn fight_json() -> String {
                 "slot": slot_name(i.slot),
             }))
             .collect();
+        // A running snapshot of both sides, taken from the numbers the log
+        // already reports rather than derived from them.
+        //
+        // The replay used to subtract `damage` from a health it kept itself,
+        // which ignores `absorbed` — so armour soaked a blow, the bar dropped
+        // anyway, and both sides sat at zero for the rest of a fight that was
+        // still going. `Hit` carries `target_health`, `Burn` and `Regen` carry
+        // `health`, and `MindHit` and `Grew` carry the maximum. All of it is
+        // authoritative; none of it needed working out.
+        let mut ph = log.player.max_health;
+        let mut pmax = log.player.max_health;
+        let mut eh = log.enemies.first().map(|c| c.max_health).unwrap_or(1);
+        let mut emax = eh;
+
         let entries: Vec<_> = log
             .entries
             .iter()
@@ -692,18 +769,32 @@ pub fn fight_json() -> String {
                 let (kind, side, item, index, amount) = match &e.event {
                     Event::Activate { side, item, index } =>
                         ("activate", *side, item.clone(), *index as i64, 0),
-                    Event::Hit { by, damage, .. } => ("hit", *by, String::new(), -1, *damage as i64),
-                    Event::MindHit { by, amount, .. } =>
-                        ("mind", *by, String::new(), -1, *amount as i64),
-                    Event::Burn { side, damage, .. } =>
-                        ("burn", *side, String::new(), -1, *damage as i64),
-                    Event::Regen { side, amount, .. } =>
-                        ("regen", *side, String::new(), -1, *amount as i64),
+                    Event::Hit { by, damage, absorbed, target_health, .. } => {
+                        // The target is the other side.
+                        if *by == Side::Player { eh = *target_health; } else { ph = *target_health; }
+                        ("hit", *by, String::new(), -1, (*damage + *absorbed) as i64)
+                    }
+                    Event::MindHit { by, amount, target_max_health } => {
+                        if *by == Side::Player { emax = *target_max_health; }
+                        else { pmax = *target_max_health; }
+                        ("mind", *by, String::new(), -1, *amount as i64)
+                    }
+                    Event::Burn { side, damage, health } => {
+                        if *side == Side::Player { ph = *health; } else { eh = *health; }
+                        ("burn", *side, String::new(), -1, *damage as i64)
+                    }
+                    Event::Regen { side, amount, health } => {
+                        if *side == Side::Player { ph = *health; } else { eh = *health; }
+                        ("regen", *side, String::new(), -1, *amount as i64)
+                    }
+                    Event::Grew { side, amount, total, .. } => {
+                        if *side == Side::Player { pmax = *total; } else { emax = *total; }
+                        ("grew", *side, String::new(), -1, *amount as i64)
+                    }
                     Event::GainArmor { side, amount, .. } =>
                         ("armor", *side, String::new(), -1, *amount as i64),
                     Event::Cast { side, .. } => ("cast", *side, String::new(), -1, 0),
-                    Event::Misfired { side, item } =>
-                        ("misfire", *side, item.clone(), -1, 0),
+                    Event::Misfired { side, item } => ("misfire", *side, item.clone(), -1, 0),
                     Event::SuddenDeath { .. } => ("sudden", Side::Player, String::new(), -1, 0),
                     _ => ("other", Side::Player, String::new(), -1, 0),
                 };
@@ -711,9 +802,12 @@ pub fn fight_json() -> String {
                     "at": e.at_ms, "kind": kind,
                     "side": if side == Side::Player { "player" } else { "enemy" },
                     "item": item, "index": index, "amount": amount,
+                    "ph": ph.max(0), "pmax": pmax.max(1),
+                    "eh": eh.max(0), "emax": emax.max(1),
                 })
             })
             .collect();
+
         serde_json::json!({
             "outcome": format!("{:?}", log.outcome).to_lowercase(),
             "duration_ms": log.duration_ms,

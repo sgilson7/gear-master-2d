@@ -29,6 +29,7 @@ pub mod rating;
 pub mod reward;
 pub mod rng;
 pub mod save;
+pub mod quest;
 pub mod shop;
 pub mod skills;
 pub mod shape;

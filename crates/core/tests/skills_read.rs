@@ -206,3 +206,19 @@ fn show() {
         }
     }
 }
+
+#[test]
+#[ignore = "lists the catalogue by price, for picking shelves"]
+fn show_cheap() {
+    use gm2d_core::piece::{is_boss_only, is_off_the_road, is_quest_reward, CATALOG};
+    let mut v: Vec<_> = CATALOG
+        .iter()
+        .filter(|d| !is_boss_only(d.name) && !is_quest_reward(d.name) && !is_off_the_road(d))
+        .collect();
+    v.sort_by_key(|d| d.price);
+    let lo: i32 = std::env::var("LO").ok().and_then(|v| v.parse().ok()).unwrap_or(0);
+    let hi: i32 = std::env::var("HI").ok().and_then(|v| v.parse().ok()).unwrap_or(26);
+    for d in v.iter().filter(|d| d.price >= lo && d.price <= hi) {
+        println!("{:>4}  {:<10?} {:<12?} {:<28} {:?}", d.price, d.slot, d.kind, d.name, d.cells);
+    }
+}

@@ -11031,6 +11031,107 @@ pub static CATALOG: &[PieceDef] = &[
         power_bonus: 0,
         price: 240,
     },
+    // ---- the toad census ---------------------------------------------
+    //
+    // The starter town's quest, and the three pieces it turns on. Added
+    // together because they are one thing: an errand, and the two halves of
+    // the caster weapon it pays out. A book with no spell assembles nothing,
+    // so handing over one without the other would be a reward you cannot use.
+    PieceDef {
+        name: "Toad Eye",
+        slot: SlotKind::Weapon,
+        // A tally, and typed as one — the same as the Platinum Chip. It costs
+        // you a cell if you insist on carrying it seated, and does nothing
+        // there, because it is proof of a thing you did rather than gear.
+        kind: PieceKind::Quest,
+        cells: &[(0, 0)],
+        base: Stats::ZERO,
+        assembly_bonus: None,
+        effect: None,
+        cooldown_ms: 0,
+        speed_bonus: 0,
+        triggers: &[],
+        quest: None,
+        power_bonus: 0,
+        price: 1,
+    },
+    PieceDef {
+        name: "Bone Nock",
+        slot: SlotKind::Weapon,
+        kind: PieceKind::Quest,
+        cells: &[(0, 0)],
+        base: Stats::ZERO,
+        assembly_bonus: None,
+        effect: None,
+        cooldown_ms: 0,
+        speed_bonus: 0,
+        triggers: &[],
+        quest: None,
+        power_bonus: 0,
+        price: 1,
+    },
+    PieceDef {
+        name: "Mirror Shard",
+        slot: SlotKind::Weapon,
+        kind: PieceKind::Quest,
+        cells: &[(0, 0)],
+        base: Stats::ZERO,
+        assembly_bonus: None,
+        effect: None,
+        cooldown_ms: 0,
+        speed_bonus: 0,
+        triggers: &[],
+        quest: None,
+        power_bonus: 0,
+        price: 1,
+    },
+    PieceDef {
+        name: "The Bog Census",
+        slot: SlotKind::Weapon,
+        kind: PieceKind::Book,
+        cells: &[(0, 0), (1, 0), (0, 1), (1, 1)],
+        base: Stats::ZERO,
+        assembly_bonus: None,
+        effect: None,
+        // Slow. It is a ledger, and the whole of what it does is bank the
+        // pool its spell spends, so a fast one would trivialise the pair.
+        cooldown_ms: 3400,
+        speed_bonus: 0,
+        // **Nature per activation, and that is the piece.** Unconditional, so
+        // it reads as a flat figure on the card rather than a sentence — see
+        // the note in `item_card` about a gain wearing a trigger's clothes.
+        triggers: &[Trigger::OnActivate(Action::Gain { what: Resource::Nature, amount: 4 })],
+        quest: None,
+        power_bonus: 0,
+        price: 34,
+    },
+    PieceDef {
+        name: "Census Bolt",
+        slot: SlotKind::Weapon,
+        kind: PieceKind::Spell,
+        cells: &[(0, 0), (1, 0), (0, 1)],
+        base: Stats { magic_damage: 7, ..Stats::ZERO },
+        assembly_bonus: None,
+        effect: None,
+        cooldown_ms: 0,
+        speed_bonus: 0,
+        // Spends what the book banks. On a board with no other source of
+        // Harvest it fires roughly every other tick and pays itself back when
+        // it does not, which is the shape every other Spend spell here has.
+        triggers: &[Trigger::Spend {
+            what: Resource::Nature,
+            cost: 6,
+            on_success: Action::Damage {
+                amount: 26,
+                kind: DamageType::Magic,
+                target: Target::Enemy,
+            },
+            on_failure: Action::Gain { what: Resource::Nature, amount: 2 },
+        }],
+        quest: None,
+        power_bonus: 0,
+        price: 30,
+    },
 ];
 
 /// Gear that exists only on a boss.
@@ -11193,52 +11294,13 @@ pub fn is_town_only(name: &str) -> bool {
     TOWN_ONLY.contains(&name)
 }
 
-/// Everything a town puts out: the five above, and every underlay.
-///
-/// Terrain is town gear by kind rather than by name. An underlay is ground
-/// rather than kit - somebody who sells you a floor has a floor to sell - and
-/// a piece of ground turning up between a helmet and a ring on the road is
-/// the shelf failing to say what the thing is. Keyed on the kind because a
-/// name list is a thing to forget: every underlay written after this one is
-/// town gear without anybody having to remember.
-/// What one town has on its shelves, drawn from the whole town pool.
-///
-/// The pool is **eleven** and a shop holds seven, so every town used to try to
-/// show all eleven and the last four fell off the bottom of the screen. A shop
-/// that cannot be read is a shop that is not there.
-///
-/// Sampled rather than scrolled, because the alternative is better than a fix:
-/// six towns drawing seven of eleven each gives every town a shelf of its own,
-/// so "the Kettleworks has the good gloves" becomes a thing a player can
-/// learn. Scrolling would have made all six identical and added a control.
-///
-/// **Derived, never drawn from `Run::rng`.** Same run seed and same town, same
-/// shelf, for ever - and taking it off the run's own generator would shift
-/// every later roll in the game, which is a re-measurement of the whole
-/// economy to fix a layout fault. The county does this already and for the
-/// same reason.
-pub fn town_shelf_for(run_seed: u64, town_id: &str) -> Vec<&'static str> {
-    let pool = town_shelf();
-    let want = crate::shop::SHOP_SIZE;
-    if pool.len() <= want {
-        return pool.to_vec();
-    }
-    // **The curated five are never sampled out.** `towns.rs` says why in one
-    // line - "the curated five are the reason to come in; the underlays are
-    // the thing a town is the only place to buy. Both, or the shelf is half a
-    // shelf" - so what varies by town is which *ground* it has in, which is
-    // the half there is more of than a shop can hold.
-    let mut out: Vec<&'static str> = TOWN_ONLY.to_vec();
-    let mut rest: Vec<&'static str> =
-        pool.iter().copied().filter(|n| !TOWN_ONLY.contains(n)).collect();
-    let keyed = town_id.bytes().fold(0xC0FF_EE00_u64, |a, b| a.rotate_left(7) ^ b as u64);
-    let mut rng = crate::rng::Rng::new(run_seed ^ keyed);
-    while out.len() < want && !rest.is_empty() {
-        let i = rng.below(rest.len());
-        out.push(rest.remove(i));
-    }
-    out
-}
+// `town_shelf_for` lived here: a deterministic sample of the town-only pool,
+// so each of upstream's six towns had a shelf of its own without touching the
+// run's generator. GM2D's shelves are `data/shops.json` and are hand-picked
+// per town, which is the same goal reached by writing it down — so the sampler
+// has nothing left to decide. `town_shelf()` stays; the tests still ask what
+// is town-only.
+
 
 pub fn town_shelf() -> &'static [&'static str] {
     static SHELF: std::sync::OnceLock<Vec<&'static str>> = std::sync::OnceLock::new();

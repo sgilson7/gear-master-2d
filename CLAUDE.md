@@ -25,8 +25,18 @@ persist between fights, the town is where the rest goes.
 - `crates/wasm` is a shim. It moves strings across the boundary and decides
   nothing. A rule decided there is a rule the test suite cannot reach in
   seconds, and then there are two rulebooks.
-- Content lives in `data/*.json`. **If you are editing a `.rs` file to change
-  what a player reads, you are in the wrong file.**
+- Content lives in `data/*.json` — the map, the events, the tree, **the town
+  shelves (`shops.json`) and the errands (`quests.json`)**. **If you are editing
+  a `.rs` file to change what a player reads, you are in the wrong file.** The
+  two exceptions are inherited and known: the component catalogue is `piece.rs`
+  and the theme tables are `theme.rs` (mirrored into `data/theme.*.json`, which
+  is generated — `REBASELINE_THEME_DATA=1`).
+- **A new component needs a themed name in the same change.**
+  `the_turtle_theme_covers_the_catalogue` fails otherwise, and it is right to:
+  a piece nobody has named reaches the player in the engine's words.
+- **Adding to `CATALOG` changes the save fingerprint**, and older saves are
+  refused with a sentence naming both catalogues. That is the design; say so in
+  the commit when it happens.
 - Never write a game string without `TONE.md` open.
 - **Save round-trip tests run on every commit. A red round-trip blocks
   everything.** `tests/save.rs` is that suite; `testing/drive.py` walks the same
@@ -429,6 +439,95 @@ names since M1 and the page rendered none of them.
   itself — an unscoped query lit a creature's card when you pointed at your own
   blade.
 
+## The economy, and why the shelf stopped rolling
+
+Three changes that are one change: **a character starts with almost nothing, a
+town sells a fixed shelf, and a town asks you for something.**
+
+- **The starting kit is `Oak Handle` + `Iron Blade`.** It was eleven components
+  — most of a helmet, a pair of molds and a whole weapon — which made the shop
+  decoration for the first hour. Two pieces assemble one weapon that beats a
+  Cave Rat and a Bog Toad and loses to a Bone Archer, which is the opening.
+- **The Iron Blade is seated turned, and has to be.** It is one cell wide and
+  **four tall**; a starting weapon frame is three rows. Upright it does not fit
+  anywhere, the weapon assembles nothing, and a character who cannot win cannot
+  earn — the M4 soft-lock, exactly. The fifth field of a `STARTER` row is the
+  rotation and this is what it is for.
+- **A shelf is content.** `data/shops.json` holds each town's stock and it never
+  changes; the save carries `WorldState::bought`, which is a town id and an
+  index. Same discipline as the map. `Game::shop` and `ShopSave` are gone, and
+  a save written before this still opens — serde ignores the key it no longer
+  knows, and the shelves it arrives to are the shelves everybody has.
+- **The index is the identity**, so a bought entry is greyed and left where it
+  was. Dropping it would renumber the list and a save saying "bought number
+  three" would come back pointing at something else. It also just reads better:
+  the gap is the memory of what you took.
+- **Append to a town's stock, never insert.** Same reason.
+- Reroll and pinning are gone with the random shelf. A town that sells
+  something different every visit is not a place, and three of them are one
+  slot machine in three costumes.
+
+## Errands
+
+`crates/core/src/quest.rs`, `data/quests.json`. **Not** upstream's `quest.rs`
+(a chain of receipts along a road, deleted in `48203ee`) and **not**
+`piece::Quest` (a component that transforms after N activations). Three things
+called quest; this is the only one a town hands out.
+
+- **The tally is a bag item, not a counter.** Beating a toad gives you a Toad
+  Eye and the eyes sit in your bag until you carry them back. A counter would
+  be simpler and would also mean the errand had no middle.
+- **A drop is gated on the errand, not on the creature.** Nothing falls before
+  it is asked for and nothing falls after the fifth: a bag filling with eyes
+  nobody wants is litter, and a sixth eye is a thing that cannot be handed in.
+- Handing in unseats the tokens first. A component handed over the counter and
+  still occupying a cell is a component in two places.
+- The **ask** is derived and unthemed — `beat 5 × Bengulon Jungle Toad, then
+  hand in 5 × Bengulon Toad Eye` — and the **brief** is the world's. Rule 13a
+  again. `×` rather than a plural because a creature's name is a proper noun
+  and some of them are already plural: The Rice Criers, The Drowned Court.
+- **No two errands share a tally.** `holding` counts a token by name across the
+  whole bag, so two errands wanting the same one would each see the other's —
+  take both, kill five toads, hand in twice.
+- **Every town has one**, and every errand names a creature that is actually in
+  some region's pool. Both are tests: a town that wants nothing is a shop, and
+  an errand naming a creature that is nowhere cannot be finished and nothing
+  else in the game would say so.
+- **A reward has to be usable.** The first errand pays a book *and* a spell,
+  because a book with no spell assembles nothing;
+  `what_the_errand_pays_assembles_into_a_weapon` seats both on a starting frame
+  and checks a weapon comes out.
+
+## Watching a fight
+
+- **Both boards tick.** Only the Cave Rat has innate attacks, so for the other
+  forty-nine a replay showing one side's cooldowns was showing half the fight
+  with no way to tell which half.
+- **Rows are HTML, bars are canvas.** A row you can point at is a row the
+  browser can tell you about; 11px canvas text can be hovered by nothing. Same
+  lesson the item list learned when it came off the board canvas.
+- **Nothing is computed that the log reports.** Armour comes off
+  `Hit::target_armor` and `GainArmor::total`; the four pools come off
+  `GainResource::total`, `GainMana::total` and every spend's `remaining`. This
+  is the health bug generalised — that one subtracted `damage` from its own
+  total and ignored `absorbed`.
+- **The armour bar wraps, it does not clamp.** Lifted from the original with
+  its reasoning: the two bars read as a pair because they are the same
+  measurement, so a full armour bar is as much armour as you have health and a
+  pixel is the same number of points in both. Past full each complete bar is
+  another layer drawn darker than the one under it. Clamping made every amount
+  from "exactly enough" to "four times over" draw an identical bar.
+- **The armour label is haloed, not coloured.** The ground under the middle of
+  that bar is whatever layer the wrap landed on — the palest shade and the
+  empty track are both possible under the same text, and no single ink reads on
+  both.
+- **The replay panel draws on its own dark ground and uses its own ink**, the
+  same as the board. Taking the page's ink put dark labels on a near-black
+  panel every time the viewer was in light mode.
+- One `oneCard` in `app.js` renders an item for the packing panel, the
+  creature's panel and both sides of the replay. Four places, one answer to "is
+  cork a standing stat".
+
 ## Tone, as a lint
 
 `tests/tone.rs` holds the eight rules from `TONE.md` a machine can check. Not
@@ -484,21 +583,24 @@ and M5's trees may spend them again.
 | M5 / MVP | 391 passing |
 | Board rebuilt against the original | 411 passing |
 | The other side's gear, and a tree that says what it does | 419 passing |
-| Catalogue | 523 components |
+| Shops, errands and a replay of both sides | 425 passing |
+| Catalogue | 528 components |
 | Ladder | 50 creatures |
 | `crates/core` | ~33k lines, down from ~50k |
 | wasm | 888 KB |
 | Save format | v1 |
 | Map | 20×20, 5 regions, 3 towns, 6 events |
 | Bestiary | 50 creatures, rated 16 to 2958 |
-| Starting kit | 11 components, 28 Fnorp, 4 assembled items |
+| Starting kit | **2 components**, 28 Fnorp, 1 assembled weapon |
+| Towns | 3, fixed shelves of 11 / 15 / 17, no reroll |
+| Errands | 3, one to a town |
 | Boards | 6×3 at level 1, one row a level, 6×8 ceiling |
 | Level 5 | ~27 fights, mean of nine seeded walks |
 | Skill trees | 13 base nodes + 3 × 8 class nodes, every one stating its effect |
-| Figures | 13 family drawings + 4 drawn for themselves → 68 SVGs |
-| Art coverage | 50 of 50 creatures, 3 of 3 towns, and you |
+| Figures | 13 family drawings + 4 drawn for themselves + 3 classes → 71 SVGs |
+| Art coverage | 50 of 50 creatures, 3 of 3 towns, 3 of 3 classes, and you |
 
-Note the catalogue is **523**, not the 374 the retheme document counts — it
+Note the catalogue is **528**, not the 374 the retheme document counts — it
 grew upstream after that document was written. Any content work that quotes a
 catalogue size should quote this one.
 
@@ -510,5 +612,9 @@ Listed in `PLAN.md` §6. None block M1.
 Actions.
 
 **Still open**, with the default in force: losing costs nothing but the walk
-back; the content charter is binding; invented proper nouns fail the M2 lint;
-`quest.rs` and `town.rs` stay dropped.
+back; the content charter is binding; invented proper nouns fail the M2 lint.
+
+**No longer open:** errands exist, as `crates/core/src/quest.rs` — a new module
+rather than upstream's, which was a chain of receipts along a road. `town.rs`
+stays dropped: a town is a place on the map plus a shelf in `shops.json`, and
+does not need a module.

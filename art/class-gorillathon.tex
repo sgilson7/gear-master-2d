@@ -1,0 +1,57 @@
+% Gorillathon — a gorilla in a bedazzled plaid suit, mid-lift. Leeching: what
+% it deals comes back, so the figure is a thing built to keep going rather than
+% a thing built to hit once.
+%
+% Written by filling in tikz_figure_prompt.md.
+\documentclass[tikz,border=4pt]{standalone}
+\usetikzlibrary{calc}
+\newcommand{\Unit}{0.055cm}
+\newcommand{\Edge}{2.4pt}
+\newcommand{\Sequins}{9}
+\newcommand{\Plates}{4}       % on the bar
+
+\definecolor{fur}{HTML}{3B3630}
+\definecolor{furdark}{HTML}{221E1A}
+\definecolor{plaid}{HTML}{9A3B3B}
+\definecolor{sequin}{HTML}{F0C85A}
+\definecolor{iron}{HTML}{6E7278}
+\definecolor{ink}{HTML}{101018}
+
+\begin{document}
+\begin{tikzpicture}[x=\Unit,y=\Unit, line join=round, line cap=round]
+
+  % ---- the bar, overhead and held ----------------------------------------
+  \draw[iron,line width=3.4pt] (4,58) -- (60,58);
+  \foreach \i in {1,...,\Plates} {
+    \pgfmathsetmacro\x{\i<3 ? 6+(\i-1)*5 : 53+(\i-3)*5}
+    \fill[iron,draw=ink,line width=1.6pt] (\x,50) rectangle ++(4,16);
+  }
+
+  % ---- arms, straight up --------------------------------------------------
+  \draw[fur,line width=6.0pt] (20,36) -- (18,56);
+  \draw[fur,line width=6.0pt] (44,36) -- (46,56);
+
+  % ---- legs ---------------------------------------------------------------
+  \fill[furdark,draw=ink,line width=\Edge] (18,2) rectangle ++(11,16);
+  \fill[furdark,draw=ink,line width=\Edge] (35,2) rectangle ++(11,16);
+
+  % ---- the suit -----------------------------------------------------------
+  \fill[plaid,draw=ink,line width=\Edge] (14,16) -- (50,16) -- (46,44) -- (18,44) -- cycle;
+  % Plaid, which is two sets of lines and nothing cleverer.
+  \foreach \x in {20,26,32,38,44} { \draw[furdark,line width=1.2pt] (\x,17) -- (\x,43); }
+  \foreach \y in {22,29,36} { \draw[furdark,line width=1.2pt] (15,\y) -- (49,\y); }
+  \foreach \i in {1,...,\Sequins} {
+    \pgfmathsetmacro\x{17+mod(\i*7,30)}
+    \pgfmathsetmacro\y{19+mod(\i*11,22)}
+    \fill[sequin] (\x,\y) circle (1.4);
+  }
+
+  % ---- head ---------------------------------------------------------------
+  \fill[fur,draw=ink,line width=\Edge] (32,52) circle (11);
+  \fill[furdark,draw=ink,line width=1.6pt] (32,48) circle (6);   % muzzle
+  \fill[ink] (28,55) circle (1.8);
+  \fill[ink] (36,55) circle (1.8);
+  \draw[ink,line width=1.8pt] (28,46) -- (36,46);
+
+\end{tikzpicture}
+\end{document}

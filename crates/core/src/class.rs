@@ -686,7 +686,7 @@ impl ClassPower {
             ClassPower::Contagion(n) => format!(
                 "every curse you land brings its opposite with it {} - searing pulls in frost, \
                  a stun pulls in a misfire",
-                if n == 1 { "as well".to_string() } else { format!("{n} times over") }
+                if n == 1 { "once more".to_string() } else { format!("{n} times over") }
             ),
             ClassPower::Reprisal(n) => {
                 format!("every hit that lands on you banks {} faith", n)

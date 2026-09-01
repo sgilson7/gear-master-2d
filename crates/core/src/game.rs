@@ -19,7 +19,6 @@
 use crate::character::Character;
 use crate::fight::Encounter;
 use crate::rng::Rng;
-use crate::shop::Shop;
 use crate::world::WorldState;
 
 /// The whole of a session's state.
@@ -41,11 +40,11 @@ pub struct Game {
     /// No log and no seed: combat does not draw, so the situation is enough to
     /// reproduce the fight exactly. See `fight.rs`.
     pub encounter: Option<Encounter>,
-    /// What the towns are selling. One shelf for the whole world rather than
-    /// one per town: a shelf per town would be four shelves to restock and
-    /// three of them stale, and the run is what stocks a shop.
-    pub shop: Shop,
 }
+// **There is no shelf here any more.** What a town sells is
+// `data/shops.json` and never changes, so it is content and is derived where
+// it is drawn; what a save carries is `WorldState::bought`, which is the short
+// list of things already taken off a shelf. Same discipline as the map.
 
 impl Game {
     /// A new session from a seed.
@@ -54,8 +53,7 @@ impl Game {
     /// item-name hash, so the same seed names the same arrangement the same
     /// way for the life of the save.
     pub fn new(seed: u64, theme: &str) -> Self {
-        let mut rng = Rng::new(seed);
-        let shop = Shop::new(&mut rng);
+        let rng = Rng::new(seed);
         Game {
             rng,
             theme: theme.to_string(),
@@ -66,7 +64,6 @@ impl Game {
             // player with `WorldState::at_start`.
             world: WorldState::default(),
             encounter: None,
-            shop,
         }
     }
 }
@@ -112,8 +109,6 @@ impl PartialEq for Game {
             && a.registry == b.registry
             && self.world == other.world
             && self.encounter == other.encounter
-            && self.shop.stock == other.shop.stock
-            && self.shop.locked == other.shop.locked
     }
 }
 

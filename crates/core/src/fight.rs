@@ -128,6 +128,12 @@ pub fn settle(game: &mut Game, log: &CombatLog, difficulty: Difficulty) -> Optio
                 }
             }
             game.world.bump("wins");
+            // What the corpse leaves for an errand that asked for it. Gated on
+            // the errand rather than on the creature: a bag filling with toad
+            // eyes before anybody wanted one is litter.
+            for name in crate::quest::on_victory(game, spec.name) {
+                receipt.push(format!("Took a {name}."));
+            }
         }
         Outcome::Defeat | Outcome::Stalemate => {
             game.world.bump("losses");

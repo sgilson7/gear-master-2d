@@ -59,5 +59,10 @@
     "kettleworks": "town-kettleworks",
     "high-wick": "town-high-wick"
   },
-  "player": "sprocketman"
+  "player": "sprocketman",
+  "classes": {
+    "Berserker": "class-gorillathon",
+    "Hexweaver": "class-funnel-sergeant",
+    "Bloodletter": "class-worm-fact-keeper"
+  }
 }

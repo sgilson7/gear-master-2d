@@ -150,19 +150,14 @@ pub struct SaveState {
     /// storing both; the engine made them unnecessary.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub encounter: Option<crate::fight::Encounter>,
-    /// The shelf, by catalogue name rather than index — the same reason the
-    /// registry is: an index is stable only while catalogue order is.
-    #[serde(default)]
-    pub shop: ShopSave,
 }
+// **The shelf is not in the save.** It was, by catalogue name, while a shop
+// was a randomised stock the run owned. A town's stock is `data/shops.json`
+// now and never changes, so it is content; what survives here is
+// `WorldState::bought`, which is state. A file written before this still
+// loads — serde ignores the key it no longer knows — and arrives with the
+// shelves it always had, because they are the same shelves for everybody.
 
-/// What is for sale, and what is pinned.
-#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
-pub struct ShopSave {
-    pub stock: Vec<String>,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    pub locked: Vec<String>,
-}
 
 // ---------------------------------------------------------------- writing
 
@@ -196,7 +191,7 @@ impl SaveFile {
     /// point of them: a new field on any of these types stops this function
     /// compiling.
     pub fn of(game: &Game) -> Self {
-        let Game { rng, theme, character, world, encounter, shop } = game;
+        let Game { rng, theme, character, world, encounter } = game;
         let Character {
             registry,
             owned,
@@ -257,10 +252,6 @@ impl SaveFile {
                 theme: theme.clone(),
                 world: world.clone(),
                 encounter: encounter.clone(),
-                shop: ShopSave {
-                    stock: shop.stock.iter().map(|&d| CATALOG[d].name.to_string()).collect(),
-                    locked: shop.locked.iter().map(|&d| CATALOG[d].name.to_string()).collect(),
-                },
                 character: CharacterSave {
                     gold: *gold,
                     grown_health: *grown_health,
@@ -374,7 +365,7 @@ impl SaveFile {
     pub fn into_game(self) -> Result<Game, String> {
         let SaveFile { format: _, version, catalog: _, state } = self;
         let state = migrate(version, state)?;
-        let SaveState { rng_state, theme, character, world, encounter, shop } = state;
+        let SaveState { rng_state, theme, character, world, encounter } = state;
         let CharacterSave {
             gold,
             grown_health,
@@ -458,21 +449,7 @@ impl SaveFile {
         character.skills_taken = skills_taken;
         character.class = class;
 
-        // The shelf. A component the shelf names and this build has not got
-        // is dropped rather than refused: a stale shelf is a smaller problem
-        // than a save that will not open, and the next restock clears it.
-        let by_name = |names: &[String]| -> Vec<usize> {
-            names
-                .iter()
-                .filter_map(|n| CATALOG.iter().position(|d| d.name == *n))
-                .collect()
-        };
-        let mut shelf = crate::shop::Shop::default();
-        shelf.stock = by_name(&shop.stock);
-        shelf.locked = by_name(&shop.locked);
-
-        let mut game =
-            Game { rng: Rng::from_state(rng_state), theme, character, world, encounter, shop: shelf };
+        let mut game = Game { rng: Rng::from_state(rng_state), theme, character, world, encounter };
         // The one pointer the file could not carry, put back from the id it
         // carried instead.
         game.character.loadout.naming = crate::theme::by_id(&game.theme).naming;

@@ -114,19 +114,25 @@
           <div>
             <p class="eyebrow">a town</p>
             <h2 id="town-name">&mdash;</h2>
-            <p class="note">Nothing follows you in here and nothing rolls while you stand in it.
-              Buy what you can afford, pack your frames, and go back out.</p>
+            <p class="note">Nothing follows you in here, and this shelf is this shelf.
+              It does not turn over: what a town has is what a town has, and what
+              you buy is gone from it.</p>
           </div>
           <img id="town-art" class="portrait" hidden alt="">
           <dl class="figures">
             <div><dt>Fnorp</dt><dd id="town-gold">&mdash;</dd></div>
           </dl>
         </header>
-        <h3 class="sub-h">The shelf</h3>
+        <h3 class="sub-h">What they have</h3>
         <div id="shelf" class="shelf"></div>
+        <!-- The errands. Hidden entirely where a town has none, rather than
+             printing a heading over an empty box. -->
+        <div id="errands" hidden>
+          <h3 class="sub-h">What they want</h3>
+          <div id="quests" class="shelf"></div>
+        </div>
         <p id="town-says" class="says" hidden></p>
         <div class="row">
-          <button id="reroll" type="button">Turn the shelf over &mdash; 1 Fnorp</button>
           <button id="pack" type="button" class="primary">Pack your frames</button>
           <button id="leave" type="button">Back out</button>
         </div>
@@ -189,11 +195,27 @@
         </div>
 
         <div id="stage-replay" hidden>
-          <canvas id="replay" width="1240" height="470"></canvas>
+          <canvas id="replay"></canvas>
+          <!-- Both sides' gear, ticking. For forty-nine of the fifty creatures
+               the gear *is* the fight, so a replay that showed only your own
+               was showing one side of it. -->
+          <div class="ticks">
+            <div>
+              <h4 class="sub-h">Yours</h4>
+              <div id="ticks-you" class="tick-list"></div>
+            </div>
+            <div>
+              <h4 class="sub-h" id="ticks-them-name">Theirs</h4>
+              <div id="ticks-them" class="tick-list"></div>
+            </div>
+          </div>
           <div class="row">
             <button id="skip" type="button">Skip to the end</button>
           </div>
         </div>
+        <!-- The hovered item's card. Pinned to the viewport, like the skill
+             tree's, so a scrolling list does not drag it around. -->
+        <div id="tick-card" class="made" hidden></div>
 
         <div id="stage-result" hidden>
           <h3 id="result-title">&mdash;</h3>

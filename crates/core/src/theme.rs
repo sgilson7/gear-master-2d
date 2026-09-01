@@ -914,6 +914,15 @@ pub static TURTLE_DICK: Theme = Theme {
         ("Signal Wire", "The Signal Wire from Multicity"),
         ("Shunter's Orb", "The Shunting Ball"),
         ("Signalman's Orb", "The Signal Ball"),
+        // The toad census. Three pieces the starter town's errand turns on,
+        // named in the change that writes them — the gear skill's own rule.
+        // The toad is already the Bengulon Jungle Toad, so its eyes are, and
+        // the ledger is a count of them.
+        ("Toad Eye", "Bengulon Toad Eye"),
+        ("Bone Nock", "Rice Crier's Nock"),
+        ("Mirror Shard", "Shard of the Long Mirror"),
+        ("The Bog Census", "The Bengulon Tally"),
+        ("Census Bolt", "Count The Legs"),
         ("A Word About the Sidings", "A Word About the Cork Yards"),
         ("A Word About the Points", "A Word About the Sprocketman's Lever"),
         // THE HUNDRED. A county is land, so the three enchantments are places

@@ -417,3 +417,27 @@ fn level_five_lands_where_the_plan_says() {
     let wild: Vec<i32> = counts.iter().copied().filter(|n| !(15..=50).contains(n)).collect();
     assert!(wild.is_empty(), "some walks are nowhere near the band: {counts:?}");
 }
+
+#[test]
+#[ignore = "prints what the starting kit actually beats"]
+fn show_the_pit() {
+    use gm2d_core::combat::{simulate_at, Outcome};
+    let mut c = Character::starting();
+    c.apply_preset();
+    let items = c.combat_items();
+    let stats = c.player_stats();
+    println!("owns {} pieces, {} Fnorp", c.owned.len(), c.gold);
+    for i in &items {
+        println!("  item: {} ({:?}) hits {} every {}ms",
+                 i.name, i.slot, i.hit_for(stats.strength), i.cooldown_ms);
+    }
+    for r in &data::world(D).regions {
+        for m in &r.enemies {
+            let log = simulate_at(stats, &items, m, D);
+            if r.id == "the-end-of-all-gears" || log.outcome == Outcome::Victory {
+                println!("  {:<24} {:<8} {:?} in {:.1}s", m.name, r.id,
+                         log.outcome, log.duration_ms as f32 / 1000.0);
+            }
+        }
+    }
+}

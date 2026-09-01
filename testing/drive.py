@@ -259,6 +259,153 @@ def check_every_skill_says_what_it_does(page, name, fails):
     page.wait_for_selector("#tree", state="hidden", timeout=8000)
 
 
+def check_the_shelf_is_the_shelf(page, name, fails):
+    """A town sells what it sells, and what you buy is gone from it.
+
+    The shop used to be one randomised stock for the whole world with a reroll
+    button, which made three towns one slot machine in three costumes. Stock is
+    `data/shops.json` now: what has to hold is that leaving and coming back
+    finds the same shelf, minus what you took.
+    """
+    if page.query_selector("#reroll"):
+        fails.append(f"{name}: the reroll button is still there")
+    before = page.evaluate("""() => [...document.querySelectorAll('#shelf .wares')].map(b => ({
+      name: b.querySelector('b').textContent,
+      sold: b.classList.contains('sold'),
+    }))""")
+    if not before:
+        fails.append(f"{name}: the town sells nothing")
+        return
+    buyable = next((i for i, w in enumerate(before) if not w["sold"]
+                    and not page.locator("#shelf .wares").nth(i).is_disabled()), None)
+    if buyable is None:
+        fails.append(f"{name}: nothing on the shelf is affordable")
+        return
+    page.locator("#shelf .wares").nth(buyable).click()
+    page.click("#leave")
+    page.wait_for_selector("#town", state="hidden", timeout=8000)
+    # Back in. Out one tile first: leaving a town leaves you standing on it,
+    # and the starting town is against the western edge — walking further west
+    # is a blocked step, which by design draws nothing and moves nobody.
+    def step(key):
+        page.keyboard.press(key)
+        if page.is_visible("#fight"):
+            page.click("#run")
+            page.wait_for_selector("#fight", state="hidden", timeout=8000)
+        dismiss_card(page)
+
+    step("ArrowRight")
+    for _ in range(12):
+        if page.is_visible("#town"):
+            break
+        step("ArrowLeft")
+    if not page.is_visible("#town"):
+        fails.append(f"{name}: could not get back into the town")
+        return
+    after = page.evaluate("""() => [...document.querySelectorAll('#shelf .wares')].map(b => ({
+      name: b.querySelector('b').textContent,
+      sold: b.classList.contains('sold'),
+    }))""")
+    if [w["name"] for w in before] != [w["name"] for w in after]:
+        fails.append(f"{name}: the shelf turned over on its own")
+    if not after[buyable]["sold"]:
+        fails.append(f"{name}: {after[buyable]['name']!r} was bought and is still for sale")
+    resold = [w["name"] for i, w in enumerate(after) if w["sold"] and i != buyable
+              and not before[i]["sold"]]
+    if resold:
+        fails.append(f"{name}: entries sold themselves while you were out: {resold}")
+
+
+def check_the_errand_board(page, name, fails):
+    """The starter town asks for something, and taking it on says what.
+
+    The ask is derived from the goal and unthemed — a count and a creature —
+    for the same reason a skill node's is: somebody deciding whether to walk
+    four streets for it is reading a number.
+    """
+    got = page.evaluate("""() => [...document.querySelectorAll('#quests .wares')].map(b => ({
+      name: b.querySelector('b')?.textContent ?? '',
+      asks: b.querySelector('.spec')?.textContent ?? '',
+      foot: b.querySelector('.cost')?.textContent ?? '',
+      pays: b.querySelector('.meta')?.textContent ?? '',
+    }))""")
+    if not got:
+        fails.append(f"{name}: the starting town has no errand")
+        return
+    q = got[0]
+    if not any(c.isdigit() for c in q["asks"]):
+        fails.append(f"{name}: the errand asks {q['asks']!r}, which names no number")
+    if not q["pays"].strip():
+        fails.append(f"{name}: the errand says nothing about what it pays")
+    if q["foot"].strip().lower() != "take it on":
+        fails.append(f"{name}: an untaken errand reads {q['foot']!r}")
+    page.locator("#quests .wares").first.click()
+    foot = page.locator("#quests .wares .cost").first.text_content()
+    if "of" not in foot:
+        fails.append(f"{name}: after taking it the errand reads {foot!r}, not a tally")
+
+    # And handing in early is refused with a sentence rather than a silence.
+    # The grind to five toads is not worth walking here — the whole loop is in
+    # `tests/quests.rs` — but the button being wired to the answer is.
+    page.locator("#quests .wares").first.click()
+    said = page.text_content("#town-says") or ""
+    if not said.strip():
+        fails.append(f"{name}: handing in an unfinished errand said nothing")
+    elif "of" not in said:
+        fails.append(f"{name}: the refusal does not say how far along you are: {said!r}")
+
+
+def check_the_replay_shows_both_sides(page, name, fails):
+    """Both boards tick, and pointing at a row reads that item.
+
+    Only the Cave Rat has innate attacks — every other creature fights purely
+    out of its gear — so a replay showing one side's cooldowns was showing half
+    the fight with no way to tell which half.
+    """
+    got = page.evaluate("""() => {
+      const r = window.__replay, log = r.log;
+      const rows = (id) => [...document.querySelectorAll(`#${id} .tick`)].map(e => ({
+        name: e.querySelector('.tick-name').textContent,
+        card: e.classList.contains('has-card'),
+      }));
+      const last = log.entries[log.entries.length - 1] ?? {};
+      return {
+        you: rows('ticks-you'), them: rows('ticks-them'),
+        wantYou: log.player.items.length, wantThem: log.enemy?.items?.length ?? 0,
+        // The four pools and both armours have to arrive as numbers, whatever
+        // this particular fight happened to bank.
+        shape: ['pa', 'ea'].every(k => typeof last[k] === 'number')
+            && ['pp', 'ep'].every(k => Array.isArray(last[k]) && last[k].length === 4),
+      };
+    }""")
+    if len(got["you"]) != got["wantYou"]:
+        fails.append(f"{name}: {len(got['you'])} rows for your {got['wantYou']} items")
+    if len(got["them"]) != got["wantThem"]:
+        fails.append(f"{name}: {len(got['them'])} rows for its {got['wantThem']} items")
+    if not got["them"]:
+        fails.append(f"{name}: the creature's side of the replay is empty")
+    if not got["shape"]:
+        fails.append(f"{name}: the replay is not carrying armour and pools")
+
+    # Pointing at a row with gear behind it opens that item's card, in the same
+    # two halves the packing panel uses.
+    row = page.query_selector("#ticks-them .tick.has-card") \
+       or page.query_selector("#ticks-you .tick.has-card")
+    if row is None:
+        return
+    row.hover()
+    page.wait_for_selector("#tick-card", state="visible", timeout=4000)
+    card = page.evaluate("""() => {
+      const b = document.getElementById('tick-card');
+      return { heads: [...b.querySelectorAll('.head')].map(h => h.textContent.trim()),
+               name: b.querySelector('b')?.textContent ?? '' };
+    }""")
+    if len(card["heads"]) < 2:
+        fails.append(f"{name}: the replay card has no two halves: {card}")
+    elif "standing" not in card["heads"][0].lower():
+        fails.append(f"{name}: the replay card leads with {card['heads'][0]!r}")
+
+
 def check_turning_in_hand(page, name, fails):
     """A component turned in hand actually turns.
 
@@ -453,8 +600,10 @@ def walk_the_gate(browser, name):
     if not page.is_visible("#town"):
         fails.append(f"{name}: stepping back onto the starting town opened no town")
     else:
+        check_the_errand_board(page, name, fails)
+        check_the_shelf_is_the_shelf(page, name, fails)
         purse = int(page.text_content("#town-gold"))
-        wares = page.locator(".wares:not(:disabled)")
+        wares = page.locator("#shelf .wares:not(:disabled)")
         if wares.count() == 0:
             fails.append(f"{name}: nothing on the shelf is affordable with {purse} Fnorp")
         else:
@@ -497,6 +646,7 @@ def walk_the_gate(browser, name):
 
         page.click("#go")
         page.wait_for_selector("#stage-replay", state="visible", timeout=10000)
+        check_the_replay_shows_both_sides(page, name, fails)
         page.click("#skip")
         page.wait_for_selector("#stage-result", state="visible", timeout=15000)
         receipt = page.locator("#result-receipt p").all_text_contents()
@@ -654,9 +804,39 @@ def walk_the_gate(browser, name):
         offered = page.locator("#fork-choices .wares").count()
         if offered != 3:
             fails.append(f"{name}: the fork offers {offered} classes, and the plan says three")
-        promises = page.locator("#fork-choices .wares .cost").all_text_contents()
+        promises = page.locator("#fork-choices .wares .promise").all_text_contents()
         if any(not p.strip() for p in promises):
             fails.append(f"{name}: a class promises nothing mechanical: {promises}")
+        # A number, in digits or in words. Spelling small ones out is the
+        # house style — TONE.md rule 12 had to learn the same thing after it
+        # failed "Forty Fnorp" for naming no number.
+        SPELT = ("once", "twice", "one", "two", "three", "four", "five", "six",
+                 "seven", "eight", "nine", "ten", "half", "double")
+        def counts(p):
+            low = p.lower()
+            return any(c.isdigit() for c in p) or any(w in low.split() for w in SPELT)
+        if any(not counts(p) for p in promises):
+            fails.append(f"{name}: a class promise names no number: {promises}")
+        # Every class has a figure, and the figure loaded. Waited for rather
+        # than sampled: `naturalWidth` is 0 until the decode finishes, so
+        # measuring the instant the screen opens is a race that fails in one
+        # engine and passes in the other two.
+        try:
+            page.wait_for_function(
+                """() => [...document.querySelectorAll('#fork-choices img')]
+                          .every(i => i.complete)""",
+                timeout=8000)
+        except Exception:
+            pass
+        art = page.evaluate("""() => [...document.querySelectorAll('#fork-choices .wares')].map(b => {
+          const i = b.querySelector('img');
+          return { src: i?.getAttribute('src') ?? null, w: i?.naturalWidth ?? 0 };
+        })""")
+        for i, a in enumerate(art):
+            if not a["src"]:
+                fails.append(f"{name}: class {i} is offered with no figure")
+            elif a["w"] == 0:
+                fails.append(f"{name}: class {i} points at {a['src']}, which did not load")
 
         # The fork does not take Escape: it is the one decision that does not
         # come off, and a screen you can dismiss is a decision you can decline.
@@ -739,6 +919,10 @@ def main():
     print("ok: every skill states its effect in numbers, unthemed, and explains it on hover")
     print("ok: the creature has a portrait, and the portrait loaded")
     print("ok: what it is wearing is on the screen — its board, its items, its own body")
+    print("ok: both boards tick in the replay, and pointing at a row reads that item")
+    print("ok: a town's shelf is that town's shelf, and what you buy is gone from it")
+    print("ok: the starting town asks for five toads, in a number rather than a mood")
+    print("ok: every class is offered with its own figure")
     print("ok: a mid-fight save reopens the same fight")
     print("ok: walk, download, reload, upload — position and stream both came back")
     print("ok: a wrong file was refused with a sentence and changed nothing")

@@ -417,6 +417,21 @@ pub struct WorldState {
     pub flags: Vec<String>,
     #[serde(default)]
     pub counters: Vec<(String, u32)>,
+    /// What has been bought off a town's shelf: the place id and the index in
+    /// that town's stock list.
+    ///
+    /// The shelf itself is `data/shops.json` and is not here, for the reason
+    /// the map is not here. The *index* is the identity, which is why a sold
+    /// entry is greyed rather than dropped — renumbering would move what
+    /// somebody already bought.
+    #[serde(default)]
+    pub bought: Vec<(String, u16)>,
+    /// Errands taken and not yet handed in.
+    #[serde(default)]
+    pub quests_taken: Vec<String>,
+    /// Errands handed in. A town does not offer one twice.
+    #[serde(default)]
+    pub quests_done: Vec<String>,
 }
 
 impl WorldState {

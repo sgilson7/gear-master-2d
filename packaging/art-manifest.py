@@ -49,7 +49,10 @@ def main() -> int:
 
     if args.write_map:
         path = pathlib.Path(args.write_map)
-        art = json.loads(path.read_text())
+        # Read, replace one key, write. `places`, `player` and `classes` are
+        # written by a person and must survive: this script owns the creature
+        # half of the file and nothing else.
+        art = json.loads(path.read_text(), object_pairs_hook=__import__("collections").OrderedDict)
         art["creatures"] = {
             name: (spec["family"]
                    if not any(k in spec for k in ("main", "dark", "accent"))

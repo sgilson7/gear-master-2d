@@ -43,9 +43,14 @@ use crate::stats::Stats;
 /// both. The chest is the first thing a player buys into.
 const STARTER: &[(&str, SlotKind, u8, u8, u8)] = &[
     ("Oak Handle", SlotKind::Weapon, 0, 0, 0),
-    ("Runed Edge", SlotKind::Weapon, 1, 0, 0),
-    ("Ruby Inlay", SlotKind::Weapon, 3, 0, 0),
-    ("Balance Weight", SlotKind::Weapon, 3, 1, 0),
+    // **Turned, and it has to be.** An Iron Blade is one cell wide and four
+    // tall, and a starting weapon frame is three rows: upright it does not fit
+    // anywhere on the board, the weapon assembles nothing, and a character who
+    // cannot win cannot earn. That is the M4 soft-lock exactly, and the reason
+    // the fifth field of these rows exists.
+    ("Iron Blade", SlotKind::Weapon, 1, 0, 1),
+    ("Ruby Inlay", SlotKind::Weapon, 1, 1, 0),
+    ("Balance Weight", SlotKind::Weapon, 2, 1, 0),
     ("Steel Frame", SlotKind::Helmet, 0, 0, 0),
     ("Iron Plating", SlotKind::Helmet, 3, 0, 0),
     ("Visor of Focus", SlotKind::Helmet, 0, 2, 0),
@@ -54,6 +59,19 @@ const STARTER: &[(&str, SlotKind, u8, u8, u8)] = &[
     ("Runed Material", SlotKind::Greaves, 0, 0, 0),
     ("Greave Mold", SlotKind::Greaves, 2, 0, 0),
 ];
+
+/// What a new character owns. **Two pieces, and they make one weapon.**
+///
+/// Everything else is bought or earned. The kit used to be eleven components —
+/// most of a helmet, a pair of molds and a whole weapon — which meant the shop
+/// was decoration for the first hour and the first quest was a formality. A
+/// character now walks out of the pit with a blade on a stick and a reason to
+/// go into town.
+///
+/// It still has to *win* in the pit, which is not a matter of taste:
+/// `a_starting_character_can_win_in_the_pit` fights the region's whole roster
+/// with exactly this and refuses a kit that beats none of it.
+const STARTING_KIT: &[&str] = &["Oak Handle", "Iron Blade"];
 
 /// How many board changes can be taken back.
 pub const UNDO_DEPTH: usize = 40;
@@ -214,9 +232,8 @@ impl Character {
         // lost every fight, and a loss pays nothing, so there was no way out of
         // the first region at all.
         //
-        // A whole weapon, most of a helmet, and a pair of molds. Enough to win
-        // in the pit and nowhere else.
-        for name in STARTER.iter().map(|(n, ..)| *n) {
+        // A blade and something to hold it by, and nothing else at all.
+        for name in STARTING_KIT {
             c.give(name);
         }
         c.forget_undo();

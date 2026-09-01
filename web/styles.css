@@ -311,3 +311,57 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
 /* Three classes are offered and `auto-fill` left the row padded out with empty
    track. `auto-fit` collapses the empty tracks and the three share the width. */
 #fork-choices { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+
+/* A shelf entry already bought, and an errand already run. The gap is the
+   memory of what you took — a fixed shelf that silently closed up would look
+   like a shelf that had never had it. */
+.wares.sold { opacity: .45; }
+.wares.sold .cost { color: var(--ink-3); font-style: italic; }
+/* An errand is a paragraph, not a card in a rack: it takes the row. */
+.wares.errand { grid-column: 1 / -1; }
+.wares.errand .flavour { margin-top: 2px; }
+.wares.errand.ready { outline: 2px solid var(--brass); outline-offset: -2px; }
+
+/* The class figures. Wide and short so three of them sit in a row without the
+   promise under each one falling below the fold. */
+#fork-choices .portrait.wide {
+  width: 100%; height: 150px; margin-bottom: 8px; order: 0; padding: 6px;
+}
+
+/* --- the replay ---------------------------------------------------------- */
+#stage-replay canvas { display: block; width: 100%; }
+.ticks { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin: 18px 0 4px; }
+.tick-list { display: grid; gap: 3px; }
+/* A row is name, track, number. `minmax(0,...)` on the name so a long item
+   name wraps inside its column instead of pushing the track off the end. */
+.tick {
+  display: grid; grid-template-columns: minmax(0, 15ch) 1fr 3.5ch;
+  align-items: center; gap: 8px;
+  font-family: var(--mono); font-size: 11.5px; color: var(--ink-2);
+  padding: 1px 4px; border-radius: 0;
+}
+.tick-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tick-track { display: block; height: 10px; background: var(--surface);
+  border: 1px solid var(--line); }
+.tick-track i { display: block; height: 100%; width: 0; background: var(--ink-3); }
+.tick.ready .tick-track i { background: var(--brass); }
+.tick-hit { text-align: right; color: var(--ink-3); }
+.tick.has-card { cursor: help; }
+.tick.has-card:hover, .tick.has-card:focus-visible {
+  background: color-mix(in srgb, #69cdeb 14%, transparent); outline: none;
+}
+@media (max-width: 720px) { .ticks { grid-template-columns: 1fr; } }
+
+/* The card the hovered row opens. Same treatment as the skill tree's, and for
+   the same reason: it must not eat the pointer that summoned it. */
+#tick-card {
+  position: fixed; right: 18px; bottom: 18px; z-index: 20; width: min(38ch, 92vw);
+  background: var(--surface); border: 1px solid var(--line);
+  box-shadow: 0 6px 24px rgb(0 0 0 / .28); padding: 12px 14px;
+  pointer-events: none;
+}
+#tick-card[hidden] { display: none; }
+
+/* The replay panel is dark, like the board, so give the box round it the same
+   edge rather than letting a light border frame a black canvas. */
+#stage-replay canvas { border: 1px solid var(--line); }

@@ -1,0 +1,48 @@
+% Worm-Fact Keeper — THE WORM FACT REMAINS LAW. A filing, not a threat: the
+% figure is a clerk on a throne of the thing they file about.
+%
+% Written by filling in tikz_figure_prompt.md.
+\documentclass[tikz,border=4pt]{standalone}
+\usetikzlibrary{calc}
+\newcommand{\Unit}{0.055cm}
+\newcommand{\Edge}{2.4pt}
+\newcommand{\Coils}{3}
+\newcommand{\Segments}{6}
+
+\definecolor{flesh}{HTML}{9C5C60}
+\definecolor{fleshdark}{HTML}{5E3438}
+\definecolor{robe}{HTML}{2F2A33}
+\definecolor{paper}{HTML}{DCD6C4}
+\definecolor{ink}{HTML}{101018}
+
+\begin{document}
+\begin{tikzpicture}[x=\Unit,y=\Unit, line join=round, line cap=round]
+
+  % ---- the throne, which is the worm -------------------------------------
+  \foreach \i in {1,...,\Coils} {
+    \pgfmathsetmacro\y{4+(\i-1)*9}
+    \pgfmathsetmacro\r{26-(\i-1)*4}
+    \draw[flesh,line width=7.0pt] ({32-\r},\y) .. controls ({32-\r},{\y+7}) and ({32+\r},{\y+7}) .. ({32+\r},\y);
+  }
+  % Segments, so it reads as a worm rather than a hose.
+  \foreach \i in {1,...,\Segments} {
+    \pgfmathsetmacro\x{10+(\i-1)*9}
+    \draw[fleshdark,line width=1.6pt] (\x,4) -- (\x,10);
+  }
+
+  % ---- the clerk ----------------------------------------------------------
+  \fill[robe,draw=ink,line width=\Edge] (20,20) -- (44,20) -- (40,46) -- (24,46) -- cycle;
+  \fill[robe,draw=ink,line width=\Edge] (32,52) circle (8);
+  \fill[paper] (29,53) circle (1.6);
+  \fill[paper] (35,53) circle (1.6);
+
+  % ---- the filing, held out where it can be read -------------------------
+  \fill[paper,draw=ink,line width=\Edge] (38,24) rectangle (58,42);
+  \foreach \y in {28,32,36} { \draw[ink,line width=1.2pt] (41,\y) -- (55,\y); }
+  \draw[robe,line width=4.4pt] (40,36) -- (44,32);
+
+  % ---- and the one line of it that matters -------------------------------
+  \draw[fleshdark,line width=2.4pt] (41,39) -- (55,39);
+
+\end{tikzpicture}
+\end{document}

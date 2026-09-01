@@ -1,0 +1,69 @@
+{
+  "format": "gm2d-shops",
+  "version": 1,
+  "_note": "What each town sells, for ever. A shelf is content: it does not roll, it does not reroll, and a save records only which entries have been bought. Order is part of the contract — a purchase is stored as a town and an index — so append to a list, never insert into the middle of one.",
+  "_shape": "Each town is a place rather than a slot machine in a costume. The End of All Gears has the cheap basics and nothing else; Kettleworks is metalwork, and is where a real helmet and a second blade come from; High Wick is the arcane shelf and the only place a book, an ink and a spell can be bought together.",
+  "towns": [
+    {
+      "id": "the-end-of-all-gears",
+      "_note": "The pit's own town, and everything on it is under six Fnorp. A starting character has twenty-eight and owns a handle and a blade, so this shelf is one finished helmet and one pair of gloves, or most of both.",
+      "stock": [
+        "Tin Frame",
+        "Tin Plating",
+        "Crest of Vigor",
+        "Leather Material",
+        "Gripping Mold",
+        "Greave Mold",
+        "Plain Sole",
+        "Sackcloth Base",
+        "Rag Layer",
+        "Balance Weight",
+        "Ruby Inlay"
+      ]
+    },
+    {
+      "id": "kettleworks",
+      "_note": "Metalwork. Plate, gauntlets and edges — the things the slag flats are made of.",
+      "stock": [
+        "Steel Frame",
+        "Iron Plating",
+        "Ridged Frame",
+        "Steel Material",
+        "Gauntlet Mold",
+        "Bulwark Material",
+        "Boiled Leather",
+        "Runner's Mold",
+        "Striding Mold",
+        "Ash Haft",
+        "Chipped Edge",
+        "Hooked Edge",
+        "Chain Coil",
+        "Plate Layer",
+        "Hide Base"
+      ]
+    },
+    {
+      "id": "high-wick",
+      "_note": "The arcane shelf, and the only one that sells a book, an ink and a spell in the same room — which is the whole of what makes a caster weapon buildable at all.",
+      "stock": [
+        "Chapbook",
+        "Soot Ink",
+        "Warding Sigil",
+        "Rime Nova",
+        "Mirrorcast",
+        "Mage's Circlet",
+        "Mirrored Visor",
+        "Third Eye",
+        "Hexer's Mold",
+        "Channeling Mold",
+        "Witch's Claw",
+        "Witch's Stilts",
+        "Wayfarer's Sole",
+        "Mana Loom",
+        "Serrated Edge",
+        "Bonesaw",
+        "Duelist's Grip"
+      ]
+    }
+  ]
+}

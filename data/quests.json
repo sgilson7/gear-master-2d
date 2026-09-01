@@ -1,0 +1,64 @@
+{
+  "format": "gm2d-quests",
+  "version": 1,
+  "_note": "Errands a town hands out. Content, not state: the save carries which are taken and which are done, and nothing else. The tally is a real bag item rather than a counter, so the middle of an errand is a walk home carrying something.",
+  "quests": [
+    {
+      "id": "the-eyes-have-it",
+      "town": "the-end-of-all-gears",
+      "name": "THE EYES HAVE IT",
+      "brief": "A clerk in the pit's own office keeps the register of what lives here. Bengulon jungle toads are not on it, and are four streets in. Nine planes over is where they are from; somebody brought forty and did not stay. She will not write down a thing she has not been handed, and what she will accept is eyes. Five toads. Ten eyes, which she is counting as five.",
+      "thanks": "She writes for a while. Then she gives you a ledger with a spine like a brick and a page of counting-out that she says works, and has not said on what. The register now runs to a hundred and nine species and one line that says PENDING.",
+      "goal": {
+        "slay": {
+          "creature": "Bog Toad",
+          "count": 5,
+          "token": "Toad Eye"
+        }
+      },
+      "reward": [
+        "The Bog Census",
+        "Census Bolt"
+      ],
+      "gold": 12
+    },
+    {
+      "id": "a-quiver-of-nocks",
+      "town": "kettleworks",
+      "name": "A QUIVER OF NOCKS",
+      "brief": "The fletcher at Kettleworks has been buying arrows back off the wallspider swarms for six years and has never once got a nock returned with them. He has a drawer of eight hundred shafts and nothing to put on the end of any of them. Four nocks. He is not asking where they come from and neither should you.",
+      "thanks": "He fits one, looks down the shaft, and puts it in the drawer with the other eight hundred. Then he gives you a frame and a visor off the shelf behind him, which was not on the shelf in front of him, and does not explain the difference.",
+      "goal": {
+        "slay": {
+          "creature": "Bone Archer",
+          "count": 4,
+          "token": "Bone Nock"
+        }
+      },
+      "reward": [
+        "Ridged Frame",
+        "Mirrored Visor"
+      ],
+      "gold": 20
+    },
+    {
+      "id": "the-long-mirror-inventory",
+      "town": "high-wick",
+      "name": "THE LONG MIRROR INVENTORY",
+      "brief": "High Wick keeps an inventory of everything the Yodregar Archive has reflected, on the grounds that a thing seen twice has been in the world twice. The inventory is nine volumes and none of them agree. Three shards, and the clerk will start volume ten, which she says will be the last one, as she has said of the previous four.",
+      "thanks": "She holds a shard up, looks at what is behind her in it, and writes for eleven minutes. Volume ten is open. Then she hands you an ink and a word she says goes with it, and adds that neither is in the inventory and she would rather they stayed out of it.",
+      "goal": {
+        "slay": {
+          "creature": "Mirror Fiend",
+          "count": 3,
+          "token": "Mirror Shard"
+        }
+      },
+      "reward": [
+        "Mercurial Ink",
+        "Warding Sigil"
+      ],
+      "gold": 35
+    }
+  ]
+}

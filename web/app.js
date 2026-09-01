@@ -6,7 +6,7 @@
 import init, {
   world_json, position, try_step, event_json, answer,
   save_json, load_json, new_game, apply_preset,
-  shop_json, buy, reroll, pin,
+  shop_json, buy, quests_json, take_quest, hand_in_quest,
   character_json, skills_json, take_skill,
   class_offer_json, choose_class, class_name, all_trees_json,
   gold, piece_count, version, save_version,
@@ -372,74 +372,82 @@ function paintMade(st) {
 /// pipeline in core, so it deserves the identical card — and a second copy of
 /// this would be a second answer to "is cork a standing stat", which is the
 /// question the two halves below exist to settle.
+const sign = (n, unit) => `${n > 0 ? '+' : ''}${n}${unit}`;
+// "built on a Oak Handle" was on every card with a vowel-headed core.
+const article = (n) => (n ? `${/^[aeiou]/i.test(n) ? 'an' : 'a'} ${n}` : '—');
+const secs = (ms) => (ms / 1000).toFixed(2);
+
+/// One item, as a card.
+///
+/// **One builder, four panels.** Your board, the creature's board and both
+/// sides of the replay draw this. Two copies would be two answers to "is cork
+/// a standing stat", which is the question the two halves exist to settle.
+function oneCard(i, where) {
+  if (!i.assembled) {
+    return (
+  `<div class="made-item short" data-key="${i.pieces.join(',')}">` +
+  `<b>${i.short || 'loose pieces'}</b>` +
+  `<span class="why">${i.status}</span></div>`);
+  }
+  // Rarity as pips as well as a word, so the tier reads without the
+  // colours needing to be told apart — same rule as on the board.
+  const pips = '◆'.repeat(i.marks) + '◇'.repeat(3 - i.marks);
+  const next = i.next_at !== null && i.next_at !== undefined
+    ? `<span class="next">${i.next_at} more for the next mark</span>` : '';
+
+  // Standing still: what it contributes whether or not a fight is on.
+  const passive = i.passive.length
+    ? i.passive.map((s) => `<li>${sign(s.n, s.unit)} ${s.label}</li>`).join('')
+    : `<li class="none">nothing — it only acts in a fight</li>`;
+
+  // Every activation. Cork, the Funny, fury, devotion and harvest live
+  // here, not above: they are laid down per tick and reset each fight, and
+  // listing them beside max health said they were something you wear.
+  const active = [];
+  if (i.hit_for > 0) {
+    // One kind: name it, because "hits for 35" says how hard and nothing
+    // about what answers it. Several: show the split, since the total is
+    // already printed.
+    const k = i.damage_kinds ?? [];
+    const kind = k.length === 1 ? ` ${k[0].split(' ')[1]}`
+  : k.length > 1 ? ` <span class="dim">(${k.join(' + ')})</span>` : '';
+    active.push(`<li>hits for <b>${i.hit_for}</b>${kind}${
+  i.dps ? ` <span class="dim">— ${i.dps.toFixed(1)} a second</span>` : ''}</li>`);
+  }
+  for (const a of i.active) active.push(`<li><b>${a.n}</b> ${a.label}</li>`);
+  if (i.casts > 0) {
+    active.push(`<li class="dim">costs ${i.cast_cost} of the Funny ${
+  i.casts > 1 ? `an activation, whichever of its ${i.casts} spells come up` : 'a cast'}</li>`);
+  }
+  for (const n of i.notes) active.push(`<li>${n}</li>`);
+  if (i.power && i.power !== 100) {
+    active.push(`<li class="dim">everything above already carries this item's own ×${
+  (i.power / 100).toFixed(2)}</li>`);
+  }
+  if (!active.length) active.push(`<li class="none">it holds its shape and nothing else</li>`);
+
+  return (`
+    <div class="made-item" data-key="${i.pieces.join(',')}">
+  <b>${i.name}</b>
+  <span class="built">${where} · built on ${article(i.core)}</span>
+  <span class="rank"><span class="pips">${pips}</span> ${i.rarity.toUpperCase()}
+    · rating ${i.rating}${next}</span>
+  <span class="head">standing still</span>
+  <ul class="stats">${passive}</ul>
+  <span class="head">every activation — one every ${secs(i.cooldown_ms ?? 0)}s</span>
+  <ul class="stats">${active.join('')}</ul>
+    </div>`);
+}
+
+/// Every item on a set of grids, as cards.
 function cards(slots) {
   const parts = [];
   let any = false;
-
-  const sign = (n, unit) => `${n > 0 ? '+' : ''}${n}${unit}`;
-  const secs = (ms) => (ms / 1000).toFixed(2);
-
   for (const slot of slots) {
     if (!slot.items.length) continue;
     any = true;
     parts.push(`<p class="grid-of">${slot.slot}</p>`);
-    for (const i of slot.items) {
-      if (!i.assembled) {
-        parts.push(
-          `<div class="made-item short" data-key="${i.pieces.join(',')}">` +
-          `<b>${i.short || 'loose pieces'}</b>` +
-          `<span class="why">${i.status}</span></div>`);
-        continue;
-      }
-      // Rarity as pips as well as a word, so the tier reads without the
-      // colours needing to be told apart — same rule as on the board.
-      const pips = '◆'.repeat(i.marks) + '◇'.repeat(3 - i.marks);
-      const next = i.next_at !== null && i.next_at !== undefined
-        ? `<span class="next">${i.next_at} more for the next mark</span>` : '';
-
-      // Standing still: what it contributes whether or not a fight is on.
-      const passive = i.passive.length
-        ? i.passive.map((s) => `<li>${sign(s.n, s.unit)} ${s.label}</li>`).join('')
-        : `<li class="none">nothing — it only acts in a fight</li>`;
-
-      // Every activation. Cork, the Funny, fury, devotion and harvest live
-      // here, not above: they are laid down per tick and reset each fight, and
-      // listing them beside max health said they were something you wear.
-      const active = [];
-      if (i.hit_for > 0) {
-        // One kind: name it, because "hits for 35" says how hard and nothing
-        // about what answers it. Several: show the split, since the total is
-        // already printed.
-        const k = i.damage_kinds ?? [];
-        const kind = k.length === 1 ? ` ${k[0].split(' ')[1]}`
-          : k.length > 1 ? ` <span class="dim">(${k.join(' + ')})</span>` : '';
-        active.push(`<li>hits for <b>${i.hit_for}</b>${kind}${
-          i.dps ? ` <span class="dim">— ${i.dps.toFixed(1)} a second</span>` : ''}</li>`);
-      }
-      for (const a of i.active) active.push(`<li><b>${a.n}</b> ${a.label}</li>`);
-      if (i.casts > 0) {
-        active.push(`<li class="dim">costs ${i.cast_cost} of the Funny ${
-          i.casts > 1 ? `an activation, whichever of its ${i.casts} spells come up` : 'a cast'}</li>`);
-      }
-      for (const n of i.notes) active.push(`<li>${n}</li>`);
-      if (i.power && i.power !== 100) {
-        active.push(`<li class="dim">everything above already carries this item's own ×${
-          (i.power / 100).toFixed(2)}</li>`);
-      }
-      if (!active.length) active.push(`<li class="none">it holds its shape and nothing else</li>`);
-
-      parts.push(`
-        <div class="made-item" data-key="${i.pieces.join(',')}">
-          <b>${i.name}</b>
-          <span class="built">${slot.slot} · built on a ${i.core ?? '—'}</span>
-          <span class="rank"><span class="pips">${pips}</span> ${i.rarity.toUpperCase()}
-            · rating ${i.rating}${next}</span>
-          <span class="head">standing still</span>
-          <ul class="stats">${passive}</ul>
-          <span class="head">every activation — one every ${secs(i.cooldown_ms ?? 0)}s</span>
-          <ul class="stats">${active.join('')}</ul>
-        </div>`);
-    }
+    for (const i of slot.items) parts.push(oneCard(i, slot.slot));
   }
   return { html: parts.join(''), any };
 }
@@ -471,7 +479,11 @@ function offerClass() {
     // sentence, unthemed and with the numbers in it — this is the screen where
     // somebody picks a class for the rest of the run, and "Fury, and something
     // heavy to spend it on" is not a thing anybody can decide on.
-    b.innerHTML = `<b>${c.name}</b>` +
+    // The figure first. This is the one irreversible choice in the game and
+    // three walls of text is not a choice anybody makes with any pleasure.
+    const art = figure('classes', c.canonical);
+    b.innerHTML = (art ? `<img class="portrait wide" src="${art}" alt="">` : '') +
+                  `<b>${c.name}</b>` +
                   // `promise`, not `short`: this choice does not come off, and
                   // the compact version only repeated the first clause of it.
                   `<span class="promise">${c.promise}</span>` +
@@ -603,6 +615,7 @@ function openTown(id) {
   $('town-name').textContent = place?.name ?? id;
   portrait($('town-art'), figure('places', id), place?.name ?? id);
   paintShelf();
+  paintQuests();
   $('town').hidden = false;
 }
 
@@ -614,23 +627,67 @@ function paintShelf() {
   if (!s.shelf.length) {
     const p = document.createElement('p');
     p.className = 'note';
-    p.textContent = 'Bare. Turn it over.';
+    p.textContent = 'Nothing for sale here.';
     box.appendChild(p);
     return;
   }
   for (const w of s.shelf) {
     const b = document.createElement('button');
     b.type = 'button';
-    b.className = 'wares' + (w.locked ? ' pinned' : '');
+    // A sold entry stays where it was and greys out. Dropping it would
+    // renumber the shelf, and an index is what a save records — but it is also
+    // just how a shop reads: the gap is the memory of what you took.
+    b.className = 'wares' + (w.sold ? ' sold' : '');
     b.disabled = !w.afford;
     b.innerHTML = `<b>${w.name}</b>` +
       `<span class="meta">${w.for} · ${w.kind.toLowerCase()} · rates ${w.rating}</span>` +
-      `<span class="cost">${w.price} Fnorp${w.locked ? ' · pinned' : ''}</span>`;
-    b.onclick = (e) => {
-      if (e.shiftKey) { pin(w.slot); paintShelf(); return; }
+      `<span class="cost">${w.sold ? 'yours' : `${w.price} Fnorp`}</span>`;
+    b.onclick = () => {
       const why = buy(w.slot);
       townSays(why || `Bought ${w.name}.`, !!why);
       paintShelf(); paintPanel(); autosave();
+    };
+    box.appendChild(b);
+  }
+}
+
+/// What the town wants, which is the other half of what a town is for.
+///
+/// An errand states what it asks for in the engine's words and a number — the
+/// same rule the skill tree follows — and says it in the world's words in the
+/// brief above it. The two registers do not mix.
+function paintQuests() {
+  const all = JSON.parse(quests_json());
+  $('errands').hidden = !all.length;
+  const box = $('quests');
+  box.replaceChildren();
+  for (const q of all) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    const done = q.stage === 'done';
+    b.className = 'wares errand' + (done ? ' sold' : '') + (q.stage === 'ready' ? ' ready' : '');
+    b.disabled = done;
+    const foot = {
+      offered: 'Take it on',
+      carrying: `${q.have} of ${q.want}`,
+      ready: `${q.have} of ${q.want} — hand it in`,
+      done: 'done',
+    }[q.stage];
+    b.innerHTML = `<b>${q.name}</b>` +
+      `<span class="spec">${q.asks}</span>` +
+      `<span class="flavour">${q.brief}</span>` +
+      `<span class="meta">pays ${q.pays.join(', ')}</span>` +
+      `<span class="cost">${foot}</span>`;
+    b.onclick = () => {
+      if (q.stage === 'offered') {
+        const why = take_quest(q.id);
+        townSays(why || `Taken. ${q.asks}.`, !!why);
+      } else {
+        const r = JSON.parse(hand_in_quest(q.id));
+        if (r.error) townSays(r.error, true);
+        else townSays(`${r.thanks} — ${r.given.join(' and ')}.`);
+      }
+      paintQuests(); paintShelf(); paintPanel(); autosave();
     };
     box.appendChild(b);
   }
@@ -791,7 +848,18 @@ async function main() {
   board.onhold = (name) => {
     $('holding').textContent = name ? `carrying ${name} — right-click to turn it` : '';
   };
-  replay = new Replay($('replay'));
+  replay = new Replay($('replay'), {
+    you: $('ticks-you'),
+    them: $('ticks-them'),
+  });
+  // Pointing at a row on either side reads that item, in the same card the
+  // packing panel draws.
+  replay.onpoint = (card, slot) => {
+    const box = $('tick-card');
+    if (!card) { box.hidden = true; return; }
+    box.innerHTML = oneCard(card, slot);
+    box.hidden = false;
+  };
   // Handles for testing/drive.py, which checks that what the board paints green
   // is exactly what core said was legal. Two references rather than one, so the
   // check compares the page's answer against core's rather than against itself.
@@ -800,11 +868,11 @@ async function main() {
   window.__replay = replay;
   window.__classOffer = () => JSON.parse(class_offer_json());
   window.__encounter = () => JSON.parse(encounter_json());
+  window.__fightJson = () => fight_json();
 
   $('skills').onclick = openTree;
   $('tree-done').onclick = closeTree;
 
-  $('reroll').onclick = () => { const why = reroll(); townSays(why, !!why); paintShelf(); };
   $('leave').onclick = closeTown;
   // Packing in town: the same board, with the fight buttons swapped for a way
   // back out. A player who cannot re-pack between fights is a player who

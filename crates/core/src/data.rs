@@ -14,6 +14,8 @@ pub const TILES_JSON: &str = include_str!("../../../data/tiles.json");
 pub const EVENTS_JSON: &str = include_str!("../../../data/events.json");
 pub const THEME_TD_JSON: &str = include_str!("../../../data/theme.td.json");
 pub const SKILLS_JSON: &str = include_str!("../../../data/skills.json");
+pub const SHOPS_JSON: &str = include_str!("../../../data/shops.json");
+pub const QUESTS_JSON: &str = include_str!("../../../data/quests.json");
 
 /// The shipped map, loaded and checked.
 ///
@@ -36,4 +38,16 @@ pub fn events() -> crate::tile_event::EventsData {
 /// second place for it to be stale.
 pub fn skills() -> crate::skills::SkillsData {
     crate::skills::SkillsData::parse(SKILLS_JSON).expect("the shipped skill tree is broken")
+}
+
+/// What the towns sell. Parsed on every call, like the tree and for the same
+/// reason: it is read when a screen opens, never in a loop, and a cache would
+/// be a second place for it to be stale.
+pub fn shops() -> crate::shop::ShopsData {
+    crate::shop::ShopsData::parse(SHOPS_JSON).expect("the shipped shelves are broken")
+}
+
+/// The errands the towns hand out.
+pub fn quests() -> crate::quest::QuestsData {
+    crate::quest::QuestsData::parse(QUESTS_JSON).expect("the shipped errands are broken")
 }

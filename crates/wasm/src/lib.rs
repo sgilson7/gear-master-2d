@@ -867,6 +867,57 @@ pub fn encounter_json() -> String {
     })
 }
 
+/// Every item on one side, in the order combat indexed them.
+///
+/// The order is the contract: `Activate { index }` counts innate attacks first
+/// and gear after, so a list built any other way lights the wrong bar. Each
+/// entry carries the same card the board panel draws — one `item_card`, so the
+/// fight screen and the packing screen cannot disagree about what a piece does.
+fn side_items(
+    reg: &gm2d_core::piece::PieceRegistry,
+    lo: &gm2d_core::loadout::Loadout,
+    profiles: &[gm2d_core::loadout::ItemProfile],
+    stats: gm2d_core::stats::Stats,
+    attacks: &[gm2d_core::combat::MonsterAttack],
+) -> Vec<serde_json::Value> {
+    use gm2d_core::piece::SlotKind;
+    // The cards, keyed by the piece set that identifies an item.
+    let mut cards: Vec<(Vec<gm2d_core::piece::PieceId>, serde_json::Value)> = Vec::new();
+    for k in SlotKind::ALL {
+        let slot = lo.slot(k);
+        for i in &lo.report(reg, k).items {
+            if i.assembled {
+                cards.push((i.pieces.clone(), item_card(i, slot, profiles, stats)));
+            }
+        }
+    }
+
+    let mut out: Vec<serde_json::Value> = attacks
+        .iter()
+        .map(|a| {
+            serde_json::json!({
+                "name": a.name,
+                "cooldown_ms": a.cooldown_ms,
+                "hit_for": a.damage,
+                "slot": "its own",
+                // Innate. There is no gear behind it and so no card: the row
+                // says what it is and the number beside it is the whole of it.
+                "card": serde_json::Value::Null,
+            })
+        })
+        .collect();
+    out.extend(profiles.iter().map(|p| {
+        serde_json::json!({
+            "name": p.name,
+            "cooldown_ms": p.cooldown_ms,
+            "hit_for": p.hit_for(stats.strength),
+            "slot": slot_name(p.slot),
+            "card": cards.iter().find(|(ps, _)| *ps == p.pieces).map(|(_, c)| c.clone()),
+        })
+    }));
+    out
+}
+
 /// Run the fight and hand back the log.
 ///
 /// Nothing is banked here. The page plays the replay first and calls
@@ -877,46 +928,68 @@ pub fn encounter_json() -> String {
 pub fn fight_json() -> String {
     use gm2d_core::combat::{Event, Side};
     with(|g| {
+        let Some(enc) = g.encounter.as_ref() else {
+            return serde_json::json!({ "error": "there is nothing to fight" }).to_string();
+        };
+        let Some(spec) = gm2d_core::fight::spec(enc) else {
+            return serde_json::json!({ "error": "there is nothing to fight" }).to_string();
+        };
         let Some(log) = gm2d_core::fight::run(g, DIFFICULTY) else {
             return serde_json::json!({ "error": "there is nothing to fight" }).to_string();
         };
-        // The player's items in the order combat indexed them, so the replay's
-        // cooldown bars line up with `Activate { index }`.
-        let items: Vec<_> = g
-            .character
-            .combat_items()
-            .iter()
-            .map(|i| serde_json::json!({
-                "name": i.name,
-                "cooldown_ms": i.cooldown_ms,
-                "hit_for": i.hit_for(g.character.player_stats().strength),
-                "slot": slot_name(i.slot),
-            }))
-            .collect();
-        // A running snapshot of both sides, taken from the numbers the log
-        // already reports rather than derived from them.
+
+        let mine = side_items(
+            &g.character.registry,
+            &g.character.loadout,
+            &g.character.combat_items(),
+            g.character.player_stats(),
+            &[],
+        );
+        let (ereg, elo) = spec.loadout_at(DIFFICULTY);
+        let (estats, eprofiles) = spec.outfit_at(DIFFICULTY);
+        let theirs = side_items(&ereg, &elo, &eprofiles, estats, spec.attacks);
+
+        // **A running snapshot of both sides, read and never derived.**
         //
-        // The replay used to subtract `damage` from a health it kept itself,
-        // which ignores `absorbed` — so armour soaked a blow, the bar dropped
-        // anyway, and both sides sat at zero for the rest of a fight that was
-        // still going. `Hit` carries `target_health`, `Burn` and `Regen` carry
-        // `health`, and `MindHit` and `Grew` carry the maximum. All of it is
-        // authoritative; none of it needed working out.
+        // Health taught this once already: the replay used to subtract
+        // `damage` from a total it kept itself, which ignores `absorbed`, so
+        // armour soaked a blow and the bar dropped anyway. Every number below
+        // comes off a field the log already reports — `Hit` carries the
+        // target's health *and* its armour, `GainArmor`, `GainMana` and
+        // `GainResource` carry the total, and every spend carries what is
+        // left. There is nothing here for the page to work out.
         let mut ph = log.player.max_health;
         let mut pmax = log.player.max_health;
         let mut eh = log.enemies.first().map(|c| c.max_health).unwrap_or(1);
         let mut emax = eh;
+        let (mut pa, mut ea) = (0i32, 0i32);
+        // mana, rage, faith, nature — the four a board actually banks.
+        let (mut pp, mut ep) = ([0i32; 4], [0i32; 4]);
+        let pool_index = |what: &str| match what {
+            "mana" => Some(0),
+            "rage" => Some(1),
+            "faith" => Some(2),
+            "nature" => Some(3),
+            _ => None,
+        };
 
         let entries: Vec<_> = log
             .entries
             .iter()
             .map(|e| {
+                let mut set_pool = |side: Side, what: &str, v: i32| {
+                    if let Some(i) = pool_index(what) {
+                        if side == Side::Player { pp[i] = v } else { ep[i] = v }
+                    }
+                };
                 let (kind, side, item, index, amount) = match &e.event {
                     Event::Activate { side, item, index } =>
                         ("activate", *side, item.clone(), *index as i64, 0),
-                    Event::Hit { by, damage, absorbed, target_health, .. } => {
-                        // The target is the other side.
-                        if *by == Side::Player { eh = *target_health; } else { ph = *target_health; }
+                    Event::Hit { by, damage, absorbed, target_health, target_armor } => {
+                        // The target is the other side, and its armour came
+                        // back with its health.
+                        if *by == Side::Player { eh = *target_health; ea = *target_armor; }
+                        else { ph = *target_health; pa = *target_armor; }
                         ("hit", *by, String::new(), -1, (*damage + *absorbed) as i64)
                     }
                     Event::MindHit { by, amount, target_max_health } => {
@@ -936,10 +1009,42 @@ pub fn fight_json() -> String {
                         if *side == Side::Player { pmax = *total; } else { emax = *total; }
                         ("grew", *side, String::new(), -1, *amount as i64)
                     }
-                    Event::GainArmor { side, amount, .. } =>
-                        ("armor", *side, String::new(), -1, *amount as i64),
-                    Event::Cast { side, .. } => ("cast", *side, String::new(), -1, 0),
+                    Event::GainArmor { side, amount, total } => {
+                        if *side == Side::Player { pa = *total; } else { ea = *total; }
+                        ("armor", *side, String::new(), -1, *amount as i64)
+                    }
+                    Event::GainMana { side, amount, total, .. } => {
+                        set_pool(*side, "mana", *total);
+                        ("mana", *side, String::new(), -1, *amount as i64)
+                    }
+                    Event::ManaCheck { side, paid, remaining, .. } => {
+                        set_pool(*side, "mana", *remaining);
+                        (if *paid { "spend" } else { "short" }, *side, String::new(), -1, 0)
+                    }
+                    Event::Cast { side, remaining, .. } => {
+                        set_pool(*side, "mana", *remaining);
+                        ("cast", *side, String::new(), -1, 0)
+                    }
+                    Event::GainResource { side, what, amount, total, .. } => {
+                        set_pool(*side, what, *total);
+                        ("pool", *side, (*what).to_string(), -1, *amount as i64)
+                    }
+                    Event::ResourceCheck { side, what, paid, remaining, .. } => {
+                        set_pool(*side, what, *remaining);
+                        (if *paid { "spend" } else { "short" }, *side, (*what).to_string(), -1, 0)
+                    }
+                    Event::Drained { on, what, amount, total } => {
+                        set_pool(*on, what, *total);
+                        ("drained", *on, (*what).to_string(), -1, *amount as i64)
+                    }
+                    Event::Fused { side, total, from, and, what } => {
+                        set_pool(*side, from.0, from.1);
+                        set_pool(*side, and.0, and.1);
+                        ("fused", *side, (*what).to_string(), -1, *total as i64)
+                    }
                     Event::Misfired { side, item } => ("misfire", *side, item.clone(), -1, 0),
+                    Event::Stunned { on, index, item, duration_ms, .. } =>
+                        ("stunned", *on, item.clone(), *index as i64, *duration_ms as i64),
                     Event::SuddenDeath { .. } => ("sudden", Side::Player, String::new(), -1, 0),
                     _ => ("other", Side::Player, String::new(), -1, 0),
                 };
@@ -947,8 +1052,9 @@ pub fn fight_json() -> String {
                     "at": e.at_ms, "kind": kind,
                     "side": if side == Side::Player { "player" } else { "enemy" },
                     "item": item, "index": index, "amount": amount,
-                    "ph": ph.max(0), "pmax": pmax.max(1),
-                    "eh": eh.max(0), "emax": emax.max(1),
+                    "ph": ph.max(0), "pmax": pmax.max(1), "pa": pa.max(0),
+                    "eh": eh.max(0), "emax": emax.max(1), "ea": ea.max(0),
+                    "pp": pp, "ep": ep,
                 })
             })
             .collect();
@@ -956,12 +1062,16 @@ pub fn fight_json() -> String {
         serde_json::json!({
             "outcome": format!("{:?}", log.outcome).to_lowercase(),
             "duration_ms": log.duration_ms,
-            "player": { "name": "you", "max_health": log.player.max_health },
+            "pools": ["the Funny", "fury", "devotion", "harvest"],
+            "player": { "name": "you", "max_health": log.player.max_health, "items": mine },
             "enemy": log.enemies.first().map(|c| serde_json::json!({
                 "name": g.theme_name(gm2d_core::combat::creature(&c.name).map(|s| s.name).unwrap_or("")),
                 "max_health": c.max_health,
+                "items": theirs,
             })),
-            "items": items,
+            // Kept under its old name so nothing that read the player's list
+            // has to change; `player.items` is the same array.
+            "items": mine,
             "entries": entries,
         })
         .to_string()
@@ -1006,78 +1116,166 @@ pub fn flee() {
 
 // ---------------------------------------------------------------- the shop
 
-/// What the towns are selling.
+/// Which town the player is standing in, if any.
 ///
-/// Prices come from `rating::shop_price`, which is derived from what a
-/// component is actually worth — deliberately steeper than linear, because
-/// slots are scarce and the strong parts are what a build is short of.
+/// Derived from the position rather than passed in by the page. The page knew
+/// which town it had just opened and could have said so, and that is exactly
+/// the problem: a shelf is a property of where you are standing, and letting
+/// the caller name it means a caller can name the wrong one.
+fn town_here(g: &gm2d_core::game::Game) -> Option<String> {
+    map(|w| {
+        w.place_at(g.world.at[0], g.world.at[1])
+            .filter(|p| p.kind == gm2d_core::world::PlaceKind::Town)
+            .map(|p| p.id.clone())
+    })
+}
+
+/// What this town sells, in order, sold entries included.
 #[wasm_bindgen]
 pub fn shop_json() -> String {
     with(|g| {
         let theme = gm2d_core::theme::by_id(&g.theme);
-        let shelf: Vec<_> = (0..g.shop.stock.len())
-            .filter_map(|i| {
-                let def = g.shop.def(i)?;
-                let price = g.shop.price(i)?;
-                Some(serde_json::json!({
-                    "slot": i,
-                    "name": theme.piece(def.name),
-                    "canonical": def.name,
-                    "for": slot_name(def.slot),
-                    "kind": format!("{:?}", def.kind),
-                    "price": price,
-                    "rating": gm2d_core::rating::piece_rating(def),
-                    "afford": g.character.gold >= price,
-                    "locked": g.shop.is_locked(i),
-                }))
+        let Some(town) = town_here(g) else {
+            return serde_json::json!({ "gold": g.character.gold, "shelf": [] }).to_string();
+        };
+        let shops = gm2d_core::data::shops();
+        let shelf: Vec<_> = gm2d_core::shop::shelf(&shops, &town, &g.world.bought)
+            .into_iter()
+            .map(|o| {
+                serde_json::json!({
+                    "slot": o.index,
+                    "name": theme.piece(o.def.name),
+                    "canonical": o.def.name,
+                    "for": slot_name(o.def.slot),
+                    "kind": format!("{:?}", o.def.kind),
+                    // §C.3, and the reason it is now trivially true: there is
+                    // one price and this is it. Nothing discounts, nothing
+                    // marks up, and the screen cannot show a figure other than
+                    // the one `buy` charges because they read the same field.
+                    "price": o.price,
+                    "rating": gm2d_core::rating::piece_rating(o.def),
+                    "afford": !o.sold && g.character.gold >= o.price,
+                    "sold": o.sold,
+                })
             })
             .collect();
-        serde_json::json!({
-            "gold": g.character.gold,
-            "reroll": gm2d_core::shop::REROLL_COST,
-            "shelf": shelf,
-        })
-        .to_string()
+        serde_json::json!({ "gold": g.character.gold, "town": town, "shelf": shelf }).to_string()
     })
 }
 
-/// Buy shelf `slot`. Returns an empty string, or why not.
+/// Buy the entry at `index` on the shelf of the town you are standing in.
 #[wasm_bindgen]
-pub fn buy(slot: usize) -> String {
+pub fn buy(index: usize) -> String {
     with_mut(|g| {
-        let Some(price) = g.shop.price(slot) else { return "nothing for sale there".into() };
-        if g.character.gold < price {
-            return format!("{price} Fnorp, and you have {}.", g.character.gold);
+        let Some(town) = town_here(g) else { return "you are not in a town".into() };
+        let shops = gm2d_core::data::shops();
+        let shelf = gm2d_core::shop::shelf(&shops, &town, &g.world.bought);
+        let Some(o) = shelf.iter().find(|o| o.index == index) else {
+            return "nothing for sale there".into();
+        };
+        if o.sold {
+            return "somebody already has that one. Yourself.".into();
         }
-        let Some(def) = g.shop.take(slot) else { return "nothing for sale there".into() };
+        if g.character.gold < o.price {
+            return format!("{} Fnorp, and you have {}.", o.price, g.character.gold);
+        }
+        let (price, name) = (o.price, o.def.name);
         g.character.gold -= price;
-        let id = g.character.registry.alloc(def);
-        g.character.owned.push(id);
+        g.character.give(name);
+        // Marked sold before anything else can change: the shelf is fixed, so
+        // this is the only record that the entry is gone.
+        g.world.bought.push((town, index as u16));
         String::new()
     })
 }
 
-/// Turn the shelf over.
+// ---------------------------------------------------------------- errands
+
+/// The errands this town has, and where each one stands.
 #[wasm_bindgen]
-pub fn reroll() -> String {
-    with_mut(|g| {
-        let cost = gm2d_core::shop::REROLL_COST;
-        if g.character.gold < cost {
-            return format!("{cost} Fnorp to turn the shelf, and you have {}.", g.character.gold);
+pub fn quests_json() -> String {
+    with(|g| {
+        let Some(town) = town_here(g) else { return "[]".into() };
+        let quests = gm2d_core::data::quests();
+        let out: Vec<_> = quests
+            .at(&town)
+            .into_iter()
+            .map(|q| {
+                let stage = gm2d_core::quest::stage(g, q);
+                let (have, want) = match stage {
+                    gm2d_core::quest::Stage::Carrying { have, want } => (have, want),
+                    gm2d_core::quest::Stage::Ready => (q.goal.count(), q.goal.count()),
+                    _ => (0, q.goal.count()),
+                };
+                serde_json::json!({
+                    "id": q.id,
+                    "name": q.name,
+                    "brief": q.brief,
+                    "stage": stage.name(),
+                    "have": have,
+                    "want": want,
+                    // Unthemed, and derived from the goal — the same rule the
+                    // skill tree follows. What somebody needs here is a number
+                    // and a creature, not a sentence about a clipboard.
+                    "asks": match &q.goal {
+                        // `5 × Bengulon Jungle Toad`, not "5 Bengulon Jungle
+                        // Toads": a creature's name is a proper noun and some
+                        // of them are already plural — The Rice Criers, The
+                        // Drowned Court — so there is no suffix that is right
+                        // for all fifty.
+                        gm2d_core::quest::Goal::Slay { creature, count, token } => format!(
+                            "beat {count} × {}, then hand in {count} × {}",
+                            g.theme_name(
+                                gm2d_core::combat::LADDER
+                                    .iter()
+                                    .find(|s| s.name == *creature)
+                                    .map(|s| s.name)
+                                    .unwrap_or("")
+                            ),
+                            theme_piece(g, token),
+                        ),
+                    },
+                    "pays": q.reward.iter()
+                        .map(|n| theme_piece(g, n))
+                        .chain((q.gold != 0).then(|| format!("{} Fnorp", q.gold)))
+                        .collect::<Vec<_>>(),
+                })
+            })
+            .collect();
+        serde_json::json!(out).to_string()
+    })
+}
+
+fn theme_piece(g: &gm2d_core::game::Game, canonical: &str) -> String {
+    let theme = gm2d_core::theme::by_id(&g.theme);
+    gm2d_core::piece::CATALOG
+        .iter()
+        .find(|d| d.name == canonical)
+        .map(|d| theme.piece(d.name).to_string())
+        .unwrap_or_else(|| canonical.to_string())
+}
+
+/// Take an errand on. Empty string, or why not.
+#[wasm_bindgen]
+pub fn take_quest(id: &str) -> String {
+    with_mut(|g| gm2d_core::quest::take(g, id).err().unwrap_or_default())
+}
+
+/// Hand one in. The reward as JSON, or `{"error": ...}`.
+#[wasm_bindgen]
+pub fn hand_in_quest(id: &str) -> String {
+    with_mut(|g| match gm2d_core::quest::hand_in(g, id) {
+        Err(why) => serde_json::json!({ "error": why }).to_string(),
+        Ok(given) => {
+            let quests = gm2d_core::data::quests();
+            let thanks = quests.get(id).map(|q| q.thanks.clone()).unwrap_or_default();
+            serde_json::json!({
+                "thanks": thanks,
+                "given": given.iter().map(|n| theme_piece(g, n)).collect::<Vec<_>>(),
+            })
+            .to_string()
         }
-        g.character.gold -= cost;
-        let need = g.character.combat_items().is_empty();
-        let mut rng = g.rng.clone();
-        g.shop.restock(&mut rng, need);
-        g.rng = rng;
-        String::new()
     })
-}
-
-/// Pin a shelf so a restock leaves it alone.
-#[wasm_bindgen]
-pub fn pin(slot: usize) -> bool {
-    with_mut(|g| g.shop.toggle_lock(slot))
 }
 
 /// Open the board outside a fight, so a player can pack in town.

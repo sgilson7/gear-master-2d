@@ -1,0 +1,57 @@
+% Funnel Sergeant — army issue, somebody else's name filed off the side. The
+% funnel is the whole silhouette: a mouth wide enough to catch a goof and a
+% spout narrow enough to aim it.
+%
+% Written by filling in tikz_figure_prompt.md.
+\documentclass[tikz,border=4pt]{standalone}
+\usetikzlibrary{calc}
+\newcommand{\Unit}{0.055cm}
+\newcommand{\Edge}{2.4pt}
+\newcommand{\Stripes}{3}      % rank, on the sleeve
+\newcommand{\Drops}{4}
+
+\definecolor{drab}{HTML}{5E6144}
+\definecolor{drabdark}{HTML}{383A28}
+\definecolor{tin}{HTML}{9BA3AA}
+\definecolor{tindark}{HTML}{5D656C}
+\definecolor{banana}{HTML}{E8C445}
+\definecolor{ink}{HTML}{101018}
+
+\begin{document}
+\begin{tikzpicture}[x=\Unit,y=\Unit, line join=round, line cap=round]
+
+  % ---- the banana on the ground, regulation placement --------------------
+  \fill[banana,draw=ink,line width=1.6pt]
+    (44,3) .. controls (52,3) and (58,7) .. (58,13)
+           .. controls (55,7) and (50,6) .. (44,6) -- cycle;
+
+  % ---- greatcoat ----------------------------------------------------------
+  \fill[drab,draw=ink,line width=\Edge] (14,2) -- (46,2) -- (42,40) -- (18,40) -- cycle;
+  \draw[drabdark,line width=2.0pt] (30,4) -- (30,38);
+  \foreach \y in {12,20,28} { \fill[tin] (30,\y) circle (1.6); }
+
+  % ---- the sleeve and its stripes ----------------------------------------
+  \draw[drab,line width=6.0pt] (17,36) -- (9,22);
+  \foreach \i in {1,...,\Stripes} {
+    \pgfmathsetmacro\o{(\i-1)*3.4}
+    \draw[banana,line width=1.6pt] ({14.5-\o},{30-\o*0.6}) -- ({11.5-\o},{25-\o*0.6});
+  }
+
+  % ---- head, small, because the funnel is the point ----------------------
+  \fill[drabdark,draw=ink,line width=\Edge] (30,46) circle (7.5);
+  \fill[banana] (27,47) circle (1.5);
+  \fill[banana] (33,47) circle (1.5);
+
+  % ---- the funnel, worn ---------------------------------------------------
+  \fill[tin,draw=ink,line width=\Edge] (16,52) -- (44,52) -- (33,64) -- (27,64) -- cycle;
+  \fill[tin,draw=ink,line width=\Edge] (27,64) rectangle (33,72);
+  \draw[tindark,line width=2.0pt] (18,55) -- (42,55);
+  % The filed-off name: a scratched-out patch, which is the joke stated once.
+  \fill[tindark] (20,58) rectangle (30,61);
+  \foreach \i in {1,...,\Drops} {
+    \pgfmathsetmacro\x{21+(\i-1)*3}
+    \draw[ink,line width=1.0pt] (\x,58) -- ({\x+2},61);
+  }
+
+\end{tikzpicture}
+\end{document}

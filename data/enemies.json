@@ -1,0 +1,7156 @@
+{
+  "format": "gm2d-enemies",
+  "version": 1,
+  "difficulty": "easy",
+  "enemies": [
+    {
+      "name": "Cave Rat",
+      "health": 55,
+      "strength": 2,
+      "regen": 0,
+      "mind_resist": 0,
+      "curse_resist": 0,
+      "physical_resist": 1,
+      "magic_resist": 1,
+      "attacks": [
+        {
+          "name": "bite",
+          "cooldown_ms": 900,
+          "damage": 4,
+          "mind": 0,
+          "armor": 0
+        }
+      ],
+      "bounty": 6,
+      "rank": "ordinary",
+      "rating": 16,
+      "items": 0
+    },
+    {
+      "name": "Bog Toad",
+      "health": 110,
+      "strength": 5,
+      "regen": 1,
+      "mind_resist": 0,
+      "curse_resist": 0,
+      "physical_resist": 2,
+      "magic_resist": 2,
+      "gear": [
+        [
+          "Godsteel Haft",
+          "weapon",
+          0,
+          0,
+          1
+        ],
+        [
+          "Iron Blade",
+          "weapon",
+          0,
+          1,
+          1
+        ],
+        [
+          "Boiled Leather",
+          "gloves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Coven Mold",
+          "gloves",
+          3,
+          0,
+          0
+        ]
+      ],
+      "bounty": 8,
+      "rank": "ordinary",
+      "rating": 80,
+      "items": 2
+    },
+    {
+      "name": "Bone Archer",
+      "health": 120,
+      "strength": 5,
+      "regen": 0,
+      "mind_resist": 0,
+      "curse_resist": 0,
+      "physical_resist": 3,
+      "magic_resist": 3,
+      "gear": [
+        [
+          "Tidecaller Orb",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Kingsbane",
+          "weapon",
+          3,
+          0,
+          0
+        ],
+        [
+          "Hollow Lance",
+          "weapon",
+          0,
+          2,
+          1
+        ],
+        [
+          "Kingsbane",
+          "weapon",
+          4,
+          1,
+          1
+        ],
+        [
+          "Mana Loom",
+          "chest",
+          0,
+          0,
+          0
+        ],
+        [
+          "Wrathbreaker",
+          "chest",
+          1,
+          2,
+          2
+        ]
+      ],
+      "bounty": 9,
+      "rank": "ordinary",
+      "rating": 95,
+      "items": 2
+    },
+    {
+      "name": "Rust Golem",
+      "health": 300,
+      "strength": 13,
+      "regen": 0,
+      "mind_resist": 0,
+      "curse_resist": 0,
+      "physical_resist": 7,
+      "magic_resist": 7,
+      "gear": [
+        [
+          "Chained Codex",
+          "weapon",
+          0,
+          0,
+          1
+        ],
+        [
+          "Kingsblood Ink",
+          "weapon",
+          3,
+          0,
+          0
+        ],
+        [
+          "Hollow Lance",
+          "weapon",
+          0,
+          2,
+          1
+        ],
+        [
+          "Bileglass Vial",
+          "weapon",
+          4,
+          1,
+          1
+        ]
+      ],
+      "bounty": 10,
+      "rank": "ordinary",
+      "rating": 125,
+      "items": 1
+    },
+    {
+      "name": "Frost Wisp",
+      "health": 150,
+      "strength": 6,
+      "regen": 0,
+      "mind_resist": 0,
+      "curse_resist": 25,
+      "physical_resist": 3,
+      "magic_resist": 3,
+      "gear": [
+        [
+          "Tidecaller Orb",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Unmaking",
+          "weapon",
+          3,
+          0,
+          1
+        ],
+        [
+          "Hollow Lance",
+          "weapon",
+          5,
+          0,
+          0
+        ],
+        [
+          "Boiled Leather",
+          "gloves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Ravener's Mold",
+          "gloves",
+          3,
+          0,
+          0
+        ]
+      ],
+      "bounty": 12,
+      "rank": "ordinary",
+      "rating": 103,
+      "items": 2
+    },
+    {
+      "name": "Plague Hound",
+      "health": 190,
+      "strength": 8,
+      "regen": 0,
+      "mind_resist": 0,
+      "curse_resist": 0,
+      "physical_resist": 4,
+      "magic_resist": 4,
+      "gear": [
+        [
+          "Tidecaller Orb",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Sunder",
+          "weapon",
+          3,
+          0,
+          0
+        ],
+        [
+          "Hollow Lance",
+          "weapon",
+          0,
+          2,
+          1
+        ],
+        [
+          "Spun Material",
+          "gloves",
+          0,
+          0,
+          1
+        ],
+        [
+          "Sovereign Mold",
+          "gloves",
+          2,
+          0,
+          0
+        ]
+      ],
+      "bounty": 14,
+      "rank": "ordinary",
+      "rating": 114,
+      "items": 2
+    },
+    {
+      "name": "The Iron Warden",
+      "health": 340,
+      "strength": 14,
+      "regen": 2,
+      "mind_resist": 20,
+      "curse_resist": 20,
+      "physical_resist": 8,
+      "magic_resist": 8,
+      "gear": [
+        [
+          "Cursed Handle",
+          "weapon",
+          0,
+          0,
+          1
+        ],
+        [
+          "Adamant Fang",
+          "weapon",
+          3,
+          0,
+          1
+        ],
+        [
+          "Reaver's Bill",
+          "weapon",
+          1,
+          1,
+          0
+        ],
+        [
+          "Hollowbone Frame",
+          "helmet",
+          0,
+          0,
+          1
+        ],
+        [
+          "Scarred Plating",
+          "helmet",
+          2,
+          0,
+          0
+        ],
+        [
+          "Cinder Base",
+          "chest",
+          1,
+          6,
+          0
+        ],
+        [
+          "Rag Layer",
+          "chest",
+          3,
+          7,
+          0
+        ]
+      ],
+      "bounty": 22,
+      "rank": "ordinary",
+      "rating": 212,
+      "items": 3
+    },
+    {
+      "name": "Iron Sentinel",
+      "health": 240,
+      "strength": 10,
+      "regen": 0,
+      "mind_resist": 0,
+      "curse_resist": 0,
+      "physical_resist": 6,
+      "magic_resist": 6,
+      "gear": [
+        [
+          "Cursed Handle",
+          "weapon",
+          0,
+          0,
+          1
+        ],
+        [
+          "Adamant Fang",
+          "weapon",
+          3,
+          0,
+          1
+        ],
+        [
+          "Hollowbone Frame",
+          "helmet",
+          0,
+          0,
+          1
+        ],
+        [
+          "Scarred Plating",
+          "helmet",
+          2,
+          0,
+          0
+        ],
+        [
+          "Deep Roots Base",
+          "chest",
+          0,
+          0,
+          0
+        ],
+        [
+          "Vast Tapestry",
+          "chest",
+          0,
+          2,
+          0
+        ]
+      ],
+      "bounty": 24,
+      "rank": "ordinary",
+      "rating": 161,
+      "items": 3
+    },
+    {
+      "name": "Whisperling",
+      "health": 160,
+      "strength": 7,
+      "regen": 0,
+      "mind_resist": 0,
+      "curse_resist": 0,
+      "physical_resist": 4,
+      "magic_resist": 4,
+      "gear": [
+        [
+          "Scrying Orb",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Mirrorcast",
+          "weapon",
+          3,
+          0,
+          0
+        ],
+        [
+          "Sanctuary",
+          "weapon",
+          4,
+          1,
+          0
+        ],
+        [
+          "Mirror Ward",
+          "weapon",
+          0,
+          3,
+          0
+        ],
+        [
+          "Bone Frame",
+          "helmet",
+          0,
+          0,
+          0
+        ],
+        [
+          "Warded Plating",
+          "helmet",
+          3,
+          0,
+          0
+        ],
+        [
+          "Bone Frame",
+          "helmet",
+          0,
+          1,
+          2
+        ],
+        [
+          "Warded Plating",
+          "helmet",
+          3,
+          2,
+          0
+        ],
+        [
+          "Hexweave Shroud",
+          "chest",
+          0,
+          0,
+          0
+        ],
+        [
+          "Unbound Core",
+          "chest",
+          3,
+          0,
+          0
+        ],
+        [
+          "Hexweave Shroud",
+          "chest",
+          3,
+          2,
+          0
+        ],
+        [
+          "Sigil Layer",
+          "chest",
+          0,
+          3,
+          0
+        ],
+        [
+          "Steel Material",
+          "greaves",
+          0,
+          0,
+          1
+        ],
+        [
+          "Greave Mold",
+          "greaves",
+          3,
+          0,
+          3
+        ],
+        [
+          "Steel Material",
+          "greaves",
+          4,
+          1,
+          0
+        ],
+        [
+          "Greave Mold",
+          "greaves",
+          1,
+          2,
+          3
+        ]
+      ],
+      "bounty": 26,
+      "rank": "mini",
+      "rating": 192,
+      "items": 7
+    },
+    {
+      "name": "Warded Idol",
+      "health": 280,
+      "strength": 12,
+      "regen": 2,
+      "mind_resist": 0,
+      "curse_resist": 55,
+      "physical_resist": 7,
+      "magic_resist": 7,
+      "gear": [
+        [
+          "Executioner's Haft",
+          "weapon",
+          0,
+          0,
+          1
+        ],
+        [
+          "Iron Blade",
+          "weapon",
+          0,
+          1,
+          1
+        ],
+        [
+          "Reliquary Frame of Nine",
+          "helmet",
+          0,
+          0,
+          0
+        ],
+        [
+          "Warding Plate",
+          "helmet",
+          3,
+          0,
+          0
+        ],
+        [
+          "Hexweave Shroud",
+          "chest",
+          0,
+          0,
+          0
+        ],
+        [
+          "Vast Tapestry",
+          "chest",
+          0,
+          3,
+          0
+        ]
+      ],
+      "bounty": 30,
+      "rank": "ordinary",
+      "rating": 204,
+      "items": 3
+    },
+    {
+      "name": "Mirror Fiend",
+      "health": 250,
+      "strength": 11,
+      "regen": 0,
+      "mind_resist": 45,
+      "curse_resist": 20,
+      "physical_resist": 6,
+      "magic_resist": 6,
+      "gear": [
+        [
+          "Grand Grimoire",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Starlit Ink",
+          "weapon",
+          3,
+          0,
+          0
+        ],
+        [
+          "Unmaking",
+          "weapon",
+          2,
+          1,
+          3
+        ],
+        [
+          "Hollowbone Frame",
+          "helmet",
+          0,
+          0,
+          1
+        ],
+        [
+          "Layered Plating",
+          "helmet",
+          2,
+          0,
+          0
+        ],
+        [
+          "Deep Roots Base",
+          "chest",
+          0,
+          0,
+          0
+        ],
+        [
+          "Scale Layer",
+          "chest",
+          3,
+          0,
+          0
+        ]
+      ],
+      "bounty": 34,
+      "rank": "ordinary",
+      "rating": 227,
+      "items": 3
+    },
+    {
+      "name": "Rust Colossus",
+      "health": 800,
+      "strength": 28,
+      "regen": 2,
+      "mind_resist": 20,
+      "curse_resist": 20,
+      "physical_resist": 20,
+      "magic_resist": 15,
+      "gear": [
+        [
+          "Steel Frame",
+          "helmet",
+          0,
+          0,
+          0
+        ],
+        [
+          "Bloomcap",
+          "helmet",
+          3,
+          0,
+          0
+        ],
+        [
+          "Hide Base",
+          "chest",
+          0,
+          0,
+          0
+        ],
+        [
+          "Berserker's Plate",
+          "chest",
+          3,
+          0,
+          0
+        ],
+        [
+          "Mage's Wrapping",
+          "gloves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Featherweight Mold",
+          "gloves",
+          2,
+          0,
+          0
+        ],
+        [
+          "Mage's Sandals",
+          "greaves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Stutterstep Mold",
+          "greaves",
+          2,
+          0,
+          0
+        ],
+        [
+          "Chapbook",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Runewash Ink",
+          "weapon",
+          2,
+          0,
+          0
+        ],
+        [
+          "Blood Rite",
+          "weapon",
+          4,
+          0,
+          0
+        ],
+        [
+          "Duskweave Material",
+          "gloves",
+          2,
+          1,
+          0
+        ],
+        [
+          "Empowering Mold",
+          "gloves",
+          2,
+          2,
+          0
+        ]
+      ],
+      "bounty": 44,
+      "rank": "ordinary",
+      "rating": 306,
+      "items": 6
+    },
+    {
+      "name": "Ashen Marshal",
+      "health": 930,
+      "strength": 31,
+      "regen": 2,
+      "mind_resist": 23,
+      "curse_resist": 23,
+      "physical_resist": 23,
+      "magic_resist": 18,
+      "gear": [
+        [
+          "Chapbook",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Starlit Ink",
+          "weapon",
+          2,
+          0,
+          0
+        ],
+        [
+          "Unmaking",
+          "weapon",
+          4,
+          0,
+          2
+        ],
+        [
+          "Hollowbone Frame",
+          "helmet",
+          0,
+          0,
+          1
+        ],
+        [
+          "Layered Plating",
+          "helmet",
+          2,
+          0,
+          0
+        ],
+        [
+          "Overflow Plate",
+          "helmet",
+          4,
+          0,
+          0
+        ],
+        [
+          "Deep Roots Base",
+          "chest",
+          0,
+          0,
+          0
+        ],
+        [
+          "Berserker's Plate",
+          "chest",
+          3,
+          0,
+          0
+        ],
+        [
+          "Clouded Orb",
+          "weapon",
+          0,
+          6,
+          0
+        ],
+        [
+          "Azure Alignment",
+          "weapon",
+          2,
+          4,
+          0
+        ],
+        [
+          "Attendant Flame",
+          "weapon",
+          0,
+          4,
+          1
+        ],
+        [
+          "Wildgrowth",
+          "weapon",
+          3,
+          5,
+          0
+        ],
+        [
+          "Wildgrowth",
+          "weapon",
+          2,
+          5,
+          0
+        ],
+        [
+          "Sprung Sole",
+          "greaves",
+          2,
+          3,
+          0
+        ],
+        [
+          "Pathfinder Material",
+          "greaves",
+          2,
+          2,
+          0
+        ]
+      ],
+      "bounty": 75,
+      "rank": "ordinary",
+      "rating": 446,
+      "items": 5
+    },
+    {
+      "name": "Grave Chorus",
+      "health": 1060,
+      "strength": 34,
+      "regen": 2,
+      "mind_resist": 26,
+      "curse_resist": 26,
+      "physical_resist": 26,
+      "magic_resist": 21,
+      "gear": [
+        [
+          "Chained Codex",
+          "weapon",
+          0,
+          0,
+          1
+        ],
+        [
+          "Kingsblood Ink",
+          "weapon",
+          3,
+          0,
+          0
+        ],
+        [
+          "Kingsbane",
+          "weapon",
+          3,
+          1,
+          2
+        ],
+        [
+          "Bileglass Vial",
+          "weapon",
+          0,
+          2,
+          0
+        ],
+        [
+          "Ashwoven Material",
+          "greaves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Coldstep Mold",
+          "greaves",
+          3,
+          0,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "greaves",
+          0,
+          1,
+          0
+        ],
+        [
+          "Runed Material",
+          "greaves",
+          2,
+          2,
+          0
+        ],
+        [
+          "Coldstep Mold",
+          "greaves",
+          4,
+          2,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "greaves",
+          0,
+          3,
+          0
+        ]
+      ],
+      "bounty": 80,
+      "rank": "ordinary",
+      "rating": 471,
+      "items": 3
+    },
+    {
+      "name": "The Hollow King",
+      "health": 400,
+      "strength": 18,
+      "regen": 3,
+      "mind_resist": 30,
+      "curse_resist": 30,
+      "physical_resist": 10,
+      "magic_resist": 5,
+      "gear": [
+        [
+          "Spinning Orb",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Unmaking",
+          "weapon",
+          3,
+          0,
+          1
+        ],
+        [
+          "Attendant Flame",
+          "weapon",
+          4,
+          0,
+          1
+        ],
+        [
+          "Emberburst",
+          "weapon",
+          1,
+          1,
+          0
+        ],
+        [
+          "Ember Alignment",
+          "weapon",
+          0,
+          2,
+          3
+        ],
+        [
+          "Scaled Material",
+          "greaves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Sump Sole",
+          "greaves",
+          2,
+          0,
+          3
+        ],
+        [
+          "Anchor Material",
+          "greaves",
+          4,
+          0,
+          0
+        ],
+        [
+          "Sump Sole",
+          "greaves",
+          2,
+          1,
+          1
+        ],
+        [
+          "Scaled Material",
+          "greaves",
+          0,
+          2,
+          0
+        ],
+        [
+          "Sump Sole",
+          "greaves",
+          2,
+          3,
+          3
+        ],
+        [
+          "Thornweald Grip",
+          "gloves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Coven Mold",
+          "gloves",
+          2,
+          0,
+          0
+        ],
+        [
+          "Scaled Material",
+          "gloves",
+          4,
+          0,
+          0
+        ],
+        [
+          "Ravener's Mold",
+          "gloves",
+          2,
+          1,
+          2
+        ],
+        [
+          "Scaled Material",
+          "gloves",
+          0,
+          2,
+          0
+        ],
+        [
+          "Coven Mold",
+          "gloves",
+          2,
+          3,
+          0
+        ]
+      ],
+      "bounty": 89,
+      "rank": "boss",
+      "rating": 521,
+      "items": 7
+    },
+    {
+      "name": "The Curator",
+      "health": 640,
+      "strength": 24,
+      "regen": 4,
+      "mind_resist": 34,
+      "curse_resist": 32,
+      "physical_resist": 16,
+      "magic_resist": 18,
+      "gear": [
+        [
+          "Tidecaller Orb",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Sunder",
+          "weapon",
+          3,
+          0,
+          0
+        ],
+        [
+          "Hollow Lance",
+          "weapon",
+          0,
+          2,
+          1
+        ],
+        [
+          "Ember Alignment",
+          "weapon",
+          3,
+          1,
+          1
+        ],
+        [
+          "Spun Material",
+          "greaves",
+          0,
+          0,
+          1
+        ],
+        [
+          "Deeprooted Sole",
+          "greaves",
+          2,
+          0,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "greaves",
+          1,
+          1,
+          0
+        ],
+        [
+          "Ashwoven Material",
+          "greaves",
+          3,
+          1,
+          0
+        ],
+        [
+          "Coldstep Mold",
+          "greaves",
+          3,
+          2,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "greaves",
+          1,
+          3,
+          0
+        ],
+        [
+          "Ashwoven Material",
+          "greaves",
+          0,
+          2,
+          1
+        ],
+        [
+          "Deeprooted Sole",
+          "greaves",
+          0,
+          5,
+          0
+        ]
+      ],
+      "bounty": 93,
+      "rank": "ordinary",
+      "rating": 453,
+      "items": 4
+    },
+    {
+      "name": "Salt Idol",
+      "health": 1190,
+      "strength": 37,
+      "regen": 3,
+      "mind_resist": 29,
+      "curse_resist": 29,
+      "physical_resist": 29,
+      "magic_resist": 24,
+      "gear": [
+        [
+          "Cursed Handle",
+          "weapon",
+          0,
+          0,
+          1
+        ],
+        [
+          "Adamant Fang",
+          "weapon",
+          3,
+          0,
+          1
+        ],
+        [
+          "Sunderer",
+          "weapon",
+          0,
+          1,
+          1
+        ],
+        [
+          "Bileglass Vial",
+          "weapon",
+          5,
+          0,
+          1
+        ],
+        [
+          "Bloodstone Bead",
+          "weapon",
+          4,
+          1,
+          1
+        ],
+        [
+          "Ashwoven Material",
+          "greaves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Coldstep Mold",
+          "greaves",
+          3,
+          0,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "greaves",
+          0,
+          1,
+          0
+        ],
+        [
+          "Pathfinder Material",
+          "greaves",
+          5,
+          0,
+          1
+        ],
+        [
+          "Sump Sole",
+          "greaves",
+          3,
+          2,
+          3
+        ],
+        [
+          "Bulwark Plating",
+          "greaves",
+          1,
+          3,
+          0
+        ],
+        [
+          "Ashwoven Material",
+          "greaves",
+          0,
+          3,
+          1
+        ],
+        [
+          "Coldstep Mold",
+          "greaves",
+          1,
+          5,
+          0
+        ]
+      ],
+      "bounty": 98,
+      "rank": "ordinary",
+      "rating": 587,
+      "items": 4
+    },
+    {
+      "name": "Pale Twin",
+      "health": 1320,
+      "strength": 40,
+      "regen": 3,
+      "mind_resist": 32,
+      "curse_resist": 32,
+      "physical_resist": 33,
+      "magic_resist": 28,
+      "gear": [
+        [
+          "Tidecaller Orb",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Sunder",
+          "weapon",
+          3,
+          0,
+          0
+        ],
+        [
+          "Hollow Lance",
+          "weapon",
+          0,
+          2,
+          1
+        ],
+        [
+          "Kingsbane",
+          "weapon",
+          3,
+          1,
+          0
+        ],
+        [
+          "Ember Alignment",
+          "weapon",
+          4,
+          2,
+          2
+        ],
+        [
+          "Spun Material",
+          "greaves",
+          0,
+          0,
+          1
+        ],
+        [
+          "Coldstep Mold",
+          "greaves",
+          2,
+          0,
+          0
+        ],
+        [
+          "Runed Material",
+          "greaves",
+          4,
+          0,
+          0
+        ],
+        [
+          "Coldstep Mold",
+          "greaves",
+          3,
+          2,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "greaves",
+          1,
+          2,
+          0
+        ],
+        [
+          "Spun Material",
+          "greaves",
+          0,
+          3,
+          0
+        ],
+        [
+          "Coldstep Mold",
+          "greaves",
+          2,
+          4,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "greaves",
+          4,
+          4,
+          0
+        ]
+      ],
+      "bounty": 107,
+      "rank": "ordinary",
+      "rating": 580,
+      "items": 4
+    },
+    {
+      "name": "Ruin Hound",
+      "health": 1450,
+      "strength": 43,
+      "regen": 3,
+      "mind_resist": 35,
+      "curse_resist": 35,
+      "physical_resist": 36,
+      "magic_resist": 31,
+      "gear": [
+        [
+          "Tidecaller Orb",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Sunder",
+          "weapon",
+          3,
+          0,
+          0
+        ],
+        [
+          "Hollow Lance",
+          "weapon",
+          0,
+          2,
+          1
+        ],
+        [
+          "Ember Alignment",
+          "weapon",
+          3,
+          1,
+          1
+        ],
+        [
+          "Ashwoven Material",
+          "greaves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Sump Sole",
+          "greaves",
+          3,
+          0,
+          3
+        ],
+        [
+          "Ashwoven Material",
+          "greaves",
+          0,
+          1,
+          0
+        ],
+        [
+          "Deeprooted Sole",
+          "greaves",
+          0,
+          2,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "greaves",
+          3,
+          2,
+          0
+        ],
+        [
+          "Ashwoven Material",
+          "greaves",
+          5,
+          0,
+          1
+        ],
+        [
+          "Loose-Sole Mold",
+          "greaves",
+          4,
+          3,
+          3
+        ],
+        [
+          "Bulwark Plating",
+          "greaves",
+          2,
+          4,
+          0
+        ],
+        [
+          "Ashwoven Material",
+          "greaves",
+          0,
+          3,
+          0
+        ],
+        [
+          "Coldstep Mold",
+          "greaves",
+          0,
+          4,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "greaves",
+          0,
+          6,
+          0
+        ]
+      ],
+      "bounty": 116,
+      "rank": "ordinary",
+      "rating": 715,
+      "items": 5
+    },
+    {
+      "name": "Bone Cantor",
+      "health": 1580,
+      "strength": 46,
+      "regen": 4,
+      "mind_resist": 38,
+      "curse_resist": 38,
+      "physical_resist": 39,
+      "magic_resist": 34,
+      "gear": [
+        [
+          "Tidecaller Orb",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Kingsbane",
+          "weapon",
+          3,
+          0,
+          0
+        ],
+        [
+          "Hollow Lance",
+          "weapon",
+          0,
+          2,
+          1
+        ],
+        [
+          "Kingsbane",
+          "weapon",
+          4,
+          1,
+          1
+        ],
+        [
+          "Ember Alignment",
+          "weapon",
+          0,
+          3,
+          0
+        ],
+        [
+          "Sevenleague Boots",
+          "greaves",
+          0,
+          0,
+          1
+        ],
+        [
+          "Treadmill Sole",
+          "greaves",
+          3,
+          0,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "greaves",
+          0,
+          2,
+          0
+        ],
+        [
+          "Ashwoven Material",
+          "greaves",
+          2,
+          2,
+          0
+        ],
+        [
+          "Coldstep Mold",
+          "greaves",
+          2,
+          3,
+          0
+        ],
+        [
+          "Scaled Material",
+          "gloves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Sovereign Mold",
+          "gloves",
+          2,
+          0,
+          0
+        ],
+        [
+          "Hermit's Band",
+          "gloves",
+          5,
+          0,
+          0
+        ],
+        [
+          "Tithe Ring",
+          "gloves",
+          2,
+          1,
+          0
+        ],
+        [
+          "Pathfinder Material",
+          "gloves",
+          0,
+          2,
+          0
+        ],
+        [
+          "Sovereign Mold",
+          "gloves",
+          3,
+          1,
+          2
+        ]
+      ],
+      "bounty": 125,
+      "rank": "mini",
+      "rating": 790,
+      "items": 5
+    },
+    {
+      "name": "Ember Wisp",
+      "health": 1710,
+      "strength": 49,
+      "regen": 4,
+      "mind_resist": 41,
+      "curse_resist": 41,
+      "physical_resist": 42,
+      "magic_resist": 37,
+      "gear": [
+        [
+          "Spun Material",
+          "greaves",
+          0,
+          0,
+          1
+        ],
+        [
+          "Pilgrim's Sole",
+          "greaves",
+          2,
+          0,
+          1
+        ],
+        [
+          "Spun Material",
+          "greaves",
+          4,
+          0,
+          1
+        ],
+        [
+          "Pilgrim's Sole",
+          "greaves",
+          2,
+          1,
+          1
+        ],
+        [
+          "Warded Plating",
+          "greaves",
+          1,
+          2,
+          0
+        ],
+        [
+          "Spun Material",
+          "greaves",
+          4,
+          1,
+          3
+        ],
+        [
+          "Tripwire Mold",
+          "greaves",
+          3,
+          2,
+          2
+        ],
+        [
+          "Spun Material",
+          "greaves",
+          0,
+          3,
+          0
+        ],
+        [
+          "Pilgrim's Sole",
+          "greaves",
+          2,
+          4,
+          1
+        ],
+        [
+          "Mage's Wrapping",
+          "gloves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Braced Mold",
+          "gloves",
+          2,
+          0,
+          0
+        ],
+        [
+          "Spun Material",
+          "gloves",
+          4,
+          0,
+          1
+        ],
+        [
+          "Braced Mold",
+          "gloves",
+          2,
+          1,
+          0
+        ],
+        [
+          "Signet of Iron",
+          "gloves",
+          5,
+          1,
+          0
+        ],
+        [
+          "Iron Band",
+          "gloves",
+          2,
+          2,
+          0
+        ],
+        [
+          "Mage's Wrapping",
+          "gloves",
+          0,
+          2,
+          0
+        ],
+        [
+          "Featherweight Mold",
+          "gloves",
+          2,
+          3,
+          0
+        ]
+      ],
+      "bounty": 134,
+      "rank": "ordinary",
+      "rating": 628,
+      "items": 7
+    },
+    {
+      "name": "Slag Warden",
+      "health": 1840,
+      "strength": 52,
+      "regen": 4,
+      "mind_resist": 44,
+      "curse_resist": 44,
+      "physical_resist": 45,
+      "magic_resist": 40,
+      "gear": [
+        [
+          "Spun Material",
+          "greaves",
+          0,
+          0,
+          1
+        ],
+        [
+          "Pilgrim's Sole",
+          "greaves",
+          2,
+          0,
+          1
+        ],
+        [
+          "Witch's Claw",
+          "greaves",
+          4,
+          0,
+          0
+        ],
+        [
+          "Runner's Mold",
+          "greaves",
+          2,
+          1,
+          0
+        ],
+        [
+          "Warded Plating",
+          "greaves",
+          0,
+          2,
+          0
+        ],
+        [
+          "Spun Material",
+          "greaves",
+          4,
+          2,
+          3
+        ],
+        [
+          "Pilgrim's Sole",
+          "greaves",
+          2,
+          3,
+          1
+        ],
+        [
+          "Warded Plating",
+          "greaves",
+          1,
+          4,
+          0
+        ],
+        [
+          "Witch's Stilts",
+          "gloves",
+          0,
+          0,
+          1
+        ],
+        [
+          "Braced Mold",
+          "gloves",
+          3,
+          0,
+          0
+        ],
+        [
+          "Spun Material",
+          "gloves",
+          4,
+          0,
+          3
+        ],
+        [
+          "Braced Mold",
+          "gloves",
+          2,
+          1,
+          0
+        ],
+        [
+          "Spun Material",
+          "gloves",
+          0,
+          1,
+          3
+        ],
+        [
+          "Braced Mold",
+          "gloves",
+          2,
+          2,
+          0
+        ],
+        [
+          "Ring of Tides",
+          "gloves",
+          4,
+          2,
+          0
+        ],
+        [
+          "Iron Band",
+          "gloves",
+          5,
+          2,
+          0
+        ],
+        [
+          "Spun Material",
+          "gloves",
+          0,
+          3,
+          1
+        ],
+        [
+          "Braced Mold",
+          "gloves",
+          2,
+          3,
+          0
+        ]
+      ],
+      "bounty": 143,
+      "rank": "ordinary",
+      "rating": 686,
+      "items": 7
+    },
+    {
+      "name": "The Gearwright",
+      "health": 720,
+      "strength": 26,
+      "regen": 4,
+      "mind_resist": 40,
+      "curse_resist": 40,
+      "physical_resist": 18,
+      "magic_resist": 13,
+      "gear": [
+        [
+          "Kingmaker Hilt",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Sunderer",
+          "weapon",
+          3,
+          0,
+          1
+        ],
+        [
+          "Bloodstone Bead",
+          "weapon",
+          0,
+          1,
+          1
+        ],
+        [
+          "Forking Bead",
+          "weapon",
+          2,
+          1,
+          0
+        ],
+        [
+          "Sevenleague Boots",
+          "gloves",
+          0,
+          0,
+          1
+        ],
+        [
+          "Nimble Mold",
+          "gloves",
+          3,
+          0,
+          1
+        ],
+        [
+          "Sevenleague Boots",
+          "gloves",
+          4,
+          1,
+          0
+        ],
+        [
+          "Nimble Mold",
+          "gloves",
+          2,
+          2,
+          1
+        ],
+        [
+          "Bulwark Material",
+          "greaves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Treadmill Sole",
+          "greaves",
+          3,
+          0,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "greaves",
+          0,
+          2,
+          0
+        ],
+        [
+          "Sevenleague Boots",
+          "greaves",
+          2,
+          2,
+          1
+        ],
+        [
+          "Treadmill Sole",
+          "greaves",
+          0,
+          4,
+          0
+        ],
+        [
+          "Helm of Blades",
+          "helmet",
+          0,
+          0,
+          0
+        ],
+        [
+          "Scrying Lens",
+          "helmet",
+          3,
+          0,
+          0
+        ],
+        [
+          "Bloomcap",
+          "helmet",
+          3,
+          1,
+          3
+        ],
+        [
+          "Stormcaught Frame",
+          "helmet",
+          0,
+          2,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          3,
+          3,
+          0
+        ]
+      ],
+      "bounty": 152,
+      "rank": "mini",
+      "rating": 538,
+      "items": 7
+    },
+    {
+      "name": "Crowned Hollow",
+      "health": 1970,
+      "strength": 55,
+      "regen": 5,
+      "mind_resist": 47,
+      "curse_resist": 47,
+      "physical_resist": 45,
+      "magic_resist": 40,
+      "gear": [
+        [
+          "Leaden Tome",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Deepwater Ink",
+          "weapon",
+          3,
+          0,
+          1
+        ],
+        [
+          "Sunder",
+          "weapon",
+          3,
+          1,
+          0
+        ],
+        [
+          "Sevenleague Boots",
+          "gloves",
+          0,
+          0,
+          1
+        ],
+        [
+          "Nimble Mold",
+          "gloves",
+          3,
+          0,
+          1
+        ],
+        [
+          "Hermit's Band",
+          "gloves",
+          5,
+          0,
+          0
+        ],
+        [
+          "Seal of the Grove",
+          "gloves",
+          4,
+          1,
+          0
+        ],
+        [
+          "Sevenleague Boots",
+          "gloves",
+          0,
+          2,
+          1
+        ],
+        [
+          "Bramble Mold",
+          "gloves",
+          3,
+          2,
+          0
+        ],
+        [
+          "Spun Material",
+          "greaves",
+          0,
+          0,
+          1
+        ],
+        [
+          "Anchored Sole",
+          "greaves",
+          2,
+          0,
+          1
+        ],
+        [
+          "Bulwark Plating",
+          "greaves",
+          4,
+          0,
+          0
+        ],
+        [
+          "Ashwoven Material",
+          "greaves",
+          1,
+          1,
+          1
+        ],
+        [
+          "Pilgrim's Sole",
+          "greaves",
+          2,
+          2,
+          1
+        ],
+        [
+          "Bulwark Plating",
+          "greaves",
+          4,
+          2,
+          0
+        ],
+        [
+          "Witch's Hat",
+          "helmet",
+          0,
+          0,
+          2
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          3,
+          0,
+          0
+        ],
+        [
+          "Warding Plate",
+          "helmet",
+          2,
+          2,
+          0
+        ],
+        [
+          "Stormcaught Frame",
+          "helmet",
+          4,
+          2,
+          1
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          2,
+          4,
+          0
+        ]
+      ],
+      "bounty": 161,
+      "rank": "mini",
+      "rating": 926,
+      "items": 7
+    },
+    {
+      "name": "Cog Priest",
+      "health": 2100,
+      "strength": 58,
+      "regen": 5,
+      "mind_resist": 50,
+      "curse_resist": 50,
+      "physical_resist": 45,
+      "magic_resist": 40,
+      "gear": [
+        [
+          "Ashwoven Material",
+          "greaves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Treadmill Sole",
+          "greaves",
+          3,
+          0,
+          0
+        ],
+        [
+          "Scaled Material",
+          "greaves",
+          0,
+          1,
+          0
+        ],
+        [
+          "Treadmill Sole",
+          "greaves",
+          2,
+          1,
+          2
+        ],
+        [
+          "Bulwark Plating",
+          "greaves",
+          0,
+          3,
+          0
+        ],
+        [
+          "Sevenleague Boots",
+          "greaves",
+          2,
+          3,
+          1
+        ],
+        [
+          "Treadmill Sole",
+          "greaves",
+          0,
+          5,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "greaves",
+          3,
+          5,
+          0
+        ],
+        [
+          "Spun Material",
+          "gloves",
+          0,
+          0,
+          1
+        ],
+        [
+          "Gauntlet Mold",
+          "gloves",
+          2,
+          0,
+          1
+        ],
+        [
+          "Hermit's Band",
+          "gloves",
+          5,
+          0,
+          0
+        ],
+        [
+          "Ring of Vigils",
+          "gloves",
+          1,
+          1,
+          0
+        ],
+        [
+          "Spun Material",
+          "gloves",
+          3,
+          1,
+          1
+        ],
+        [
+          "Braced Mold",
+          "gloves",
+          5,
+          1,
+          1
+        ],
+        [
+          "Hermit's Band",
+          "gloves",
+          2,
+          2,
+          0
+        ],
+        [
+          "Seal of the Grove",
+          "gloves",
+          1,
+          2,
+          0
+        ],
+        [
+          "Spun Material",
+          "gloves",
+          0,
+          2,
+          0
+        ],
+        [
+          "Nimble Mold",
+          "gloves",
+          2,
+          3,
+          1
+        ],
+        [
+          "Witch's Stilts",
+          "gloves",
+          4,
+          2,
+          0
+        ],
+        [
+          "Nimble Mold",
+          "gloves",
+          2,
+          4,
+          3
+        ]
+      ],
+      "bounty": 170,
+      "rank": "ordinary",
+      "rating": 999,
+      "items": 7
+    },
+    {
+      "name": "Mire Behemoth",
+      "health": 2230,
+      "strength": 61,
+      "regen": 5,
+      "mind_resist": 53,
+      "curse_resist": 53,
+      "physical_resist": 45,
+      "magic_resist": 40,
+      "gear": [
+        [
+          "Spun Material",
+          "greaves",
+          0,
+          0,
+          1
+        ],
+        [
+          "Treadmill Sole",
+          "greaves",
+          2,
+          0,
+          0
+        ],
+        [
+          "Witch's Stilts",
+          "greaves",
+          0,
+          1,
+          3
+        ],
+        [
+          "Coldstep Mold",
+          "greaves",
+          3,
+          2,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "greaves",
+          0,
+          3,
+          0
+        ],
+        [
+          "Sevenleague Boots",
+          "greaves",
+          2,
+          4,
+          1
+        ],
+        [
+          "Treadmill Sole",
+          "greaves",
+          0,
+          5,
+          2
+        ],
+        [
+          "Bulwark Plating",
+          "greaves",
+          3,
+          6,
+          0
+        ],
+        [
+          "Sevenleague Boots",
+          "gloves",
+          0,
+          0,
+          1
+        ],
+        [
+          "Nimble Mold",
+          "gloves",
+          3,
+          0,
+          1
+        ],
+        [
+          "Hermit's Band",
+          "gloves",
+          5,
+          0,
+          0
+        ],
+        [
+          "Ring of Vigils",
+          "gloves",
+          4,
+          1,
+          0
+        ],
+        [
+          "Ashwoven Material",
+          "gloves",
+          0,
+          2,
+          0
+        ],
+        [
+          "Nimble Mold",
+          "gloves",
+          3,
+          2,
+          1
+        ],
+        [
+          "Hermit's Band",
+          "gloves",
+          5,
+          2,
+          0
+        ],
+        [
+          "Hermit's Band",
+          "gloves",
+          5,
+          1,
+          0
+        ],
+        [
+          "Sevenleague Boots",
+          "gloves",
+          0,
+          3,
+          1
+        ],
+        [
+          "Nimble Mold",
+          "gloves",
+          3,
+          3,
+          3
+        ],
+        [
+          "Hermit's Band",
+          "gloves",
+          5,
+          3,
+          0
+        ],
+        [
+          "Iron Band",
+          "gloves",
+          5,
+          4,
+          0
+        ],
+        [
+          "Scaled Material",
+          "gloves",
+          0,
+          5,
+          0
+        ],
+        [
+          "Nimble Mold",
+          "gloves",
+          2,
+          5,
+          1
+        ]
+      ],
+      "bounty": 179,
+      "rank": "ordinary",
+      "rating": 1105,
+      "items": 7
+    },
+    {
+      "name": "Vermin Sovereign",
+      "health": 2360,
+      "strength": 64,
+      "regen": 6,
+      "mind_resist": 56,
+      "curse_resist": 56,
+      "physical_resist": 45,
+      "magic_resist": 40,
+      "gear": [
+        [
+          "Witch's Stilts",
+          "greaves",
+          0,
+          0,
+          1
+        ],
+        [
+          "Treadmill Sole",
+          "greaves",
+          3,
+          0,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "greaves",
+          1,
+          1,
+          0
+        ],
+        [
+          "Spun Material",
+          "greaves",
+          3,
+          1,
+          0
+        ],
+        [
+          "Treadmill Sole",
+          "greaves",
+          1,
+          3,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "greaves",
+          4,
+          3,
+          0
+        ],
+        [
+          "Spun Material",
+          "greaves",
+          0,
+          3,
+          0
+        ],
+        [
+          "Pilgrim's Sole",
+          "greaves",
+          0,
+          5,
+          1
+        ],
+        [
+          "Ashwoven Material",
+          "greaves",
+          3,
+          4,
+          1
+        ],
+        [
+          "Treadmill Sole",
+          "greaves",
+          1,
+          5,
+          1
+        ],
+        [
+          "Bulwark Plating",
+          "greaves",
+          4,
+          5,
+          0
+        ],
+        [
+          "Sevenleague Boots",
+          "gloves",
+          0,
+          0,
+          1
+        ],
+        [
+          "Nimble Mold",
+          "gloves",
+          3,
+          0,
+          1
+        ],
+        [
+          "Hermit's Band",
+          "gloves",
+          5,
+          0,
+          0
+        ],
+        [
+          "Ring of Vigils",
+          "gloves",
+          4,
+          1,
+          0
+        ],
+        [
+          "Anchor Material",
+          "gloves",
+          0,
+          2,
+          0
+        ],
+        [
+          "Nimble Mold",
+          "gloves",
+          2,
+          2,
+          1
+        ],
+        [
+          "Anchor Material",
+          "gloves",
+          4,
+          2,
+          0
+        ],
+        [
+          "Nimble Mold",
+          "gloves",
+          2,
+          3,
+          3
+        ],
+        [
+          "Hermit's Band",
+          "gloves",
+          5,
+          1,
+          0
+        ],
+        [
+          "Signet of Iron",
+          "gloves",
+          1,
+          4,
+          0
+        ],
+        [
+          "Spun Material",
+          "gloves",
+          0,
+          4,
+          0
+        ],
+        [
+          "Gauntlet Mold",
+          "gloves",
+          2,
+          4,
+          3
+        ]
+      ],
+      "bounty": 188,
+      "rank": "ordinary",
+      "rating": 1017,
+      "items": 8
+    },
+    {
+      "name": "Obsidian Colossus",
+      "health": 2490,
+      "strength": 67,
+      "regen": 6,
+      "mind_resist": 59,
+      "curse_resist": 59,
+      "physical_resist": 45,
+      "magic_resist": 40,
+      "gear": [
+        [
+          "Sevenleague Boots",
+          "greaves",
+          0,
+          0,
+          1
+        ],
+        [
+          "Treadmill Sole",
+          "greaves",
+          3,
+          0,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "greaves",
+          0,
+          2,
+          0
+        ],
+        [
+          "Anchor Material",
+          "greaves",
+          2,
+          2,
+          0
+        ],
+        [
+          "Anchored Sole",
+          "greaves",
+          4,
+          1,
+          3
+        ],
+        [
+          "Bulwark Plating",
+          "greaves",
+          4,
+          3,
+          0
+        ],
+        [
+          "Spun Material",
+          "greaves",
+          0,
+          4,
+          1
+        ],
+        [
+          "Anchored Sole",
+          "greaves",
+          2,
+          4,
+          1
+        ],
+        [
+          "Bulwark Plating",
+          "greaves",
+          3,
+          5,
+          0
+        ],
+        [
+          "Spun Material",
+          "greaves",
+          0,
+          5,
+          3
+        ],
+        [
+          "Tempered Sole",
+          "greaves",
+          0,
+          7,
+          1
+        ],
+        [
+          "Ashwoven Material",
+          "gloves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Nimble Mold",
+          "gloves",
+          3,
+          0,
+          1
+        ],
+        [
+          "Hermit's Band",
+          "gloves",
+          5,
+          0,
+          0
+        ],
+        [
+          "Iron Band",
+          "gloves",
+          0,
+          1,
+          0
+        ],
+        [
+          "Sevenleague Boots",
+          "gloves",
+          1,
+          1,
+          0
+        ],
+        [
+          "Nimble Mold",
+          "gloves",
+          3,
+          1,
+          3
+        ],
+        [
+          "Ring of Tides",
+          "gloves",
+          5,
+          1,
+          0
+        ],
+        [
+          "Ring of Vigils",
+          "gloves",
+          0,
+          2,
+          0
+        ],
+        [
+          "Sevenleague Boots",
+          "gloves",
+          3,
+          3,
+          1
+        ],
+        [
+          "Nimble Mold",
+          "gloves",
+          1,
+          4,
+          1
+        ],
+        [
+          "Hermit's Band",
+          "gloves",
+          5,
+          2,
+          0
+        ],
+        [
+          "Seal of the Grove",
+          "gloves",
+          0,
+          4,
+          0
+        ]
+      ],
+      "bounty": 197,
+      "rank": "ordinary",
+      "rating": 1118,
+      "items": 7
+    },
+    {
+      "name": "Null Sentinel",
+      "health": 2620,
+      "strength": 70,
+      "regen": 6,
+      "mind_resist": 62,
+      "curse_resist": 62,
+      "physical_resist": 45,
+      "magic_resist": 40,
+      "gear": [
+        [
+          "Leaden Tome",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Kingsblood Ink",
+          "weapon",
+          3,
+          0,
+          0
+        ],
+        [
+          "Sunder",
+          "weapon",
+          4,
+          1,
+          1
+        ],
+        [
+          "Stormcaught Frame",
+          "helmet",
+          0,
+          0,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          3,
+          0,
+          0
+        ],
+        [
+          "Scrying Lens",
+          "helmet",
+          5,
+          0,
+          1
+        ],
+        [
+          "Stormcaught Frame",
+          "helmet",
+          0,
+          2,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          3,
+          2,
+          0
+        ],
+        [
+          "Scrying Lens",
+          "helmet",
+          0,
+          4,
+          0
+        ],
+        [
+          "Martyr's Crest",
+          "helmet",
+          3,
+          4,
+          0
+        ],
+        [
+          "Stormcaught Frame",
+          "helmet",
+          0,
+          5,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          3,
+          5,
+          0
+        ],
+        [
+          "Scrying Lens",
+          "helmet",
+          5,
+          5,
+          1
+        ],
+        [
+          "Reckoning Crest",
+          "helmet",
+          0,
+          7,
+          0
+        ]
+      ],
+      "bounty": 206,
+      "rank": "ordinary",
+      "rating": 903,
+      "items": 4
+    },
+    {
+      "name": "Silence",
+      "health": 2750,
+      "strength": 73,
+      "regen": 7,
+      "mind_resist": 65,
+      "curse_resist": 65,
+      "physical_resist": 45,
+      "magic_resist": 40,
+      "gear": [
+        [
+          "Worldeye Orb",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Sunder",
+          "weapon",
+          3,
+          0,
+          0
+        ],
+        [
+          "Hollow Lance",
+          "weapon",
+          0,
+          2,
+          1
+        ],
+        [
+          "Rootwork Alignment",
+          "weapon",
+          3,
+          1,
+          0
+        ],
+        [
+          "Stormcaught Frame",
+          "helmet",
+          0,
+          0,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          3,
+          0,
+          0
+        ],
+        [
+          "Scrying Lens",
+          "helmet",
+          5,
+          0,
+          1
+        ],
+        [
+          "Stormcaught Frame",
+          "helmet",
+          0,
+          2,
+          0
+        ],
+        [
+          "Reckoning Plate",
+          "helmet",
+          3,
+          2,
+          0
+        ],
+        [
+          "Scrying Lens",
+          "helmet",
+          0,
+          4,
+          0
+        ],
+        [
+          "Martyr's Crest",
+          "helmet",
+          4,
+          3,
+          1
+        ],
+        [
+          "Stormcaught Frame",
+          "helmet",
+          0,
+          5,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          3,
+          6,
+          0
+        ],
+        [
+          "Scrying Lens",
+          "helmet",
+          5,
+          4,
+          1
+        ]
+      ],
+      "bounty": 215,
+      "rank": "ordinary",
+      "rating": 1006,
+      "items": 4
+    },
+    {
+      "name": "Weeping Idol",
+      "health": 2880,
+      "strength": 76,
+      "regen": 7,
+      "mind_resist": 68,
+      "curse_resist": 68,
+      "physical_resist": 45,
+      "magic_resist": 40,
+      "gear": [
+        [
+          "Emberheart Orb",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Unmaking",
+          "weapon",
+          3,
+          0,
+          1
+        ],
+        [
+          "Kingsbane",
+          "weapon",
+          4,
+          0,
+          1
+        ],
+        [
+          "Kingsbane",
+          "weapon",
+          0,
+          2,
+          0
+        ],
+        [
+          "Stonewall Frame",
+          "helmet",
+          0,
+          0,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          3,
+          0,
+          0
+        ],
+        [
+          "Reckoning Plate",
+          "helmet",
+          4,
+          1,
+          2
+        ],
+        [
+          "Stonewall Frame",
+          "helmet",
+          0,
+          2,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          3,
+          3,
+          0
+        ],
+        [
+          "Stonewall Frame",
+          "helmet",
+          0,
+          4,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          3,
+          5,
+          0
+        ],
+        [
+          "Mana Ward",
+          "helmet",
+          0,
+          6,
+          0
+        ],
+        [
+          "Spun Material",
+          "gloves",
+          0,
+          0,
+          1
+        ],
+        [
+          "Ravener's Mold",
+          "gloves",
+          2,
+          0,
+          0
+        ],
+        [
+          "Siphon Ring",
+          "gloves",
+          4,
+          0,
+          0
+        ],
+        [
+          "Blightfinger",
+          "gloves",
+          5,
+          0,
+          0
+        ],
+        [
+          "Bulwark Material",
+          "gloves",
+          3,
+          1,
+          0
+        ],
+        [
+          "Ravener's Mold",
+          "gloves",
+          1,
+          1,
+          3
+        ],
+        [
+          "Bulwark Material",
+          "gloves",
+          0,
+          3,
+          0
+        ],
+        [
+          "Ravener's Mold",
+          "gloves",
+          3,
+          3,
+          0
+        ],
+        [
+          "Hermit's Band",
+          "gloves",
+          0,
+          2,
+          0
+        ],
+        [
+          "Blightfinger",
+          "gloves",
+          5,
+          3,
+          0
+        ],
+        [
+          "Bulwark Material",
+          "gloves",
+          4,
+          4,
+          1
+        ],
+        [
+          "Ravener's Mold",
+          "gloves",
+          2,
+          5,
+          0
+        ],
+        [
+          "Mage's Sandals",
+          "gloves",
+          0,
+          5,
+          0
+        ],
+        [
+          "Ravener's Mold",
+          "gloves",
+          0,
+          6,
+          2
+        ]
+      ],
+      "bounty": 224,
+      "rank": "boss",
+      "rating": 1240,
+      "items": 9
+    },
+    {
+      "name": "The Long Mirror",
+      "health": 3010,
+      "strength": 79,
+      "regen": 7,
+      "mind_resist": 70,
+      "curse_resist": 70,
+      "physical_resist": 45,
+      "magic_resist": 40,
+      "gear": [
+        [
+          "Worldeye Orb",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Sunder",
+          "weapon",
+          3,
+          0,
+          0
+        ],
+        [
+          "Hollow Lance",
+          "weapon",
+          0,
+          2,
+          1
+        ],
+        [
+          "Cometfall",
+          "weapon",
+          3,
+          1,
+          0
+        ],
+        [
+          "Stormcaught Frame",
+          "helmet",
+          0,
+          0,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          3,
+          0,
+          0
+        ],
+        [
+          "Martyr's Crest",
+          "helmet",
+          5,
+          0,
+          1
+        ],
+        [
+          "Stormcaught Frame",
+          "helmet",
+          0,
+          2,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          3,
+          2,
+          0
+        ],
+        [
+          "Tin Frame",
+          "helmet",
+          0,
+          4,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          2,
+          4,
+          0
+        ],
+        [
+          "Martyr's Crest",
+          "helmet",
+          4,
+          4,
+          1
+        ],
+        [
+          "Tin Frame",
+          "helmet",
+          0,
+          6,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          2,
+          6,
+          0
+        ],
+        [
+          "Bloomcap",
+          "helmet",
+          4,
+          6,
+          1
+        ]
+      ],
+      "bounty": 233,
+      "rank": "ordinary",
+      "rating": 1015,
+      "items": 5
+    },
+    {
+      "name": "Iron Abbot",
+      "health": 3140,
+      "strength": 82,
+      "regen": 8,
+      "mind_resist": 70,
+      "curse_resist": 70,
+      "physical_resist": 45,
+      "magic_resist": 40,
+      "gear": [
+        [
+          "Kingmaker Hilt",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Arcane Splinter",
+          "weapon",
+          3,
+          0,
+          1
+        ],
+        [
+          "Arcane Splinter",
+          "weapon",
+          4,
+          0,
+          3
+        ],
+        [
+          "Bloodstone Bead",
+          "weapon",
+          0,
+          1,
+          1
+        ],
+        [
+          "Forking Bead",
+          "weapon",
+          2,
+          1,
+          0
+        ],
+        [
+          "Stormcaught Frame",
+          "helmet",
+          0,
+          0,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          3,
+          0,
+          0
+        ],
+        [
+          "Scrying Lens",
+          "helmet",
+          5,
+          0,
+          1
+        ],
+        [
+          "Stormcaught Frame",
+          "helmet",
+          0,
+          2,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          3,
+          2,
+          0
+        ],
+        [
+          "Scrying Lens",
+          "helmet",
+          0,
+          4,
+          0
+        ],
+        [
+          "Martyr's Crest",
+          "helmet",
+          3,
+          4,
+          0
+        ],
+        [
+          "Stormcaught Frame",
+          "helmet",
+          0,
+          5,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          3,
+          5,
+          0
+        ],
+        [
+          "Scrying Lens",
+          "helmet",
+          5,
+          5,
+          1
+        ],
+        [
+          "Martyr's Crest",
+          "helmet",
+          0,
+          7,
+          0
+        ]
+      ],
+      "bounty": 242,
+      "rank": "ordinary",
+      "rating": 1030,
+      "items": 4
+    },
+    {
+      "name": "The Last Gearwright",
+      "health": 3270,
+      "strength": 85,
+      "regen": 8,
+      "mind_resist": 70,
+      "curse_resist": 70,
+      "physical_resist": 45,
+      "magic_resist": 40,
+      "gear": [
+        [
+          "Worldeye Orb",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Sunder",
+          "weapon",
+          3,
+          0,
+          0
+        ],
+        [
+          "Cometfall",
+          "weapon",
+          3,
+          1,
+          0
+        ],
+        [
+          "Kingsbane",
+          "weapon",
+          0,
+          2,
+          0
+        ],
+        [
+          "Rootwork Alignment",
+          "weapon",
+          3,
+          2,
+          1
+        ],
+        [
+          "Stormcaught Frame",
+          "helmet",
+          0,
+          0,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          3,
+          0,
+          0
+        ],
+        [
+          "Scrying Lens",
+          "helmet",
+          5,
+          0,
+          1
+        ],
+        [
+          "Martyr's Crest",
+          "helmet",
+          0,
+          2,
+          0
+        ],
+        [
+          "Stormcaught Frame",
+          "helmet",
+          3,
+          2,
+          1
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          1,
+          3,
+          0
+        ],
+        [
+          "Martyr's Crest",
+          "helmet",
+          0,
+          3,
+          1
+        ],
+        [
+          "Bone Frame",
+          "helmet",
+          3,
+          4,
+          2
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          1,
+          5,
+          0
+        ],
+        [
+          "Reckoning Plate",
+          "helmet",
+          0,
+          6,
+          3
+        ],
+        [
+          "Martyr's Crest",
+          "helmet",
+          3,
+          6,
+          0
+        ],
+        [
+          "Sigil Layer",
+          "chest",
+          2,
+          3,
+          0
+        ],
+        [
+          "Seedbed Layer",
+          "chest",
+          2,
+          4,
+          0
+        ],
+        [
+          "Berserker's Plate",
+          "chest",
+          2,
+          5,
+          0
+        ],
+        [
+          "Deep Roots Base",
+          "chest",
+          2,
+          1,
+          0
+        ],
+        [
+          "Wayfarer's Sole",
+          "greaves",
+          3,
+          2,
+          0
+        ],
+        [
+          "Scaled Plating",
+          "greaves",
+          4,
+          2,
+          0
+        ],
+        [
+          "Leather Material",
+          "greaves",
+          1,
+          2,
+          0
+        ],
+        [
+          "Tempered Sole",
+          "greaves",
+          0,
+          5,
+          0
+        ],
+        [
+          "Rootbound Material",
+          "greaves",
+          1,
+          6,
+          0
+        ],
+        [
+          "Reckoning Plate",
+          "greaves",
+          3,
+          6,
+          0
+        ]
+      ],
+      "bounty": 251,
+      "rank": "ordinary",
+      "rating": 1353,
+      "items": 7
+    },
+    {
+      "name": "Rimefather",
+      "health": 3480,
+      "strength": 92,
+      "regen": 8,
+      "mind_resist": 70,
+      "curse_resist": 70,
+      "physical_resist": 48,
+      "magic_resist": 44,
+      "gear": [
+        [
+          "Kingmaker Hilt",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Arcane Splinter",
+          "weapon",
+          3,
+          0,
+          1
+        ],
+        [
+          "Arcane Splinter",
+          "weapon",
+          4,
+          0,
+          3
+        ],
+        [
+          "Bloodstone Bead",
+          "weapon",
+          0,
+          1,
+          1
+        ],
+        [
+          "Forking Bead",
+          "weapon",
+          2,
+          1,
+          0
+        ],
+        [
+          "Helm of Blades",
+          "helmet",
+          0,
+          0,
+          0
+        ],
+        [
+          "Bloomcap",
+          "helmet",
+          3,
+          0,
+          3
+        ],
+        [
+          "Martyr's Crest",
+          "helmet",
+          5,
+          0,
+          1
+        ],
+        [
+          "Stormcaught Frame",
+          "helmet",
+          0,
+          2,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          3,
+          2,
+          0
+        ],
+        [
+          "Reckoning Plate",
+          "helmet",
+          4,
+          3,
+          2
+        ],
+        [
+          "Martyr's Crest",
+          "helmet",
+          0,
+          4,
+          0
+        ],
+        [
+          "Stormcaught Frame",
+          "helmet",
+          0,
+          5,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          3,
+          5,
+          0
+        ],
+        [
+          "Scrying Lens",
+          "helmet",
+          5,
+          5,
+          1
+        ],
+        [
+          "Martyr's Crest",
+          "helmet",
+          0,
+          7,
+          0
+        ]
+      ],
+      "bounty": 262,
+      "rank": "ordinary",
+      "rating": 1129,
+      "items": 4
+    },
+    {
+      "name": "The Tallow Saint",
+      "health": 3690,
+      "strength": 96,
+      "regen": 9,
+      "mind_resist": 72,
+      "curse_resist": 72,
+      "physical_resist": 50,
+      "magic_resist": 46,
+      "gear": [
+        [
+          "Worldeye Orb",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Sunder",
+          "weapon",
+          3,
+          0,
+          0
+        ],
+        [
+          "Shatterbolt",
+          "weapon",
+          3,
+          1,
+          0
+        ],
+        [
+          "Cometfall",
+          "weapon",
+          0,
+          2,
+          0
+        ],
+        [
+          "Rootwork Alignment",
+          "weapon",
+          3,
+          2,
+          0
+        ],
+        [
+          "Stormcaught Frame",
+          "helmet",
+          0,
+          0,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          3,
+          0,
+          0
+        ],
+        [
+          "Tin Frame",
+          "helmet",
+          0,
+          2,
+          0
+        ],
+        [
+          "Reckoning Plate",
+          "helmet",
+          2,
+          2,
+          0
+        ],
+        [
+          "Scrying Lens",
+          "helmet",
+          4,
+          2,
+          1
+        ],
+        [
+          "Martyr's Crest",
+          "helmet",
+          5,
+          0,
+          1
+        ],
+        [
+          "Stormcaught Frame",
+          "helmet",
+          0,
+          4,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          3,
+          5,
+          0
+        ],
+        [
+          "Scrying Lens",
+          "helmet",
+          5,
+          3,
+          1
+        ],
+        [
+          "Bone Frame",
+          "helmet",
+          0,
+          6,
+          0
+        ],
+        [
+          "Scrying Lens",
+          "helmet",
+          1,
+          7,
+          0
+        ]
+      ],
+      "bounty": 273,
+      "rank": "ordinary",
+      "rating": 1223,
+      "items": 5
+    },
+    {
+      "name": "Hollowmarch",
+      "health": 3910,
+      "strength": 101,
+      "regen": 9,
+      "mind_resist": 74,
+      "curse_resist": 74,
+      "physical_resist": 52,
+      "magic_resist": 48,
+      "gear": [
+        [
+          "Ashwoven Material",
+          "gloves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Ravener's Mold",
+          "gloves",
+          3,
+          0,
+          0
+        ],
+        [
+          "Seal of the Deep",
+          "gloves",
+          0,
+          1,
+          0
+        ],
+        [
+          "Siphon Ring",
+          "gloves",
+          5,
+          0,
+          0
+        ],
+        [
+          "Ashwoven Material",
+          "gloves",
+          0,
+          2,
+          0
+        ],
+        [
+          "Ravener's Mold",
+          "gloves",
+          3,
+          1,
+          2
+        ],
+        [
+          "Storm Signet",
+          "gloves",
+          5,
+          1,
+          1
+        ],
+        [
+          "Blightfinger",
+          "gloves",
+          2,
+          1,
+          0
+        ],
+        [
+          "Ashwoven Material",
+          "gloves",
+          0,
+          3,
+          0
+        ],
+        [
+          "Ravener's Mold",
+          "gloves",
+          3,
+          3,
+          0
+        ],
+        [
+          "Ashwoven Material",
+          "gloves",
+          0,
+          4,
+          0
+        ],
+        [
+          "Ravener's Mold",
+          "gloves",
+          0,
+          5,
+          0
+        ],
+        [
+          "Ashwoven Material",
+          "gloves",
+          5,
+          3,
+          1
+        ],
+        [
+          "Ravener's Mold",
+          "gloves",
+          3,
+          4,
+          2
+        ],
+        [
+          "Mage's Wrapping",
+          "gloves",
+          1,
+          6,
+          0
+        ],
+        [
+          "Ravener's Mold",
+          "gloves",
+          3,
+          6,
+          0
+        ],
+        [
+          "Stonewall Frame",
+          "helmet",
+          0,
+          0,
+          0
+        ],
+        [
+          "Reckoning Plate",
+          "helmet",
+          3,
+          0,
+          0
+        ],
+        [
+          "Mana Ward",
+          "helmet",
+          4,
+          0,
+          1
+        ],
+        [
+          "Stonewall Frame",
+          "helmet",
+          0,
+          2,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          3,
+          2,
+          0
+        ],
+        [
+          "Stonewall Frame",
+          "helmet",
+          0,
+          4,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          3,
+          4,
+          0
+        ],
+        [
+          "Stonewall Frame",
+          "helmet",
+          0,
+          6,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          3,
+          6,
+          0
+        ]
+      ],
+      "bounty": 284,
+      "rank": "ordinary",
+      "rating": 1496,
+      "items": 10
+    },
+    {
+      "name": "The Iron Choir",
+      "health": 4140,
+      "strength": 106,
+      "regen": 10,
+      "mind_resist": 76,
+      "curse_resist": 76,
+      "physical_resist": 54,
+      "magic_resist": 50,
+      "gear": [
+        [
+          "Ashwoven Material",
+          "gloves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Ravener's Mold",
+          "gloves",
+          3,
+          0,
+          0
+        ],
+        [
+          "Ashwoven Material",
+          "gloves",
+          0,
+          1,
+          0
+        ],
+        [
+          "Ravener's Mold",
+          "gloves",
+          0,
+          2,
+          0
+        ],
+        [
+          "Storm Signet",
+          "gloves",
+          2,
+          2,
+          0
+        ],
+        [
+          "Siphon Ring",
+          "gloves",
+          4,
+          2,
+          0
+        ],
+        [
+          "Ashwoven Material",
+          "gloves",
+          5,
+          0,
+          1
+        ],
+        [
+          "Ravener's Mold",
+          "gloves",
+          4,
+          3,
+          0
+        ],
+        [
+          "Siphon Ring",
+          "gloves",
+          4,
+          1,
+          0
+        ],
+        [
+          "Siphon Ring",
+          "gloves",
+          3,
+          3,
+          0
+        ],
+        [
+          "Ashwoven Material",
+          "gloves",
+          1,
+          3,
+          1
+        ],
+        [
+          "Ravener's Mold",
+          "gloves",
+          2,
+          3,
+          3
+        ],
+        [
+          "Storm Signet",
+          "gloves",
+          0,
+          4,
+          1
+        ],
+        [
+          "Siphon Ring",
+          "gloves",
+          2,
+          5,
+          0
+        ],
+        [
+          "Ashwoven Material",
+          "gloves",
+          3,
+          5,
+          0
+        ],
+        [
+          "Ravener's Mold",
+          "gloves",
+          2,
+          6,
+          0
+        ],
+        [
+          "Stonewall Frame",
+          "helmet",
+          0,
+          0,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          3,
+          0,
+          0
+        ],
+        [
+          "Mana Ward",
+          "helmet",
+          0,
+          2,
+          0
+        ],
+        [
+          "Crown of the Deep",
+          "helmet",
+          4,
+          1,
+          1
+        ],
+        [
+          "Stonewall Frame",
+          "helmet",
+          2,
+          3,
+          0
+        ],
+        [
+          "Mana Ward",
+          "helmet",
+          0,
+          3,
+          3
+        ],
+        [
+          "Mana Ward",
+          "helmet",
+          1,
+          5,
+          0
+        ],
+        [
+          "Archon's Crest",
+          "helmet",
+          4,
+          4,
+          3
+        ],
+        [
+          "Stonewall Frame",
+          "helmet",
+          3,
+          6,
+          0
+        ],
+        [
+          "Mana Ward",
+          "helmet",
+          0,
+          6,
+          2
+        ]
+      ],
+      "bounty": 295,
+      "rank": "ordinary",
+      "rating": 1487,
+      "items": 8
+    },
+    {
+      "name": "Gallowglass",
+      "health": 4380,
+      "strength": 112,
+      "regen": 10,
+      "mind_resist": 78,
+      "curse_resist": 78,
+      "physical_resist": 56,
+      "magic_resist": 52,
+      "gear": [
+        [
+          "Ashwoven Material",
+          "gloves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Twinning Mold",
+          "gloves",
+          3,
+          0,
+          0
+        ],
+        [
+          "Seal of the Deep",
+          "gloves",
+          0,
+          1,
+          0
+        ],
+        [
+          "Siphon Ring",
+          "gloves",
+          5,
+          0,
+          0
+        ],
+        [
+          "Ashwoven Material",
+          "gloves",
+          0,
+          2,
+          0
+        ],
+        [
+          "Ravener's Mold",
+          "gloves",
+          3,
+          1,
+          2
+        ],
+        [
+          "Ashwoven Material",
+          "gloves",
+          5,
+          1,
+          1
+        ],
+        [
+          "Ravener's Mold",
+          "gloves",
+          3,
+          3,
+          0
+        ],
+        [
+          "Storm Signet",
+          "gloves",
+          1,
+          3,
+          0
+        ],
+        [
+          "Siphon Ring",
+          "gloves",
+          0,
+          3,
+          0
+        ],
+        [
+          "Ashwoven Material",
+          "gloves",
+          0,
+          4,
+          0
+        ],
+        [
+          "Ravener's Mold",
+          "gloves",
+          0,
+          5,
+          0
+        ],
+        [
+          "Siphon Ring",
+          "gloves",
+          2,
+          5,
+          0
+        ],
+        [
+          "Siphon Ring",
+          "gloves",
+          3,
+          5,
+          0
+        ],
+        [
+          "Ashwoven Material",
+          "gloves",
+          4,
+          4,
+          1
+        ],
+        [
+          "Ravener's Mold",
+          "gloves",
+          2,
+          6,
+          0
+        ],
+        [
+          "Siphon Ring",
+          "gloves",
+          5,
+          4,
+          0
+        ],
+        [
+          "Siphon Ring",
+          "gloves",
+          5,
+          5,
+          0
+        ],
+        [
+          "Stonewall Frame",
+          "helmet",
+          0,
+          0,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          3,
+          0,
+          0
+        ],
+        [
+          "Mana Ward",
+          "helmet",
+          0,
+          2,
+          0
+        ],
+        [
+          "Tithe Collector",
+          "helmet",
+          5,
+          0,
+          1
+        ],
+        [
+          "Stonewall Frame",
+          "helmet",
+          3,
+          2,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          2,
+          4,
+          0
+        ],
+        [
+          "Stonewall Frame",
+          "helmet",
+          0,
+          4,
+          1
+        ],
+        [
+          "Mana Ward",
+          "helmet",
+          2,
+          6,
+          0
+        ],
+        [
+          "Mana Ward",
+          "helmet",
+          4,
+          4,
+          1
+        ]
+      ],
+      "bounty": 306,
+      "rank": "mini",
+      "rating": 1534,
+      "items": 8
+    },
+    {
+      "name": "The Rust Parliament",
+      "health": 4640,
+      "strength": 118,
+      "regen": 11,
+      "mind_resist": 80,
+      "curse_resist": 80,
+      "physical_resist": 58,
+      "magic_resist": 54,
+      "gear": [
+        [
+          "Mage's Wrapping",
+          "gloves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Ravener's Mold",
+          "gloves",
+          2,
+          0,
+          0
+        ],
+        [
+          "Storm Signet",
+          "gloves",
+          4,
+          0,
+          0
+        ],
+        [
+          "Siphon Ring",
+          "gloves",
+          3,
+          1,
+          0
+        ],
+        [
+          "Ashwoven Material",
+          "gloves",
+          0,
+          2,
+          0
+        ],
+        [
+          "Ravener's Mold",
+          "gloves",
+          3,
+          1,
+          2
+        ],
+        [
+          "Ashwoven Material",
+          "gloves",
+          5,
+          1,
+          1
+        ],
+        [
+          "Ravener's Mold",
+          "gloves",
+          3,
+          3,
+          0
+        ],
+        [
+          "Storm Signet",
+          "gloves",
+          1,
+          3,
+          0
+        ],
+        [
+          "Siphon Ring",
+          "gloves",
+          0,
+          3,
+          0
+        ],
+        [
+          "Ashwoven Material",
+          "gloves",
+          0,
+          4,
+          0
+        ],
+        [
+          "Ravener's Mold",
+          "gloves",
+          0,
+          5,
+          0
+        ],
+        [
+          "Mage's Wrapping",
+          "gloves",
+          4,
+          4,
+          0
+        ],
+        [
+          "Ravener's Mold",
+          "gloves",
+          2,
+          5,
+          0
+        ],
+        [
+          "Storm Signet",
+          "gloves",
+          3,
+          6,
+          0
+        ],
+        [
+          "Siphon Ring",
+          "gloves",
+          1,
+          6,
+          0
+        ],
+        [
+          "Ashwoven Material",
+          "gloves",
+          0,
+          7,
+          0
+        ],
+        [
+          "Gauntlet Mold",
+          "gloves",
+          3,
+          6,
+          3
+        ],
+        [
+          "Stonewall Frame",
+          "helmet",
+          0,
+          0,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          3,
+          0,
+          0
+        ],
+        [
+          "Vigil Crest",
+          "helmet",
+          5,
+          0,
+          0
+        ],
+        [
+          "Stonewall Frame",
+          "helmet",
+          0,
+          2,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          3,
+          2,
+          0
+        ],
+        [
+          "Bloomcap",
+          "helmet",
+          4,
+          3,
+          1
+        ],
+        [
+          "Stonewall Frame",
+          "helmet",
+          0,
+          4,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          3,
+          5,
+          0
+        ],
+        [
+          "Stonewall Frame",
+          "helmet",
+          0,
+          6,
+          0
+        ],
+        [
+          "Scrying Lens",
+          "helmet",
+          3,
+          7,
+          0
+        ]
+      ],
+      "bounty": 317,
+      "rank": "ordinary",
+      "rating": 1612,
+      "items": 10
+    },
+    {
+      "name": "Sootmother",
+      "health": 4910,
+      "strength": 124,
+      "regen": 11,
+      "mind_resist": 82,
+      "curse_resist": 82,
+      "physical_resist": 60,
+      "magic_resist": 56,
+      "gear": [
+        [
+          "Spun Material",
+          "gloves",
+          0,
+          0,
+          1
+        ],
+        [
+          "Gauntlet Mold",
+          "gloves",
+          2,
+          0,
+          1
+        ],
+        [
+          "Storm Signet",
+          "gloves",
+          5,
+          0,
+          1
+        ],
+        [
+          "Siphon Ring",
+          "gloves",
+          1,
+          1,
+          0
+        ],
+        [
+          "Mage's Wrapping",
+          "gloves",
+          3,
+          1,
+          0
+        ],
+        [
+          "Ravener's Mold",
+          "gloves",
+          1,
+          2,
+          0
+        ],
+        [
+          "Storm Signet",
+          "gloves",
+          0,
+          2,
+          1
+        ],
+        [
+          "Siphon Ring",
+          "gloves",
+          5,
+          2,
+          0
+        ],
+        [
+          "Spun Material",
+          "gloves",
+          2,
+          3,
+          1
+        ],
+        [
+          "Ravener's Mold",
+          "gloves",
+          4,
+          3,
+          0
+        ],
+        [
+          "Ashwoven Material",
+          "gloves",
+          0,
+          4,
+          1
+        ],
+        [
+          "Ravener's Mold",
+          "gloves",
+          1,
+          4,
+          3
+        ],
+        [
+          "Ashwoven Material",
+          "gloves",
+          3,
+          4,
+          1
+        ],
+        [
+          "Ravener's Mold",
+          "gloves",
+          4,
+          4,
+          2
+        ],
+        [
+          "Siphon Ring",
+          "gloves",
+          2,
+          6,
+          0
+        ],
+        [
+          "Siphon Ring",
+          "gloves",
+          1,
+          6,
+          0
+        ],
+        [
+          "Ashwoven Material",
+          "gloves",
+          0,
+          7,
+          0
+        ],
+        [
+          "Ravener's Mold",
+          "gloves",
+          3,
+          6,
+          2
+        ],
+        [
+          "Stonewall Frame",
+          "helmet",
+          0,
+          0,
+          0
+        ],
+        [
+          "Reckoning Plate",
+          "helmet",
+          3,
+          0,
+          0
+        ],
+        [
+          "Mana Ward",
+          "helmet",
+          4,
+          0,
+          1
+        ],
+        [
+          "Stonewall Frame",
+          "helmet",
+          0,
+          2,
+          0
+        ],
+        [
+          "Bloomcap",
+          "helmet",
+          3,
+          2,
+          3
+        ],
+        [
+          "Bloomcap",
+          "helmet",
+          4,
+          3,
+          3
+        ],
+        [
+          "Crown of the Deep",
+          "helmet",
+          0,
+          4,
+          0
+        ],
+        [
+          "Stonewall Frame",
+          "helmet",
+          2,
+          5,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          0,
+          6,
+          0
+        ],
+        [
+          "Archon's Crest",
+          "helmet",
+          4,
+          6,
+          3
+        ]
+      ],
+      "bounty": 328,
+      "rank": "ordinary",
+      "rating": 1670,
+      "items": 9
+    },
+    {
+      "name": "The Quiet Hour",
+      "health": 5190,
+      "strength": 131,
+      "regen": 12,
+      "mind_resist": 84,
+      "curse_resist": 84,
+      "physical_resist": 62,
+      "magic_resist": 58,
+      "gear": [
+        [
+          "Ashwoven Material",
+          "gloves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Ravener's Mold",
+          "gloves",
+          3,
+          0,
+          0
+        ],
+        [
+          "Storm Signet",
+          "gloves",
+          0,
+          1,
+          0
+        ],
+        [
+          "Blightfinger",
+          "gloves",
+          5,
+          0,
+          0
+        ],
+        [
+          "Ashwoven Material",
+          "gloves",
+          0,
+          2,
+          0
+        ],
+        [
+          "Ravener's Mold",
+          "gloves",
+          3,
+          1,
+          2
+        ],
+        [
+          "Storm Signet",
+          "gloves",
+          5,
+          1,
+          1
+        ],
+        [
+          "Siphon Ring",
+          "gloves",
+          2,
+          1,
+          0
+        ],
+        [
+          "Spun Material",
+          "gloves",
+          0,
+          3,
+          1
+        ],
+        [
+          "Ravener's Mold",
+          "gloves",
+          2,
+          3,
+          0
+        ],
+        [
+          "Storm Signet",
+          "gloves",
+          4,
+          3,
+          0
+        ],
+        [
+          "Blightfinger",
+          "gloves",
+          1,
+          4,
+          0
+        ],
+        [
+          "Ashwoven Material",
+          "gloves",
+          3,
+          4,
+          0
+        ],
+        [
+          "Gauntlet Mold",
+          "gloves",
+          1,
+          5,
+          1
+        ],
+        [
+          "Ashwoven Material",
+          "gloves",
+          0,
+          5,
+          1
+        ],
+        [
+          "Ravener's Mold",
+          "gloves",
+          1,
+          6,
+          2
+        ],
+        [
+          "Mage's Wrapping",
+          "gloves",
+          4,
+          5,
+          0
+        ],
+        [
+          "Ravener's Mold",
+          "gloves",
+          3,
+          6,
+          3
+        ],
+        [
+          "Stonewall Frame",
+          "helmet",
+          0,
+          0,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          3,
+          0,
+          0
+        ],
+        [
+          "Mana Ward",
+          "helmet",
+          0,
+          2,
+          0
+        ],
+        [
+          "Archon's Crest",
+          "helmet",
+          4,
+          1,
+          3
+        ],
+        [
+          "Stonewall Frame",
+          "helmet",
+          2,
+          3,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          0,
+          4,
+          0
+        ],
+        [
+          "Mana Ward",
+          "helmet",
+          4,
+          4,
+          1
+        ],
+        [
+          "Stonewall Frame",
+          "helmet",
+          2,
+          5,
+          1
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          0,
+          6,
+          0
+        ],
+        [
+          "Archon's Crest",
+          "helmet",
+          4,
+          6,
+          0
+        ]
+      ],
+      "bounty": 339,
+      "rank": "ordinary",
+      "rating": 1722,
+      "items": 9
+    },
+    {
+      "name": "Verdigris",
+      "health": 5490,
+      "strength": 138,
+      "regen": 12,
+      "mind_resist": 86,
+      "curse_resist": 86,
+      "physical_resist": 63,
+      "magic_resist": 60,
+      "gear": [
+        [
+          "Ashwoven Material",
+          "gloves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Ravener's Mold",
+          "gloves",
+          3,
+          0,
+          0
+        ],
+        [
+          "Seal of the Deep",
+          "gloves",
+          0,
+          1,
+          0
+        ],
+        [
+          "Siphon Ring",
+          "gloves",
+          5,
+          0,
+          0
+        ],
+        [
+          "Ashwoven Material",
+          "gloves",
+          0,
+          2,
+          0
+        ],
+        [
+          "Throttling Mold",
+          "gloves",
+          3,
+          2,
+          0
+        ],
+        [
+          "Siphon Ring",
+          "gloves",
+          2,
+          1,
+          0
+        ],
+        [
+          "Siphon Ring",
+          "gloves",
+          4,
+          1,
+          0
+        ],
+        [
+          "Ashwoven Material",
+          "gloves",
+          5,
+          1,
+          1
+        ],
+        [
+          "Throttling Mold",
+          "gloves",
+          4,
+          4,
+          0
+        ],
+        [
+          "Storm Signet",
+          "gloves",
+          2,
+          4,
+          0
+        ],
+        [
+          "Siphon Ring",
+          "gloves",
+          2,
+          3,
+          0
+        ],
+        [
+          "Ashwoven Material",
+          "gloves",
+          0,
+          3,
+          1
+        ],
+        [
+          "Ravener's Mold",
+          "gloves",
+          1,
+          4,
+          3
+        ],
+        [
+          "Storm Signet",
+          "gloves",
+          3,
+          5,
+          1
+        ],
+        [
+          "Siphon Ring",
+          "gloves",
+          1,
+          3,
+          0
+        ],
+        [
+          "Ashwoven Material",
+          "gloves",
+          0,
+          6,
+          0
+        ],
+        [
+          "Gauntlet Mold",
+          "gloves",
+          2,
+          6,
+          3
+        ],
+        [
+          "Storm Signet",
+          "gloves",
+          0,
+          7,
+          0
+        ],
+        [
+          "Siphon Ring",
+          "gloves",
+          5,
+          6,
+          0
+        ],
+        [
+          "Stonewall Frame",
+          "helmet",
+          0,
+          0,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          3,
+          0,
+          0
+        ],
+        [
+          "Mana Ward",
+          "helmet",
+          0,
+          2,
+          0
+        ],
+        [
+          "Stonewall Frame",
+          "helmet",
+          3,
+          2,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          2,
+          4,
+          0
+        ],
+        [
+          "Mana Ward",
+          "helmet",
+          0,
+          3,
+          3
+        ],
+        [
+          "Stonewall Frame",
+          "helmet",
+          4,
+          4,
+          1
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          2,
+          6,
+          0
+        ],
+        [
+          "Mana Ward",
+          "helmet",
+          0,
+          5,
+          1
+        ]
+      ],
+      "bounty": 350,
+      "rank": "mini",
+      "rating": 1774,
+      "items": 8
+    },
+    {
+      "name": "The Drowned Court",
+      "health": 5810,
+      "strength": 146,
+      "regen": 13,
+      "mind_resist": 88,
+      "curse_resist": 88,
+      "physical_resist": 64,
+      "magic_resist": 62,
+      "gear": [
+        [
+          "Ashwoven Material",
+          "gloves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Ravener's Mold",
+          "gloves",
+          3,
+          0,
+          0
+        ],
+        [
+          "Seal of the Deep",
+          "gloves",
+          0,
+          1,
+          0
+        ],
+        [
+          "Siphon Ring",
+          "gloves",
+          5,
+          0,
+          0
+        ],
+        [
+          "Mage's Wrapping",
+          "gloves",
+          4,
+          1,
+          0
+        ],
+        [
+          "Ravener's Mold",
+          "gloves",
+          2,
+          1,
+          3
+        ],
+        [
+          "Deepdraught Ring",
+          "gloves",
+          1,
+          2,
+          0
+        ],
+        [
+          "Grasping Ring",
+          "gloves",
+          0,
+          2,
+          0
+        ],
+        [
+          "Ashwoven Material",
+          "gloves",
+          0,
+          3,
+          0
+        ],
+        [
+          "Ravener's Mold",
+          "gloves",
+          3,
+          3,
+          0
+        ],
+        [
+          "Storm Signet",
+          "gloves",
+          0,
+          4,
+          0
+        ],
+        [
+          "Storm Signet",
+          "gloves",
+          5,
+          3,
+          1
+        ],
+        [
+          "Ashwoven Material",
+          "gloves",
+          0,
+          5,
+          0
+        ],
+        [
+          "Ravener's Mold",
+          "gloves",
+          3,
+          4,
+          2
+        ],
+        [
+          "Storm Signet",
+          "gloves",
+          0,
+          6,
+          0
+        ],
+        [
+          "Siphon Ring",
+          "gloves",
+          2,
+          4,
+          0
+        ],
+        [
+          "Ashwoven Material",
+          "gloves",
+          2,
+          6,
+          0
+        ],
+        [
+          "Gauntlet Mold",
+          "gloves",
+          3,
+          6,
+          3
+        ],
+        [
+          "Siphon Ring",
+          "gloves",
+          5,
+          5,
+          0
+        ],
+        [
+          "Deepdraught Ring",
+          "gloves",
+          2,
+          7,
+          0
+        ],
+        [
+          "Stonewall Frame",
+          "helmet",
+          0,
+          0,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          3,
+          0,
+          0
+        ],
+        [
+          "Crown of the Deep",
+          "helmet",
+          0,
+          2,
+          0
+        ],
+        [
+          "Stonewall Frame",
+          "helmet",
+          3,
+          2,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          2,
+          4,
+          0
+        ],
+        [
+          "Mana Ward",
+          "helmet",
+          0,
+          3,
+          3
+        ],
+        [
+          "Stonewall Frame",
+          "helmet",
+          4,
+          4,
+          1
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          2,
+          6,
+          0
+        ],
+        [
+          "Mana Ward",
+          "helmet",
+          0,
+          5,
+          1
+        ]
+      ],
+      "bounty": 361,
+      "rank": "ordinary",
+      "rating": 1889,
+      "items": 8
+    },
+    {
+      "name": "Anvilheart",
+      "health": 6150,
+      "strength": 154,
+      "regen": 14,
+      "mind_resist": 90,
+      "curse_resist": 90,
+      "physical_resist": 66,
+      "magic_resist": 64,
+      "gear": [
+        [
+          "Anvil Frame",
+          "helmet",
+          0,
+          0,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          3,
+          0,
+          0
+        ],
+        [
+          "Mirrored Visor",
+          "helmet",
+          0,
+          2,
+          0
+        ],
+        [
+          "Crown of the Deep",
+          "helmet",
+          3,
+          2,
+          0
+        ],
+        [
+          "Bulwark Base",
+          "chest",
+          0,
+          0,
+          0
+        ],
+        [
+          "Aegis Weave",
+          "chest",
+          0,
+          2,
+          0
+        ],
+        [
+          "Aegis Weave",
+          "chest",
+          3,
+          2,
+          0
+        ],
+        [
+          "Warlord's Pauldron",
+          "chest",
+          4,
+          0,
+          0
+        ],
+        [
+          "Bulwark Material",
+          "gloves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Sovereign Mold",
+          "gloves",
+          3,
+          0,
+          0
+        ],
+        [
+          "Seal of the Deep",
+          "gloves",
+          0,
+          2,
+          0
+        ],
+        [
+          "Ring of Roots",
+          "gloves",
+          3,
+          1,
+          0
+        ],
+        [
+          "Boiled Leather",
+          "greaves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Mirrored Visor",
+          "greaves",
+          3,
+          0,
+          0
+        ],
+        [
+          "Sevenleague Sole",
+          "greaves",
+          3,
+          1,
+          0
+        ],
+        [
+          "Sunderer",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Sunderer",
+          "weapon",
+          2,
+          0,
+          0
+        ],
+        [
+          "Kingmaker Hilt",
+          "weapon",
+          0,
+          3,
+          0
+        ],
+        [
+          "Chain Coil",
+          "weapon",
+          4,
+          0,
+          0
+        ],
+        [
+          "Chain Coil",
+          "weapon",
+          5,
+          0,
+          0
+        ],
+        [
+          "Hollowbone Frame",
+          "helmet",
+          0,
+          3,
+          0
+        ],
+        [
+          "Scarred Plating",
+          "helmet",
+          2,
+          4,
+          0
+        ]
+      ],
+      "bounty": 372,
+      "rank": "ordinary",
+      "rating": 1803,
+      "items": 6
+    },
+    {
+      "name": "The Salt Wedding",
+      "health": 6510,
+      "strength": 163,
+      "regen": 14,
+      "mind_resist": 92,
+      "curse_resist": 92,
+      "physical_resist": 68,
+      "magic_resist": 66,
+      "gear": [
+        [
+          "Anvil Frame",
+          "helmet",
+          0,
+          0,
+          0
+        ],
+        [
+          "Mirrored Visor",
+          "helmet",
+          3,
+          0,
+          0
+        ],
+        [
+          "Mirrored Visor",
+          "helmet",
+          0,
+          2,
+          0
+        ],
+        [
+          "Archon's Crest",
+          "helmet",
+          3,
+          1,
+          0
+        ],
+        [
+          "Bulwark Base",
+          "chest",
+          0,
+          0,
+          0
+        ],
+        [
+          "Aegis Weave",
+          "chest",
+          0,
+          2,
+          0
+        ],
+        [
+          "Aegis Weave",
+          "chest",
+          3,
+          2,
+          0
+        ],
+        [
+          "Aegis Weave",
+          "chest",
+          0,
+          4,
+          0
+        ],
+        [
+          "Bulwark Material",
+          "gloves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Sovereign Mold",
+          "gloves",
+          3,
+          0,
+          0
+        ],
+        [
+          "Seal of the Deep",
+          "gloves",
+          0,
+          2,
+          0
+        ],
+        [
+          "Storm Signet",
+          "gloves",
+          2,
+          2,
+          0
+        ],
+        [
+          "Sevenleague Boots",
+          "greaves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Mirrored Visor",
+          "greaves",
+          2,
+          0,
+          0
+        ],
+        [
+          "Sevenleague Sole",
+          "greaves",
+          5,
+          0,
+          0
+        ],
+        [
+          "Sunderer",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Sunderer",
+          "weapon",
+          2,
+          0,
+          0
+        ],
+        [
+          "Kingmaker Hilt",
+          "weapon",
+          0,
+          3,
+          0
+        ],
+        [
+          "Chain Coil",
+          "weapon",
+          4,
+          0,
+          0
+        ],
+        [
+          "Clockwork Key",
+          "weapon",
+          4,
+          2,
+          0
+        ]
+      ],
+      "bounty": 383,
+      "rank": "ordinary",
+      "rating": 1897,
+      "items": 5
+    },
+    {
+      "name": "Nine of Ashes",
+      "health": 6890,
+      "strength": 172,
+      "regen": 15,
+      "mind_resist": 93,
+      "curse_resist": 93,
+      "physical_resist": 70,
+      "magic_resist": 68,
+      "gear": [
+        [
+          "Stormcaught Frame",
+          "helmet",
+          0,
+          0,
+          0
+        ],
+        [
+          "Scarred Plating",
+          "helmet",
+          3,
+          0,
+          0
+        ],
+        [
+          "Scarred Plating",
+          "helmet",
+          3,
+          1,
+          0
+        ],
+        [
+          "Covenant Frame",
+          "helmet",
+          0,
+          2,
+          0
+        ],
+        [
+          "Scarred Plating",
+          "helmet",
+          3,
+          2,
+          0
+        ],
+        [
+          "Scarred Plating",
+          "helmet",
+          2,
+          3,
+          0
+        ],
+        [
+          "Harvest Crest",
+          "helmet",
+          5,
+          1,
+          0
+        ],
+        [
+          "Hollowbone Frame",
+          "helmet",
+          0,
+          3,
+          0
+        ],
+        [
+          "Layered Plating",
+          "helmet",
+          2,
+          4,
+          0
+        ],
+        [
+          "Layered Plating",
+          "helmet",
+          4,
+          4,
+          0
+        ],
+        [
+          "Zealot's Crest",
+          "helmet",
+          4,
+          3,
+          0
+        ],
+        [
+          "Cinder Base",
+          "chest",
+          0,
+          0,
+          0
+        ],
+        [
+          "Warlord's Pauldron",
+          "chest",
+          3,
+          0,
+          0
+        ],
+        [
+          "Warlord's Pauldron",
+          "chest",
+          2,
+          1,
+          0
+        ],
+        [
+          "Wrathbreaker",
+          "chest",
+          0,
+          2,
+          0
+        ],
+        [
+          "Cinder Base",
+          "chest",
+          1,
+          3,
+          0
+        ],
+        [
+          "Verdant Weave",
+          "chest",
+          3,
+          4,
+          0
+        ],
+        [
+          "Oathplate",
+          "chest",
+          4,
+          2,
+          0
+        ],
+        [
+          "Cinder Base",
+          "chest",
+          0,
+          5,
+          0
+        ],
+        [
+          "Thornmail Layer",
+          "chest",
+          3,
+          5,
+          0
+        ],
+        [
+          "Oathplate",
+          "chest",
+          2,
+          6,
+          0
+        ],
+        [
+          "Ashwoven Material",
+          "gloves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Deft Mold",
+          "gloves",
+          3,
+          0,
+          0
+        ],
+        [
+          "Blightfinger",
+          "gloves",
+          5,
+          0,
+          0
+        ],
+        [
+          "Hermit's Band",
+          "gloves",
+          0,
+          1,
+          0
+        ],
+        [
+          "Ashwoven Material",
+          "gloves",
+          1,
+          1,
+          0
+        ],
+        [
+          "Deft Mold",
+          "gloves",
+          4,
+          1,
+          0
+        ],
+        [
+          "Hermit's Band",
+          "gloves",
+          1,
+          2,
+          0
+        ],
+        [
+          "Ashwoven Material",
+          "gloves",
+          2,
+          2,
+          0
+        ],
+        [
+          "Deft Mold",
+          "gloves",
+          1,
+          3,
+          0
+        ],
+        [
+          "Tithe Ring",
+          "gloves",
+          5,
+          2,
+          0
+        ],
+        [
+          "Hermit's Band",
+          "gloves",
+          0,
+          3,
+          0
+        ],
+        [
+          "Pathfinder Material",
+          "greaves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Stormstep Mold",
+          "greaves",
+          3,
+          0,
+          0
+        ],
+        [
+          "Overflow Plate",
+          "greaves",
+          0,
+          1,
+          0
+        ],
+        [
+          "Rootbound Material",
+          "greaves",
+          2,
+          1,
+          0
+        ],
+        [
+          "Sapling Mold",
+          "greaves",
+          4,
+          1,
+          0
+        ],
+        [
+          "Warding Plate",
+          "greaves",
+          1,
+          3,
+          0
+        ],
+        [
+          "Sevenleague Boots",
+          "greaves",
+          3,
+          3,
+          0
+        ],
+        [
+          "Sapling Mold",
+          "greaves",
+          5,
+          2,
+          0
+        ],
+        [
+          "Mana Ward",
+          "greaves",
+          0,
+          5,
+          0
+        ],
+        [
+          "Cursed Handle",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Adamant Fang",
+          "weapon",
+          1,
+          0,
+          0
+        ],
+        [
+          "Forking Bead",
+          "weapon",
+          2,
+          0,
+          0
+        ],
+        [
+          "Bileglass Vial",
+          "weapon",
+          3,
+          0,
+          0
+        ],
+        [
+          "Cursed Handle",
+          "weapon",
+          5,
+          0,
+          0
+        ],
+        [
+          "Adamant Fang",
+          "weapon",
+          3,
+          1,
+          0
+        ],
+        [
+          "Fury Sigil",
+          "weapon",
+          4,
+          1,
+          0
+        ],
+        [
+          "Cursed Handle",
+          "weapon",
+          1,
+          2,
+          0
+        ],
+        [
+          "Adamant Fang",
+          "weapon",
+          2,
+          2,
+          0
+        ],
+        [
+          "Bloodstone Bead",
+          "weapon",
+          4,
+          3,
+          0
+        ]
+      ],
+      "bounty": 394,
+      "rank": "boss",
+      "rating": 2519,
+      "items": 15
+    },
+    {
+      "name": "The Last Light",
+      "health": 7290,
+      "strength": 182,
+      "regen": 16,
+      "mind_resist": 94,
+      "curse_resist": 94,
+      "physical_resist": 72,
+      "magic_resist": 70,
+      "gear": [
+        [
+          "Anvil Frame",
+          "helmet",
+          0,
+          0,
+          0
+        ],
+        [
+          "Mirrored Visor",
+          "helmet",
+          3,
+          0,
+          0
+        ],
+        [
+          "Mirrored Visor",
+          "helmet",
+          0,
+          2,
+          0
+        ],
+        [
+          "Martyr's Crest",
+          "helmet",
+          3,
+          2,
+          0
+        ],
+        [
+          "Adamant Carapace",
+          "chest",
+          0,
+          0,
+          0
+        ],
+        [
+          "Aegis Weave",
+          "chest",
+          0,
+          3,
+          0
+        ],
+        [
+          "Aegis Weave",
+          "chest",
+          3,
+          3,
+          0
+        ],
+        [
+          "Warlord's Pauldron",
+          "chest",
+          4,
+          0,
+          0
+        ],
+        [
+          "Bulwark Material",
+          "gloves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Sovereign Mold",
+          "gloves",
+          3,
+          0,
+          0
+        ],
+        [
+          "Storm Signet",
+          "gloves",
+          0,
+          2,
+          0
+        ],
+        [
+          "Ring of Roots",
+          "gloves",
+          3,
+          1,
+          0
+        ],
+        [
+          "Bulwark Material",
+          "greaves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Mirrored Visor",
+          "greaves",
+          3,
+          0,
+          0
+        ],
+        [
+          "Sevenleague Sole",
+          "greaves",
+          3,
+          1,
+          0
+        ],
+        [
+          "Sunderer",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Sunderer",
+          "weapon",
+          2,
+          0,
+          0
+        ],
+        [
+          "Kingmaker Hilt",
+          "weapon",
+          0,
+          3,
+          0
+        ],
+        [
+          "Clockwork Key",
+          "weapon",
+          4,
+          0,
+          0
+        ],
+        [
+          "Silver Charm",
+          "weapon",
+          4,
+          1,
+          0
+        ]
+      ],
+      "bounty": 405,
+      "rank": "ordinary",
+      "rating": 2031,
+      "items": 5
+    },
+    {
+      "name": "Gilt",
+      "health": 7720,
+      "strength": 192,
+      "regen": 17,
+      "mind_resist": 95,
+      "curse_resist": 95,
+      "physical_resist": 74,
+      "magic_resist": 72,
+      "gear": [
+        [
+          "Aegis Crown",
+          "helmet",
+          0,
+          0,
+          0
+        ],
+        [
+          "Scarred Plating",
+          "helmet",
+          3,
+          0,
+          0
+        ],
+        [
+          "Doubter's Crest",
+          "helmet",
+          3,
+          1,
+          0
+        ],
+        [
+          "Aegis Crown",
+          "helmet",
+          3,
+          2,
+          0
+        ],
+        [
+          "Scarred Plating",
+          "helmet",
+          1,
+          3,
+          0
+        ],
+        [
+          "Scarred Plating",
+          "helmet",
+          0,
+          4,
+          0
+        ],
+        [
+          "Ribbed Base",
+          "chest",
+          0,
+          0,
+          0
+        ],
+        [
+          "Warlord's Pauldron",
+          "chest",
+          3,
+          0,
+          0
+        ],
+        [
+          "Oathplate",
+          "chest",
+          0,
+          2,
+          0
+        ],
+        [
+          "Cinder Base",
+          "chest",
+          2,
+          2,
+          0
+        ],
+        [
+          "Warlord's Pauldron",
+          "chest",
+          4,
+          3,
+          0
+        ],
+        [
+          "Warlord's Pauldron",
+          "chest",
+          2,
+          4,
+          0
+        ],
+        [
+          "Wrathbreaker",
+          "chest",
+          0,
+          4,
+          0
+        ],
+        [
+          "Ashwoven Material",
+          "gloves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Deft Mold",
+          "gloves",
+          3,
+          0,
+          0
+        ],
+        [
+          "Siphon Ring",
+          "gloves",
+          5,
+          0,
+          0
+        ],
+        [
+          "Hermit's Band",
+          "gloves",
+          0,
+          1,
+          0
+        ],
+        [
+          "Ashwoven Material",
+          "gloves",
+          1,
+          1,
+          0
+        ],
+        [
+          "Oathkeeper Mold",
+          "gloves",
+          0,
+          2,
+          0
+        ],
+        [
+          "Blightfinger",
+          "gloves",
+          4,
+          1,
+          0
+        ],
+        [
+          "Hermit's Band",
+          "gloves",
+          5,
+          1,
+          0
+        ],
+        [
+          "Boiled Leather",
+          "greaves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Stormstep Mold",
+          "greaves",
+          3,
+          0,
+          0
+        ],
+        [
+          "Warding Plate",
+          "greaves",
+          3,
+          1,
+          0
+        ],
+        [
+          "Sevenleague Boots",
+          "greaves",
+          0,
+          2,
+          0
+        ],
+        [
+          "Sevenleague Sole",
+          "greaves",
+          2,
+          2,
+          0
+        ],
+        [
+          "Scarred Plating",
+          "greaves",
+          3,
+          3,
+          0
+        ],
+        [
+          "Cursed Handle",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Adamant Fang",
+          "weapon",
+          1,
+          0,
+          0
+        ],
+        [
+          "Forking Bead",
+          "weapon",
+          2,
+          0,
+          0
+        ],
+        [
+          "Forking Bead",
+          "weapon",
+          3,
+          0,
+          0
+        ],
+        [
+          "Cursed Handle",
+          "weapon",
+          4,
+          0,
+          0
+        ],
+        [
+          "Adamant Fang",
+          "weapon",
+          3,
+          2,
+          0
+        ],
+        [
+          "Fury Sigil",
+          "weapon",
+          5,
+          0,
+          0
+        ],
+        [
+          "Bileglass Vial",
+          "weapon",
+          1,
+          2,
+          0
+        ]
+      ],
+      "bounty": 416,
+      "rank": "mini",
+      "rating": 2489,
+      "items": 10
+    },
+    {
+      "name": "Francis",
+      "health": 9400,
+      "strength": 215,
+      "regen": 22,
+      "mind_resist": 96,
+      "curse_resist": 96,
+      "physical_resist": 78,
+      "magic_resist": 76,
+      "gear": [
+        [
+          "Covenant Frame",
+          "helmet",
+          0,
+          0,
+          0
+        ],
+        [
+          "Deadweight Plating",
+          "helmet",
+          3,
+          0,
+          1
+        ],
+        [
+          "Warding Plate",
+          "helmet",
+          2,
+          1,
+          0
+        ],
+        [
+          "Covenant Frame",
+          "helmet",
+          0,
+          1,
+          3
+        ],
+        [
+          "Broken Crown",
+          "helmet",
+          1,
+          3,
+          0
+        ],
+        [
+          "Warding Plate",
+          "helmet",
+          4,
+          1,
+          0
+        ],
+        [
+          "Bloomed Crest",
+          "helmet",
+          0,
+          4,
+          1
+        ],
+        [
+          "Covenant Frame",
+          "helmet",
+          2,
+          5,
+          0
+        ],
+        [
+          "Deadweight Plating",
+          "helmet",
+          0,
+          6,
+          1
+        ],
+        [
+          "Warding Plate",
+          "helmet",
+          4,
+          6,
+          0
+        ],
+        [
+          "Bloomed Crest",
+          "helmet",
+          0,
+          7,
+          0
+        ],
+        [
+          "The Money Jacket",
+          "chest",
+          0,
+          0,
+          0
+        ],
+        [
+          "Riveted Layer",
+          "chest",
+          4,
+          0,
+          1
+        ],
+        [
+          "Ribbed Base",
+          "chest",
+          0,
+          3,
+          0
+        ],
+        [
+          "Aether Layer",
+          "chest",
+          3,
+          3,
+          0
+        ],
+        [
+          "Scale Layer",
+          "chest",
+          5,
+          1,
+          1
+        ],
+        [
+          "Scale Layer",
+          "chest",
+          0,
+          5,
+          0
+        ],
+        [
+          "Ribbed Base",
+          "chest",
+          3,
+          5,
+          0
+        ],
+        [
+          "Riveted Layer",
+          "chest",
+          0,
+          6,
+          0
+        ],
+        [
+          "Steel Material",
+          "gloves",
+          0,
+          0,
+          1
+        ],
+        [
+          "Deft Mold",
+          "gloves",
+          3,
+          0,
+          0
+        ],
+        [
+          "Steel Material",
+          "gloves",
+          3,
+          1,
+          1
+        ],
+        [
+          "Deft Mold",
+          "gloves",
+          1,
+          2,
+          0
+        ],
+        [
+          "Storm Signet",
+          "gloves",
+          0,
+          2,
+          1
+        ],
+        [
+          "Ring of Roots",
+          "gloves",
+          5,
+          0,
+          0
+        ],
+        [
+          "Steel Material",
+          "gloves",
+          1,
+          3,
+          1
+        ],
+        [
+          "Deft Mold",
+          "gloves",
+          4,
+          3,
+          0
+        ],
+        [
+          "Steel Material",
+          "gloves",
+          4,
+          4,
+          0
+        ],
+        [
+          "Deft Mold",
+          "gloves",
+          2,
+          5,
+          0
+        ],
+        [
+          "Storm Signet",
+          "gloves",
+          0,
+          5,
+          0
+        ],
+        [
+          "Ring of Roots",
+          "gloves",
+          0,
+          4,
+          0
+        ],
+        [
+          "Steel Material",
+          "gloves",
+          0,
+          6,
+          1
+        ],
+        [
+          "Deft Mold",
+          "gloves",
+          3,
+          6,
+          1
+        ],
+        [
+          "Steel Material",
+          "greaves",
+          0,
+          0,
+          1
+        ],
+        [
+          "Sump Sole",
+          "greaves",
+          3,
+          0,
+          3
+        ],
+        [
+          "Deadweight Plating",
+          "greaves",
+          5,
+          0,
+          0
+        ],
+        [
+          "Scaled Material",
+          "greaves",
+          0,
+          2,
+          0
+        ],
+        [
+          "Sump Sole",
+          "greaves",
+          2,
+          2,
+          3
+        ],
+        [
+          "Broken Crown",
+          "greaves",
+          0,
+          4,
+          0
+        ],
+        [
+          "Steel Material",
+          "greaves",
+          1,
+          6,
+          1
+        ],
+        [
+          "Sump Sole",
+          "greaves",
+          4,
+          6,
+          1
+        ],
+        [
+          "Deadweight Plating",
+          "greaves",
+          5,
+          3,
+          0
+        ],
+        [
+          "Ambusher's Grip",
+          "weapon",
+          0,
+          0,
+          1
+        ],
+        [
+          "Reaver's Bill",
+          "weapon",
+          3,
+          0,
+          0
+        ]
+      ],
+      "bounty": 500,
+      "rank": "ordinary",
+      "rating": 2958,
+      "items": 15
+    }
+  ]
+}

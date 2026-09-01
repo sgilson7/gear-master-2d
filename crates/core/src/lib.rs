@@ -14,9 +14,11 @@
 pub mod character;
 pub mod class;
 pub mod combat;
+pub mod enemy_data;
 pub mod event;
 pub mod curse;
 pub mod data;
+pub mod fight;
 pub mod game;
 pub mod loadout;
 pub mod naming;

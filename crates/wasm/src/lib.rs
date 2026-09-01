@@ -266,6 +266,15 @@ pub fn try_step(dir: &str) -> String {
     with_mut(|g| {
         map(|w| {
             let s = world::step(w, &mut g.world, &mut g.rng, DIFFICULTY, d);
+            // An encounter becomes state the moment it is rolled. Holding it
+            // only in the page would mean a player who saved while a creature
+            // was on screen came back with no creature and a free step.
+            if let Some(m) = s.encounter {
+                g.encounter = Some(gm2d_core::fight::Encounter {
+                    enemy: m.name.to_string(),
+                    at: g.world.at,
+                });
+            }
             serde_json::json!({
                 "moved": s.moved,
                 "blocked": s.blocked,
@@ -397,4 +406,319 @@ pub fn to_last_town() {
             }
         })
     });
+}
+
+// ---------------------------------------------------------------- the board
+
+fn slot_of(name: &str) -> Option<gm2d_core::piece::SlotKind> {
+    use gm2d_core::piece::SlotKind::*;
+    Some(match name {
+        "weapon" => Weapon,
+        "helmet" => Helmet,
+        "chest" => Chest,
+        "gloves" => Gloves,
+        "greaves" => Greaves,
+        _ => return None,
+    })
+}
+
+fn slot_name(s: gm2d_core::piece::SlotKind) -> String {
+    format!("{s:?}").to_lowercase()
+}
+
+/// The five grids, everything on them, and what it all assembles into.
+///
+/// One call rather than a dozen getters, because the board is drawn as a whole
+/// and a page that fetched it piecemeal could draw half of one arrangement and
+/// half of the next.
+///
+/// **Every judgement here is core's.** Which pieces form an item, whether an
+/// item assembled, what it is called, what it is worth, and what it is missing
+/// if it did not — the page draws these and does not compute any of them.
+#[wasm_bindgen]
+pub fn board_json() -> String {
+    use gm2d_core::piece::SlotKind;
+    with(|g| {
+        let ch = &g.character;
+        let slots: Vec<_> = SlotKind::ALL
+            .iter()
+            .map(|&k| {
+                let slot = ch.loadout.slot(k);
+                let report = ch.report(k);
+                let placed: Vec<_> = slot
+                    .pieces()
+                    .into_iter()
+                    .filter_map(|p| {
+                        let (x, y) = slot.anchor_of(p)?;
+                        Some(serde_json::json!({
+                            "id": p.0, "x": x, "y": y,
+                            "name": ch.registry.def(p).name,
+                            "cells": slot.cells_of(p),
+                            "locked": ch.is_locked_item(p),
+                        }))
+                    })
+                    .collect();
+                let items: Vec<_> = report
+                    .items
+                    .iter()
+                    .map(|i| {
+                        serde_json::json!({
+                            "pieces": i.pieces.iter().map(|p| p.0).collect::<Vec<_>>(),
+                            "cells": i.pieces.iter()
+                                .flat_map(|&p| slot.cells_of(p))
+                                .collect::<Vec<_>>(),
+                            "assembled": i.assembled,
+                            "status": i.status,
+                            "name": i.name.full,
+                            "short": i.name.short,
+                            "rating": i.rating,
+                            "notes": i.notes,
+                        })
+                    })
+                    .collect();
+                serde_json::json!({
+                    "slot": slot_name(k),
+                    "rows": slot.rows(),
+                    "cols": gm2d_core::slot::SLOT_W,
+                    "placed": placed,
+                    "items": items,
+                })
+            })
+            .collect();
+
+        let bag: Vec<_> = ch
+            .inventory()
+            .into_iter()
+            .map(|p| {
+                let d = ch.registry.def(p);
+                serde_json::json!({
+                    "id": p.0,
+                    "name": d.name,
+                    "slot": slot_name(d.slot),
+                    "kind": format!("{:?}", d.kind),
+                    "cells": ch.registry.shape(p).cells(),
+                    "rotation": ch.registry.rotation(p),
+                    "price": d.price,
+                })
+            })
+            .collect();
+
+        let stats = ch.player_stats();
+        serde_json::json!({
+            "slots": slots,
+            "bag": bag,
+            "undoable": ch.undoable(),
+            "stats": {
+                "health": stats.health, "strength": stats.strength,
+                "armor": stats.armor, "mana": stats.mana, "regen": stats.regen,
+            },
+        })
+        .to_string()
+    })
+}
+
+/// Where this piece may be seated in this slot, as `[x, y]` pairs.
+///
+/// The fit preview *is* this list rendered. The page must never work out for
+/// itself whether a cell is legal — `Slot::legal_anchors` is the rulebook, and
+/// a preview that computed its own answer would be a second one.
+#[wasm_bindgen]
+pub fn legal_anchors(piece: u32, slot: &str) -> String {
+    use gm2d_core::piece::PieceId;
+    let Some(kind) = slot_of(slot) else { return "[]".into() };
+    with(|g| {
+        let id = PieceId(piece);
+        let mut out = Vec::new();
+        for y in 0..g.character.loadout.slot(kind).rows() {
+            for x in 0..gm2d_core::slot::SLOT_W {
+                if g.character.can_equip(id, kind, x, y).is_ok() {
+                    out.push([x, y]);
+                }
+            }
+        }
+        serde_json::to_string(&out).unwrap_or_else(|_| "[]".into())
+    })
+}
+
+/// Seat a piece. Returns an empty string on success, or the reason it was
+/// refused — the sentence core wrote, shown unchanged.
+#[wasm_bindgen]
+pub fn place(piece: u32, slot: &str, x: u8, y: u8) -> String {
+    use gm2d_core::piece::PieceId;
+    let Some(kind) = slot_of(slot) else { return "no such slot".into() };
+    with_mut(|g| match g.character.equip(PieceId(piece), kind, x, y) {
+        Ok(()) => String::new(),
+        Err(e) => e.to_string(),
+    })
+}
+
+/// Take a piece off the board and back into the bag.
+#[wasm_bindgen]
+pub fn pick_up(piece: u32) -> String {
+    use gm2d_core::piece::PieceId;
+    with_mut(|g| match g.character.unequip(PieceId(piece)) {
+        Ok(()) => String::new(),
+        Err(e) => e.to_string(),
+    })
+}
+
+/// Turn a piece a quarter turn clockwise. A seated piece only turns if it still
+/// fits, and a refused turn leaves the board and the history untouched.
+#[wasm_bindgen]
+pub fn rotate(piece: u32) -> String {
+    use gm2d_core::piece::PieceId;
+    with_mut(|g| match g.character.rotate(PieceId(piece)) {
+        Ok(()) => String::new(),
+        Err(e) => e.to_string(),
+    })
+}
+
+/// Lock or release the assembled item this piece belongs to.
+#[wasm_bindgen]
+pub fn toggle_lock(piece: u32) -> bool {
+    use gm2d_core::piece::PieceId;
+    with_mut(|g| g.character.toggle_lock_item(PieceId(piece)))
+}
+
+/// Take back the last board change, returning what was undone.
+#[wasm_bindgen]
+pub fn undo() -> String {
+    with_mut(|g| g.character.undo().unwrap_or_default())
+}
+
+/// Clear every grid.
+#[wasm_bindgen]
+pub fn clear_board() {
+    with_mut(|g| g.character.clear_all());
+}
+
+// ---------------------------------------------------------------- the fight
+
+/// The creature waiting, or `null`.
+#[wasm_bindgen]
+pub fn encounter_json() -> String {
+    with(|g| {
+        let Some(e) = g.encounter.as_ref() else { return "null".into() };
+        let Some(spec) = gm2d_core::fight::spec(e) else { return "null".into() };
+        let (reg, lo) = spec.loadout_at(DIFFICULTY);
+        serde_json::json!({
+            "name": g.theme_name(spec.name),
+            "canonical": spec.name,
+            "note": gm2d_core::theme::by_id(&g.theme).note(spec.name),
+            "rank": format!("{:?}", spec.rank).to_lowercase(),
+            "health": spec.health,
+            "bounty": spec.bounty,
+            "rating": gm2d_core::rating::creature_rating(spec, DIFFICULTY),
+            "items": lo.combat_items(&reg).iter()
+                .map(|i| serde_json::json!({ "name": i.name, "rating": i.rating }))
+                .collect::<Vec<_>>(),
+        })
+        .to_string()
+    })
+}
+
+/// Run the fight and hand back the log.
+///
+/// Nothing is banked here. The page plays the replay first and calls
+/// [`settle_fight`] when it is over, so a player who closes the tab mid-replay
+/// has not been paid for a fight they did not watch — and, more to the point,
+/// so the encounter is still in the save if they come back.
+#[wasm_bindgen]
+pub fn fight_json() -> String {
+    use gm2d_core::combat::{Event, Side};
+    with(|g| {
+        let Some(log) = gm2d_core::fight::run(g, DIFFICULTY) else {
+            return serde_json::json!({ "error": "there is nothing to fight" }).to_string();
+        };
+        // The player's items in the order combat indexed them, so the replay's
+        // cooldown bars line up with `Activate { index }`.
+        let items: Vec<_> = g
+            .character
+            .combat_items()
+            .iter()
+            .map(|i| serde_json::json!({
+                "name": i.name,
+                "cooldown_ms": i.cooldown_ms,
+                "hit_for": i.hit_for(g.character.player_stats().strength),
+                "slot": slot_name(i.slot),
+            }))
+            .collect();
+        let entries: Vec<_> = log
+            .entries
+            .iter()
+            .map(|e| {
+                let (kind, side, item, index, amount) = match &e.event {
+                    Event::Activate { side, item, index } =>
+                        ("activate", *side, item.clone(), *index as i64, 0),
+                    Event::Hit { by, damage, .. } => ("hit", *by, String::new(), -1, *damage as i64),
+                    Event::MindHit { by, amount, .. } =>
+                        ("mind", *by, String::new(), -1, *amount as i64),
+                    Event::Burn { side, damage, .. } =>
+                        ("burn", *side, String::new(), -1, *damage as i64),
+                    Event::Regen { side, amount, .. } =>
+                        ("regen", *side, String::new(), -1, *amount as i64),
+                    Event::GainArmor { side, amount, .. } =>
+                        ("armor", *side, String::new(), -1, *amount as i64),
+                    Event::Cast { side, .. } => ("cast", *side, String::new(), -1, 0),
+                    Event::Misfired { side, item } =>
+                        ("misfire", *side, item.clone(), -1, 0),
+                    Event::SuddenDeath { .. } => ("sudden", Side::Player, String::new(), -1, 0),
+                    _ => ("other", Side::Player, String::new(), -1, 0),
+                };
+                serde_json::json!({
+                    "at": e.at_ms, "kind": kind,
+                    "side": if side == Side::Player { "player" } else { "enemy" },
+                    "item": item, "index": index, "amount": amount,
+                })
+            })
+            .collect();
+        serde_json::json!({
+            "outcome": format!("{:?}", log.outcome).to_lowercase(),
+            "duration_ms": log.duration_ms,
+            "player": { "name": "you", "max_health": log.player.max_health },
+            "enemy": log.enemies.first().map(|c| serde_json::json!({
+                "name": g.theme_name(gm2d_core::combat::creature(&c.name).map(|s| s.name).unwrap_or("")),
+                "max_health": c.max_health,
+            })),
+            "items": items,
+            "entries": entries,
+        })
+        .to_string()
+    })
+}
+
+/// Bank the fight just watched and clear it.
+#[wasm_bindgen]
+pub fn settle_fight() -> String {
+    with_mut(|g| {
+        let Some(log) = gm2d_core::fight::run(g, DIFFICULTY) else {
+            return serde_json::json!({ "error": "there is nothing to settle" }).to_string();
+        };
+        let Some(s) = gm2d_core::fight::settle(g, &log, DIFFICULTY) else {
+            return serde_json::json!({ "error": "nothing to settle" }).to_string();
+        };
+        // A loss walks you home. The world owns where the player is, so the
+        // move happens here rather than inside `settle`.
+        if s.sent_home.is_some() {
+            map(|w| {
+                if let Some(p) = w.places.iter().find(|p| p.id == g.world.last_town) {
+                    g.world.at = p.at;
+                }
+            });
+        }
+        serde_json::json!({
+            "outcome": format!("{:?}", s.outcome).to_lowercase(),
+            "gold": s.gold,
+            "xp": s.xp,
+            "sent_home": s.sent_home,
+            "receipt": s.receipt,
+        })
+        .to_string()
+    })
+}
+
+/// Walk away without fighting. The creature is forgotten and the tile is not.
+#[wasm_bindgen]
+pub fn flee() {
+    with_mut(|g| g.encounter = None);
 }

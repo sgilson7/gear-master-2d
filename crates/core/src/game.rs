@@ -17,6 +17,7 @@
 //! nothing about it looks wrong until a player loses a run to it.
 
 use crate::character::Character;
+use crate::fight::Encounter;
 use crate::rng::Rng;
 use crate::world::WorldState;
 
@@ -34,6 +35,11 @@ pub struct Game {
     /// Where you are standing and what you have answered. **Not the map** —
     /// the map is `data/tiles.json` and is derived, never stored.
     pub world: WorldState,
+    /// The fight the player is standing in, if any.
+    ///
+    /// No log and no seed: combat does not draw, so the situation is enough to
+    /// reproduce the fight exactly. See `fight.rs`.
+    pub encounter: Option<Encounter>,
 }
 
 impl Game {
@@ -52,6 +58,7 @@ impl Game {
             // panic in every constructor. Whoever has a `World` places the
             // player with `WorldState::at_start`.
             world: WorldState::default(),
+            encounter: None,
         }
     }
 }
@@ -96,6 +103,7 @@ impl PartialEq for Game {
             && a.loadout.slots == b.loadout.slots
             && a.registry == b.registry
             && self.world == other.world
+            && self.encounter == other.encounter
     }
 }
 

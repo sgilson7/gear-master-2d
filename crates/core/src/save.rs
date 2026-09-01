@@ -131,6 +131,14 @@ pub struct SaveState {
     /// carried a copy would be a save that could disagree with the game.
     #[serde(default)]
     pub world: crate::world::WorldState,
+    /// The fight in progress, if the save was taken mid-encounter.
+    ///
+    /// The creature and the tile, and nothing else. Combat does not draw, so
+    /// the fight this reopens is the fight that was interrupted, character for
+    /// character — no seed and no partial log needed. `PLAN.md` §6 proposed
+    /// storing both; the engine made them unnecessary.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub encounter: Option<crate::fight::Encounter>,
 }
 
 // ---------------------------------------------------------------- writing
@@ -165,7 +173,7 @@ impl SaveFile {
     /// point of them: a new field on any of these types stops this function
     /// compiling.
     pub fn of(game: &Game) -> Self {
-        let Game { rng, theme, character, world } = game;
+        let Game { rng, theme, character, world, encounter } = game;
         let Character { registry, owned, loadout, gold, grown_health, undo_stack: _ } = character;
         let Loadout { slots, locks, name_seed, naming: _, assembly_pct } = loadout;
 
@@ -214,6 +222,7 @@ impl SaveFile {
                 rng_state: rng.state(),
                 theme: theme.clone(),
                 world: world.clone(),
+                encounter: encounter.clone(),
                 character: CharacterSave {
                     gold: *gold,
                     grown_health: *grown_health,
@@ -323,7 +332,7 @@ impl SaveFile {
     pub fn into_game(self) -> Result<Game, String> {
         let SaveFile { format: _, version, catalog: _, state } = self;
         let state = migrate(version, state)?;
-        let SaveState { rng_state, theme, character, world } = state;
+        let SaveState { rng_state, theme, character, world, encounter } = state;
         let CharacterSave {
             gold,
             grown_health,
@@ -399,7 +408,7 @@ impl SaveFile {
         character.gold = gold;
         character.grown_health = grown_health;
 
-        let mut game = Game { rng: Rng::from_state(rng_state), theme, character, world };
+        let mut game = Game { rng: Rng::from_state(rng_state), theme, character, world, encounter };
         // The one pointer the file could not carry, put back from the id it
         // carried instead.
         game.character.loadout.naming = crate::theme::by_id(&game.theme).naming;

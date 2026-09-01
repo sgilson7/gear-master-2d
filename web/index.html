@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gear Master 2D</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main>
+    <header>
+      <p class="eyebrow">M0 &middot; foundation</p>
+      <h1>Gear Master 2D</h1>
+      <p class="sub">The engine compiles to wasm and answers. Nothing here is the game yet.</p>
+    </header>
+
+    <section class="counts">
+      <div><b id="pieces">&hellip;</b><span>components in the catalogue</span></div>
+      <div><b id="monsters">&hellip;</b><span>creatures on the ladder</span></div>
+    </section>
+
+    <section>
+      <h2>The preset board, assembled</h2>
+      <p class="note">Placing pieces, assembling items, naming them and rating them &mdash;
+        run in core, in the browser. The board screen that draws this is M3.</p>
+      <table id="items"><tbody></tbody></table>
+    </section>
+
+    <footer>
+      <span id="status">loading the engine&hellip;</span>
+      <span class="build">build __BUILD__</span>
+    </footer>
+  </main>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+name: test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Formatting
+        run: cargo fmt --all --check
+        continue-on-error: true
+
+      - name: Clippy
+        run: cargo clippy --workspace --all-targets -- -D warnings
+        continue-on-error: true
+
+      # The whole of core is browser-free and runs in seconds. The golden
+      # combat fixture is in here: if a change to the fork moves a fight by one
+      # character, this is where it says so.
+      - name: Test
+        run: cargo test --workspace --locked

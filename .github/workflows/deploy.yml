@@ -1,0 +1,75 @@
+name: Build and deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Least privilege: read the repo, mint a Pages deployment.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never let two deploys race; a superseded run is cancelled rather than queued.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - uses: Swatinem/rust-cache@v2
+
+      # wasm-bindgen-cli must match the wasm-bindgen crate exactly or the glue
+      # will not match the module. Read the version out of the lockfile so a
+      # `cargo update` can never silently desync the two.
+      - name: Resolve pinned wasm-bindgen version
+        id: wb
+        run: |
+          V=$(awk '/^name = "wasm-bindgen"$/{f=1} f&&/^version = /{gsub(/"/,"");print $3;exit}' Cargo.lock)
+          echo "Using wasm-bindgen $V"
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: wasm-bindgen-cli@${{ steps.wb.outputs.version }}
+
+      # A failing engine stops the deploy rather than publishing a broken one.
+      - name: Test the engine
+        run: cargo test --workspace --locked
+
+      - name: Build the site
+        run: ./packaging/package-web.sh
+
+      # The half `cargo test` cannot reach: whether the module instantiates in
+      # a browser, whether the imports resolve after cache-busting rewrote the
+      # URLs, and whether the page says what the deploy gate asks it to. Fails
+      # on any console error or any request that leaves the origin.
+      - name: Drive the real page in a browser
+        run: |
+          python3 -m venv .venv-test
+          ./.venv-test/bin/pip -q install playwright
+          ./.venv-test/bin/playwright install --with-deps chromium
+          ./.venv-test/bin/python testing/drive.py
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/web
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

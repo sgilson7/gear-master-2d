@@ -460,7 +460,42 @@ function stamp() {
          `-${p(d.getHours())}${p(d.getMinutes())}.json`;
 }
 
+// GitHub Pages serves index.html with `Cache-Control: max-age=600`, and every
+// other asset is content-hashed — so a browser holding a stale index.html keeps
+// loading the *old* app.js and the *old* wasm from URLs that will be served
+// forever. A fix can be deployed, verified, and still not reach somebody whose
+// tab is pinned to the previous entry point. That is how a player stayed stuck
+// in the rock after the repair was live.
+//
+// So the page checks. One fetch of index.html with a cache-busting query, its
+// build stamp against the one baked into this file, and a single reload if they
+// differ. Guarded by sessionStorage so a genuine mismatch cannot loop.
+const BUILD = '__BUILD__';
+
+async function freshEnough() {
+  if (sessionStorage.getItem('gm2d.reloaded') === BUILD) return true;
+  try {
+    const res = await fetch(`./index.html?cb=${Date.now()}`, { cache: 'no-store' });
+    const html = await res.text();
+    const live = html.match(/app\.js\?v=([a-f0-9]+)/)?.[1];
+    if (live && live !== BUILD) {
+      sessionStorage.setItem('gm2d.reloaded', live);
+      // Navigate to a different URL rather than reloading. `location.reload()`
+      // is allowed to re-serve the same cached document, which would land back
+      // here and loop; a query the browser has never seen forces a fresh fetch
+      // of the entry point, and that is the whole problem being solved.
+      location.replace(`${location.pathname}?v=${live}`);
+      return false;
+    }
+  } catch {
+    // Offline, or the fetch was blocked. Carry on with what we have: a stale
+    // page is better than no page.
+  }
+  return true;
+}
+
 async function main() {
+  if (!(await freshEnough())) return;
   try { await init(); } catch (e) {
     $('status').textContent = `the engine did not load: ${e}`;
     $('status').classList.add('bad');

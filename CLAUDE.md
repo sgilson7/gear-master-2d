@@ -186,6 +186,26 @@ file rather than waiting for one.
 The general rule: a field defaulted for backward compatibility is a field that
 will arrive wrong, and the loader is where that is caught.
 
+`try_step` repairs too, not only `load_json`. A position you cannot stand on is
+a dead end rather than a glitch — there is no key that gets you out of it — so
+the first keypress fixes it whatever put it there.
+
+## A deployed fix is not a delivered fix
+
+Pages serves `index.html` with `Cache-Control: max-age=600` and everything else
+is content-hashed, so a browser holding a stale entry point keeps loading the
+**old** `app.js` and the **old** wasm from URLs that are served forever. The
+position-repair fix was live, verified against the deployed site, and still had
+not reached a player whose tab was pinned to the previous `index.html`.
+
+`app.js` carries the build stamp it was packaged with, fetches `index.html` once
+with a cache-busting query, and if the stamps differ navigates to
+`?v=<live>` — a **different URL**, not `location.reload()`, which is allowed to
+re-serve the same cached document and would loop. `sessionStorage` guards
+against a genuine mismatch looping anyway.
+
+`packaging/package-web.sh` fails the build if the stamp is not applied.
+
 ## Classes
 
 - **Three, and they are upstream's.** Gorillathon, Funnel Sergeant and

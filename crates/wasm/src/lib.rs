@@ -272,6 +272,11 @@ pub fn try_step(dir: &str) -> String {
     };
     with_mut(|g| {
         map(|w| {
+            // Repaired here as well as on load. A position that cannot be stood
+            // on is a dead end rather than a glitch — there is no key that gets
+            // you out of it — so the first keypress fixes it whatever put it
+            // there, including a code path nobody has found yet.
+            w.repair(&mut g.world);
             let s = world::step(w, &mut g.world, &mut g.rng, DIFFICULTY, d);
             // An encounter becomes state the moment it is rolled. Holding it
             // only in the page would mean a player who saved while a creature

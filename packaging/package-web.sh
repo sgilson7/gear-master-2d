@@ -68,11 +68,13 @@ bust "$WEB/pkg/$WASM.js" "new URL('${WASM}_bg.wasm', import.meta.url)" \
 bust "$WEB/index.html"   'src="app.js"'      "src=\"app.js?v=$BUILD\""
 bust "$WEB/index.html"   'href="styles.css"' "href=\"styles.css?v=$BUILD\""
 bust "$WEB/index.html"   '__BUILD__'         "$BUILD"
+bust "$WEB/app.js"       '__BUILD__'         "$BUILD"
 
 # Fail loudly rather than shipping a page that silently serves stale assets.
 grep -q "app.js?v=$BUILD" "$WEB/index.html" || die "cache-busting did not apply"
 grep -q "?v=$BUILD" "$WEB/pkg/$WASM.js"     || die "wasm URL not stamped"
 grep -q "board.js?v=$BUILD" "$WEB/app.js"   || die "board.js URL not stamped"
+grep -q "const BUILD = '$BUILD'" "$WEB/app.js" || die "app.js build stamp not applied"
 
 # Jekyll would otherwise skip the pkg/ directory and mangle assets.
 touch "$WEB/.nojekyll"

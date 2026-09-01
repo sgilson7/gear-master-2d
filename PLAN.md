@@ -900,8 +900,9 @@ risks). New kinds are added when a node needs one, not in advance.
 1. **Does losing cost anything beyond the missed reward?** §1.7 ships `LOSS_XP_PCT = 0` — a
    loss costs the walk back to town and nothing else. The knob exists; the default is
    "no". Worth revisiting after gate 4, when there is something to feel.
-2. **Is `gear-master-2d` the repo name?** Assumed throughout, giving
-   `https://sgilson7.github.io/gear-master-2d/`.
+2. ~~**Is `gear-master-2d` the repo name?**~~ **Answered.**
+   `sgilson7/gear-master-2d`, public, Pages served from Actions. Live at
+   <https://sgilson7.github.io/gear-master-2d/>.
 3. **How binding is the retheme's §2 content charter on the *new* material?** I have treated
    it as binding — no raunch, no drugs or alcohol, no bathroom humour, no real public figures,
    cartoon-grade violence — since it was written for a publicly hosted build and GM2D is one.

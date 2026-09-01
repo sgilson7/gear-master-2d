@@ -9,8 +9,9 @@ from `sgilson7/gear-master`. `PLANNING-BRIEF.md` is the brief; `PLAN.md` is the
 plan and **wins where the two disagree**; `TONE.md` governs every string a
 player reads.
 
-**Milestone: M0 complete.** Gate 1 is buildable locally (`make web`,
-`make test-ui`) and deploys on push. M1 has not started.
+**Milestone: M0 complete. Deploy gate 1 is live** at
+<https://sgilson7.github.io/gear-master-2d/> — the page loads the wasm and
+answers `core: 523 pieces`. M1 has not started.
 
 ## Rules
 
@@ -25,7 +26,8 @@ player reads.
 - Save round-trip tests run on every commit from M1. A red round-trip blocks
   everything.
 - **The agent does not run `git push` or `make publish`.** Only a human
-  deploys.
+  deploys. (The one exception was the repo's creation and first push, which the
+  human asked for explicitly. The rule is back in force.)
 - Do not start a milestone before the previous gate is live and the human has
   seen it.
 
@@ -131,7 +133,11 @@ catalogue size should quote this one.
 
 ## Open questions the human has not answered
 
-Listed in `PLAN.md` §6. None block M1. The defaults in force are: losing costs
-nothing but the walk back, the repo is `gear-master-2d`, the content charter is
-binding, invented proper nouns fail the M2 lint, and `quest.rs`/`town.rs` stay
-dropped.
+Listed in `PLAN.md` §6. None block M1.
+
+**Answered:** the repo is `sgilson7/gear-master-2d`, public, Pages served from
+Actions.
+
+**Still open**, with the default in force: losing costs nothing but the walk
+back; the content charter is binding; invented proper nouns fail the M2 lint;
+`quest.rs` and `town.rs` stay dropped.

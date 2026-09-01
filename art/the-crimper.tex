@@ -1,0 +1,62 @@
+% The Crimper — rung four. A garbage-truck jaw that smashes down; slow, heavy
+% plate and one enormous hit.
+%
+% Written by filling in tikz_figure_prompt.md.
+\documentclass[tikz,border=4pt]{standalone}
+\usetikzlibrary{calc}
+
+% ---- tunables -------------------------------------------------------------
+\newcommand{\Unit}{0.055cm}
+\newcommand{\Edge}{2.4pt}     % heaviest outline in the set: it is a machine
+\newcommand{\Teeth}{5}        % teeth along the jaw
+\newcommand{\JawY}{30}        % where the jaw hinges
+
+\definecolor{steel}{HTML}{6E7278}
+\definecolor{steeldark}{HTML}{43464B}
+\definecolor{rust}{HTML}{8B4225}
+\definecolor{ink}{HTML}{101018}
+
+\begin{document}
+\begin{tikzpicture}[x=\Unit,y=\Unit, line join=round, line cap=round]
+
+  % ---- background: none ---------------------------------------------------
+
+  % ---- the hopper ---------------------------------------------------------
+  \fill[steel,draw=ink,line width=\Edge] (10,6) rectangle (54,\JawY);
+  % Ribs, which is what tells you it is pressed rather than cast.
+  \foreach \x in {18,26,34,42} {
+    \draw[steeldark,line width=2.0pt] (\x,8) -- (\x,\JawY-2);
+  }
+
+  % ---- the jaw, open ------------------------------------------------------
+  % Hinged at the left and swung up, so it reads as a jaw about to come down
+  % rather than as a roof sitting on a shed. The teeth follow it.
+  \fill[steeldark,draw=ink,line width=\Edge]
+    (8,\JawY-2) -- (54,\JawY+10) -- (52,\JawY+17) -- (8,\JawY+5) -- cycle;
+  \foreach \i in {1,...,\Teeth} {
+    \pgfmathsetmacro\x{13 + (\i-1)*9}
+    \pgfmathsetmacro\y{\JawY - 1 + (\i-1)*2.6}
+    \fill[steel,draw=ink,line width=1.4pt]
+      (\x,\y) -- ++(3,-6) -- ++(3.4,5.2) -- cycle;
+  }
+  % The hinge itself, so the swing has somewhere to come from.
+  \fill[steel,draw=ink,line width=1.6pt] (9,\JawY+1) circle (3.2);
+
+  % ---- rust, where a machine left outside gets it -------------------------
+  \fill[rust] (12,8) rectangle ++(6,4);
+  \fill[rust] (46,8) rectangle ++(5,3);
+
+  % ---- one lamp, so it has somewhere to be looking ------------------------
+  \fill[rust,draw=ink,line width=1.6pt] (44,20) circle (4.2);
+
+  % ---- annotations: none. --------------------------------------------------
+
+\end{tikzpicture}
+\end{document}
+
+% ---- self-check ------------------------------------------------------------
+% 1. Standalone class, compiles alone with pdflatex.
+% 2. Tunables at the top, including the jaw's hinge height.
+% 3. \foreach draws the hopper ribs and the jaw teeth.
+% 4. Order runs hopper -> jaw -> rust -> lamp, so the lamp is never covered.
+% 5. Rectangles, triangles and one circle; no external images.

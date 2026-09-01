@@ -1,0 +1,61 @@
+% Bengulon Jungle Toad — rung two. Nine planes from home, and four hundred and
+% seven of them counted in the verge so far.
+%
+% Written by filling in tikz_figure_prompt.md.
+\documentclass[tikz,border=4pt]{standalone}
+\usetikzlibrary{calc}
+
+% ---- tunables -------------------------------------------------------------
+\newcommand{\Unit}{0.055cm}
+\newcommand{\Edge}{2.2pt}
+\newcommand{\Warts}{6}        % warts across the back
+\newcommand{\BodyW}{50}       % how wide it squats
+\newcommand{\BodyH}{26}
+
+\definecolor{hide}{HTML}{5E7A3E}
+\definecolor{hidedark}{HTML}{3A4E27}
+\definecolor{belly}{HTML}{9DB56A}
+\definecolor{ink}{HTML}{101018}
+
+\begin{document}
+\begin{tikzpicture}[x=\Unit,y=\Unit, line join=round, line cap=round]
+
+  % ---- background: none ---------------------------------------------------
+
+  % ---- legs, behind the body ---------------------------------------------
+  \foreach \x in {6,48} {
+    \fill[hidedark,draw=ink,line width=1.6pt] (\x,4) rectangle ++(10,14);
+    \fill[hidedark,draw=ink,line width=1.6pt] (\x-2,2) rectangle ++(14,5);
+  }
+
+  % ---- body ---------------------------------------------------------------
+  \fill[hide,draw=ink,line width=\Edge]
+    (32,20) ellipse [x radius=\BodyW/2, y radius=\BodyH/2];
+  \fill[belly] (32,12) ellipse [x radius=16, y radius=6];
+
+  % ---- warts, in a row across the back ------------------------------------
+  \foreach \i in {1,...,\Warts} {
+    \pgfmathsetmacro\x{12 + (\i-1)*8}
+    \pgfmathsetmacro\y{28 + mod(\i,2)*3}
+    \fill[hidedark] (\x,\y) circle (2.0);
+  }
+
+  % ---- eyes, on top where a toad keeps them -------------------------------
+  \foreach \x in {24,40} {
+    \fill[hide,draw=ink,line width=1.8pt] (\x,34) circle (6);
+    \fill[white] (\x,34) circle (3.4);
+    \fill[ink] (\x,34) ellipse [x radius=1.2, y radius=3.0];
+  }
+
+  % ---- annotations: none. --------------------------------------------------
+
+\end{tikzpicture}
+\end{document}
+
+% ---- self-check ------------------------------------------------------------
+% 1. Standalone class, compiles alone with pdflatex.
+% 2. Tunables and colours are all declared at the top.
+% 3. \foreach draws the legs, the warts and the eyes.
+% 4. Order runs legs -> body -> warts -> eyes -> annotations, so nothing
+%    covers the eyes, which is the only place the figure is looking.
+% 5. Ellipses, circles and rectangles only.

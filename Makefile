@@ -39,7 +39,10 @@ publish:
 	@echo "Pushed. Actions builds and publishes; live in about two minutes."
 	@echo "Watch: gh run watch"
 
-## art: compile the TikZ sources in art/ to SVGs in web/assets/ (M6)
+## art: compile art/*.tex to web/assets/*.svg (needs pdflatex + pdftocairo)
+##
+## The SVGs are checked in, so a deploy never runs this — it is what you run
+## after editing a figure. Missing LaTeX prints what to install and exits 0.
 art:
 	@$(ROOT)/packaging/build-art.sh
 

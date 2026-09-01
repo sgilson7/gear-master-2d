@@ -1,0 +1,16 @@
+{
+  "format": "gm2d-art",
+  "version": 1,
+  "_note": "Canonical name or place id -> a figure in web/assets/. A subject with no entry draws nothing, which is what makes this file safe to be incomplete: the game shows a portrait where there is one and a heading where there is not.",
+  "creatures": {
+    "Cave Rat": "a-rat",
+    "Bog Toad": "bengulon-toad",
+    "Rust Golem": "the-crimper"
+  },
+  "places": {
+    "the-end-of-all-gears": "town-the-end-of-all-gears",
+    "kettleworks": "town-kettleworks",
+    "high-wick": "town-high-wick"
+  },
+  "player": "sprocketman"
+}

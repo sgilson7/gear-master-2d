@@ -1,0 +1,55 @@
+% High Wick — a light kept burning on the only high ground for four regions,
+% by somebody nobody has met.
+%
+% Written by filling in tikz_figure_prompt.md.
+\documentclass[tikz,border=4pt]{standalone}
+\usetikzlibrary{calc}
+
+% ---- tunables -------------------------------------------------------------
+\newcommand{\Unit}{0.055cm}
+\newcommand{\Edge}{2.2pt}
+\newcommand{\Rays}{8}          % rays off the lamp
+\newcommand{\RayIn}{9}         % where a ray starts
+\newcommand{\RayOut}{15}       % where it ends
+\newcommand{\TowerTop}{40}
+
+\definecolor{stone}{HTML}{8A8578}
+\definecolor{stonedark}{HTML}{56534A}
+\definecolor{flame}{HTML}{F0C85A}
+\definecolor{hill}{HTML}{5E6A44}
+\definecolor{ink}{HTML}{101018}
+
+\begin{document}
+\begin{tikzpicture}[x=\Unit,y=\Unit, line join=round, line cap=round]
+
+  % ---- the hill -----------------------------------------------------------
+  \fill[hill,draw=ink,line width=\Edge]
+    (0,0) -- (0,8) .. controls (18,20) and (46,20) .. (64,8) -- (64,0) -- cycle;
+
+  % ---- the tower ----------------------------------------------------------
+  \fill[stone,draw=ink,line width=\Edge] (26,12) rectangle (38,\TowerTop);
+  % Courses, so it reads as stacked stone rather than as a post.
+  \foreach \y in {17,22,27,32,37} {
+    \draw[stonedark,line width=1.4pt] (27,\y) -- (37,\y);
+  }
+  \fill[stonedark,draw=ink,line width=1.6pt] (24,\TowerTop) rectangle (40,\TowerTop+4);
+
+  % ---- the light ----------------------------------------------------------
+  \fill[flame,draw=ink,line width=1.8pt] (32,\TowerTop+9) circle (5);
+  \foreach \i in {1,...,\Rays} {
+    \pgfmathsetmacro\a{360/\Rays*\i}
+    \draw[flame,line width=2.0pt]
+      ($(32,\TowerTop+9)+(\a:\RayIn)$) -- ($(32,\TowerTop+9)+(\a:\RayOut)$);
+  }
+
+  % ---- annotations: none. --------------------------------------------------
+
+\end{tikzpicture}
+\end{document}
+
+% ---- self-check ------------------------------------------------------------
+% 1. Standalone class, compiles alone with pdflatex.
+% 2. Ray count, ray reach and the tower's height are tunables at the top.
+% 3. \foreach draws the stone courses and every ray.
+% 4. Order runs hill -> tower -> light, so the light is drawn last and over.
+% 5. Rectangles, circles, lines and one Bezier for the hill.

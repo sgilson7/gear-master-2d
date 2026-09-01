@@ -1,0 +1,76 @@
+% The player: a Sprocketman, drawn as what the five frames make of you.
+%
+% Written by filling in tikz_figure_prompt.md. Every tunable is a \newcommand
+% at the top; positions are in the figure's own 64-unit grid with x=/y= set
+% once; repeats use \foreach; sections run in drawing order; annotations are
+% last; nothing is an external image.
+\documentclass[tikz,border=4pt]{standalone}
+\usetikzlibrary{calc}
+
+% ---- tunables -------------------------------------------------------------
+\newcommand{\Unit}{0.055cm}  % one figure unit; the whole piece is 64 wide
+\newcommand{\Span}{64}       % the figure's own grid, matching a 64px sprite
+\newcommand{\Edge}{2.2pt}    % outline weight: heavy, so it reads at 64px
+\newcommand{\Teeth}{8}       % gear teeth round the head
+\newcommand{\ToothR}{13}     % radius the teeth sit at
+\newcommand{\HeadR}{9}       % the head disc itself
+
+% The game's own palette. Brass is the player's colour everywhere else, and
+% slag is the pit these came out of.
+\definecolor{brass}{HTML}{C08A2E}
+\definecolor{brassdark}{HTML}{6E4A14}
+\definecolor{slag}{HTML}{2B2B3A}
+\definecolor{ink}{HTML}{101018}
+\definecolor{cork}{HTML}{CF9F66}
+
+\begin{document}
+\begin{tikzpicture}[x=\Unit,y=\Unit, line join=round, line cap=round]
+
+  % ---- background ---------------------------------------------------------
+  % Nothing. A sprite sits on whatever is behind it, and a filled ground would
+  % be a box round the figure at every size it is drawn.
+
+  % ---- the body -----------------------------------------------------------
+  % Five frames, stacked the way the slots are: helmet, chest, two gloves,
+  % two greaves. Flat fills and a heavy edge, no gradients.
+  \fill[slag,draw=ink,line width=\Edge] (22,10) rectangle (42,32); % chest
+  \fill[brassdark,draw=ink,line width=\Edge] (14,14) rectangle (22,26); % left glove
+  \fill[brassdark,draw=ink,line width=\Edge] (42,14) rectangle (50,26); % right glove
+  \fill[brassdark,draw=ink,line width=\Edge] (24,0) rectangle (31,10);  % left greave
+  \fill[brassdark,draw=ink,line width=\Edge] (33,0) rectangle (40,10);  % right greave
+
+  % Bracket work across the chest: the thing a Sprocketman's people cut.
+  \foreach \y in {15,20,25} {
+    \draw[ink,line width=1.4pt] (24,\y) -- (40,\y);
+  }
+
+  % ---- the head, which is a gear -----------------------------------------
+  % Square teeth, turned to face out, so it reads as a gear rather than as a
+  % flower. Drawn before the hub so the hub covers their inner ends.
+  \foreach \i in {1,...,\Teeth} {
+    \pgfmathsetmacro\a{360/\Teeth*\i}
+    \fill[brass,draw=ink,line width=1.2pt,rotate around={\a:(32,46)}]
+      ($(32,46)+(0,\ToothR-3)$) ++(-2.6,-1.6) rectangle ++(5.2,5.0);
+  }
+  \fill[brass,draw=ink,line width=\Edge] (32,46) circle (\HeadR);
+  \fill[ink] (32,46) circle (3.2);   % the bore
+
+  % ---- the strip of cork -------------------------------------------------
+  % Wedged where the water sits, per THE STANDING FRAME. One detail, so the
+  % figure has something in it that is not symmetry.
+  \fill[cork,draw=ink,line width=1.2pt] (20,10) rectangle (44,13);
+
+  % ---- annotations --------------------------------------------------------
+  % None. This is a sprite, not a diagram; a label would be drawn at 64px and
+  % read at none of them.
+
+\end{tikzpicture}
+\end{document}
+
+% ---- self-check ------------------------------------------------------------
+% 1. Standalone class, compiles alone in Overleaf with pdflatex — line 7.
+% 2. Every tunable is a \newcommand or \definecolor at the top — lines 10-24.
+% 3. One \foreach for the repeated elements (chest brackets, gear teeth).
+% 4. Sections run background -> body -> head -> detail -> annotations, and
+%    there are no annotations, which is stated rather than omitted.
+% 5. Geometric primitives only: rectangles, circles. No external images.

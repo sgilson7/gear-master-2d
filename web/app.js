@@ -22,6 +22,15 @@ const TILE = 32;
 const AUTOSAVE = 'gm2d.autosave';
 
 let world = null;
+let art = { creatures: {}, places: {} };
+
+// A subject with no figure draws nothing. That is what makes `art.json` safe to
+// be incomplete — and it will be incomplete for a long time, because there are
+// fifty creatures and seven figures.
+function figure(kind, key) {
+  const name = art[kind]?.[key];
+  return name ? `assets/${name}.svg` : null;
+}
 let debug = false;
 let blocked = null;   // the last refusal, drawn for one frame
 
@@ -248,6 +257,7 @@ function openFight() {
   if (!m) return;
   $('fight-rank').textContent = m.rank === 'ordinary' ? 'an encounter' : m.rank;
   $('fight-name').textContent = m.name;
+  portrait($('fight-art'), figure('creatures', m.canonical), m.name);
   $('fight-note').textContent = m.note ?? '';
   $('fight-rating').textContent = m.rating;
   $('fight-bounty').textContent = m.bounty;
@@ -378,9 +388,16 @@ function closeTree() {
 
 // ---------------------------------------------------------------- the town
 
+function portrait(el, src, alt) {
+  if (!el) return;
+  if (src) { el.src = src; el.alt = alt; el.hidden = false; }
+  else { el.hidden = true; el.removeAttribute('src'); }
+}
+
 function openTown(id) {
   const place = world.places.find((p) => p.id === id);
   $('town-name').textContent = place?.name ?? id;
+  portrait($('town-art'), figure('places', id), place?.name ?? id);
   paintShelf();
   $('town').hidden = false;
 }
@@ -504,6 +521,12 @@ async function main() {
   }
 
   world = JSON.parse(world_json());
+  try {
+    art = await (await fetch('data/art.json')).json();
+  } catch {
+    // No art file, or it will not parse. The game draws headings instead,
+    // which is exactly what it did before there was any art at all.
+  }
 
   let restored = false;
   try {

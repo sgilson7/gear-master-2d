@@ -157,3 +157,14 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
 .wares:disabled { opacity: .5; cursor: not-allowed; }
 .wares:disabled .cost { color: var(--rust); }
 .wares.pinned { outline: 2px solid var(--brass); outline-offset: -2px; }
+
+/* --- M6: the figures ---------------------------------------------------- */
+/* TikZ, compiled to SVG by `make art`. Flat fills and heavy outlines, so a
+   figure reads at 64px on the map and again at 4x in a panel. */
+.portrait {
+  width: 120px; height: 120px; object-fit: contain;
+  background: #101018; border: 1px solid var(--line); padding: 8px;
+  order: 2; flex: none;
+}
+.portrait[hidden] { display: none; }
+@media (max-width: 620px) { .portrait { width: 84px; height: 84px; } }

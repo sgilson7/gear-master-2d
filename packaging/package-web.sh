@@ -38,6 +38,12 @@ rm -rf "$WEB"; mkdir -p "$WEB"
 cp -R "$ROOT/web/." "$WEB/"
 rm -rf "$WEB/pkg"
 
+# The page fetches data/art.json at startup — the one data file it reads
+# directly, because a name-to-filename lookup has no rule in it and does not
+# need to cross the wasm boundary. Everything else in data/ is compiled in.
+mkdir -p "$WEB/data"
+cp "$ROOT/data/art.json" "$WEB/data/"
+
 say "Generating JS bindings"
 wasm-bindgen --target web --no-typescript --out-dir "$WEB/pkg" \
   "$ROOT/target/$TARGET/release/$WASM.wasm"

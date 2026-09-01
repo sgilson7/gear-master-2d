@@ -233,7 +233,7 @@
         {
           "id": "g-plaid",
           "name": "Bedazzled Plaid",
-          "blurb": "It is not armour. It has never once been mistaken for armour.",
+          "blurb": "Four thousand sequins, and a plate under them nobody has asked about.",
           "cost": 1,
           "requires": [],
           "effect": {
@@ -245,7 +245,7 @@
         {
           "id": "g-wider-frames",
           "name": "Wider Frames",
-          "blurb": "A row on the weapon and a row on the chest. Your arms had to go somewhere.",
+          "blurb": "A row on the weapon frame. Your arms had to go somewhere.",
           "cost": 2,
           "requires": [
             "g-plaid"

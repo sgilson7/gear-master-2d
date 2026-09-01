@@ -9,12 +9,9 @@ from `sgilson7/gear-master`. `PLANNING-BRIEF.md` is the brief; `PLAN.md` is the
 plan and **wins where the two disagree**; `TONE.md` governs every string a
 player reads.
 
-**MVP complete, tagged `v0.1.0-mvp`.** Deploy gate 6 is live at
-<https://sgilson7.github.io/gear-master-2d/>. Every line of
-`PLANNING-BRIEF.md` §0 was walked against the deployed build and every one is a
-yes.
-
-M6 — art and a second tone pass — is post-MVP and optional. It has not started.
+**Every milestone is done.** M0–M5 shipped the MVP, tagged `v0.1.0-mvp`; the
+board was then rebuilt against the original's colourblind design; M6 added the
+art and the tone pass. Live at <https://sgilson7.github.io/gear-master-2d/>.
 
 **No rest point, and there should not be one.** M2 carried it forward; M3 is
 where it turns out to be nothing. Combat health resets every fight, so a rest
@@ -252,6 +249,38 @@ which can be lost:**
   Escape. A save made at level three arrives at five and is asked, and one made
   at nine without a class is still asked — the question was never answered
   rather than declined.
+
+## Art
+
+- **TikZ or nothing.** Every figure in `art/` is a standalone document written
+  by filling in `tikz_figure_prompt.md`, and the reason is not ceremony: a
+  figure that is text can be reviewed, diffed and corrected in one line, and a
+  figure that is a PNG can only be re-rolled and hoped over.
+- `make art` compiles to `web/assets/*.svg`. **The SVGs are checked in**, so a
+  deploy never needs LaTeX; missing tooling prints what to install and exits 0.
+  `standalone.cls` is not in BasicTeX and is the usual reason it fails —
+  `tlmgr init-usertree && tlmgr --usermode install standalone`.
+- **The house style, which is the prompt's "audience" field:** flat fills, heavy
+  outlines, no gradients; a figure must read at 64px on the map and again at 4×
+  in a panel.
+- `data/art.json` maps a canonical creature name or place id to a figure. **A
+  subject with no entry draws nothing**, which is what makes the file safe to be
+  incomplete — and it will be, because there are fifty creatures and seven
+  figures.
+
+## Tone, as a lint
+
+`tests/tone.rs` holds the eight rules from `TONE.md` a machine can check. Not
+the ones about register — those need a reader — but the ones that are facts
+about a string. Every one caught something on its first run:
+
+- **Rule 13** found a blurb saying "armour" twice where the game says Cork.
+- **The blurb/effect check** found a node promising a row on two frames and
+  granting one. A blurb that overstates its effect is the worst kind: the
+  player finds out by not getting it.
+- **Rule 12** was itself wrong first, and failed two lines that were perfectly
+  clear — "Forty Fnorp" names forty, and spelling small numbers out is the
+  house style. The lint learned to read numbers as prose.
 
 ## Inherited on purpose — do not "simplify"
 

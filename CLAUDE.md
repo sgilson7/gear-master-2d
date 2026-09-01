@@ -257,6 +257,13 @@ which can be lost:**
   `damage` from a running total ignores `absorbed`, so armour soaked a blow, the
   bar dropped anyway, and both sides could sit at zero for the rest of a fight
   that was still going. `fight_json` carries a snapshot per entry.
+- **An item card has two halves and which stat goes in which is not a
+  presentation choice.** *Standing still* is what the item contributes whether
+  or not a fight is happening — health, strength, power, regen, resists, pierce,
+  harden. *Every activation* is what one tick does — damage, cork, the Funny,
+  fury, devotion, harvest, plus any unconditional pool gain folded in from a
+  trigger. Cork resets every fight; listing it beside max health told the player
+  they were wearing armour they were not. `testing/drive.py` checks the split.
 - **Do not reuse a class name.** `.card` is the event dialog — `position: fixed`,
   `inset: 0`, `z-index: 10`. The item cards were given the same class and every
   one of them became a full-viewport overlay pinned over the game. Found by

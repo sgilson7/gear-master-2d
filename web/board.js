@@ -30,10 +30,16 @@ export class Board {
     this.hover = null;
     this.onchange = () => {};
     this.onhold = () => {};
+    this.onpoint = () => {};
+    this.pointed = null;   // pieces of the item under the cursor
     this.slotOrder = ['weapon', 'helmet', 'chest', 'gloves', 'greaves'];
 
     canvas.addEventListener('mousemove', (e) => this.move(e));
-    canvas.addEventListener('mouseleave', () => { this.hover = null; this.draw(); });
+    canvas.addEventListener('mouseleave', () => {
+      this.hover = null;
+      if (this.pointed) { this.pointed = null; this.onpoint(null); }
+      this.draw();
+    });
     canvas.addEventListener('mousedown', (e) => this.press(e));
     canvas.addEventListener('contextmenu', (e) => { e.preventDefault(); this.rotateHeld(); });
 
@@ -157,7 +163,34 @@ export class Board {
     const changed = cell?.slot !== this.hover?.slot;
     this.hover = cell;
     if (this.held && cell && (changed || !this.legal)) this.askLegal(cell.slot);
+    this.point(cell, px, py);
     this.draw();
+  }
+
+  /// Which item the cursor is over, if any.
+  ///
+  /// An item rather than a component: a player pointing at a blade is asking
+  /// about the weapon it is part of, and the card is about the item. Reported
+  /// by its piece list, which is what identifies one.
+  point(cell, px, py) {
+    let key = null;
+    if (!this.held && cell) {
+      const p = this.pieceAt(cell.slot, cell.x, cell.y);
+      if (p) {
+        const slot = this.state.slots.find((s) => s.slot === cell.slot);
+        const item = slot.items.find((i) => i.pieces.includes(p.id));
+        if (item) key = item.pieces.join(',');
+      }
+    }
+    // The bag, too — a loose component has no item, so it names itself.
+    if (!key && !this.held && py >= this.bagY) {
+      const loose = this.bagAt(px, py);
+      if (loose) key = `bag:${loose.id}`;
+    }
+    if (key !== this.pointed) {
+      this.pointed = key;
+      this.onpoint(key);
+    }
   }
 
   // The one question this file is not allowed to answer itself.
@@ -373,6 +406,15 @@ export class Board {
           this.pips(g, origin, cells, item.rating);
         } else {
           this.edge(g, cells, origin, L.unassembled, L.unassembled_width, 1);
+        }
+      }
+
+      // A ring round whatever the cursor is asking about, so the board and the
+      // panel agree on which item is being read.
+      if (this.pointed && !this.held) {
+        const item = s.items.find((i) => i.pieces.join(',') === this.pointed);
+        if (item && item.cells.length) {
+          this.edge(g, item.cells, origin, '#69cdeb', 2, 3);
         }
       }
 

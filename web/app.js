@@ -312,7 +312,8 @@ function paintMade(st) {
     for (const i of slot.items) {
       if (!i.assembled) {
         parts.push(
-          `<div class="made-item short"><b>${i.short || 'loose pieces'}</b>` +
+          `<div class="made-item short" data-key="${i.pieces.join(',')}">` +
+          `<b>${i.short || 'loose pieces'}</b>` +
           `<span class="why">${i.status}</span></div>`);
         continue;
       }
@@ -322,31 +323,46 @@ function paintMade(st) {
       const next = i.next_at !== null && i.next_at !== undefined
         ? `<span class="next">${i.next_at} more for the next mark</span>` : '';
 
-      // Standing still.
+      // Standing still: what it contributes whether or not a fight is on.
       const passive = i.passive.length
         ? i.passive.map((s) => `<li>${sign(s.n, s.unit)} ${s.label}</li>`).join('')
         : `<li class="none">nothing — it only acts in a fight</li>`;
 
-      // And every time it comes round.
+      // Every activation. Cork, the Funny, fury, devotion and harvest live
+      // here, not above: they are laid down per tick and reset each fight, and
+      // listing them beside max health said they were something you wear.
       const active = [];
       if (i.hit_for > 0) {
-        active.push(`<li>hits for <b>${i.hit_for}</b></li>`);
-        if (i.dps) active.push(`<li>${i.dps.toFixed(1)} damage a second</li>`);
+        // One kind: name it, because "hits for 35" says how hard and nothing
+        // about what answers it. Several: show the split, since the total is
+        // already printed.
+        const k = i.damage_kinds ?? [];
+        const kind = k.length === 1 ? ` ${k[0].split(' ')[1]}`
+          : k.length > 1 ? ` <span class="dim">(${k.join(' + ')})</span>` : '';
+        active.push(`<li>hits for <b>${i.hit_for}</b>${kind}${
+          i.dps ? ` <span class="dim">— ${i.dps.toFixed(1)} a second</span>` : ''}</li>`);
       }
-      if (i.casts > 0) active.push(`<li>${i.casts} cast${i.casts > 1 ? 's' : ''}</li>`);
+      for (const a of i.active) active.push(`<li><b>${a.n}</b> ${a.label}</li>`);
+      if (i.casts > 0) {
+        active.push(`<li class="dim">costs ${i.cast_cost} of the Funny ${
+          i.casts > 1 ? `an activation, whichever of its ${i.casts} spells come up` : 'a cast'}</li>`);
+      }
       for (const n of i.notes) active.push(`<li>${n}</li>`);
+      if (i.power && i.power !== 100) {
+        active.push(`<li class="dim">everything above already carries this item's own ×${
+          (i.power / 100).toFixed(2)}</li>`);
+      }
       if (!active.length) active.push(`<li class="none">it holds its shape and nothing else</li>`);
 
       parts.push(`
-        <div class="made-item">
+        <div class="made-item" data-key="${i.pieces.join(',')}">
           <b>${i.name}</b>
           <span class="built">${slot.slot} · built on a ${i.core ?? '—'}</span>
           <span class="rank"><span class="pips">${pips}</span> ${i.rarity.toUpperCase()}
             · rating ${i.rating}${next}</span>
-          <span class="head">out of combat</span>
+          <span class="head">standing still</span>
           <ul class="stats">${passive}</ul>
-          <span class="head">in combat — every ${secs(i.cooldown_ms ?? 0)}s${
-            i.power && i.power !== 100 ? ` · ${(i.power / 100).toFixed(2)}× power` : ''}</span>
+          <span class="head">every activation — one every ${secs(i.cooldown_ms ?? 0)}s</span>
           <ul class="stats">${active.join('')}</ul>
         </div>`);
     }
@@ -638,6 +654,15 @@ async function main() {
     $('fight-yours').textContent = made;
     $('undo').disabled = !st.undoable;
     paintMade(st);
+  };
+  board.onpoint = (key) => {
+    let target = null;
+    for (const el of $('made').querySelectorAll('.made-item')) {
+      const on = el.dataset.key === key;
+      el.classList.toggle('pointed', on);
+      if (on) target = el;
+    }
+    if (target) target.scrollIntoView({ block: 'nearest' });
   };
   board.onhold = (name) => {
     $('holding').textContent = name ? `carrying ${name} — right-click to turn it` : '';

@@ -222,3 +222,13 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
 }
 .portrait[hidden] { display: none; }
 @media (max-width: 620px) { .portrait { width: 84px; height: 84px; } }
+
+/* Pointing at an item on the board lights its card, and the board draws a ring
+   round the same item — so the two always agree about what is being read. */
+.made .made-item { transition: background .12s, box-shadow .12s; margin: 0 -8px;
+  padding-left: 8px; padding-right: 8px; }
+.made .made-item.pointed { background: color-mix(in srgb, #69cdeb 12%, transparent);
+  box-shadow: inset 3px 0 0 #69cdeb; }
+.made .stats li .dim { color: var(--ink-3); }
+.made .stats li.dim { color: var(--ink-3); }
+@media (prefers-reduced-motion: reduce) { .made .made-item { transition: none; } }

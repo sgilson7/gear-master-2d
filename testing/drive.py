@@ -89,6 +89,65 @@ def walk_until_a_fight(page, limit=200):
     return False
 
 
+# Laid down per tick and reset each fight — never something you are wearing.
+PER_ACTIVATION = ["cork", "the funny", "fury", "devotion", "harvest",
+                  "idiot mode", "physical damage", "magic damage"]
+
+
+def check_the_card_halves(page, name, fails):
+    """Cork is per activation, not a standing stat.
+
+    Reported from a real session. The card lumped every stat an item carried
+    into one "out of combat" list, which said a piece granting 29 cork was
+    armour you wear — when it is laid down on each tick and reset every fight.
+    Upstream splits the two at the one place a blow is worked out; this checks
+    the split rather than trusting it.
+    """
+    # Only finished items. An item that has not come together is a name and
+    # core's sentence about what it is missing, and has no halves to split.
+    got = page.evaluate("""() => [...document.querySelectorAll('#made .made-item:not(.short)')].map(c => {
+      const heads = [...c.querySelectorAll('.head')].map(h => h.textContent.trim());
+      const lists = [...c.querySelectorAll('.stats')].map(
+        u => [...u.querySelectorAll('li')].map(li => li.textContent.trim()));
+      return { name: c.querySelector('b')?.textContent ?? '?', heads, lists };
+    })""")
+    if not got:
+        return
+    for card in got:
+        if len(card["heads"]) < 2 or len(card["lists"]) < 2:
+            fails.append(f"{name}: {card['name']} has no two halves: {card['heads']}")
+            continue
+        standing = " ".join(card["lists"][0]).lower()
+        for stat in PER_ACTIVATION:
+            if stat in standing:
+                fails.append(f"{name}: {card['name']} lists {stat!r} as standing still, "
+                             f"and it is laid down per activation")
+        if "standing" not in card["heads"][0].lower():
+            fails.append(f"{name}: the first half is headed {card['heads'][0]!r}")
+        if "activation" not in card["heads"][1].lower():
+            fails.append(f"{name}: the second half is headed {card['heads'][1]!r}")
+
+
+def check_hovering_an_item(page, name, fails):
+    """Pointing at an item on the board reads it in the panel."""
+    got = page.evaluate("""() => {
+      const b = window.__board;
+      const s = b.state.slots.find(s => s.placed.length && s.items.some(i => i.assembled));
+      if (!s) return { skipped: true };
+      const item = s.items.find(i => i.assembled);
+      b.point({ slot: s.slot, x: item.cells[0][0], y: item.cells[0][1] }, 0, 0);
+      const lit = [...document.querySelectorAll('#made .made-item.pointed')]
+        .map(e => e.dataset.key);
+      return { key: item.pieces.join(','), lit, ring: b.pointed };
+    }""")
+    if got.get("skipped"):
+        return
+    if got["ring"] != got["key"]:
+        fails.append(f"{name}: the board rings {got['ring']!r}, not the item under the cursor")
+    if got["lit"] != [got["key"]]:
+        fails.append(f"{name}: hovering lit {got['lit']!r}, expected [{got['key']!r}]")
+
+
 def check_turning_in_hand(page, name, fails):
     """A component turned in hand actually turns.
 
@@ -300,6 +359,8 @@ def walk_the_gate(browser, name):
             fails.append(f"{name}: auto-packing the starting kit assembled {made}")
         check_fit_preview(page, name, fails)
         check_turning_in_hand(page, name, fails)
+        check_the_card_halves(page, name, fails)
+        check_hovering_an_item(page, name, fails)
         page.click("#run")
         page.wait_for_selector("#fight", state="hidden", timeout=8000)
 
@@ -556,6 +617,8 @@ def main():
     print("ok: level five forked the character, and the fork does not come off")
     print("ok: the fit preview is core's answer, not the page's")
     print("ok: a component turned in hand turns on the board too")
+    print("ok: cork is per activation, not a standing stat")
+    print("ok: pointing at an item on the board reads it in the panel")
     print("ok: a mid-fight save reopens the same fight")
     print("ok: walk, download, reload, upload — position and stream both came back")
     print("ok: a wrong file was refused with a sentence and changed nothing")

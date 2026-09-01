@@ -449,7 +449,7 @@ fn slot_name(s: gm2d_core::piece::SlotKind) -> String {
 /// if it did not — the page draws these and does not compute any of them.
 #[wasm_bindgen]
 pub fn board_json() -> String {
-    use gm2d_core::piece::SlotKind;
+    use gm2d_core::piece::{Action, SlotKind, Trigger};
     with(|g| {
         let ch = &g.character;
         // The profiles the fight runs on, so a card quotes the cadence and the
@@ -509,13 +509,20 @@ pub fn board_json() -> String {
                         let profile = profiles.iter().find(|p| p.pieces == i.pieces);
                         let st = i.stats;
                         let rarity = gm2d_core::rating::Rarity::of(i.rating);
+
+                        // **Two halves, and which stat goes in which is not a
+                        // presentation choice.** Upstream splits them at the
+                        // one place a blow is worked out, and getting it wrong
+                        // tells the player something false: cork is laid down
+                        // *per activation* and resets each fight, so listing it
+                        // beside max health reads as armour you are wearing.
+                        //
+                        // Standing still: what it contributes whether or not a
+                        // fight is happening.
                         let passive: Vec<serde_json::Value> = [
                             (st.health, "max health", ""),
                             (st.strength, "strength", ""),
-                            (st.armor, "cork", ""),
-                            (st.mana, "the Funny", ""),
                             (st.regen, "regen a second", ""),
-                            (st.mind, "idiot mode", ""),
                             (st.power, "weapon power", "%"),
                             (st.mind_resist, "thick skull", "%"),
                             (st.curse_resist, "curse resist", "%"),
@@ -525,10 +532,10 @@ pub fn board_json() -> String {
                             (st.magic_pierce, "magic piercing", "%"),
                             (st.physical_harden, "physical hardening", "%"),
                             (st.magic_harden, "magic hardening", "%"),
+                            // Not in upstream's list. It is a standing share of
+                            // what armour soaks rather than something the item
+                            // does on its tick, so it sits here.
                             (st.reflect, "reflected", "%"),
-                            (st.rage, "fury", ""),
-                            (st.faith, "devotion", ""),
-                            (st.nature, "harvest", ""),
                         ]
                         .iter()
                         .filter(|(v, ..)| *v != 0)
@@ -537,14 +544,73 @@ pub fn board_json() -> String {
                         })
                         .collect();
 
+                        // An unconditional pool gain is a stat wearing a
+                        // trigger's clothes. Folded into the figures below, so
+                        // a piece that banks two Fury reads like every other
+                        // piece that banks two Fury — anything *conditional*
+                        // keeps its own line, because there the wording is the
+                        // information.
+                        let mut banked = [0i32; 4];
+                        if let Some(pr) = profile {
+                            for t in &pr.triggers {
+                                match t {
+                                    Trigger::OnActivate(Action::GainMana(n)) => banked[0] += n,
+                                    Trigger::OnActivate(Action::Gain { what, amount }) => {
+                                        banked[what.index().min(3)] += amount
+                                    }
+                                    _ => {}
+                                }
+                            }
+                        }
+
                         let hit = profile.map(|p| p.hit_for(stats.strength)).unwrap_or(0);
-                        // `dps_milli` is damage a second in *thousandths* — the
-                        // engine keeps it that way so a slow heavy weapon and a
-                        // fast light one compare without floating point. A
-                        // weapon hitting 35 every 1.5s is 23.3, not 0.0.
                         let dps = profile
                             .filter(|_| hit > 0)
+                            // `dps_milli` is damage a second in thousandths.
                             .map(|p| p.dps_milli(stats.strength) as f64 / 1_000.0);
+
+                        // What answers the blow. "Hits for 61" says how hard
+                        // and nothing about what resists it.
+                        let mut damage_kinds: Vec<String> = Vec::new();
+                        if let Some(pr) = profile {
+                            let carried =
+                                if pr.slot == SlotKind::Weapon { stats.strength } else { 0 };
+                            for (v, name) in [
+                                (st.physical_damage + carried, "physical"),
+                                (st.magic_damage, "magic"),
+                            ] {
+                                if v > 0 {
+                                    // Through the item's own multiplier, so the
+                                    // parts add up to the total beside them.
+                                    let scaled = (v as i64 * pr.power as i64 / 100) as i32;
+                                    damage_kinds.push(format!("{scaled} {name}"));
+                                }
+                            }
+                        }
+
+                        // Every activation: what one tick of it does.
+                        let mut active: Vec<serde_json::Value> = Vec::new();
+                        let mut push = |n: i32, label: &str| {
+                            if n > 0 {
+                                active.push(serde_json::json!({ "n": n, "label": label, "unit": "" }));
+                            }
+                        };
+                        // Only when the item does not already print a swing.
+                        // A weapon's "hits for 35" *is* its physical damage
+                        // plus the wearer's strength, through its own power —
+                        // listing "5 physical damage" beside it says the item
+                        // does five, which is the misreading this card exists
+                        // to prevent.
+                        if hit == 0 {
+                            push(st.physical_damage, "physical damage");
+                            push(st.magic_damage, "magic damage");
+                        }
+                        push(st.mind, "idiot mode");
+                        push(st.armor, "cork");
+                        push(banked[0] + st.mana, "the Funny");
+                        push(banked[1] + st.rage, "fury");
+                        push(banked[2] + st.faith, "devotion");
+                        push(banked[3] + st.nature, "harvest");
 
                         serde_json::json!({
                             "pieces": i.pieces.iter().map(|p| p.0).collect::<Vec<_>>(),
@@ -565,8 +631,11 @@ pub fn board_json() -> String {
                             "power": profile.map(|p| p.power),
                             "hit_for": hit,
                             "dps": dps,
+                            "damage_kinds": damage_kinds,
                             "casts": profile.map(|p| p.casts.len()).unwrap_or(0),
+                            "cast_cost": gm2d_core::combat::SPELL_MANA_COST,
                             "passive": passive,
+                            "active": active,
                         })
                     })
                     .collect();

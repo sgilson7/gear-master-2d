@@ -158,6 +158,7 @@ def check_their_gear_is_on_the_screen(page, name, fails):
     other one fights purely out of its gear.
     """
     page.click("#tab-theirs")
+    wait_for_images(page, "#theirs-art")
     got = page.evaluate("""() => {
       const cards = [...document.querySelectorAll('#theirs-cards .made-item')];
       const c = document.getElementById('theirs-board');
@@ -203,6 +204,7 @@ def check_the_portrait_shows(page, name, fails):
     `make art` was reachable from almost nowhere. The map is generated from
     `art/creatures.json` now and this is what says so from the browser's side.
     """
+    wait_for_images(page, "#fight-art")
     got = page.evaluate("""() => {
       const a = document.getElementById('fight-art');
       return { hidden: a.hidden, src: a.getAttribute('src'),
@@ -257,6 +259,23 @@ def check_every_skill_says_what_it_does(page, name, fails):
         fails.append(f"{name}: the hover card is drawn off the edge of the window")
     page.click("#tree-done")
     page.wait_for_selector("#tree", state="hidden", timeout=8000)
+
+
+def wait_for_images(page, selector, timeout=8000):
+    """Let the images under `selector` finish decoding before measuring them.
+
+    `naturalWidth` is 0 until a decode completes, so sampling it the instant a
+    screen opens is a race — one that passes on this machine and fails on a
+    cold CI runner, which is the worst shape a test can have. It failed two
+    deploys before anybody looked at why.
+    """
+    try:
+        page.wait_for_function(
+            "(sel) => [...document.querySelectorAll(sel + ' img, ' + sel)]"
+            "  .filter(e => e.tagName === 'IMG' && !e.hidden).every(i => i.complete)",
+            arg=selector, timeout=timeout)
+    except Exception:
+        pass
 
 
 def check_the_shelf_is_the_shelf(page, name, fails):
@@ -939,13 +958,7 @@ def walk_the_gate(browser, name):
         # than sampled: `naturalWidth` is 0 until the decode finishes, so
         # measuring the instant the screen opens is a race that fails in one
         # engine and passes in the other two.
-        try:
-            page.wait_for_function(
-                """() => [...document.querySelectorAll('#fork-choices img')]
-                          .every(i => i.complete)""",
-                timeout=8000)
-        except Exception:
-            pass
+        wait_for_images(page, "#fork-choices")
         art = page.evaluate("""() => [...document.querySelectorAll('#fork-choices .wares')].map(b => {
           const i = b.querySelector('img');
           return { src: i?.getAttribute('src') ?? null, w: i?.naturalWidth ?? 0 };

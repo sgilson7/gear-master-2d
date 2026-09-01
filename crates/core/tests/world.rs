@@ -325,13 +325,19 @@ fn fixed_path() -> Vec<Dir> {
 
 type Trace = Vec<([u8; 2], Option<&'static str>, Option<String>)>;
 
+/// Walks a real `Game`, not a bare `Rng`.
+///
+/// It matters: `Game::new` stocks the shop off the same stream, so a walk
+/// driven by `Rng::new(seed)` starts several draws behind one driven by a game
+/// made from the same seed. One stream is the rule — this helper is what makes
+/// the tests measure the stream the game actually walks on.
 fn walk(w: &World, path: &[Dir], seed: u64) -> Trace {
-    let mut state = WorldState::at_start(w);
-    let mut rng = Rng::new(seed);
+    let mut g = gm2d_core::game::Game::new(seed, "td");
+    g.world = WorldState::at_start(w);
     path.iter()
         .map(|d| {
-            let s = step(w, &mut state, &mut rng, D, *d);
-            (state.at, s.met(), s.event.clone())
+            let s = step(w, &mut g.world, &mut g.rng, D, *d);
+            (g.world.at, s.met(), s.event.clone())
         })
         .collect()
 }

@@ -34,7 +34,7 @@ pub const STARTING_GOLD: i32 = 28;
 /// What a reroll costs.
 pub const REROLL_COST: i32 = 1;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct Shop {
     /// Catalog indices currently for sale, no duplicates.
     pub stock: Vec<usize>,

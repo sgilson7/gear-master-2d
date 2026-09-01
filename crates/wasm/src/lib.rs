@@ -128,12 +128,14 @@ pub fn items() -> String {
     })
 }
 
-/// Seat the engine's own preset, so there is a board to save.
+/// Arrange what the player owns into the engine's own preset positions.
+///
+/// The auto-build button. It seats components the character *has* and skips the
+/// rest, so it is a convenience rather than a supply of free gear — which it
+/// was, briefly, and which made the shop pointless.
 #[wasm_bindgen]
 pub fn apply_preset() {
     with_mut(|g| {
-        g.character = gm2d_core::character::Character::with_all_pieces();
-        g.character.loadout.name_seed = g.rng.state();
         g.character.loadout.naming = gm2d_core::theme::by_id(&g.theme).naming;
         g.character.apply_preset();
     });
@@ -440,6 +442,10 @@ pub fn board_json() -> String {
     use gm2d_core::piece::SlotKind;
     with(|g| {
         let ch = &g.character;
+        // Every component name a player reads goes through the theme, the same
+        // as every other one. The engine still says "Oak Handle" everywhere,
+        // because everything it decides depends on that name meaning one thing.
+        let theme = gm2d_core::theme::by_id(&g.theme);
         let slots: Vec<_> = SlotKind::ALL
             .iter()
             .map(|&k| {
@@ -452,7 +458,7 @@ pub fn board_json() -> String {
                         let (x, y) = slot.anchor_of(p)?;
                         Some(serde_json::json!({
                             "id": p.0, "x": x, "y": y,
-                            "name": ch.registry.def(p).name,
+                            "name": theme.piece(ch.registry.def(p).name),
                             "cells": slot.cells_of(p),
                             "locked": ch.is_locked_item(p),
                         }))
@@ -493,7 +499,7 @@ pub fn board_json() -> String {
                 let d = ch.registry.def(p);
                 serde_json::json!({
                     "id": p.0,
-                    "name": d.name,
+                    "name": theme.piece(d.name),
                     "slot": slot_name(d.slot),
                     "kind": format!("{:?}", d.kind),
                     "cells": ch.registry.shape(p).cells(),
@@ -721,4 +727,86 @@ pub fn settle_fight() -> String {
 #[wasm_bindgen]
 pub fn flee() {
     with_mut(|g| g.encounter = None);
+}
+
+// ---------------------------------------------------------------- the shop
+
+/// What the towns are selling.
+///
+/// Prices come from `rating::shop_price`, which is derived from what a
+/// component is actually worth — deliberately steeper than linear, because
+/// slots are scarce and the strong parts are what a build is short of.
+#[wasm_bindgen]
+pub fn shop_json() -> String {
+    with(|g| {
+        let theme = gm2d_core::theme::by_id(&g.theme);
+        let shelf: Vec<_> = (0..g.shop.stock.len())
+            .filter_map(|i| {
+                let def = g.shop.def(i)?;
+                let price = g.shop.price(i)?;
+                Some(serde_json::json!({
+                    "slot": i,
+                    "name": theme.piece(def.name),
+                    "canonical": def.name,
+                    "for": slot_name(def.slot),
+                    "kind": format!("{:?}", def.kind),
+                    "price": price,
+                    "rating": gm2d_core::rating::piece_rating(def),
+                    "afford": g.character.gold >= price,
+                    "locked": g.shop.is_locked(i),
+                }))
+            })
+            .collect();
+        serde_json::json!({
+            "gold": g.character.gold,
+            "reroll": gm2d_core::shop::REROLL_COST,
+            "shelf": shelf,
+        })
+        .to_string()
+    })
+}
+
+/// Buy shelf `slot`. Returns an empty string, or why not.
+#[wasm_bindgen]
+pub fn buy(slot: usize) -> String {
+    with_mut(|g| {
+        let Some(price) = g.shop.price(slot) else { return "nothing for sale there".into() };
+        if g.character.gold < price {
+            return format!("{price} Fnorp, and you have {}.", g.character.gold);
+        }
+        let Some(def) = g.shop.take(slot) else { return "nothing for sale there".into() };
+        g.character.gold -= price;
+        let id = g.character.registry.alloc(def);
+        g.character.owned.push(id);
+        String::new()
+    })
+}
+
+/// Turn the shelf over.
+#[wasm_bindgen]
+pub fn reroll() -> String {
+    with_mut(|g| {
+        let cost = gm2d_core::shop::REROLL_COST;
+        if g.character.gold < cost {
+            return format!("{cost} Fnorp to turn the shelf, and you have {}.", g.character.gold);
+        }
+        g.character.gold -= cost;
+        let need = g.character.combat_items().is_empty();
+        let mut rng = g.rng.clone();
+        g.shop.restock(&mut rng, need);
+        g.rng = rng;
+        String::new()
+    })
+}
+
+/// Pin a shelf so a restock leaves it alone.
+#[wasm_bindgen]
+pub fn pin(slot: usize) -> bool {
+    with_mut(|g| g.shop.toggle_lock(slot))
+}
+
+/// Open the board outside a fight, so a player can pack in town.
+#[wasm_bindgen]
+pub fn packing() -> bool {
+    with(|g| g.encounter.is_none())
 }

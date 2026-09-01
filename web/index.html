@@ -9,10 +9,10 @@
 <body>
   <main class="wide">
     <header>
-      <p class="eyebrow">M2 &middot; the world</p>
+      <p class="eyebrow">M3 &middot; fights on the map</p>
       <h1>Gear Master 2D</h1>
-      <p class="sub">Arrow keys or WASD, one tile a press. Terrain decides how often something
-        stops you; the region decides what. Press <kbd>`</kbd>, or the button, for the numbers behind it.</p>
+      <p class="sub">Arrow keys or WASD, one tile a press. Something stops you, you pack your frames,
+        and the fight runs itself. Press <kbd>`</kbd>, or the button, for the numbers behind the map.</p>
     </header>
 
     <div class="board">
@@ -59,6 +59,75 @@
         <div id="card-choices" class="choices"></div>
         <div id="card-receipt" class="receipt" hidden></div>
         <button id="card-close" type="button" hidden>Walk on</button>
+      </div>
+    </div>
+
+    <div id="town" class="screen" hidden>
+      <div class="screenbox">
+        <header class="fighthead">
+          <div>
+            <p class="eyebrow">a town</p>
+            <h2 id="town-name">&mdash;</h2>
+            <p class="note">Nothing follows you in here and nothing rolls while you stand in it.
+              Buy what you can afford, pack your frames, and go back out.</p>
+          </div>
+          <dl class="figures">
+            <div><dt>Fnorp</dt><dd id="town-gold">&mdash;</dd></div>
+          </dl>
+        </header>
+        <h3 class="sub-h">The shelf</h3>
+        <div id="shelf" class="shelf"></div>
+        <p id="town-says" class="says" hidden></p>
+        <div class="row">
+          <button id="reroll" type="button">Turn the shelf over &mdash; 1 Fnorp</button>
+          <button id="pack" type="button" class="primary">Pack your frames</button>
+          <button id="leave" type="button">Back out</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="fight" class="screen" hidden>
+      <div class="screenbox">
+        <header class="fighthead">
+          <div>
+            <p class="eyebrow" id="fight-rank">&mdash;</p>
+            <h2 id="fight-name">&mdash;</h2>
+            <p class="note" id="fight-note"></p>
+          </div>
+          <dl class="figures">
+            <div><dt>it rates</dt><dd id="fight-rating">&mdash;</dd></div>
+            <div><dt>bounty</dt><dd id="fight-bounty">&mdash;</dd></div>
+            <div><dt>your board</dt><dd id="fight-yours">&mdash;</dd></div>
+          </dl>
+        </header>
+
+        <div id="stage-board">
+          <p class="note">Click a piece to pick it up, click a cell to seat it, right-click to turn it.
+            Shift-click a finished item to lock it. Green is where it fits &mdash; core decides that, not the page.</p>
+          <canvas id="board" width="960" height="620"></canvas>
+          <p id="board-says" class="says" hidden></p>
+          <div class="row">
+            <button id="go" type="button" class="primary">Fight</button>
+            <button id="undo" type="button">Undo</button>
+            <button id="preset" type="button">Auto-pack</button>
+            <button id="clear" type="button">Clear</button>
+            <button id="run" type="button">Walk away</button>
+            <button id="fight-save" type="button">Download save</button>
+          </div>
+        </div>
+
+        <div id="stage-replay" hidden>
+          <canvas id="replay" width="960" height="430"></canvas>
+          <div class="row">
+            <button id="skip" type="button">Skip to the end</button>
+          </div>
+        </div>
+
+        <div id="stage-result" hidden>
+          <h3 id="result-title">&mdash;</h3>
+          <div id="result-receipt" class="receipt"></div>
+          <div class="row"><button id="done" type="button" class="primary">Walk on</button></div>
+        </div>
       </div>
     </div>
 

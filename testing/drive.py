@@ -5,14 +5,17 @@ browser, whether the ES module import resolves after cache-busting rewrote the
 URLs, whether `<a download>` actually produces a file, and whether
 `file.arrayBuffer()` feeds it back in.
 
-The gate M1 has to pass is a sequence, not a state, so this walks it:
+The gate is a sequence, not a state, so this walks the whole loop:
 
-    walk somewhere -> download -> reload the page -> upload -> you are back there
+    town -> buy -> pack -> walk -> a fight -> the board -> the replay ->
+    the receipt -> download -> reload -> upload -> everything is back
 
-and it checks the harder half at the same time: the tiles walked, the purse and
-the events answered all have to cross the file together, because a save that
-restored the position and not the stream would put the player back on the same
-tile facing a different map.
+and it checks the harder halves at the same time. The fit preview has to come
+from core rather than from the page. A save taken mid-fight has to reopen the
+same fight. And the tiles walked, the purse, the board and the answered events
+all have to cross the file together, because a save that restored the position
+and not the stream would put the player back on the same tile facing a
+different map.
 
 A console error or a request that leaves the origin fails the run, so "nothing
 is uploaded" is tested rather than asserted.
@@ -48,13 +51,67 @@ def serve():
 
 
 def dismiss_card(page):
-    """Close an event or encounter card if one opened, so the walk continues."""
+    """Close an event card if one opened, so the walk continues."""
     if page.is_visible("#card"):
         if page.is_visible("#card-choices button"):
             page.click("#card-choices button")
         page.wait_for_selector("#card-close", state="visible", timeout=5000)
         page.click("#card-close")
         page.wait_for_selector("#card", state="hidden", timeout=5000)
+        return True
+    return False
+
+
+def leave_town(page):
+    if page.is_visible("#town"):
+        page.click("#leave")
+        page.wait_for_selector("#town", state="hidden", timeout=5000)
+        return True
+    return False
+
+
+# East, north, west, north: a serpentine that keeps finding new ground. A path
+# that walks into a wall would stall the search, because a blocked step draws
+# nothing — which is correct, and would make this loop run forever.
+PATROL = ["ArrowRight"] * 6 + ["ArrowUp"] * 2 + ["ArrowLeft"] * 6 + ["ArrowUp"] * 2
+
+
+def walk_until_a_fight(page, limit=200):
+    for i in range(limit):
+        if page.is_visible("#fight"):
+            return True
+        if leave_town(page) or dismiss_card(page):
+            continue
+        page.keyboard.press(PATROL[i % len(PATROL)])
+    return False
+
+
+def check_fit_preview(page, name, fails):
+    """The fit preview comes from core, not from the page.
+
+    Picks a piece up and asks the page what it painted green. The list has to be
+    the one `legal_anchors` returned — if the page ever works out for itself
+    which cells are legal, there are two rulebooks and this is where it shows.
+    """
+    got = page.evaluate("""() => {
+      const b = window.__board; if (!b || !b.state) return null;
+      const loose = b.state.bag[0]; if (!loose) return null;
+      b.held = { id: loose.id, from: null, name: loose.name, slot: loose.slot };
+      b.askLegal(loose.slot);
+      const drawn = [...b.legal];
+      const core = JSON.parse(window.__legalAnchors(loose.id, loose.slot))
+                     .map(([x, y]) => `${x},${y}`);
+      b.held = null; b.legal = null;
+      return { drawn, core };
+    }""")
+    if got is None:
+        fails.append(f"{name}: could not reach the board to check the fit preview")
+        return
+    if sorted(got["drawn"]) != sorted(got["core"]):
+        fails.append(f"{name}: the fit preview disagrees with core "
+                     f"({len(got['drawn'])} cells drawn, {len(got['core'])} legal)")
+    if not got["core"]:
+        fails.append(f"{name}: core says a loose piece fits nowhere on an empty board")
 
 
 def walk_the_gate(browser, name):
@@ -79,29 +136,94 @@ def walk_the_gate(browser, name):
     if painted < 640 * 640 * 0.9:
         fails.append(f"{name}: the canvas is {painted} opaque pixels of {640*640}")
 
-    # --- walk ----------------------------------------------------------------
-    # East along the bottom road, out of the pit. Twelve steps is enough to
-    # leave the starting town and cross an event tile or two.
-    start = page.text_content("#coords")
-    for _ in range(12):
-        page.keyboard.press("ArrowRight")
-        dismiss_card(page)
-    walked = page.text_content("#coords")
-    if walked == start:
-        fails.append(f"{name}: twelve steps east and the player is still at {start}")
-    if page.text_content("#walked") in (None, "0", "—"):
-        fails.append(f"{name}: the walk counter did not move")
-
-    # Into the map's edge, which must refuse rather than wrap.
-    for _ in range(30):
+    # --- the map refuses what it should --------------------------------------
+    # Into the map's southern edge, which is rock and must refuse rather than
+    # wrap. Done first, before anything is bought or fought, so the player is
+    # still standing on the town they started from.
+    for _ in range(4):
         page.keyboard.press("ArrowDown")
+        if page.is_visible("#fight"):
+            page.click("#run")
+            page.wait_for_selector("#fight", state="hidden", timeout=8000)
         dismiss_card(page)
     y = int(page.text_content("#coords").split(",")[1])
     if y > 18:
         fails.append(f"{name}: walked to row {y}, which is off the map or into rock")
 
+    # --- the town: buy something, and pack it ---------------------------------
+    # The starting tile is a town, so leaving it and coming back opens the shop.
+    # Stepping off can start a fight, which has to be walked away from before
+    # the next keypress lands — and each retry moves the player another tile, so
+    # the way back is "west until the town opens" rather than a fixed count.
+    def step_out(key):
+        page.keyboard.press(key)
+        if page.is_visible("#fight"):
+            page.click("#run")
+            page.wait_for_selector("#fight", state="hidden", timeout=8000)
+        dismiss_card(page)
+
+    step_out("ArrowRight")
+    for _ in range(12):
+        if page.is_visible("#town"):
+            break
+        step_out("ArrowLeft")
+
+    if not page.is_visible("#town"):
+        fails.append(f"{name}: stepping back onto the starting town opened no town")
+    else:
+        purse = int(page.text_content("#town-gold"))
+        wares = page.locator(".wares:not(:disabled)")
+        if wares.count() == 0:
+            fails.append(f"{name}: nothing on the shelf is affordable with {purse} Fnorp")
+        else:
+            wares.first.click()
+            after = int(page.text_content("#town-gold"))
+            if after >= purse:
+                fails.append(f"{name}: buying cost nothing ({purse} -> {after})")
+        page.click("#pack")
+        page.wait_for_selector("#fight", state="visible", timeout=8000)
+        page.click("#preset")
+        made = page.text_content("#fight-yours")
+        if made in (None, "", "0", "—"):
+            fails.append(f"{name}: auto-packing the starting kit assembled {made}")
+        check_fit_preview(page, name, fails)
+        page.click("#run")
+        page.wait_for_selector("#fight", state="hidden", timeout=8000)
+
+    # --- a fight -------------------------------------------------------------
+    if not walk_until_a_fight(page):
+        fails.append(f"{name}: never met anything in 200 steps")
+    else:
+        creature = page.text_content("#fight-name")
+        if not creature or creature == "—":
+            fails.append(f"{name}: a fight opened against nothing")
+        # A save taken here has to reopen the same fight.
+        with page.expect_download(timeout=20000) as dl:
+            page.click("#fight-save")
+        mid = dl.value.path()
+        if '"encounter"' not in Path(mid).read_text():
+            fails.append(f"{name}: a save taken mid-fight does not carry the encounter")
+
+        page.click("#go")
+        page.wait_for_selector("#stage-replay", state="visible", timeout=10000)
+        page.click("#skip")
+        page.wait_for_selector("#stage-result", state="visible", timeout=15000)
+        receipt = page.locator("#result-receipt p").all_text_contents()
+        if not receipt:
+            fails.append(f"{name}: the fight settled with an empty receipt")
+        page.click("#done")
+        page.wait_for_selector("#fight", state="hidden", timeout=8000)
+
+        # And the mid-fight save reopens into the fight, not onto the map.
+        page.set_input_files("#file", str(mid))
+        page.wait_for_selector("#fight", state="visible", timeout=10000)
+        if page.text_content("#fight-name") != creature:
+            fails.append(f"{name}: the reopened fight is against "
+                         f"{page.text_content('#fight-name')}, not {creature}")
+        page.click("#run")
+        page.wait_for_selector("#fight", state="hidden", timeout=8000)
+
     gold_before = page.text_content("#gold")
-    rng_before = page.text_content("#rng") if page.query_selector("#rng") else None
     pos_before = page.text_content("#coords")
     walked_before = page.text_content("#walked")
 
@@ -193,7 +315,10 @@ def main():
     if fails:
         print("\n".join(f"FAIL: {f}" for f in fails))
         sys.exit(1)
-    print("ok: change, download, reload, upload — the number and the stream both came back")
+    print("ok: town, shop, pack, walk, fight, replay, receipt — the whole loop")
+    print("ok: the fit preview is core's answer, not the page's")
+    print("ok: a mid-fight save reopens the same fight")
+    print("ok: walk, download, reload, upload — position and stream both came back")
     print("ok: a wrong file was refused with a sentence and changed nothing")
     print("ok: no console errors, no off-origin requests")
 

@@ -150,6 +150,34 @@ impl Character {
         c
     }
 
+    /// What a Sprocketman climbs out of the pit with.
+    ///
+    /// Scrap, and not much of it: two grips, an edge, a plate, a base and a
+    /// mold. Enough to assemble one weapon badly and cover one other slot,
+    /// which is the position the frame story puts you in and the position a
+    /// shop is only interesting from. `with_all_pieces` owns the whole
+    /// catalogue and is a test fixture, not a starting point.
+    pub fn starting() -> Self {
+        let mut c = Self::new();
+        c.gold = crate::shop::STARTING_GOLD;
+        for name in [
+            "Oak Handle", "Balanced Grip", "Iron Blade", "Serrated Edge",
+            "Steel Frame", "Iron Plating", "Padded Base", "Leather Material",
+            "Gripping Mold", "Boiled Leather", "Runner\'s Mold",
+        ] {
+            c.give(name);
+        }
+        c.forget_undo();
+        c
+    }
+
+    /// [`Character::starting`], with the name seed set.
+    pub fn starting_seeded(name_seed: u64) -> Self {
+        let mut c = Self::starting();
+        c.loadout.name_seed = name_seed;
+        c
+    }
+
     // ------------------------------------------------------------ the bag
 
     /// Everything owned that is not currently on a grid.
@@ -559,8 +587,12 @@ impl Character {
     /// Inlay beside it, and the Hollow Weave sits in open space where its
     /// empty-cell bonus counts.
     ///
-    /// Seats what it can and skips what it cannot, so a character who does not
-    /// own the whole preset gets the part of it they can wear.
+    /// **Seats only what is owned.** An earlier version handed out any missing
+    /// component, which made the auto-build button a way to get the whole
+    /// preset for nothing and made the shop pointless. A character who owns
+    /// scrap gets their scrap arranged well; a character who owns everything —
+    /// `with_all_pieces`, which is what the tests use — gets the whole preset,
+    /// so nothing about the fixtures changed.
     pub fn apply_preset(&mut self) {
         const PRESET: &[(&str, SlotKind, u8, u8, u8)] = &[
     ("Steel Frame", SlotKind::Helmet, 0, 0, 0),
@@ -590,13 +622,7 @@ impl Character {
             self.loadout.slot_mut(k).clear();
         }
         for &(name, kind, ax, ay, rot) in PRESET {
-            let id = match self.find_by_name(name) {
-                Some(id) => id,
-                None => match self.give(name) {
-                    Some(id) => id,
-                    None => continue,
-                },
-            };
+            let Some(id) = self.find_by_name(name) else { continue };
             self.registry.set_rotation(id, rot);
             self.loadout.remove_anywhere(id);
             if self.loadout.can_place(&self.registry, id, kind, ax, ay).is_ok() {

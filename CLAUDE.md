@@ -9,16 +9,15 @@ from `sgilson7/gear-master`. `PLANNING-BRIEF.md` is the brief; `PLAN.md` is the
 plan and **wins where the two disagree**; `TONE.md` governs every string a
 player reads.
 
-**Milestone: M2 complete. Deploy gate 3 is live** at
-<https://sgilson7.github.io/gear-master-2d/> — walk a 20×20 map, hit events,
-have encounters roll, and save/load the whole thing mid-journey. M3 has not
+**Milestone: M3 complete. Deploy gate 4 is live** at
+<https://sgilson7.github.io/gear-master-2d/> — the whole loop: walk, get
+stopped, pack your frames, watch the fight, take the receipt. M4 has not
 started.
 
-**Carried into M3:** the plan listed a shop and a rest point among M2's
-deliverables and they are not here. A shop with nothing to spend on and a rest
-with nothing to rest from would have been two screens built against a fight
-that does not exist yet; they are M3's, alongside the fight. The towns exist,
-are reached, are remembered as `last_town`, and say so.
+**No rest point, and there should not be one.** M2 carried it forward; M3 is
+where it turns out to be nothing. Combat health resets every fight, so a rest
+would restore something that was never spent. If M4 gives damage a way to
+persist between fights, the town is where the rest goes.
 
 ## Rules
 
@@ -121,6 +120,21 @@ weapon pieces came back as one item.
   encounter chance in JavaScript for the debug overlay, which put the formula
   in two languages with only one of them tested.
 
+## The fight
+
+- **Combat has no RNG**, which is why a mid-fight save carries a creature name
+  and a tile and nothing else. `PLAN.md` §6 proposed storing the pre-fight state
+  and the seed; the engine made both unnecessary.
+- **The page decides nothing about the board.** The green fit preview *is*
+  `legal_anchors` rendered. `testing/drive.py` picks a piece up and compares
+  what the board painted against what core returned, so a page that started
+  computing its own answer would be caught rather than trusted.
+- **The auto-pack button seats only what you own.** It briefly handed out any
+  missing component, which made it a supply of free gear and the shop
+  pointless.
+- **A loss pays nothing and walks you home.** Visible in play now, not just in
+  `reward.rs`.
+
 ## Inherited on purpose — do not "simplify"
 
 No RNG in combat. 50 ms ticks. Monsters are loadouts wearing catalogue pieces.
@@ -157,12 +171,15 @@ and M5's trees may spend them again.
 | After the simulation tests were ported to `Character` | 329 passing |
 | M1 | 346 passing |
 | M2 | 359 passing |
+| M3 | 369 passing |
 | Catalogue | 523 components |
 | Ladder | 50 creatures |
 | `crates/core` | ~33k lines, down from ~50k |
 | wasm | 502 KB |
 | Save format | v1 |
 | Map | 20×20, 5 regions, 3 towns, 6 events |
+| Bestiary | 50 creatures, rated 16 to 2958 |
+| Starting kit | 11 components, 28 Fnorp |
 
 Note the catalogue is **523**, not the 374 the retheme document counts — it
 grew upstream after that document was written. Any content work that quotes a

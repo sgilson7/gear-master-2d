@@ -4,10 +4,15 @@
 // of the boundary — a page that works any of those out for itself is a second
 // copy of the rules that will disagree with the first.
 import init, {
-  world_json, position, try_step, event_json, answer, to_last_town,
+  world_json, position, try_step, event_json, answer,
   save_json, load_json, new_game, apply_preset,
+  shop_json, buy, reroll, pin,
   gold, piece_count, version, save_version,
+  board_json, legal_anchors, place, pick_up, rotate, toggle_lock, undo, clear_board,
+  encounter_json, fight_json, settle_fight, flee,
 } from './pkg/gm2d_wasm.js';
+import { Board } from './board.js';
+import { Replay } from './replay.js';
 
 const $ = (id) => document.getElementById(id);
 const TILE = 32;
@@ -16,7 +21,6 @@ const AUTOSAVE = 'gm2d.autosave';
 let world = null;
 let debug = false;
 let blocked = null;   // the last refusal, drawn for one frame
-let lastFight = null; // the creature met on the last step
 
 // Terrain colours, in the palette the rest of the page uses. Two per terrain:
 // the fill, and a slightly shifted second used to break up large expanses so a
@@ -221,38 +225,123 @@ function openEvent(id) {
   });
 }
 
-// M3 replaces this with the board and the fight. For now it says what would
-// happen and who it would happen to, which is what gate 3 asks for.
-function openFight(m) {
-  lastFight = m;
-  showCard(m.name, [
-    m.note ? m.note : 'It has seen you.',
-    `A fight would happen here. It rates ${m.rating} on the shared scale, which is what the region's danger is the mean of.`,
-    'The gear board and the fight itself are M3.',
-  ], [], () => {});
-  $('card-close').hidden = false;
+// ---------------------------------------------------------------- the fight
+
+let board = null;
+let replay = null;
+
+function stage(which) {
+  for (const s of ['board', 'replay', 'result']) $(`stage-${s}`).hidden = s !== which;
 }
+
+function openFight() {
+  const m = JSON.parse(encounter_json());
+  if (!m) return;
+  $('fight-rank').textContent = m.rank === 'ordinary' ? 'an encounter' : m.rank;
+  $('fight-name').textContent = m.name;
+  $('fight-note').textContent = m.note ?? '';
+  $('fight-rating').textContent = m.rating;
+  $('fight-bounty').textContent = m.bounty;
+  $('fight').hidden = false;
+  stage('board');
+  board.refresh();
+}
+
+function closeFight() {
+  $('fight').hidden = true;
+  paintPanel(); draw(); autosave();
+  $('map').focus();
+}
+
+function runFight() {
+  const log = JSON.parse(fight_json());
+  if (log.error) { boardSays(log.error); return; }
+  stage('replay');
+  replay.load(log);
+  replay.onend = () => {
+    const s = JSON.parse(settle_fight());
+    stage('result');
+    $('result-title').textContent =
+      s.outcome === 'victory' ? 'It stops moving' : 'You stop moving';
+    $('result-receipt').replaceChildren(...s.receipt.map((line) => {
+      const p = document.createElement('p'); p.textContent = line; return p;
+    }));
+    autosave();
+  };
+  replay.play();
+}
+
+function boardSays(text) {
+  const el = $('board-says');
+  el.textContent = text;
+  el.hidden = !text;
+  el.classList.add('bad');
+  clearTimeout(boardSays.t);
+  boardSays.t = setTimeout(() => { el.hidden = true; }, 2600);
+}
+
+// ---------------------------------------------------------------- the town
 
 function openTown(id) {
   const place = world.places.find((p) => p.id === id);
-  showCard(place?.name ?? id, [
-    'Nothing follows you in here, and nothing rolls while you stand in it.',
-    'A shop and a rest point are M3, when there is something to spend Fnorp on and something to rest from.',
-  ], [], () => {});
-  $('card-close').hidden = false;
+  $('town-name').textContent = place?.name ?? id;
+  paintShelf();
+  $('town').hidden = false;
+}
+
+function paintShelf() {
+  const s = JSON.parse(shop_json());
+  $('town-gold').textContent = s.gold;
+  const box = $('shelf');
+  box.replaceChildren();
+  if (!s.shelf.length) {
+    const p = document.createElement('p');
+    p.className = 'note';
+    p.textContent = 'Bare. Turn it over.';
+    box.appendChild(p);
+    return;
+  }
+  for (const w of s.shelf) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'wares' + (w.locked ? ' pinned' : '');
+    b.disabled = !w.afford;
+    b.innerHTML = `<b>${w.name}</b>` +
+      `<span class="meta">${w.for} · ${w.kind.toLowerCase()} · rates ${w.rating}</span>` +
+      `<span class="cost">${w.price} Fnorp${w.locked ? ' · pinned' : ''}</span>`;
+    b.onclick = (e) => {
+      if (e.shiftKey) { pin(w.slot); paintShelf(); return; }
+      const why = buy(w.slot);
+      townSays(why || `Bought ${w.name}.`, !!why);
+      paintShelf(); paintPanel(); autosave();
+    };
+    box.appendChild(b);
+  }
+}
+
+function townSays(text, bad = false) {
+  const el = $('town-says');
+  el.textContent = text; el.hidden = !text;
+  el.classList.toggle('bad', bad);
+}
+
+function closeTown() {
+  $('town').hidden = true;
+  paintPanel(); draw(); autosave();
+  $('map').focus();
 }
 
 // ---------------------------------------------------------------- walking
 
 function walk(dir) {
-  if (!$('card').hidden) return;
+  if (!$('card').hidden || !$('fight').hidden || !$('town').hidden) return;
   const r = JSON.parse(try_step(dir));
   blocked = r.moved ? null : r.blocked;
   paintPanel(); draw(); autosave();
   if (blocked) setTimeout(() => { blocked = null; draw(); }, 1100);
   if (r.town) openTown(r.town);
   else if (r.event) openEvent(r.event);
-  else if (r.encounter) openFight(r.encounter);
+  else if (r.encounter) openFight();
 }
 
 const KEYS = {
@@ -289,9 +378,17 @@ async function main() {
     const saved = localStorage.getItem(AUTOSAVE);
     if (saved) { load_json(saved); restored = true; }
   } catch { localStorage.removeItem(AUTOSAVE); }
-  if (!restored) { new_game(Date.now()); apply_preset(); }
+  if (!restored) new_game(Date.now());
 
   addEventListener('keydown', (e) => {
+    if (!$('fight').hidden) {
+      if (e.key === 'r' || e.key === 'R') { e.preventDefault(); board.rotateHeld(); }
+      return;
+    }
+    if (!$('town').hidden) {
+      if (e.key === 'Escape') closeTown();
+      return;
+    }
     if (e.key === 'Escape' && !$('card').hidden) { closeCard(); return; }
     // `d` is east on WASD, so the overlay gets its own key and a button.
     if (e.key === '`') { e.preventDefault(); toggleDebug(); return; }
@@ -300,6 +397,64 @@ async function main() {
   });
 
   $('numbers').onclick = toggleDebug;
+
+  board = new Board($('board'), {
+    boardJson: board_json,
+    legalAnchors: legal_anchors,
+    place, pickUp: pick_up, rotate, toggleLock: toggle_lock,
+  });
+  board.onsay = boardSays;
+  board.onchange = (st) => {
+    const made = st.slots.reduce((n, s) => n + s.items.filter((i) => i.assembled).length, 0);
+    $('fight-yours').textContent = made;
+    $('undo').disabled = !st.undoable;
+  };
+  replay = new Replay($('replay'));
+  // Handles for testing/drive.py, which checks that what the board paints green
+  // is exactly what core said was legal. Two references rather than one, so the
+  // check compares the page's answer against core's rather than against itself.
+  window.__board = board;
+  window.__legalAnchors = legal_anchors;
+
+  $('reroll').onclick = () => { const why = reroll(); townSays(why, !!why); paintShelf(); };
+  $('leave').onclick = closeTown;
+  // Packing in town: the same board, with the fight buttons swapped for a way
+  // back out. A player who cannot re-pack between fights is a player who
+  // bought a component they cannot use.
+  $('pack').onclick = () => {
+    $('town').hidden = true;
+    $('fight-rank').textContent = 'in town';
+    $('fight-name').textContent = 'Your frames';
+    $('fight-note').textContent = 'Nothing is waiting. Pack, then go back out.';
+    $('fight-rating').textContent = '—';
+    $('fight-bounty').textContent = '—';
+    $('go').hidden = true;
+    $('run').textContent = 'Done';
+    $('fight').hidden = false;
+    stage('board');
+    board.refresh();
+  };
+
+  // A player standing in front of a creature can save. The encounter is state,
+  // so the file they get reopens onto this fight rather than onto the map.
+  $('fight-save').onclick = () => {
+    const n = stamp();
+    download(n, save_json());
+    boardSays(`Saved ${n}.`);
+    $('board-says').classList.remove('bad');
+  };
+
+  $('go').onclick = runFight;
+  $('undo').onclick = () => { undo(); board.refresh(); };
+  $('preset').onclick = () => { apply_preset(); board.refresh(); };
+  $('clear').onclick = () => { clear_board(); board.refresh(); };
+  $('run').onclick = () => {
+    if ($('go').hidden) { $('go').hidden = false; $('run').textContent = 'Walk away'; }
+    else flee();
+    closeFight();
+  };
+  $('skip').onclick = () => replay.finish();
+  $('done').onclick = closeFight;
 
   $('card-close').onclick = closeCard;
   $('map').onclick = () => $('map').focus();
@@ -310,7 +465,7 @@ async function main() {
     says(`Saved ${name}.`);
   };
   $('reset').onclick = () => {
-    new_game(Date.now()); apply_preset();
+    new_game(Date.now());
     closeCard(); paintPanel(); draw(); autosave(); says('New game.');
   };
   $('file').onchange = async (e) => {
@@ -318,8 +473,10 @@ async function main() {
     if (!f) return;
     try {
       load_json(new TextDecoder().decode(await f.arrayBuffer()));
-      closeCard(); paintPanel(); draw(); autosave();
+      closeCard(); $('fight').hidden = true;
+      paintPanel(); draw(); autosave();
       says(`Loaded ${f.name}.`);
+      if (JSON.parse(encounter_json())) openFight();
     } catch (err) {
       says(String(err?.message ?? err), true);
     }
@@ -330,7 +487,9 @@ async function main() {
 
   paintPanel();
   draw();
-  $('map').focus();
+  // A save taken mid-fight comes back mid-fight. The creature is in the file,
+  // so there is one waiting whether or not this page has seen it before.
+  if (JSON.parse(encounter_json())) openFight(); else $('map').focus();
   $('status').textContent =
     `core: ${piece_count()} pieces · v${version()} · save v${save_version()}`;
 }

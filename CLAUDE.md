@@ -9,10 +9,16 @@ from `sgilson7/gear-master`. `PLANNING-BRIEF.md` is the brief; `PLAN.md` is the
 plan and **wins where the two disagree**; `TONE.md` governs every string a
 player reads.
 
-**Milestone: M1 complete. Deploy gate 2 is live** at
-<https://sgilson7.github.io/gear-master-2d/> — change a number, download the
-save, reload, load it back, and both the number and the random stream's
-position come back. M2 has not started.
+**Milestone: M2 complete. Deploy gate 3 is live** at
+<https://sgilson7.github.io/gear-master-2d/> — walk a 20×20 map, hit events,
+have encounters roll, and save/load the whole thing mid-journey. M3 has not
+started.
+
+**Carried into M3:** the plan listed a shop and a rest point among M2's
+deliverables and they are not here. A shop with nothing to spend on and a rest
+with nothing to rest from would have been two screens built against a fight
+that does not exist yet; they are M3's, alongside the fight. The towns exist,
+are reached, are remembered as `last_town`, and say so.
 
 ## Rules
 
@@ -94,6 +100,27 @@ or two of full, so deriving items in a single pass at the end asks which pieces
 are connected and gets "most of them". `share.rs` learned this when nineteen
 weapon pieces came back as one item.
 
+## The world
+
+- **Danger is measured, not typed.** A region's danger is the mean of
+  `rating::creature_rating` over its enemy pool.
+  `tests/world.rs::no_data_file_types_a_danger_number` fails the build if a
+  number ever appears in a data file. Tuning the map means moving creatures
+  between pools; typing a number would be tuning the ruler.
+- **Every roll is integer per-mille.** A seeded walk has to produce the same
+  encounters in every browser, and float rounding is the one thing that breaks
+  that silently — the symptom would be a save that replays for the person who
+  wrote it and not for the person they sent it to.
+- **A blocked step draws nothing.** Bumping into a cliff must not advance the
+  stream, or a replay would depend on the player's mistakes rather than their
+  path.
+- **The map is never saved.** `WorldState` holds a position, an answered set
+  and flags. The grid is `data/tiles.json`, and content is not state — the
+  discipline is borrowed from upstream's `county.rs`.
+- **The page draws numbers core sent it.** An earlier draft recomputed the
+  encounter chance in JavaScript for the debug overlay, which put the formula
+  in two languages with only one of them tested.
+
 ## Inherited on purpose — do not "simplify"
 
 No RNG in combat. 50 ms ticks. Monsters are loadouts wearing catalogue pieces.
@@ -129,11 +156,13 @@ and M5's trees may spend them again.
 | After the campaign was cut | 128 passing |
 | After the simulation tests were ported to `Character` | 329 passing |
 | M1 | 346 passing |
+| M2 | 372 passing |
 | Catalogue | 523 components |
 | Ladder | 50 creatures |
 | `crates/core` | ~33k lines, down from ~50k |
 | wasm | 502 KB |
 | Save format | v1 |
+| Map | 20×20, 5 regions, 3 towns, 6 events |
 
 Note the catalogue is **523**, not the 374 the retheme document counts — it
 grew upstream after that document was written. Any content work that quotes a

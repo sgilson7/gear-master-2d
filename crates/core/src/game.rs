@@ -18,6 +18,7 @@
 
 use crate::character::Character;
 use crate::rng::Rng;
+use crate::world::WorldState;
 
 /// The whole of a session's state.
 #[derive(Clone, Debug)]
@@ -30,6 +31,9 @@ pub struct Game {
     /// live in `data/`; a save carries the id and nothing else.
     pub theme: String,
     pub character: Character,
+    /// Where you are standing and what you have answered. **Not the map** —
+    /// the map is `data/tiles.json` and is derived, never stored.
+    pub world: WorldState,
 }
 
 impl Game {
@@ -43,7 +47,22 @@ impl Game {
             rng: Rng::new(seed),
             theme: theme.to_string(),
             character: Character::seeded(seed),
+            // Left at the default rather than reading the map: `Game` must not
+            // depend on content loading, or a broken data file becomes a
+            // panic in every constructor. Whoever has a `World` places the
+            // player with `WorldState::at_start`.
+            world: WorldState::default(),
         }
+    }
+}
+
+impl Game {
+    /// A creature's name in the theme that is talking.
+    ///
+    /// Falls through to the canonical name, like every other theme lookup, so
+    /// an unthemed creature is one untranslated word rather than a crash.
+    pub fn theme_name(&self, canonical: &'static str) -> String {
+        crate::theme::by_id(&self.theme).monster(canonical).to_string()
     }
 }
 
@@ -76,6 +95,7 @@ impl PartialEq for Game {
             && a.loadout.assembly_pct == b.loadout.assembly_pct
             && a.loadout.slots == b.loadout.slots
             && a.registry == b.registry
+            && self.world == other.world
     }
 }
 

@@ -1473,3 +1473,52 @@ mod calib {
         }
     }
 }
+
+/// What a creature is worth on the shared scale.
+///
+/// **This is what "danger" is made of**, and it lives here rather than in
+/// `world.rs` for one reason: `world` must not be allowed to invent a number.
+/// A region's danger is the mean of this over its enemy pool, so if this were
+/// a formula typed somewhere else, the map's difficulty gradient would be an
+/// opinion rather than a measurement, and tuning it would mean tuning a ruler.
+///
+/// Two parts, both weighed on the scale the rest of this file uses:
+///
+/// 1. **Its gear**, assembled the way the player's is and rated item by item.
+///    This is most of what makes a creature hard — the engine's own rule is
+///    that to make a monster harder you give it better equipment.
+/// 2. **Its body**, which no `ItemProfile` covers. A rat wears nothing and is
+///    still not free, so innate health, strength, regen, resistances and the
+///    damage of its own attacks are weighed with the same constants.
+///
+/// Difficulty is a parameter because a creature's gear steps up and down with
+/// it, so "how dangerous is this region" has no answer until somebody says at
+/// what setting.
+pub fn creature_rating(spec: &crate::combat::MonsterSpec, difficulty: crate::combat::Difficulty) -> i32 {
+    let (reg, lo) = spec.loadout_at(difficulty);
+    let geared: i32 = lo.combat_items(&reg).iter().map(|i| i.rating).sum();
+
+    // The body, on the same scale. Resistances are weighed as resistances
+    // rather than as flat stats because that is what they are.
+    let mut body = spec.health as f32 * weight::HEALTH
+        + spec.strength as f32 * weight::STRENGTH
+        + spec.regen as f32 * weight::REGEN
+        + spec.mind_resist as f32 * weight::MIND_RESIST
+        + spec.curse_resist as f32 * weight::CURSE_RESIST
+        + (spec.physical_resist + spec.magic_resist) as f32 * weight::RESIST;
+
+    // An innate attack is a weapon the creature does not have to wear. Rated
+    // at the cadence it actually runs at, so a fast shiv and a slow club are
+    // comparable, which is the same thing `piece_rating_at` does for gear.
+    for a in spec.attacks {
+        let per_second = if a.cooldown_ms == 0 {
+            0.0
+        } else {
+            1000.0 / a.cooldown_ms as f32
+        };
+        body += (a.damage + a.mind) as f32 * per_second * weight::DAMAGE_PS / 10.0
+            + a.armor as f32 * weight::ARMOR_PS / 10.0;
+    }
+
+    (geared as f32 + body).round().max(0.0) as i32
+}

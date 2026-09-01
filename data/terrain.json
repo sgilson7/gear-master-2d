@@ -1,0 +1,15 @@
+{
+  "format": "gm2d-terrain",
+  "version": 1,
+  "terrain": {
+    "road":   { "glyph": "=", "passable": true,  "cost": 1, "encounter_per_mille": 30 },
+    "grass":  { "glyph": ".", "passable": true,  "cost": 1, "encounter_per_mille": 90 },
+    "scrub":  { "glyph": ",", "passable": true,  "cost": 1, "encounter_per_mille": 140 },
+    "wood":   { "glyph": "T", "passable": true,  "cost": 2, "encounter_per_mille": 200 },
+    "slag":   { "glyph": "%", "passable": true,  "cost": 2, "encounter_per_mille": 260 },
+    "cork":   { "glyph": "o", "passable": true,  "cost": 2, "encounter_per_mille": 180 },
+    "town":   { "glyph": "#", "passable": true,  "cost": 1, "encounter_per_mille": 0 },
+    "rock":   { "glyph": "^", "passable": false, "cost": 0, "encounter_per_mille": 0 },
+    "water":  { "glyph": "~", "passable": false, "cost": 0, "encounter_per_mille": 0 }
+  }
+}

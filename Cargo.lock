@@ -27,6 +27,7 @@ name = "gm2d-wasm"
 version = "0.1.0"
 dependencies = [
  "gm2d-core",
+ "serde_json",
  "wasm-bindgen",
 ]
 

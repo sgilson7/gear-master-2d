@@ -1,0 +1,197 @@
+{
+  "format": "gm2d-tiles",
+  "version": 1,
+  "width": 20,
+  "height": 20,
+  "start": [
+    1,
+    18
+  ],
+  "rows": [
+    "^^^^^^^^^^^^^^^^^^^^",
+    "^%%%%,,..TTTT..,,,,^",
+    "^%%%,,...TTT...,,o,^",
+    "^%%,,,..=====..,ooo^",
+    "^%,,...==...==..,oo^",
+    "^,,...==.TT..==..,o^",
+    "^,..==..TTTT..==..,^",
+    "^..==..#TTT....==..^",
+    "^.==...........,==.^",
+    "^==....~~~~....,,==^",
+    "^=....~~~~~~....,,=^",
+    "^=...~~~~~~~~....,=^",
+    "^==...~~~~~~....,==^",
+    "^,==...~~~~....,==,^",
+    "^,,==.........,==,,^",
+    "^,,,====....===,,,,^",
+    "^%,,,,,====#=,,,,,,^",
+    "^%%,,,,,,=,,,,,,,,,^",
+    "^#%%%,,,,=,,,,,,,,,^",
+    "^^^^^^^^^^^^^^^^^^^^"
+  ],
+  "regions": [
+    {
+      "id": "the-end-of-all-gears",
+      "name": "The End of All Gears",
+      "bounds": [
+        [
+          1,
+          16,
+          19,
+          18
+        ]
+      ],
+      "enemies": [
+        "Cave Rat",
+        "Bog Toad",
+        "Bone Archer"
+      ]
+    },
+    {
+      "id": "the-slag-flats",
+      "name": "The Slag Flats",
+      "bounds": [
+        [
+          1,
+          13,
+          19,
+          15
+        ]
+      ],
+      "enemies": [
+        "Rust Golem",
+        "Frost Wisp",
+        "Plague Hound"
+      ]
+    },
+    {
+      "id": "the-burnwarp-shallows",
+      "name": "The Burnwarp Shallows",
+      "bounds": [
+        [
+          1,
+          8,
+          19,
+          12
+        ]
+      ],
+      "enemies": [
+        "The Iron Warden",
+        "Iron Sentinel",
+        "Whisperling"
+      ]
+    },
+    {
+      "id": "the-bengulon-verge",
+      "name": "The Bengulon Verge",
+      "bounds": [
+        [
+          1,
+          4,
+          19,
+          7
+        ]
+      ],
+      "enemies": [
+        "Warded Idol",
+        "Mirror Fiend",
+        "Rust Colossus",
+        "Ashen Marshal"
+      ]
+    },
+    {
+      "id": "west-bambulon",
+      "name": "West Bambulon",
+      "bounds": [
+        [
+          1,
+          1,
+          19,
+          3
+        ]
+      ],
+      "enemies": [
+        "Grave Chorus",
+        "The Hollow King",
+        "Salt Idol"
+      ]
+    }
+  ],
+  "places": [
+    {
+      "at": [
+        1,
+        18
+      ],
+      "kind": "town",
+      "id": "the-end-of-all-gears",
+      "name": "The End of All Gears"
+    },
+    {
+      "at": [
+        11,
+        16
+      ],
+      "kind": "town",
+      "id": "kettleworks",
+      "name": "Kettleworks"
+    },
+    {
+      "at": [
+        7,
+        7
+      ],
+      "kind": "town",
+      "id": "high-wick",
+      "name": "High Wick"
+    },
+    {
+      "at": [
+        9,
+        17
+      ],
+      "kind": "event",
+      "id": "the-cork-boundary"
+    },
+    {
+      "at": [
+        16,
+        14
+      ],
+      "kind": "event",
+      "id": "the-counted-heap"
+    },
+    {
+      "at": [
+        4,
+        12
+      ],
+      "kind": "event",
+      "id": "the-shallows-marker"
+    },
+    {
+      "at": [
+        17,
+        9
+      ],
+      "kind": "event",
+      "id": "the-standing-frame"
+    },
+    {
+      "at": [
+        12,
+        5
+      ],
+      "kind": "event",
+      "id": "the-toad-census"
+    },
+    {
+      "at": [
+        17,
+        2
+      ],
+      "kind": "event",
+      "id": "the-gate-that-was-yours"
+    }
+  ]
+}

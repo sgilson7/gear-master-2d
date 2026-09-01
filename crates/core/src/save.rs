@@ -126,6 +126,11 @@ pub struct SaveState {
     pub rng_state: u64,
     pub theme: String,
     pub character: CharacterSave,
+    /// Where you are standing and what you have answered. The map itself is
+    /// never here: it is `data/tiles.json`, it does not change, and a save that
+    /// carried a copy would be a save that could disagree with the game.
+    #[serde(default)]
+    pub world: crate::world::WorldState,
 }
 
 // ---------------------------------------------------------------- writing
@@ -160,7 +165,7 @@ impl SaveFile {
     /// point of them: a new field on any of these types stops this function
     /// compiling.
     pub fn of(game: &Game) -> Self {
-        let Game { rng, theme, character } = game;
+        let Game { rng, theme, character, world } = game;
         let Character { registry, owned, loadout, gold, grown_health, undo_stack: _ } = character;
         let Loadout { slots, locks, name_seed, naming: _, assembly_pct } = loadout;
 
@@ -208,6 +213,7 @@ impl SaveFile {
             state: SaveState {
                 rng_state: rng.state(),
                 theme: theme.clone(),
+                world: world.clone(),
                 character: CharacterSave {
                     gold: *gold,
                     grown_health: *grown_health,
@@ -317,7 +323,7 @@ impl SaveFile {
     pub fn into_game(self) -> Result<Game, String> {
         let SaveFile { format: _, version, catalog: _, state } = self;
         let state = migrate(version, state)?;
-        let SaveState { rng_state, theme, character } = state;
+        let SaveState { rng_state, theme, character, world } = state;
         let CharacterSave {
             gold,
             grown_health,
@@ -393,7 +399,7 @@ impl SaveFile {
         character.gold = gold;
         character.grown_health = grown_health;
 
-        let mut game = Game { rng: Rng::from_state(rng_state), theme, character };
+        let mut game = Game { rng: Rng::from_state(rng_state), theme, character, world };
         // The one pointer the file could not carry, put back from the id it
         // carried instead.
         game.character.loadout.naming = crate::theme::by_id(&game.theme).naming;

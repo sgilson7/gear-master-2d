@@ -1,0 +1,182 @@
+{
+  "format": "gm2d-events",
+  "version": 1,
+  "events": [
+    {
+      "id": "the-cork-boundary",
+      "title": "THE CORK BOUNDARY",
+      "prose": [
+        "The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attending to it, and it is four feet thick now and going west at the rate of a hand a year.",
+        "A man is cutting a doorway through it with a bread knife. He has a system: four strokes down, four across, and a pause to let the cut close a little before he widens it again.",
+        "\"Ninth one,\" he says, without looking up. \"They close.\""
+      ],
+      "choices": [
+        {
+          "label": "Take a strip",
+          "blurb": "It comes away like bark and starts back while you are holding it.",
+          "requires": "none",
+          "outcome": { "all": [{ "flag": "has-cork" }, { "xp": 6 }] },
+          "unmet": ""
+        },
+        {
+          "label": "Buy the knife",
+          "blurb": "Forty Fnorp. He says he has nine more and you believe him.",
+          "requires": { "gold": 40 },
+          "outcome": { "all": [{ "gold": -40 }, { "give": "Serrated Edge" }] },
+          "unmet": "Forty Fnorp, and you have not got it."
+        },
+        {
+          "label": "Cut the tenth with him",
+          "blurb": "Four down, four across, and a pause. It takes most of an afternoon.",
+          "requires": "none",
+          "outcome": { "all": [{ "flag": "cut-the-tenth" }, { "xp": 14 }] },
+          "unmet": ""
+        }
+      ]
+    },
+
+    {
+      "id": "the-counted-heap",
+      "title": "THE COUNTED HEAP",
+      "prose": [
+        "Somebody has stacked eleven thousand two hundred gear-teeth in a cone on the slag, sorted by pitch, and written the number on a board leaning against it.",
+        "The board also says WAS 11,204 and has WAS 11,204 crossed out four times, each time with a smaller number under it, and the smallest is the one that is not crossed out.",
+        "Nobody is here. The teeth are yours by any reading of it, and the board is watching the way a board does."
+      ],
+      "choices": [
+        {
+          "label": "Take four",
+          "blurb": "The number on the board becomes wrong by four, which is what the crossings-out are.",
+          "requires": "none",
+          "outcome": { "all": [{ "gold": 25 }, { "flag": "took-from-the-heap" }, { "xp": 8 }] },
+          "unmet": ""
+        },
+        {
+          "label": "Correct the board",
+          "blurb": "Cross out the number, write 11,200, and leave the teeth where they are.",
+          "requires": "none",
+          "outcome": { "all": [{ "flag": "corrected-the-heap" }, { "xp": 18 }] },
+          "unmet": ""
+        }
+      ]
+    },
+
+    {
+      "id": "the-shallows-marker",
+      "title": "THE SHALLOWS MARKER",
+      "prose": [
+        "A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed through. The sixth is blank and the cut beside it is fresh.",
+        "The Burnwarp does not have tides. It has a level, and the level is a decision somebody upstream makes on a Tuesday.",
+        "A Sprocketman could read this post as a warning or as a timetable. It is both, and it is not signed."
+      ],
+      "choices": [
+        {
+          "label": "Cut your name at the sixth",
+          "blurb": "Then the post has six names and five of them are crossed through.",
+          "requires": "none",
+          "outcome": { "all": [{ "flag": "named-on-the-post" }, { "xp": 12 }] },
+          "unmet": ""
+        },
+        {
+          "label": "Read the five and go",
+          "blurb": "Two of them are Sprocketman names. You did not know either of them.",
+          "requires": "none",
+          "outcome": { "all": [{ "flag": "read-the-post" }, { "xp": 20 }] },
+          "unmet": ""
+        }
+      ]
+    },
+
+    {
+      "id": "the-standing-frame",
+      "title": "THE STANDING FRAME",
+      "prose": [
+        "A gear-frame, upright in the shallows, empty. Chest height. It has been standing here long enough that the water has taken the finish off the bottom eight inches and gone no further, which puts it at about thirty years.",
+        "It is a Sprocketman frame. The bracket pattern is the one your people cut, and whoever wore it took every piece out of it before they left and put the frame back on its feet.",
+        "That last part is the part worth standing here about."
+      ],
+      "choices": [
+        {
+          "label": "Take the frame",
+          "blurb": "It is a frame. You have five. This would be a sixth thing to carry and not a sixth frame.",
+          "requires": "none",
+          "outcome": { "all": [{ "gold": 60 }, { "flag": "took-the-frame" }, { "xp": 10 }] },
+          "unmet": ""
+        },
+        {
+          "label": "Leave it standing",
+          "blurb": "Whoever set it up did the same arithmetic and reached the same answer.",
+          "requires": "none",
+          "outcome": { "all": [{ "flag": "left-it-standing" }, { "xp": 26 }] },
+          "unmet": ""
+        },
+        {
+          "label": "Fit your cork to it",
+          "blurb": "A strip of cork, wedged where the water sits. It buys the frame another thirty years.",
+          "requires": { "flag": "has-cork" },
+          "outcome": { "all": [{ "flag": "corked-the-frame" }, { "xp": 34 }] },
+          "unmet": "You would need cork, and the fence is four days behind you."
+        }
+      ]
+    },
+
+    {
+      "id": "the-toad-census",
+      "title": "THE TOAD CENSUS",
+      "prose": [
+        "A woman with a clipboard is standing in the verge counting Bengulon jungle toads. She has counted four hundred and six. She has been counting since the eleventh.",
+        "\"They are not from here,\" she says. \"Bengulon is nine planes over. Somebody brought forty and did not stay to see what forty does.\"",
+        "One of them goes past your boot. She marks it. Four hundred and seven."
+      ],
+      "choices": [
+        {
+          "label": "Count the west side for her",
+          "blurb": "Two hours. You reach two hundred and eleven and stop trusting yourself at about a hundred and forty.",
+          "requires": "none",
+          "outcome": { "all": [{ "gold": 30 }, { "flag": "counted-toads" }, { "xp": 22 }] },
+          "unmet": ""
+        },
+        {
+          "label": "Ask who brought forty",
+          "blurb": "She has an answer and it is not the one you want, but it is a name.",
+          "requires": "none",
+          "outcome": { "all": [{ "flag": "knows-who-brought-them" }, { "xp": 16 }] },
+          "unmet": ""
+        }
+      ]
+    },
+
+    {
+      "id": "the-gate-that-was-yours",
+      "title": "THE GATE THAT WAS YOURS",
+      "prose": [
+        "The Great Gear Cave has a gate on it now. Cork, over sneel, over the old bracket work, which is still there under both and still holds the hinges because nothing Henpeck's people brought would take the weight.",
+        "There is a notice. It says the workings below are producing, that the season has been a good one, and that the figure for the quarter is up nine per cent on the last.",
+        "It does not say on what. It has not said on what for six quarters."
+      ],
+      "choices": [
+        {
+          "label": "Read the six notices",
+          "blurb": "They are all still nailed up, one over another. The oldest one says what.",
+          "requires": "none",
+          "outcome": { "all": [{ "flag": "read-the-notices" }, { "xp": 40 }] },
+          "unmet": ""
+        },
+        {
+          "label": "Take the hinges",
+          "blurb": "Your people cut them. They will come off in your hands and the gate will not.",
+          "requires": "none",
+          "outcome": { "all": [{ "give": "Steel Frame" }, { "flag": "took-the-hinges" }, { "xp": 24 }] },
+          "unmet": ""
+        },
+        {
+          "label": "Pay the toll and walk in",
+          "blurb": "Two hundred Fnorp, at a gate onto ground that was yours.",
+          "requires": { "gold": 200 },
+          "outcome": { "all": [{ "gold": -200 }, { "flag": "paid-at-your-own-gate" }, { "xp": 60 }] },
+          "unmet": "Two hundred Fnorp. You have stood here before with less."
+        }
+      ]
+    }
+  ]
+}

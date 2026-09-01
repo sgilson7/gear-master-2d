@@ -7,13 +7,12 @@ URLs, whether `<a download>` actually produces a file, and whether
 
 The gate M1 has to pass is a sequence, not a state, so this walks it:
 
-    change a number -> download -> reload the page -> upload -> the number is back
+    walk somewhere -> download -> reload the page -> upload -> you are back there
 
-and it checks the harder half at the same time. The random stream's position
-has to survive too: a save that stored the seed instead of the position would
-restore the purse perfectly and then hand the player a draw they had already
-seen. So the walk takes a draw before saving, and asserts the *next* draw after
-loading is the one that would have come next.
+and it checks the harder half at the same time: the tiles walked, the purse and
+the events answered all have to cross the file together, because a save that
+restored the position and not the stream would put the player back on the same
+tile facing a different map.
 
 A console error or a request that leaves the origin fails the run, so "nothing
 is uploaded" is tested rather than asserted.
@@ -48,6 +47,16 @@ def serve():
     return httpd
 
 
+def dismiss_card(page):
+    """Close an event or encounter card if one opened, so the walk continues."""
+    if page.is_visible("#card"):
+        if page.is_visible("#card-choices button"):
+            page.click("#card-choices button")
+        page.wait_for_selector("#card-close", state="visible", timeout=5000)
+        page.click("#card-close")
+        page.wait_for_selector("#card", state="hidden", timeout=5000)
+
+
 def walk_the_gate(browser, name):
     """Returns a list of failures; empty means the gate is passed."""
     fails, problems, offsite = [], [], []
@@ -60,26 +69,41 @@ def walk_the_gate(browser, name):
             if not r.url.startswith(ORIGIN) else None)
 
     page.goto(ORIGIN + "/", wait_until="networkidle")
-    page.wait_for_function("document.getElementById('gold').textContent !== '…'", timeout=20000)
+    page.wait_for_function("document.getElementById('coords').textContent !== '—'", timeout=20000)
 
-    # The board has to be there, or the save has nothing interesting in it.
-    items = page.locator("#items tbody tr").count()
-    if items < 5:
-        fails.append(f"{name}: the preset assembled {items} items in the browser")
+    # The map has to be drawn, or nothing below is testing the world.
+    painted = page.evaluate(
+        "() => { const c = document.getElementById('map');"
+        " const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data;"
+        " let n = 0; for (let i = 3; i < d.length; i += 4) if (d[i] > 0) n++; return n; }")
+    if painted < 640 * 640 * 0.9:
+        fails.append(f"{name}: the canvas is {painted} opaque pixels of {640*640}")
 
-    # --- change a number -----------------------------------------------------
-    for _ in range(3):
-        page.click("#plus")
-    page.click("#roll")
+    # --- walk ----------------------------------------------------------------
+    # East along the bottom road, out of the pit. Twelve steps is enough to
+    # leave the starting town and cross an event tile or two.
+    start = page.text_content("#coords")
+    for _ in range(12):
+        page.keyboard.press("ArrowRight")
+        dismiss_card(page)
+    walked = page.text_content("#coords")
+    if walked == start:
+        fails.append(f"{name}: twelve steps east and the player is still at {start}")
+    if page.text_content("#walked") in (None, "0", "—"):
+        fails.append(f"{name}: the walk counter did not move")
+
+    # Into the map's edge, which must refuse rather than wrap.
+    for _ in range(30):
+        page.keyboard.press("ArrowDown")
+        dismiss_card(page)
+    y = int(page.text_content("#coords").split(",")[1])
+    if y > 18:
+        fails.append(f"{name}: walked to row {y}, which is off the map or into rock")
+
     gold_before = page.text_content("#gold")
-    draw_before = page.text_content("#draw")
-    rng_before = page.text_content("#rng")
-    names_before = page.locator("#items tbody tr td:first-child").all_text_contents()
-
-    if gold_before in (None, "0"):
-        fails.append(f"{name}: the purse did not move; it reads {gold_before!r}")
-    if draw_before in (None, "", "—"):
-        fails.append(f"{name}: the stream produced no draw")
+    rng_before = page.text_content("#rng") if page.query_selector("#rng") else None
+    pos_before = page.text_content("#coords")
+    walked_before = page.text_content("#walked")
 
     # --- download ------------------------------------------------------------
     with page.expect_download(timeout=20000) as dl:
@@ -97,28 +121,20 @@ def walk_the_gate(browser, name):
     # would prove that localStorage works rather than that the file does.
     page.evaluate("localStorage.clear()")
     page.reload(wait_until="networkidle")
-    page.wait_for_function("document.getElementById('gold').textContent !== '…'", timeout=20000)
-    if page.text_content("#gold") == gold_before:
-        fails.append(f"{name}: the purse survived a cleared reload, so the upload proves nothing")
+    page.wait_for_function("document.getElementById('coords').textContent !== '—'", timeout=20000)
+    dismiss_card(page)
+    if page.text_content("#coords") == pos_before:
+        fails.append(f"{name}: the position survived a cleared reload, so the upload proves nothing")
 
     # --- upload --------------------------------------------------------------
     page.set_input_files("#file", str(path))
     page.wait_for_function(
-        f"document.getElementById('gold').textContent === {gold_before!r}", timeout=20000)
-
-    if page.text_content("#rng") != rng_before:
-        fails.append(f"{name}: the stream position did not come back "
-                     f"({page.text_content('#rng')} vs {rng_before})")
-
-    names_after = page.locator("#items tbody tr td:first-child").all_text_contents()
-    if names_after != names_before:
-        fails.append(f"{name}: the board came back as different items\n"
-                     f"    before: {names_before}\n    after:  {names_after}")
-
-    # The next draw must be the one that would have come next, not a repeat.
-    page.click("#roll")
-    if page.text_content("#draw") == draw_before:
-        fails.append(f"{name}: the stream restarted — the next draw repeated {draw_before}")
+        f"document.getElementById('coords').textContent === {pos_before!r}", timeout=20000)
+    if page.text_content("#walked") != walked_before:
+        fails.append(f"{name}: the walk counter came back as "
+                     f"{page.text_content('#walked')}, not {walked_before}")
+    if page.text_content("#gold") != gold_before:
+        fails.append(f"{name}: the purse came back as {page.text_content('#gold')}")
 
     # --- a bad file is refused with a sentence -------------------------------
     junk = ROOT / "dist" / "not-a-save.json"
@@ -129,8 +145,14 @@ def walk_the_gate(browser, name):
     if "gm2d-save" not in (msg or ""):
         fails.append(f"{name}: a wrong file was refused with {msg!r}, which names nothing")
     junk.unlink()
-    if page.text_content("#gold") != gold_before:
-        fails.append(f"{name}: a refused file still changed the game")
+    if page.text_content("#coords") != pos_before:
+        fails.append(f"{name}: a refused file still moved the player")
+
+    # --- the numbers overlay -------------------------------------------------
+    page.click("#numbers")
+    if page.get_attribute("#numbers", "aria-pressed") != "true":
+        fails.append(f"{name}: the numbers overlay did not turn on")
+    page.click("#numbers")
 
     ctx.close()
     if problems:

@@ -12,14 +12,25 @@
 use std::cell::RefCell;
 use wasm_bindgen::prelude::*;
 
+use gm2d_core::combat::Difficulty;
 use gm2d_core::game::Game;
 use gm2d_core::save;
+use gm2d_core::world::{self, Dir, World, WorldState};
+
+const DIFFICULTY: Difficulty = Difficulty::Easy;
 
 // One game, because a page is one session. `RefCell` rather than a lock:
 // wasm32-unknown-unknown is single-threaded, and a mutex here would be
 // ceremony around a borrow that cannot be contended.
 thread_local! {
     static GAME: RefCell<Game> = RefCell::new(Game::default());
+    /// The map. Loaded once, never mutated, never saved — it is content, and
+    /// `WorldState` in the game is the only part of it that is state.
+    static WORLD: World = gm2d_core::data::world(DIFFICULTY);
+}
+
+fn map<T>(f: impl FnOnce(&World) -> T) -> T {
+    WORLD.with(f)
 }
 
 fn with<T>(f: impl FnOnce(&Game) -> T) -> T {
@@ -57,7 +68,12 @@ pub fn load_json(text: &str) -> Result<(), JsValue> {
 /// Start over from a seed.
 #[wasm_bindgen]
 pub fn new_game(seed: f64) -> () {
-    with_mut(|g| *g = Game::new(seed as u64, "td"));
+    with_mut(|g| {
+        *g = Game::new(seed as u64, "td");
+        // A new game starts where the map says, not at (0, 0) — which on this
+        // map is rock, and on any map is an assumption.
+        g.world = map(WorldState::at_start);
+    });
 }
 
 // ---------------------------------------------------------------- readings
@@ -146,4 +162,239 @@ pub fn version() -> String {
 #[wasm_bindgen]
 pub fn save_version() -> u32 {
     save::VERSION
+}
+
+// ---------------------------------------------------------------- the world
+
+/// The map as the canvas needs it: the terrain grid, the places on it, and the
+/// regions with their measured danger.
+///
+/// Sent once at startup. The page redraws from this and from [`position`]; it
+/// never asks core to draw anything, and core never learns what a pixel is.
+#[wasm_bindgen]
+pub fn world_json() -> String {
+    map(|w| {
+        let mut rows = Vec::new();
+        for y in 0..w.height {
+            let mut row = Vec::new();
+            for x in 0..w.width {
+                row.push(w.terrain_name(x, y).to_string());
+            }
+            rows.push(row);
+        }
+        let places: Vec<_> = w
+            .places
+            .iter()
+            .map(|p| {
+                serde_json::json!({
+                    "at": p.at,
+                    "kind": format!("{:?}", p.kind).to_lowercase(),
+                    "id": p.id,
+                    "name": p.name,
+                })
+            })
+            .collect();
+        let regions: Vec<_> = w
+            .regions
+            .iter()
+            .map(|r| {
+                serde_json::json!({
+                    "id": r.id,
+                    "name": r.name,
+                    "danger": r.danger,
+                    "enemies": r.enemies.iter().map(|m| m.name).collect::<Vec<_>>(),
+                })
+            })
+            .collect();
+        // The per-tile encounter chance, computed here.
+        //
+        // The page could work these out from the terrain table and the region
+        // danger, and an earlier draft did — which put the encounter formula in
+        // two places, in two languages, with only one of them tested. The
+        // overlay draws numbers it was given.
+        let mut chances = Vec::new();
+        for y in 0..w.height {
+            let mut row = Vec::new();
+            for x in 0..w.width {
+                row.push(w.encounter_per_mille(x, y));
+            }
+            chances.push(row);
+        }
+        serde_json::json!({
+            "width": w.width, "height": w.height, "rows": rows,
+            "chances": chances, "places": places, "regions": regions,
+        })
+        .to_string()
+    })
+}
+
+/// Where the player is standing, and what is under them.
+#[wasm_bindgen]
+pub fn position() -> String {
+    with(|g| {
+        map(|w| {
+            let [x, y] = g.world.at;
+            serde_json::json!({
+                "x": x, "y": y,
+                "terrain": w.terrain_name(x, y),
+                "region": w.region_at(x, y).map(|r| r.name.clone()),
+                "danger": w.region_at(x, y).map(|r| r.danger),
+                "chance": w.encounter_per_mille(x, y),
+                "town": g.world.last_town,
+                "walked": g.world.count("tiles-walked"),
+                "fights": g.world.count("encounters"),
+            })
+            .to_string()
+        })
+    })
+}
+
+/// Take one step. `dir` is one of `n`, `s`, `e`, `w`.
+///
+/// Returns what happened, as JSON. The page renders it; it does not decide
+/// anything about it — whether a tile is walkable, whether a fight starts and
+/// which creature it is are all answered here.
+#[wasm_bindgen]
+pub fn try_step(dir: &str) -> String {
+    let d = match dir {
+        "n" => Dir::North,
+        "s" => Dir::South,
+        "e" => Dir::East,
+        "w" => Dir::West,
+        _ => return serde_json::json!({ "moved": false, "blocked": "no such direction" }).to_string(),
+    };
+    with_mut(|g| {
+        map(|w| {
+            let s = world::step(w, &mut g.world, &mut g.rng, DIFFICULTY, d);
+            serde_json::json!({
+                "moved": s.moved,
+                "blocked": s.blocked,
+                "event": s.event,
+                "town": s.town,
+                "encounter": s.encounter.map(|m| serde_json::json!({
+                    "name": g.theme_name(m.name),
+                    "canonical": m.name,
+                    "rating": gm2d_core::rating::creature_rating(m, DIFFICULTY),
+                    "note": gm2d_core::theme::by_id(&g.theme).note(m.name),
+                })),
+            })
+            .to_string()
+        })
+    })
+}
+
+/// The event standing on the current tile, with each choice already judged
+/// against what the player has.
+///
+/// The `takeable` flag and the `unmet` line are worked out here for the same
+/// reason legality is: a page that decides for itself whether a choice is
+/// available is a page with a second copy of the rules in it.
+#[wasm_bindgen]
+pub fn event_json(id: &str) -> String {
+    use gm2d_core::tile_event::Requirement;
+    with(|g| {
+        let events = gm2d_core::data::events();
+        let Some(e) = events.get(id) else {
+            return serde_json::json!({ "error": format!("no event called {id}") }).to_string();
+        };
+        let choices: Vec<_> = e
+            .choices
+            .iter()
+            .map(|c| {
+                let ok = match &c.requires {
+                    Requirement::None => true,
+                    Requirement::Gold(n) => g.character.gold >= *n,
+                    Requirement::Flag(f) => g.world.flags.iter().any(|x| x == f),
+                    Requirement::Holding(name) => g.character.holds(name),
+                };
+                serde_json::json!({
+                    "label": c.label, "blurb": c.blurb,
+                    "takeable": ok,
+                    "unmet": if ok { String::new() } else { c.unmet.clone() },
+                })
+            })
+            .collect();
+        serde_json::json!({ "id": e.id, "title": e.title, "prose": e.prose, "choices": choices })
+            .to_string()
+    })
+}
+
+/// Take choice `n` of the event on this tile. Returns the receipt.
+#[wasm_bindgen]
+pub fn answer(id: &str, n: usize) -> String {
+    use gm2d_core::tile_event::{Outcome, Requirement};
+
+    fn apply(g: &mut Game, o: &Outcome, receipt: &mut Vec<String>) {
+        match o {
+            Outcome::All(list) => list.iter().for_each(|i| apply(g, i, receipt)),
+            Outcome::Gold(n) => {
+                g.character.gold = (g.character.gold + n).max(0);
+                receipt.push(if *n >= 0 {
+                    format!("+{n} Fnorp")
+                } else {
+                    format!("{n} Fnorp")
+                });
+            }
+            Outcome::Flag(f) => {
+                if !g.world.flags.iter().any(|x| x == f) {
+                    g.world.flags.push(f.clone());
+                }
+            }
+            Outcome::Give(name) => match g.character.give(name) {
+                Some(_) => receipt.push(format!("Gained: {name}")),
+                None => receipt.push(format!("{name} is not in the catalogue")),
+            },
+            Outcome::Xp(n) => {
+                // Banked, not spent. M4 is what turns this into a level; until
+                // then the number is kept honestly rather than discarded, so
+                // M4 inherits real figures instead of starting from zero.
+                g.world.add("xp", (*n).max(0) as u32);
+                receipt.push(format!("+{n} toward the next level"));
+            }
+            Outcome::Nothing => receipt.push("Nothing you could point to".into()),
+        }
+    }
+
+    with_mut(|g| {
+        let events = gm2d_core::data::events();
+        let Some(e) = events.get(id) else {
+            return serde_json::json!({ "error": "no such event" }).to_string();
+        };
+        if g.world.answered.iter().any(|a| a == id) {
+            return serde_json::json!({ "error": "already answered" }).to_string();
+        }
+        let Some(c) = e.choices.get(n) else {
+            return serde_json::json!({ "error": "no such choice" }).to_string();
+        };
+        let ok = match &c.requires {
+            Requirement::None => true,
+            Requirement::Gold(n) => g.character.gold >= *n,
+            Requirement::Flag(f) => g.world.flags.iter().any(|x| x == f),
+            Requirement::Holding(name) => g.character.holds(name),
+        };
+        if !ok {
+            return serde_json::json!({ "error": c.unmet }).to_string();
+        }
+        let mut receipt = Vec::new();
+        apply(g, &c.outcome, &mut receipt);
+        g.world.answered.push(id.to_string());
+        serde_json::json!({ "receipt": receipt }).to_string()
+    })
+}
+
+/// Put the player back at the start, as a loss will in M3.
+#[wasm_bindgen]
+pub fn to_last_town() {
+    with_mut(|g| {
+        map(|w| {
+            let home = w
+                .places
+                .iter()
+                .find(|p| p.id == g.world.last_town)
+                .or_else(|| w.place_at(w.start.0, w.start.1));
+            if let Some(p) = home {
+                g.world.at = p.at;
+            }
+        })
+    });
 }

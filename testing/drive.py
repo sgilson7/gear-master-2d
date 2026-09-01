@@ -35,6 +35,7 @@ ROOT = Path(__file__).resolve().parent.parent
 WEB = ROOT / "dist" / "web"
 PORT = 8127
 ORIGIN = f"http://127.0.0.1:{PORT}"
+JSON_NULL = None
 
 
 class Quiet(http.server.SimpleHTTPRequestHandler):
@@ -349,6 +350,66 @@ def walk_the_gate(browser, name):
         page.click("#tree-done")
         page.wait_for_selector("#tree", state="hidden", timeout=8000)
 
+    # --- the fork -------------------------------------------------------------
+    # Grind on to level five and take the class. Slower than the rest of the
+    # walk by a wide margin, and worth it: this is the MVP's last line, and the
+    # only place it can be checked is a browser that has actually got there.
+    # There is no fast-forward, deliberately — a debug hook that skipped four
+    # levels would be a cheat in shipped code, and the first thing to rot.
+    for i in range(900):
+        if page.is_visible("#fork"):
+            break
+        if page.is_visible("#fight"):
+            page.click("#preset")
+            page.click("#go")
+            page.wait_for_selector("#stage-replay", state="visible", timeout=10000)
+            page.click("#skip")
+            page.wait_for_selector("#stage-result", state="visible", timeout=20000)
+            page.click("#done")
+            page.wait_for_selector("#fight", state="hidden", timeout=8000)
+            continue
+        if leave_town(page) or dismiss_card(page):
+            continue
+        page.keyboard.press(PATROL[i % len(PATROL)])
+
+    if not page.is_visible("#fork"):
+        fails.append(f"{name}: never reached the class fork "
+                     f"(level {page.text_content('#level')})")
+    else:
+        if page.text_content("#level") != "5":
+            fails.append(f"{name}: the fork opened at level {page.text_content('#level')}")
+        offered = page.locator("#fork-choices .wares").count()
+        if offered != 3:
+            fails.append(f"{name}: the fork offers {offered} classes, and the plan says three")
+        promises = page.locator("#fork-choices .wares .cost").all_text_contents()
+        if any(not p.strip() for p in promises):
+            fails.append(f"{name}: a class promises nothing mechanical: {promises}")
+
+        # The fork does not take Escape: it is the one decision that does not
+        # come off, and a screen you can dismiss is a decision you can decline.
+        page.keyboard.press("Escape")
+        if not page.is_visible("#fork"):
+            fails.append(f"{name}: Escape dismissed the class fork")
+
+        page.locator("#fork-choices .wares").first.click()
+        page.wait_for_selector("#fork", state="hidden", timeout=8000)
+        chosen = page.text_content("#class")
+        if not chosen or chosen == "—":
+            fails.append(f"{name}: a class was chosen and the sheet still says {chosen!r}")
+
+        # The class tree opened, and it is bigger than the base tree alone.
+        page.wait_for_selector("#tree", state="visible", timeout=8000)
+        after = page.locator("#nodes .wares").count()
+        if after <= 13:
+            fails.append(f"{name}: after the fork the tree shows {after} nodes, "
+                         f"which is no more than the base tree")
+        page.click("#tree-done")
+        page.wait_for_selector("#tree", state="hidden", timeout=8000)
+
+        # And it is permanent: reopening offers nothing.
+        if JSON_NULL != page.evaluate("() => window.__classOffer()"):
+            fails.append(f"{name}: the fork is still on offer after being taken")
+
     # --- the numbers overlay -------------------------------------------------
     page.click("#numbers")
     if page.get_attribute("#numbers", "aria-pressed") != "true":
@@ -396,6 +457,7 @@ def main():
         sys.exit(1)
     print("ok: town, shop, pack, walk, fight, replay, receipt — the whole loop")
     print("ok: a level-up named the frame it grew, and the point could be spent")
+    print("ok: level five forked the character, and the fork does not come off")
     print("ok: the fit preview is core's answer, not the page's")
     print("ok: a mid-fight save reopens the same fight")
     print("ok: walk, download, reload, upload — position and stream both came back")

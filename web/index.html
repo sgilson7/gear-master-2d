@@ -9,11 +9,11 @@
 <body>
   <main class="wide">
     <header>
-      <p class="eyebrow">M4 &middot; levels and the tree</p>
+      <p class="eyebrow">v0.1.0 &middot; MVP</p>
       <h1>Gear Master 2D</h1>
       <p class="sub">Arrow keys or WASD, one tile a press. Something stops you, you pack your frames,
-        and the fight runs itself. Every level adds a row to one frame and a point to spend.
-        Press <kbd>`</kbd> for the numbers behind the map.</p>
+        and the fight runs itself. Every level adds a row to one frame and a point to spend, and at level five
+        you pick what you are. Press <kbd>`</kbd> for the numbers behind the map.</p>
     </header>
 
     <div class="board">
@@ -36,6 +36,7 @@
             <div><dt>level</dt><dd id="level">&mdash;</dd></div>
             <div><dt>experience</dt><dd id="xp">&mdash;</dd></div>
             <div><dt>points</dt><dd id="points">&mdash;</dd></div>
+            <div><dt>class</dt><dd id="class">&mdash;</dd></div>
           </dl>
           <div class="row">
             <button id="skills" type="button">The tree</button>
@@ -64,6 +65,22 @@
         <div id="card-choices" class="choices"></div>
         <div id="card-receipt" class="receipt" hidden></div>
         <button id="card-close" type="button" hidden>Walk on</button>
+      </div>
+    </div>
+
+    <div id="fork" class="screen" hidden>
+      <div class="screenbox">
+        <header class="fighthead">
+          <div>
+            <p class="eyebrow">level five</p>
+            <h2>What you are</h2>
+            <p class="note">You have been out of the pit long enough that people have started
+              deciding what you are. This is the one time you get a say in it, and it does not
+              come off.</p>
+          </div>
+        </header>
+        <div id="fork-choices" class="shelf"></div>
+        <p id="fork-says" class="says" hidden></p>
       </div>
     </div>
 

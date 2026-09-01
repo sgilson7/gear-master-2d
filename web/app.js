@@ -8,6 +8,7 @@ import init, {
   save_json, load_json, new_game, apply_preset,
   shop_json, buy, reroll, pin,
   character_json, skills_json, take_skill,
+  class_offer_json, choose_class, class_name, all_trees_json,
   gold, piece_count, version, save_version,
   board_json, legal_anchors, place, pick_up, rotate, toggle_lock, undo, clear_board,
   encounter_json, fight_json, settle_fight, flee,
@@ -157,6 +158,7 @@ function paintPanel() {
   $('xp').textContent = `${c.into} / ${c.needed}`;
   $('points').textContent = c.points;
   $('skills').classList.toggle('primary', c.points > 0);
+  $('class').textContent = class_name() || '—';
   $('region').textContent = p.region ?? '—';
   $('terrain').textContent = p.terrain;
   $('coords').textContent = `${p.x}, ${p.y}`;
@@ -256,7 +258,8 @@ function openFight() {
 function closeFight() {
   $('fight').hidden = true;
   paintPanel(); draw(); autosave();
-  $('map').focus();
+  // A fight is where a level lands, so it is where the fork is offered.
+  if (!offerClass()) $('map').focus();
 }
 
 function runFight() {
@@ -286,6 +289,40 @@ function boardSays(text) {
   boardSays.t = setTimeout(() => { el.hidden = true; }, 2600);
 }
 
+// ---------------------------------------------------------------- the fork
+
+// Offered the moment the level lands, and offered again on every load until it
+// is answered — a save made before five is still asked, and so is one made at
+// nine by somebody who closed the tab.
+function offerClass() {
+  const o = JSON.parse(class_offer_json());
+  if (!o) return false;
+  const box = $('fork-choices');
+  box.replaceChildren();
+  for (const c of o.classes) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'wares';
+    b.innerHTML = `<b>${c.name}</b><span class="meta">${c.blurb}</span>` +
+                  `<span class="cost">${c.promise}</span>` +
+                  `<span class="meta">${c.nodes} of its own to spend on</span>`;
+    b.onclick = () => {
+      const why = choose_class(c.canonical);
+      if (why) {
+        const el = $('fork-says');
+        el.textContent = why; el.hidden = false; el.classList.add('bad');
+        return;
+      }
+      $('fork').hidden = true;
+      paintPanel(); draw(); autosave();
+      openTree();
+    };
+    box.appendChild(b);
+  }
+  $('fork').hidden = false;
+  return true;
+}
+
 // ---------------------------------------------------------------- the tree
 
 function openTree() {
@@ -298,11 +335,12 @@ function openTree() {
 }
 
 function paintTree() {
-  const t = JSON.parse(skills_json());
-  $('tree-points').textContent = t.points;
+  const all = JSON.parse(all_trees_json());
+  $('tree-points').textContent = all.points;
   const box = $('nodes');
   box.replaceChildren();
-  for (const n of t.nodes) {
+  const nodes = all.trees.flatMap((t) => t.nodes.map((n) => ({ ...n, tree: t.name })));
+  for (const n of nodes) {
     const b = document.createElement('button');
     b.type = 'button';
     b.className = 'wares' + (n.taken ? ' pinned' : '');
@@ -311,7 +349,9 @@ function paintTree() {
       : n.takeable ? `${n.cost} point${n.cost > 1 ? 's' : ''}`
       : n.why;
     b.innerHTML = `<b>${n.name}</b><span class="meta">${n.blurb}</span>` +
-                  `<span class="cost">${foot}</span>`;
+                  `<span class="cost">${foot}</span>` +
+                  (nodes.some((o) => o.tree !== n.tree)
+                    ? `<span class="meta">${n.tree}</span>` : '');
     b.onclick = () => {
       const why = take_skill(n.id);
       treeSays(why, !!why);
@@ -389,7 +429,8 @@ function closeTown() {
 // ---------------------------------------------------------------- walking
 
 function walk(dir) {
-  if (!$('card').hidden || !$('fight').hidden || !$('town').hidden || !$('tree').hidden) return;
+  if (!$('card').hidden || !$('fight').hidden || !$('town').hidden ||
+      !$('tree').hidden || !$('fork').hidden) return;
   const r = JSON.parse(try_step(dir));
   blocked = r.moved ? null : r.blocked;
   paintPanel(); draw(); autosave();
@@ -448,6 +489,10 @@ async function main() {
       if (e.key === 'Escape') closeTree();
       return;
     }
+    // The fork has no way out but through. It is the one screen in the game
+    // that does not take Escape, because it is the one decision that does not
+    // come off.
+    if (!$('fork').hidden) return;
     if (e.key === 'Escape' && !$('card').hidden) { closeCard(); return; }
     // `d` is east on WASD, so the overlay gets its own key and a button.
     if (e.key === '`') { e.preventDefault(); toggleDebug(); return; }
@@ -474,6 +519,7 @@ async function main() {
   // check compares the page's answer against core's rather than against itself.
   window.__board = board;
   window.__legalAnchors = legal_anchors;
+  window.__classOffer = () => JSON.parse(class_offer_json());
 
   $('skills').onclick = openTree;
   $('tree-done').onclick = closeTree;
@@ -539,6 +585,7 @@ async function main() {
       paintPanel(); draw(); autosave();
       says(`Loaded ${f.name}.`);
       if (JSON.parse(encounter_json())) openFight();
+      else offerClass();
     } catch (err) {
       says(String(err?.message ?? err), true);
     }
@@ -551,7 +598,8 @@ async function main() {
   draw();
   // A save taken mid-fight comes back mid-fight. The creature is in the file,
   // so there is one waiting whether or not this page has seen it before.
-  if (JSON.parse(encounter_json())) openFight(); else $('map').focus();
+  if (JSON.parse(encounter_json())) openFight();
+  else if (!offerClass()) $('map').focus();
   $('status').textContent =
     `core: ${piece_count()} pieces · v${version()} · save v${save_version()}`;
 }

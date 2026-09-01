@@ -71,11 +71,19 @@ pub fn spec(e: &Encounter) -> Option<&'static MonsterSpec> {
 pub fn run(game: &Game, difficulty: Difficulty) -> Option<CombatLog> {
     let e = game.encounter.as_ref()?;
     let spec = spec(e)?;
-    Some(combat::simulate_at(
+    // The class is a rule the fight has to know about, not a stat bundle, so it
+    // goes in here rather than being folded into `player_stats`. A character
+    // with no class passes an empty slice, which is exactly what
+    // `simulate_at` does — so an unclassed fight is the same fight it was
+    // before M5, and the golden fixture says so.
+    let worn: Vec<crate::class::ClassDef> =
+        game.character.class_def().into_iter().cloned().collect();
+    Some(combat::simulate_with_class(
         game.character.player_stats(),
         &game.character.combat_items(),
         spec,
         difficulty,
+        &worn,
     ))
 }
 

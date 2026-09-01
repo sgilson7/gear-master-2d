@@ -124,6 +124,11 @@ pub struct Character {
     pub skill_points: u32,
     /// Node ids taken, in the order they were taken.
     pub skills_taken: Vec<String>,
+    /// The class, by **canonical** name — `"Berserker"`, not `"Gorillathon"`.
+    /// The theme renames it on the way to the screen, like every other name.
+    ///
+    /// `None` until level 5, and permanent after. See [`Character::choose_class`].
+    pub class: Option<String>,
     /// **Not serialised.** Undo is a session's history of its own edits, not
     /// part of the character: a save that restored forty snapshots would be a
     /// save that let you undo your way back into a previous session's board.
@@ -155,6 +160,7 @@ impl Character {
             xp: 0,
             skill_points: 0,
             skills_taken: Vec::new(),
+            class: None,
             undo_stack: Vec::new(),
         }
     }
@@ -657,7 +663,9 @@ impl Character {
         tree: &crate::skills::SkillsData,
         id: &str,
     ) -> Result<(), crate::skills::Refusal> {
-        let cost = tree.can_take(id, &self.skills_taken, self.skill_points)?.cost;
+        let cost = tree
+            .can_take(id, &self.skills_taken, self.skill_points, self.class.as_deref())?
+            .cost;
         self.skill_points -= cost;
         self.skills_taken.push(id.to_string());
         self.apply_skills(tree);
@@ -674,6 +682,50 @@ impl Character {
         self.loadout.assembly_pct = tree.assembly_pct(&self.skills_taken);
         let granted = tree.granted_rows(&self.skills_taken);
         self.resize_boards(granted);
+    }
+
+    /// The level a class may be chosen at.
+    pub const CLASS_AT: u32 = 5;
+
+    /// Is the character owed a class choice?
+    ///
+    /// True at level 5 and every level after, until one is taken. A save made
+    /// before level 5 loads and is still asked; a save made at level 9 with no
+    /// class is still asked, because the question was never answered rather
+    /// than declined.
+    pub fn owed_a_class(&self) -> bool {
+        self.class.is_none() && self.level() >= Self::CLASS_AT
+    }
+
+    /// Take a class. **Permanent within a save.**
+    ///
+    /// There is no path that clears one — no `clear_class`, no `None` write
+    /// anywhere but construction — and `a_class_is_permanent` is what says so.
+    /// The plan makes this a decision rather than a loadout, and a decision you
+    /// can take back is not one.
+    pub fn choose_class(&mut self, canonical: &str) -> Result<&'static crate::class::ClassDef, String> {
+        if let Some(have) = &self.class {
+            return Err(format!("you are already a {have}, and that does not come off"));
+        }
+        if self.level() < Self::CLASS_AT {
+            return Err(format!(
+                "a class is chosen at level {}, and you are level {}",
+                Self::CLASS_AT,
+                self.level()
+            ));
+        }
+        let def = crate::class::CLASSES
+            .iter()
+            .find(|c| c.name == canonical)
+            .ok_or_else(|| format!("there is no such class as {canonical}"))?;
+        self.class = Some(def.name.to_string());
+        Ok(def)
+    }
+
+    /// The chosen class, resolved.
+    pub fn class_def(&self) -> Option<&'static crate::class::ClassDef> {
+        let name = self.class.as_ref()?;
+        crate::class::CLASSES.iter().find(|c| c.name == *name)
     }
 
     // ------------------------------------------------------------ growth

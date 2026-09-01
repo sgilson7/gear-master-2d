@@ -864,7 +864,12 @@ pub fn skills_json() -> String {
             .iter()
             .map(|n| {
                 let taken = g.character.skills_taken.iter().any(|t| *t == n.id);
-                let verdict = tree.can_take(&n.id, &g.character.skills_taken, g.character.skill_points);
+                let verdict = tree.can_take(
+                    &n.id,
+                    &g.character.skills_taken,
+                    g.character.skill_points,
+                    g.character.class.as_deref(),
+                );
                 serde_json::json!({
                     "id": n.id,
                     "name": n.name,
@@ -895,5 +900,102 @@ pub fn take_skill(id: &str) -> String {
             Ok(()) => String::new(),
             Err(e) => e.to_string(),
         }
+    })
+}
+
+// ---------------------------------------------------------------- the fork
+
+/// The three classes on offer, or `null` when none is owed.
+///
+/// Named by the theme, promising in the engine's own words: `ClassPower` can
+/// describe itself, so the mechanical line beside each is the rule rather than
+/// a sentence about the rule.
+#[wasm_bindgen]
+pub fn class_offer_json() -> String {
+    const THREE: [&str; 3] = ["Berserker", "Hexweaver", "Bloodletter"];
+    with(|g| {
+        if !g.character.owed_a_class() {
+            return "null".into();
+        }
+        let theme = gm2d_core::theme::by_id(&g.theme);
+        let tree = gm2d_core::data::skills();
+        let offer: Vec<_> = THREE
+            .iter()
+            .filter_map(|canonical| {
+                let def = gm2d_core::class::CLASSES.iter().find(|c| c.name == *canonical)?;
+                let t = tree.tree_for_class(canonical);
+                Some(serde_json::json!({
+                    "canonical": def.name,
+                    "name": theme.class(def.name),
+                    // `retell` swaps the engine's words for the theme's, whole
+                    // word at a time — so a promise about curses arrives
+                    // talking about the Roast and Nut Freeze rather than
+                    // searing and frost. TONE.md rule 13.
+                    "blurb": theme.retell(def.blurb),
+                    "promise": theme.retell(&def.power.describe()),
+                    "nodes": t.map(|t| t.nodes.len()).unwrap_or(0),
+                    "first": t.and_then(|t| t.nodes.first()).map(|n| n.name.clone()),
+                }))
+            })
+            .collect();
+        serde_json::json!({ "level": g.character.level(), "classes": offer }).to_string()
+    })
+}
+
+/// Take the fork. Permanent.
+#[wasm_bindgen]
+pub fn choose_class(canonical: &str) -> String {
+    with_mut(|g| match g.character.choose_class(canonical) {
+        Ok(_) => String::new(),
+        Err(why) => why,
+    })
+}
+
+/// The class in play, themed, or an empty string.
+#[wasm_bindgen]
+pub fn class_name() -> String {
+    // Through `class_def` rather than the stored string: the theme's lookup
+    // wants a canonical name that outlives the call, and `CLASSES` is where
+    // those live. The save stores a `String`; this is the resolver.
+    with(|g| match g.character.class_def() {
+        Some(def) => gm2d_core::theme::by_id(&g.theme).class(def.name).to_string(),
+        None => String::new(),
+    })
+}
+
+/// Every tree the character may spend in: the base one, plus their own.
+#[wasm_bindgen]
+pub fn all_trees_json() -> String {
+    with(|g| {
+        let tree = gm2d_core::data::skills();
+        let mine = g.character.class.as_deref();
+        let trees: Vec<_> = tree
+            .trees
+            .iter()
+            .filter(|t| t.class.is_none() || t.class.as_deref() == mine)
+            .map(|t| {
+                let nodes: Vec<_> = t
+                    .nodes
+                    .iter()
+                    .map(|n| {
+                        let taken = g.character.skills_taken.iter().any(|x| *x == n.id);
+                        let v = tree.can_take(
+                            &n.id,
+                            &g.character.skills_taken,
+                            g.character.skill_points,
+                            mine,
+                        );
+                        serde_json::json!({
+                            "id": n.id, "name": n.name, "blurb": n.blurb, "cost": n.cost,
+                            "taken": taken,
+                            "takeable": v.is_ok(),
+                            "why": v.err().map(|e| e.to_string()).unwrap_or_default(),
+                        })
+                    })
+                    .collect();
+                serde_json::json!({ "id": t.id, "name": t.name, "class": t.class, "nodes": nodes })
+            })
+            .collect();
+        serde_json::json!({ "points": g.character.skill_points, "trees": trees }).to_string()
     })
 }

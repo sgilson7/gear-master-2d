@@ -122,6 +122,9 @@ pub struct CharacterSave {
     pub skill_points: u32,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub skills_taken: Vec<String>,
+    /// The class, by canonical name. Absent until level 5 and permanent after.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub class: Option<String>,
 }
 
 fn is_zero_i32(n: &i32) -> bool {
@@ -203,6 +206,7 @@ impl SaveFile {
             xp,
             skill_points,
             skills_taken,
+            class,
             undo_stack: _,
         } = character;
         let Loadout { slots, locks, name_seed, naming: _, assembly_pct } = loadout;
@@ -275,6 +279,7 @@ impl SaveFile {
                     xp: *xp,
                     skill_points: *skill_points,
                     skills_taken: skills_taken.clone(),
+                    class: class.clone(),
                 },
             },
         }
@@ -382,6 +387,7 @@ impl SaveFile {
             xp,
             skill_points,
             skills_taken,
+            class,
         } = character;
 
         // The registry first, in order, so `PieceId(i)` means what it meant.
@@ -450,6 +456,7 @@ impl SaveFile {
         character.xp = xp;
         character.skill_points = skill_points;
         character.skills_taken = skills_taken;
+        character.class = class;
 
         // The shelf. A component the shelf names and this build has not got
         // is dropped rather than refused: a stale shelf is a smaller problem

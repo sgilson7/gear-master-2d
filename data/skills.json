@@ -13,31 +13,55 @@
           "blurb": "One more row on the weapon frame, out of turn.",
           "cost": 1,
           "requires": [],
-          "effect": { "grow_slot_rows": { "slot": "weapon", "rows": 1 } }
+          "effect": {
+            "grow_slot_rows": {
+              "slot": "weapon",
+              "rows": 1
+            }
+          }
         },
         {
           "id": "second-frame",
           "name": "The Second Frame",
           "blurb": "And one on the chest. Your people cut brackets before they cut anything else.",
           "cost": 1,
-          "requires": ["frame-sense"],
-          "effect": { "grow_slot_rows": { "slot": "chest", "rows": 1 } }
+          "requires": [
+            "frame-sense"
+          ],
+          "effect": {
+            "grow_slot_rows": {
+              "slot": "chest",
+              "rows": 1
+            }
+          }
         },
         {
           "id": "flush-fit",
           "name": "Flush Fit",
           "blurb": "Every finished item pays a tenth more. Nothing is wasted at the joins.",
           "cost": 1,
-          "requires": ["frame-sense"],
-          "effect": { "assembly_pct": { "pct": 10 } }
+          "requires": [
+            "frame-sense"
+          ],
+          "effect": {
+            "assembly_pct": {
+              "pct": 10
+            }
+          }
         },
         {
           "id": "tighter-still",
           "name": "Tighter Still",
           "blurb": "Another tenth. There is a point past which it stops being packing and starts being pride.",
           "cost": 2,
-          "requires": ["flush-fit"],
-          "effect": { "assembly_pct": { "pct": 10 } }
+          "requires": [
+            "flush-fit"
+          ],
+          "effect": {
+            "assembly_pct": {
+              "pct": 10
+            }
+          }
         },
         {
           "id": "thick-skull",
@@ -45,7 +69,11 @@
           "blurb": "Songil is survivable. Barely, and not twice in a week.",
           "cost": 1,
           "requires": [],
-          "effect": { "stat": { "mind_resist": 8 } }
+          "effect": {
+            "stat": {
+              "mind_resist": 8
+            }
+          }
         },
         {
           "id": "corked",
@@ -53,7 +81,11 @@
           "blurb": "A strip of it, wedged where a blow lands. It comes back every fight.",
           "cost": 1,
           "requires": [],
-          "effect": { "stat": { "armor": 12 } }
+          "effect": {
+            "stat": {
+              "armor": 12
+            }
+          }
         },
         {
           "id": "cave-lungs",
@@ -61,15 +93,26 @@
           "blurb": "Nine hundred feet of Deep Chocolate mine, and you never once came up early.",
           "cost": 1,
           "requires": [],
-          "effect": { "stat": { "health": 60 } }
+          "effect": {
+            "stat": {
+              "health": 60
+            }
+          }
         },
         {
           "id": "the-long-shift",
           "name": "The Long Shift",
           "blurb": "Fourteen hours is a shift. Sixteen is a shift somebody is counting.",
           "cost": 2,
-          "requires": ["cave-lungs"],
-          "effect": { "stat": { "health": 120, "regen": 2 } }
+          "requires": [
+            "cave-lungs"
+          ],
+          "effect": {
+            "stat": {
+              "health": 120,
+              "regen": 2
+            }
+          }
         },
         {
           "id": "handspan",
@@ -77,15 +120,25 @@
           "blurb": "You can still judge a gear by putting a hand across it. It is not a skill anybody taught you.",
           "cost": 1,
           "requires": [],
-          "effect": { "stat": { "strength": 6 } }
+          "effect": {
+            "stat": {
+              "strength": 6
+            }
+          }
         },
         {
           "id": "anvil-armed",
           "name": "Anvil-Armed",
           "blurb": "The pit had one anvil and four hundred of you. You got your turn at it.",
           "cost": 2,
-          "requires": ["handspan"],
-          "effect": { "stat": { "strength": 10 } }
+          "requires": [
+            "handspan"
+          ],
+          "effect": {
+            "stat": {
+              "strength": 10
+            }
+          }
         },
         {
           "id": "funnel-drill",
@@ -93,23 +146,407 @@
           "blurb": "Army-issue, and it has somebody else's name filed off the side of it.",
           "cost": 1,
           "requires": [],
-          "effect": { "stat": { "mana": 20 } }
+          "effect": {
+            "stat": {
+              "mana": 20
+            }
+          }
         },
         {
           "id": "jinx-read",
           "name": "Jinx Read",
           "blurb": "You can tell which of the four it is before it lands. Knowing does not stop it.",
           "cost": 1,
-          "requires": ["thick-skull"],
-          "effect": { "stat": { "curse_resist": 15 } }
+          "requires": [
+            "thick-skull"
+          ],
+          "effect": {
+            "stat": {
+              "curse_resist": 15
+            }
+          }
         },
         {
           "id": "the-fifth-frame",
           "name": "The Fifth Frame",
           "blurb": "A row on the greaves. You walked out of the pit; you may as well arrive.",
           "cost": 2,
-          "requires": ["second-frame"],
-          "effect": { "grow_slot_rows": { "slot": "greaves", "rows": 1 } }
+          "requires": [
+            "second-frame"
+          ],
+          "effect": {
+            "grow_slot_rows": {
+              "slot": "greaves",
+              "rows": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "gorillathon",
+      "name": "Gorillathon",
+      "class": "Berserker",
+      "nodes": [
+        {
+          "id": "g-deadlift",
+          "name": "Deadlift",
+          "blurb": "A gorilla in a bedazzled plaid suit does not warm up. Neither do you.",
+          "cost": 1,
+          "requires": [],
+          "effect": {
+            "stat": {
+              "strength": 12
+            }
+          }
+        },
+        {
+          "id": "g-figure-eight",
+          "name": "The Figure Eight",
+          "blurb": "Nobody scored it. Everybody saw it.",
+          "cost": 1,
+          "requires": [
+            "g-deadlift"
+          ],
+          "effect": {
+            "stat": {
+              "health": 140,
+              "regen": 2
+            }
+          }
+        },
+        {
+          "id": "g-the-five",
+          "name": "The Five",
+          "blurb": "One judge gave it a five. The others gave it a two and a minus seven.",
+          "cost": 2,
+          "requires": [
+            "g-figure-eight"
+          ],
+          "effect": {
+            "stat": {
+              "strength": 16,
+              "armor": 10
+            }
+          }
+        },
+        {
+          "id": "g-plaid",
+          "name": "Bedazzled Plaid",
+          "blurb": "It is not armour. It has never once been mistaken for armour.",
+          "cost": 1,
+          "requires": [],
+          "effect": {
+            "stat": {
+              "armor": 22
+            }
+          }
+        },
+        {
+          "id": "g-wider-frames",
+          "name": "Wider Frames",
+          "blurb": "A row on the weapon and a row on the chest. Your arms had to go somewhere.",
+          "cost": 2,
+          "requires": [
+            "g-plaid"
+          ],
+          "effect": {
+            "grow_slot_rows": {
+              "slot": "weapon",
+              "rows": 1
+            }
+          }
+        },
+        {
+          "id": "g-second-wider",
+          "name": "Wider Still",
+          "blurb": "And the chest, which is where the rest of you is.",
+          "cost": 2,
+          "requires": [
+            "g-wider-frames"
+          ],
+          "effect": {
+            "grow_slot_rows": {
+              "slot": "chest",
+              "rows": 1
+            }
+          }
+        },
+        {
+          "id": "g-full-lift",
+          "name": "The Full Lift",
+          "blurb": "Four hundred and eleven pounds, held for nine seconds, on skates.",
+          "cost": 2,
+          "requires": [
+            "g-the-five"
+          ],
+          "effect": {
+            "stat": {
+              "strength": 20,
+              "health": 180
+            }
+          }
+        },
+        {
+          "id": "g-crowd",
+          "name": "The Crowd",
+          "blurb": "They are not cheering for the lift. They have never been cheering for the lift.",
+          "cost": 2,
+          "requires": [
+            "g-full-lift"
+          ],
+          "effect": {
+            "assembly_pct": {
+              "pct": 15
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "funnel-sergeant",
+      "name": "Funnel Sergeant",
+      "class": "Hexweaver",
+      "nodes": [
+        {
+          "id": "f-issue",
+          "name": "Army Issue",
+          "blurb": "The funnel has somebody else's name filed off it. Everyone's does.",
+          "cost": 1,
+          "requires": [],
+          "effect": {
+            "stat": {
+              "mana": 30
+            }
+          }
+        },
+        {
+          "id": "f-drillbook",
+          "name": "The Drillbook",
+          "blurb": "Low-level goofs often go horribly wrong. Yours will not, because you read it.",
+          "cost": 1,
+          "requires": [
+            "f-issue"
+          ],
+          "effect": {
+            "stat": {
+              "mind_resist": 12,
+              "curse_resist": 12
+            }
+          }
+        },
+        {
+          "id": "f-wider-mouth",
+          "name": "A Wider Mouth",
+          "blurb": "A row on the helmet. The funnel has to sit on something.",
+          "cost": 2,
+          "requires": [
+            "f-issue"
+          ],
+          "effect": {
+            "grow_slot_rows": {
+              "slot": "helmet",
+              "rows": 1
+            }
+          }
+        },
+        {
+          "id": "f-banana",
+          "name": "The Banana Standard",
+          "blurb": "Regulation peel, regulation placement, regulation nine feet of skid.",
+          "cost": 1,
+          "requires": [
+            "f-drillbook"
+          ],
+          "effect": {
+            "stat": {
+              "mana": 25,
+              "strength": 6
+            }
+          }
+        },
+        {
+          "id": "f-anvil",
+          "name": "Anvil, Own Foot",
+          "blurb": "Self-deprecation is a supply line. The Jester dropped a moon with it.",
+          "cost": 2,
+          "requires": [
+            "f-banana"
+          ],
+          "effect": {
+            "stat": {
+              "mana": 40,
+              "health": 80
+            }
+          }
+        },
+        {
+          "id": "f-pie",
+          "name": "Pie, Own Face",
+          "blurb": "Held in reserve. Deployed once, at the correct moment, by a sergeant.",
+          "cost": 2,
+          "requires": [
+            "f-anvil"
+          ],
+          "effect": {
+            "assembly_pct": {
+              "pct": 15
+            }
+          }
+        },
+        {
+          "id": "f-concentrate",
+          "name": "Concentrating Funnel",
+          "blurb": "A row on the gloves. You cannot aim a funnel one-handed.",
+          "cost": 2,
+          "requires": [
+            "f-wider-mouth"
+          ],
+          "effect": {
+            "grow_slot_rows": {
+              "slot": "gloves",
+              "rows": 1
+            }
+          }
+        },
+        {
+          "id": "f-undone",
+          "name": "A Funny Undone",
+          "blurb": "There is a version of every goof that does not land. You have met it.",
+          "cost": 2,
+          "requires": [
+            "f-pie"
+          ],
+          "effect": {
+            "stat": {
+              "mana": 60,
+              "mind_resist": 15
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "worm-fact-keeper",
+      "name": "Worm-Fact Keeper",
+      "class": "Bloodletter",
+      "nodes": [
+        {
+          "id": "w-the-fact",
+          "name": "The Worm Fact",
+          "blurb": "THE WORM FACT REMAINS LAW. It is not a threat. It is a filing.",
+          "cost": 1,
+          "requires": [],
+          "effect": {
+            "stat": {
+              "curse_resist": 20
+            }
+          }
+        },
+        {
+          "id": "w-throne",
+          "name": "The Flesh Throne",
+          "blurb": "Somebody sat in it before LETO. Nobody has asked who.",
+          "cost": 1,
+          "requires": [
+            "w-the-fact"
+          ],
+          "effect": {
+            "stat": {
+              "health": 150,
+              "regen": 3
+            }
+          }
+        },
+        {
+          "id": "w-ledger",
+          "name": "The Ledger",
+          "blurb": "Every name, every date, and a column nobody will explain.",
+          "cost": 2,
+          "requires": [
+            "w-the-fact"
+          ],
+          "effect": {
+            "stat": {
+              "mind_resist": 18,
+              "curse_resist": 15
+            }
+          }
+        },
+        {
+          "id": "w-long-body",
+          "name": "A Longer Body",
+          "blurb": "A row on the chest. There is more of you than there was.",
+          "cost": 2,
+          "requires": [
+            "w-throne"
+          ],
+          "effect": {
+            "grow_slot_rows": {
+              "slot": "chest",
+              "rows": 1
+            }
+          }
+        },
+        {
+          "id": "w-patience",
+          "name": "Worm's Patience",
+          "blurb": "Death is not in a hurry. Death has never once been in a hurry.",
+          "cost": 2,
+          "requires": [
+            "w-throne"
+          ],
+          "effect": {
+            "stat": {
+              "regen": 6,
+              "health": 200
+            }
+          }
+        },
+        {
+          "id": "w-rot",
+          "name": "Something Rotting",
+          "blurb": "On the other side of it, and getting closer to your side of it.",
+          "cost": 2,
+          "requires": [
+            "w-ledger"
+          ],
+          "effect": {
+            "stat": {
+              "strength": 14,
+              "curse_resist": 10
+            }
+          }
+        },
+        {
+          "id": "w-greaves",
+          "name": "The Slow Approach",
+          "blurb": "A row on the greaves. Death arrives on foot.",
+          "cost": 2,
+          "requires": [
+            "w-long-body"
+          ],
+          "effect": {
+            "grow_slot_rows": {
+              "slot": "greaves",
+              "rows": 1
+            }
+          }
+        },
+        {
+          "id": "w-law",
+          "name": "Remains Law",
+          "blurb": "Francis condensed Death's plane to a point once. The filing survived.",
+          "cost": 2,
+          "requires": [
+            "w-patience",
+            "w-rot"
+          ],
+          "effect": {
+            "assembly_pct": {
+              "pct": 15
+            }
+          }
         }
       ]
     }

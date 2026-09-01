@@ -192,6 +192,40 @@ fn the_shipped_tree_is_coherent() {
         base.nodes.len()
     );
 
+    // Every tree, not only the base one: a class tree with a misspelled
+    // prerequisite is a node no player can ever take, and it would sit there
+    // through the whole of M5 without anything noticing.
+    for t in &tree.trees {
+        let ids: Vec<&str> = t.nodes.iter().map(|n| n.id.as_str()).collect();
+        let mut seen: Vec<&str> = Vec::new();
+        for n in &t.nodes {
+            assert!(!seen.contains(&n.id.as_str()), "{} appears twice in {}", n.id, t.id);
+            seen.push(&n.id);
+            assert!(!n.blurb.is_empty(), "{} has no blurb", n.id);
+            for r in &n.requires {
+                assert!(
+                    ids.contains(&r.as_str()),
+                    "{} requires {r:?}, which is not in its own tree {}",
+                    n.id,
+                    t.id
+                );
+            }
+        }
+        // And reachable by spending in some order.
+        let mut taken: Vec<String> = Vec::new();
+        let mut progress = true;
+        while progress {
+            progress = false;
+            for n in &t.nodes {
+                if !taken.contains(&n.id) && n.requires.iter().all(|r| taken.contains(r)) {
+                    taken.push(n.id.clone());
+                    progress = true;
+                }
+            }
+        }
+        assert_eq!(taken.len(), t.nodes.len(), "{} has unreachable nodes", t.id);
+    }
+
     let ids: Vec<&str> = base.nodes.iter().map(|n| n.id.as_str()).collect();
     for n in &base.nodes {
         assert!(!n.blurb.is_empty(), "{} has no blurb", n.id);

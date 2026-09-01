@@ -91,6 +91,10 @@ pub enum Refusal {
     AlreadyTaken,
     NotEnoughPoints { need: u32, have: u32 },
     Missing(String),
+    /// The node is in a tree belonging to a class this character is not.
+    WrongClass(String),
+    /// The node is in a class tree and no class has been chosen yet.
+    NoClassYet,
 }
 
 impl std::fmt::Display for Refusal {
@@ -102,6 +106,8 @@ impl std::fmt::Display for Refusal {
                 write!(f, "that costs {need} and you have {have}")
             }
             Refusal::Missing(what) => write!(f, "you would need {what} first"),
+            Refusal::WrongClass(what) => write!(f, "that is {what}'s, and you are not one"),
+            Refusal::NoClassYet => write!(f, "that wants a class, and you have not taken one"),
         }
     }
 }
@@ -126,6 +132,16 @@ impl SkillsData {
         self.trees.iter().flat_map(|t| &t.nodes).find(|n| n.id == id)
     }
 
+    /// Which tree a node belongs to.
+    pub fn tree_of(&self, id: &str) -> Option<&Tree> {
+        self.trees.iter().find(|t| t.nodes.iter().any(|n| n.id == id))
+    }
+
+    /// The tree belonging to a class, if it has one.
+    pub fn tree_for_class(&self, class: &str) -> Option<&Tree> {
+        self.trees.iter().find(|t| t.class.as_deref() == Some(class))
+    }
+
     /// The base tree — the one everybody spends in.
     pub fn base(&self) -> Option<&Tree> {
         self.trees.iter().find(|t| t.class.is_none())
@@ -136,8 +152,32 @@ impl SkillsData {
     /// The three refusals the plan names, in one place: bought twice, without
     /// its prerequisite, or without a point. A screen that greyed a button out
     /// for its own reasons would be a fourth rule nobody tested.
-    pub fn can_take(&self, id: &str, taken: &[String], points: u32) -> Result<&Node, Refusal> {
+    pub fn can_take(
+        &self,
+        id: &str,
+        taken: &[String],
+        points: u32,
+        class: Option<&str>,
+    ) -> Result<&Node, Refusal> {
         let node = self.node(id).ok_or(Refusal::NoSuchNode)?;
+        // A class tree is shut to everybody but its class. Checked before
+        // anything else, because "you would need X first" about a node you can
+        // never take is a worse answer than "that is not yours".
+        if let Some(owner) = self.tree_of(id).and_then(|t| t.class.clone()) {
+            match class {
+                None => return Err(Refusal::NoClassYet),
+                Some(c) if c != owner => {
+                    let name = self
+                        .trees
+                        .iter()
+                        .find(|t| t.class.as_deref() == Some(owner.as_str()))
+                        .map(|t| t.name.clone())
+                        .unwrap_or(owner);
+                    return Err(Refusal::WrongClass(name));
+                }
+                Some(_) => {}
+            }
+        }
         if taken.iter().any(|t| t == id) {
             return Err(Refusal::AlreadyTaken);
         }

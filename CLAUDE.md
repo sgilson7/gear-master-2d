@@ -745,6 +745,87 @@ not exist yet.
   back to the start, and `world.rs` tests exactly that; without it such a save
   would put a player nowhere.
 
+## Fatigue is what a fight actually spends
+
+Health resets at every bell, which is why a rest had nothing to restore.
+**Every battle takes four percent of your maximum health for good, won or
+lost**, and only a restorative gives it back — a town does not, or the tins
+would be decoration.
+
+- A **percentage**, so it means the same thing at level one and at twenty.
+  Twelve points is a third of a starting character and a rounding error later.
+- Applied **last, on the total**, in `player_stats`. Taking it off the base and
+  adding gear back would make a helmet cure tiredness.
+- Capped at 60. A maximum that can reach zero is a character who can neither
+  fight nor mend, which is a game over with no screen for it.
+- `PER_FIGHT` is set against the pit by
+  `a_full_expedition_is_a_budget_and_not_a_wall`, which walks twelve fights and
+  refuses a number that makes the second unwinnable or the tenth free.
+- Restoratives are **not components**: no shape, no grid, spent rather than
+  worn. Three good reasons not to force them into `PieceDef`, where each would
+  have been a special case. `data/supplies.json`, and every town sells them —
+  a place that had run out of the only thing that undoes tiredness is a place
+  you could strand yourself at.
+- Drinkable **from the standing panel**, not in town. The decision this exists
+  to create is the one on the road: another fight, open the tin, or turn round.
+
+## Errands are not a town's
+
+`giver` asks and `turn_in` takes it back, which makes "go and tell them in
+town" one errand rather than two; `requires` makes a questline. Three goals:
+slay something, bring something, or go somewhere and report.
+
+- **Arriving is the doing.** `quest::on_arrival` runs on the step, so walking
+  over the tile and carrying on still counts. The marker goes in
+  `world.answered` — the same set a tile-event writes to, so a word and a door
+  are remembered the same way.
+- `Bring` names **a component or a restorative**, resolved by looking in both
+  drawers. The alternative was a second goal kind asking the same question of
+  a different list. It also had to be: the shelf sells each entry **once**, so
+  "bring me four of a shop item" is impossible and "bring me four tins" is not.
+- **No two errands share a tally**, or handing in one would empty the other.
+- An errand shows at its turn-in only **once it is on you**: a clerk who has
+  not been told about the heap has nothing to say about it.
+- **Every reward is unique and on no shelf.** They are in `EVENT_ONLY` too, or
+  the creature stepper walks into them — a Harvest Crest turned into
+  Marbulon's glass before that was noticed. A reward you could have bought
+  makes the errand a slow way to shop.
+
+## The first dungeon
+
+`data/dungeon.json`, nine by five, one way in and one thing at the end of it.
+Short on purpose: fatigue is the budget, and the walk back out is part of it.
+
+- **Maps are a list.** `data::MAPS` is `(id, json)` and `WorldState::map` says
+  which one you are on. A map this build has not got falls back to the
+  overworld rather than panicking — a save can name one, and `World::repair`
+  then finds them somewhere to stand.
+- Two new `PlaceKind`s. A **Gate** is a way onto another map, and whether it
+  opens is answered in the shim rather than in `World`, because it depends on
+  what is in the bag and a map does not know about bags. A **Boss** is a
+  creature standing on a tile rather than one the ground rolled.
+- **A boss drop is looked up by the tile, not the creature.** The same Rust
+  Colossus stands in a region's pool; beating one in a field must not hand over
+  the way to the next map.
+- **Dying in a dungeon walks you home across maps.** It used to leave you
+  standing on the boss's own tile, because the walk home looked for a town on
+  the map you were on and a dungeon has none.
+- `every_gate_leads_somewhere_you_can_stand` is the one that matters: a gate
+  whose far side is a wall strands a player on a map with no way off it, and
+  nothing else in the game would say so.
+
+### `map()` must not reach for the game
+
+`map` used to look `WORLD` up as a single static. Following the player means
+knowing which map they are on, and the first version read `GAME` to find out —
+which is a `RefCell` double borrow at nearly every call site, because they are
+all already inside `with` or `with_mut`. In a wasm build that is a bare
+`unreachable` on the console and **nothing else to go on**.
+
+`map_for(g, …)` takes the game. Where the closure also mutates it, the id is
+resolved first and `map_named` is used, because borrowing the game to find the
+map and then mutating it inside the closure is the same fault one level up.
+
 ## Tone, as a lint
 
 `tests/tone.rs` holds the eight rules from `TONE.md` a machine can check. Not
@@ -805,23 +886,24 @@ and M5's trees may spend them again.
 | The sheet, and a fight that opens holding what it holds | 429 passing |
 | A tree drawn as a tree | 431 passing |
 | Souls experience, and one town on the map | 432 passing |
-| Catalogue | 528 components |
+| Fatigue, errands, and the first dungeon | 447 passing |
+| Catalogue | 536 components |
 | Ladder | 50 creatures |
 | `crates/core` | ~33k lines, down from ~50k |
 | wasm | 888 KB |
 | Save format | v1 |
-| Map | 20×20, 5 regions, **1 town**, 6 events |
+| Maps | overworld 20×20 (1 town, 7 events, 1 gate) + the cave 9×5 |
 | Bestiary | 50 creatures, rated 16 to 2958 |
 | Starting kit | **2 components**, 28 Fnorp, 1 assembled weapon |
 | Towns | 1 placed, 2 staged; fixed shelves of 11 / 15 / 17, no reroll |
-| Errands | 3, one to a town |
+| Errands | 8: 3 in the pit, 2 roadside, 2 of Marbulon's, 2 staged |
 | Boards | 6×3 at level 1, one row a level, 6×8 ceiling |
 | Level 5 | ~27 fights, mean of nine seeded walks |
 | Skill trees | 13 base nodes + 3 × 8 class nodes, drawn as trees, a tab each |
 | Figures | 13 family drawings + 4 drawn for themselves + 3 classes → 71 SVGs |
 | Art coverage | 50 of 50 creatures, 3 of 3 towns, 3 of 3 classes, and you |
 
-Note the catalogue is **528**, not the 374 the retheme document counts — it
+Note the catalogue is **536**, not the 374 the retheme document counts — it
 grew upstream after that document was written. Any content work that quotes a
 catalogue size should quote this one.
 

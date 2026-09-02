@@ -73,7 +73,20 @@ function ink() {
   return getComputedStyle(document.body).getPropertyValue('--ink').trim() || '#171a19';
 }
 
+/// The canvas is the map's size, not a fixed square.
+///
+/// The overworld is twenty by twenty and the first dungeon is nine by five; a
+/// canvas pinned to the larger left the cave floating in a screen of nothing.
+function fitMap() {
+  const c = $('map');
+  const w = (world?.width ?? 20) * TILE;
+  const h = (world?.height ?? 20) * TILE;
+  if (c.width !== w) c.width = w;
+  if (c.height !== h) c.height = h;
+}
+
 function draw() {
+  fitMap();
   const c = $('map');
   const g = c.getContext('2d');
   const pal = dark() ? DARK : LIGHT;
@@ -98,7 +111,25 @@ function draw() {
     const cy = y * TILE + TILE / 2;
     g.strokeStyle = ink();
     g.lineWidth = 2;
-    if (p.kind === 'town') {
+    if (p.kind === 'gate' || p.kind === 'boss') {
+      // A gate is a way off this map and a boss is a thing standing on it;
+      // both are worth more than the small mark an event gets.
+      // A diamond, drawn off the tile centre this loop already has — the
+      // first version reached for `px`/`py`, which belong to the terrain loop
+      // above and are out of scope here.
+      const r = TILE / 2 - 3;
+      g.fillStyle = p.kind === 'gate' ? pal.town[0] : pal.rock[0];
+      g.beginPath();
+      g.moveTo(cx, cy - r);
+      g.lineTo(cx + r, cy);
+      g.lineTo(cx, cy + r);
+      g.lineTo(cx - r, cy);
+      g.closePath();
+      g.fill();
+      g.strokeStyle = ink();
+      g.lineWidth = 1.5;
+      g.stroke();
+    } else if (p.kind === 'town') {
       g.fillStyle = pal.town[0];
       g.fillRect(x * TILE + 6, y * TILE + 6, TILE - 12, TILE - 12);
       g.strokeRect(x * TILE + 6, y * TILE + 6, TILE - 12, TILE - 12);
@@ -434,6 +465,10 @@ function runFight() {
     $('result-receipt').replaceChildren(...s.receipt.map((line) => {
       const p = document.createElement('p'); p.textContent = line; return p;
     }));
+    // **Repaint behind the result.** A fight settles here — the purse, what is
+    // carried and how worn out you are all move — and the standing panel used
+    // to keep the pre-fight numbers until the result was dismissed.
+    paintPanel();
     autosave();
   };
   replay.play();
@@ -1001,6 +1036,15 @@ function walk(dir) {
   // Arriving is the doing: an errand that says "go and talk to them" is
   // finished by standing there, and core says so on the step.
   if ((r.spoke ?? []).length) says(`You have been. ${r.spoke.join(', ')}.`);
+  // **Through a gate is a different map.** The ground, the places and the
+  // player's own position all changed, so the page reloads the map rather
+  // than redrawing the one it had.
+  if (r.went) {
+    world = JSON.parse(world_json());
+    says(`You go through.`);
+    paintPanel(); draw(); autosave();
+  }
+  if (r.shut) says(r.shut, true);
   if (r.town) openTown(r.town);
   else if (r.event) openEvent(r.event);
   else if (r.encounter) openFight();
@@ -1166,6 +1210,7 @@ async function main() {
   window.__character = () => JSON.parse(character_json());
   window.__trees = () => JSON.parse(all_trees_json());
   window.__places = () => world.places;
+  window.__world = () => world;
   window.__fightJson = () => fight_json();
 
   $('skills').onclick = openTree;

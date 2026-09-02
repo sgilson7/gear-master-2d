@@ -182,7 +182,24 @@
       ],
       "kind": "event",
       "id": "marbulons-door"
+    },
+    {
+      "at": [
+        16,
+        2
+      ],
+      "kind": "gate",
+      "id": "the-cave-mouth",
+      "name": "the mouth of the Great Gear Cave",
+      "to": "the-great-gear-cave",
+      "at_to": [
+        2,
+        1
+      ],
+      "needs": "The Witch's Key",
+      "shut": "Cork over sneel over your own people's bracket work, and a lock in the middle of it that somebody in the shallows has the key to."
     }
   ],
-  "_map_note": "The first map: one town and a great deal of wilds. Kettleworks and High Wick are written and are not placed here \u2014 they belong on maps that do not exist yet, and their shelves and errands are kept in shops.json and quests.json waiting for them. `towns_on_this_map_all_trade_and_all_want_something` is what stops that becoming an excuse for unreachable content."
+  "_map_note": "The first map: one town and a great deal of wilds. Kettleworks and High Wick are written and are not placed here \u2014 they belong on maps that do not exist yet, and their shelves and errands are kept in shops.json and quests.json waiting for them. `towns_on_this_map_all_trade_and_all_want_something` is what stops that becoming an excuse for unreachable content.",
+  "id": "west-bambulon"
 }

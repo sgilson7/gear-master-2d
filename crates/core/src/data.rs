@@ -11,6 +11,7 @@
 
 pub const TERRAIN_JSON: &str = include_str!("../../../data/terrain.json");
 pub const TILES_JSON: &str = include_str!("../../../data/tiles.json");
+pub const DUNGEON_JSON: &str = include_str!("../../../data/dungeon.json");
 pub const EVENTS_JSON: &str = include_str!("../../../data/events.json");
 pub const THEME_TD_JSON: &str = include_str!("../../../data/theme.td.json");
 pub const SKILLS_JSON: &str = include_str!("../../../data/skills.json");
@@ -24,8 +25,29 @@ pub const SUPPLIES_JSON: &str = include_str!("../../../data/supplies.json");
 /// map does not load is a build that cannot start, and the tests in
 /// `tests/world.rs` are what stop one being made.
 pub fn world(difficulty: crate::combat::Difficulty) -> crate::world::World {
-    crate::world::World::load(TERRAIN_JSON, TILES_JSON, difficulty)
-        .expect("the shipped map is broken")
+    map(&crate::world::overworld(), difficulty)
+}
+
+/// Every map this build ships, by id.
+pub const MAPS: &[(&str, &str)] = &[
+    ("west-bambulon", TILES_JSON),
+    ("the-great-gear-cave", DUNGEON_JSON),
+];
+
+/// One map by id, falling back to the overworld.
+///
+/// **Falls back rather than panics.** A save can name a map this build does
+/// not have — a file from a later version, or one whose dungeon was renamed —
+/// and putting the player on the overworld is a recoverable answer where a
+/// panic is not. `World::repair` then finds them somewhere to stand.
+pub fn map(id: &str, difficulty: crate::combat::Difficulty) -> crate::world::World {
+    let text = MAPS
+        .iter()
+        .find(|(k, _)| *k == id)
+        .or_else(|| MAPS.first())
+        .map(|(_, t)| *t)
+        .expect("at least one map ships");
+    crate::world::World::load(TERRAIN_JSON, text, difficulty).expect("a shipped map is broken")
 }
 
 pub fn events() -> crate::tile_event::EventsData {

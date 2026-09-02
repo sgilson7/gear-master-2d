@@ -26,11 +26,37 @@ thread_local! {
     static GAME: RefCell<Game> = RefCell::new(Game::default());
     /// The map. Loaded once, never mutated, never saved — it is content, and
     /// `WorldState` in the game is the only part of it that is state.
-    static WORLD: World = gm2d_core::data::world(DIFFICULTY);
+    /// Every map, loaded once and kept. Two of them is not worth a cache
+    /// policy; what matters is that `map` never parses a file per frame, which
+    /// is what a naive "load the current one" would do.
+    static WORLDS: Vec<World> = gm2d_core::data::MAPS
+        .iter()
+        .map(|(id, _)| gm2d_core::data::map(id, DIFFICULTY))
+        .collect();
 }
 
-fn map<T>(f: impl FnOnce(&World) -> T) -> T {
-    WORLD.with(f)
+/// The map a given game is standing on.
+///
+/// **Takes the game rather than fetching it.** Nearly every caller is already
+/// inside `with` or `with_mut`, and reaching for `GAME` again is a `RefCell`
+/// double borrow — which in a wasm build is a bare `unreachable` on the
+/// console and nothing else to go on. It cost an hour once; it takes an
+/// argument now.
+///
+/// **Falls back to the first map rather than panicking.** A save can name one
+/// this build has not got, and putting somebody on the overworld is a
+/// recoverable answer where a panic is not — `World::repair` then finds them
+/// somewhere to stand.
+fn map_for<T>(g: &gm2d_core::game::Game, f: impl FnOnce(&World) -> T) -> T {
+    map_named(&g.world.map_id(), f)
+}
+
+/// A named map, whichever one the player is on.
+fn map_named<T>(id: &str, f: impl FnOnce(&World) -> T) -> T {
+    WORLDS.with(|ws| {
+        let w = ws.iter().find(|w| w.id == id).unwrap_or(&ws[0]);
+        f(w)
+    })
 }
 
 fn with<T>(f: impl FnOnce(&Game) -> T) -> T {
@@ -62,7 +88,8 @@ pub fn load_json(text: &str) -> Result<(), JsValue> {
             // trusted. A save from before M2 carries no position at all and
             // defaults to (0, 0), which on this map is rock — and a player who
             // arrived there could not move in any direction.
-            map(|w| w.repair(&mut g.world));
+            let here = g.world.map_id();
+            map_named(&here, |w| w.repair(&mut g.world));
             with_mut(|slot| *slot = g);
             Ok(())
         }
@@ -77,7 +104,7 @@ pub fn new_game(seed: f64) -> () {
         *g = Game::new(seed as u64, "td");
         // A new game starts where the map says, not at (0, 0) — which on this
         // map is rock, and on any map is an assumption.
-        g.world = map(WorldState::at_start);
+        g.world = map_named(&gm2d_core::world::overworld(), WorldState::at_start);
     });
 }
 
@@ -180,7 +207,7 @@ pub fn save_version() -> u32 {
 /// never asks core to draw anything, and core never learns what a pixel is.
 #[wasm_bindgen]
 pub fn world_json() -> String {
-    map(|w| {
+    with(|g| map_for(g, |w| {
         let mut rows = Vec::new();
         for y in 0..w.height {
             let mut row = Vec::new();
@@ -198,6 +225,7 @@ pub fn world_json() -> String {
                     "kind": format!("{:?}", p.kind).to_lowercase(),
                     "id": p.id,
                     "name": p.name,
+                    "needs": p.needs,
                 })
             })
             .collect();
@@ -228,18 +256,21 @@ pub fn world_json() -> String {
             chances.push(row);
         }
         serde_json::json!({
+            // The id, so the page can tell one map from another — a gate that
+            // led somewhere identical would look like a gate that did nothing.
+            "id": w.id,
             "width": w.width, "height": w.height, "rows": rows,
             "chances": chances, "places": places, "regions": regions,
         })
         .to_string()
-    })
+    }))
 }
 
 /// Where the player is standing, and what is under them.
 #[wasm_bindgen]
 pub fn position() -> String {
     with(|g| {
-        map(|w| {
+        map_for(g, |w| {
             let [x, y] = g.world.at;
             serde_json::json!({
                 "x": x, "y": y,
@@ -271,7 +302,8 @@ pub fn try_step(dir: &str) -> String {
         _ => return serde_json::json!({ "moved": false, "blocked": "no such direction" }).to_string(),
     };
     with_mut(|g| {
-        map(|w| {
+        let here = g.world.map_id();
+        map_named(&here, |w| {
             // Repaired here as well as on load. A position that cannot be stood
             // on is a dead end rather than a glitch — there is no key that gets
             // you out of it — so the first keypress fixes it whatever put it
@@ -298,13 +330,64 @@ pub fn try_step(dir: &str) -> String {
                     spoke = gm2d_core::quest::on_arrival(g, &id);
                 }
             }
+
+            // **A gate is answered here, not in `World`.** Whether it opens
+            // depends on what is in the bag, and a map does not know about
+            // bags. Either the player goes through or they are told what the
+            // lock wants.
+            let mut went = None;
+            let mut shut = None;
+            if let Some(id) = &s.gate {
+                if let Some(p) = w.places.iter().find(|p| p.id == *id).cloned() {
+                    let has = p
+                        .needs
+                        .as_deref()
+                        .map(|n| gm2d_core::quest::holding(g, n) > 0)
+                        .unwrap_or(true);
+                    if has {
+                        if let (Some(to), Some(at)) = (p.to.clone(), p.at_to) {
+                            g.world.map = to.clone();
+                            g.world.at = at;
+                            // Repaired on the far side: a gate whose landing
+                            // tile is not walkable would strand somebody on a
+                            // map they cannot leave.
+                            map_named(&to, |dest| dest.repair(&mut g.world));
+                            went = Some(to);
+                        }
+                    } else {
+                        shut = Some(if p.shut.is_empty() {
+                            "It is locked.".to_string()
+                        } else {
+                            p.shut.clone()
+                        });
+                    }
+                }
+            }
+
+            // A creature standing here rather than one the ground rolled.
+            if let Some(id) = &s.boss {
+                if let Some(p) = w.places.iter().find(|p| p.id == *id) {
+                    if let Some(c) = p.creature.clone() {
+                        g.encounter = Some(gm2d_core::fight::Encounter {
+                            enemy: c,
+                            at: g.world.at,
+                        });
+                    }
+                }
+            }
+
             serde_json::json!({
                 "moved": s.moved,
                 "blocked": s.blocked,
                 "event": s.event,
                 "town": s.town,
                 "spoke": spoke,
-                "encounter": s.encounter.map(|m| serde_json::json!({
+                "went": went,
+                "shut": shut,
+                "boss": s.boss,
+                "encounter": s.encounter.or_else(|| {
+                    g.encounter.as_ref().and_then(|e| gm2d_core::fight::spec(e))
+                }).map(|m| serde_json::json!({
                     "name": g.theme_name(m.name),
                     "canonical": m.name,
                     "rating": gm2d_core::rating::creature_rating(m, DIFFICULTY),
@@ -419,7 +502,8 @@ pub fn answer(id: &str, n: usize) -> String {
 #[wasm_bindgen]
 pub fn to_last_town() {
     with_mut(|g| {
-        map(|w| {
+        let here = g.world.map_id();
+        map_named(&here, |w| {
             let home = w
                 .places
                 .iter()
@@ -1168,11 +1252,36 @@ pub fn settle_fight() -> String {
         // A loss walks you home. The world owns where the player is, so the
         // move happens here rather than inside `settle`.
         if s.sent_home.is_some() {
-            map(|w| {
-                if let Some(p) = w.places.iter().find(|p| p.id == g.world.last_town) {
-                    g.world.at = p.at;
+            // **Home may be on another map.** Dying in the cave used to leave
+            // you standing on the boss's own tile, because the walk home
+            // looked for a town on the map you were on and a dungeon has none.
+            // The town is found across every map, and going home crosses maps
+            // the same way a gate does.
+            let want = g.world.last_town.clone();
+            let mut moved = false;
+            for (id, _) in gm2d_core::data::MAPS {
+                map_named(id, |w| {
+                    if !moved {
+                        if let Some(p) = w.places.iter().find(|p| p.id == want) {
+                            g.world.map = w.id.clone();
+                            g.world.at = p.at;
+                            moved = true;
+                        }
+                    }
+                });
+                if moved {
+                    break;
                 }
-            });
+            }
+            if !moved {
+                // No town remembered anywhere. The overworld's start is
+                // always somewhere you can stand.
+                let over = gm2d_core::world::overworld();
+                map_named(&over, |w| {
+                    g.world.map = w.id.clone();
+                    g.world.at = [w.start.0, w.start.1];
+                });
+            }
         }
         serde_json::json!({
             "outcome": format!("{:?}", s.outcome).to_lowercase(),
@@ -1202,11 +1311,11 @@ pub fn flee() {
 /// the caller name it means a caller can name the wrong one.
 /// The place the player is standing on, town or event.
 fn place_here(g: &gm2d_core::game::Game) -> Option<String> {
-    map(|w| w.place_at(g.world.at[0], g.world.at[1]).map(|p| p.id.clone()))
+    map_for(g, |w| w.place_at(g.world.at[0], g.world.at[1]).map(|p| p.id.clone()))
 }
 
 fn town_here(g: &gm2d_core::game::Game) -> Option<String> {
-    map(|w| {
+    map_for(g, |w| {
         w.place_at(g.world.at[0], g.world.at[1])
             .filter(|p| p.kind == gm2d_core::world::PlaceKind::Town)
             .map(|p| p.id.clone())
@@ -1439,7 +1548,7 @@ fn theme_thing(g: &gm2d_core::game::Game, id: &str) -> String {
 /// What a place is called, whether it is a town or something standing in a
 /// field. A town has a name on the map; an event's name is its title.
 fn place_name(g: &gm2d_core::game::Game, id: &str) -> String {
-    let from_map = map(|w| w.places.iter().find(|p| p.id == id).map(|p| p.name.clone()));
+    let from_map = map_for(g, |w| w.places.iter().find(|p| p.id == id).map(|p| p.name.clone()));
     if let Some(n) = from_map.filter(|n| !n.is_empty()) {
         return n;
     }

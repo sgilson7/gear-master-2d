@@ -89,6 +89,19 @@ pub fn run(game: &Game, difficulty: Difficulty) -> Option<CombatLog> {
     ))
 }
 
+/// The boss standing on a tile, if one is, and what beating it leaves.
+///
+/// Reads the map the player is on. A `World` is cheap to build here — this
+/// runs once per settled fight, not per frame.
+fn boss_at(game: &Game, at: [u8; 2]) -> Option<(String, Option<String>)> {
+    let w = crate::data::map(&game.world.map_id(), Difficulty::Easy);
+    let p = w.place_at(at[0], at[1])?;
+    if p.kind != crate::world::PlaceKind::Boss {
+        return None;
+    }
+    Some((p.id.clone(), p.drops.clone()))
+}
+
 /// Bank the result and clear the encounter.
 ///
 /// Idempotent in the sense that matters: with no encounter it does nothing and
@@ -134,6 +147,21 @@ pub fn settle(game: &mut Game, log: &CombatLog, difficulty: Difficulty) -> Optio
             // eyes before anybody wanted one is litter.
             for name in crate::quest::on_victory(game, spec.name) {
                 receipt.push(format!("Took a {name}."));
+            }
+            // **What a boss leaves behind.**
+            //
+            // Looked up by the tile the fight happened on rather than by the
+            // creature's name: the same creature stands in a region's pool as
+            // an ordinary encounter, and beating one in a field must not hand
+            // over the key to anywhere. The place is what makes it a boss.
+            if let Some((id, drop)) = boss_at(game, e.at) {
+                if !game.world.answered.iter().any(|a| *a == id) {
+                    game.world.answered.push(id);
+                    if let Some(name) = drop {
+                        game.character.give(&name);
+                        receipt.push(format!("It was carrying {name}."));
+                    }
+                }
             }
         }
         Outcome::Defeat | Outcome::Stalemate => {

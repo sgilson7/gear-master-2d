@@ -27,6 +27,7 @@ import http.server
 import socketserver
 import sys
 import threading
+import json
 from pathlib import Path
 
 from playwright.sync_api import sync_playwright
@@ -747,6 +748,88 @@ def check_the_result_is_a_pocket_not_a_level(page, name, fails, lines, before):
         fails.append(f"{name}: a defeat left {after['carried']} in the pocket")
 
 
+def check_the_cave_is_shut_until_it_is_not(page, name, fails):
+    """A gate wants a key, says so, and opens once you have one.
+
+    Driven by planting a save on the gate's doorstep rather than by walking
+    Marbulon's questline, which is twenty minutes of fighting. The questline
+    itself is `tests/dungeon.rs`; what a browser has to prove is that the door
+    refuses, says what it wants, and lets you through when it is answered.
+    """
+    gate = page.evaluate("""() => (window.__world().places ?? [])
+        .find(p => p.kind === 'gate' && p.needs)""")
+    if not gate:
+        fails.append(f"{name}: the overworld has no locked gate on it")
+        return
+
+    def stand_beside(save_path, extra=None):
+        save = json.loads(Path(save_path).read_text())
+        body = save.get("state", save)
+        body.setdefault("world", {})["at"] = [gate["at"][0] - 1, gate["at"][1]]
+        body["world"]["map"] = ""
+        if extra:
+            extra(body)
+        out = Path(save_path).parent / "gate-probe.json"
+        out.write_text(json.dumps(save))
+        page.set_input_files("#file", str(out))
+        page.wait_for_timeout(400)
+
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+
+    # Shut.
+    stand_beside(base)
+    page.keyboard.press("ArrowRight")
+    page.wait_for_timeout(250)
+    said = (page.text_content("#says") or "").strip()
+    if not said:
+        fails.append(f"{name}: a locked gate said nothing")
+    if page.evaluate("() => window.__world().id") == 'the-great-gear-cave':
+        fails.append(f"{name}: the locked gate let you through")
+
+    # And open, with the key in the bag.
+    def add_key(body):
+        reg = body["character"].setdefault("registry", [])
+        reg.append({"def": gate["needs"], "rot": 0})
+        body["character"]["owned"].append(len(reg) - 1)
+
+    stand_beside(base, add_key)
+    page.keyboard.press("ArrowRight")
+    page.wait_for_timeout(300)
+    inside = page.evaluate("() => window.__world().id")
+    if inside == "west-bambulon":
+        fails.append(f"{name}: the gate would not open with {gate['needs']} in hand")
+        return
+    # The dungeon is short, has a way back, and something standing at the end.
+    got = page.evaluate("""() => {
+      const w = window.__world();
+      const walk = w.rows.flat().filter(t => t !== 'rock' && t !== 'water').length;
+      return { id: w.id, walk,
+               gates: w.places.filter(p => p.kind === 'gate').length,
+               bosses: w.places.filter(p => p.kind === 'boss').length };
+    }""")
+    if got["walk"] > 40:
+        fails.append(f"{name}: the first dungeon is {got['walk']} tiles, which is a second overworld")
+    if got["gates"] < 1:
+        fails.append(f"{name}: {got['id']} has no way out")
+    if got["bosses"] != 1:
+        fails.append(f"{name}: {got['id']} has {got['bosses']} things at the end of it")
+
+
+def check_fatigue_wears_and_mends(page, name, fails):
+    """A fight tires you, the panel says so, and a tin takes it off."""
+    before = page.evaluate("() => window.__character()")
+    if before["fatigue"] <= 0:
+        fails.append(f"{name}: fights have happened and nothing is worn off")
+        return
+    if "not at all" in (page.text_content("#fatigue") or ""):
+        fails.append(f"{name}: {before['fatigue']}% worn and the panel says otherwise")
+    worn = next((s["n"] for s in before["stats"] if s["label"] == "max health"), 0)
+    if worn >= before["rested_health"]:
+        fails.append(f"{name}: {before['fatigue']}% worn and the maximum did not move")
+
+
 def check_turning_in_hand(page, name, fails):
     """A component turned in hand actually turns.
 
@@ -999,6 +1082,7 @@ def walk_the_gate(browser, name):
         page.wait_for_selector("#stage-result", state="visible", timeout=15000)
         receipt = page.locator("#result-receipt p").all_text_contents()
         check_the_result_is_a_pocket_not_a_level(page, name, fails, receipt, was)
+        check_fatigue_wears_and_mends(page, name, fails)
         if not receipt:
             fails.append(f"{name}: the fight settled with an empty receipt")
         page.click("#done")
@@ -1257,6 +1341,12 @@ def walk_the_gate(browser, name):
         if JSON_NULL != page.evaluate("() => window.__classOffer()"):
             fails.append(f"{name}: the fork is still on offer after being taken")
 
+    # --- the way into the cave -----------------------------------------------
+    # **Last, because it plants a save.** It replaces the character to stand
+    # them on the gate's doorstep, so anything after it would be checking a
+    # game this walk did not play.
+    check_the_cave_is_shut_until_it_is_not(page, name, fails)
+
     # --- the numbers overlay -------------------------------------------------
     page.click("#numbers")
     if page.get_attribute("#numbers", "aria-pressed") != "true":
@@ -1322,6 +1412,8 @@ def main():
     print("ok: both boards are drawn in the replay, and what fires jolts")
     print("ok: the sheet says what you are, and a fight opens holding what the tree granted")
     print("ok: experience is carried out of a fight and only a town spends it")
+    print("ok: every fight wears you down, and the panel and the sheet both say so")
+    print("ok: the cave is shut until you have the key, and short once you are in it")
     print("ok: your own figure becomes your class's when you take one")
     print("ok: a mid-fight save reopens the same fight")
     print("ok: walk, download, reload, upload — position and stream both came back")

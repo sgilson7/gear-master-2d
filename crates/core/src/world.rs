@@ -99,6 +99,18 @@ pub struct RegionDef {
 pub enum PlaceKind {
     Town,
     Event,
+    /// A way onto another map.
+    ///
+    /// The first one is the gate Henpeck put on the Great Gear Cave. A gate
+    /// may want something in your hands before it opens, which is what makes a
+    /// questline a door rather than a receipt.
+    Gate,
+    /// A creature that is standing here, rather than one the ground rolled.
+    ///
+    /// The only fights in the game that are not a draw against a region's
+    /// pool. It is at the end of a dungeon because that is what a dungeon is:
+    /// a corridor with something certain at the end of it.
+    Boss,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -108,12 +120,33 @@ pub struct PlaceDef {
     pub id: String,
     #[serde(default)]
     pub name: String,
+    /// `Gate`: the map it opens onto, and where you arrive on it.
+    #[serde(default)]
+    pub to: Option<String>,
+    #[serde(default)]
+    pub at_to: Option<[u8; 2]>,
+    /// `Gate`: the canonical component you must be carrying for it to open.
+    #[serde(default)]
+    pub needs: Option<String>,
+    /// `Gate`: what to say when you are not.
+    #[serde(default)]
+    pub shut: String,
+    /// `Boss`: the creature standing here, by canonical name.
+    #[serde(default)]
+    pub creature: Option<String>,
+    /// `Boss`: the canonical component beating it leaves behind.
+    #[serde(default)]
+    pub drops: Option<String>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TilesData {
     pub format: String,
     pub version: u32,
+    /// Which map this is. Defaulted so the overworld file, which was the only
+    /// map when it was written, does not have to say so.
+    #[serde(default = "overworld")]
+    pub id: String,
     pub width: u8,
     pub height: u8,
     pub start: [u8; 2],
@@ -139,6 +172,9 @@ pub struct Region {
 /// The map, loaded and checked.
 #[derive(Clone, Debug)]
 pub struct World {
+    /// Which map this is. The overworld is `"west-bambulon"`; a dungeon is its
+    /// own, and `WorldState::map` says which one the player is standing on.
+    pub id: String,
     pub width: u8,
     pub height: u8,
     pub start: (u8, u8),
@@ -153,6 +189,22 @@ pub struct World {
 
 /// Why a map would not load. Every one is a sentence naming the tile.
 pub type WorldError = String;
+
+/// The map everything starts on.
+pub fn overworld() -> String {
+    "west-bambulon".to_string()
+}
+
+impl WorldState {
+    /// Which map this state is on, with the empty default resolved.
+    pub fn map_id(&self) -> String {
+        if self.map.is_empty() {
+            overworld()
+        } else {
+            self.map.clone()
+        }
+    }
+}
 
 impl World {
     /// Load a map from its two data files, checking everything a later stage
@@ -259,6 +311,7 @@ impl World {
         }
 
         let world = World {
+            id: tl.id.clone(),
             width: tl.width,
             height: tl.height,
             start: (tl.start[0], tl.start[1]),
@@ -406,6 +459,12 @@ impl World {
 /// Position, what has been answered, and flags. **Not the map.**
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct WorldState {
+    /// Which map you are standing on.
+    ///
+    /// `default` is the empty string and means the overworld, so a file
+    /// written before there was a second map opens where it left off.
+    #[serde(default)]
+    pub map: String,
     pub at: [u8; 2],
     /// The town to return to after a loss. Empty until one is reached.
     #[serde(default)]
@@ -498,6 +557,11 @@ pub struct Step {
     pub event: Option<String>,
     /// A town on the tile.
     pub town: Option<String>,
+    /// A gate you are now standing on. Whether it opens is the caller's
+    /// question, because it depends on what is in the bag.
+    pub gate: Option<String>,
+    /// A creature standing here rather than one the ground rolled.
+    pub boss: Option<String>,
     /// A fight rolled on entering.
     pub encounter: Option<&'static MonsterSpec>,
 }
@@ -526,6 +590,8 @@ impl Step {
             blocked: Some(why.to_string()),
             event: None,
             town: None,
+            gate: None,
+            boss: None,
             encounter: None,
         }
     }
@@ -568,7 +634,15 @@ pub fn step(
     state.at = [nx, ny];
     state.bump("tiles-walked");
 
-    let mut out = Step { moved: true, blocked: None, event: None, town: None, encounter: None };
+    let mut out = Step {
+        moved: true,
+        blocked: None,
+        event: None,
+        town: None,
+        gate: None,
+        boss: None,
+        encounter: None,
+    };
 
     if let Some(p) = world.place_at(nx, ny) {
         match p.kind {
@@ -580,6 +654,19 @@ pub fn step(
             PlaceKind::Event => {
                 if !state.answered.iter().any(|a| a == &p.id) {
                     out.event = Some(p.id.clone());
+                    return out;
+                }
+            }
+            PlaceKind::Gate => {
+                // The step lands you on the gate; whether it opens is not the
+                // world's business, because it depends on what is in the bag
+                // and a `World` does not know about bags.
+                out.gate = Some(p.id.clone());
+                return out;
+            }
+            PlaceKind::Boss => {
+                if !state.answered.iter().any(|a| a == &p.id) {
+                    out.boss = Some(p.id.clone());
                     return out;
                 }
             }

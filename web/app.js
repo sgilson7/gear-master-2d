@@ -558,46 +558,148 @@ function openTree() {
   $('tree').hidden = false;
 }
 
+/// Which tree is on screen. Kept across repaints so taking a node does not
+/// throw you back to the first tab.
+let openTreeId = null;
+
 function paintTree() {
   const all = JSON.parse(all_trees_json());
   $('tree-points').textContent = all.points;
-  const box = $('nodes');
-  box.replaceChildren();
-  const nodes = all.trees.flatMap((t) => t.nodes.map((n) => ({ ...n, tree: t.name })));
-  for (const n of nodes) {
+  const trees = all.trees;
+  if (!trees.some((t) => t.id === openTreeId)) openTreeId = trees[0]?.id ?? null;
+
+  // --- the tabs ------------------------------------------------------------
+  const tabs = $('tree-tabs');
+  tabs.replaceChildren();
+  tabs.hidden = trees.length < 2;
+  for (const t of trees) {
     const b = document.createElement('button');
     b.type = 'button';
-    b.className = 'wares' + (n.taken ? ' pinned' : '');
-    b.disabled = n.taken || !n.takeable;
-    const foot = n.taken ? 'taken'
-      : n.takeable ? `${n.cost} point${n.cost > 1 ? 's' : ''}`
-      : n.why;
-    // **The name is the world's and the line under it is the engine's.**
-    // A tree that described itself only in the world's words — "Nine hundred
-    // feet of Deep Chocolate mine, and you never once came up early" — is a
-    // tree nobody can spend a point in. The blurb still exists; it has just
-    // stopped being the only thing on the button.
-    b.innerHTML = `<b>${n.name}</b>` +
-                  `<span class="spec">${n.effect}</span>` +
-                  `<span class="cost">${foot}</span>` +
-                  (nodes.some((o) => o.tree !== n.tree)
-                    ? `<span class="meta">${n.tree}</span>` : '');
-    // The rest — what those words mean, and the flavour — on hover and on
-    // focus, so the button stays one line per node and a keyboard reaches it.
-    const detail = () => hoverNode(b, n);
-    b.onpointerenter = detail;
-    b.onfocus = detail;
-    b.onpointerleave = hideNode;
-    b.onblur = hideNode;
-    b.onclick = () => {
-      const why = take_skill(n.id);
-      treeSays(why, !!why);
-      paintTree(); paintPanel(); autosave();
-      const c = JSON.parse(character_json());
-      $('tree-level').textContent = c.level;
-      $('tree-next').textContent = c.next_grows ?? '—';
-    };
-    box.appendChild(b);
+    b.setAttribute('role', 'tab');
+    b.className = t.id === openTreeId ? 'on' : '';
+    b.setAttribute('aria-selected', String(t.id === openTreeId));
+    b.dataset.tree = t.id;
+    const left = t.nodes.filter((n) => !n.taken).length;
+    b.innerHTML = `${t.name}<span class="meta">${left} left</span>`;
+    b.onclick = () => { openTreeId = t.id; hideNode(); paintTree(); };
+    tabs.appendChild(b);
+  }
+
+  const tree = trees.find((t) => t.id === openTreeId);
+  $('tree-which').textContent = tree?.name ?? '';
+  const box = $('nodes');
+  box.replaceChildren();
+  if (!tree) return;
+
+  // --- the tree ------------------------------------------------------------
+  //
+  // **Rows are depth, and depth is core's answer.** A node with nothing to
+  // take first is on the top row; everything else sits below the deepest thing
+  // it asks for. It was one flat rack of buttons before, which told you what
+  // existed and nothing about what led to what.
+  //
+  // Ordered within a row by the average position of its parents, which is the
+  // cheapest thing that stops the lines crossing: a node sits over the things
+  // that need it.
+  const byDepth = [];
+  for (const n of tree.nodes) (byDepth[n.depth] ??= []).push(n);
+  const at = new Map();
+  byDepth.forEach((row, d) => {
+    if (d > 0) {
+      row.sort((a, b) => mean(a) - mean(b));
+    }
+    row.forEach((n, i) => at.set(n.id, i));
+  });
+  function mean(n) {
+    const ps = n.requires.map((r) => at.get(r)).filter((v) => v !== undefined);
+    return ps.length ? ps.reduce((a, b) => a + b, 0) / ps.length : 99;
+  }
+
+  // The lines go under the buttons, in one SVG sized to the whole tree.
+  const wires = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  wires.setAttribute('class', 'wires');
+  box.appendChild(wires);
+
+  const el = new Map();
+  byDepth.forEach((row, d) => {
+    const line = document.createElement('div');
+    line.className = 'tier';
+    line.dataset.depth = d;
+    for (const n of row) line.appendChild(nodeButton(n, tree));
+    box.appendChild(line);
+    for (const n of row) el.set(n.id, line.querySelector(`[data-node="${n.id}"]`));
+  });
+
+  drawWires(box, wires, tree, el);
+  // The rows reflow with the window, so the lines have to be redrawn with it.
+  paintTree.onresize ??= () => { if (!$('tree').hidden) paintTree(); };
+  window.removeEventListener('resize', paintTree.onresize);
+  window.addEventListener('resize', paintTree.onresize);
+}
+
+/// One node, as a button. Unchanged in what it says — the name is the world's
+/// and the line under it is the engine's — only where it sits is new.
+function nodeButton(n, tree) {
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.dataset.node = n.id;
+  b.className = 'wares node' + (n.taken ? ' pinned' : '') + (n.takeable ? ' open' : '');
+  b.disabled = n.taken || !n.takeable;
+  const foot = n.taken ? 'taken'
+    : n.takeable ? `${n.cost} point${n.cost > 1 ? 's' : ''}`
+    : n.why;
+  b.innerHTML = `<b>${n.name}</b>` +
+                `<span class="spec">${n.effect}</span>` +
+                `<span class="cost">${foot}</span>`;
+  const detail = () => hoverNode(b, n);
+  b.onpointerenter = detail;
+  b.onfocus = detail;
+  b.onpointerleave = hideNode;
+  b.onblur = hideNode;
+  b.onclick = () => {
+    const why = take_skill(n.id);
+    treeSays(why, !!why);
+    hideNode();
+    paintTree(); paintPanel(); autosave();
+    const c = JSON.parse(character_json());
+    $('tree-level').textContent = c.level;
+    $('tree-next').textContent = c.next_grows ?? '—';
+  };
+  return b;
+}
+
+/// A line from each prerequisite to the node that wants it.
+///
+/// Measured off the laid-out buttons rather than computed from a grid: the
+/// rows are flex and wrap, so where a node actually *is* is the only thing
+/// that can be trusted. Drawn as an elbow — down out of the parent, across,
+/// down into the child — because a diagonal through three rows of buttons is
+/// unreadable and a curve is worse.
+function drawWires(box, svg, tree, el) {
+  const b = box.getBoundingClientRect();
+  svg.setAttribute('width', b.width);
+  svg.setAttribute('height', b.height);
+  svg.setAttribute('viewBox', `0 0 ${b.width} ${b.height}`);
+  svg.replaceChildren();
+  for (const n of tree.nodes) {
+    const to = el.get(n.id);
+    if (!to) continue;
+    for (const r of n.requires) {
+      const from = el.get(r);
+      if (!from) continue;
+      const a = from.getBoundingClientRect(), c = to.getBoundingClientRect();
+      const x1 = a.left - b.left + a.width / 2, y1 = a.bottom - b.top;
+      const x2 = c.left - b.left + c.width / 2, y2 = c.top - b.top;
+      const mid = y1 + (y2 - y1) / 2;
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', `M ${x1} ${y1} V ${mid} H ${x2} V ${y2}`);
+      // A wire into something already taken is spent; one into something you
+      // could take now is lit. The rest is scaffolding.
+      const cls = tree.nodes.find((m) => m.id === n.id)?.taken ? 'done'
+        : el.get(r).classList.contains('pinned') ? 'live' : '';
+      path.setAttribute('class', cls);
+      svg.appendChild(path);
+    }
   }
 }
 
@@ -948,6 +1050,7 @@ async function main() {
   window.__classOffer = () => JSON.parse(class_offer_json());
   window.__encounter = () => JSON.parse(encounter_json());
   window.__character = () => JSON.parse(character_json());
+  window.__trees = () => JSON.parse(all_trees_json());
   window.__fightJson = () => fight_json();
 
   $('skills').onclick = openTree;

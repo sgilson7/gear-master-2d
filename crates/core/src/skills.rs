@@ -244,6 +244,51 @@ pub struct Tree {
     pub nodes: Vec<Node>,
 }
 
+impl Tree {
+    /// How far down this node sits: **0 when nothing has to be taken first**,
+    /// otherwise one past the deepest thing it needs.
+    ///
+    /// A property of the prerequisite graph, so it lives here rather than in
+    /// the page that draws it. A screen working its own layering out would be
+    /// a second answer to "what has to come first", and the two would disagree
+    /// the first time a node gained a second prerequisite.
+    ///
+    /// A cycle cannot deepen a node for ever: the walk refuses to revisit, and
+    /// `no_tree_requires_itself_in_a_circle` refuses the data outright.
+    pub fn depth_of(&self, id: &str) -> u32 {
+        fn walk(t: &Tree, id: &str, seen: &mut Vec<String>) -> u32 {
+            if seen.iter().any(|s| s == id) {
+                return 0;
+            }
+            let Some(n) = t.nodes.iter().find(|n| n.id == id) else { return 0 };
+            if n.requires.is_empty() {
+                return 0;
+            }
+            seen.push(id.to_string());
+            let d = n.requires.iter().map(|r| walk(t, r, seen)).max().unwrap_or(0) + 1;
+            seen.pop();
+            d
+        }
+        walk(self, id, &mut Vec::new())
+    }
+
+    /// The nodes grouped by depth, shallowest first.
+    ///
+    /// What you can spend a point on right now is the top row; everything that
+    /// asks for something first is below whatever it asks for.
+    pub fn rows(&self) -> Vec<Vec<&Node>> {
+        let mut rows: Vec<Vec<&Node>> = Vec::new();
+        for n in &self.nodes {
+            let d = self.depth_of(&n.id) as usize;
+            if rows.len() <= d {
+                rows.resize_with(d + 1, Vec::new);
+            }
+            rows[d].push(n);
+        }
+        rows
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct SkillsData {
     pub format: String,

@@ -243,6 +243,41 @@ def check_every_skill_says_what_it_does(page, name, fails):
             if w in n["spec"].lower():
                 fails.append(f"{name}: {n['name']!r} spec is themed: {n['spec']!r}")
 
+    # --- and it is drawn as a tree ------------------------------------------
+    #
+    # It was one flat rack of buttons, which told you what existed and nothing
+    # about what led to what. Rows are depth: nothing on the top row asks for
+    # anything first, and every node sits below the deepest thing it needs.
+    shape = page.evaluate("""() => {
+      const tiers = [...document.querySelectorAll('#nodes .tier')];
+      const depth = new Map();
+      tiers.forEach((t, d) => t.querySelectorAll('.node').forEach(n => depth.set(n.dataset.node, d)));
+      const all = window.__trees();
+      const tree = all.trees.find(t => t.id === document.querySelector('#tree-tabs button.on')
+                                        ?.dataset.tree) ?? all.trees[0];
+      const bad = [];
+      for (const n of tree.nodes) {
+        const d = depth.get(n.id);
+        if (d === undefined) { bad.push(`${n.id} is not drawn`); continue; }
+        if (n.requires.length === 0 && d !== 0) bad.push(`${n.id} needs nothing and is on row ${d}`);
+        for (const r of n.requires) {
+          const p = depth.get(r);
+          if (p === undefined) bad.push(`${n.id} requires ${r}, which is not drawn`);
+          else if (p >= d) bad.push(`${n.id} is on row ${d}, at or above its prerequisite ${r} on ${p}`);
+        }
+      }
+      return { tiers: tiers.map(t => t.querySelectorAll('.node').length),
+               wires: document.querySelectorAll('#nodes .wires path').length,
+               edges: tree.nodes.reduce((n, x) => n + x.requires.length, 0),
+               bad };
+    }""")
+    if shape["bad"]:
+        fails.append(f"{name}: the tree is not a tree: {shape['bad'][:4]}")
+    if len(shape["tiers"]) < 2:
+        fails.append(f"{name}: the tree drew {len(shape['tiers'])} row(s), so it is still a list")
+    if shape["wires"] != shape["edges"]:
+        fails.append(f"{name}: {shape['edges']} prerequisites and {shape['wires']} lines drawn")
+
     # And hovering one opens the card that explains the words in it.
     page.hover("#nodes .wares")
     page.wait_for_selector("#node-detail", state="visible", timeout=4000)
@@ -1071,12 +1106,28 @@ def walk_the_gate(browser, name):
         if art["hidden"] or not art["w"]:
             fails.append(f"{name}: the class figure did not load: {art}")
 
-        # The class tree opened, and it is bigger than the base tree alone.
+        # The class brought its own tree, and it has a tab of its own.
+        #
+        # Counted as tabs rather than as one long rack of nodes: only the open
+        # tree is drawn now, so "more nodes than the base tree" stopped being
+        # the question. What matters is that the class tree is reachable and
+        # full of nodes.
         page.wait_for_selector("#tree", state="visible", timeout=8000)
-        after = page.locator("#nodes .wares").count()
-        if after <= 13:
-            fails.append(f"{name}: after the fork the tree shows {after} nodes, "
-                         f"which is no more than the base tree")
+        tabs = page.locator("#tree-tabs button")
+        if tabs.count() < 2:
+            fails.append(f"{name}: after the fork the tree screen shows "
+                         f"{tabs.count()} tab(s), so the class tree is unreachable")
+        else:
+            base = page.locator("#nodes .node").count()
+            tabs.nth(1).click()
+            page.wait_for_timeout(120)
+            klass = page.locator("#nodes .node").count()
+            if klass == 0:
+                fails.append(f"{name}: the class tab opened an empty tree")
+            if page.locator("#tree-tabs button.on").count() != 1:
+                fails.append(f"{name}: switching tabs left {page.locator('#tree-tabs button.on').count()} selected")
+            if base == 0:
+                fails.append(f"{name}: the base tree drew nothing")
         page.click("#tree-done")
         page.wait_for_selector("#tree", state="hidden", timeout=8000)
 
@@ -1138,6 +1189,7 @@ def main():
     print("ok: cork is per activation, not a standing stat")
     print("ok: pointing at an item on the board reads it in the panel")
     print("ok: every skill states its effect in numbers, unthemed, and explains it on hover")
+    print("ok: the tree is drawn as a tree — free skills on top, prerequisites above what needs them")
     print("ok: the creature has a portrait, and the portrait loaded")
     print("ok: what it is wearing is on the screen — its board, its items, its own body")
     print("ok: both boards tick in the replay, and pointing at a row reads that item")

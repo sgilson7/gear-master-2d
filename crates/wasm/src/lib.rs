@@ -1551,6 +1551,14 @@ pub fn all_trees_json() -> String {
                         );
                         serde_json::json!({
                             "id": n.id, "name": n.name, "blurb": n.blurb, "cost": n.cost,
+                            // The shape of the tree, as core reads it: what has
+                            // to come first, and how far down that puts this.
+                            // The page draws the layout; it does not work it
+                            // out, or there would be two answers to "what comes
+                            // first" and they would part the first time a node
+                            // gained a second prerequisite.
+                            "requires": n.requires,
+                            "depth": t.depth_of(&n.id),
                             // The two halves the panel keeps apart: the name
                             // and blurb are the world's, `effect` and `detail`
                             // are the engine's, unthemed and with a number in
@@ -1565,7 +1573,11 @@ pub fn all_trees_json() -> String {
                         })
                     })
                     .collect();
-                serde_json::json!({ "id": t.id, "name": t.name, "class": t.class, "nodes": nodes })
+                serde_json::json!({
+                    "id": t.id, "name": t.name, "class": t.class,
+                    "rows": t.rows().len(),
+                    "nodes": nodes,
+                })
             })
             .collect();
         serde_json::json!({ "points": g.character.skill_points, "trees": trees }).to_string()

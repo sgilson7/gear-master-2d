@@ -397,3 +397,43 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
 #sheet li::before { content: "·"; position: absolute; left: 0; color: var(--ink-3); }
 #sheet li.dim { color: var(--ink-3); }
 #sheet li.none { color: var(--ink-3); font-style: italic; }
+
+/* --- the tree, drawn as a tree ------------------------------------------- */
+/* Rows are depth: nothing on the top row asks for anything first, and every
+   node below sits under the deepest thing it needs. */
+.skilltree { position: relative; display: grid; gap: 30px; padding-top: 4px; }
+.skilltree .tier {
+  display: flex; flex-wrap: wrap; gap: 14px; justify-content: center;
+  position: relative; z-index: 1;
+}
+.skilltree .node { width: 208px; }
+/* The wires sit under the buttons and take no pointer events, or the gaps
+   between nodes would swallow a hover. */
+.skilltree .wires {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: visible;
+}
+.skilltree .wires path { fill: none; stroke: var(--line); stroke-width: 2; }
+.skilltree .wires path.live { stroke: var(--brass); stroke-width: 2.5; }
+.skilltree .wires path.done { stroke: var(--brass); opacity: .45; }
+/* Something you can spend a point on right now. The tree is mostly locked at
+   any moment, so the few open doors are what wants finding. */
+.skilltree .node.open { border: 1px solid var(--brass); }
+
+/* The tab strip was styled only as `.made .tabs`, and this one is not inside
+   a `.made` panel — so it inherited nothing and the buttons stacked. */
+#tree-tabs { display: flex; flex-wrap: wrap; gap: 2px; margin-bottom: 22px; }
+#tree-tabs button {
+  font-family: var(--mono); font-size: 10.5px; font-weight: 600;
+  letter-spacing: .08em; text-transform: uppercase;
+  border: 1px solid var(--line); background: transparent; color: var(--ink-3);
+  border-radius: 0; text-align: center;
+}
+#tree-tabs button.on {
+  background: var(--surface-2); color: var(--ink);
+  border-color: var(--brass); box-shadow: inset 0 -2px 0 var(--brass);
+}
+#tree-tabs button:hover:not(.on) { color: var(--ink-2); }
+#tree-tabs[hidden] { display: none; }
+#tree-tabs button { flex: 0 1 auto; padding: 8px 16px; display: grid; gap: 1px; }
+#tree-tabs button .meta { font-size: 10px; letter-spacing: .06em; opacity: .8; }
+@media (max-width: 720px) { .skilltree .node { width: 100%; } }

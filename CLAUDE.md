@@ -628,6 +628,46 @@ the panel draws `art.classes[canonical]` from then on. Repainted on every
 `paintPanel`, so a loaded save arrives wearing its own figure rather than
 waiting for the next fork.
 
+## The tree is a tree
+
+It was one flat rack of buttons, which told you what existed and nothing about
+what led to what.
+
+- **Rows are depth, and depth is core's.** `Tree::depth_of` is 0 for a node
+  with no prerequisite and one past the deepest thing it needs otherwise;
+  `Tree::rows` groups by it. A screen working its own layering out would be a
+  second answer to "what has to come first", and the two would part the first
+  time a node gained a second prerequisite — `w-law` already has two.
+- The top row is exactly **what you can spend a point on with an empty sheet**,
+  which is the question somebody opening the screen is asking.
+- **Within a row, order by the average position of the parents.** The cheapest
+  thing that keeps the lines from crossing, and it puts a node over the things
+  that need it.
+- **Wires are measured, not computed.** The rows are flex and wrap, so where a
+  node actually *is* is the only thing that can be trusted; `drawWires` reads
+  `getBoundingClientRect` after layout and redraws on resize. Elbows rather
+  than diagonals — a straight line through three rows of buttons is
+  unreadable.
+- A wire into a node whose prerequisite is taken is lit; the rest is
+  scaffolding. `.open` outlines a node you could take right now, because the
+  tree is mostly locked at any moment and the few open doors are what wants
+  finding.
+
+**One tab a tree**, and it is built for a list rather than a pair: a character
+has the base tree plus whichever class trees they have unlocked, and there will
+be more than one of the second kind. `all_trees_json` already returns exactly
+the trees a character may spend in, so the tabs are however many that is.
+
+Two things this broke, both worth knowing:
+
+- `#tree-tabs` carries `class="tabs"` and is **not** inside a `.made` panel,
+  and the tab styling was written as `.made .tabs`. It inherited nothing and
+  the buttons stacked. A style scoped to a container is a style the next user
+  of that class name will not get.
+- The fork's browser check counted `#nodes .wares` and asserted "more than the
+  base tree". Only the open tree is drawn now, so that question stopped
+  meaning anything; it counts tabs and opens the class one instead.
+
 ## Tone, as a lint
 
 `tests/tone.rs` holds the eight rules from `TONE.md` a machine can check. Not
@@ -686,6 +726,7 @@ and M5's trees may spend them again.
 | Shops, errands and a replay of both sides | 425 passing |
 | Components that show their shape and explain themselves | 427 passing |
 | The sheet, and a fight that opens holding what it holds | 429 passing |
+| A tree drawn as a tree | 431 passing |
 | Catalogue | 528 components |
 | Ladder | 50 creatures |
 | `crates/core` | ~33k lines, down from ~50k |
@@ -698,7 +739,7 @@ and M5's trees may spend them again.
 | Errands | 3, one to a town |
 | Boards | 6×3 at level 1, one row a level, 6×8 ceiling |
 | Level 5 | ~27 fights, mean of nine seeded walks |
-| Skill trees | 13 base nodes + 3 × 8 class nodes, every one stating its effect |
+| Skill trees | 13 base nodes + 3 × 8 class nodes, drawn as trees, a tab each |
 | Figures | 13 family drawings + 4 drawn for themselves + 3 classes → 71 SVGs |
 | Art coverage | 50 of 50 creatures, 3 of 3 towns, 3 of 3 classes, and you |
 

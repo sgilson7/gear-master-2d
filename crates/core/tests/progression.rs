@@ -441,3 +441,63 @@ fn show_the_pit() {
         }
     }
 }
+
+/// A tree is a tree: nothing requires itself, however far round you go.
+///
+/// `Tree::depth_of` walks prerequisites and would recurse for ever on a cycle.
+/// It refuses to revisit, so a cycle in the data would draw a quietly wrong
+/// layout rather than hanging — which is worse, because nothing would say so.
+#[test]
+fn no_tree_requires_itself_in_a_circle() {
+    let skills = data::skills();
+    for t in &skills.trees {
+        for n in &t.nodes {
+            let mut seen = vec![n.id.clone()];
+            let mut edge = n.requires.clone();
+            while let Some(id) = edge.pop() {
+                assert_ne!(id, n.id, "{}: {} requires its way back to itself", t.id, n.id);
+                if seen.contains(&id) {
+                    continue;
+                }
+                seen.push(id.clone());
+                if let Some(m) = t.nodes.iter().find(|m| m.id == id) {
+                    edge.extend(m.requires.clone());
+                }
+            }
+        }
+    }
+}
+
+/// Every tree has something you can spend a point on the moment you open it,
+/// and every prerequisite is in the same tree as the node that wants it.
+#[test]
+fn every_tree_has_a_top_row_and_keeps_its_prerequisites_at_home() {
+    let skills = data::skills();
+    for t in &skills.trees {
+        let rows = t.rows();
+        assert!(!rows.is_empty(), "{}: no nodes at all", t.id);
+        assert!(!rows[0].is_empty(), "{}: nothing can be taken first", t.id);
+        for n in &t.nodes {
+            for r in &n.requires {
+                assert!(
+                    t.nodes.iter().any(|m| m.id == *r),
+                    "{}: {} requires {r}, which is in another tree",
+                    t.id,
+                    n.id
+                );
+            }
+        }
+        // And a node always sits below everything it asks for.
+        for n in &t.nodes {
+            let d = t.depth_of(&n.id);
+            for r in &n.requires {
+                assert!(
+                    t.depth_of(r) < d,
+                    "{}: {} is not below its prerequisite {r}",
+                    t.id,
+                    n.id
+                );
+            }
+        }
+    }
+}

@@ -95,7 +95,7 @@
       <div class="screenbox">
         <header class="fighthead">
           <div>
-            <p class="eyebrow">a Sprocketman's craft</p>
+            <p class="eyebrow" id="tree-which">a Sprocketman's craft</p>
             <h2>The tree</h2>
             <p class="note">One point a level. A Sprocketman's craft is making working gear out
               of loose pieces; everything here is a way of being better at that.</p>
@@ -106,7 +106,11 @@
             <div><dt>next row</dt><dd id="tree-next">&mdash;</dd></div>
           </dl>
         </header>
-        <div id="nodes" class="shelf"></div>
+        <!-- One tab a tree. A character has the base tree and whichever class
+             tree they have unlocked; there will be more than one of the second
+             kind, so this is built for a list rather than for a pair. -->
+        <div id="tree-tabs" class="tabs" role="tablist"></div>
+        <div id="nodes" class="skilltree"></div>
         <p id="tree-says" class="says" hidden></p>
         <div class="row"><button id="tree-done" type="button" class="primary">Back out</button></div>
       </div>

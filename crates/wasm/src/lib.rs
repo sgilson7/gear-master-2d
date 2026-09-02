@@ -380,6 +380,7 @@ pub fn try_step(dir: &str) -> String {
                 "moved": s.moved,
                 "blocked": s.blocked,
                 "event": s.event,
+                "spent": s.spent,
                 "town": s.town,
                 "spoke": spoke,
                 "went": went,
@@ -430,8 +431,14 @@ pub fn event_json(id: &str) -> String {
                 })
             })
             .collect();
-        serde_json::json!({ "id": e.id, "title": e.title, "prose": e.prose, "choices": choices })
-            .to_string()
+        serde_json::json!({
+            "id": e.id, "title": e.title, "prose": e.prose, "choices": choices,
+            // **The card opens whether or not the doors are spent.** A place
+            // with an errand on it is somewhere you come back to, and refusing
+            // to reopen made Marbulon's tile inert the moment you spoke to her.
+            "spent": g.world.answered.iter().any(|a| a == id),
+        })
+        .to_string()
     })
 }
 
@@ -1302,6 +1309,46 @@ pub fn flee() {
 }
 
 // ---------------------------------------------------------------- the shop
+
+/// Where there is an errand you could act on, keyed by place.
+///
+/// The map draws a ring on these. Answered here rather than in the page for the
+/// usual reason: which errands are actionable where is a rule, and a screen
+/// working it out is a second rulebook.
+#[wasm_bindgen]
+pub fn errand_marks_json() -> String {
+    with(|g| {
+        let quests = gm2d_core::data::quests();
+        let here = g.world.map_id();
+        let mut out: Vec<serde_json::Value> = Vec::new();
+        map_for(g, |w| {
+            for p in &w.places {
+                let mut take = false;
+                let mut give = false;
+                for q in quests.at(&p.id) {
+                    match gm2d_core::quest::stage(g, q) {
+                        gm2d_core::quest::Stage::Offered if q.giver == p.id => take = true,
+                        gm2d_core::quest::Stage::Ready
+                            if gm2d_core::quest::QuestsData::turn_in_of(q) == p.id =>
+                        {
+                            give = true
+                        }
+                        _ => {}
+                    }
+                }
+                if take || give {
+                    out.push(serde_json::json!({
+                        "at": p.at, "id": p.id,
+                        // Handing one in is the better news, so it wins when a
+                        // place is both.
+                        "mark": if give { "hand-in" } else { "take" },
+                    }));
+                }
+            }
+        });
+        serde_json::json!({ "map": here, "places": out }).to_string()
+    })
+}
 
 /// Which town the player is standing in, if any.
 ///

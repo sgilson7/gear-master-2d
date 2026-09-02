@@ -13,6 +13,7 @@ import init, {
   board_json, legal_anchors, place, pick_up, rotate, toggle_lock, undo, clear_board,
   look_json, look_over,
   encounter_json, fight_json, settle_fight, flee,
+  errand_marks_json,
 } from './pkg/gm2d_wasm.js';
 import { Board } from './board.js';
 import { Theirs } from './theirs.js';
@@ -34,6 +35,9 @@ function figure(kind, key) {
   return name ? `assets/${name}.svg` : null;
 }
 let debug = false;
+/// Where there is an errand you could act on. Core's answer, refreshed
+/// whenever anything could have changed it.
+let errandMarks = [];
 let blocked = null;   // the last refusal, drawn for one frame
 
 // Terrain colours, in the palette the rest of the page uses. Two per terrain:
@@ -100,6 +104,23 @@ function draw() {
       g.fillStyle = pair[(x + y) % 2];
       g.fillRect(x * TILE, y * TILE, TILE, TILE);
     }
+  }
+
+  // **A ring where there is something to do.** Drawn over whatever the place
+  // already is, rather than as a fourth shape, because "there is an errand
+  // here" is a fact *about* a place and not a kind of place. Gold to take one,
+  // brass-on-white to hand one in — the second is the better news, so it is
+  // the louder mark.
+  for (const m of errandMarks) {
+    const [mx, my] = m.at;
+    const ccx = mx * TILE + TILE / 2, ccy = my * TILE + TILE / 2;
+    g.beginPath();
+    g.arc(ccx, ccy, TILE / 2 - 2, 0, Math.PI * 2);
+    g.strokeStyle = m.mark === 'hand-in' ? '#f0c85a' : pal.town[0];
+    g.lineWidth = m.mark === 'hand-in' ? 3 : 2;
+    g.setLineDash(m.mark === 'hand-in' ? [] : [5, 4]);
+    g.stroke();
+    g.setLineDash([]);
   }
 
   // Places. A town is a filled square with a ring; an event is a small mark —
@@ -218,6 +239,7 @@ function paintPanel() {
   $('gold').textContent = gold();
   paintSheet(c);
   paintYou(c.class);
+  refreshErrandMarks();
 }
 
 /// The character sheet: what you are, and what you walk into a fight holding.
@@ -295,6 +317,13 @@ function paintSheet(c) {
   $('sheet').innerHTML = rows.join('') || `<li class="none">nothing yet</li>`;
 }
 
+/// Ask core where the errands are. Cheap, and called wherever one could have
+/// moved: a panel repaint covers taking, handing in, walking and loading.
+function refreshErrandMarks() {
+  const m = JSON.parse(errand_marks_json());
+  errandMarks = m.map === (world?.id ?? m.map) ? m.places : [];
+}
+
 function toggleDebug() {
   debug = !debug;
   $('numbers').textContent = debug ? 'Hide the numbers' : 'Show the numbers';
@@ -348,7 +377,10 @@ function openEvent(id) {
   const e = JSON.parse(event_json(id));
   if (e.error) { says(e.error, true); return; }
   paintErrands($('card-errands'), null);
-  showCard(e.title, e.prose, e.choices, (i) => {
+  // **Spent doors are not offered again.** The card reopens because the place
+  // may still have an errand on it; the choices were answered once and that
+  // was right.
+  showCard(e.title, e.prose, e.spent ? [] : e.choices, (i) => {
     const r = JSON.parse(answer(id, i));
     if (r.error) { says(r.error, true); return; }
     $('card-choices').replaceChildren();

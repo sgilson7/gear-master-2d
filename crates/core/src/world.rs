@@ -555,6 +555,14 @@ pub struct Step {
     pub blocked: Option<String>,
     /// An event standing on the tile that has not been answered yet.
     pub event: Option<String>,
+    /// Whether that event's choices have already been answered.
+    ///
+    /// **The card always opens; only the choices are spent.** An event's prose
+    /// and its doors are a one-time thing, which is right — but an errand board
+    /// is a standing feature of a place, the same as a town's. Refusing to
+    /// reopen the card made Marbulon's tile inert the moment you spoke to her,
+    /// and her two errands are the questline that unlocks the cave.
+    pub spent: bool,
     /// A town on the tile.
     pub town: Option<String>,
     /// A gate you are now standing on. Whether it opens is the caller's
@@ -589,6 +597,7 @@ impl Step {
             moved: false,
             blocked: Some(why.to_string()),
             event: None,
+            spent: false,
             town: None,
             gate: None,
             boss: None,
@@ -638,6 +647,7 @@ pub fn step(
         moved: true,
         blocked: None,
         event: None,
+        spent: false,
         town: None,
         gate: None,
         boss: None,
@@ -652,10 +662,9 @@ pub fn step(
                 return out;
             }
             PlaceKind::Event => {
-                if !state.answered.iter().any(|a| a == &p.id) {
-                    out.event = Some(p.id.clone());
-                    return out;
-                }
+                out.event = Some(p.id.clone());
+                out.spent = state.answered.iter().any(|a| a == &p.id);
+                return out;
             }
             PlaceKind::Gate => {
                 // The step lands you on the gate; whether it opens is not the

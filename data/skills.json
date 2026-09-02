@@ -571,6 +571,35 @@
               "pct": 15
             }
           }
+        },
+        {
+          "id": "w-roast",
+          "name": "Filed Under The Roast",
+          "blurb": "Two hundred and nine helmets are in the Keeper’s book, filed by what was still coming off them when they were handed back. Yours goes down as two hundred and ten, under the Roast.",
+          "requires": [
+            "w-ledger"
+          ],
+          "effect": {
+            "grants": {
+              "rule": {
+                "curse_on_activate": {
+                  "slot": "helmet",
+                  "curse": "searing"
+                }
+              }
+            }
+          }
+        },
+        {
+          "id": "w-survey",
+          "name": "The Standing Count",
+          "blurb": "The Keeper counts what is out there twice a day and has never once gone out to look. The second count is the one filed. The first is kept for the difference, which is the part worth knowing.",
+          "requires": [],
+          "effect": {
+            "grants": {
+              "rule": "scout"
+            }
+          }
         }
       ]
     }

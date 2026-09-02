@@ -3270,6 +3270,14 @@ pub struct Combatant {
     /// Wellspring: spending a pool refunds this percent of it to each of the
     /// other three.
     pub confluence: i32,
+    /// Slots whose every activation lands a curse, because the skill tree
+    /// said so.
+    ///
+    /// **A fight input, not a global.** It arrives on `Held` beside the armour
+    /// and the mana the tree grants, the same way a `ClassPower` arrives on
+    /// `classes` — combat stays a pure function of what it was handed, which
+    /// is the property a mid-fight save rests on.
+    pub curse_on_activate: Vec<(SlotKind, crate::curse::CurseKind)>,
     /// How many times this side has activated anything, for `echo_every`.
     activations: u32,
     dot_milli: i32,
@@ -3369,6 +3377,7 @@ impl Combatant {
             burn_acc: 0,
             burn_timer: 0,
             curse_watch_depth: 0,
+            curse_on_activate: Vec::new(),
         }
     }
 
@@ -3481,6 +3490,7 @@ impl Combatant {
             burn_acc: 0,
             burn_timer: 0,
             curse_watch_depth: 0,
+            curse_on_activate: Vec::new(),
         }
     }
 
@@ -4222,7 +4232,7 @@ impl CombatLog {
 ///   4. deaths are checked
 ///
 /// Nothing here consults a random number generator.
-/// What the player is already holding when the bell goes.
+/// What the player brings to the bell that is not in their stats.
 ///
 /// Armour and mana are grants an *item* makes on its own tick everywhere else
 /// in the engine, so the character-level totals of them describe nothing and
@@ -4230,10 +4240,18 @@ impl CombatLog {
 /// one thing that hands them out standing rather than per activation, so it
 /// passes them here — beside `Stats` rather than inside it, because folding
 /// them in would pay every item's armour a second time as a starting balance.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+///
+/// `rules` arrived with the tree's fifth effect kind and goes through the same
+/// door for the same reason: **a granted rule is a fight input, like a class
+/// power, and not a mutable global.** Combat stays a pure function of what it
+/// was handed. It costs this type its `Copy`, which is the whole of the price.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Held {
     pub armor: i32,
     pub mana: i32,
+    /// Rules the skill tree granted. Translated into combatant fields below,
+    /// the same way a `ClassPower` is.
+    pub rules: Vec<crate::skills::Rule>,
 }
 
 pub fn simulate(player_stats: Stats, profiles: &[ItemProfile], spec: &MonsterSpec) -> CombatLog {
@@ -4337,6 +4355,26 @@ pub fn simulate_party_holding(
     // add to and subtract from what the tree granted rather than replacing it.
     start_player.armor += held.armor;
     start_player.mana += held.mana;
+    // **Rules the tree granted.** Translated here rather than read as `Rule`s
+    // in the tick, so combat goes on speaking its own vocabulary and a new
+    // rule is one arm in one place. Exhaustive, so a rule nobody wires up is a
+    // compile error rather than a node that costs a point and does nothing.
+    for r in &held.rules {
+        match r {
+            crate::skills::Rule::CurseOnActivate { slot, curse } => {
+                if let (Some(s), Some(k)) = (
+                    crate::skills::slot_of(slot),
+                    crate::curse::CurseKind::by_name(curse),
+                ) {
+                    start_player.curse_on_activate.push((s, k));
+                }
+            }
+            // Not a combat rule at all: it decides what the map screen is
+            // allowed to print. Same shape as `Prospector` and `Showstopper`,
+            // which are settlement rules and are ignored here too.
+            crate::skills::Rule::Scout => {}
+        }
+    }
     // Every class you hold applies at once. The fountains hand out different
     // classes, never the same one twice, so two powers never fight over the
     // same field.
@@ -5305,6 +5343,28 @@ fn activate(
             }
             other => firing.push(other),
         }
+    }
+
+    // **A rule the tree granted, not a trigger the item carries.**
+    //
+    // Here rather than folded into `item.triggers` at profile time, because
+    // the profile is the board's answer and this is the character's: two
+    // players with the identical board do not have the identical fight, and
+    // an item's card must not start claiming a curse the item does not own.
+    let granted: Vec<crate::curse::CurseKind> = {
+        let me = pick(p, foes, me);
+        match item.slot {
+            Some(s) => me
+                .curse_on_activate
+                .iter()
+                .filter(|(want, _)| *want == s)
+                .map(|(_, k)| *k)
+                .collect(),
+            None => Vec::new(),
+        }
+    };
+    for kind in granted {
+        apply(p, foes, me, Action::Curse { kind, target: Target::Enemy }, t, log, Some(idx));
     }
 
     for trigger in &firing {

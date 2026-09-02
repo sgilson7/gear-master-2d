@@ -1008,6 +1008,15 @@ impl Character {
         crate::data::skills().start_with(&self.skills_taken)
     }
 
+    /// Can this character read the map's numbers?
+    ///
+    /// Core's answer, so the shim can decide nothing: a screen that worked out
+    /// for itself whether to print the danger would be a second copy of the
+    /// rule, and it would go on printing it after the node was retuned.
+    pub fn scouting(&self) -> bool {
+        self.start_with().rules.iter().any(|r| matches!(r, crate::skills::Rule::Scout))
+    }
+
     pub fn combat_items(&self) -> Vec<crate::loadout::ItemProfile> {
         self.loadout.combat_items(&self.registry)
     }

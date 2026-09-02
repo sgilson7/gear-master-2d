@@ -89,6 +89,7 @@ fn every_effect_key_is_one_the_engine_actually_reads() {
         ("start_with", &["armor", "mana"]),
         ("grow_slot_rows", &["slot", "rows"]),
         ("assembly_pct", &["pct"]),
+        ("grants", &["rule"]),
     ];
     let raw: serde_json::Value =
         serde_json::from_str(include_str!("../../../data/skills.json")).unwrap();
@@ -159,7 +160,7 @@ fn armour_the_tree_grants_is_armour_the_fight_starts_with() {
     };
     assert_eq!(soaked(Held::default()), 0, "nobody starts a fight wearing armour");
     assert_eq!(
-        soaked(Held { armor: 40, mana: 0 }),
+        soaked(Held { armor: 40, mana: 0, rules: Vec::new() }),
         40,
         "all forty points should be spent soaking, and no more than forty"
     );
@@ -170,7 +171,7 @@ fn armour_the_tree_grants_is_armour_the_fight_starts_with() {
 fn the_shipped_tree_still_hands_out_what_it_promises() {
     let tree = data::skills();
     let held = tree.start_with(&["corked".into(), "funnel-drill".into()]);
-    assert_eq!(held, Held { armor: 12, mana: 20 }, "the two base nodes that grant them");
+    assert_eq!(held, Held { armor: 12, mana: 20, rules: Vec::new() }, "the two base nodes that grant them");
 
     // And the mixed node keeps both halves: strength through `stats_from`,
     // armour through `start_with`.
@@ -308,7 +309,7 @@ fn the_log_opens_holding_what_the_tree_granted() {
         c.take_skill(&data::skills(), id).expect("a base node with a point in hand");
     }
     let held = c.start_with();
-    assert_eq!(held, Held { armor: 12, mana: 20 }, "the two nodes as shipped");
+    assert_eq!(held, Held { armor: 12, mana: 20, rules: Vec::new() }, "the two nodes as shipped");
 
     let spec: &MonsterSpec =
         gm2d_core::combat::LADDER.iter().find(|s| s.name == "Bog Toad").expect("a toad");
@@ -319,7 +320,7 @@ fn the_log_opens_holding_what_the_tree_granted() {
         Difficulty::Easy,
         &[],
         0,
-        held,
+        held.clone(),
     );
 
     assert_eq!(log.player.armor, held.armor, "the opening frame's armour");
@@ -350,7 +351,7 @@ fn the_four_nodes_a_player_took_all_do_something() {
     let after = c.player_stats();
     assert_eq!(after.health - before.health, 60, "Cave Lungs");
     assert_eq!(after.strength - before.strength, 6, "Handspan");
-    assert_eq!(c.start_with(), Held { armor: 12, mana: 20 }, "Corked and Funnel Drill");
+    assert_eq!(c.start_with(), Held { armor: 12, mana: 20, rules: Vec::new() }, "Corked and Funnel Drill");
 }
 
 // ------------------------------------------------- what an item does to them
@@ -411,4 +412,130 @@ fn a_piece_that_curses_nobody_has_nothing_in_that_group() {
         .find(|d| d.name == "Oak Handle")
         .expect("the starting handle");
     assert!(curse_lines(plain.triggers).is_empty(), "the Oak Handle curses somebody");
+}
+
+// ------------------------------------------------------- skills that grant rules
+
+/// **A rule the tree granted reaches the fight, and only when it is taken.**
+///
+/// The tree could grant a stat, a starting balance, a row and an assembly
+/// percentage — all arithmetic. `Effect::Grants` is the first one that says the
+/// game works differently for you now, and the way it can fail is the way
+/// `Effect::Stat`'s armour and mana failed: it parses, it costs a point, it
+/// shows as taken, and nothing reads it.
+#[test]
+fn a_granted_rule_reaches_the_fight() {
+    use gm2d_core::character::Character;
+    use gm2d_core::combat::{simulate_holding, Difficulty, Event, Side};
+    use gm2d_core::curse::CurseKind;
+
+    fn burns(c: &Character) -> usize {
+        let spec = gm2d_core::combat::LADDER
+            .iter()
+            .find(|s| s.name == "Bog Toad")
+            .expect("a toad");
+        let log = simulate_holding(
+            c.player_stats(),
+            &c.combat_items(),
+            spec,
+            Difficulty::Easy,
+            &[],
+            0,
+            c.start_with(),
+        );
+        log.entries
+            .iter()
+            .filter(|e| {
+                matches!(
+                    e.event,
+                    Event::Cursed { on: Side::Enemy, kind: CurseKind::Searing, .. }
+                )
+            })
+            .count()
+    }
+
+    // A helmet, because the rule hangs off a helmet's activation and the
+    // starting kit is a handle and a blade. Seated by hand at the three cells
+    // the old starting kit used, which is a helmet that assembles on a
+    // three-row frame.
+    fn with_a_helmet() -> Character {
+        use gm2d_core::piece::SlotKind;
+        let mut c = Character::starting();
+        c.apply_preset();
+        for (piece, x, y) in [("Steel Frame", 0, 0), ("Iron Plating", 3, 0), ("Visor of Focus", 0, 2)]
+        {
+            let id = c.give(piece).expect("a catalogue helmet piece");
+            c.equip(id, SlotKind::Helmet, x, y).expect("it fits a three-row frame");
+        }
+        c
+    }
+
+    let plain = with_a_helmet();
+    assert_eq!(burns(&plain), 0, "a starting kit already burns things");
+
+    let mut keeper = with_a_helmet();
+    keeper.skill_points += 8;
+    // A class tree is shut until the class is taken, and a class is taken at
+    // level five. Spent rather than granted, because the level is derived from
+    // what has been spent and there is no second number to set.
+    keeper.gain_xp(500);
+    keeper.choose_class("Bloodletter").expect("the class the node belongs to");
+    for id in ["w-the-fact", "w-ledger", "w-roast"] {
+        keeper.take_skill(&data::skills(), id).expect("the spine down to the node");
+    }
+    // The helmet has to be assembled, or there is nothing to hang the rule off
+    // — which is the point of hanging it off an activation rather than off the
+    // bell.
+    assert!(
+        keeper.combat_items().iter().any(|i| i.slot == gm2d_core::piece::SlotKind::Helmet),
+        "the preset seats no helmet, so this test proves nothing"
+    );
+    assert!(burns(&keeper) > 0, "the node was taken and no curse of searing landed");
+
+    // And the rule is the character's, not the board's: the same board without
+    // the node burns nothing.
+    assert_eq!(burns(&plain), 0, "the rule leaked onto a character who never took it");
+}
+
+/// **Every rule says what it does, in a number, unthemed.**
+///
+/// The exhaustive match is what makes a new rule a compile error until
+/// somebody has said what it does — the same guard `Action::describe` and
+/// `Trigger::describe` carry, arrived at for the same reason.
+#[test]
+fn every_rule_is_described() {
+    use gm2d_core::skills::Rule;
+    const THEMED: &[&str] = &["fnorp", "the funny", "cork", "fury", "devotion", "harvest"];
+    let every = [
+        Rule::CurseOnActivate { slot: "helmet".into(), curse: "searing".into() },
+        Rule::Scout,
+    ];
+    for r in &every {
+        let line = r.line();
+        assert!(!line.is_empty(), "{r:?} says nothing");
+        assert!(line.chars().any(|c| c.is_ascii_digit()), "{r:?}: {line:?} names no number");
+        let low = line.to_lowercase();
+        for w in THEMED {
+            assert!(!low.contains(w), "{r:?}: {line:?} speaks the theme");
+        }
+        assert!(!r.detail().is_empty(), "{r:?} explains nothing on hover");
+        r.check().unwrap_or_else(|e| panic!("{r:?} is not a rule the engine has: {e}"));
+    }
+    // And a rule naming something the engine has not got is refused at load
+    // rather than discovered by whoever spent the point on it.
+    assert!(Rule::CurseOnActivate { slot: "hat".into(), curse: "searing".into() }.check().is_err());
+    assert!(Rule::CurseOnActivate { slot: "helmet".into(), curse: "damp".into() }.check().is_err());
+}
+
+/// Scouting is a rule the character either has or has not.
+#[test]
+fn scouting_is_earned_and_not_assumed() {
+    use gm2d_core::character::Character;
+    let mut c = Character::starting();
+    assert!(!c.scouting(), "a fresh character can already read the map");
+    c.skill_points += 4;
+    c.gain_xp(500);
+    c.choose_class("Bloodletter").expect("the class");
+    c.take_skill(&data::skills(), "w-survey").expect("the scouting node");
+    assert!(c.scouting(), "took the node and the map stayed shut");
 }

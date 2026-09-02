@@ -207,7 +207,13 @@ pub fn save_version() -> u32 {
 /// never asks core to draw anything, and core never learns what a pixel is.
 #[wasm_bindgen]
 pub fn world_json() -> String {
-    with(|g| map_for(g, |w| {
+    with(|g| {
+        // **Scouting is earned.** The figures a `Show the numbers` button used
+        // to hand out for free are a skill's now, and whether this character
+        // has it is core's answer — a screen deciding for itself would go on
+        // printing them after the node was retuned.
+        let scouting = g.character.scouting();
+        map_for(g, |w| {
         let mut rows = Vec::new();
         for y in 0..w.height {
             let mut row = Vec::new();
@@ -248,36 +254,44 @@ pub fn world_json() -> String {
         // two places, in two languages, with only one of them tested. The
         // overlay draws numbers it was given.
         let mut chances = Vec::new();
-        for y in 0..w.height {
-            let mut row = Vec::new();
-            for x in 0..w.width {
-                row.push(w.encounter_per_mille(x, y));
+        if scouting {
+            for y in 0..w.height {
+                let mut row = Vec::new();
+                for x in 0..w.width {
+                    row.push(w.encounter_per_mille(x, y));
+                }
+                chances.push(row);
             }
-            chances.push(row);
         }
         serde_json::json!({
             // The id, so the page can tell one map from another — a gate that
             // led somewhere identical would look like a gate that did nothing.
             "id": w.id,
             "width": w.width, "height": w.height, "rows": rows,
+            "scouting": scouting,
             "chances": chances, "places": places, "regions": regions,
         })
         .to_string()
-    }))
+    })})
 }
 
 /// Where the player is standing, and what is under them.
 #[wasm_bindgen]
 pub fn position() -> String {
     with(|g| {
+        let scouting = g.character.scouting();
         map_for(g, |w| {
             let [x, y] = g.world.at;
             serde_json::json!({
                 "x": x, "y": y,
                 "terrain": w.terrain_name(x, y),
                 "region": w.region_at(x, y).map(|r| r.name.clone()),
-                "danger": w.region_at(x, y).map(|r| r.danger),
-                "chance": w.encounter_per_mille(x, y),
+                // Null until the tree grants the reading. Not zero: zero is a
+                // number and would be a lie, and a screen cannot tell a lie
+                // from a bug.
+                "scouting": scouting,
+                "danger": scouting.then(|| w.region_at(x, y).map(|r| r.danger)).flatten(),
+                "chance": scouting.then(|| w.encounter_per_mille(x, y)),
                 "town": g.world.last_town,
                 "walked": g.world.count("tiles-walked"),
                 "fights": g.world.count("encounters"),

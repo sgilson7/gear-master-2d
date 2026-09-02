@@ -76,6 +76,16 @@ impl CurseKind {
     pub const ALL: [CurseKind; 4] =
         [CurseKind::Searing, CurseKind::Frost, CurseKind::Stun, CurseKind::Misfire];
 
+    /// The kind a data file names, or nothing.
+    ///
+    /// The inverse of [`name`](Self::name), and it exists so a skill node can
+    /// say `"searing"` in `skills.json` and be refused at load if it says
+    /// anything else. A curse nobody can spell is a node that costs a point
+    /// and does nothing, which is a failure this project has shipped once.
+    pub fn by_name(name: &str) -> Option<CurseKind> {
+        CurseKind::ALL.into_iter().find(|k| k.name() == name)
+    }
+
     pub fn name(self) -> &'static str {
         match self {
             CurseKind::Searing => "searing",

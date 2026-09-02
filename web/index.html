@@ -13,7 +13,8 @@
       <h1>Gear Master 2D</h1>
       <p class="sub">Arrow keys or WASD, one tile a press. Something stops you, you pack your frames,
         and the fight runs itself. Every level adds a row to one frame and a point to spend, and at level five
-        you pick what you are. Press <kbd>`</kbd> for the numbers behind the map.</p>
+        you pick what you are. What is out there and how likely it is to stop you are things
+        you learn rather than things you are told.</p>
     </header>
 
     <div class="board">
@@ -57,7 +58,11 @@
           <div class="row">
             <button id="skills" type="button">The tree</button>
             <button id="errands-open" type="button">Errands</button>
-            <button id="numbers" type="button" aria-pressed="false">Show the numbers</button>
+            <!-- **Not `#numbers`.** That button handed out the map's danger
+                 and its odds to everybody for nothing, which made a skill that
+                 grants them a skill that grants nothing. The reading is earned
+                 now, and this only exists once somebody has earned it. -->
+            <button id="scout" type="button" aria-pressed="false" hidden>Odds on every tile</button>
           </div>
         </div>
 

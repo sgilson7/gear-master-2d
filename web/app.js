@@ -210,7 +210,7 @@ function draw() {
     g.stroke();
   }
 
-  if (debug) drawDebug(g, pos);
+  if (debug && world.scouting) drawDebug(g, pos);
 
   if (blocked) {
     g.fillStyle = 'rgba(139,66,37,.9)';
@@ -282,8 +282,13 @@ function paintPanel() {
   $('region').textContent = p.region ?? '—';
   $('terrain').textContent = p.terrain;
   $('coords').textContent = `${p.x}, ${p.y}`;
-  $('chance').textContent = `${p.chance} / 1000`;
-  $('danger').textContent = p.danger ?? '—';
+  // Null rather than zero until the tree grants the reading: zero is a number
+  // and would be a lie, and a screen cannot tell a lie from a bug.
+  $('chance').textContent = p.scouting ? `${p.chance} / 1000` : 'you could not say';
+  $('danger').textContent = p.scouting ? (p.danger ?? '—') : 'you could not say';
+  // The button is the skill's, so it is not there without it.
+  $('scout').hidden = !p.scouting;
+  if (!p.scouting && debug) toggleScout();
   $('walked').textContent = p.walked;
   $('fights').textContent = p.fights;
   $('gold').textContent = gold();
@@ -385,10 +390,16 @@ function refreshPin() {
   startPulse();
 }
 
-function toggleDebug() {
+/// The per-tile odds, for somebody who has earned them.
+///
+/// **Not a debug overlay any more.** `#numbers` handed the map's danger and
+/// its odds to everybody for nothing, which made a skill that grants them a
+/// skill that grants nothing. The button only exists once the node is taken,
+/// and core decides that — the page asks and draws.
+function toggleScout() {
   debug = !debug;
-  $('numbers').textContent = debug ? 'Hide the numbers' : 'Show the numbers';
-  $('numbers').setAttribute('aria-pressed', String(debug));
+  $('scout').textContent = debug ? 'Hide the odds' : 'Odds on every tile';
+  $('scout').setAttribute('aria-pressed', String(debug));
   draw();
 }
 
@@ -865,7 +876,10 @@ function nodeButton(n, tree) {
     const why = take_skill(n.id);
     treeSays(why, !!why);
     hideNode();
-    paintTree(); paintPanel(); autosave();
+    // A node can change what the map is allowed to say, and `chances` rides
+    // in `world_json` — so the map is re-read rather than merely redrawn.
+    world = JSON.parse(world_json());
+    paintTree(); paintPanel(); draw(); autosave();
     const c = JSON.parse(character_json());
     $('tree-level').textContent = c.level;
     $('tree-next').textContent = c.next_grows ?? '—';
@@ -1353,12 +1367,12 @@ async function main() {
     if (!$('fork').hidden) return;
     if (e.key === 'Escape' && !$('card').hidden) { closeCard(); return; }
     // `d` is east on WASD, so the overlay gets its own key and a button.
-    if (e.key === '`') { e.preventDefault(); toggleDebug(); return; }
+    if (e.key === '`' && !$('scout').hidden) { e.preventDefault(); toggleScout(); return; }
     const dir = KEYS[e.key];
     if (dir) { e.preventDefault(); walk(dir); }
   });
 
-  $('numbers').onclick = toggleDebug;
+  $('scout').onclick = toggleScout;
 
   board = new Board($('board'), {
     boardJson: board_json,
@@ -1423,6 +1437,7 @@ async function main() {
   window.__log = () => JSON.parse(quest_log_json());
   window.__guide = (id) => JSON.parse(guide_json(id));
   window.__hoverGuide = () => hoverGuide;
+  window.__position = () => position();
   // Layout is the one claim reading the source cannot settle, so the gate has
   // to be able to put the fight screen on each stage and measure it.
   window.__stage = (which) => stage(which);
@@ -1497,7 +1512,9 @@ async function main() {
   };
   $('reset').onclick = () => {
     new_game(Date.now());
-    closeCard(); paintPanel(); draw(); autosave(); says('New game.');
+    closeCard();
+    world = JSON.parse(world_json());
+    paintPanel(); draw(); autosave(); says('New game.');
   };
   $('file').onchange = async (e) => {
     const f = e.target.files?.[0];
@@ -1505,6 +1522,12 @@ async function main() {
     try {
       load_json(new TextDecoder().decode(await f.arrayBuffer()));
       closeCard(); $('fight').hidden = true;
+      // **Re-read the map, not just repaint it.** A save carries which map it
+      // was on and what the character may read of it, and both ride in
+      // `world_json` — a loaded file was drawing the map the page happened to
+      // start with. Only a step through a gate used to refresh this, so a save
+      // taken in the cave opened onto the overworld's ground until you moved.
+      world = JSON.parse(world_json());
       paintPanel(); draw(); autosave();
       says(`Loaded ${f.name}.`);
       if (JSON.parse(encounter_json())) openFight();

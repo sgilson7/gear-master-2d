@@ -838,6 +838,74 @@ def check_an_errand_can_be_handed_in_where_it_was_taken(page, name, fails):
     page.wait_for_selector("#card", state="hidden", timeout=5000)
 
 
+def check_scouting_is_earned(page, name, fails):
+    """The map's danger and its odds are a skill, and `#numbers` is gone.
+
+    `Show the numbers` was a debug overlay that shipped, and it handed the
+    region's danger and every tile's odds to everybody for nothing — which
+    makes a node granting them a node granting nothing. The reading is the
+    Worm-Fact Keeper's now: the class that files what a thing was doing.
+
+    Planted for the second half, because reaching the node by play means
+    levelling to five, being offered the right one of three classes and
+    spending a point on it — and a check that only fires when the fork happens
+    to deal you a Bloodletter is a check that stops firing.
+    """
+    if page.query_selector("#numbers") is not None:
+        fails.append(f"{name}: #numbers is still on the page, so the skill grants nothing")
+    shut = page.evaluate("""() => ({
+      scouting: JSON.parse(window.__position()).scouting,
+      chance: document.getElementById('chance').textContent,
+      danger: document.getElementById('danger').textContent,
+      button: !!document.querySelector('#scout:not([hidden])'),
+      chances: (window.__world().chances ?? []).length,
+    })""")
+    if shut["scouting"]:
+        fails.append(f"{name}: this character never took the node and can read the map")
+    else:
+        if any(c.isdigit() for c in shut["chance"]) or any(c.isdigit() for c in shut["danger"]):
+            fails.append(f"{name}: unscouted and the panel prints {shut['chance']!r} / "
+                         f"{shut['danger']!r}")
+        if shut["button"]:
+            fails.append(f"{name}: unscouted and the odds button is on the panel")
+        if shut["chances"]:
+            fails.append(f"{name}: unscouted and the map shipped {shut['chances']} rows of odds")
+
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+
+    def keeper(body):
+        body["character"]["class"] = "Bloodletter"
+        body["character"]["skills_taken"] = list(
+            body["character"].get("skills_taken", [])) + ["w-survey"]
+
+    plant(page, base, keeper, stem="scout-probe")
+    open_ = page.evaluate("""() => ({
+      scouting: JSON.parse(window.__position()).scouting,
+      chance: document.getElementById('chance').textContent,
+      danger: document.getElementById('danger').textContent,
+      button: !!document.querySelector('#scout:not([hidden])'),
+      chances: (window.__world().chances ?? []).length,
+    })""")
+    if not open_["scouting"]:
+        fails.append(f"{name}: took the scouting node and core still says no")
+        return
+    if not any(c.isdigit() for c in open_["chance"]):
+        fails.append(f"{name}: scouting, and the odds read {open_['chance']!r}")
+    if not any(c.isdigit() for c in open_["danger"]):
+        fails.append(f"{name}: scouting, and the danger reads {open_['danger']!r}")
+    if not open_["button"]:
+        fails.append(f"{name}: scouting, and there is no way to see the per-tile odds")
+        return
+    if not open_["chances"]:
+        fails.append(f"{name}: scouting, and the map carries no per-tile odds")
+    page.click("#scout")
+    if page.get_attribute("#scout", "aria-pressed") != "true":
+        fails.append(f"{name}: the odds overlay did not turn on")
+    page.click("#scout")
+
+
 def check_the_replay_reports_a_curse(page, name, fails):
     """A curse lands and the screen moves.
 
@@ -1697,11 +1765,8 @@ def walk_the_gate(browser, name):
     check_an_errand_can_be_handed_in_where_it_was_taken(page, name, fails)
     check_the_cave_is_shut_until_it_is_not(page, name, fails)
 
-    # --- the numbers overlay -------------------------------------------------
-    page.click("#numbers")
-    if page.get_attribute("#numbers", "aria-pressed") != "true":
-        fails.append(f"{name}: the numbers overlay did not turn on")
-    page.click("#numbers")
+    # --- scouting ------------------------------------------------------------
+    check_scouting_is_earned(page, name, fails)
 
     ctx.close()
     if problems:
@@ -1769,6 +1834,7 @@ def main():
     print("ok: a curse lands, says what it is doing, and comes off its own clock")
     print("ok: the advance button is the same box on all three fight stages")
     print("ok: a town takes the tiredness off, and the panel says so")
+    print("ok: the map's odds are a skill somebody took, not a button everybody had")
     print("ok: your own figure becomes your class's when you take one")
     print("ok: a mid-fight save reopens the same fight")
     print("ok: walk, download, reload, upload — position and stream both came back")

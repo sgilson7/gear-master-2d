@@ -7,6 +7,11 @@ next block and follows their conventions.
 **Four milestones, each deployable on its own.** M10.0 changes where an ench
 comes from, M10.1 teaches the fight that an item can break, M10.2 is the class
 that is built on the two of them, and M10.3 is the standing "play it" gate.
+
+**Three of §5's questions were answered before a line was written**, and the
+answers are folded in below rather than left as proposals: it breaks **for the
+fight**; **no town sells an ench**; and what a tree does not award is sold by
+**one vendor, who is not there until level 10.** §5 keeps the record.
 Every one ships behind `make test`, `make test-ui` in three browsers, and
 `make play` read by a person.
 
@@ -61,6 +66,23 @@ grid rather than a shorter portrait."* The fix is written down; this is the bloc
 that owes it. `check_the_fork_is_on_top` measures with `elementFromPoint` and is
 what will say whether the grid works.
 
+### **No town benches means three of the Patent's eight nodes are dead**
+
+This one is a consequence of the human's answer rather than of the ask, and it
+is the sharpest thing recon found after it.
+
+The Kaklon Patent's tree is eight nodes and **three of them tune the spin** —
+`spin_extra`, `spin_every`, `spin_keep`. The spin is not a stat; it is an
+*ench*, The Ponkey Turn, and today you buy it off a bench for 90 Fnorp. Take the
+benches out of the towns and the Patent is a class you are offered at level five
+whose identity, and three eighths of whose tree, does nothing at all until level
+ten.
+
+That is not a reason to keep the benches. It is the thing that makes the other
+half of the ask load-bearing: **the Patent's tree has to grant The Ponkey Turn,**
+and the node it belongs on is already called **Bench Rights** — no prerequisite,
+and the root of the spin spine. The node named for the bench hands you the bench.
+
 ### **Three quarters of the ench already exists**
 
 `Ench::Effect::Power { pct }` adds percentage points to an item's own power
@@ -81,7 +103,7 @@ still a new one.
 
 | # | Ask | Where it lands |
 |---|---|---|
-| A | An ench comes from a **named vendor**, not from every town | M10.0 |
+| A | **No town sells an ench**; one vendor does, and not before level 10 | M10.0 |
 | B | An ench comes from a **skill node** | M10.0 |
 | C | An item can **break**: one activation, then it is finished | M10.1 |
 | D | An ench that is **3× power and breaks** | M10.1 |
@@ -110,8 +132,8 @@ still a new one.
 
 ## M10.0 — Where an ench comes from
 
-**Theme:** an ench stops being a shelf item and becomes something you went and
-got.
+**Theme:** an ench stops being a shelf item and becomes something you were
+awarded or went and found.
 
 ### The rule today, and why it is being changed
 
@@ -127,16 +149,10 @@ and got.**
 
 ### Deliverables
 
-1. **A bench is a town's, and it is content.** `shops.json`'s town entries gain
-   `enchs: [id]`, beside the `stock` they already carry. `EnchDef::price` stays
-   as *what it costs*; **where** is the town's list. Same division the components
-   already make: the catalogue says what a thing is, the shelf says who sells it.
-   - **Append, never insert**, and the save carries `WorldState::bought` by
-     index — so the bench needs the same treatment the shelf has or a save that
-     bought ench two comes back having bought a different one. Decide this
-     explicitly: the recommendation is a **separate `bought_enchs` list keyed by
-     `(town, ench id)`**, because an ench is bought by name and not by shelf
-     position, and reusing the index would be one list answering two questions.
+1. **No town sells an ench.** The bench comes off the town screen and
+   `shop_json`; `buy_ench`'s "you are not in a town" refusal goes with it. This
+   is a deletion, and it is the milestone's first commit so that everything
+   after it is adding sources back rather than moving them.
 2. **A node can hand one over.** `skills::Effect` gains a sixth kind,
    `GivesEnch { ench: String }`.
    - **Derived, never banked.** `Character::enchs_owned` is state; a node's
@@ -149,48 +165,91 @@ and got.**
      attachment. If that ever changes, `tidy_enchs` is where it lands.
    - `Effect::line` for it is the ench's own name and spec, so a node says what
      it hands over rather than naming an id.
-3. **`Rule::check`'s sibling for enchs.** `SkillsData::parse` refuses a node
-   naming an ench `enchs.json` has not got, and `ShopsData::parse` refuses a town
-   selling one. Both are the guard `Rule::check` already is, and both exist
+3. **`Bench Rights` grants The Ponkey Turn.** Not a nicety — see §0. Three of
+   the Patent's eight nodes tune a spin that only an ench supplies, and with the
+   towns closed the class would be inert from five to ten. The node with no
+   prerequisite at the root of the spin spine is the one, and it is already
+   named for it.
+4. **One vendor, and he is not there until level 10.** A place on the overworld
+   that does not exist below the level and sells what no tree awards.
+   - **A place, gated on a level.** `PlaceDef::hidden_until` reads `answered`
+     and `flags`, which cannot express a level — and writing `level-10` into
+     `flags` when it is reached would store a number the game derives from
+     experience, which is two answers to one question and is refused by the rule
+     that has held since M4. So it reads the level the way a crossing does:
+     through `world::Allowances`, which has carried one since M9.3.
+     `place_is_there`, `place_now` and `places_now` take it. **Seventeen call
+     sites across three files — counted, not guessed.**
+   - **It is a bench, not a card.** An event's choices are spent as a set:
+     `answer` refuses a second choice and pushes the whole event id into
+     `answered`, so a card could sell one thing once. The town bench already
+     renders an ench with its spec, its price, whether it is affordable and how
+     many you hold, and `buy_ench` already refuses the ways it should. So the
+     vendor is `PlaceKind::Bench` and it reuses all of that; what is new is the
+     tile it stands on and the level it waits for.
+   - **What he sells is content**, in `enchs.json` beside the price or in his
+     own list — one of the two, decided in the commit, and not both.
+   - **Bought once, and remembered.** `WorldState::bought` is `(town, index)`
+     into a shelf; an ench is bought by id, so this is a separate
+     `bought_enchs` list of ids. One list answering two questions is how the
+     shelf's index rule gets broken.
+5. **`Rule::check`'s sibling for enchs.** `SkillsData::parse` refuses a node
+   naming an ench `enchs.json` has not got, and the vendor's stock is refused
+   the same way. Both are the guard `Rule::check` already is, and both exist
    because *content nobody can reach is the thing nothing else in the game says
    anything about.*
-4. **A lint per source.** `every_ench_comes_from_somewhere` walks `enchs.json`
-   and refuses one that is on no bench, in no node and paid by no errand. That is
-   the lint this milestone is *for*: the point of narrowing availability is that
-   an ench now has a place it comes from, and an ench with none is an orphan.
-5. **The bench says whose it is.** A town that sells no ench shows no bench, the
-   same way a town with no errand shows no board.
+6. **A lint per source.** `every_ench_comes_from_somewhere` walks `enchs.json`
+   and refuses one that is on no vendor, in no node and paid by no errand. That
+   is the lint this milestone is *for*: the point of narrowing availability is
+   that an ench now has a place it comes from, and an ench with none is an
+   orphan. Its sibling, `no_ench_is_sold_by_a_town`, is the ask.
+
+### Where the vendor stands, and why it matters
+
+He has to be somewhere a level-ten character can reach and a level-nine one
+cannot trivially stumble over, which the map now answers for free: the crossings
+opened the Verge at nine, so **the Verge or West Bambulon is where he goes** —
+past the last crossing, in the half of the map a player only sees once they have
+earned it. That also means the walk to him is a walk, which is the whole of what
+"went and found" means here.
 
 ### Tests
 
-- `every_ench_comes_from_somewhere`, and its inverse — no ench is sold by every
-  town, which is the ask.
-- `a_node_that_names_no_ench_is_refused`, `a_bench_that_names_no_ench_is_refused`.
+- `no_ench_is_sold_by_a_town` — the ask, stated as a lint.
+- `every_ench_comes_from_somewhere`, and the inverse: nothing is awarded twice.
+- `the_patent_is_not_inert_before_the_vendor` — a level-five Licensee who has
+  spent one point can put an ench on a component. This is the test that would
+  have caught the gap §0 found, and it is the reason the milestone has a
+  deliverable 3.
+- `a_node_that_names_no_ench_is_refused`, `a_vendor_that_names_no_ench_is_refused`.
 - `a_granted_ench_is_derived_and_not_banked`: take the node, assert the ench is
   there; **change nothing in the save and retune the node in the data**, and
   assert the character's answer moved.
-- `a_save_from_before_the_bench_moved_still_opens` — the four priced enchs are
-  still buyable somewhere, and a character who already owns one keeps it.
-- `check_the_bench_is_that_towns_bench` (browser).
+- `the_vendor_is_not_there_before_the_level`, and is there after — asserted
+  against `place_now`, `places_now` and `step`, because a place that is absent
+  from the map and steppable is half hidden.
+- `a_save_from_before_the_benches_closed_still_opens`, and a character who
+  already bought an ench keeps it.
+- `check_the_vendor_appears` (browser): planted at nine, nothing on the tile;
+  planted at ten, a bench with something on it.
 
 ### Deploy point
 
-After 5. Nothing new exists; four things moved. Worth shipping on its own
-because it is the milestone most likely to be *wrong about the map* — one town
-is placed, so "specific vendors" is currently a list of one, and that is a
-finding a player will have an opinion about immediately.
+After 6.
 
 ### Risks
 
-- **One town is placed.** Kettleworks and High Wick are written, shelved and on
-  no map (`PLAN.md` §6a row 1). If the four existing enchs are spread across
-  three benches, three quarters of them become unreachable in the shipped
-  build. **The plan is that the pit's bench keeps two and the tree grants one,
-  and the other two move to the staged towns** — which turns §6a row 1 from a
-  deferred nicety into the thing standing between the player and content. Say so
-  in the commit; do not quietly keep all four in the pit.
-
----
+- **Seventeen call sites for one signature.** M9.0 did the same to `world::step`
+  and the note it left is the one to follow: change it once, in one commit, with
+  nothing else in it.
+- **A place that appears is a place the map has to redraw.** `world_json` is
+  sent once at startup and re-read on a gate; a place that appears on a *level*
+  appears when you bank, which is a moment nothing currently refreshes the map
+  for. That is a one-line fix and a very easy thing to miss — the symptom is a
+  vendor who is there and invisible until you walk through a gate.
+- **The errand's ench is a third source** and stays one. The Yodregar Index is
+  paid by THE FRAME THAT STANDS and is on nobody's bench, which is the rule
+  M8 set and this milestone does not disturb.
 
 ## M10.1 — An item that breaks
 
@@ -245,9 +304,18 @@ that could be.
 
 ### Deploy point
 
-After 6, with the ench on a bench and no class attached to it. **The mechanic
-gets a player's opinion before a class is built on it**, which is the ordering
-M9 wished it had for the drop rate.
+After 6, with the Swing on the vendor's bench and no class attached to it yet.
+**The mechanic gets a player's opinion before a class is built on it**, which is
+the ordering M9 wished it had for the drop rate. It costs nothing to move it
+into the Bill's tree afterwards if that reads better.
+
+**It breaks for the fight and not for good** — answered, and the reasoning is
+kept because it is what makes the deliverables above small: combat is a pure
+function of the board, a mid-fight save carries a creature name and a tile, and
+a component destroyed for good would be the fight writing to the character. It
+would also be the first thing in the game that takes a component away, with
+locks, enchs, Auto-pack and the save all owed an answer. `RunningItem` is
+rebuilt at every bell, so "for the fight" is free and "for good" is a block.
 
 ### Risks
 
@@ -387,39 +455,51 @@ The end of it.
 | Enchs | 5 | 6 |
 | Ench effect kinds | 3 | 4 — power, haste, spin, **fragile** |
 | Skill effect kinds | 5 | 6 — **gives_ench** |
+| `PlaceKind` | 6 | 7 — **bench** |
 | Classes offered | 4 | 5 |
 | Skill trees | 5 | 6 — a tree of eight for the Bill |
 | Classes whose power reaches code | 4 of 4 | 5 of 5, **and a lint that says so** |
-| Towns selling every ench | all of them | none |
+| Towns selling an ench | 3 of 3 | **none** |
+| Enchs a level-9 character can reach | all 4 priced ones | whatever the trees award |
+| Places gated on a level | 0 | 1, and the crossings already gate 2 regions |
 | Save format | v1 | v1, and every M9 file still opens |
 
-## 5. Open questions for the human
+## 5. Questions, and which are still open
+
+**Answered, and folded into the milestones above.**
+
+- **Does it break for the fight, or for good?** *For the fight.* M10.1's deploy
+  point keeps the reasoning, because it is what makes that milestone small.
+- **Which vendor sells what?** *No town sells an ench.* What a tree does not
+  award is sold by one vendor, on a place that is not there until level 10 —
+  M10.0, deliverables 1 and 4.
+- **Does the ench break, or the item?** *The item.* An ench that was consumed
+  would be a consumable, and the game already has a word for those.
+
+**Still open, and none of them blocks M10.0.**
 
 1. **Is `The Chonga Swing` the name?** Sourced to p. 41, and the class it
    belongs to is already Top of the Bill in the shipped theme. `PLAN.md` §6.4 —
    whether invention is allowed at all — is still open, and this is a
    construction from a sourced proper noun the way *The Ponkey Turn* is.
-2. **Does it break for the fight, or for good?** Planned: **for the fight.**
-   Combat is a pure function of the board and a mid-fight save carries a
-   creature name and a tile; a component destroyed for good would make the fight
-   write to the character, and it would be the first thing in the game that
-   takes a component away — with locks, enchs, Auto-pack and the save all
-   needing an answer. Permanent is a much larger and much more interesting
-   mechanic, and it should be its own block if it is wanted.
-3. **Does the ench break, or the item?** Planned: the item, for the fight. An
-   ench that was consumed would be a consumable, and the game already has a word
-   for those.
-4. **Which vendor sells what?** Planned: the pit keeps two, the tree grants the
-   Swing, and the last two go to Kettleworks and High Wick — which are on no map.
-   That makes `PLAN.md` §6a row 1 load-bearing rather than deferred. The
-   alternative is that the pit keeps all four and "specific vendors" means one
-   vendor, which is not much of a rule.
-5. **Is `+200%` the right number?** It is exactly "3× more powerful" as asked,
-   and nothing in the catalogue moves power by half that. Deferred to M10.3, when
-   somebody has played it — the same way M9 deferred the drop rate, and that
-   deferral was right.
-6. **Should the Bill's tree be able to make the Swing survivable?** A node that
+2. **Who is the vendor, and where does he stand?** The plan puts him past the
+   last crossing, in the half of the map you only see once you have earned it.
+   He needs a name, a figure and two paragraphs, and all three are the kind of
+   thing the answer changes.
+3. **Is `+200%` the right number?** It is exactly "3× more powerful" as asked,
+   and nothing in the catalogue moves power by half that. Deferred to M10.3,
+   when somebody has played it — the same way M9 deferred the drop rate, and
+   that deferral was right.
+4. **Should the Bill's tree be able to make the Swing survivable?** A node that
    let a fragile item fire twice would be the class's whole build. It is the
    most obvious node in the tree and it is also the one that could delete the
    mechanic. Planned: **no** — the tree tunes what the swing is *worth*, never
    how many it gets.
+5. **Does the vendor restock?** Planned: no, once each, the rule every shelf in
+   the game already follows. Worth asking because he is now the only shop for a
+   whole system, and "sold out for ever" is a stronger sentence when there is
+   one of him.
+6. **Does closing the benches want a second town more, or less?** Less, is the
+   honest answer, and it is worth writing down: `PLAN.md` §6a row 1 has wanted a
+   second town since M8.8, and one of its arguments was that a bench is a reason
+   to visit one. That argument is gone. The other three stand.

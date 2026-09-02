@@ -384,6 +384,26 @@ pub struct LockedItem {
 /// against the slot's default cadence rather than its own. Twelve percent of
 /// the items in the game came out a whole tier apart depending on which one
 /// you asked, which is how a legendary ended up with a three-word name.
+/// The name every component of an item agrees it should be called.
+///
+/// `name_item` builds `[Qualifier] [Base] of the [Suffix]` out of a hash, which
+/// is the right answer for five hundred and thirty-six components that were
+/// never meant to be assembled into anything in particular, and the wrong one
+/// for a set somebody wrote the name of.
+///
+/// **Agreement, not one piece deciding.** A set is its pieces: if one of them
+/// could name the item, then two thirds of the Mandate plus a stranger would
+/// be the Mandate. Every component in the group has to say the same thing, and
+/// a component saying nothing is a component that disagrees.
+///
+/// Takes the names rather than the registry so it is a pure function about a
+/// list, which is the whole of what it decides and all a test needs to reach.
+pub fn agreed_name<'a>(names: impl IntoIterator<Item = Option<&'a str>>) -> Option<&'a str> {
+    let mut it = names.into_iter();
+    let first = it.next()??;
+    it.all(|n| n == Some(first)).then_some(first)
+}
+
 pub fn item_cooldown_ms(reg: &PieceRegistry, pieces: &[PieceId], kind: SlotKind) -> u32 {
     let core = pieces.iter().copied().find(|&p| reg.def(p).kind.is_core());
     let base = core
@@ -734,15 +754,34 @@ impl Loadout {
             } else {
                 0
             };
+            // **A set has the name somebody wrote.** Only once it is finished:
+            // three loose components in a bag are three components, and the
+            // Mandate is what they make.
+            let written = assembled[gi]
+                .then(|| {
+                    agreed_name(group.iter().map(|&p| {
+                        reg.def(p).assembly_bonus.and_then(|b| b.names)
+                    }))
+                })
+                .flatten();
             items.push(GearItem {
-                name: name_item(
-                    self.name_seed,
-                    reg,
-                    slot,
-                    group,
-                    crate::rating::Rarity::of(rating),
-                    self.naming,
-                ),
+                name: match written {
+                    // Both halves the same: there is no short form of a name
+                    // that is already one thing, and inventing one would be
+                    // the generator getting a say after all.
+                    Some(n) => crate::naming::ItemName {
+                        full: n.to_string(),
+                        short: n.to_string(),
+                    },
+                    None => name_item(
+                        self.name_seed,
+                        reg,
+                        slot,
+                        group,
+                        crate::rating::Rarity::of(rating),
+                        self.naming,
+                    ),
+                },
                 pieces: group.clone(),
                 assembled: assembled[gi],
                 status: match &verdicts[gi] {

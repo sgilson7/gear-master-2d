@@ -320,6 +320,29 @@ pub struct AssemblyBonus {
     /// because `Loadout::combat_items` has already filtered to assembled items
     /// by the time it reads this.
     pub triggers: &'static [Trigger],
+    /// Rules the *character* gains while this item is assembled.
+    ///
+    /// The third thing an assembly bonus can pay, after a stat lump and a
+    /// trigger, and the first that is not about the fight. A trigger can do
+    /// anything a piece can do inside combat; routing a creature happens
+    /// before a fight starts and wading happens on a step, and neither is
+    /// expressible as one.
+    ///
+    /// Read by `Character::rules`, which walks the assembled items every time
+    /// it is asked rather than banking the answer - for the same reason a
+    /// bought node's effect is read fresh. **An unassembled set grants
+    /// nothing**, and that is not a check anywhere: it is that only assembled
+    /// items are walked.
+    pub grants: &'static [crate::rule::Rule],
+    /// The name this component insists its finished item is called.
+    ///
+    /// `name_item` generates `[Qualifier] [Base] of the [Suffix]` out of a
+    /// hash, which is right for the five hundred and thirty-six and wrong for
+    /// a set somebody wrote the name of. **Agreement, not one piece
+    /// deciding**: `loadout::agreed_name` takes the item's name from here only
+    /// when every component in it says the same thing, so two pieces of a set
+    /// plus a stranger cannot call themselves the Mandate.
+    pub names: Option<&'static str>,
 }
 
 /// When a piece's `Effect` is live, relative to whether the item it is part of
@@ -1486,6 +1509,8 @@ pub static CATALOG: &[PieceDef] = &[
         // gives armour where a damaging piece would give damage.
         base: Stats::ZERO,
         assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: None,
             label: "Blade of Helms",
             stats: Stats::health(175),
             triggers: &[],
@@ -1572,6 +1597,8 @@ pub static CATALOG: &[PieceDef] = &[
         cells: &[(0, 0), (1, 0), (1, 1)],
         base: Stats::health(240),
         assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: None,
             label: "Warlord",
             stats: Stats::strength(6),
             triggers: &[],
@@ -1611,6 +1638,8 @@ pub static CATALOG: &[PieceDef] = &[
         cells: &[(0, 0), (1, 0), (0, 1)],
         base: Stats::ZERO,
         assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: None,
             label: "Reckoning",
             stats: Stats { curse_resist: 30, ..Stats::ZERO },
             triggers: &[],
@@ -1657,6 +1686,8 @@ pub static CATALOG: &[PieceDef] = &[
         cells: &[(0, 0), (0, 1), (0, 2)],
         base: Stats { mana: 2, curse_resist: 12, ..Stats::ZERO },
         assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: None,
             label: "Sevenleague",
             stats: Stats::power(35),
             triggers: &[],
@@ -1710,7 +1741,7 @@ pub static CATALOG: &[PieceDef] = &[
         kind: PieceKind::Base,
         cells: &[(0,0),(1,0),(2,0),(0,1),(2,1),(0,2),(1,2),(2,2)],
         base: Stats { health: 150, magic_damage: 6, mana: 2, ..Stats::ZERO },
-        assembly_bonus: Some(AssemblyBonus { label: "Voidsilk", stats: Stats { magic_resist: 20, ..Stats::ZERO }, triggers: &[] }),
+        assembly_bonus: Some(AssemblyBonus { grants: &[], names: None, label: "Voidsilk", stats: Stats { magic_resist: 20, ..Stats::ZERO }, triggers: &[] }),
         effect: None,
         cooldown_ms: 3600,
         speed_bonus: 0,
@@ -1786,6 +1817,8 @@ pub static CATALOG: &[PieceDef] = &[
         cells: &[(0,0),(1,0),(0,1),(1,1),(0,2),(1,2)],
         base: Stats { physical_damage: 14, physical_pierce: 35, ..Stats::ZERO },
         assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: None,
             label: "Breaker",
             stats: Stats { strength: 6, ..Stats::ZERO },
             // Anger and conviction, which are the two things a person needs to
@@ -2173,7 +2206,7 @@ pub static CATALOG: &[PieceDef] = &[
         kind: PieceKind::Orb,
         cells: &[(0,0),(1,0),(2,0),(1,1)],
         base: Stats { magic_damage: 2, mana: 2, ..Stats::ZERO },
-        assembly_bonus: Some(AssemblyBonus { label: "Timeworn", stats: Stats { power: 30, ..Stats::ZERO }, triggers: &[] }),
+        assembly_bonus: Some(AssemblyBonus { grants: &[], names: None, label: "Timeworn", stats: Stats { power: 30, ..Stats::ZERO }, triggers: &[] }),
         effect: None,
         cooldown_ms: 2800,
         speed_bonus: 0,
@@ -2525,7 +2558,7 @@ pub static CATALOG: &[PieceDef] = &[
         kind: PieceKind::Crest,
         cells: &[(0,0),(0,1)],
         base: Stats { mana: 2, ..Stats::ZERO },
-        assembly_bonus: Some(AssemblyBonus { label: "Hastening", stats: Stats { power: 20, ..Stats::ZERO }, triggers: &[] }),
+        assembly_bonus: Some(AssemblyBonus { grants: &[], names: None, label: "Hastening", stats: Stats { power: 20, ..Stats::ZERO }, triggers: &[] }),
         effect: None,
         cooldown_ms: 0,
         speed_bonus: 0,
@@ -2552,7 +2585,7 @@ pub static CATALOG: &[PieceDef] = &[
         kind: PieceKind::Base,
         cells: &[(0,0),(1,0),(2,0),(0,1),(1,1),(2,1)],
         base: Stats { health: 200, magic_resist: 15, ..Stats::ZERO },
-        assembly_bonus: Some(AssemblyBonus { label: "Rimeguard", stats: Stats { magic_harden: 20, ..Stats::ZERO }, triggers: &[] }),
+        assembly_bonus: Some(AssemblyBonus { grants: &[], names: None, label: "Rimeguard", stats: Stats { magic_harden: 20, ..Stats::ZERO }, triggers: &[] }),
         effect: None,
         cooldown_ms: 2600,
         speed_bonus: 0,
@@ -2582,7 +2615,7 @@ pub static CATALOG: &[PieceDef] = &[
         kind: PieceKind::Frame,
         cells: &[(0,0),(1,0),(2,0),(0,1),(1,1),(2,1)],
         base: Stats { mind_resist: 20, mana: 4, physical_resist: 18, magic_resist: 25, ..Stats::ZERO },
-        assembly_bonus: Some(AssemblyBonus { label: "Stonewall", stats: Stats { physical_resist: 25, ..Stats::ZERO }, triggers: &[] }),
+        assembly_bonus: Some(AssemblyBonus { grants: &[], names: None, label: "Stonewall", stats: Stats { physical_resist: 25, ..Stats::ZERO }, triggers: &[] }),
         effect: None,
         cooldown_ms: 2800,
         speed_bonus: 0,
@@ -2719,6 +2752,8 @@ pub static CATALOG: &[PieceDef] = &[
         cells: &[(0,0),(1,0),(2,0),(0,1),(1,1),(2,1)],
         base: Stats { health: 175, nature: 2, ..Stats::ZERO },
         assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: None,
             label: "Heartwood",
             stats: Stats { regen: 4, ..Stats::ZERO },
             // Heartwood is the dead middle of a living tree, and everything
@@ -2843,7 +2878,7 @@ pub static CATALOG: &[PieceDef] = &[
         kind: PieceKind::Base,
         cells: &[(0,0),(1,0),(2,0),(3,0),(0,1),(1,1),(2,1),(3,1)],
         base: Stats { health: 225, physical_resist: 22, physical_damage: 6, ..Stats::ZERO },
-        assembly_bonus: Some(AssemblyBonus { label: "Bulwark", stats: Stats { physical_harden: 20, ..Stats::ZERO }, triggers: &[] }),
+        assembly_bonus: Some(AssemblyBonus { grants: &[], names: None, label: "Bulwark", stats: Stats { physical_harden: 20, ..Stats::ZERO }, triggers: &[] }),
         effect: None,
         cooldown_ms: 3400,
         speed_bonus: 0,
@@ -2959,6 +2994,8 @@ pub static CATALOG: &[PieceDef] = &[
         cells: &[(0, 0), (0, 1), (0, 2), (0, 3), (0, 4), (0, 5)],
         base: Stats::power(70),
         assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: None,
             label: "Godsteel",
             stats: Stats::strength(8),
             triggers: &[],
@@ -2996,6 +3033,8 @@ pub static CATALOG: &[PieceDef] = &[
         cells: &[(0, 0), (1, 0), (2, 0), (0, 1), (2, 1), (0, 2), (2, 2)],
         base: Stats { mind_resist: 20, mana: 5, ..Stats::ZERO },
         assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: None,
             label: "Aegis",
             stats: Stats { mind_resist: 25, curse_resist: 25, ..Stats::ZERO },
             triggers: &[],
@@ -3015,6 +3054,8 @@ pub static CATALOG: &[PieceDef] = &[
         cells: &[(0, 0), (1, 0), (2, 0), (3, 0), (0, 1), (1, 1), (2, 1), (3, 1), (0, 2), (3, 2)],
         base: Stats::health(450),
         assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: None,
             label: "Adamant",
             stats: Stats::regen(3),
             triggers: &[],
@@ -3034,6 +3075,8 @@ pub static CATALOG: &[PieceDef] = &[
         cells: &[(0, 0), (1, 0), (2, 0), (0, 1), (1, 1), (2, 1)],
         base: Stats { mana: 3, ..Stats::strength(14) },
         assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: None,
             label: "Titan",
             stats: Stats::power(60),
             triggers: &[],
@@ -3053,6 +3096,8 @@ pub static CATALOG: &[PieceDef] = &[
         cells: &[(0, 0), (1, 0), (0, 1), (1, 1), (0, 2), (1, 2)],
         base: Stats::regen(5),
         assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: None,
             label: "Sevenleague",
             stats: Stats::health(225),
             triggers: &[],
@@ -3357,6 +3402,8 @@ pub static CATALOG: &[PieceDef] = &[
         base: Stats::power(10),
         // >>> the Weapon slot's assembly bonus <<<
         assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: None,
             label: "Balanced",
             stats: Stats::power(50),
             triggers: &[],
@@ -3470,6 +3517,8 @@ pub static CATALOG: &[PieceDef] = &[
         base: Stats { armor: 2, mana: 1, ..Stats::ZERO },
         // >>> the Helmet slot's assembly bonus <<<
         assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: None,
             label: "Focused",
             stats: Stats::strength(3),
             triggers: &[],
@@ -3555,6 +3604,8 @@ pub static CATALOG: &[PieceDef] = &[
         base: Stats::health(30),
         // >>> the Chest slot's assembly bonus <<<
         assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: None,
             label: "Woven",
             stats: Stats::regen(2),
             triggers: &[],
@@ -3606,6 +3657,8 @@ pub static CATALOG: &[PieceDef] = &[
         base: Stats::strength(1),
         // >>> the Gloves slot's assembly bonus <<<
         assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: None,
             label: "Gauntleted",
             stats: Stats::strength(2),
             triggers: &[],
@@ -3642,6 +3695,8 @@ pub static CATALOG: &[PieceDef] = &[
         base: Stats { armor: 12, ..Stats::ZERO },
         // >>> the Greaves slot's assembly bonus <<<
         assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: None,
             label: "Runed",
             stats: Stats::health(75),
             triggers: &[],
@@ -3996,6 +4051,8 @@ pub static CATALOG: &[PieceDef] = &[
         cells: &[(0, 0)],
         base: Stats { mana: 2, ..Stats::ZERO },
         assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: None,
             label: "Overflowing",
             stats: Stats { mana: 2, ..Stats::ZERO },
             triggers: &[],
@@ -4141,6 +4198,8 @@ pub static CATALOG: &[PieceDef] = &[
         cells: &[(0, 0), (1, 0)],
         base: Stats { mind: 1, ..Stats::ZERO },
         assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: None,
             label: "Bilious",
             stats: Stats::mind(2),
             triggers: &[],
@@ -6973,6 +7032,8 @@ pub static CATALOG: &[PieceDef] = &[
         cells: &[(0,0),(1,0),(0,1),(1,1)],
         base: Stats { faith: 3, magic_resist: 10, ..Stats::ZERO },
         assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: None,
             label: "the road knows you",
             stats: Stats { curse_resist: 4, faith: 1, ..Stats::ZERO },
             // The pilgrim starts with a little of both and turns them into the
@@ -7060,6 +7121,8 @@ pub static CATALOG: &[PieceDef] = &[
         cells: &[(0,0),(1,0),(2,0),(1,1)],
         base: Stats { regen: 4, armor: 18, health: 200, ..Stats::ZERO },
         assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: None,
             label: "one stride ahead",
             stats: Stats { curse_resist: 5, ..Stats::ZERO },
             // A stride ahead of *them*. Every other relation in the game
@@ -7619,6 +7682,8 @@ pub static CATALOG: &[PieceDef] = &[
             ..Stats::ZERO
         },
         assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: None,
             // A coat is a thing other things shelter under. Chest's tense is
             // structural - what rests on it - and the one thing the coat
             // cannot be is terrain, because Francis wears it as part of an
@@ -7690,6 +7755,8 @@ pub static CATALOG: &[PieceDef] = &[
         cells: &[(0,0),(1,0),(2,0)],
         base: Stats { curse_resist: 12, ..Stats::ZERO },
         assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: None,
             label: "planted",
             stats: Stats { curse_resist: 10, ..Stats::ZERO },
             // Roots draw. Growth every time it comes round, which is worth
@@ -8092,6 +8159,8 @@ pub static CATALOG: &[PieceDef] = &[
         cells: &[(0,0),(1,0),(0,1),(1,1)],
         base: Stats { faith: 2, curse_resist: 12, ..Stats::ZERO },
         assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: None,
             label: "Reliquary",
             stats: Stats { curse_resist: 12, ..Stats::ZERO },
             triggers: &[],
@@ -8157,6 +8226,8 @@ pub static CATALOG: &[PieceDef] = &[
         cells: &[(0,0),(1,0),(0,1),(1,1)],
         base: Stats { faith: 3, curse_resist: 14, ..Stats::ZERO },
         assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: None,
             label: "Overflow",
             stats: Stats { curse_resist: 10, ..Stats::ZERO },
             triggers: &[],
@@ -8305,6 +8376,8 @@ pub static CATALOG: &[PieceDef] = &[
         cells: &[(0,0),(1,0),(0,1),(1,1),(0,2),(1,2)],
         base: Stats { armor: 60, regen: 80, physical_resist: 34, magic_resist: 34, ..Stats::ZERO },
         assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: None,
             // A Material floats between gloves and greaves, so it may not
             // carry an identity mechanic - `ReduceCooldown` is the feet's and
             // the ratchet said so the moment it was tried. Positional stats are
@@ -9213,6 +9286,8 @@ pub static CATALOG: &[PieceDef] = &[
         cells: &[(0, 0), (1, 0), (2, 0), (3, 0)],
         base: Stats { health: 90, armor: 12, nature: 4, ..Stats::ZERO },
         assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: None,
             label: "downhill all the way",
             stats: Stats { curse_resist: 4, strength: 2, ..Stats::ZERO },
             // Fast off the top and slower every stride. It starts the fight
@@ -9424,6 +9499,8 @@ pub static CATALOG: &[PieceDef] = &[
         cells: &[(0, 0), (1, 0), (1, 1)],
         base: Stats { curse_resist: 4, ..Stats::ZERO },
         assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: None,
             label: "the cold gets into the works",
             stats: Stats { curse_resist: 6, ..Stats::ZERO },
             // Cold in the works is cold in *theirs*. Every second curse landed
@@ -9483,6 +9560,8 @@ pub static CATALOG: &[PieceDef] = &[
         cells: &[(0, 0), (1, 0), (0, 1), (1, 1)],
         base: Stats { curse_resist: 6, ..Stats::ZERO },
         assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: None,
             label: "sure-footed on ice",
             stats: Stats { curse_resist: 8, ..Stats::ZERO },
             // Nothing stops it. `steady` was already half of this and had no
@@ -9536,6 +9615,8 @@ pub static CATALOG: &[PieceDef] = &[
         cells: &[(0, 0), (1, 0), (1, 1)],
         base: Stats::ZERO,
         assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: None,
             label: "already moving",
             stats: Stats { strength: 4, ..Stats::ZERO },
             // Not this item: the whole board. Every fight in this game starts
@@ -9577,6 +9658,8 @@ pub static CATALOG: &[PieceDef] = &[
         cells: &[(0, 0), (0, 1), (1, 1)],
         base: Stats { curse_resist: 3, ..Stats::ZERO },
         assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: None,
             label: "set before they arrive",
             stats: Stats { armor: 6, ..Stats::ZERO },
             // A trap wants room to be laid in. Armour at the bell for every
@@ -11097,6 +11180,8 @@ pub static CATALOG: &[PieceDef] = &[
         cells: &[(0, 0), (1, 0), (2, 0), (0, 1), (2, 1)],
         base: Stats { mind_resist: 9, ..Stats::ZERO },
         assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: None,
             label: "counted twice",
             stats: Stats { mind_resist: 6, curse_resist: 6, ..Stats::ZERO },
             triggers: &[],

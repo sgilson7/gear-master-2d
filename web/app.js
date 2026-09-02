@@ -393,6 +393,14 @@ function paintSheet(c) {
   for (const [n, label] of [[held.armor, 'armor'], [held.mana, 'mana']]) {
     if (n) rows.push(`<li class="dim">you start every fight holding <b>${n}</b> ${label}</li>`);
   }
+  // **And the rules**, from the tree and from whatever is assembled on the
+  // board. A rule moves no bar and prints no number of its own, so without
+  // this there is no way at all to tell one that works from one that does not
+  // — which is how eight nodes cost a point and did nothing for two
+  // milestones. The line is core's, unthemed, and the hover explains it.
+  for (const r of c.rules ?? []) {
+    rows.push(`<li class="rule" title="${(r.detail ?? []).join(' ')}">${r.line}</li>`);
+  }
   $('sheet').innerHTML = rows.join('') || `<li class="none">nothing yet</li>`;
 }
 
@@ -1437,6 +1445,11 @@ function walk(dir) {
   if (r.shut) says(r.shut, true);
   if (r.ending) openEnding(r.ending);
   if (r.mended > 0) says(`Somebody puts a chair out. ${r.mended}% of you comes back.`);
+  // **A creature that gave up.** No fight screen and no replay, because there
+  // was no fight — core settled the encounter where it stood and handed over
+  // the receipt. Printed, never worked out: the page has no idea what a rout
+  // pays and must not learn.
+  if (r.routed) says(r.routed.receipt.join(' '));
   if (r.town) openTown(r.town);
   else if (r.event) openEvent(r.event);
   else if (r.encounter) openFight();

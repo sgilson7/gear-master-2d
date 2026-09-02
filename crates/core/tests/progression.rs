@@ -360,7 +360,7 @@ fn a_starting_character_can_win_in_the_pit() {
 /// fought and lost here, and pay nothing.
 #[test]
 fn level_five_lands_where_the_plan_says() {
-    use gm2d_core::world::{step, Dir, WorldState};
+    use gm2d_core::world::{step, Allowances, Dir, WorldState};
 
     let w = data::world(D);
     // East and west along the pit's road, which is what grinding the first
@@ -383,7 +383,7 @@ fn level_five_lands_where_the_plan_says() {
         g.character.apply_preset();
         let mut fights = 0;
         for i in 0..20000 {
-            let s = step(&w, &mut g.world, &mut g.rng, D, patrol[i % patrol.len()]);
+            let s = step(&w, &mut g.world, &mut g.rng, D, patrol[i % patrol.len()], &Allowances::default());
             let Some(m) = s.encounter else { continue };
             fights += 1;
             let log = gm2d_core::combat::simulate_at(

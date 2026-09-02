@@ -9,7 +9,7 @@ use gm2d_core::combat::Difficulty;
 use gm2d_core::data;
 use gm2d_core::game::Game;
 use gm2d_core::quest;
-use gm2d_core::world::{self, Dir, PlaceKind, WorldState};
+use gm2d_core::world::{self, Allowances, Dir, PlaceKind, WorldState};
 
 const D: Difficulty = Difficulty::Easy;
 
@@ -47,7 +47,7 @@ fn a_hidden_place_is_not_there_until_its_condition_holds() {
     // And walking onto it finds nothing there.
     g.world.at = [door.at[0] + 1, door.at[1]];
     let mut rng = g.rng.clone();
-    let s = world::step(&w, &mut g.world, &mut rng, D, Dir::West);
+    let s = world::step(&w, &mut g.world, &mut rng, D, Dir::West, &Allowances::default());
     assert!(s.moved, "the tile itself is walkable");
     assert_eq!(s.door, None, "a hidden door opened");
 
@@ -55,7 +55,7 @@ fn a_hidden_place_is_not_there_until_its_condition_holds() {
     g.world.answered.push(key);
     assert!(w.places_now(&g.world).iter().any(|p| p.id == door.id));
     g.world.at = [door.at[0] + 1, door.at[1]];
-    let s = world::step(&w, &mut g.world, &mut rng, D, Dir::West);
+    let s = world::step(&w, &mut g.world, &mut rng, D, Dir::West, &Allowances::default());
     assert_eq!(s.door.as_deref(), Some(door.id.as_str()), "the door is not answering");
 }
 

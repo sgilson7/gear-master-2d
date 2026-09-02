@@ -4469,6 +4469,14 @@ pub fn simulate_party_holding(
                 start_player.spin_every_ms = start_player.spin_every_ms.min(*ms).max(TICK_MS)
             }
             crate::skills::Rule::Scout => {}
+            // **Neither of M9's two is a combat rule**, and that is the whole
+            // reason `Rule` moved out of the tree rather than growing a
+            // combat-only sibling. A rout is settled where the encounter is,
+            // before there is a fight to put it in; a wade is answered by
+            // `world::step`, where a wall is refused. Ignored here for the same
+            // reason `Scout` is — this arm exists so that adding a rule is a
+            // decision about combat rather than a silence.
+            crate::skills::Rule::Rout { .. } | crate::skills::Rule::Wade => {}
         }
     }
     // Every class you hold applies at once. The fountains hand out different

@@ -29,6 +29,7 @@ pub mod progression;
 pub mod rating;
 pub mod reward;
 pub mod rng;
+pub mod rule;
 pub mod save;
 pub mod explain;
 pub mod fatigue;

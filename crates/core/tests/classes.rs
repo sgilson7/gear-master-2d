@@ -207,7 +207,7 @@ fn a_class_reaches_combat() {
 #[test]
 fn a_whole_run_reaches_the_fork() {
     use gm2d_core::combat::{simulate_with_class, Outcome};
-    use gm2d_core::world::{step, Dir, WorldState};
+    use gm2d_core::world::{step, Allowances, Dir, WorldState};
 
     let w = data::world(D);
     let mut g = Game::new(0xC0FF_EE00_1234_5678, "td");
@@ -225,7 +225,7 @@ fn a_whole_run_reaches_the_fork() {
         if g.character.owed_a_class() {
             break;
         }
-        let s = step(&w, &mut g.world, &mut g.rng, D, patrol[i % patrol.len()]);
+        let s = step(&w, &mut g.world, &mut g.rng, D, patrol[i % patrol.len()], &Allowances::default());
         let Some(m) = s.encounter else { continue };
         fights += 1;
 

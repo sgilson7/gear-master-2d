@@ -450,6 +450,9 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
 #sheet li::before { content: "·"; position: absolute; left: 0; color: var(--ink-3); }
 #sheet li.dim { color: var(--ink-3); }
 #sheet li.none { color: var(--ink-3); font-style: italic; }
+/* A rule is not a stat. It moves no bar, so it gets the one visual difference
+   on this list: the brass the page already uses for something earned. */
+#sheet li.rule { color: var(--brass); cursor: help; }
 
 /* --- the tree, drawn as a tree ------------------------------------------- */
 /* Rows are depth: nothing on the top row asks for anything first, and every

@@ -56,6 +56,56 @@ pub const DANGER_REF: i32 = 800;
 /// map would stop being a place and start being a corridor.
 pub const MAX_ENCOUNTER_PER_MILLE: i32 = 450;
 
+/// How far off dry land a waded tile may be.
+///
+/// One, and the plan measured what one means before it was written: a water
+/// tile that touches somewhere you could already stand. On the first map that
+/// opens fourteen of the lake's twenty-eight tiles — the rim — and leaves the
+/// middle fourteen shut, so the lake stops being a wall at its edge while
+/// staying one through its middle. No new terrain and no repaint.
+pub const WADE_DEPTH: u8 = 1;
+
+/// What the character stepping is allowed to do that nobody else is.
+///
+/// **A map does not know about bags**, and [`step`] takes this rather than the
+/// character so that it never has to. The caller fills it from
+/// `Character::rules`; the same division a gate's key makes, and a door's, made
+/// once and given a name.
+///
+/// Plain and small on purpose. Every field here is a *refusal a step would
+/// otherwise make*, so a `Default` is the game everybody has always played and
+/// no existing caller has to say it holds nothing.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct Allowances {
+    /// Water within [`WADE_DEPTH`] of land is ground.
+    pub wade: bool,
+}
+
+impl Allowances {
+    /// Read a rule list for everything a step cares about.
+    ///
+    /// **Exhaustive**, which is the point of it being here: a rule added to the
+    /// game is a rule somebody has to decide is not about walking.
+    pub fn of(rules: &[crate::rule::Rule]) -> Self {
+        use crate::rule::Rule;
+        let mut out = Allowances::default();
+        for r in rules {
+            match r {
+                Rule::Wade => out.wade = true,
+                // Combat rules, a map-screen rule and an encounter rule. None
+                // of them is about whether a tile can be stood on.
+                Rule::CurseOnActivate { .. }
+                | Rule::SpinExtra { .. }
+                | Rule::SpinKeep { .. }
+                | Rule::SpinEvery { .. }
+                | Rule::Scout
+                | Rule::Rout { .. } => {}
+            }
+        }
+        out
+    }
+}
+
 // ------------------------------------------------------------------ the data
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -405,6 +455,41 @@ impl World {
         self.terrain_at(x, y).passable
     }
 
+    /// Is this tile within [`WADE_DEPTH`] of somewhere you could stand?
+    ///
+    /// The map's half of `Rule::Wade`: a question about the ground, which the
+    /// map can answer, and not about who is walking on it, which it cannot.
+    /// Only impassable tiles are ever asked — [`passable`](Self::passable) has
+    /// already said yes to everything else.
+    pub fn shallow(&self, x: u8, y: u8) -> bool {
+        let d = WADE_DEPTH as i32;
+        for dy in -d..=d {
+            for dx in -d..=d {
+                // Orthogonal only. A diagonal touch is a corner, and a corner
+                // is not somewhere you can put a foot down on the way in.
+                if dx.abs() + dy.abs() > d || (dx == 0 && dy == 0) {
+                    continue;
+                }
+                let (nx, ny) = (x as i32 + dx, y as i32 + dy);
+                if self.in_bounds(nx, ny) && self.passable(nx as u8, ny as u8) {
+                    return true;
+                }
+            }
+        }
+        false
+    }
+
+    /// Can this character stand here?
+    ///
+    /// [`passable`](Self::passable) is the ground's answer and this is the
+    /// game's. Everything that decides where a player may be goes through it —
+    /// a step, and nothing else yet, because `repair` deliberately does not:
+    /// see the note on it.
+    pub fn walkable(&self, x: u8, y: u8, allowed: &Allowances) -> bool {
+        self.passable(x, y)
+            || (allowed.wade && self.terrain_name(x, y) == "water" && self.shallow(x, y))
+    }
+
     fn region_index(&self, x: u8, y: u8) -> Option<usize> {
         let i = self.region_of[self.idx(x, y)];
         (i != usize::MAX).then_some(i)
@@ -494,9 +579,17 @@ impl World {
     /// The order is deliberate: the last town first, because that is where the
     /// player *was* in any sense that survives, and the map's start only if
     /// that fails too.
-    pub fn repair(&self, state: &mut WorldState) -> Option<[u8; 2]> {
+    ///
+    /// **It takes the allowances too, and lands you only on ground.** A player
+    /// standing on a waded tile is standing somewhere they are allowed to be,
+    /// so the first argument is needed or the next keypress would walk them
+    /// home out of the middle of a lake they were legally in. Where it *puts*
+    /// somebody ignores them entirely, and has to: a rim tile is only a place
+    /// to stand while the set is on the board, and a repair that used one
+    /// would be a repair you could unpack your way out of.
+    pub fn repair(&self, state: &mut WorldState, allowed: &Allowances) -> Option<[u8; 2]> {
         let [x, y] = state.at;
-        if self.in_bounds(x as i32, y as i32) && self.passable(x, y) {
+        if self.in_bounds(x as i32, y as i32) && self.walkable(x, y, allowed) {
             return None;
         }
         let was = state.at;
@@ -722,6 +815,7 @@ pub fn step(
     rng: &mut Rng,
     difficulty: Difficulty,
     dir: Dir,
+    allowed: &Allowances,
 ) -> Step {
     let (dx, dy) = dir.delta();
     let (nx, ny) = (state.at[0] as i32 + dx, state.at[1] as i32 + dy);
@@ -729,8 +823,12 @@ pub fn step(
         return Step::nowhere("the map ends here");
     }
     let (nx, ny) = (nx as u8, ny as u8);
-    if !world.passable(nx, ny) {
+    // **What the walker is allowed to do, not who they are.** `allowed` is a
+    // handful of bools the caller filled in; a `World` that took a character
+    // to answer this would be a map that knew about bags.
+    if !world.walkable(nx, ny, allowed) {
         return Step::nowhere(match world.terrain_name(nx, ny) {
+            // Still the frame's fault, and a toad's frame is the answer to it.
             "water" => "you would have to swim, and you are wearing a frame",
             "rock" => "rock, and no way up it",
             _ => "there is no way through",

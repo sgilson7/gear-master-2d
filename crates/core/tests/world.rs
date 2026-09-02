@@ -9,7 +9,7 @@ use std::collections::HashSet;
 use gm2d_core::combat::Difficulty;
 use gm2d_core::rng::Rng;
 use gm2d_core::tile_event::EventsData;
-use gm2d_core::world::{step, Dir, PlaceKind, World, WorldState};
+use gm2d_core::world::{step, Allowances, Dir, PlaceKind, World, WorldState};
 
 const D: Difficulty = Difficulty::Easy;
 
@@ -264,7 +264,7 @@ fn walking_into_a_wall_does_not_move_the_stream() {
     let before = rng.state();
 
     // West from the start column is the map's edge.
-    let s = step(&w, &mut state, &mut rng, D, Dir::West);
+    let s = step(&w, &mut state, &mut rng, D, Dir::West, &Allowances::default());
     assert!(!s.moved && s.blocked.is_some(), "expected to be refused");
     assert_eq!(rng.state(), before, "a refused step advanced the random stream");
     assert_eq!(state.at, [w.start.0, w.start.1], "a refused step moved the player");
@@ -294,7 +294,7 @@ fn a_walk_survives_being_saved_halfway() {
             let text = save::save(&g);
             g = save::load(&text).expect("a mid-walk save loads");
         }
-        let s = step(&w, &mut g.world, &mut g.rng, D, *d);
+        let s = step(&w, &mut g.world, &mut g.rng, D, *d, &Allowances::default());
         interrupted.push((g.world.at, s.met(), s.event.clone()));
     }
 
@@ -336,7 +336,7 @@ fn walk(w: &World, path: &[Dir], seed: u64) -> Trace {
     g.world = WorldState::at_start(w);
     path.iter()
         .map(|d| {
-            let s = step(w, &mut g.world, &mut g.rng, D, *d);
+            let s = step(w, &mut g.world, &mut g.rng, D, *d, &Allowances::default());
             (g.world.at, s.met(), s.event.clone())
         })
         .collect()
@@ -354,7 +354,7 @@ fn a_long_walk_starts_some_fights() {
     let mut met = 0;
     let dirs = [Dir::East, Dir::North, Dir::West, Dir::North];
     for i in 0..400 {
-        let s = step(&w, &mut state, &mut rng, D, dirs[i % dirs.len()]);
+        let s = step(&w, &mut state, &mut rng, D, dirs[i % dirs.len()], &Allowances::default());
         if s.encounter.is_some() {
             met += 1;
         }
@@ -378,7 +378,7 @@ fn a_position_off_the_walkable_map_is_repaired() {
     let mut state = WorldState::default();
     assert_eq!(state.at, [0, 0]);
     assert!(!w.passable(0, 0), "the corner is walkable, so this test proves nothing");
-    let was = w.repair(&mut state);
+    let was = w.repair(&mut state, &Allowances::default());
     assert_eq!(was, Some([0, 0]), "the repair did not report moving anybody");
     assert!(w.passable(state.at[0], state.at[1]), "repaired onto {:?}", state.at);
     assert_eq!(state.at, [w.start.0, w.start.1], "with no town known, go to the start");
@@ -393,7 +393,7 @@ fn a_position_off_the_walkable_map_is_repaired() {
         .expect("the map has a town");
     let mut state = WorldState::default();
     state.last_town = town.id.clone();
-    w.repair(&mut state);
+    w.repair(&mut state, &Allowances::default());
     assert_eq!(state.at, town.at, "a remembered town is a better answer than the start");
 
     // **A town this map does not have.** The first map carries one town and
@@ -404,7 +404,7 @@ fn a_position_off_the_walkable_map_is_repaired() {
     let mut state = WorldState::default();
     state.last_town = "kettleworks".into();
     state.at = [0, 0];
-    w.repair(&mut state);
+    w.repair(&mut state, &Allowances::default());
     assert_eq!(
         state.at,
         [w.start.0, w.start.1],
@@ -415,13 +415,13 @@ fn a_position_off_the_walkable_map_is_repaired() {
     // Off the map entirely.
     let mut state = WorldState::default();
     state.at = [200, 200];
-    w.repair(&mut state);
+    w.repair(&mut state, &Allowances::default());
     assert!(w.in_bounds(state.at[0] as i32, state.at[1] as i32));
     assert!(w.passable(state.at[0], state.at[1]));
 
     // And somebody standing somewhere fine is left alone.
     let mut state = WorldState::at_start(&w);
-    assert_eq!(w.repair(&mut state), None, "a good position was moved");
+    assert_eq!(w.repair(&mut state, &Allowances::default()), None, "a good position was moved");
     assert_eq!(state.at, [w.start.0, w.start.1]);
 }
 
@@ -440,12 +440,12 @@ fn a_save_from_before_the_world_existed_still_walks() {
 
     let mut g = save::load(&old).expect("an old save still opens");
     let w = world();
-    w.repair(&mut g.world);
+    w.repair(&mut g.world, &Allowances::default());
 
     // And they can actually go somewhere.
     let mut rng = Rng::new(1);
     let moved = [Dir::North, Dir::South, Dir::East, Dir::West]
         .into_iter()
-        .any(|d| step(&w, &mut g.world.clone(), &mut rng, D, d).moved);
+        .any(|d| step(&w, &mut g.world.clone(), &mut rng, D, d, &Allowances::default()).moved);
     assert!(moved, "the player is walled in at {:?}", g.world.at);
 }

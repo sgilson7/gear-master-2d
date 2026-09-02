@@ -89,7 +89,8 @@ pub fn load_json(text: &str) -> Result<(), JsValue> {
             // defaults to (0, 0), which on this map is rock — and a player who
             // arrived there could not move in any direction.
             let here = g.world.map_id();
-            map_named(&here, |w| w.repair(&mut g.world));
+            let allowed = g.character.allowances();
+            map_named(&here, |w| w.repair(&mut g.world, &allowed));
             with_mut(|slot| *slot = g);
             Ok(())
         }
@@ -325,8 +326,14 @@ pub fn try_step(dir: &str) -> String {
             // on is a dead end rather than a glitch — there is no key that gets
             // you out of it — so the first keypress fixes it whatever put it
             // there, including a code path nobody has found yet.
-            w.repair(&mut g.world);
-            let s = world::step(w, &mut g.world, &mut g.rng, DIFFICULTY, d);
+            // **What this character is allowed to do**, read once and handed
+            // in. A `World` never sees the character: it is given a handful of
+            // bools and asked about the ground, which is the same division a
+            // gate's key makes and the reason `map_for` takes the game rather
+            // than reaching for it.
+            let allowed = g.character.allowances();
+            w.repair(&mut g.world, &allowed);
+            let s = world::step(w, &mut g.world, &mut g.rng, DIFFICULTY, d, &allowed);
             // An encounter becomes state the moment it is rolled. Holding it
             // only in the page would mean a player who saved while a creature
             // was on screen came back with no creature and a free step.
@@ -336,6 +343,22 @@ pub fn try_step(dir: &str) -> String {
                     at: g.world.at,
                 });
             }
+            // **Something that will not fight you.** Core's answer, and it
+            // takes the encounter with it: a routed creature never reaches the
+            // fight screen, because there is no fight and a replay would have
+            // nothing to draw. The receipt is core's too — the page prints what
+            // it was paid rather than working it out.
+            let routed = gm2d_core::fight::rout(g).map(|r| {
+                serde_json::json!({
+                    "name": g.theme_name(
+                        gm2d_core::combat::creature(&r.creature).map(|m| m.name).unwrap_or("")
+                    ),
+                    "gold": r.gold,
+                    "xp": r.xp,
+                    "carried": r.carried,
+                    "receipt": r.receipt,
+                })
+            });
             // **Arriving is the doing.** An errand that says "go and talk to
             // them" is finished by standing there, so this is where it is
             // noticed — on the step, rather than when some screen opens. A
@@ -368,7 +391,7 @@ pub fn try_step(dir: &str) -> String {
                             // Repaired on the far side: a gate whose landing
                             // tile is not walkable would strand somebody on a
                             // map they cannot leave.
-                            map_named(&to, |dest| dest.repair(&mut g.world));
+                            map_named(&to, |dest| dest.repair(&mut g.world, &allowed));
                             went = Some(to);
                         }
                     } else {
@@ -441,9 +464,13 @@ pub fn try_step(dir: &str) -> String {
                 "shut": shut,
                 "ending": ending,
                 "boss": s.boss,
-                "encounter": s.encounter.or_else(|| {
-                    g.encounter.as_ref().and_then(|e| gm2d_core::fight::spec(e))
-                }).map(|m| serde_json::json!({
+                "routed": routed,
+                // **Nothing to fight.** A rout took the encounter, so this is
+                // null and the fight screen never opens — reported off
+                // `g.encounter` rather than off the step, which still
+                // remembers rolling one.
+                "encounter": g.encounter.as_ref().and_then(|e| gm2d_core::fight::spec(e))
+                    .map(|m| serde_json::json!({
                     "name": g.theme_name(m.name),
                     "canonical": m.name,
                     "rating": gm2d_core::rating::creature_rating(m, DIFFICULTY),
@@ -2223,6 +2250,19 @@ pub fn character_json() -> String {
                 "armor": c.start_with().armor,
                 "mana": c.start_with().mana,
             },
+            // **Every rule this character has, and where it came from.**
+            //
+            // A derived number needs somewhere it is shown or it cannot be told
+            // from a bug — and a rule is worse than a number, because there is
+            // no bar it moves. Somebody holding a set that routs a creature has
+            // to be able to read what it does without going and meeting one.
+            //
+            // The line is `Rule::line`, unthemed, TONE 13a: the item's name
+            // carries the world and this carries the rule.
+            "rules": c.rules().iter().map(|r| serde_json::json!({
+                "line": r.line(),
+                "detail": r.detail(),
+            })).collect::<Vec<_>>(),
             "class": c.class.clone(),
         })
         .to_string()

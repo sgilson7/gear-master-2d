@@ -152,7 +152,7 @@ fn the_used_game_is_actually_used() {
 /// two errands, the questline that unlocks the cave, could never be handed in.
 #[test]
 fn an_event_with_an_errand_reopens_once_its_choices_are_spent() {
-    use gm2d_core::world::Dir;
+    use gm2d_core::world::{Allowances, Dir};
 
     let w = data::world(D);
     let mut g = Game::new(4, "td");
@@ -162,14 +162,14 @@ fn an_event_with_an_errand_reopens_once_its_choices_are_spent() {
     // Stand beside her and step on.
     g.world.at = [door.at[0] - 1, door.at[1]];
     let mut rng = g.rng.clone();
-    let s = gm2d_core::world::step(&w, &mut g.world, &mut rng, D, Dir::East);
+    let s = gm2d_core::world::step(&w, &mut g.world, &mut rng, D, Dir::East, &Allowances::default());
     assert_eq!(s.event.as_deref(), Some("marbulons-door"), "her card did not open");
     assert!(!s.spent, "her choices were spent before they were answered");
 
     // Answer it, walk off, and come back.
     g.world.answered.push("marbulons-door".into());
     g.world.at = [door.at[0] - 1, door.at[1]];
-    let s = gm2d_core::world::step(&w, &mut g.world, &mut rng, D, Dir::East);
+    let s = gm2d_core::world::step(&w, &mut g.world, &mut rng, D, Dir::East, &Allowances::default());
     assert_eq!(
         s.event.as_deref(),
         Some("marbulons-door"),

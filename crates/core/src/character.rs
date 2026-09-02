@@ -1219,10 +1219,65 @@ impl Character {
     /// reason `player_stats` reads the tree: a bought node's *effect* is not
     /// state, the node is.
     pub fn start_with(&self) -> crate::combat::Held {
-        if self.skills_taken.is_empty() {
-            return crate::combat::Held::default();
+        let mut held = if self.skills_taken.is_empty() {
+            crate::combat::Held::default()
+        } else {
+            crate::data::skills().start_with(&self.skills_taken)
+        };
+        // **And every rule an assembled item grants.** Not folded into the
+        // tree's answer, because the tree does not know about the board; added
+        // here, because `Held` is what a fight is handed and this is the one
+        // place that has both.
+        held.rules.extend(self.item_rules());
+        held
+    }
+
+    /// Every rule this character has, from wherever it came.
+    ///
+    /// The tree's plus every rule granted by an item that is **currently
+    /// assembled**. One list, read fresh every time it is asked, for the same
+    /// reason a node's effect is read fresh rather than banked when the point
+    /// is spent: a bought node's effect is not state, and neither is a seated
+    /// item's.
+    ///
+    /// It is on `Character` and not on `Loadout` for the reason enchs are: a
+    /// loadout that knew about granted rules would be a loadout that knew about
+    /// a skill tree.
+    pub fn rules(&self) -> Vec<crate::rule::Rule> {
+        let mut out = if self.skills_taken.is_empty() {
+            Vec::new()
+        } else {
+            crate::data::skills().rules_from(&self.skills_taken)
+        };
+        out.extend(self.item_rules());
+        out
+    }
+
+    /// The board's half of [`rules`](Self::rules).
+    ///
+    /// **Assembled items only**, and that is not a check written anywhere: a
+    /// `SlotReport` says which groups came together and this walks those. "An
+    /// unassembled set grants nothing" is the shape of the loop rather than a
+    /// condition inside it.
+    fn item_rules(&self) -> Vec<crate::rule::Rule> {
+        let mut out = Vec::new();
+        for report in self.loadout.reports(&self.registry) {
+            for item in report.items.iter().filter(|i| i.assembled) {
+                for &p in &item.pieces {
+                    let Some(b) = self.registry.def(p).assembly_bonus else { continue };
+                    out.extend(b.grants.iter().cloned());
+                }
+            }
         }
-        crate::data::skills().start_with(&self.skills_taken)
+        out
+    }
+
+    /// What a step is allowed to do that it would otherwise refuse.
+    ///
+    /// The caller's half of *a map does not know about bags*: `world::step`
+    /// takes this, and this is filled from what the character has.
+    pub fn allowances(&self) -> crate::world::Allowances {
+        crate::world::Allowances::of(&self.rules())
     }
 
     /// Can this character read the map's numbers?
@@ -1231,7 +1286,7 @@ impl Character {
     /// for itself whether to print the danger would be a second copy of the
     /// rule, and it would go on printing it after the node was retuned.
     pub fn scouting(&self) -> bool {
-        self.start_with().rules.iter().any(|r| matches!(r, crate::skills::Rule::Scout))
+        self.rules().iter().any(|r| matches!(r, crate::rule::Rule::Scout))
     }
 
     pub fn combat_items(&self) -> Vec<crate::loadout::ItemProfile> {

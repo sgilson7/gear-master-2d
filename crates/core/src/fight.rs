@@ -102,6 +102,87 @@ fn boss_at(game: &Game, at: [u8; 2]) -> Option<(String, Option<String>)> {
     Some((p.id.clone(), p.drops.clone()))
 }
 
+/// A creature that gave up, and what that paid.
+///
+/// **Not a [`Settlement`].** A settlement has an `Outcome`, which is the answer
+/// to "how did the fight go", and there was no fight. Two types rather than an
+/// outcome variant, so nothing downstream can ask a rout what its log said.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Rout {
+    /// Canonical, like everything the engine matches on.
+    pub creature: String,
+    pub gold: i32,
+    pub xp: i32,
+    /// What is on you now, the same number a win reports.
+    pub carried: i32,
+    pub receipt: Vec<String>,
+}
+
+/// Meet something that will not fight you.
+///
+/// `Rule::Rout` is the one rule in the game that resolves an **encounter**
+/// rather than a fight or a step, and this is why it is here rather than in
+/// `combat`: a fight decided before its first tick is a fight the replay has to
+/// draw, and there is nothing to draw. So the encounter is settled where it
+/// stands, pays what a win pays, and says why.
+///
+/// Returns `None` when there is no encounter or nothing routs this creature,
+/// which is the ordinary case and is not an error.
+///
+/// **A boss is never routed.** The same rule that looks a boss drop up by the
+/// tile rather than by the creature: the thing standing at the end of a
+/// corridor is the corridor's, and a set that walked past it would walk past
+/// the key as well.
+pub fn rout(game: &mut Game) -> Option<Rout> {
+    let e = game.encounter.as_ref()?;
+    let spec = spec(e)?;
+    if boss_at(game, e.at).is_some() {
+        return None;
+    }
+    if !crate::rule::routs(&game.character.rules(), &e.enemy) {
+        return None;
+    }
+    let e = game.encounter.take()?;
+    let difficulty = Difficulty::Easy;
+    let gold = reward::bounty_for(Outcome::Victory, spec.bounty);
+    let rating = crate::rating::creature_rating(spec, difficulty);
+    let xp = reward::xp_for(Outcome::Victory, crate::progression::xp_for_rating(rating));
+
+    let mut receipt =
+        vec![format!("The {} will not come near you. Nothing was fought.", game.theme_name(spec.name))];
+    game.character.gold += gold;
+    receipt.push(format!("+{gold} Fnorp"));
+    if xp > 0 {
+        game.character.carry(xp);
+        receipt.push(format!("+{xp} experience, carried"));
+        receipt.push(format!(
+            "{} on you. It is worth nothing until you bank it.",
+            game.character.carried
+        ));
+    }
+    game.world.bump("wins");
+    game.world.bump("routs");
+    // An errand that counts this creature counts it. A set that broke a town's
+    // errand would be a reward that took something away.
+    for name in crate::quest::on_victory(game, spec.name) {
+        receipt.push(format!("Took a {name}."));
+    }
+    // **And no tiredness.** A fight takes 4% of you whatever happens in it;
+    // this was not one, and a player will check.
+    receipt.push(format!(
+        "0% more tired. There was no fight to be tired from, and {}% of you is still missing.",
+        game.character.fatigue
+    ));
+    let _ = e;
+    Some(Rout {
+        creature: spec.name.to_string(),
+        gold,
+        xp,
+        carried: game.character.carried,
+        receipt,
+    })
+}
+
 /// Bank the result and clear the encounter.
 ///
 /// Idempotent in the sense that matters: with no encounter it does nothing and

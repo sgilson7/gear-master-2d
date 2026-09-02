@@ -748,6 +748,96 @@ def check_the_result_is_a_pocket_not_a_level(page, name, fails, lines, before):
         fails.append(f"{name}: a defeat left {after['carried']} in the pocket")
 
 
+def plant(page, base_path, edit, stem="probe"):
+    """Load a save built by editing a downloaded one. Returns nothing.
+
+    The pattern the gate check invented and this file now shares: walking to a
+    particular state costs twenty minutes of fighting, and what wants proving
+    is what happens *at* that state rather than the road to it.
+    """
+    save = json.loads(Path(base_path).read_text())
+    edit(save.get("state", save))
+    out = Path(base_path).parent / f"{stem}.json"
+    out.write_text(json.dumps(save))
+    page.set_input_files("#file", str(out))
+    page.wait_for_timeout(400)
+
+
+def check_an_errand_can_be_handed_in_where_it_was_taken(page, name, fails):
+    """The reported blocker: Marbulon's tile went dead once her card was read.
+
+    `world::step` opened an event only when its id was absent from `answered`,
+    so answering the card once made the tile inert — and her two errands, the
+    questline that unlocks the Cave, could never be taken or handed in.
+
+    Planted rather than walked. What the browser has to prove is that a place
+    with an errand on it reopens **after it has been answered**, still shows
+    the errand, and takes it back; the questline itself is `tests/quests.rs`.
+    """
+    door = page.evaluate("""() => (window.__world().places ?? [])
+        .find(p => p.id === 'marbulons-door')""")
+    if not door:
+        fails.append(f"{name}: the overworld has no marbulons-door on it")
+        return
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+
+    # Standing one west of her door, having already read her card, carrying
+    # the errand and the three jars it asked for. Exactly the reported state.
+    def used(body):
+        w = body.setdefault("world", {})
+        w["at"] = [door["at"][0] - 1, door["at"][1]]
+        w["map"] = ""
+        w["answered"] = list(w.get("answered", [])) + ["marbulons-door"]
+        w["quests_taken"] = ["marbulon-asks-first"]
+        w["quests_done"] = []
+        reg = body["character"].setdefault("registry", [])
+        for _ in range(3):
+            reg.append({"def": "Whisper Jar", "rot": 0})
+            body["character"]["owned"].append(len(reg) - 1)
+
+    plant(page, base, used, stem="errand-probe")
+    page.keyboard.press("ArrowRight")
+    page.wait_for_timeout(350)
+
+    if page.is_hidden("#card"):
+        fails.append(f"{name}: an answered event tile with an errand on it opened nothing")
+        return
+    # A spent door is not offered again — the choices were answered once and
+    # that was right. Only the errand board comes back.
+    if page.locator("#card-choices button").count():
+        fails.append(f"{name}: reopening a spent card offered its choices again")
+    errands = page.locator("#card-errands .wares")
+    if errands.count() == 0:
+        fails.append(f"{name}: her door reopened with no errand board on it")
+        return
+    foot = (page.locator("#card-errands .wares .cost").first.text_content() or "").strip()
+    if foot.lower() != "hand it in":
+        fails.append(f"{name}: an errand ready to hand in reads {foot!r}")
+    live = page.locator("#card-errands .wares:not(:disabled)")
+    if live.count() == 0:
+        fails.append(f"{name}: the errand is ready and the button is dead")
+        return
+    live.first.click()
+    page.wait_for_timeout(200)
+    said = page.text_content("#says") or ""
+    if not said.strip():
+        fails.append(f"{name}: handing in at the door said nothing")
+    done = page.evaluate("""() => JSON.parse(window.__save()).state.world.quests_done""")
+    if "marbulon-asks-first" not in (done or []):
+        fails.append(f"{name}: handed the errand in and the save says {done}")
+
+    # And the ring on the map moved on: the first is done, so what is drawn is
+    # the second one waiting to be taken.
+    marks = page.evaluate("() => window.__errandMarks()")
+    if not any(m["id"] == "marbulons-door" and m["mark"] == "take" for m in marks):
+        fails.append(f"{name}: her door is not marked for the next errand: {marks}")
+    # Her card is still open, and it is over everything.
+    page.click("#card-close")
+    page.wait_for_selector("#card", state="hidden", timeout=5000)
+
+
 def check_the_cave_is_shut_until_it_is_not(page, name, fails):
     """A gate wants a key, says so, and opens once you have one.
 
@@ -1342,9 +1432,10 @@ def walk_the_gate(browser, name):
             fails.append(f"{name}: the fork is still on offer after being taken")
 
     # --- the way into the cave -----------------------------------------------
-    # **Last, because it plants a save.** It replaces the character to stand
-    # them on the gate's doorstep, so anything after it would be checking a
-    # game this walk did not play.
+    # **Last, because these plant saves.** They replace the character to stand
+    # them somewhere the walk would take twenty minutes to reach, so anything
+    # after them would be checking a game this walk did not play.
+    check_an_errand_can_be_handed_in_where_it_was_taken(page, name, fails)
     check_the_cave_is_shut_until_it_is_not(page, name, fails)
 
     # --- the numbers overlay -------------------------------------------------
@@ -1414,6 +1505,7 @@ def main():
     print("ok: experience is carried out of a fight and only a town spends it")
     print("ok: every fight wears you down, and the panel and the sheet both say so")
     print("ok: the cave is shut until you have the key, and short once you are in it")
+    print("ok: a door you have already read reopens, and takes its errand back")
     print("ok: your own figure becomes your class's when you take one")
     print("ok: a mid-fight save reopens the same fight")
     print("ok: walk, download, reload, upload — position and stream both came back")

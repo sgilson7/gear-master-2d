@@ -1244,6 +1244,8 @@ async function main() {
   window.__places = () => world.places;
   window.__world = () => world;
   window.__fightJson = () => fight_json();
+  window.__save = () => save_json();
+  window.__errandMarks = () => JSON.parse(errand_marks_json()).places;
 
   $('skills').onclick = openTree;
   $('tree-done').onclick = closeTree;

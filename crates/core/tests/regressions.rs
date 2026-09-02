@@ -5,6 +5,8 @@
 //! it survives as a UI rule in `CLAUDE.md` and will be a test in M3, when
 //! there is a shop screen to assert against.
 
+mod common;
+
 use gm2d_core::character::Character;
 use gm2d_core::combat::{simulate, Event, MonsterSpec, MonsterSprite, Outcome, Rank, Side};
 use gm2d_core::piece::SlotKind;
@@ -71,26 +73,42 @@ const DUMMY: MonsterSpec = MonsterSpec {
 #[test]
 fn hit_for_matches_the_log() {
     let mut ch = Character::with_all_pieces();
-    ch.apply_preset();
+    // **The fixture's board.** This is about one weapon's card agreeing with
+    // that weapon's blow. A packed board banks rage, and rage sharpens the
+    // physical half at the moment of the swing — which the card cannot know
+    // and is not claiming to. Comparing the two on a board that banks nothing
+    // is the only way this reads `hit_for` and nothing else.
+    common::build_full_loadout(&mut ch);
 
     let items = ch.combat_items();
     let stats = ch.player_stats();
-    let weapon = items
-        .iter()
-        .find(|i| i.slot == SlotKind::Weapon)
-        .expect("the preset seats a weapon");
-    let card = weapon.hit_for(stats.strength);
-    assert!(card > 0, "the preset's weapon advertises no damage at all");
+    assert!(
+        items.iter().any(|i| i.slot == SlotKind::Weapon),
+        "the packed board seats no weapon at all"
+    );
 
     let log = simulate(stats, &items, &DUMMY);
-    let first = log
-        .entries
-        .iter()
-        .find_map(|e| match e.event {
-            Event::Hit { by: Side::Player, damage, absorbed, .. } => Some((damage, absorbed)),
-            _ => None,
-        })
-        .expect("the preset's weapon never landed a blow on a dummy");
+    // **Whichever item actually swung**, not whichever is first in the list. A
+    // packed board carries several weapons now, and picking the first while
+    // reading the first blow compares one item's card against another item's
+    // hit — which is a different bug wearing this one's clothes. The player has
+    // no innate attacks, so `Activate`'s index is an index into `items`.
+    let mut swung = None;
+    let mut first = None;
+    for e in &log.entries {
+        match e.event {
+            Event::Activate { side: Side::Player, index, .. } => swung = Some(index),
+            Event::Hit { by: Side::Player, damage, absorbed, .. } => {
+                first = Some((damage, absorbed));
+                break;
+            }
+            _ => {}
+        }
+    }
+    let first = first.expect("the packed board never landed a blow on a dummy");
+    let weapon = &items[swung.expect("something activated before it hit")];
+    let card = weapon.hit_for(stats.strength);
+    assert!(card > 0, "the item that swung advertises no damage at all");
 
     assert_eq!(
         first.1, 0,

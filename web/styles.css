@@ -129,6 +129,26 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
 .screen { position: fixed; inset: 0; background: var(--ground); z-index: 20;
   overflow-y: auto; padding: 28px 24px 40px; }
 .screen[hidden] { display: none; }
+/* **Screens stack in the order they open, and the order is written down.**
+   Every `.screen` sat at 20, so which one covered which was decided by the
+   order of the file — and the town comes after the fork. A level lands when
+   you bank, banking happens with the town up, and the fork opened *underneath*
+   it: four class cards on screen, none of them clickable, and the game
+   unfinishable from level five. Taking a class then opens the tree, which was
+   under the town for the same reason.
+
+   Three tiers, and each is a sentence about what a screen is:
+
+   - **where you are** — the fight, the town, the map's card. One at a time.
+   - **what you opened from there** — the tree, the log, the ending.
+   - **the one that does not come off** — the fork.
+
+   The third collision of this kind: `.card` made every item card a
+   full-viewport overlay, `.screen.framed[hidden]` kept a hidden fight screen
+   swallowing clicks, and this. All three were found by `elementFromPoint` and
+   none of them by reading. `check_the_fork_is_on_top` is what stops a fourth. */
+#tree, #log, #ending { z-index: 30; }
+#fork { z-index: 40; }
 /* The board is the game's main screen and was being squeezed into the same
    column as a paragraph of prose. The original ran at 1600x980 with 36px
    cells; this gets as close as the viewport allows. */

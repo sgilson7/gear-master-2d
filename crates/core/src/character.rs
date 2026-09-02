@@ -142,8 +142,10 @@ pub struct Character {
     ///
     /// **The only thing a fight spends for good.** Health resets at the bell,
     /// so this is what makes a fourth fight in a row a different fight from
-    /// the first. Only a restorative takes it off — a town does not, or the
-    /// restoratives would be decoration.
+    /// the first. A town takes all of it off on arrival and a restorative
+    /// takes some of it off wherever you are standing — the second is the
+    /// decision on the road, the first is what makes the walk home worth
+    /// taking. See `Game::arrive_in_town`.
     pub fatigue: i32,
     /// Restoratives carried, by id and count.
     pub supplies: Vec<(String, u32)>,
@@ -862,35 +864,235 @@ impl Character {
         // way out of the first region at all: the game was unwinnable from its
         // own first tile. `a_starting_character_can_win_in_the_pit` is the test
         // that would have caught it, and now does.
-        if self.loadout.slot(SlotKind::Weapon).rows() < 8 {
-            self.seat(STARTER);
-            return;
+        self.pack_what_you_own();
+    }
+
+    /// Seat everything you own that will go on, biggest first.
+    ///
+    /// # The bug this replaces, which the M8.8 playthrough found
+    ///
+    /// Auto-pack used to seat a **fixed list of twenty-two component names**,
+    /// skipping anything not owned. Five of the eleven things the only town on
+    /// the map sells are not on that list — `Tin Frame`, `Tin Plating`,
+    /// `Sackcloth Base`, `Rag Layer`, `Plain Sole` — so a player who bought the
+    /// whole shelf and pressed the button they were given watched most of it
+    /// stay in the bag. With every component the map can hand out, the board
+    /// came to **two assembled items of five frames**, and two items lose to
+    /// the Cave's boss, so the key never dropped and the door never appeared.
+    /// The suite was green and the demo could not be finished.
+    ///
+    /// The old list was not wrong when it was written; it was written against a
+    /// starting kit of eleven components and outlived it by three milestones.
+    /// A list of names is a second copy of what the shops sell, and the two
+    /// drifted the moment the shelves became content.
+    ///
+    /// # How it packs
+    ///
+    /// Greedy and deterministic: biggest first, into the first legal cell,
+    /// trying each of the four turns. It is not an optimiser and is not meant
+    /// to be — the whole game is the arrangement, and a button that packed
+    /// perfectly would be a button that played for you. What it has to do is
+    /// leave nothing in the bag that would obviously have gone on.
+    ///
+    /// Order is fixed by area and then by id, so the same bag always produces
+    /// the same board. A seeded walk that repacked differently on two machines
+    /// would be a seeded walk that fought different fights.
+    pub fn pack_what_you_own(&mut self) {
+        for k in SlotKind::ALL {
+            self.loadout.slot_mut(k).clear();
         }
-        const PRESET: &[(&str, SlotKind, u8, u8, u8)] = &[
-    ("Steel Frame", SlotKind::Helmet, 0, 0, 0),
-    ("Crest of Vigor", SlotKind::Helmet, 3, 0, 0),
-    ("Iron Plating", SlotKind::Helmet, 0, 2, 0),
-    ("Visor of Focus", SlotKind::Helmet, 0, 4, 0),
-    ("Padded Base", SlotKind::Chest, 0, 0, 0),
-    ("Keystone Base", SlotKind::Chest, 0, 0, 0),
-    ("Hollow Weave", SlotKind::Chest, 5, 2, 1),
-    ("Chain Layer", SlotKind::Chest, 0, 3, 0),
-    ("Woven Underlayer", SlotKind::Chest, 0, 4, 0),
-    ("Hide Base", SlotKind::Chest, 3, 6, 0),
-    ("Leather Material", SlotKind::Gloves, 0, 0, 0),
-    ("Gripping Mold", SlotKind::Gloves, 2, 0, 0),
-    ("Steel Material", SlotKind::Gloves, 0, 4, 0),
-    ("Gauntlet Mold", SlotKind::Gloves, 2, 4, 0),
-    ("Runed Material", SlotKind::Greaves, 0, 0, 0),
-    ("Greave Mold", SlotKind::Greaves, 2, 0, 0),
-    ("Boiled Leather", SlotKind::Greaves, 0, 4, 0),
-    ("Runner's Mold", SlotKind::Greaves, 3, 4, 0),
-    ("Balanced Grip", SlotKind::Weapon, 0, 0, 0),
-    ("Runed Edge", SlotKind::Weapon, 1, 0, 0),
-    ("Ruby Inlay", SlotKind::Weapon, 2, 0, 0),
-    ("Balance Weight", SlotKind::Weapon, 2, 2, 0),
+        // **The weapon first.** It is the only thing that swings, and a
+        // component that fits several grids is worth more in it than anywhere
+        // else. Then the chest, which wants the most room, and the three
+        // smaller grids after.
+        const ORDER: [SlotKind; 5] = [
+            SlotKind::Weapon,
+            SlotKind::Chest,
+            SlotKind::Helmet,
+            SlotKind::Gloves,
+            SlotKind::Greaves,
         ];
-        self.seat(PRESET);
+        for kind in ORDER {
+            self.pack_one(kind);
+        }
+    }
+
+    /// How good a grid is: how many items came together, then what they rate.
+    ///
+    /// The count first and the rating second, because one assembled item beats
+    /// any amount of loose metal — an item that did not come together does
+    /// nothing at all, whatever its parts are worth.
+    fn worth_of(r: &SlotReport) -> (usize, i32) {
+        let made = r.items.iter().filter(|i| i.assembled).count();
+        let worth = r.items.iter().filter(|i| i.assembled).map(|i| i.rating).sum();
+        (made, worth)
+    }
+
+    /// Pack one grid: seed on a core, grow what improves, repeat.
+    ///
+    /// # The bug this exists because of
+    ///
+    /// The first version filled the grid with everything that fitted, and
+    /// **packing more is not packing better**: two components that touch are
+    /// one item, so a seven-row weapon frame packed solid is one enormous
+    /// group that assembles nothing at all. A character carrying every reward
+    /// on the map lost to a Cave Rat, because the button had given them a
+    /// weapon frame full of books and no weapon.
+    ///
+    /// # The rule
+    ///
+    /// A **core** is seeded where it touches nothing, because a recipe is
+    /// built round one. Everything after it has to *strictly improve* the grid
+    /// — one more item, or the same items worth more — and is taken straight
+    /// back out otherwise. Then another core is seeded somewhere clear and the
+    /// pass runs again, up to four items a grid.
+    ///
+    /// It is not an optimiser and must not become one: **the whole game is the
+    /// arrangement**, and a button that packed perfectly would be a button that
+    /// played for you. What it has to do is leave nothing obvious in the bag
+    /// and never hand back a board worse than the one you could have made by
+    /// putting the first two things down.
+    fn pack_one(&mut self, kind: SlotKind) {
+        // A core that made nothing is taken back out. **Seeding is
+        // provisional**: a lone core on a grid is a component doing nothing in
+        // a cell somebody else could have used, and the first version left one
+        // behind on every grid with an odd part in the bag.
+        let mut skip: Vec<PieceId> = Vec::new();
+        for _ in 0..8 {
+            let before = Self::worth_of(&self.report(kind));
+            let keep_slot = self.loadout.slot(kind).clone();
+            let keep_rots: Vec<(PieceId, u8)> = self
+                .loose_for(kind)
+                .into_iter()
+                .map(|id| (id, self.registry.rotation(id)))
+                .collect();
+
+            let Some(seed) = self.seed_a_core(kind, &skip) else { break };
+            self.grow(kind);
+            if Self::worth_of(&self.report(kind)).0 > before.0 {
+                continue;
+            }
+            // That core led nowhere. Put the grid back the way it was and try
+            // the next one down.
+            for (id, r) in keep_rots {
+                self.registry.set_rotation(id, r);
+            }
+            *self.loadout.slot_mut(kind) = keep_slot;
+            skip.push(seed);
+        }
+    }
+
+    /// Everything owned, loose, and allowed on this grid — best rated first.
+    fn loose_for(&self, kind: SlotKind) -> Vec<PieceId> {
+        let mut out: Vec<PieceId> = self
+            .owned
+            .iter()
+            .copied()
+            .filter(|&id| !self.is_equipped(id))
+            .filter(|&id| {
+                let d = self.registry.def(id);
+                // A quest item is carried, never worn — `equip` refuses one,
+                // and skipping it here saves a bag full of keys a great many
+                // failed placements a repack.
+                d.kind != crate::piece::PieceKind::Quest && d.slots().contains(&kind)
+            })
+            .collect();
+        // Ties broken by id, so the same bag always packs the same way. A
+        // seeded walk that repacked differently on two machines would be a
+        // seeded walk that fought different fights.
+        out.sort_by_key(|&id| {
+            (std::cmp::Reverse(crate::rating::piece_rating(self.registry.def(id))), id.0)
+        });
+        out
+    }
+
+    /// Put the best unused core down somewhere it touches nothing.
+    ///
+    /// Touching nothing is what makes it the start of a new item rather than
+    /// another part of the one already there.
+    fn seed_a_core(&mut self, kind: SlotKind, skip: &[PieceId]) -> Option<PieceId> {
+        for id in self.loose_for(kind) {
+            if !self.registry.def(id).kind.is_core() || skip.contains(&id) {
+                continue;
+            }
+            let was = self.registry.rotation(id);
+            for turn in 0..4u8 {
+                self.registry.set_rotation(id, (was + turn) % 4);
+                for y in 0..self.loadout.slot(kind).rows() {
+                    for x in 0..SLOT_W {
+                        if self.loadout.can_place(&self.registry, id, kind, x, y).is_err() {
+                            continue;
+                        }
+                        if !self.stands_clear(kind, id, x, y) {
+                            continue;
+                        }
+                        self.loadout.slot_mut(kind).place(&self.registry, id, x, y);
+                        return Some(id);
+                    }
+                }
+            }
+            self.registry.set_rotation(id, was);
+        }
+        None
+    }
+
+    /// Would this piece, seated here, touch nothing already on the grid?
+    fn stands_clear(&self, kind: SlotKind, id: PieceId, ax: u8, ay: u8) -> bool {
+        let slot = self.loadout.slot(kind);
+        self.registry.shape(id).cells().iter().all(|&(dx, dy)| {
+            let (cx, cy) = (ax as i32 + dx as i32, ay as i32 + dy as i32);
+            [(0i32, -1i32), (0, 1), (-1, 0), (1, 0)].iter().all(|&(ox, oy)| {
+                let (nx, ny) = (cx + ox, cy + oy);
+                !slot.in_bounds(nx, ny) || slot.get(nx as u8, ny as u8).is_none()
+            })
+        })
+    }
+
+    /// Add anything that makes the grid strictly better, and nothing else.
+    ///
+    /// Only anchors where the piece would *touch* something already down are
+    /// tried: a component standing on its own changes no item, so it cannot
+    /// improve one, and trying every empty cell of a six-by-eight frame for
+    /// every piece is how a button becomes a pause.
+    fn grow(&mut self, kind: SlotKind) -> bool {
+        let mut any = false;
+        for _ in 0..2 {
+            let mut moved = false;
+            for id in self.loose_for(kind) {
+                let before = Self::worth_of(&self.report(kind));
+                let was = self.registry.rotation(id);
+                let mut placed = false;
+                'turns: for turn in 0..4u8 {
+                    self.registry.set_rotation(id, (was + turn) % 4);
+                    for y in 0..self.loadout.slot(kind).rows() {
+                        for x in 0..SLOT_W {
+                            if self.loadout.can_place(&self.registry, id, kind, x, y).is_err() {
+                                continue;
+                            }
+                            if self.stands_clear(kind, id, x, y) {
+                                continue;
+                            }
+                            self.loadout.slot_mut(kind).place(&self.registry, id, x, y);
+                            if Self::worth_of(&self.report(kind)) > before {
+                                placed = true;
+                                break 'turns;
+                            }
+                            self.loadout.slot_mut(kind).remove(id);
+                        }
+                    }
+                }
+                if placed {
+                    moved = true;
+                    any = true;
+                } else {
+                    self.registry.set_rotation(id, was);
+                }
+            }
+            if !moved {
+                break;
+            }
+        }
+        any
     }
 
     /// Clear every grid and seat a layout, skipping anything not owned or not

@@ -3,10 +3,15 @@
 //! Health resets at every bell — that has been true since M0 and is why there
 //! was never anything for a rest to restore. **Fatigue is the thing a fight
 //! actually spends.** Every battle takes a share of your *maximum* health for
-//! good, and only a restorative gives it back, so an expedition is a budget
-//! rather than a corridor: the fourth fight in a row is fought by a weaker
-//! character than the first, and knowing when to turn round is the decision
-//! the map was missing.
+//! good, so an expedition is a budget rather than a corridor: the fourth fight
+//! in a row is fought by a weaker character than the first, and knowing when to
+//! turn round is the decision the map was missing.
+//!
+//! Two things give it back and they are not the same thing. **A town takes all
+//! of it off on arrival** — see `Game::arrive_in_town` — which is what makes
+//! the walk home worth taking rather than a formality. **A restorative takes
+//! some of it off wherever you are standing**, which is the decision this
+//! exists to create: another fight, open the tin, or turn round.
 //!
 //! It is a percentage rather than a number of points because it has to mean
 //! the same thing at level one and level twenty. Twelve points is a third of a

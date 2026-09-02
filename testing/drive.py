@@ -140,6 +140,12 @@ def leave_town(page, bank=True):
     if page.is_visible("#town"):
         if bank:
             bank_here(page)
+        # **Banking is where a level lands, and a level is where the fork
+        # opens** — on top of the town, because it is the one screen that does
+        # not come off. Leave it to the caller rather than clicking Back out
+        # through it.
+        if page.is_visible("#fork"):
+            return True
         page.click("#leave")
         page.wait_for_selector("#town", state="hidden", timeout=5000)
         return True
@@ -850,6 +856,78 @@ def check_an_errand_can_be_handed_in_where_it_was_taken(page, name, fails):
     # Her card is still open, and it is over everything.
     page.click("#card-close")
     page.wait_for_selector("#card", state="hidden", timeout=5000)
+
+
+def check_the_fork_is_on_top(page, name, fails):
+    """The class fork is clickable when it opens, which is in a town.
+
+    Found by playing it. A level lands when you bank, banking happens with the
+    town screen up, and every `.screen` sat at the same z-index — so the town,
+    which comes later in the file, painted over the fork. Four class cards on
+    screen, all of them under something, none of them clickable, and the game
+    unfinishable from level five.
+
+    **Measured with `elementFromPoint`**, because reading the source says every
+    card is a button and it was. This is the third time that has been the only
+    way to see it: `.card` made every item card a full-viewport overlay, and
+    `.screen.framed` kept a hidden fight screen swallowing clicks.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+    town = page.evaluate("""() => (window.__world().places ?? []).find(p => p.kind === 'town')""")
+
+    def owed(body):
+        body["character"]["class"] = None
+        body["character"]["xp"] = 0
+        body["character"]["carried"] = 600
+        body["world"]["at"] = [town["at"][0] + 1, town["at"][1]]
+        body["world"]["map"] = ""
+
+    plant(page, base, owed, stem="fork-probe")
+    page.keyboard.press("ArrowLeft")
+    page.wait_for_timeout(300)
+    if not page.is_visible("#town"):
+        fails.append(f"{name}: could not get into a town to bank a level")
+        return
+    page.click("#bank")
+    page.wait_for_timeout(300)
+    if page.is_hidden("#fork"):
+        fails.append(f"{name}: banked past level five in a town and was never asked")
+        return
+    hidden = page.evaluate("""() => [...document.querySelectorAll('#fork-choices .wares')]
+        .map(b => {
+          const r = b.getBoundingClientRect();
+          const mid = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+          return b.contains(mid) ? null
+               : { name: b.querySelector('b').textContent,
+                   under: mid ? (mid.closest('.screen')?.id ?? mid.tagName) : 'nothing' };
+        }).filter(Boolean)""")
+    if hidden:
+        fails.append(f"{name}: the fork opened under something: {hidden}")
+        return
+    # Take it, so the walk carries on with a class rather than a screen it
+    # cannot dismiss — and taking it opens the tree, over the same town,
+    # which is the same bug one screen along.
+    page.locator("#fork-choices .wares").first.click()
+    page.wait_for_selector("#fork", state="hidden", timeout=8000)
+    if page.is_visible("#tree"):
+        buried = page.evaluate(
+            "() => {"
+            "  const b = document.querySelector('#tree-done');"
+            "  const r = b.getBoundingClientRect();"
+            "  const mid = document.elementFromPoint(r.x + r.width / 2,"
+            "                                        r.y + r.height / 2);"
+            "  return b.contains(mid) ? null : (mid?.closest('.screen')?.id ?? 'nothing');"
+            "}")
+        if buried:
+            fails.append(f"{name}: the tree opened from the fork is under {buried}")
+            return
+        page.click("#tree-done")
+        page.wait_for_selector("#tree", state="hidden", timeout=8000)
+    if page.is_visible("#town"):
+        page.click("#leave")
+        page.wait_for_selector("#town", state="hidden", timeout=5000)
 
 
 def check_the_door_ends_the_demo(page, name, fails):
@@ -1611,12 +1689,23 @@ def check_turning_in_hand(page, name, fails):
     got = page.evaluate("""() => {
       const b = window.__board;
       if (!b || !b.state) return null;
-      // Take something off the board so there is a multi-cell piece loose.
+      // **A shape a quarter turn actually moves.** A two-by-two square comes
+      // back to itself, and the "it changed" assertion below is the negative
+      // test that keeps the real one honest — so a symmetric piece reports a
+      // working board as a broken one. The board packs tightly now and the bag
+      // is often one piece deep, so the choice has to be made when taking one
+      // off the board rather than afterwards.
+      const turns = (p) => {
+        const xs = p.cells.map(c => c[0]), ys = p.cells.map(c => c[1]);
+        return (Math.max(...xs) - Math.min(...xs)) !== (Math.max(...ys) - Math.min(...ys));
+      };
       for (const s of b.state.slots) {
-        const p = s.placed.find(p => p.cells.length > 1);
+        const p = s.placed.find(p => p.cells.length > 1 && turns(p))
+               ?? s.placed.find(p => p.cells.length > 1);
         if (p) { b.api.pickUp(p.id); b.refresh(); break; }
       }
-      const loose = b.state.bag.find(p => p.cells.length > 1);
+      const loose = b.state.bag.find(p => p.cells.length > 1 && turns(p))
+                 ?? b.state.bag.find(p => p.cells.length > 1);
       if (!loose) return { skipped: true };
       b.held = { id: loose.id, from: null, name: loose.name, slot: loose.slot };
       const before = JSON.stringify(b.heldCells());
@@ -1735,9 +1824,17 @@ def check_a_stale_autosave(browser, name):
     return fails
 
 
-def walk_the_gate(browser, name):
-    """Returns a list of failures; empty means the gate is passed."""
-    fails, problems, offsite = [], [], []
+def walk_the_gate(browser, name, fails=None):
+    """Returns a list of failures; empty means the gate is passed.
+
+    `fails` is passed in so that a crash does not take the findings with it.
+    A check that reported a real failure and left a screen up used to kill the
+    next check on a click it could not land, and the whole list went unprinted
+    — so the run reported a Playwright traceback and not the one sentence that
+    said what was wrong.
+    """
+    fails = [] if fails is None else fails
+    problems, offsite = [], []
     ctx = browser.new_context(accept_downloads=True)
     page = ctx.new_page()
     page.on("console", lambda m: problems.append(f"console.{m.type}: {m.text}")
@@ -2117,6 +2214,7 @@ def walk_the_gate(browser, name):
     # **Last, because these plant saves.** They replace the character to stand
     # them somewhere the walk would take twenty minutes to reach, so anything
     # after them would be checking a game this walk did not play.
+    check_the_fork_is_on_top(page, name, fails)
     check_the_door_ends_the_demo(page, name, fails)
     check_the_rack(page, name, fails)
     check_the_spin_animates(page, name, fails)
@@ -2159,7 +2257,14 @@ def main():
                     fails.append(f"{name}: could not launch ({e})")
                     continue
                 fails += check_a_stale_autosave(b, name)
-                fails += walk_the_gate(b, name)
+                mine = []
+                try:
+                    walk_the_gate(b, name, mine)
+                except Exception as e:
+                    # Keep whatever was found before the crash. The crash is a
+                    # failure too, and usually a consequence of the first one.
+                    mine.append(f"{name}: the walk stopped: {str(e).splitlines()[0]}")
+                fails += mine
                 b.close()
                 if not any(f.startswith(name + ":") for f in fails):
                     print(f"ok: {name} walked the gate")
@@ -2199,6 +2304,7 @@ def main():
     print("ok: a licensee buys an ench, bolts it on, switches it off and takes it back")
     print("ok: a spinning item turns, and turns to somewhere core said it could")
     print("ok: the wall grows a door, the key opens it, and the demo ends there")
+    print("ok: the class fork opens on top of the town it is offered in")
     print("ok: your own figure becomes your class's when you take one")
     print("ok: a mid-fight save reopens the same fight")
     print("ok: walk, download, reload, upload — position and stream both came back")

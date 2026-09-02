@@ -10,6 +10,8 @@ use gm2d_core::fight::{self, Encounter};
 use gm2d_core::game::Game;
 use gm2d_core::save;
 
+mod common;
+
 const D: Difficulty = Difficulty::Easy;
 
 fn facing(enemy: &str) -> Game {
@@ -17,7 +19,13 @@ fn facing(enemy: &str) -> Game {
     g.character = Character::with_all_pieces();
     g.character.loadout.name_seed = 0x5EED_1234_ABCD_0001;
     g.character.loadout.naming = gm2d_core::theme::by_id("td").naming;
-    g.character.apply_preset();
+    // **The fixture's board, not the button's.** These tests want a board that
+    // beats a Cave Rat and loses to Francis, which is a statement about one
+    // particular arrangement. Auto-pack stopped being an arrangement in M8.8
+    // and became a packer, and a packer handed the whole catalogue produces a
+    // board that beats everything — which is correct of the packer and useless
+    // as a fixture.
+    common::build_full_loadout(&mut g.character);
     g.world.last_town = "the-end-of-all-gears".into();
     g.encounter = Some(Encounter { enemy: enemy.into(), at: [9, 17] });
     g

@@ -1,6 +1,6 @@
 ROOT := $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 
-.PHONY: help test test-ui test-ui-setup check web serve publish art clean
+.PHONY: help test test-ui test-ui-setup check web serve publish art play clean
 
 ## test: run the engine suite (native, no browser needed)
 test:
@@ -20,6 +20,16 @@ test-ui-setup:
 	@$(ROOT)/.venv-test/bin/pip -q install playwright
 	@$(ROOT)/.venv-test/bin/playwright install chromium firefox webkit
 	@echo "ready: make test-ui"
+
+## play: play the demo start to finish and write down what it said
+#
+# Not the gate. `drive.py` walks a route chosen to exercise checks; this starts
+# a new game, buys with the money it has, packs with the button a player is
+# given, and reads every screen. The transcript is the point — it caught an
+# Auto-pack that seated the starting kit for the whole game and a class fork
+# that opened underneath the town, and both were green in the suite.
+play: web
+	@$(ROOT)/.venv-test/bin/python $(ROOT)/testing/playthrough.py chromium
 
 ## web: build the browser app into dist/web/
 web:

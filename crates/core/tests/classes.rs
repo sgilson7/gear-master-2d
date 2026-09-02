@@ -345,3 +345,46 @@ fn the_mvp_checklist() {
     //    `testing/drive.py` walks in three browsers on every push. Nothing here
     //    can check that, and pretending to would be worse than saying so.
 }
+
+/// **No offered class promises a mechanic this game has not got.**
+///
+/// Upstream handed the same class out over and over, so a promise had to say
+/// what a second one bought. GM2D asks once, at level five, and the answer
+/// does not come off — so a sentence about carrying five of something
+/// describes a game the player is not in. It reached the screen: the Kaklon
+/// Patent's promise said "for each stack of Recycler you are carrying. Five
+/// stacks is half again on all five slots", on the one screen in the game
+/// somebody reads before an irreversible choice.
+#[test]
+fn no_class_on_offer_promises_a_stack() {
+    // The four the fork deals. Named here rather than read from the shim,
+    // because the shim is wasm and this is the list it holds.
+    const OFFERED: [&str; 4] = ["Berserker", "Hexweaver", "Bloodletter", "Recycler"];
+    for name in OFFERED {
+        let def = gm2d_core::class::CLASSES
+            .iter()
+            .find(|c| c.name == name)
+            .unwrap_or_else(|| panic!("{name} is offered and is not a class"));
+        let said = def.power.describe().to_lowercase();
+        assert!(
+            !said.contains("stack"),
+            "{name} promises {said:?}, and nobody carries two of anything here"
+        );
+        // A number, in digits or spelled out. Spelling small ones out is the
+        // house style — TONE rule 12's lint had to learn the same thing after
+        // it failed "Forty Fnorp" for naming no number.
+        const SPELT: &[&str] = &[
+            "once", "twice", "one", "two", "three", "four", "five", "six", "seven",
+            "eight", "nine", "ten", "half", "double",
+        ];
+        let counted = said.chars().any(|c| c.is_ascii_digit())
+            || said.split(|c: char| !c.is_alphanumeric()).any(|w| SPELT.contains(&w));
+        assert!(counted, "{name} promises {said:?}, which names no number");
+        // And it has a tree to spend points in, or the promise is the whole
+        // class.
+        assert!(
+            gm2d_core::data::skills().tree_for_class(name).is_some(),
+            "{name} is offered and has no tree"
+        );
+    }
+}

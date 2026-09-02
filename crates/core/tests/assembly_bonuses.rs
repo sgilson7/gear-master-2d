@@ -404,7 +404,13 @@ fn sure_footed_cannot_be_stunned() {
         };
         // A whole board, so the fight lasts long enough for a stun to land at
         // all - and the same board both times, with only the mold swapped.
-        ch.apply_preset();
+        //
+        // **The fixture's board, not the button's.** This wants a known
+        // arrangement that fights for a while; Auto-pack stopped being one in
+        // M8.8 and became a packer, and a packer's answer moves whenever the
+        // bag does — which took the control's stun away and left the
+        // comparison empty.
+        common::build_full_loadout(&mut ch);
         for held in ch.loadout.slot(SlotKind::Greaves).pieces() {
             let _ = ch.unequip(held);
         }

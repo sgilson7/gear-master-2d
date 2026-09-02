@@ -919,6 +919,59 @@ risks). New kinds are added when a node needs one, not in advance.
 
 ---
 
+### 6a. Left open by M8.8's playthrough
+
+The playthrough's triage table is in the M8.8 commit. Everything a **Blocker**,
+a **Wrong** or a cheap **Rough** was fixed there. These are the **Later** rows —
+design questions rather than defects, deferred *visibly* rather than forgotten.
+
+1. **The pit's shelf is the whole economy.** One town is placed; Kettleworks
+   and High Wick are written, shelved, given errands and on no map. Eleven
+   entries have to carry a whole demo, and they do not: a player who buys
+   everything still cannot fill five frames without errand rewards. The other
+   half of the same fact is that the shelf sells each line **once**, so a
+   played-through character stands in the pit with **6,669 Fnorp** and nothing
+   left to spend it on — that is a real figure off the playthrough, at level
+   twelve, with the shelf bought out and the bench emptied. Widening the shelf would answer both and would
+   be the wrong fix: *a town is a place, and High Wick is where the plating
+   is.* **Placing a second town is the answer, and it wants a map decision.**
+2. **A `Bring` errand competes with using the thing it asks for.** THE ONES
+   STILL DOWN THERE wants four Long Shift Tins handed over, and a tin is the
+   only thing that undoes tiredness on the road. Nothing warns you that the one
+   you are about to drink was the fourth. Either the errand says so, or a tin
+   held for an errand is marked — both are content decisions.
+3. **Four class cards fill a 1280×720 viewport.** They fit and they are
+   clickable, measured. A fifth will not, and the fix then is a two-row grid
+   rather than a shorter portrait.
+4. **The boss is beatable and the margin is not tuned.** A level-12 character
+   carrying the map's rewards wins; a level-10 one does not. That band was
+   measured, not chosen, and nothing yet holds it in place the way
+   `a_full_expedition_is_a_budget_and_not_a_wall` holds fatigue.
+5. **The Cave's boss is also a creature in a region's pool.** The playthrough
+   beat Ponkey Dong **thirty-seven times in the open** before it ever reached
+   the tile he is standing on. That is the design working — a boss drop is
+   looked up by the *tile*, so beating one in a field must not hand over the
+   key — but it costs the fight at the bottom of the dungeon everything that
+   makes it a boss fight. Either the Cave's creature is one nothing else on the
+   map draws, or the tile does something the field does not.
+6. **The Cave's mouth is thirty tiles from the only town, and the walk costs
+   more of the fatigue budget than the Cave does.** The playthrough got in and
+   reached the boss's own tile — and arrived at the **60% cap**, on 188 of
+   ~470 max health, and lost. It went home, was mended by the town, walked back
+   through thirty tiles of fights, and arrived at the cap again: 320 losses to
+   697 wins, most of them at the bottom of that hole.
+
+   It is **not a blocker** and the reason is worth writing down: the walker
+   bought one tin a town visit while holding 11,857 Fnorp, and a player with
+   that much money buys twenty Full Stops and walks in fresh. But a mechanic
+   whose intended decision is *"another fight, open the tin, or turn round"*
+   should not be answerable by "the trip there spent it". Either the Cave is
+   nearer something, or arriving at a dungeon does what arriving at a town
+   does. Another thing a second town would answer for nothing.
+7. **What is past the door.** Open, and the human's. Nothing in the code
+   assumes a second overworld, a chapter count, or an ending beyond the one
+   M8.7 writes.
+
 ## 7. What happens next
 
 On approval: M0, in the order — scaffold the workspace, capture the golden combat fixtures

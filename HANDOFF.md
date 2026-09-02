@@ -121,9 +121,17 @@ REBASELINE_GOLDEN_COMBAT=1 cargo test -p gm2d-core
 - **Shelves are fixed.** Each town sells a set list, once each, no reroll.
 - **Errands** have a giver and a turn-in, which may differ; three goals — slay,
   bring, or go somewhere and report.
+- **A town takes the tiredness off**, and it is the only thing that does apart
+  from a tin. A tin is what you drink four tiles in with something on the next
+  square; the town is what makes the walk home worth taking.
 - **One map with one town** plus a short dungeon, the Great Gear Cave, behind a
-  gate that wants Marbulon's key. Its boss drops the key to a map that does not
-  exist yet.
+  gate that wants Marbulon's key. Its boss drops the key to **a door in the
+  western wall**, which is not there until the boss is down and is where the
+  demo ends.
+- **A class is one of four**, taken at level five and permanent. The Kaklon
+  Patent is the one that can bolt **enchs** onto components — a rack on the
+  packing screen, one ench a component, and one of them turns the item it is on
+  once a second for stacking power.
 
 ## 7. Where to look when something is wrong
 
@@ -154,7 +162,17 @@ REBASELINE_GOLDEN_COMBAT=1 cargo test -p gm2d-core
 
 ## 9. What is being built next
 
-`PLAN-M8.md`, seven milestones, each deployable on its own. Start at **M8.0**,
-which fixes a live blocker: an event tile goes inert once its card is answered,
-so Marbulon's errands — the questline that unlocks the dungeon — cannot be
-handed in.
+**Nothing is scheduled.** `PLAN-M8.md` is finished, all nine milestones, and
+the demo ends at a door in the western wall. What is past that door is not
+written, and the game's overall structure past it is the human's to decide —
+`PLAN-M8.md` §5.6 is where that question is written down. Nothing in the code
+assumes a second overworld, a chapter count, or an ending beyond the one the
+door gives.
+
+The two things most obviously worth doing next, and neither is a defect:
+
+- **Place a second town.** Kettleworks and High Wick are written, shelved and
+  given errands, and are on no map. The pit's eleven-line shelf is the whole
+  economy, and it is why a player who buys everything still cannot fill five
+  frames without errand rewards.
+- **Something past the door.** See above.

@@ -151,7 +151,51 @@ pub fn all_def_indices() -> Vec<usize> {
     (0..CATALOG.len()).collect()
 }
 
-/// Upstream's name for the preset. Kept so ported tests read as they did.
+/// A known-good full board, seated by name.
+///
+/// **Its own list, not `apply_preset`.** It was that until M8.8, when Auto-pack
+/// stopped being a fixed arrangement and became a packer — and the assembly
+/// tests that use this are about *recipes*, not about the button. Sharing one
+/// list meant a change to how the button packs broke four tests about what an
+/// assembly bonus does, which is two subjects tangled in one helper.
+///
+/// This is the arrangement `apply_preset` used to seat, kept here because it
+/// is a board somebody checked: every grid assembles, and chest, gloves and
+/// greaves each carry two separate items.
 pub fn build_full_loadout(ch: &mut Character) {
-    ch.apply_preset();
+    const PRESET: &[(&str, SlotKind, u8, u8, u8)] = &[
+        ("Steel Frame", SlotKind::Helmet, 0, 0, 0),
+        ("Crest of Vigor", SlotKind::Helmet, 3, 0, 0),
+        ("Iron Plating", SlotKind::Helmet, 0, 2, 0),
+        ("Visor of Focus", SlotKind::Helmet, 0, 4, 0),
+        ("Padded Base", SlotKind::Chest, 0, 0, 0),
+        ("Keystone Base", SlotKind::Chest, 0, 0, 0),
+        ("Hollow Weave", SlotKind::Chest, 5, 2, 1),
+        ("Chain Layer", SlotKind::Chest, 0, 3, 0),
+        ("Woven Underlayer", SlotKind::Chest, 0, 4, 0),
+        ("Hide Base", SlotKind::Chest, 3, 6, 0),
+        ("Leather Material", SlotKind::Gloves, 0, 0, 0),
+        ("Gripping Mold", SlotKind::Gloves, 2, 0, 0),
+        ("Steel Material", SlotKind::Gloves, 0, 4, 0),
+        ("Gauntlet Mold", SlotKind::Gloves, 2, 4, 0),
+        ("Runed Material", SlotKind::Greaves, 0, 0, 0),
+        ("Greave Mold", SlotKind::Greaves, 2, 0, 0),
+        ("Boiled Leather", SlotKind::Greaves, 0, 4, 0),
+        ("Runner's Mold", SlotKind::Greaves, 3, 4, 0),
+        ("Balanced Grip", SlotKind::Weapon, 0, 0, 0),
+        ("Runed Edge", SlotKind::Weapon, 1, 0, 0),
+        ("Ruby Inlay", SlotKind::Weapon, 2, 0, 0),
+        ("Balance Weight", SlotKind::Weapon, 2, 2, 0),
+    ];
+    for k in SlotKind::ALL {
+        ch.loadout.slot_mut(k).clear();
+    }
+    for &(name, kind, ax, ay, rot) in PRESET {
+        let Some(id) = ch.find_by_name(name) else { continue };
+        ch.registry.set_rotation(id, rot);
+        ch.loadout.remove_anywhere(id);
+        if ch.can_equip(id, kind, ax, ay).is_ok() {
+            let _ = ch.equip(id, kind, ax, ay);
+        }
+    }
 }

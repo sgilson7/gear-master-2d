@@ -620,11 +620,16 @@ impl ClassPower {
     /// rule that was never written. Name the numbers and the condition.
     pub fn describe(self) -> String {
         match self {
+            // **No stacks.** Upstream handed the same class out over and over
+            // and a promise had to say what a second one bought; GM2D asks
+            // once, at level five, and the answer does not come off. A
+            // sentence about carrying five of these describes a game the
+            // player is not in — and this is the sentence somebody reads
+            // before the one irreversible choice there is.
             ClassPower::Recycler { pct } => format!(
-                "Every assembly bonus on your boards counts {}% more, for each stack of \
-                 Recycler you are carrying. Five stacks is half again on all five slots. \
-                 An assembly bonus is the lump a component pays only when its item comes \
-                 together, so this pays a board that finishes what it seats.",
+                "Every assembly bonus on your boards counts {}% more. An assembly bonus \
+                 is the lump a component pays only when its item comes together, so this \
+                 pays a board that finishes what it seats.",
                 pct
             ),
             ClassPower::Piety { faith } => format!(

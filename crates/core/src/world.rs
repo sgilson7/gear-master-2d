@@ -377,6 +377,34 @@ impl World {
         self.places.iter().find(|p| p.at == [x, y])
     }
 
+    /// The regions whose pool holds this creature.
+    ///
+    /// The answer to "where do I find a Whisperling", which is a question about
+    /// the map's pools and therefore the map's to answer. A page working it out
+    /// for itself would be a second copy of "what lives where", and the pools
+    /// are the one thing on this map that gets retuned.
+    pub fn regions_holding(&self, creature: &str) -> Vec<&Region> {
+        self.regions
+            .iter()
+            .filter(|r| r.enemies.iter().any(|m| m.name == creature))
+            .collect()
+    }
+
+    /// Every tile of a region, as coordinates. Empty for a region this map
+    /// does not have.
+    pub fn tiles_of(&self, region: &str) -> Vec<[u8; 2]> {
+        let Some(i) = self.regions.iter().position(|r| r.id == region) else { return Vec::new() };
+        let mut out = Vec::new();
+        for y in 0..self.height {
+            for x in 0..self.width {
+                if self.region_index(x, y) == Some(i) && self.passable(x, y) {
+                    out.push([x, y]);
+                }
+            }
+        }
+        out
+    }
+
     /// The chance of an encounter on entering this tile, in per-mille.
     ///
     /// `terrain.base × (1 + danger/DANGER_REF)`, capped, in integers
@@ -491,6 +519,14 @@ pub struct WorldState {
     /// Errands handed in. A town does not offer one twice.
     #[serde(default)]
     pub quests_done: Vec<String>,
+    /// The errand the map is currently pointing at, if one is pinned.
+    ///
+    /// **State, because a pin that died with the screen would be a reference
+    /// rather than a tool.** You pin an errand in the log, close the log, and
+    /// walk — the whole value is in the walking, and it is the only part the
+    /// log itself cannot do.
+    #[serde(default)]
+    pub pinned: Option<String>,
 }
 
 impl WorldState {

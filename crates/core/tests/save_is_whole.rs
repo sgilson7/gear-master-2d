@@ -61,6 +61,9 @@ fn a_used_game() -> Game {
     g.character.gain_xp(400);
     g.character.carry(17);
 
+    // An errand pinned, so the map is pointing somewhere.
+    quest::pin(&mut g, "the-eyes-have-it").expect("a taken errand can be pinned");
+
     // A skill, a class, and a mid-fight encounter on a dungeon tile.
     g.character.skill_points += 2;
     g.character.take_skill(&data::skills(), "corked").expect("a base node");
@@ -89,6 +92,7 @@ fn a_used_game_survives_a_round_trip() {
     assert_eq!(after.world.bought, before.world.bought, "what has been bought");
     assert_eq!(after.world.quests_taken, before.world.quests_taken, "errands taken");
     assert_eq!(after.world.quests_done, before.world.quests_done, "errands finished");
+    assert_eq!(after.world.pinned, before.world.pinned, "the pinned errand");
 
     // --- the character -----------------------------------------------------
     let (a, b) = (&after.character, &before.character);
@@ -129,6 +133,7 @@ fn the_used_game_is_actually_used() {
     assert!(!g.world.bought.is_empty(), "nothing bought");
     assert!(!g.world.quests_taken.is_empty(), "no errand taken");
     assert!(!g.world.quests_done.is_empty(), "no errand finished");
+    assert!(g.world.pinned.is_some(), "nothing pinned, so the map points nowhere");
     assert!(g.character.fatigue > 0, "not tired");
     assert!(!g.character.supplies.is_empty(), "carrying no tins");
     assert!(g.character.carried > 0, "carrying no experience");

@@ -321,6 +321,12 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
 .wares.errand { grid-column: 1 / -1; }
 .wares.errand .flavour { margin-top: 2px; }
 .wares.errand.ready { outline: 2px solid var(--brass); outline-offset: -2px; }
+/* The errand the map is pointing at. **Not `.pinned`**, which already means
+   "taken" on a skill node and "can be handed in" a line above — two states
+   wearing one mark is a list you cannot read. A bar down the edge, so a pinned
+   errand that is also ready still shows both. */
+.wares.errand.pin { box-shadow: inset 5px 0 0 var(--brass); }
+.wares.errand.pin .cost { color: var(--brass); font-weight: 600; }
 
 /* The class figures. Wide and short so three of them sit in a row without the
    promise under each one falling below the fold. */

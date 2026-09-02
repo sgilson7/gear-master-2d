@@ -7,6 +7,7 @@ import init, {
   world_json, position, try_step, event_json, answer,
   save_json, load_json, new_game, apply_preset,
   shop_json, buy, buy_supply, use_supply, quests_json, take_quest, hand_in_quest, bank_xp,
+  quest_log_json, guide_json, pin_quest,
   character_json, skills_json, take_skill,
   class_offer_json, choose_class, class_name, all_trees_json,
   gold, piece_count, version, save_version,
@@ -38,6 +39,11 @@ let debug = false;
 /// Where there is an errand you could act on. Core's answer, refreshed
 /// whenever anything could have changed it.
 let errandMarks = [];
+/// What the map is pointing at: the pinned errand, or whichever the cursor is
+/// over in the log. Core's answer, in tiles — the page never works out where a
+/// creature lives or which town stocks a thing.
+let pinGuide = null;
+let hoverGuide = null;
 let blocked = null;   // the last refusal, drawn for one frame
 
 // Terrain colours, in the palette the rest of the page uses. Two per terrain:
@@ -123,6 +129,31 @@ function draw() {
     g.setLineDash([]);
   }
 
+  // **What the pin points at, as motion.** The map already carries terrain hue,
+  // region shade, place marks and the player; a fifth hue would be a fifth
+  // thing to tell apart. So the region breathes and the ring's dashes march,
+  // and neither reads as a new kind of ground.
+  //
+  // Core says which tiles. The page never works out where a Whisperling lives.
+  const guide = hoverGuide ?? pinGuide;
+  if (guide) {
+    const t = performance.now();
+    const breathe = 0.06 + 0.09 * (0.5 + 0.5 * Math.sin(t / 420));
+    g.fillStyle = `rgba(240,200,90,${breathe.toFixed(3)})`;
+    for (const [x, y] of guide.regions ?? []) g.fillRect(x * TILE, y * TILE, TILE, TILE);
+    g.strokeStyle = '#f0c85a';
+    g.lineWidth = 3;
+    g.setLineDash([6, 5]);
+    g.lineDashOffset = -(t / 40) % 11;
+    for (const [x, y] of guide.places ?? []) {
+      g.beginPath();
+      g.arc(x * TILE + TILE / 2, y * TILE + TILE / 2, TILE / 2 - 1, 0, Math.PI * 2);
+      g.stroke();
+    }
+    g.setLineDash([]);
+    g.lineDashOffset = 0;
+  }
+
   // Places. A town is a filled square with a ring; an event is a small mark —
   // deliberately not a letter, because a letter on a 32px tile is a letter
   // nobody reads.
@@ -188,6 +219,25 @@ function draw() {
     g.font = '13px ui-monospace, Menlo, monospace';
     g.fillText(blocked, 10, c.height - 8);
   }
+}
+
+/// Keep redrawing while something is pointing.
+///
+/// **Only while there is something to point at.** A map that repainted for ever
+/// would burn a core to draw a picture that has not changed. Throttled to about
+/// twelve frames a second because the animation is a breath and a crawl, and
+/// each frame costs a call across the boundary for the player's position.
+let pulsing = null;
+let pulsedAt = 0;
+
+function pulse(now) {
+  if (!(hoverGuide ?? pinGuide)) { pulsing = null; return; }
+  if (now - pulsedAt > 80) { pulsedAt = now; draw(); }
+  pulsing = requestAnimationFrame(pulse);
+}
+
+function startPulse() {
+  if (pulsing === null && (hoverGuide ?? pinGuide)) pulsing = requestAnimationFrame(pulse);
 }
 
 // The overlay the milestone asks for: every tile's encounter chance, drawn on
@@ -322,6 +372,17 @@ function paintSheet(c) {
 function refreshErrandMarks() {
   const m = JSON.parse(errand_marks_json());
   errandMarks = m.map === (world?.id ?? m.map) ? m.places : [];
+  refreshPin();
+}
+
+/// What the pinned errand points at here, if anything.
+///
+/// `guide_json` answers `null` for an errand whose target is on another map,
+/// which is the honest answer: the cave has no Whisperlings in it.
+function refreshPin() {
+  const log = JSON.parse(quest_log_json());
+  pinGuide = log.pinned ? JSON.parse(guide_json(log.pinned)) : null;
+  startPulse();
 }
 
 function toggleDebug() {
@@ -858,6 +919,83 @@ function closeTree() {
   paintPanel(); draw(); $('map').focus();
 }
 
+// ---------------------------------------------------------------- the log
+
+/// Everything you said you would do, and where it wants you.
+///
+/// **A different question from the town's board.** That one is "what does this
+/// place want", which is a property of where you are standing; this is "what am
+/// I carrying", which follows you around. Two questions, two calls.
+function openLog() {
+  paintLog();
+  $('log').hidden = false;
+}
+
+function paintLog() {
+  const all = JSON.parse(quest_log_json());
+  const live = all.errands.filter((q) => q.stage !== 'done');
+  $('log-carrying').textContent = live.length;
+  $('log-finished').textContent = all.errands.length - live.length;
+  const box = $('log-list');
+  box.replaceChildren();
+  if (!all.errands.length) {
+    const p = document.createElement('p');
+    p.className = 'note';
+    p.textContent = 'Nothing yet. Towns and the people standing about in fields both ask.';
+    box.appendChild(p);
+    return;
+  }
+  // Live first, finished after: a log is a list of what is still owed, with a
+  // record of what is not underneath it.
+  for (const q of [...live, ...all.errands.filter((x) => x.stage === 'done')]) {
+    const done = q.stage === 'done';
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'wares errand' + (done ? ' sold' : '') + (q.pinned ? ' pin' : '');
+    b.dataset.errand = q.id;
+    b.disabled = done;
+    const foot = done ? 'finished'
+      : q.pinned ? 'pinned — click to unpin'
+      : q.on_this_map ? 'pin it to the map'
+      : 'not on this map';
+    b.innerHTML = `<b>${q.name}</b>` +
+      `<span class="spec">${q.asks}</span>` +
+      `<span class="flavour">${q.brief}</span>` +
+      `<span class="meta">${q.where} · pays ${q.pays.join(', ')}</span>` +
+      `<span class="cost">${foot}</span>`;
+    // Hover, and the map answers — before anything is committed to. The pin is
+    // what makes the answer outlive the screen.
+    const show = () => { hoverGuide = JSON.parse(guide_json(q.id)); startPulse(); draw(); };
+    const drop = () => { hoverGuide = null; draw(); };
+    b.onpointerenter = show;
+    b.onfocus = show;
+    b.onpointerleave = drop;
+    b.onblur = drop;
+    b.onclick = () => {
+      const why = pin_quest(q.id);
+      logSays(why, !!why);
+      hoverGuide = null;
+      refreshPin();
+      paintLog();
+      draw();
+      autosave();
+    };
+    box.appendChild(b);
+  }
+}
+
+function logSays(text, bad = false) {
+  const el = $('log-says');
+  el.textContent = text; el.hidden = !text;
+  el.classList.toggle('bad', bad);
+}
+
+function closeLog() {
+  hoverGuide = null;
+  $('log').hidden = true;
+  paintPanel(); draw(); $('map').focus();
+}
+
 // ---------------------------------------------------------------- the town
 
 function portrait(el, src, alt) {
@@ -1060,7 +1198,7 @@ function closeTown() {
 
 function walk(dir) {
   if (!$('card').hidden || !$('fight').hidden || !$('town').hidden ||
-      !$('tree').hidden || !$('fork').hidden) return;
+      !$('tree').hidden || !$('fork').hidden || !$('log').hidden) return;
   const r = JSON.parse(try_step(dir));
   blocked = r.moved ? null : r.blocked;
   paintPanel(); draw(); autosave();
@@ -1173,6 +1311,10 @@ async function main() {
       if (e.key === 'Escape') closeTree();
       return;
     }
+    if (!$('log').hidden) {
+      if (e.key === 'Escape') closeLog();
+      return;
+    }
     // The fork has no way out but through. It is the one screen in the game
     // that does not take Escape, because it is the one decision that does not
     // come off.
@@ -1246,9 +1388,16 @@ async function main() {
   window.__fightJson = () => fight_json();
   window.__save = () => save_json();
   window.__errandMarks = () => JSON.parse(errand_marks_json()).places;
+  window.__log = () => JSON.parse(quest_log_json());
+  window.__guide = (id) => JSON.parse(guide_json(id));
+  window.__hoverGuide = () => hoverGuide;
+  window.__save = () => save_json();
+  window.__errandMarks = () => JSON.parse(errand_marks_json()).places;
 
   $('skills').onclick = openTree;
   $('tree-done').onclick = closeTree;
+  $('errands-open').onclick = openLog;
+  $('log-close').onclick = closeLog;
 
   $('bank').onclick = () => {
     const r = JSON.parse(bank_xp());

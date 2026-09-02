@@ -838,6 +838,65 @@ def check_an_errand_can_be_handed_in_where_it_was_taken(page, name, fails):
     page.wait_for_selector("#card", state="hidden", timeout=5000)
 
 
+def check_the_log_points_somewhere(page, name, fails):
+    """The log lists what is on you, and pinning one lights the map.
+
+    The errands existed and there was nowhere to see them all, and no way to
+    find out where a Whisperling lives. Where an errand points is core's answer
+    — a page working out which regions hold a creature would be a second copy
+    of the pools, which are the one thing on this map that gets retuned.
+    """
+    page.click("#errands-open")
+    page.wait_for_selector("#log", state="visible", timeout=8000)
+    rows = page.locator("#log-list .wares")
+    if rows.count() == 0:
+        fails.append(f"{name}: the walk has taken errands and the log is empty")
+        page.click("#log-close")
+        return
+    said = page.locator("#log-list .wares .meta").first.text_content() or ""
+    if "·" not in said:
+        fails.append(f"{name}: the log's first row says {said!r}, which names no destination")
+
+    # Hovering answers before anything is committed to.
+    first = rows.first
+    first.hover()
+    page.wait_for_timeout(120)
+    hovered = page.evaluate("() => window.__hoverGuide()")
+    if not hovered:
+        fails.append(f"{name}: hovering an errand lit nothing on the map")
+
+    # And pinning it outlives the screen, which is the whole difference between
+    # a reference and a tool.
+    live = page.locator("#log-list .wares:not(:disabled)")
+    if live.count() == 0:
+        fails.append(f"{name}: every errand in the log is finished")
+        page.click("#log-close")
+        return
+    which = live.first.get_attribute("data-errand")
+    live.first.click()
+    page.wait_for_timeout(150)
+    log = page.evaluate("() => window.__log()")
+    if log["pinned"] != which:
+        fails.append(f"{name}: pinned {which} and the save says {log['pinned']!r}")
+    guide = page.evaluate("(id) => window.__guide(id)", which)
+    if guide and not (guide["places"] or guide["regions"]):
+        fails.append(f"{name}: {which} is pinned and points at no tile at all")
+    page.click("#log-close")
+    page.wait_for_selector("#log", state="hidden", timeout=5000)
+    after = page.evaluate("() => window.__log().pinned")
+    if after != which:
+        fails.append(f"{name}: the pin came off when the log closed ({after!r})")
+    # A second click on the same one takes it off, and one at a time is the rule.
+    page.click("#errands-open")
+    page.wait_for_selector("#log", state="visible", timeout=8000)
+    page.locator(f'#log-list .wares[data-errand="{which}"]').click()
+    page.wait_for_timeout(120)
+    if page.evaluate("() => window.__log().pinned") is not JSON_NULL:
+        fails.append(f"{name}: pinning the pinned errand did not take it off")
+    page.click("#log-close")
+    page.wait_for_selector("#log", state="hidden", timeout=5000)
+
+
 def check_the_cave_is_shut_until_it_is_not(page, name, fails):
     """A gate wants a key, says so, and opens once you have one.
 
@@ -1435,6 +1494,7 @@ def walk_the_gate(browser, name):
     # **Last, because these plant saves.** They replace the character to stand
     # them somewhere the walk would take twenty minutes to reach, so anything
     # after them would be checking a game this walk did not play.
+    check_the_log_points_somewhere(page, name, fails)
     check_an_errand_can_be_handed_in_where_it_was_taken(page, name, fails)
     check_the_cave_is_shut_until_it_is_not(page, name, fails)
 
@@ -1506,6 +1566,7 @@ def main():
     print("ok: every fight wears you down, and the panel and the sheet both say so")
     print("ok: the cave is shut until you have the key, and short once you are in it")
     print("ok: a door you have already read reopens, and takes its errand back")
+    print("ok: the log says where every errand wants you, and a pin outlives the screen")
     print("ok: your own figure becomes your class's when you take one")
     print("ok: a mid-fight save reopens the same fight")
     print("ok: walk, download, reload, upload — position and stream both came back")

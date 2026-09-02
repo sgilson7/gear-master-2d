@@ -314,6 +314,108 @@ pub fn on_arrival(game: &mut Game, place: &str) -> Vec<String> {
     moved
 }
 
+/// Where an errand is asking you to go next, in ids a map can find.
+///
+/// **A rule, not a drawing decision.** Where to go depends on the errand's
+/// stage and its goal — a slaying points at the regions the creature lives in,
+/// a word points at the tile you have to stand on, and every errand whose
+/// tally is full points at whoever takes it back. A page working that out for
+/// itself would be a second copy of the errand rules, and it would disagree
+/// with this one the first time a goal kind was added.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct Guide {
+    /// Place ids to ring.
+    pub places: Vec<String>,
+    /// Region ids to pulse.
+    pub regions: Vec<String>,
+}
+
+impl Guide {
+    pub fn is_empty(&self) -> bool {
+        self.places.is_empty() && self.regions.is_empty()
+    }
+}
+
+/// Where `q` points, given every map this build ships.
+///
+/// Takes the worlds rather than loading them, because loading a map wants a
+/// difficulty and this question does not: which regions hold a creature is a
+/// property of the pools, and the pools are the same at every difficulty.
+pub fn guide(game: &Game, q: &Quest, worlds: &[crate::world::World]) -> Guide {
+    let mut out = Guide::default();
+    match stage(game, q) {
+        Stage::Done | Stage::Locked => {}
+        // Not taken yet: go and be asked.
+        Stage::Offered => out.places.push(q.giver.clone()),
+        // Everything it wanted is in the bag. One answer, and it is the same
+        // one for all three goal kinds — which is why it is not inside the
+        // match below.
+        Stage::Ready => out.places.push(QuestsData::turn_in_of(q).to_string()),
+        Stage::Carrying { .. } => match &q.goal {
+            Goal::Word { place } => out.places.push(place.clone()),
+            Goal::Slay { creature, .. } => {
+                for w in worlds {
+                    for r in w.regions_holding(creature) {
+                        if !out.regions.iter().any(|x| *x == r.id) {
+                            out.regions.push(r.id.clone());
+                        }
+                    }
+                }
+            }
+            // A component points at the shelves that stock it; a restorative
+            // points at every shelf, because every town sells tins — a place
+            // that had run out of the only thing that undoes tiredness would
+            // be a place you could strand yourself at, and that rule is what
+            // makes this one true.
+            Goal::Bring { item, .. } => {
+                let shops = crate::data::shops();
+                let is_supply = crate::data::supplies().get(item).is_some();
+                for t in &shops.towns {
+                    let stocks = is_supply || t.stock.iter().any(|n| n == item);
+                    let placed = worlds.iter().any(|w| w.places.iter().any(|p| p.id == t.id));
+                    if stocks && placed && !out.places.iter().any(|x| *x == t.id) {
+                        out.places.push(t.id.clone());
+                    }
+                }
+            }
+        },
+    }
+    out
+}
+
+/// Pin an errand, or unpin it by naming the one already pinned.
+///
+/// One at a time. Two pins is a map with two answers to "where now", and the
+/// whole point of a pin is that it is the answer.
+pub fn pin(game: &mut Game, id: &str) -> Result<bool, String> {
+    if game.world.pinned.as_deref() == Some(id) {
+        game.world.pinned = None;
+        return Ok(false);
+    }
+    let quests = crate::data::quests();
+    let Some(q) = quests.get(id) else { return Err("there is no such errand".into()) };
+    match stage(game, q) {
+        Stage::Done => Err("that one is finished".into()),
+        Stage::Locked => Err("there is something else they want doing first".into()),
+        _ => {
+            game.world.pinned = Some(q.id.clone());
+            Ok(true)
+        }
+    }
+}
+
+/// Drop a pin that no longer points anywhere.
+///
+/// Called wherever an errand can finish. A pin on a done errand would ring a
+/// place with nothing at it, which is worse than no pin at all.
+pub fn tidy_pin(game: &mut Game) {
+    if let Some(id) = game.world.pinned.clone() {
+        if done(game, &id) {
+            game.world.pinned = None;
+        }
+    }
+}
+
 /// Take an errand on. Returns why not.
 pub fn take(game: &mut Game, id: &str) -> Result<(), String> {
     let quests = crate::data::quests();
@@ -421,5 +523,6 @@ pub fn hand_in(game: &mut Game, id: &str) -> Result<Vec<String>, String> {
     }
     game.world.quests_taken.retain(|t| *t != q.id);
     game.world.quests_done.push(q.id.clone());
+    tidy_pin(game);
     Ok(given)
 }

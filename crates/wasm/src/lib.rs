@@ -1553,25 +1553,7 @@ pub fn quests_json() -> String {
                     // a thing, the same register a skill node's line uses. A
                     // player deciding whether to walk four streets for this is
                     // reading a number.
-                    "asks": match &q.goal {
-                        gm2d_core::quest::Goal::Slay { creature, count, token } => format!(
-                            "beat {count} × {}, then hand in {count} × {}",
-                            g.theme_name(
-                                gm2d_core::combat::LADDER
-                                    .iter()
-                                    .find(|s| s.name == *creature)
-                                    .map(|s| s.name)
-                                    .unwrap_or("")
-                            ),
-                            theme_piece(g, token),
-                        ),
-                        gm2d_core::quest::Goal::Bring { item, count } => {
-                            format!("hand over {count} × {}", theme_thing(g, item))
-                        }
-                        gm2d_core::quest::Goal::Word { place } => {
-                            format!("go to {}, then report back", place_name(g, place))
-                        }
-                    },
+                    "asks": quest_ask(g, q),
                     "pays": q.reward.iter()
                         .map(|n| theme_piece(g, n))
                         .chain((q.gold != 0).then(|| format!("{} Fnorp", q.gold)))
@@ -1581,6 +1563,37 @@ pub fn quests_json() -> String {
             .collect();
         serde_json::json!(out).to_string()
     })
+}
+
+/// What an errand asks for, unthemed in shape and themed in its nouns.
+///
+/// The same rule the skill tree's line follows: a player deciding whether to
+/// walk four streets for this is reading a number, and a number wearing a joke
+/// has to be translated first. `×` rather than a plural, because a creature's
+/// name is a proper noun and some of them are already plural.
+///
+/// **One builder.** The town's board and the log both print this, and two
+/// copies would be two answers to "what does she want".
+fn quest_ask(g: &gm2d_core::game::Game, q: &gm2d_core::quest::Quest) -> String {
+    match &q.goal {
+        gm2d_core::quest::Goal::Slay { creature, count, token } => format!(
+            "beat {count} × {}, then hand in {count} × {}",
+            g.theme_name(
+                gm2d_core::combat::LADDER
+                    .iter()
+                    .find(|s| s.name == *creature)
+                    .map(|s| s.name)
+                    .unwrap_or("")
+            ),
+            theme_piece(g, token),
+        ),
+        gm2d_core::quest::Goal::Bring { item, count } => {
+            format!("hand over {count} × {}", theme_thing(g, item))
+        }
+        gm2d_core::quest::Goal::Word { place } => {
+            format!("go to {}, then report back", place_name(g, place))
+        }
+    }
 }
 
 /// A component or a restorative, whichever it is.
@@ -1618,6 +1631,171 @@ fn theme_piece(g: &gm2d_core::game::Game, canonical: &str) -> String {
         .find(|d| d.name == canonical)
         .map(|d| theme.piece(d.name).to_string())
         .unwrap_or_else(|| canonical.to_string())
+}
+
+/// Every errand on you, plus the ones already finished.
+///
+/// **A different question from `quests_json`.** That one answers "what does
+/// this place want", which is a property of where you are standing; this
+/// answers "what am I carrying", which follows you around. Two questions, two
+/// calls — folding them into one would mean a screen filtering an answer it
+/// did not ask for.
+#[wasm_bindgen]
+pub fn quest_log_json() -> String {
+    with(|g| {
+        let quests = gm2d_core::data::quests();
+        let maps = gm2d_core::data::all_maps(DIFFICULTY);
+        let here = g.world.map_id();
+        let rows: Vec<_> = quests
+            .quests
+            .iter()
+            // What is on you and what you have done. An errand nobody has
+            // mentioned to you is not in your log — that is the town's board.
+            .filter(|q| {
+                g.world.quests_taken.iter().any(|t| *t == q.id)
+                    || g.world.quests_done.iter().any(|d| *d == q.id)
+            })
+            .map(|q| {
+                let stage = gm2d_core::quest::stage(g, q);
+                let (have, want) = match stage {
+                    gm2d_core::quest::Stage::Carrying { have, want } => (have, want),
+                    _ => (q.goal.count(), q.goal.count()),
+                };
+                let guide = gm2d_core::quest::guide(g, q, &maps);
+                let (hp, hr) = guide_on(&guide, &here, &maps);
+                let on_this_map = !hp.is_empty() || !hr.is_empty();
+                serde_json::json!({
+                    "id": q.id,
+                    "name": q.name,
+                    "brief": q.brief,
+                    "stage": stage.name(),
+                    "have": have,
+                    "want": want,
+                    "asks": quest_ask(g, q),
+                    "pays": q.reward.iter()
+                        .map(|n| theme_piece(g, n))
+                        .chain((q.gold != 0).then(|| format!("{} Fnorp", q.gold)))
+                        .collect::<Vec<_>>(),
+                    "giver": place_name(g, &q.giver),
+                    "back_to": place_name(g, gm2d_core::quest::QuestsData::turn_in_of(q)),
+                    "pinned": g.world.pinned.as_deref() == Some(q.id.as_str()),
+                    // Where to go, in the same register `asks` uses: the shape
+                    // is the engine's and the nouns are the world's.
+                    "where": where_to(g, q, &guide, &maps),
+                    // Whether any of that is on the map underfoot. A player in
+                    // the cave whose errand is on the overworld should be told
+                    // so rather than shown an empty map.
+                    "on_this_map": on_this_map,
+                })
+            })
+            .collect();
+        serde_json::json!({ "pinned": g.world.pinned, "errands": rows }).to_string()
+    })
+}
+
+/// The tiles one errand wants lit, on the map the player is standing on.
+///
+/// `null` when it points nowhere here. Separate from the log because the log
+/// is a list of sentences and this is a list of coordinates: a hover asks for
+/// this one and the pin asks for it again on every repaint.
+#[wasm_bindgen]
+pub fn guide_json(id: &str) -> String {
+    with(|g| {
+        let quests = gm2d_core::data::quests();
+        let Some(q) = quests.get(id) else { return "null".to_string() };
+        let maps = gm2d_core::data::all_maps(DIFFICULTY);
+        let guide = gm2d_core::quest::guide(g, q, &maps);
+        let here = g.world.map_id();
+        let (places, regions) = guide_on(&guide, &here, &maps);
+        if places.is_empty() && regions.is_empty() {
+            return "null".to_string();
+        }
+        serde_json::json!({
+            "id": q.id, "name": q.name, "map": here,
+            "places": places, "regions": regions,
+        })
+        .to_string()
+    })
+}
+
+/// The guide's ids turned into tiles on one map. Empty where none of it is
+/// here — a cave is not where your errand is.
+fn guide_on(
+    guide: &gm2d_core::quest::Guide,
+    map: &str,
+    maps: &[gm2d_core::world::World],
+) -> (Vec<[u8; 2]>, Vec<[u8; 2]>) {
+    let Some(w) = maps.iter().find(|w| w.id == map) else { return (Vec::new(), Vec::new()) };
+    let places = guide
+        .places
+        .iter()
+        .filter_map(|id| w.places.iter().find(|p| p.id == *id).map(|p| p.at))
+        .collect();
+    let regions = guide.regions.iter().flat_map(|r| w.tiles_of(r)).collect();
+    (places, regions)
+}
+
+/// One sentence saying where to go next.
+///
+/// Derived from the stage and the goal, never typed: retuning an errand
+/// retunes this. Unthemed in shape and themed in its nouns, which is the split
+/// `asks` already uses — somebody reading this is looking for a place name.
+fn where_to(
+    g: &gm2d_core::game::Game,
+    q: &gm2d_core::quest::Quest,
+    guide: &gm2d_core::quest::Guide,
+    maps: &[gm2d_core::world::World],
+) -> String {
+    use gm2d_core::quest::{Goal, Stage};
+    match gm2d_core::quest::stage(g, q) {
+        Stage::Done => "done".into(),
+        Stage::Locked => "something else of theirs first".into(),
+        Stage::Offered => format!("ask at {}", place_name(g, &q.giver)),
+        Stage::Ready => {
+            format!("hand in at {}", place_name(g, gm2d_core::quest::QuestsData::turn_in_of(q)))
+        }
+        Stage::Carrying { have, want } => match &q.goal {
+            Goal::Word { place } => format!("go to {}", place_name(g, place)),
+            Goal::Slay { creature, .. } => {
+                let names: Vec<String> = guide
+                    .regions
+                    .iter()
+                    .filter_map(|r| {
+                        maps.iter()
+                            .flat_map(|w| &w.regions)
+                            .find(|x| x.id == *r)
+                            .map(|x| x.name.clone())
+                    })
+                    .collect();
+                // Through the ladder, so the name handed to the theme is the
+                // `&'static str` it wants rather than a borrow of the errand
+                // file.
+                let told = gm2d_core::combat::LADDER
+                    .iter()
+                    .find(|s| s.name == *creature)
+                    .map(|s| g.theme_name(s.name))
+                    .unwrap_or_else(|| creature.clone());
+                format!(
+                    "{have} of {want} — {told} is met in {}",
+                    if names.is_empty() { "nowhere on any map".into() } else { names.join(", ") },
+                )
+            }
+            Goal::Bring { .. } => {
+                let names: Vec<String> = guide.places.iter().map(|p| place_name(g, p)).collect();
+                if names.is_empty() {
+                    format!("{have} of {want} — nowhere placed sells it")
+                } else {
+                    format!("{have} of {want} — sold at {}", names.join(", "))
+                }
+            }
+        },
+    }
+}
+
+/// Pin an errand to the map, or unpin it. Empty string, or why not.
+#[wasm_bindgen]
+pub fn pin_quest(id: &str) -> String {
+    with_mut(|g| gm2d_core::quest::pin(g, id).err().unwrap_or_default())
 }
 
 /// Take an errand on. Empty string, or why not.

@@ -56,6 +56,7 @@
           <div id="kit" class="pack"></div>
           <div class="row">
             <button id="skills" type="button">The tree</button>
+            <button id="errands-open" type="button">Errands</button>
             <button id="numbers" type="button" aria-pressed="false">Show the numbers</button>
           </div>
         </div>
@@ -127,6 +128,31 @@
         <div id="nodes" class="skilltree"></div>
         <p id="tree-says" class="says" hidden></p>
         <div class="row"><button id="tree-done" type="button" class="primary">Back out</button></div>
+      </div>
+    </div>
+
+    <!-- The log. A screen of its own rather than a tab inside the tree: the
+         tree's tab strip answers "which tree", and a strip that answered two
+         different questions would be the `.card` collision in a new coat. It
+         opens off the button beside the tree, which is where it reads as one. -->
+    <div id="log" class="screen" hidden>
+      <div class="screenbox">
+        <header class="fighthead">
+          <div>
+            <p class="eyebrow">what you said you would do</p>
+            <h2>Errands</h2>
+            <p class="note">Everything you have taken on, what it still wants, and where.
+              Pin one and the map keeps pointing at it after you close this — that is the
+              difference between a list and a thing you can walk by.</p>
+          </div>
+          <dl class="figures">
+            <div><dt>on you</dt><dd id="log-carrying">&mdash;</dd></div>
+            <div><dt>finished</dt><dd id="log-finished">&mdash;</dd></div>
+          </dl>
+        </header>
+        <div id="log-list" class="shelf"></div>
+        <p id="log-says" class="says" hidden></p>
+        <div class="row"><button id="log-close" type="button" class="primary">Back out</button></div>
       </div>
     </div>
 

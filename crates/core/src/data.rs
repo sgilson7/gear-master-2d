@@ -50,6 +50,16 @@ pub fn map(id: &str, difficulty: crate::combat::Difficulty) -> crate::world::Wor
     crate::world::World::load(TERRAIN_JSON, text, difficulty).expect("a shipped map is broken")
 }
 
+/// Every map this build ships, loaded.
+///
+/// For the questions that are about the world rather than about the tile you
+/// are standing on — where a creature lives, which towns are placed. A guide
+/// that only looked at the map underfoot would tell a player in a dungeon that
+/// their errand points nowhere.
+pub fn all_maps(difficulty: crate::combat::Difficulty) -> Vec<crate::world::World> {
+    MAPS.iter().map(|(id, _)| map(id, difficulty)).collect()
+}
+
 pub fn events() -> crate::tile_event::EventsData {
     crate::tile_event::EventsData::parse(EVENTS_JSON).expect("the shipped events are broken")
 }

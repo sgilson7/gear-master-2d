@@ -230,3 +230,106 @@ fn the_starting_kit_can_beat_what_the_first_errand_asks_for() {
     );
     assert_eq!(log.outcome, Outcome::Victory, "the starting kit cannot beat a toad");
 }
+
+// ------------------------------------------------------------------ the guide
+//
+// An errand that cannot say where to go is an errand a player has to be told
+// about somewhere else. The log points at the map, and what it points at is
+// core's answer — a page working it out would be a second copy of the rules
+// about stages and goals.
+
+/// **Every slaying errand names a creature some region actually holds.**
+///
+/// `QuestsData::parse` already refuses a creature that is not in the ladder.
+/// This is the stronger claim the highlight depends on: it has to be *placed*.
+/// A creature in the catalogue and in no region's pool cannot be met, so the
+/// errand cannot be finished and nothing else in the game would say so.
+#[test]
+fn every_slaying_errand_names_a_creature_some_region_holds() {
+    let quests = data::quests();
+    let maps = data::all_maps(D);
+    for q in &quests.quests {
+        let Some(c) = q.goal.creature() else { continue };
+        let regions: Vec<&str> = maps
+            .iter()
+            .flat_map(|w| w.regions_holding(c))
+            .map(|r| r.id.as_str())
+            .collect();
+        assert!(
+            !regions.is_empty(),
+            "{}: {c:?} is in no region's pool, so the errand cannot be finished",
+            q.id
+        );
+    }
+}
+
+/// Where each stage of an errand points.
+#[test]
+fn a_guide_points_where_the_stage_says() {
+    let maps = data::all_maps(D);
+    let quests = data::quests();
+    let mut g = Game::new(9, "td");
+    g.world = gm2d_core::world::WorldState::at_start(&data::world(D));
+
+    let toads = quests.get("the-eyes-have-it").expect("the toad errand");
+
+    // Untaken: go and be asked.
+    let go = quest::guide(&g, toads, &maps);
+    assert_eq!(go.places, vec!["the-end-of-all-gears".to_string()]);
+    assert!(go.regions.is_empty(), "nothing to hunt until it is taken");
+
+    // Taken: the regions the toads are in.
+    quest::take(&mut g, &toads.id).unwrap();
+    let go = quest::guide(&g, toads, &maps);
+    assert!(go.places.is_empty(), "a hunt does not point at a person");
+    assert!(
+        go.regions.iter().any(|r| r == "the-end-of-all-gears"),
+        "the pit holds Bog Toads and the guide does not say so: {go:?}"
+    );
+
+    // Full: back to whoever asked.
+    for _ in 0..toads.goal.count() {
+        g.character.give("Toad Eye");
+    }
+    assert_eq!(quest::stage(&g, toads), Stage::Ready);
+    let go = quest::guide(&g, toads, &maps);
+    assert_eq!(go.places, vec!["the-end-of-all-gears".to_string()]);
+
+    // A word points at the tile you have to stand on, and then at whoever
+    // wants to be told — which is the whole of what makes "go and tell them"
+    // one errand rather than two.
+    let heap = quests.get("the-count-is-wrong").expect("the heap errand");
+    quest::take(&mut g, &heap.id).unwrap();
+    let go = quest::guide(&g, heap, &maps);
+    assert_eq!(go.places, vec!["the-end-of-all-gears".to_string()], "go and tell the office");
+    assert_ne!(heap.giver, "the-end-of-all-gears", "or this is testing nothing");
+}
+
+/// A pin is one at a time, comes off by being pinned again, and is dropped
+/// when the errand it names is finished.
+#[test]
+fn a_pin_is_one_errand_and_survives_being_walked_away_from() {
+    let mut g = Game::new(3, "td");
+    g.world = gm2d_core::world::WorldState::at_start(&data::world(D));
+    quest::take(&mut g, "the-eyes-have-it").unwrap();
+    quest::take(&mut g, "word-with-the-fencecutter").unwrap();
+
+    assert_eq!(quest::pin(&mut g, "the-eyes-have-it"), Ok(true));
+    assert_eq!(g.world.pinned.as_deref(), Some("the-eyes-have-it"));
+    // A second pin replaces the first. Two is a map with two answers.
+    assert_eq!(quest::pin(&mut g, "word-with-the-fencecutter"), Ok(true));
+    assert_eq!(g.world.pinned.as_deref(), Some("word-with-the-fencecutter"));
+    // Pinning the pinned one takes it off.
+    assert_eq!(quest::pin(&mut g, "word-with-the-fencecutter"), Ok(false));
+    assert_eq!(g.world.pinned, None);
+
+    // And handing one in drops its pin, rather than ringing a place that has
+    // nothing at it any more.
+    quest::pin(&mut g, "the-eyes-have-it").unwrap();
+    for _ in 0..5 {
+        g.character.give("Toad Eye");
+    }
+    at_town(&mut g, "the-end-of-all-gears");
+    quest::hand_in(&mut g, "the-eyes-have-it").unwrap();
+    assert_eq!(g.world.pinned, None, "a finished errand is still pinned");
+}

@@ -214,6 +214,9 @@ pub fn world_json() -> String {
         // has it is core's answer — a screen deciding for itself would go on
         // printing them after the node was retuned.
         let scouting = g.character.scouting();
+        // **What the walker may see.** A place can be hidden until a level now,
+        // so drawing the map is a question about who is asking.
+        let allowed = g.character.allowances();
         map_for(g, |w| {
         let mut rows = Vec::new();
         for y in 0..w.height {
@@ -227,7 +230,7 @@ pub fn world_json() -> String {
         // of what makes it hidden — the other half is `world::step` refusing
         // to walk onto one.
         let places: Vec<_> = w
-            .places_now(&g.world)
+            .places_now(&g.world, &allowed)
             .into_iter()
             .map(|p| {
                 serde_json::json!({
@@ -370,7 +373,7 @@ pub fn try_step(dir: &str) -> String {
             // player who walks over the tile and keeps going has still been.
             let mut spoke = Vec::new();
             if s.moved {
-                if let Some(p) = w.place_now(&g.world, g.world.at[0], g.world.at[1]) {
+                if let Some(p) = w.place_now(&g.world, g.world.at[0], g.world.at[1], &allowed) {
                     let id = p.id.clone();
                     spoke = gm2d_core::quest::on_arrival(g, &id);
                 }
@@ -1558,9 +1561,10 @@ pub fn errand_marks_json() -> String {
     with(|g| {
         let quests = gm2d_core::data::quests();
         let here = g.world.map_id();
+        let allowed = g.character.allowances();
         let mut out: Vec<serde_json::Value> = Vec::new();
         map_for(g, |w| {
-            for p in w.places_now(&g.world) {
+            for p in w.places_now(&g.world, &allowed) {
                 let mut take = false;
                 let mut give = false;
                 for q in quests.at(&p.id) {
@@ -1596,7 +1600,10 @@ pub fn errand_marks_json() -> String {
 /// the caller name it means a caller can name the wrong one.
 /// The place the player is standing on, town or event.
 fn place_here(g: &gm2d_core::game::Game) -> Option<String> {
-    map_for(g, |w| w.place_now(&g.world, g.world.at[0], g.world.at[1]).map(|p| p.id.clone()))
+    let allowed = g.character.allowances();
+    map_for(g, |w| {
+        w.place_now(&g.world, g.world.at[0], g.world.at[1], &allowed).map(|p| p.id.clone())
+    })
 }
 
 fn town_here(g: &gm2d_core::game::Game) -> Option<String> {

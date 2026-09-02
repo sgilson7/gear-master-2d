@@ -37,10 +37,10 @@ fn a_hidden_place_is_not_there_until_its_condition_holds() {
 
     // Shut: nowhere in the list, nothing on the tile.
     assert!(
-        !w.places_now(&g.world).iter().any(|p| p.id == door.id),
+        !w.places_now(&g.world, &Allowances::default()).iter().any(|p| p.id == door.id),
         "a hidden place is in the list the map draws from"
     );
-    assert!(w.place_now(&g.world, door.at[0], door.at[1]).is_none());
+    assert!(w.place_now(&g.world, door.at[0], door.at[1], &Allowances::default()).is_none());
     // But it is in the file, which is what makes it content rather than state.
     assert!(w.place_at(door.at[0], door.at[1]).is_some());
 
@@ -53,7 +53,7 @@ fn a_hidden_place_is_not_there_until_its_condition_holds() {
 
     // Open, once the thing that opens it has happened.
     g.world.answered.push(key);
-    assert!(w.places_now(&g.world).iter().any(|p| p.id == door.id));
+    assert!(w.places_now(&g.world, &Allowances::default()).iter().any(|p| p.id == door.id));
     g.world.at = [door.at[0] + 1, door.at[1]];
     let s = world::step(&w, &mut g.world, &mut rng, D, Dir::West, &Allowances::default());
     assert_eq!(s.door.as_deref(), Some(door.id.as_str()), "the door is not answering");

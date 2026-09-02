@@ -245,6 +245,19 @@ pub struct PlaceDef {
     /// there is nothing to choose and nothing to answer.
     #[serde(default)]
     pub prose: Vec<String>,
+    /// Not here at all until the walker is this level.
+    ///
+    /// The sibling of [`PlaceDef::hidden_until`], and a separate field rather
+    /// than a second meaning for it: that one names something in `answered` or
+    /// `flags`, and a level is in neither. Writing `level-10` into `flags` when
+    /// it was reached would have worked and is refused — the level is derived
+    /// from experience and never stored, and a flag saying otherwise would be
+    /// the second answer to a question that has had one since M4.
+    ///
+    /// **Distinct from `needs_level`**, which is a `Crossing`'s and is about
+    /// getting *past* something. This is about whether the place is there.
+    #[serde(default)]
+    pub hidden_until_level: Option<u32>,
     /// `Crossing`: the id of the region on the far side of it.
     #[serde(default)]
     pub guards: Option<String>,
@@ -263,7 +276,12 @@ pub struct PlaceDef {
 ///
 /// A free function rather than a method, so the check is one place and every
 /// caller is obviously asking the same question.
-pub fn place_is_there(p: &PlaceDef, state: &WorldState) -> bool {
+pub fn place_is_there(p: &PlaceDef, state: &WorldState, allowed: &Allowances) -> bool {
+    // Two gates and both must hold. One reads what has happened and the other
+    // reads who is asking — see the two fields.
+    if p.hidden_until_level.is_some_and(|n| allowed.level < n) {
+        return false;
+    }
     match &p.hidden_until {
         None => true,
         Some(k) => {
@@ -552,8 +570,14 @@ impl World {
     }
 
     /// The place on this tile that is there right now.
-    pub fn place_now(&self, state: &WorldState, x: u8, y: u8) -> Option<&PlaceDef> {
-        self.place_at(x, y).filter(|p| place_is_there(p, state))
+    pub fn place_now(
+        &self,
+        state: &WorldState,
+        x: u8,
+        y: u8,
+        allowed: &Allowances,
+    ) -> Option<&PlaceDef> {
+        self.place_at(x, y).filter(|p| place_is_there(p, state, allowed))
     }
 
     /// The crossing guarding the region this tile is in, if one does.
@@ -562,12 +586,18 @@ impl World {
     /// walking the places rather than by an index, because there are two of
     /// them on the biggest map this build ships and a cache would be a second
     /// place for the answer to be stale.
-    pub fn crossing_into(&self, state: &WorldState, x: u8, y: u8) -> Option<&PlaceDef> {
+    pub fn crossing_into(
+        &self,
+        state: &WorldState,
+        x: u8,
+        y: u8,
+        allowed: &Allowances,
+    ) -> Option<&PlaceDef> {
         let region = self.region_at(x, y)?;
         self.places.iter().find(|p| {
             p.kind == PlaceKind::Crossing
                 && p.guards.as_deref() == Some(region.id.as_str())
-                && place_is_there(p, state)
+                && place_is_there(p, state, allowed)
         })
     }
 
@@ -611,13 +641,13 @@ impl World {
         if here == Some(there.id.as_str()) {
             return None;
         }
-        let c = self.crossing_into(state, to.0, to.1)?;
+        let c = self.crossing_into(state, to.0, to.1, allowed)?;
         (allowed.level < c.needs_level?).then_some(c)
     }
 
     /// Every place on this map that is there right now.
-    pub fn places_now(&self, state: &WorldState) -> Vec<&PlaceDef> {
-        self.places.iter().filter(|p| place_is_there(p, state)).collect()
+    pub fn places_now(&self, state: &WorldState, allowed: &Allowances) -> Vec<&PlaceDef> {
+        self.places.iter().filter(|p| place_is_there(p, state, allowed)).collect()
     }
 
     /// The regions whose pool holds this creature.
@@ -952,7 +982,7 @@ pub fn step(
     // walking into a cliff.
     if let Some(why) = world.crossing_refuses(state, (nx, ny), allowed) {
         let mut out = Step::nowhere(&why);
-        out.crossing = world.crossing_into(state, nx, ny).map(|c| c.id.clone());
+        out.crossing = world.crossing_into(state, nx, ny, allowed).map(|c| c.id.clone());
         return out;
     }
 
@@ -975,7 +1005,7 @@ pub fn step(
     // **Not there is not there.** A hidden place is not walked onto, not
     // reported and not drawn, so a door in a wall is a wall until the thing
     // that opens it has happened.
-    if let Some(p) = world.place_now(state, nx, ny) {
+    if let Some(p) = world.place_now(state, nx, ny, allowed) {
         match p.kind {
             PlaceKind::Town => {
                 state.last_town = p.id.clone();

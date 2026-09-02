@@ -523,11 +523,18 @@ Two failures worth keeping, because both were the walk telling the truth:
 
 ## Classes
 
-- **Three, and they are upstream's.** Gorillathon, Funnel Sergeant and
-  Worm-Fact Keeper are `Berserker`, `Hexweaver` and `Bloodletter` with the
-  theme talking, so the powers — Leeching, Contagion, Bloodscent — are already
-  tuned and already tested. Nothing new was invented in combat at the last
-  milestone, deliberately.
+- **Four, and every one of them is upstream's.** Gorillathon, Funnel Sergeant,
+  Worm-Fact Keeper and the Kaklon Licensee are `Berserker`, `Hexweaver`,
+  `Bloodletter` and `Recycler` with the theme talking, so the powers — Leeching,
+  Contagion, Bloodscent, Recycler — are already tuned and already tested.
+  **Nothing new has been invented in combat for a class**, twice over now: M5
+  took three and M8.4 took a fourth, and the fourth's identity is the ench rack
+  rather than a new rule in the fight.
+- **A promise must describe the game the player is in.** `Recycler`'s said
+  "for each stack of Recycler you are carrying. Five stacks is half again on
+  all five slots" — upstream handed the same class out repeatedly and a promise
+  had to say what a second one bought. GM2D asks once, at level five, and the
+  answer does not come off. `no_class_on_offer_promises_a_stack` is the lint.
 - **The promise is the rule.** Each class's one-line mechanical promise is
   `ClassPower::describe()` put through `theme.retell`, so it cannot go stale and
   it speaks the game's language rather than the engine's.
@@ -859,6 +866,13 @@ slay something, bring something, or go somewhere and report.
   the creature stepper walks into them — a Harvest Crest turned into
   Marbulon's glass before that was noticed. A reward you could have bought
   makes the errand a slow way to shop.
+- **An errand can pay an ench**, in `Quest::enchs` rather than in `reward`,
+  because an ench is not a component: no shape, no grid, and it goes in a rack.
+  The same rule holds and is enforced at load — `EnchDef::price` is optional,
+  and `QuestsData::parse` refuses an errand paying one that has a price. It is
+  handed over whether or not the character is licensed: an errand does not know
+  what you became, and a reward that vanished for three players in four would
+  be worse than one they cannot use yet.
 
 ## A log that points at the map
 

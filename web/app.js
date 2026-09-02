@@ -6,7 +6,7 @@
 import init, {
   world_json, position, try_step, event_json, answer,
   save_json, load_json, new_game, apply_preset,
-  shop_json, buy, buy_supply, use_supply, quests_json, take_quest, hand_in_quest, bank_xp,
+  shop_json, buy, buy_supply, buy_ench, use_supply, quests_json, take_quest, hand_in_quest, bank_xp,
   quest_log_json, guide_json, pin_quest,
   character_json, skills_json, take_skill,
   class_offer_json, choose_class, class_name, all_trees_json,
@@ -15,6 +15,7 @@ import init, {
   look_json, look_over,
   encounter_json, fight_json, settle_fight, flee,
   errand_marks_json,
+  ench_rack_json, attach_ench, detach_ench, toggle_ench,
 } from './pkg/gm2d_wasm.js';
 import { Board } from './board.js';
 import { Theirs } from './theirs.js';
@@ -598,6 +599,91 @@ function runFight() {
   replay.play();
 }
 
+// ---------------------------------------------------------------- the rack
+
+/// The ench in hand, waiting for a component to go on. Null when nothing is
+/// picked up.
+let holdingEnch = null;
+
+/// What you own loose, and what is already bolted to something.
+///
+/// **Only for a licensee.** Enching is what the Kaklon Patent is, so the rack
+/// arrives with the class rather than with a point spent inside it — and
+/// whether this character has it is core's answer, not a class name the page
+/// compared for itself.
+function paintRack() {
+  const r = JSON.parse(ench_rack_json());
+  $('rack').hidden = !r.licensed;
+  if (!r.licensed) { holdingEnch = null; return; }
+
+  const loose = $('rack-loose');
+  loose.replaceChildren();
+  if (!r.loose.length) {
+    const p = document.createElement('p');
+    p.className = 'note';
+    p.textContent = 'Nothing loose. What you have is bolted to something.';
+    loose.appendChild(p);
+  }
+  for (const e of r.loose) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'wares ench' + (holdingEnch === e.id ? ' pin' : '');
+    b.dataset.ench = e.id;
+    b.innerHTML = `<b>${e.name}${e.have > 1 ? ` ×${e.have}` : ''}</b>` +
+      `<span class="spec">${e.spec}</span>` +
+      `<span class="flavour">${e.blurb}</span>` +
+      `<span class="cost">${holdingEnch === e.id ? 'now click a component' : 'pick it up'}</span>`;
+    b.onclick = () => {
+      holdingEnch = holdingEnch === e.id ? null : e.id;
+      boardSays(holdingEnch ? `${e.name}. Click the component it goes on.` : '');
+      paintRack();
+    };
+    loose.appendChild(b);
+  }
+
+  const on = $('rack-on');
+  on.replaceChildren();
+  for (const e of r.on) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'wares ench' + (e.active ? '' : ' sold');
+    b.dataset.enchOn = String(e.piece);
+    b.innerHTML = `<b>${e.name}</b>` +
+      `<span class="spec">${e.spec}</span>` +
+      `<span class="meta">on ${e.on}</span>` +
+      `<span class="cost">${e.active ? 'switched on — click to switch off'
+                                     : 'switched off — click to take it back'}</span>`;
+    // One button, two steps, and in that order on purpose: switching off is
+    // the reversible half and is what somebody trying an arrangement wants,
+    // so it is the first click rather than the second.
+    b.onclick = () => {
+      if (e.active) {
+        toggle_ench(e.piece);
+        boardSays(`${e.name} switched off.`);
+      } else {
+        detach_ench(e.piece);
+        boardSays(`${e.name} back in the rack.`);
+      }
+      $('board-says').classList.remove('bad');
+      board.refresh();
+      paintRack();
+      autosave();
+    };
+    on.appendChild(b);
+  }
+}
+
+/// A component was clicked while an ench was in hand.
+function bolt(pieceId) {
+  const why = attach_ench(holdingEnch, pieceId);
+  if (why) { boardSays(why); return false; }
+  holdingEnch = null;
+  board.refresh();
+  paintRack();
+  autosave();
+  return true;
+}
+
 // What the five grids made, beside the board rather than crammed under it.
 //
 // Every judgement here is core's: which pieces form an item, whether it came
@@ -1056,6 +1142,7 @@ function openTown(id) {
   paintShelf();
   paintQuests();
   paintTins();
+  paintBench();
   paintCarrying();
   $('town').hidden = false;
 }
@@ -1126,6 +1213,35 @@ function paintTins() {
       const why = buy_supply(t.id);
       townSays(why || `Bought ${t.name}.`, !!why);
       paintTins(); paintShelf(); paintPanel(); autosave();
+    };
+    box.appendChild(b);
+  }
+}
+
+/// What a town's bench sells, for somebody who may use one.
+///
+/// Every trading town keeps one, the same rule the tins follow — a licensee who
+/// had to find the one town that stocks the thing their class is about could be
+/// stranded from their own class.
+function paintBench() {
+  const s = JSON.parse(shop_json());
+  $('bench-wrap').hidden = !s.licensed;
+  const box = $('bench');
+  box.replaceChildren();
+  for (const e of s.bench ?? []) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'wares ench';
+    b.dataset.buyEnch = e.id;
+    b.disabled = !e.afford;
+    b.innerHTML = `<b>${e.name}</b>` +
+      `<span class="spec">${e.spec}</span>` +
+      `<span class="flavour">${e.blurb}</span>` +
+      `<span class="cost">${e.price} Fnorp${e.have ? ` · ${e.have} in the rack` : ''}</span>`;
+    b.onclick = () => {
+      const why = buy_ench(e.id);
+      townSays(why || `Bought ${e.name}. It goes on when you pack.`, !!why);
+      paintBench(); paintShelf(); paintPanel(); autosave();
     };
     box.appendChild(b);
   }
@@ -1381,11 +1497,16 @@ async function main() {
     look: look_json, lookOver: look_over,
   });
   board.onsay = boardSays;
+  // An ench in hand takes the click instead of the board: picking a component
+  // up and bolting something to it are two different gestures on one target,
+  // and which one is happening is decided by whether anything is in hand.
+  board.onclaim = (pieceId) => (holdingEnch ? bolt(pieceId) : false);
   board.onchange = (st) => {
     const made = st.slots.reduce((n, s) => n + s.items.filter((i) => i.assembled).length, 0);
     $('fight-yours').textContent = made;
     $('undo').disabled = !st.undoable;
     paintMade(st);
+    paintRack();
   };
   // Scoped to its own panel: both sides draw `.made-item` now, and an
   // unscoped query lit a creature's card when you pointed at your own blade.
@@ -1438,6 +1559,17 @@ async function main() {
   window.__guide = (id) => JSON.parse(guide_json(id));
   window.__hoverGuide = () => hoverGuide;
   window.__position = () => position();
+  window.__rack = () => ench_rack_json();
+  // Stand somewhere, so a planted check can walk one step into a place rather
+  // than a hundred steps to it. Not a cheat in shipped play: nothing calls it.
+  window.__standAt = (at) => {
+    const save = JSON.parse(save_json());
+    save.state.world.at = at;
+    save.state.world.map = '';
+    load_json(JSON.stringify(save));
+    world = JSON.parse(world_json());
+    paintPanel(); draw();
+  };
   // Layout is the one claim reading the source cannot settle, so the gate has
   // to be able to put the fight screen on each stage and measure it.
   window.__stage = (which) => stage(which);

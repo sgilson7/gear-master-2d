@@ -18,6 +18,7 @@ pub const SKILLS_JSON: &str = include_str!("../../../data/skills.json");
 pub const SHOPS_JSON: &str = include_str!("../../../data/shops.json");
 pub const QUESTS_JSON: &str = include_str!("../../../data/quests.json");
 pub const SUPPLIES_JSON: &str = include_str!("../../../data/supplies.json");
+pub const ENCHS_JSON: &str = include_str!("../../../data/enchs.json");
 
 /// The shipped map, loaded and checked.
 ///
@@ -88,4 +89,9 @@ pub fn quests() -> crate::quest::QuestsData {
 /// What a town sells to take the tiredness off.
 pub fn supplies() -> crate::fatigue::SuppliesData {
     crate::fatigue::SuppliesData::parse(SUPPLIES_JSON).expect("the shipped supplies are broken")
+}
+
+/// What a licensee can bolt to a component.
+pub fn enchs() -> crate::ench::EnchsData {
+    crate::ench::EnchsData::parse(ENCHS_JSON).expect("the shipped enchs are broken")
 }

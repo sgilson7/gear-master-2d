@@ -838,6 +838,166 @@ def check_an_errand_can_be_handed_in_where_it_was_taken(page, name, fails):
     page.wait_for_selector("#card", state="hidden", timeout=5000)
 
 
+def check_the_rack(page, name, fails):
+    """A licensee buys an ench, bolts it on, switches it off, and takes it back.
+
+    Planted, for the same reason scouting's check is: reaching the rack by play
+    means levelling to five and being dealt one class of four. What has to hold
+    is that the licence gates it, that the board marks what is bolted on, and
+    that the card says so — the arithmetic is `tests/enchs.rs`.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+
+    # --- unlicensed: no bench, no rack ---------------------------------------
+    #
+    # A Gorillathon rather than a character with no class at all: this walk is
+    # past level five, and a classed level-five save with the class stripped
+    # reopens onto the fork, which is a screen over everything.
+    def plain(body):
+        body["character"]["class"] = "Berserker"
+        body["character"]["gold"] = 400
+
+    plant(page, base, plain, stem="rack-none")
+    if page.evaluate("() => JSON.parse(window.__rack()).licensed") is not False:
+        fails.append(f"{name}: an unlicensed character is licensed")
+
+    # --- licensed ------------------------------------------------------------
+    def licensed(body):
+        body["character"]["class"] = "Recycler"
+        body["character"]["gold"] = 400
+
+    plant(page, base, licensed, stem="rack-probe")
+    rack = page.evaluate("() => JSON.parse(window.__rack())")
+    if not rack["licensed"]:
+        fails.append(f"{name}: took the Kaklon Patent and the rack is shut")
+        return
+
+    # Walk into the town and buy one off the bench.
+    town = page.evaluate("""() => (window.__world().places ?? []).find(p => p.kind === 'town')""")
+    page.evaluate("(at) => window.__standAt(at)", [town["at"][0] + 1, town["at"][1]])
+    page.keyboard.press("ArrowLeft")
+    page.wait_for_timeout(300)
+    if not page.is_visible("#town"):
+        fails.append(f"{name}: could not get into a town to reach the bench")
+        return
+    if page.is_hidden("#bench-wrap"):
+        fails.append(f"{name}: a licensee walked into a town and there is no bench")
+        return
+    bench = page.locator("#bench .wares:not(:disabled)")
+    if bench.count() == 0:
+        fails.append(f"{name}: 400 Fnorp and nothing on the bench is affordable")
+        return
+    purse = int(page.text_content("#town-gold"))
+    bench.first.click()
+    page.wait_for_timeout(150)
+    if int(page.text_content("#town-gold")) >= purse:
+        fails.append(f"{name}: an ench cost nothing")
+    page.click("#pack")
+    page.wait_for_selector("#fight", state="visible", timeout=8000)
+    page.click("#preset")
+    page.wait_for_timeout(150)
+
+    if page.is_hidden("#rack"):
+        fails.append(f"{name}: a licensee is packing and there is no rack")
+        return
+    loose = page.locator("#rack-loose .wares")
+    if loose.count() == 0:
+        fails.append(f"{name}: bought an ench and the rack is empty")
+        return
+    spec = page.locator("#rack-loose .wares .spec").first.text_content() or ""
+    if not any(c.isdigit() for c in spec):
+        fails.append(f"{name}: the rack says {spec!r}, which names no number")
+
+    # **Measured, not read.** The board carrying `p.ench` proves core told it;
+    # it does not prove anything was drawn. The mark's live colour is a cyan
+    # nothing else on this board uses, so counting it answers "is it obvious
+    # which component is enched" in the only way a screenshot could.
+    def cyan():
+        return page.evaluate("""() => {
+          window.__board.draw();
+          const c = document.getElementById('board');
+          const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data;
+          let n = 0;
+          for (let i = 0; i < d.length; i += 4) {
+            if (Math.abs(d[i] - 87) < 5 && Math.abs(d[i + 1] - 179) < 5
+                && Math.abs(d[i + 2] - 200) < 5) n++;
+          }
+          return n;
+        }""")
+
+    before = cyan()
+    if before:
+        fails.append(f"{name}: {before} pixels of the ench mark are on a board with no ench")
+
+    # Pick it up, then click a seated component: two gestures on one target.
+    loose.first.click()
+    got = page.evaluate("""() => {
+      const b = window.__board;
+      const s = b.state.slots.find(s => s.placed.length);
+      if (!s) return { none: true };
+      const p = s.placed[0];
+      // Straight at the component's first cell, the way a click lands.
+      return { ok: b.onclaim(p.id), id: p.id };
+    }""")
+    if got.get("none"):
+        fails.append(f"{name}: nothing is seated, so there is nothing to bolt anything to")
+        return
+    if not got["ok"]:
+        fails.append(f"{name}: clicking a component with an ench in hand did nothing")
+        return
+    page.wait_for_timeout(150)
+
+    # The board marks it, the card says so, and core agrees.
+    marked = page.evaluate("""(id) => {
+      const b = window.__board;
+      const p = b.state.slots.flatMap(s => s.placed).find(p => p.id === id);
+      const r = JSON.parse(window.__rack());
+      return { ench: p?.ench ?? null, on: r.on, loose: r.loose.length };
+    }""", got["id"])
+    if not marked["ench"]:
+        fails.append(f"{name}: bolted an ench on and the board draws nothing on the component")
+    elif not marked["ench"]["active"]:
+        fails.append(f"{name}: a freshly bolted ench arrived switched off")
+    if len(marked["on"]) != 1:
+        fails.append(f"{name}: {len(marked['on'])} enchs bolted on, and one was bolted")
+    lit = cyan()
+    if lit <= before:
+        fails.append(f"{name}: bolted an ench on and the board painted no mark "
+                     f"({before} -> {lit} pixels)")
+
+    # Switching it off changes the mark and the fight; taking it back empties
+    # the component and fills the rack.
+    page.locator("#rack-on .wares").first.click()
+    page.wait_for_timeout(150)
+    off = page.evaluate("""(id) => {
+      const b = window.__board;
+      const p = b.state.slots.flatMap(s => s.placed).find(p => p.id === id);
+      return p?.ench?.active ?? null;
+    }""", got["id"])
+    if off is not False:
+        fails.append(f"{name}: switched an ench off and the board still says {off!r}")
+    greyed = cyan()
+    if greyed >= lit:
+        fails.append(f"{name}: switched an ench off and the mark stayed lit "
+                     f"({lit} -> {greyed} pixels)")
+    page.locator("#rack-on .wares").first.click()
+    page.wait_for_timeout(150)
+    back = page.evaluate("""(id) => {
+      const b = window.__board;
+      const p = b.state.slots.flatMap(s => s.placed).find(p => p.id === id);
+      const r = JSON.parse(window.__rack());
+      return { ench: p?.ench ?? null, on: r.on.length, loose: r.loose.length };
+    }""", got["id"])
+    if back["ench"]:
+        fails.append(f"{name}: took the ench back and the component still carries it")
+    if back["on"] != 0 or back["loose"] == 0:
+        fails.append(f"{name}: took the ench back and the rack says {back}")
+    page.click("#run")
+    page.wait_for_selector("#fight", state="hidden", timeout=8000)
+
+
 def check_scouting_is_earned(page, name, fails):
     """The map's danger and its odds are a skill, and `#numbers` is gone.
 
@@ -1670,9 +1830,11 @@ def walk_the_gate(browser, name):
             fails.append(f"{name}: the fork opened at level {at}, before it is owed")
         if not any("Level 5" in r for r in BANKINGS):
             fails.append(f"{name}: no banking announced level five: {BANKINGS[-2:]}")
+        # **Four now.** The Kaklon Patent arrived with the ench system, and
+        # the licence is the class rather than a node inside it.
         offered = page.locator("#fork-choices .wares").count()
-        if offered != 3:
-            fails.append(f"{name}: the fork offers {offered} classes, and the plan says three")
+        if offered != 4:
+            fails.append(f"{name}: the fork offers {offered} classes, and there are four")
         promises = page.locator("#fork-choices .wares .promise").all_text_contents()
         if any(not p.strip() for p in promises):
             fails.append(f"{name}: a class promises nothing mechanical: {promises}")
@@ -1759,6 +1921,7 @@ def walk_the_gate(browser, name):
     # **Last, because these plant saves.** They replace the character to stand
     # them somewhere the walk would take twenty minutes to reach, so anything
     # after them would be checking a game this walk did not play.
+    check_the_rack(page, name, fails)
     check_a_town_takes_the_tiredness_off(page, name, fails)
     check_the_replay_reports_a_curse(page, name, fails)
     check_the_log_points_somewhere(page, name, fails)
@@ -1835,6 +1998,7 @@ def main():
     print("ok: the advance button is the same box on all three fight stages")
     print("ok: a town takes the tiredness off, and the panel says so")
     print("ok: the map's odds are a skill somebody took, not a button everybody had")
+    print("ok: a licensee buys an ench, bolts it on, switches it off and takes it back")
     print("ok: your own figure becomes your class's when you take one")
     print("ok: a mid-fight save reopens the same fight")
     print("ok: walk, download, reload, upload — position and stream both came back")

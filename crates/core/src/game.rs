@@ -128,6 +128,21 @@ impl PartialEq for Game {
             && a.loadout.assembly_pct == b.loadout.assembly_pct
             && a.loadout.slots == b.loadout.slots
             && a.registry == b.registry
+            // **Who the character has become**, which this equality left out
+            // until an ench needed adding to it. A level-one and a level-nine
+            // character are extremely tellable apart, and the round-trip
+            // property is stated in this operator — so anything a save has to
+            // preserve and this did not compare was being asserted one field
+            // at a time in one test and nowhere else.
+            && a.xp == b.xp
+            && a.carried == b.carried
+            && a.fatigue == b.fatigue
+            && a.supplies == b.supplies
+            && a.skill_points == b.skill_points
+            && a.skills_taken == b.skills_taken
+            && a.class == b.class
+            && a.enchs_owned == b.enchs_owned
+            && a.enchanted == b.enchanted
             && self.world == other.world
             && self.encounter == other.encounter
     }

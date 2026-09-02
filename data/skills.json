@@ -602,6 +602,52 @@
           }
         }
       ]
+    },
+    {
+      "id": "kaklon-patent",
+      "name": "The Kaklon Patent",
+      "class": "Recycler",
+      "nodes": [
+        {
+          "id": "k-licence",
+          "name": "The Licence",
+          "blurb": "Nine pages, and eight of them are the list of what the licence does not cover. Page one is a drawing of a hand holding a thing, and under it, in Kaklon’s own writing, the words BOLT IT ON.",
+          "requires": [],
+          "effect": {
+            "assembly_pct": {
+              "pct": 12
+            }
+          }
+        },
+        {
+          "id": "k-tolerances",
+          "name": "Kaklon Tolerances",
+          "blurb": "Three hundred and twelve of the four hundred came back. The note that came back with them is the same note every time, and it is a compliment.",
+          "requires": [
+            "k-licence"
+          ],
+          "effect": {
+            "stat": {
+              "health": 120,
+              "strength": 8
+            }
+          }
+        },
+        {
+          "id": "k-second-bench",
+          "name": "The Second Bench",
+          "blurb": "The first bench is where the work is done. The second is where the gloves go while somebody decides whether it was done. Four hundred went onto the second bench and nothing has ever come off it.",
+          "requires": [
+            "k-licence"
+          ],
+          "effect": {
+            "grow_slot_rows": {
+              "slot": "gloves",
+              "rows": 1
+            }
+          }
+        }
+      ]
     }
   ]
 }

@@ -79,6 +79,12 @@ export function pieceCardHtml(p) {
       mine.map((l) => `<li>${l.text}</li>`).join('')}</ul>`);
   }
   if (!parts.length) parts.push(`<ul class="stats"><li class="none">it takes up room, and that is all</li></ul>`);
+  // What is bolted to this one. Its own group, because it is not something the
+  // component does — it is something somebody did to the component.
+  if (p.ench) {
+    parts.push(`<span class="head">bolted on${p.ench.active ? '' : ' — switched off'}</span>`);
+    parts.push(`<ul class="stats"><li><b>${p.ench.name}</b> — ${p.ench.spec}</li></ul>`);
+  }
   const where = (p.slots ?? []).join(' or ');
   // Wrapped in `.made-item`, because that is what the card CSS is written
   // against — the first draft put these spans bare inside `.made` and every

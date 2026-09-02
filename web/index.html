@@ -193,6 +193,12 @@
              down. This is that place. -->
         <h3 class="sub-h">Supplies</h3>
         <div id="tins" class="shelf"></div>
+        <!-- The bench. Only a licensee sees it: a shelf of things you can buy
+             and cannot use reads as a bug rather than as a tease. -->
+        <div id="bench-wrap" hidden>
+          <h3 class="sub-h">The bench</h3>
+          <div id="bench" class="shelf"></div>
+        </div>
         <h3 class="sub-h">What you are carrying</h3>
         <p id="carrying" class="note"></p>
         </div><!-- /.stages -->
@@ -234,6 +240,16 @@
               <canvas id="board" width="900" height="420"></canvas>
               <p id="holding" class="holding"></p>
               <p id="board-says" class="says" hidden></p>
+              <!-- The rack. Only there for a licensee: enching is what the
+                   Kaklon Patent is, so it arrives with the class. -->
+              <div id="rack" hidden>
+                <h4 class="sub-h">The rack</h4>
+                <p class="note" id="rack-note">Click an ench, then click the component you
+                  want it on. Click a bolted one to switch it off; click it again to take it
+                  back. One ench a component.</p>
+                <div id="rack-loose" class="shelf"></div>
+                <div id="rack-on" class="shelf"></div>
+              </div>
             </div>
             <aside class="made" id="made">
               <!-- Two boards, one panel. Yours and its, side by side in the

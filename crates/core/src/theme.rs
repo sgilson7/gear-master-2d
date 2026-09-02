@@ -361,7 +361,12 @@ pub static TURTLE_DICK: Theme = Theme {
         ("Tired", "Henpeck's Double Shift"),
         // Cogs are the one place the old words survive on purpose, salvaged
         // out of the Great Gear Cave - and salvage is exactly what this is.
-        ("Recycler", "Gear Cave Salvager"),
+        // The ench economy is Spike Kaklon's (p. 119, and pp. 32-35 for him),
+        // and a licensee is somebody working under the patent rather than the
+        // man himself — he is already the Gearwright's themed name and one
+        // name cannot be two things. Was "Gear Cave Salvager", which no
+        // player ever saw: nothing offered this class until M8.4.
+        ("Recycler", "Kaklon Licensee"),
         ("Juggernaut", "Multicity Commuter"),   // 1.79 trillion residents, pp. 70-73
         ("Longhauler", "Thrumbus Finisher"),
         ("Oracle", "Galapagos Timekeeper"),     // Galapagos Jim, time traveller, pp. 89-90

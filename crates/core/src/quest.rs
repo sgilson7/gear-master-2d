@@ -496,6 +496,9 @@ pub fn hand_in(game: &mut Game, id: &str) -> Result<Vec<String>, String> {
                     // and still occupying a cell is a component in two places.
                     game.character.loadout.remove_anywhere(id);
                     game.character.owned.retain(|&p| p != id);
+                    // Anything bolted to it comes back to the rack rather
+                    // than going over the counter with it.
+                    game.character.tidy_enchs();
                 }
                 None => {
                     // A restorative, then. Spent the same way it would be if it

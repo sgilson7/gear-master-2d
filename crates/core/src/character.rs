@@ -158,6 +158,19 @@ pub struct Character {
     pub skill_points: u32,
     /// Node ids taken, in the order they were taken.
     pub skills_taken: Vec<String>,
+    /// Enchs owned and not bolted to anything.
+    ///
+    /// Ids into `data/enchs.json`, and a list rather than a set because two of
+    /// the same ench are two things you can bolt to two components.
+    #[serde(default)]
+    pub enchs_owned: Vec<String>,
+    /// Enchs bolted to a component, and whether each is switched on.
+    ///
+    /// The attachment names a `PieceId`, not a cell, so it survives a repack:
+    /// pick the component up, turn it, move it to another grid, and the ench
+    /// is still on it. See `ench.rs`.
+    #[serde(default)]
+    pub enchanted: Vec<crate::ench::Ench>,
     /// The class, by **canonical** name — `"Berserker"`, not `"Gorillathon"`.
     /// The theme renames it on the way to the screen, like every other name.
     ///
@@ -194,6 +207,8 @@ impl Character {
             xp: 0,
             carried: 0,
             fatigue: 0,
+            enchs_owned: Vec::new(),
+            enchanted: Vec::new(),
             supplies: Vec::new(),
             skill_points: 0,
             skills_taken: Vec::new(),
@@ -1018,6 +1033,113 @@ impl Character {
     }
 
     pub fn combat_items(&self) -> Vec<crate::loadout::ItemProfile> {
-        self.loadout.combat_items(&self.registry)
+        let mut out = self.loadout.combat_items(&self.registry);
+        // **Enchs land here, not in the loadout.** A profile is the board's
+        // answer to "what did these cells make"; an ench is the character's,
+        // and a loadout that knew about them would be a loadout that knew
+        // about a licence.
+        if !self.enchanted.is_empty() {
+            crate::ench::apply(&mut out, &self.enchanted, &crate::data::enchs());
+        }
+        out
+    }
+
+    // ---------------------------------------------------------------- enchs
+
+    /// Is this character licensed to bolt anything to anything?
+    ///
+    /// The Kaklon Patent's, and nobody else's. **The class is the gate**, not a
+    /// node inside it: enching is what the class *is*, and a class whose
+    /// identity waited on a point spent would be a class you could take and not
+    /// notice you had taken.
+    pub fn licensed(&self) -> bool {
+        self.class.as_deref() == Some(crate::ench::LICENSED_CLASS)
+    }
+
+    /// What is bolted to this component, if anything.
+    pub fn ench_on(&self, piece: PieceId) -> Option<&crate::ench::Ench> {
+        self.enchanted.iter().find(|e| e.on == piece)
+    }
+
+    pub fn give_ench(&mut self, id: &str) {
+        self.enchs_owned.push(id.to_string());
+    }
+
+    /// How many of an ench are loose in the rack.
+    pub fn enchs_loose(&self, id: &str) -> usize {
+        self.enchs_owned.iter().filter(|e| *e == id).count()
+    }
+
+    /// Bolt an ench to a component. Returns why not.
+    pub fn attach_ench(
+        &mut self,
+        id: &str,
+        piece: PieceId,
+    ) -> Result<(), crate::ench::Refusal> {
+        use crate::ench::Refusal;
+        if !self.licensed() {
+            return Err(Refusal::NoLicence);
+        }
+        let data = crate::data::enchs();
+        if data.get(id).is_none() {
+            return Err(Refusal::NoSuchEnch);
+        }
+        if self.enchs_loose(id) == 0 {
+            return Err(Refusal::NotYours);
+        }
+        if !self.owned.contains(&piece) {
+            return Err(Refusal::NoSuchPiece);
+        }
+        // **One ench a component.** Two is a bigger space and a bigger screen,
+        // and neither has earned its place. Enforced here rather than assumed
+        // by whatever is drawing the rack.
+        if let Some(there) = self.ench_on(piece) {
+            let what = data.get(&there.id).map(|d| d.name.clone()).unwrap_or_else(|| there.id.clone());
+            return Err(Refusal::AlreadyEnched(what));
+        }
+        let at = self
+            .enchs_owned
+            .iter()
+            .position(|e| e == id)
+            .ok_or(Refusal::NotYours)?;
+        self.enchs_owned.remove(at);
+        self.enchanted.push(crate::ench::Ench {
+            on: piece,
+            id: id.to_string(),
+            active: true,
+        });
+        Ok(())
+    }
+
+    /// Take one off. It goes back in the rack. Returns which, or nothing.
+    pub fn detach_ench(&mut self, piece: PieceId) -> Option<String> {
+        let at = self.enchanted.iter().position(|e| e.on == piece)?;
+        let e = self.enchanted.remove(at);
+        self.enchs_owned.push(e.id.clone());
+        Some(e.id)
+    }
+
+    /// Switch one on or off where it is. Returns the new state.
+    pub fn toggle_ench(&mut self, piece: PieceId) -> Option<bool> {
+        let e = self.enchanted.iter_mut().find(|e| e.on == piece)?;
+        e.active = !e.active;
+        Some(e.active)
+    }
+
+    /// Drop any attachment to a component that is no longer owned.
+    ///
+    /// Handing a component over a counter, or selling one, takes the ench with
+    /// it back to the rack rather than leaving an attachment pointing at
+    /// something the character has not got.
+    pub fn tidy_enchs(&mut self) {
+        let gone: Vec<PieceId> = self
+            .enchanted
+            .iter()
+            .map(|e| e.on)
+            .filter(|p| !self.owned.contains(p))
+            .collect();
+        for p in gone {
+            self.detach_ench(p);
+        }
     }
 }

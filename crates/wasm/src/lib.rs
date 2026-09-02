@@ -568,6 +568,10 @@ fn slot_name(s: gm2d_core::piece::SlotKind) -> String {
 fn piece_payload(
     def: &'static gm2d_core::piece::PieceDef,
     theme: &'static gm2d_core::theme::Theme,
+    // What is bolted to this component. `Null` everywhere a component is not
+    // a particular instance — a shelf shows a *kind* of thing, and nothing is
+    // bolted to a kind of thing.
+    ench: serde_json::Value,
     // Absolute board cells from one caller, a shape's own relative cells from
     // another. Both are pairs of numbers by the time they reach the page, and
     // neither caller should have to convert to suit the other.
@@ -590,6 +594,27 @@ fn piece_payload(
             .into_iter()
             .map(|(where_, text)| serde_json::json!({ "where": where_, "text": text }))
             .collect::<Vec<_>>(),
+        // **The fourth channel**, after motif, luminance and hue. Null where
+        // nothing is bolted on, so a screen draws the mark because there is an
+        // answer rather than because it read a flag and decided.
+        "ench": ench,
+    })
+}
+
+/// What is bolted to one component, as the page needs it. `Null` for nothing.
+fn ench_json(
+    ch: &gm2d_core::character::Character,
+    data: &gm2d_core::ench::EnchsData,
+    p: gm2d_core::piece::PieceId,
+) -> serde_json::Value {
+    let Some(e) = ch.ench_on(p) else { return serde_json::Value::Null };
+    let Some(d) = data.get(&e.id) else { return serde_json::Value::Null };
+    serde_json::json!({
+        "id": d.id, "name": d.name, "blurb": d.blurb,
+        // Unthemed and with the number in it, the same register a skill node's
+        // line is written in. TONE 13a.
+        "spec": d.effect.line(), "detail": d.effect.detail(),
+        "active": e.active,
     })
 }
 
@@ -782,6 +807,7 @@ pub fn board_json() -> String {
         // as every other one. The engine still says "Oak Handle" everywhere,
         // because everything it decides depends on that name meaning one thing.
         let theme = gm2d_core::theme::by_id(&g.theme);
+        let enchs = gm2d_core::data::enchs();
         let slots: Vec<_> = SlotKind::ALL
             .iter()
             .map(|&k| {
@@ -800,7 +826,9 @@ pub fn board_json() -> String {
                         // with its own, untested, accessibility story.
                         let look = gm2d_core::look::look(def, Some(k));
                         let (ink, ink_a) = gm2d_core::look::motif_ink(look.fill);
-                        let mut v = piece_payload(def, theme, serde_json::json!(slot.cells_of(p)), Some(k));
+                        let mut v = piece_payload(
+                            def, theme, ench_json(ch, &enchs, p),
+                            serde_json::json!(slot.cells_of(p)), Some(k));
                         let o = v.as_object_mut().expect("an object");
                         o.insert("id".into(), p.0.into());
                         o.insert("x".into(), x.into());
@@ -837,7 +865,9 @@ pub fn board_json() -> String {
                 // one. Role brightness still reads.
                 let look = gm2d_core::look::look(d, None);
                 let (ink, ink_a) = gm2d_core::look::motif_ink(look.fill);
-                let mut v = piece_payload(d, theme, serde_json::json!(ch.registry.shape(p).cells()), None);
+                let mut v = piece_payload(
+                    d, theme, ench_json(ch, &enchs, p),
+                    serde_json::json!(ch.registry.shape(p).cells()), None);
                 let o = v.as_object_mut().expect("an object");
                 o.insert("id".into(), p.0.into());
                 o.insert("slot".into(), slot_name(d.slot).into());
@@ -1009,7 +1039,8 @@ fn side_slots(
                     let (x, y) = slot.anchor_of(p)?;
                     let def = reg.def(p);
                     let mut v =
-                        piece_payload(def, theme, serde_json::json!(slot.cells_of(p)), Some(k));
+                        piece_payload(def, theme, serde_json::Value::Null,
+                                      serde_json::json!(slot.cells_of(p)), Some(k));
                     let o = v.as_object_mut().expect("an object");
                     o.insert("id".into(), p.0.into());
                     o.insert("x".into(), x.into());
@@ -1471,7 +1502,8 @@ pub fn shop_json() -> String {
         let shelf: Vec<_> = gm2d_core::shop::shelf(&shops, &town, &g.world.bought)
             .into_iter()
             .map(|o| {
-                let mut v = piece_payload(o.def, theme, serde_json::json!(o.def.cells), None);
+                let mut v = piece_payload(o.def, theme, serde_json::Value::Null,
+                                          serde_json::json!(o.def.cells), None);
                 let m = v.as_object_mut().expect("an object");
                 m.insert("slot".into(), o.index.into());
                 m.insert("for".into(), slot_name(o.def.slot).into());
@@ -1504,12 +1536,57 @@ pub fn shop_json() -> String {
                 })
             })
             .collect();
+        // The bench. Every trading town keeps one, the same rule the tins
+        // follow: a licensee who had to walk to the one town that stocks the
+        // thing their class is *about* would be a licensee who could be
+        // stranded from their own class.
+        //
+        // Only shown to somebody licensed to use one, because a shelf of
+        // things you can buy and cannot use is a shelf that reads as a bug.
+        let licensed = g.character.licensed();
+        let bench: Vec<_> = gm2d_core::data::enchs()
+            .enchs
+            .iter()
+            .filter(|_| licensed)
+            .map(|e| {
+                serde_json::json!({
+                    "id": e.id, "name": e.name, "blurb": e.blurb,
+                    "spec": e.effect.line(), "detail": e.effect.detail(),
+                    "price": e.price,
+                    "afford": g.character.gold >= e.price,
+                    "have": g.character.enchs_loose(&e.id),
+                })
+            })
+            .collect();
         serde_json::json!({
             "gold": g.character.gold, "town": town, "shelf": shelf,
             "supplies": tins,
+            "licensed": licensed,
+            "bench": bench,
             "fatigue": g.character.fatigue,
         })
         .to_string()
+    })
+}
+
+/// Buy an ench off a town's bench. Empty string, or why not.
+#[wasm_bindgen]
+pub fn buy_ench(id: &str) -> String {
+    with_mut(|g| {
+        if town_here(g).is_none() {
+            return "you are not in a town".into();
+        }
+        if !g.character.licensed() {
+            return "The bench is not for you.".into();
+        }
+        let data = gm2d_core::data::enchs();
+        let Some(e) = data.get(id) else { return "there is no such ench".into() };
+        if g.character.gold < e.price {
+            return format!("{} Fnorp, and you have not got it.", e.price);
+        }
+        g.character.gold -= e.price;
+        g.character.give_ench(id);
+        String::new()
     })
 }
 
@@ -1932,6 +2009,77 @@ pub fn hand_in_quest(id: &str) -> String {
     })
 }
 
+/// The rack: what you own loose, and whether you may use any of it.
+///
+/// **The licence is the gate, and it is core's.** Enching is what the Kaklon
+/// Patent *is*, so it arrives with the class rather than with a point spent
+/// inside it — a class whose identity waited on a node would be a class you
+/// could take and not notice you had taken.
+#[wasm_bindgen]
+pub fn ench_rack_json() -> String {
+    with(|g| {
+        let data = gm2d_core::data::enchs();
+        let ch = &g.character;
+        let mut seen: Vec<(&str, usize)> = Vec::new();
+        for id in &ch.enchs_owned {
+            match seen.iter_mut().find(|(k, _)| *k == id.as_str()) {
+                Some((_, n)) => *n += 1,
+                None => seen.push((id.as_str(), 1)),
+            }
+        }
+        let loose: Vec<_> = seen
+            .iter()
+            .filter_map(|(id, n)| {
+                let d = data.get(id)?;
+                Some(serde_json::json!({
+                    "id": d.id, "name": d.name, "blurb": d.blurb,
+                    "spec": d.effect.line(), "detail": d.effect.detail(),
+                    "have": n,
+                }))
+            })
+            .collect();
+        let on: Vec<_> = ch
+            .enchanted
+            .iter()
+            .filter_map(|e| {
+                let d = data.get(&e.id)?;
+                let def = ch.registry.def(e.on);
+                Some(serde_json::json!({
+                    "id": d.id, "name": d.name, "spec": d.effect.line(),
+                    "piece": e.on.0,
+                    "on": gm2d_core::theme::by_id(&g.theme).piece(def.name),
+                    "active": e.active,
+                }))
+            })
+            .collect();
+        serde_json::json!({ "licensed": ch.licensed(), "loose": loose, "on": on }).to_string()
+    })
+}
+
+/// Bolt one on. Empty string, or why not.
+#[wasm_bindgen]
+pub fn attach_ench(id: &str, piece: u32) -> String {
+    use gm2d_core::piece::PieceId;
+    with_mut(|g| match g.character.attach_ench(id, PieceId(piece)) {
+        Ok(()) => String::new(),
+        Err(why) => why.to_string(),
+    })
+}
+
+/// Take one off. It goes back in the rack.
+#[wasm_bindgen]
+pub fn detach_ench(piece: u32) -> String {
+    use gm2d_core::piece::PieceId;
+    with_mut(|g| g.character.detach_ench(PieceId(piece)).unwrap_or_default())
+}
+
+/// Switch one on or off where it is. Returns whether it is now on.
+#[wasm_bindgen]
+pub fn toggle_ench(piece: u32) -> bool {
+    use gm2d_core::piece::PieceId;
+    with_mut(|g| g.character.toggle_ench(PieceId(piece)).unwrap_or(false))
+}
+
 /// Open the board outside a fight, so a player can pack in town.
 #[wasm_bindgen]
 pub fn packing() -> bool {
@@ -2075,14 +2223,16 @@ pub fn take_skill(id: &str) -> String {
 /// a sentence about the rule.
 #[wasm_bindgen]
 pub fn class_offer_json() -> String {
-    const THREE: [&str; 3] = ["Berserker", "Hexweaver", "Bloodletter"];
+    // Four now. The Kaklon Patent is the ench class, and enching is what it
+    // *is* rather than a node inside it — so the fork is the gate.
+    const OFFERED: [&str; 4] = ["Berserker", "Hexweaver", "Bloodletter", "Recycler"];
     with(|g| {
         if !g.character.owed_a_class() {
             return "null".into();
         }
         let theme = gm2d_core::theme::by_id(&g.theme);
         let tree = gm2d_core::data::skills();
-        let offer: Vec<_> = THREE
+        let offer: Vec<_> = OFFERED
             .iter()
             .filter_map(|canonical| {
                 let def = gm2d_core::class::CLASSES.iter().find(|c| c.name == *canonical)?;

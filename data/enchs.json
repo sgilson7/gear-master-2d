@@ -1,0 +1,29 @@
+{
+  "format": "gm2d-enchs",
+  "version": 1,
+  "_note": "Enchs. Not enchantments — `PieceKind::Enchantment` is thirteen catalogue pieces laid under the grid, and this is the other thing, which is the book's own word for it (the ench economy, p. 119). An ench has no shape and goes on no grid: it bolts to a component you already own, and it comes off. Everything one does is a number the engine already had, so nothing here retunes combat.",
+  "enchs": [
+    {
+      "id": "plug-energy-tap",
+      "name": "Plug Energy Tap",
+      "blurb": "Four hundred of these were made and three hundred and ninety-one were recalled. The recall notice is on the side of the tap, printed under the tap, where you have to take the tap off to read it.",
+      "price": 60,
+      "effect": {
+        "power": {
+          "pct": 30
+        }
+      }
+    },
+    {
+      "id": "grungo-elastic-band",
+      "name": "Grungo Elastic Band",
+      "blurb": "Cut off the tree in one piece and sold in eleven. Kaklon's own note says it goes back to the length it was, and does not say when.",
+      "price": 45,
+      "effect": {
+        "haste": {
+          "pct": 25
+        }
+      }
+    }
+  ]
+}

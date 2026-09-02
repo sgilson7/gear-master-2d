@@ -63,6 +63,7 @@
   "classes": {
     "Berserker": "class-gorillathon",
     "Hexweaver": "class-funnel-sergeant",
-    "Bloodletter": "class-worm-fact-keeper"
+    "Bloodletter": "class-worm-fact-keeper",
+    "Recycler": "class-kaklon-patent"
   }
 }

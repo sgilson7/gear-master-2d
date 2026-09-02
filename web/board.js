@@ -67,6 +67,9 @@ export class Board {
     this.onchange = () => {};
     this.onhold = () => {};
     this.onpoint = () => {};
+    /// Somebody else's chance at a click on a component. Returns true when it
+    /// took it, and the board does nothing further with that press.
+    this.onclaim = null;
     this.pointed = null;   // pieces of the item under the cursor
     this.slotOrder = ['weapon', 'helmet', 'chest', 'gloves', 'greaves'];
 
@@ -277,6 +280,11 @@ export class Board {
     if (cell) {
       const p = this.pieceAt(cell.slot, cell.x, cell.y);
       if (!p) return;
+      // **Something else may want this click.** An ench in hand is bolted onto
+      // the component rather than picking it up — one target, two gestures,
+      // and which is happening is decided by whether anything is in hand. The
+      // page owns that; the board asks and does as it is told.
+      if (this.onclaim?.(p.id)) { this.refresh(); return; }
       if (e.shiftKey) { this.api.toggleLock(p.id); this.refresh(); return; }
       const why = this.api.pickUp(p.id);
       if (why) { this.say(why); return; }
@@ -289,6 +297,7 @@ export class Board {
 
     const loose = this.bagAt(px, py);
     if (loose) {
+      if (this.onclaim?.(loose.id)) { this.refresh(); return; }
       this.held = { id: loose.id, from: null, name: loose.name, slot: loose.slot };
       this.askLegal(loose.slot);
       this.onhold(this.held.name);
@@ -418,6 +427,36 @@ export class Board {
         let mx = px + CELL - 5;
         if (p.trigger) { g.fillStyle = L.trigger; g.beginPath(); g.arc(mx, py + 5, 2.2, 0, 7); g.fill(); mx -= 6; }
         if (p.effect) { g.fillStyle = L.effect; g.beginPath(); g.arc(mx, py + 5, 2.2, 0, 7); g.fill(); }
+      }
+
+      // **Enched.** The fourth channel, after motif, luminance and hue, and it
+      // has to be told from the two lines already on this board: the lock's
+      // solid gold outer edge and the assembled item's pulsing white one. So
+      // it is drawn *inside* the component — a dashed inner edge and a bolt in
+      // the corner — where neither of those goes.
+      //
+      // Greyed when it is switched off, because an ench toggled off does
+      // nothing and a mark that looked the same either way would be a mark
+      // that answered the wrong question.
+      for (const p of s.placed) {
+        if (!p.ench) continue;
+        const live = p.ench.active;
+        g.save();
+        g.strokeStyle = live ? '#57b3c8' : '#5a5a68';
+        g.lineWidth = 1.6;
+        g.setLineDash([4, 3]);
+        for (const [cx, cy] of p.cells) {
+          const [px, py] = origin(cx, cy);
+          g.strokeRect(px + 3.5, py + 3.5, CELL - 7, CELL - 7);
+        }
+        g.setLineDash([]);
+        // The bolt, on the component's last cell so it does not sit under the
+        // effect and trigger dots, which take the first.
+        const [bx, by] = p.cells[p.cells.length - 1];
+        const [px, py] = origin(bx, by);
+        g.fillStyle = live ? '#57b3c8' : '#5a5a68';
+        g.fillRect(px + 3, py + CELL - 8, 5, 5);
+        g.restore();
       }
 
       // Item outlines. Assembled is brightness and weight — pulsing white,
@@ -583,6 +622,12 @@ export class Board {
       // base drew the same square before this, which hid the only thing about
       // a loose component that decides where it can go.
       this.thumb(g, x, y, p, BAG_THUMB);
+      // A loose component can carry an ench too, and the bag is where a player
+      // looks for the one they bolted something to.
+      if (p.ench) {
+        g.fillStyle = p.ench.active ? '#57b3c8' : '#5a5a68';
+        g.fillRect(x, y + BAG_THUMB - 5, 5, 5);
+      }
       g.fillStyle = on ? '#f0c85a' : C.ink;
       const tx = x + BAG_THUMB + 8;
       const room = COL - BAG_THUMB - 22;

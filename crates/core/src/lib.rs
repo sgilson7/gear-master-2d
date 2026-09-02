@@ -17,6 +17,7 @@ pub mod combat;
 pub mod enemy_data;
 pub mod event;
 pub mod curse;
+pub mod ench;
 pub mod data;
 pub mod fight;
 pub mod game;

@@ -97,6 +97,19 @@ pub struct BoardSave {
     pub enchanted: Vec<[u32; 3]>,
 }
 
+/// An ench bolted to a component, as an index into `registry`.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct EnchSave {
+    pub id: String,
+    pub on: u32,
+    #[serde(default = "yes")]
+    pub active: bool,
+}
+
+fn yes() -> bool {
+    true
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CharacterSave {
     pub gold: i32,
@@ -136,6 +149,17 @@ pub struct CharacterSave {
     pub skill_points: u32,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub skills_taken: Vec<String>,
+    /// Enchs in the rack, by id.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub enchs_owned: Vec<String>,
+    /// Enchs bolted to a component: which one, which component, switched on.
+    ///
+    /// The component is a **registry index**, exactly as `owned` and every
+    /// board placement are — the registry is written whole and in order, so an
+    /// index into it survives the trip. Writing a catalogue name instead would
+    /// lose which of two identical components the ench was on.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub enchanted: Vec<EnchSave>,
     /// The class, by canonical name. Absent until level 5 and permanent after.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub class: Option<String>,
@@ -219,6 +243,8 @@ impl SaveFile {
             skill_points,
             skills_taken,
             class,
+            enchs_owned,
+            enchanted,
             undo_stack: _,
         } = character;
         let Loadout { slots, locks, name_seed, naming: _, assembly_pct } = loadout;
@@ -291,6 +317,11 @@ impl SaveFile {
                     skill_points: *skill_points,
                     skills_taken: skills_taken.clone(),
                     class: class.clone(),
+                    enchs_owned: enchs_owned.clone(),
+                    enchanted: enchanted
+                        .iter()
+                        .map(|e| EnchSave { id: e.id.clone(), on: e.on.0, active: e.active })
+                        .collect(),
                 },
             },
         }
@@ -402,6 +433,8 @@ impl SaveFile {
             skill_points,
             skills_taken,
             class,
+            enchs_owned,
+            enchanted,
         } = character;
 
         // The registry first, in order, so `PieceId(i)` means what it meant.
@@ -474,6 +507,20 @@ impl SaveFile {
         character.skill_points = skill_points;
         character.skills_taken = skills_taken;
         character.class = class;
+        character.enchs_owned = enchs_owned;
+        // Checked like every other index into the registry. An ench bolted to
+        // component 400 of 12 is a damaged file, and saying so beats panicking
+        // three screens later.
+        character.enchanted = enchanted
+            .into_iter()
+            .map(|e| {
+                check(e.on, "an ench").map(|on| crate::ench::Ench {
+                    on,
+                    id: e.id,
+                    active: e.active,
+                })
+            })
+            .collect::<Result<_, _>>()?;
 
         let mut game = Game { rng: Rng::from_state(rng_state), theme, character, world, encounter };
         // The one pointer the file could not carry, put back from the id it

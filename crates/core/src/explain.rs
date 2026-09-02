@@ -90,6 +90,25 @@ pub fn piece_lines(def: &PieceDef) -> Vec<(&'static str, String)> {
     if let Some(b) = def.assembly_bonus {
         out.push(("assembled", format!("{} — {}", b.label, b.stats.summary())));
     }
+    // **Which set it is a piece of, and how many that is.**
+    //
+    // Found by playing it: the M9.4 walk collected all three of the Mandate's
+    // components and never once learned they made anything, because Auto-pack
+    // packs for a rating and a set is only the set. Nothing on any screen in
+    // the game said the three cheeses were three of a thing. A derived number
+    // needs somewhere it is shown or it cannot be told from a bug — and here it
+    // could not be told from three unrelated gloves components.
+    //
+    // The rules go with it, because *what the set does* is the reason to give
+    // up the better arrangement, and reading it on the card of a piece you have
+    // not seated yet is the whole decision.
+    if let Some(set) = def.assembly_bonus.and_then(|b| b.names) {
+        let n = crate::loadout::set_pieces(set).len();
+        out.push(("set", format!("{set} — {n} pieces, and the item must be all of them")));
+        for r in def.assembly_bonus.into_iter().flat_map(|b| b.grants) {
+            out.push(("set", r.line()));
+        }
+    }
     if let Some(e) = def.effect {
         out.push(("effect", e.label.to_string()));
     }

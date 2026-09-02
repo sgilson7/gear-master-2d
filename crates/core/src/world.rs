@@ -589,16 +589,30 @@ impl World {
         to: (u8, u8),
         allowed: &Allowances,
     ) -> Option<String> {
+        let c = self.crossing_between(state, to, allowed)?;
+        let need = c.needs_level?;
+        Some(format!("{} It wants level {need}, and you are {}.", c.shut, allowed.level))
+    }
+
+    /// The crossing standing between the player and this tile, if one is shut.
+    ///
+    /// The question `crossing_refuses` asks about the next step and the quest
+    /// log asks about somewhere thirty tiles away. One answer to it, because
+    /// two would be a map that refused a step for one reason and explained it
+    /// with another.
+    pub fn crossing_between(
+        &self,
+        state: &WorldState,
+        to: (u8, u8),
+        allowed: &Allowances,
+    ) -> Option<&PlaceDef> {
         let here = self.region_at(state.at[0], state.at[1]).map(|r| r.id.as_str());
         let there = self.region_at(to.0, to.1)?;
         if here == Some(there.id.as_str()) {
             return None;
         }
         let c = self.crossing_into(state, to.0, to.1)?;
-        let need = c.needs_level?;
-        (allowed.level < need).then(|| {
-            format!("{} It wants level {need}, and you are {}.", c.shut, allowed.level)
-        })
+        (allowed.level < c.needs_level?).then_some(c)
     }
 
     /// Every place on this map that is there right now.

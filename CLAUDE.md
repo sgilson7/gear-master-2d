@@ -19,18 +19,21 @@ from `sgilson7/gear-master`. `PLANNING-BRIEF.md` is the brief; `PLAN.md` is the
 plan and **wins where the two disagree**; `TONE.md` governs every string a
 player reads.
 
-**Every milestone is done, M0 through M8, and M8 is live.** M0–M5 shipped the
-MVP, tagged `v0.1.0-mvp`; the board was rebuilt against the original's
-colourblind design; M6 added the art and the tone pass; M7 the shops, errands
-and the first dungeon; M8 curses made visible, a quest log, enchs, a fourth
-class, and a door at the end of it. Deployed at `ce46848` and verified against
-the live page rather than the local build — see *A deployed fix is not a
-delivered fix*. <https://sgilson7.github.io/gear-master-2d/>
+**Every milestone is done, M0 through M9.** M0–M5 shipped the MVP, tagged
+`v0.1.0-mvp`; the board was rebuilt against the original's colourblind design;
+M6 added the art and the tone pass; M7 the shops, errands and the first
+dungeon; M8 curses made visible, a quest log, enchs, a fourth class, and a door
+at the end of it; M9 what a creature leaves behind — three sets, two rules no
+stat could express, and two crossings that make the north a decision.
+<https://sgilson7.github.io/gear-master-2d/>
 
-**`PLAN-M9.md` is the next block**, written and not started: every creature in
-the pit drops pieces of a set, and a set does something no stat can. Read
-`HANDOFF.md` §9 before touching it — the four things it names are the ones that
-will cost you a day otherwise.
+**M8 is the last block that was deployed.** M9.0 through M9.4 are committed and
+green and have not been pushed — `git log origin/main..HEAD` is the check and it
+costs nothing. See *A deployed fix is not a delivered fix*: the failure this
+catches has happened here, and the deploy is a human's.
+
+**There is no plan for the next block.** `PLAN-M9.md` is done; `PLAN.md` §6b is
+the list of what M9.4's playthrough left open, and §6a is M8.8's.
 
 **The demo ends at a door in the western wall**, which appears once the Cave's
 boss is down and opens to the key it drops. What is past it is not written —
@@ -94,6 +97,17 @@ something cost a day.
   fight with an empty armour bar because nothing *announces* a balance nobody
   had to earn; and a curse's countdown was nearly divided out of the playback
   head, which would have drawn a shape the fight never had.
+- **A set is the set or it is gear.** `loadout::set_of` is the one answer to
+  "is this the Mandate", and both the item's name and the rules it grants read
+  it. Two conditions: every component in the item names the same set, and every
+  component that names the set is in the item. Agreement alone lets two thirds
+  of a three-piece set call itself whole, because most recipes have an optional
+  slot; completeness alone would let a stranger in.
+- **A map does not know about bags, or about levels.** `world::step` takes a
+  `world::Allowances` — a handful of bools and a number the caller fills from
+  the character — and never the character. Same division a gate's key makes.
+  `Allowances::of` matches `Rule` exhaustively, so a new rule is a decision
+  about walking rather than a silence.
 - **Before adding a system, grep for it.** `explain.rs` was written with a
   duplicate `Action::describe` and `Trigger::describe` already in `piece.rs`,
   and M8 opened with a request to add curses to a game that has had 59
@@ -120,6 +134,12 @@ chosen to exercise checks and asserts; the second starts a new game and plays
 it, and its output is a transcript rather than a verdict. The second is the one
 that found an Auto-pack seating the starting kit for the whole game and a class
 fork opening underneath the town — both of which the first was green through.
+
+**It reaches the ending now**, which it never had before: M9.4 taught it two
+things a player already knew — that a road refused three times is a road you
+stop walking at, and that the way out of a dungeon is a target like any other.
+The transcripts are in `testing/transcripts/`. The current one is 1,434 steps,
+159 wins, 13 losses, level 14.
 
 Rebaseline the golden combat fixture, and say in the commit what started
 fighting differently:
@@ -187,6 +207,59 @@ will arrive wrong, and the loader is where that is caught.
 `try_step` repairs too, not only `load_json`. A position you cannot stand on is
 a dead end rather than a glitch — there is no key that gets you out of it — so
 the first keypress fixes it whatever put it there.
+
+## The north is a decision, not a slope
+
+Nothing stopped a level-one character walking fifteen tiles north into a region
+of two-thousand-rated creatures. The gradient was a gradient and not a gate.
+`PlaceKind::Crossing` is the gate — a `Gate`'s sibling, on this map rather than
+onto another one.
+
+- **A crossing guards a region, not its own tile**, which is a divergence from
+  `PLAN-M9.md` and the map is the reason: rows four to fifteen are open ground
+  twelve tiles wide, so a crossing that refused only the square it stands on
+  would need a dozen of them across a row — which is the wall the plan
+  rejected, drawn in places instead of in rock. The place stands on the **near**
+  side of what it guards, so it is a milestone you can walk up to and read.
+- **It is the first thing gated on what you *are*.** A key is in the bag and a
+  level is not, so the number travels in `Allowances` with everything else the
+  map may not go and read.
+- **Before the step, not after it.** Every other place does its work once you
+  are standing on it; this one refuses, so it happens first — and a refused
+  crossing draws nothing and counts no tile, the same rule a cliff obeys.
+- **A threshold, not a cage.** A step that stays inside the guarded region is
+  never refused and neither is one out of it, so a save planted on the far side
+  is somebody who can still walk. And **going home is never refused**: the walk
+  after a defeat is a placement, so `World::repair` consults no crossing.
+- **The refusal is two registers.** `shut` is the world's and lives in
+  `tiles.json`; the number is the engine's and is derived in
+  `crossing_refuses`. A `shut` line quoting its own level would be a second
+  copy of `needs_level` two lines above it, and the lint refuses a digit there.
+- **The quest log says when a road is shut.** `Guide::shut`, found by playing
+  it: the M9.4 walk pressed north into the first crossing for nine thousand
+  steps because the log went on pointing at an errand behind it without a word.
+  A log that points somewhere you cannot go and says nothing is a log that is
+  wrong rather than a road that is shut.
+- Its own mark, and neither of the two it is nearest: a post with a bar across
+  it, the one shape on this map that is a line rather than a body.
+
+## The lake has a rim
+
+`Rule::Wade` opens water that touches land. **Measured before it was written:**
+on this map that is 14 of the lake's 28 tiles, so row 9 becomes crossable end to
+end and the middle 14 stay shut. No new terrain and no repaint.
+
+- `World::shallow` is the ground's half and `World::walkable` is the game's.
+  Orthogonal only — a diagonal touch is a corner, and a corner is not somewhere
+  to put a foot down on the way in.
+- **`World::repair` reads the allowances going in and ignores them coming out.**
+  What counts as *standing somewhere* has to know about the set, or the next
+  keypress walks a wading player home out of a lake they were legally in; where
+  a repair *puts* somebody must not, because a rim tile is only a place to
+  stand while the set is on the board.
+- Wading only ever **adds**. `an_allowance_never_shuts_anything` says so over
+  every tile of every map, which is what makes the reachability tests still
+  mean what they meant.
 
 ## The first dungeon
 
@@ -419,7 +492,7 @@ names since M1 and the page rendered none of them.
 ## Curses were always there, and nothing said so
 
 Reported as *"are curses in the game? if not, they need to be added"*. They
-were, and always had been: **59 of 536 components apply one**, six are on a town
+were, and always had been: **59 of the then-536 components apply one**, six are on a town
 shelf and two are on the *starting* shelf at three Fnorp each. What was missing
 was every screen that should have mentioned them.
 
@@ -739,6 +812,40 @@ The plumbing was built two milestones before the Kaklon Patent wanted it, and
 that is the whole reason M8.6 could write eight nodes instead of writing them
 twice.
 
+### And an item grants them too
+
+M9.0 widened `Effect::Grants` from the tree to an assembled item, which is what
+every set in that block goes through. A type two systems grant is a type neither
+of them owns, so `Rule` moved to `crates/core/src/rule.rs`; `skills.rs` keeps a
+`pub use` and nothing about `data/skills.json` changed.
+
+- **The strings are `Cow<'static, str>`.** A rule arrives from two places now:
+  parsed out of JSON, where a name has to be owned, and written into `CATALOG`,
+  where it has to be a compile-time constant. `Cow` is the one type that is
+  both. The alternative was a second enum for the catalogue's half, which is two
+  rulebooks.
+- **`Character::rules()` is the tree's plus every rule an assembled item
+  grants**, read fresh every time for the reason a node's effect is read fresh.
+  It is on `Character` and not on `Loadout` for the reason enchs are.
+- *An unassembled set grants nothing* is not a check anywhere: only assembled
+  groups are walked, so it is the shape of the loop rather than a condition in
+  it.
+- **A rule pays off the whole set**, gated by `loadout::set_of` — see *Rules*.
+  A rule off one component would be a rule off one component, and both M9's
+  would ride into any glove or chest that happened to hold the piece carrying
+  them.
+- **Three consumers, each where it can honestly answer.** The combat rules go
+  through `Held` as they always did; `Rule::Rout` is settled by `fight::rout`,
+  before there is a fight to put it in; `Rule::Wade` is answered by
+  `world::step`, where a wall is refused. The match in `combat.rs` has an arm
+  saying the last two are not combat's, which is the arm existing so that adding
+  a rule is a decision rather than a silence.
+- **No `Rule::describe` was written.** `line` and `detail` already exist and a
+  second describer is the mistake `explain.rs` made from the other direction.
+  The sheet prints `Rule::line`, unthemed, TONE 13a — a rule moves no bar and
+  prints no number of its own, so without somewhere it is shown there is no way
+  to tell one that works from one that does not.
+
 ## Enchs, and the spin
 
 **An ench is not an enchantment.** `PieceKind::Enchantment` is thirteen
@@ -910,6 +1017,73 @@ where a Whisperling lives.
 The log is a screen of its own rather than a tab inside the tree. `#tree-tabs`
 answers "which tree", and a strip answering two different questions is the
 `.card` collision in a new coat.
+
+## What a creature leaves behind
+
+Three sets, one a pit creature, and each is exactly one grid's recipe — so three
+drops make one finished item and nothing has to be bought to complete it.
+
+| set | creature | grid | what it does |
+|---|---|---|---|
+| The Rat King's Mandate | Cave Rat | gloves | `Rule::Rout` — an A. Rat gives up |
+| The Toad's Own Frame | Bog Toad | chest | `Rule::Wade` — the lake has a rim |
+| The Wallspider Weave | Bone Archer | helmet | `Rule::CurseOnActivate` |
+
+- **The third set does not change the world, and that is the point of it.**
+  `PLAN-M9.md` proposed a combat bonus through `AssemblyBonus.triggers`; that
+  cannot be a *set* bonus, because an assembly bonus's triggers pay on any
+  assembled item holding the piece. So the Weave grants a rule the Patent's
+  nodes have granted since M8.3, which combat already translates at the bell —
+  still no new combat code, and `Rule` kinds went 5 → 7 rather than the plan's
+  8.
+- **A set's name is not themed.** Every other name in `piece.rs` is canonical
+  and the theme gives the player's word for it; these are the player's word
+  already. A name somebody wrote is a proper noun and a proper noun is not
+  translated. They are constants because a set name is the key
+  `loadout::set_pieces` matches on, and `set_pieces` derives what is in a set
+  from the catalogue rather than listing it — the last list of names written by
+  hand here was `package-web.sh`'s modules and it was missed twice.
+- **`data/drops.json` is creature, component, per-mille**, keyed canonically
+  like a `Slay` goal, refused at load for a creature the ladder has not got, a
+  component the catalogue has not got, or a rate outside 1..=500. A certainty is
+  not a drop, it is a boss's `drops` field.
+- **The roll is in `fight::settle`, on a victory, off `game.rng`.** `fight.rs`
+  did not touch the stream before M9.1, so a won fight now costs one draw per
+  drop entry. `a_seeded_walk_replays` walks a fixed path with two seeds and
+  settles nothing, so it holds — re-read rather than assumed.
+- **Every entry is rolled whether or not the piece is already in the bag**, and
+  the refusal happens after. Skipping the draw would make the stream a function
+  of what the player is carrying rather than of the fights they had.
+- **`pay_a_win` is one function**, because a rout pays what a win pays and two
+  copies of "what a win pays" is two answers to one question.
+- **A rout is settled where the encounter is.** A fight decided before its first
+  tick is a fight the replay has to draw, and there is nothing to draw. It pays
+  what a win pays, costs **no** tiredness — nothing was fought, and the receipt
+  says so because a player will check — and **a boss is never routed**, the same
+  rule that looks a boss drop up by the tile.
+- **A drop you could buy is worse than a quest reward you could buy.** All eight
+  components are `EVENT_ONLY`, which also keeps them out of every footprint
+  family `stepped_component` walks — so no creature can ever be dealt one, which
+  is why arming three assembly bonuses did not move the ladder.
+- **A component's card names its set.** Found by playing it: the M9.4 walk
+  picked up all three of the Mandate's components and was never told they made
+  anything, because Auto-pack packs for a rating and a set is only the set.
+
+### The rate, and the thing the rate cannot fix
+
+Set by a test, like `XP_DIVISOR` and `PER_FIGHT`. What that test *measures*
+changed in M9.4 and the change is the finding:
+
+**Wins in the region, not wins against the creature.** `draw_enemy` weights a
+pool so its hardest member is its rarest, and the pit's 16 / 80 / 95 deals
+80 / 16 / **1** out of 97. Measured per creature, all three rates looked fine
+and the Wallspider Weave was three and a half thousand fights away. Measured the
+way a player counts — draw the pool the way the map draws it, count every win —
+the three sets are 40, 120 and 242 wins, against a full playthrough of 159.
+
+So the rates are 50 / 80 / 500 per-mille and they are *not* the same on purpose:
+the rate carries what the draw does not. **The pool weight is the proper fix and
+it is a person's** — `PLAN.md` §6b, row 1.
 
 ## Fatigue is what a fight actually spends
 
@@ -1233,6 +1407,8 @@ about a string. Every one caught something on its first run:
 | 1.7 | §C.1 is a **design change, not a bug fix**. Upstream paid the bounty on a loss deliberately and its reasoning was sound *on a ladder*. GM2D is not a corridor, so the justification goes and the exploit stays. | `crates/core/src/reward.rs` |
 | 1.9 | The theme becomes data. `theme.rs` already treats a name as a key rather than a label; moving its tables to `data/` is where they belong. | `PLAN.md` 1.9 |
 | 1.10 | Actions builds and publishes to Pages. No `docs/`, no human-run `make publish` rebuild. The brief described gear-master, which predates both house web repos and ships macroquad. | `.github/workflows/deploy.yml` |
+| 9.1 | **A crossing guards a region, not its own tile.** `PLAN-M9.md` §M9.3 wrote it as a tile you may pass; the map is twelve tiles of open ground across every boundary, so that is a dozen crossings in a row, which is the wall the same section rejects. | `crates/core/src/world.rs`, `PlaceKind::Crossing` |
+| 9.2 | **The third set grants a `Rule` rather than an assembly trigger.** §M9.2 proposed the trigger because it costs nothing; it also pays on any assembled item holding the piece, which is not a *set* bonus. The rule it grants is one the tree has granted since M8.3, so it still costs no combat code. `Rule` kinds went 5 → 7, not the table's 8. | `crates/core/src/piece.rs`, `WEAVE` |
 
 Also true, and not in the brief because it could not have been:
 
@@ -1267,7 +1443,7 @@ and M5's trees may spend them again.
 
 ## Numbers, so a regression is visible
 
-Every figure below was re-measured for M8.8 rather than carried forward.
+Every figure below was re-measured for M9.4 rather than carried forward.
 
 | | |
 |---|---|
@@ -1294,20 +1470,27 @@ Every figure below was re-measured for M8.8 rather than carried forward.
 | M8.5: the spin | 474 passing |
 | M8.6: the Kaklon Patent | 477 passing |
 | M8.7: the door in the wall | 482 passing |
-| **M8.8: played, triaged, written down** | **483 passing** |
+| M8.8: played, triaged, written down | 483 passing |
+| M9.0: a rule an item grants, and an item with a name | 494 passing |
+| M9.1: a creature leaves something behind | 503 passing |
+| M9.2: three sets | 518 passing |
+| M9.3: the north is a decision | 526 passing |
+| **M9.4: played to the ending, triaged, written down** | **526 passing** |
 
 | | |
 |---|---|
-| Catalogue | 536 components, unchanged since M7 — the save fingerprint has not moved |
-| Pieces that apply a curse | 59 of 536, 4 kinds, 2 on the starting shelf |
+| Catalogue | **544 components**, up 8 in M9.1 — **the save fingerprint moved and every pre-M9 file is refused** |
+| Pieces that apply a curse | 59 of 544, 4 kinds, 2 on the starting shelf |
+| Sets | 3, of 3 / 2 / 3 components — every one `EVENT_ONLY`, off one creature, in one grid |
 | Ladder | 50 creatures, rated 16 to 2958 |
-| `crates/core` | ~38.6k lines, up from 33k at M7, down from ~50k at the fork |
-| wasm | 1116 KB, up from 888 KB at M7 |
-| Save format | v1. Every M8 field defaults, so a pre-M8 file still opens |
-| Maps | 2 — overworld 20×20 (1 town, 7 events, 1 gate, 1 door) + the cave 9×5 (1 boss, 1 gate) |
-| `PlaceKind` | 5: town, event, gate, boss, **door** |
-| Effect kinds | 5: stat, start_with, grow_slot_rows, assembly_pct, **grants** |
-| `Rule` kinds | 5: curse_on_activate, spin_extra, spin_keep, spin_every, scout |
+| `crates/core` | ~39.8k lines, up from 38.6k at M8.8, down from ~50k at the fork |
+| wasm | 1159 KB, up from 1116 KB at M8.8 |
+| Save format | v1. Every M9 field defaults, so the *format* is unchanged — it is the catalogue stamp that refuses an old file |
+| Maps | 2 — overworld 20×20 (1 town, 7 events, 1 gate, 1 door, **2 crossings**) + the cave 9×5 (1 boss, 1 gate) |
+| `PlaceKind` | 6: town, event, gate, boss, door, **crossing** |
+| Effect kinds | 5: stat, start_with, grow_slot_rows, assembly_pct, grants |
+| `Rule` kinds | 7: curse_on_activate, spin_extra, spin_keep, spin_every, scout, **rout**, **wade** |
+| Data files | 14 — `drops.json` is M9.1's, and `data::FILES` is what `data_is_current` walks |
 | Starting kit | **2 components**, 28 Fnorp, 1 assembled weapon |
 | Towns | 1 placed, 2 staged; fixed shelves of 11 / 15 / 17, no reroll; every one keeps a bench |
 | Errands | 10: 5 at the pit, 1 roadside, 2 of Marbulon's, 2 staged |
@@ -1315,15 +1498,18 @@ Every figure below was re-measured for M8.8 rather than carried forward.
 | Restoratives | 3, at 4 / 11 / 28 Fnorp — retuned down when a town started mending |
 | Boards | 6×3 at level 1, one row a level, 6×8 ceiling |
 | Level 5 | ~27 fights, mean of nine seeded walks |
+| Regions reachable | 2 at level 1, 3 at 5, all 5 at 9 — flood-filled, not declared |
+| A whole set | 40 / 120 / 242 wins in the pit, at 50 / 80 / 500 per-mille |
+| A whole playthrough | 159 wins, 13 losses, level 14, 1,434 steps to the ending |
 | Skill trees | 13 base nodes + gorillathon 8, funnel-sergeant 8, worm-fact-keeper 10, kaklon-patent 8 |
 | Classes offered | 4 |
 | Figures | 26 `.tex` → 72 SVGs (13 family drawings, 4 drawn for themselves, 4 classes, 3 towns, you) |
-| Art coverage | 50 of 50 creatures, 3 of 3 towns, **4 of 4 classes**, and you |
-| Browser gate | 37 checks, 3 engines |
+| Art coverage | 50 of 50 creatures, 3 of 3 towns, **4 of 4 classes**, and you. **The eight set pieces have no art and want none** — a component has never had a figure |
+| Browser gate | 40 checks, 3 engines |
 
-Note the catalogue is **536**, not the 374 the retheme document counts — it
-grew upstream after that document was written. Any content work that quotes a
-catalogue size should quote this one.
+Note the catalogue is **544**, not the 374 the retheme document counts — it
+grew upstream after that document was written, and again here. Any content work
+that quotes a catalogue size should quote this one.
 
 ## Open questions the human has not answered
 
@@ -1334,6 +1520,16 @@ Actions.
 
 **Still open**, with the default in force: losing costs nothing but the walk
 back; the content charter is binding; invented proper nouns fail the M2 lint.
+
+**Answered by `PLAN-M9.md` §5, with the plan's proposal taken in each case:** a
+rout pays what a win pays and costs no tiredness; the crossings ask for level 5
+and level 9; the drop rate started at one in twenty and was retuned in M9.4
+against what a player counts. The Wallspider Weave was left unnamed by the human
+and is named here; say the word for a different one.
+
+**`PLAN.md` §6b** is what M9.4's playthrough left open — the pool weight that
+makes one set three times dearer than the others, and whether Auto-pack should
+know what a set is.
 
 **No longer open:** errands exist, as `crates/core/src/quest.rs` — a new module
 rather than upstream's, which was a chain of receipts along a road. `town.rs`

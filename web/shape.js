@@ -66,6 +66,12 @@ export function pieceCardHtml(p) {
     ['standing', 'standing still'],
     ['activation', 'every activation'],
     ['assembled', 'when its item is finished'],
+    // **Which set it belongs to, and what the set does.** M9.4 played the game
+    // and picked up all three of the Mandate's components without ever being
+    // told they made anything: Auto-pack packs for a rating and a set is only
+    // the set, so nothing on any screen said the three of them were three of a
+    // thing.
+    ['set', 'part of a set'],
     ['effect', 'what it does to its neighbours'],
     ['trigger', ''],
   ];

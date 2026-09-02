@@ -150,35 +150,57 @@ fn the_stream_is_a_function_of_the_fights_and_not_of_the_bag() {
 /// **The rate is set by a test, and this is the test.**
 ///
 /// `XP_DIVISOR` is 5 because a test says so and `PER_FIGHT` is 4 because a test
-/// walks twelve fights. This is the same: a whole set has to be a few hours of
-/// meeting a creature and not a lifetime of it, so it is walked with the real
-/// roll and the real generator over a hundred seeds and the mean is held
-/// between fifteen and a hundred and twenty wins.
+/// walks twelve fights. This is the same, and M9.4 rewrote what it measures.
 ///
-/// **Wins against the creature that owns the set**, which is what a player
-/// counts. How often the pit deals that creature is the map's question and not
-/// the rate's — `draw_enemy` weights a pool so its hardest member is its rarest,
-/// and the Bone Archer is one encounter in ninety-seven down there. That is a
-/// real problem and it is not this number's: see the note this milestone leaves
-/// for M9.4.
+/// **Wins in the region, not wins against the creature.** The first version
+/// counted wins against the creature that owns the set, which is the number the
+/// rate controls and *not* the number a player experiences: `draw_enemy`
+/// weights a pool so its hardest member is its rarest, and in the pit that is
+/// eighty encounters in ninety-seven for an A. Rat, sixteen for a toad and one
+/// for a Wallspider Swarm. Measured the old way all three rates looked fine and
+/// the Weave was three and a half thousand fights away. So this draws the pool
+/// the way the map draws it and counts every win, which is what somebody
+/// standing in the pit is counting.
+///
+/// The band is 25 to 400 wins in the region. Under twenty-five is a set you get
+/// by accident; over four hundred is a set nobody finishes. The M9.4
+/// playthrough took 169 wins to reach the ending, so this is "one demo" at the
+/// near end and "three" at the far one, which is the spread three sets should
+/// have.
 #[test]
 fn a_set_is_a_few_hours_and_not_a_lifetime() {
     let d = shipped();
+    let w = data::world(D);
     let mut creatures: Vec<&str> = d.drops.iter().map(|e| e.creature.as_str()).collect();
     creatures.dedup();
     for who in creatures {
         let want: Vec<&str> = d.of(who).iter().map(|e| e.piece.as_str()).collect();
+        // A tile in the region that holds it, so the draw is the map's own.
+        let region = w
+            .regions
+            .iter()
+            .find(|r| r.enemies.iter().any(|m| m.name == who))
+            .unwrap_or_else(|| panic!("nothing on this map holds a {who}"));
+        let tile = w.tiles_of(&region.id)[0];
+
+        let trials = 40;
         let mut total = 0u32;
-        let trials = 100;
         for seed in 0..trials {
             let mut rng = Rng::new(0x5E7_0000 + seed as u64);
             let mut have: Vec<String> = Vec::new();
             let mut wins = 0u32;
             while have.len() < want.len() {
                 wins += 1;
-                assert!(wins < 100_000, "{who}'s set never completed at all");
-                for got in drops::roll(&d, &mut rng, who) {
-                    if !have.contains(&got) {
+                assert!(wins < 200_000, "{who}'s set never completed at all");
+                let met = w
+                    .draw_enemy(tile[0], tile[1], D, &mut rng)
+                    .expect("the region deals something");
+                // **This set's pieces only.** The pit deals three creatures
+                // and they all leave something; counting a toad's hide towards
+                // the Mandate made the rat's set look like twenty-three wins
+                // when it is forty-four.
+                for got in drops::roll(&d, &mut rng, met.name) {
+                    if want.contains(&got.as_str()) && !have.contains(&got) {
                         have.push(got);
                     }
                 }
@@ -186,13 +208,20 @@ fn a_set_is_a_few_hours_and_not_a_lifetime() {
             total += wins;
         }
         let mean = total / trials;
-        assert!(
-            (15..=120).contains(&mean),
-            "{who}: {} pieces take a mean of {mean} wins. Fewer than fifteen is a set \
-             you get by accident; more than a hundred and twenty is a set nobody finishes.",
-            want.len()
+        println!(
+            "{who}: {} pieces at {} per mille -> {mean} wins in {}",
+            want.len(),
+            d.of(who)[0].per_mille,
+            region.name,
         );
-        println!("{who}: {} pieces, mean {mean} wins", want.len());
+        assert!(
+            (25..=400).contains(&mean),
+            "{who}: {} pieces take a mean of {mean} wins in {}. Under twenty-five is a set \
+             you get by accident; over four hundred is a set nobody finishes. The M9.4 \
+             playthrough reached the ending in 169 wins.",
+            want.len(),
+            region.name,
+        );
     }
 }
 

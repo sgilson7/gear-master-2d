@@ -361,6 +361,17 @@ pub struct Guide {
     pub places: Vec<String>,
     /// Region ids to pulse.
     pub regions: Vec<String>,
+    /// Why you cannot get there yet, if you cannot.
+    ///
+    /// **M9.3 made this possible and M9.4's playthrough made it necessary.** A
+    /// crossing shuts the north until a level, and the log went on pointing at
+    /// errands behind one without a word — which from where the player sits is
+    /// a log that is wrong rather than a road that is shut. The playthrough
+    /// pressed north into the Slag Flats' crossing for nine thousand steps.
+    ///
+    /// Two registers again: the crossing's name is the world's and the number
+    /// is the engine's.
+    pub shut: Option<String>,
 }
 
 impl Guide {
@@ -412,6 +423,29 @@ pub fn guide(game: &Game, q: &Quest, worlds: &[crate::world::World]) -> Guide {
                 }
             }
         },
+    }
+    // **And whether any of it is reachable.** Worked out here rather than by
+    // the page, for the reason the guide itself is: a screen deciding what is
+    // behind a crossing would be a second copy of the rule, and it would go on
+    // saying so after the number moved.
+    let allowed = game.character.allowances();
+    for w in worlds {
+        let spots = out
+            .places
+            .iter()
+            .filter_map(|id| w.places.iter().find(|p| p.id == *id).map(|p| p.at))
+            .chain(out.regions.iter().filter_map(|id| w.tiles_of(id).first().copied()));
+        for at in spots {
+            let Some(c) = w.crossing_between(&game.world, (at[0], at[1]), &allowed) else {
+                continue;
+            };
+            let name = if c.name.is_empty() { c.id.as_str() } else { c.name.as_str() };
+            out.shut = Some(format!(
+                "Behind {name}, which wants level {}.",
+                c.needs_level.unwrap_or(0)
+            ));
+            break;
+        }
     }
     out
 }

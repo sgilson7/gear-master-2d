@@ -325,6 +325,9 @@ def main():
             wins = 0
             moved = 0
             patrol = 0
+            # Targets that would not let us in, by how many presses were spent
+            # finding that out.
+            stuck = {}
             for step in range(STEPS):
                 if page.is_visible("#ending"):
                     head("the ending")
@@ -352,7 +355,11 @@ def main():
                     in_town(page)
                     spend_points(page)
                     target = None
+                    # A level lands in a town, and a level is what a crossing
+                    # asks for — so everything that was out of reach is worth
+                    # trying again from here.
                     done_marks.clear()
+                    stuck.clear()
                     continue
 
                 c = page.evaluate("() => window.__character()")
@@ -378,10 +385,20 @@ def main():
                 have_witch = "The Witch's Key" in keys
 
                 want = None
-                if door and have_deep:
+                if world["id"] != "west-bambulon":
+                    # **In the cave, and the way out is a target too.** The
+                    # boss while it is standing; the gate once the key is in
+                    # hand, because what the key opens is on the other map and
+                    # `toward` paths one map at a time. Without this the walker
+                    # beat the boss, took the key, and wandered a nine-by-five
+                    # room for the rest of the run — which is what the M8.8
+                    # transcript ends on and what this one nearly repeated.
+                    if have_deep and gate:
+                        want, why = gate["at"], "out"
+                    elif boss or gate:
+                        want, why = (boss or gate)["at"], "boss"
+                elif door and have_deep:
                     want, why = door["at"], "door"
-                elif world["id"] != "west-bambulon":
-                    want, why = ((boss or gate)["at"], "boss") if (boss or gate) else (None, "")
                 elif have_witch and c["level"] >= 9 and gate:
                     # **No tiredness gate on setting out.** The Cave's mouth is
                     # thirty tiles from the only town and there are fights on
@@ -472,6 +489,22 @@ def main():
                 page.keyboard.press(press)
                 if page.text_content("#walked") != before:
                     moved += 1
+                elif want is not None:
+                    # **A road that is shut is a road you stop walking at.**
+                    # M9.3 put two crossings on the map and this walker pressed
+                    # north into the first of them for nine thousand steps,
+                    # because `toward` paths over terrain and a crossing is not
+                    # terrain. A player reads the refusal and goes and fights
+                    # something; so does this now — the target is dropped and
+                    # the grind lane takes over until a level opens it.
+                    stuck[tuple(want)] = stuck.get(tuple(want), 0) + 1
+                    if stuck[tuple(want)] >= 3:
+                        say(f"  shut: {tuple(want)} is not reachable yet"
+                            f" — {page.text_content('#says') or 'no reason given'}")
+                        done_marks.add(tuple(want))
+                        done_marks.add(here)
+                        errand_turn += 1
+                        stuck.clear()
             else:
                 say("")
                 say(f"DID NOT REACH THE ENDING in {STEPS} steps. {panel(page)}")

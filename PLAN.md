@@ -972,6 +972,46 @@ design questions rather than defects, deferred *visibly* rather than forgotten.
    assumes a second overworld, a chapter count, or an ending beyond the one
    M8.7 writes.
 
+---
+
+### 6b. Left open by M9.4's playthrough
+
+The triage table is in the M9.4 commit. Blockers, Wrongs and cheap Roughs were
+fixed there. These are the **Later** rows.
+
+1. **`draw_enemy` weights the pit's hardest creature at one encounter in
+   ninety-seven, and that is now a content decision rather than a fights
+   decision.** The weighting is `(max + 1 − rating)`, so a pool of 16 / 80 / 95
+   deals 80 / 16 / **1**. That is right for fights — every region stays winnable
+   while still being able to frighten you — and it is wrong for *drops*, because
+   a set off the rarest creature is a set behind the rarest creature. M9.4
+   answered it with the rate, which is the knob that exists: the Wallspider
+   Weave drops at the 500‰ ceiling and still takes a mean of 242 wins in the
+   pit against the Mandate's 40. **The proper fix is the pool**, and it is one
+   of two decisions: put the Bone Archer in a second region as well, or floor
+   the draw weight so nothing in a pool is rarer than about one in eight. Both
+   move `the_map_has_a_difficulty_gradient` and the calibration walk, so both
+   want a person.
+2. **Auto-pack will never build a set, and that is probably correct.** A set
+   item is *only* the set, so it rates below the arrangement Auto-pack would
+   otherwise make — and the button is documented as not an optimiser and told
+   not to become one. M9.4 fixed the half that was a defect (nothing on any
+   screen said three components were three of a thing; a component's card names
+   its set now, and what the set does). What is left is a design question: is a
+   set something you give up a better glove for, or should the button know?
+   The first is more interesting and is what ships.
+3. **The demo now asks for level 9 before the Cave's mouth.** The crossings
+   gate the Verge at nine and West Bambulon is behind the Verge, so the Cave —
+   and therefore the door and the ending — sits behind a level the M9.4 walk
+   reached at about a hundred wins. That is a *deliberate* consequence of M9.3
+   and it reads as pacing rather than as a wall, but it is a number nobody has
+   argued about: 5 and 9 were the plan's proposal and are one line of data
+   each.
+4. **A rout has never been seen in play.** `Rule::Rout` works, is tested, and
+   needs the whole Rat King's Mandate on the board — which Auto-pack will not
+   do (row 2). The first person to seat it by hand is the first person to watch
+   an A. Rat give up.
+
 ## 7. What happens next
 
 On approval: M0, in the order — scaffold the workspace, capture the golden combat fixtures

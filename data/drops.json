@@ -1,15 +1,47 @@
 {
   "format": "gm2d-drops",
   "version": 1,
-  "_note": "What a creature leaves behind, by canonical name and in per-mille. The order matters: it is the order the stream is drawn in, so a seeded walk replays only while it holds. Every rate here is 50 - one win in twenty - which `a_set_is_a_few_hours_and_not_a_lifetime` walks and holds between fifteen and a hundred and twenty wins for a whole set. It is a starting point and it is meant to be argued with once somebody has played it.",
+  "_note": "What a creature leaves behind, by canonical name and in per-mille. The order matters: it is the order the stream is drawn in, so a seeded walk replays only while it holds. The rates are not the same because the pit does not deal its three creatures the same: `draw_enemy` weights a pool so its hardest member is its rarest, and in The End of All Gears that is eighty encounters in ninety-seven for an A. Rat, sixteen for a toad and ONE for a Wallspider Swarm. So the rate has to carry what the draw does not, and `a_set_is_a_few_hours_and_not_a_lifetime` measures what a player actually counts \u2014 wins in the region that holds the creature, drawn with the real weighting. Even at the ceiling the Wallspider Weave is the far end of the band; the pool weight is what would fix that properly and that is the human's call. See PLAN.md 6a.",
   "drops": [
-    { "creature": "Cave Rat", "piece": "Ratskin Material", "per_mille": 50 },
-    { "creature": "Cave Rat", "piece": "Ratskin Mold", "per_mille": 50 },
-    { "creature": "Cave Rat", "piece": "Rat Signet", "per_mille": 50 },
-    { "creature": "Bog Toad", "piece": "Toad Frame", "per_mille": 50 },
-    { "creature": "Bog Toad", "piece": "Toad Hide", "per_mille": 50 },
-    { "creature": "Bone Archer", "piece": "Bone Crown", "per_mille": 50 },
-    { "creature": "Bone Archer", "piece": "Bone Scale", "per_mille": 50 },
-    { "creature": "Bone Archer", "piece": "Bone Fletch", "per_mille": 50 }
+    {
+      "creature": "Cave Rat",
+      "piece": "Ratskin Material",
+      "per_mille": 50
+    },
+    {
+      "creature": "Cave Rat",
+      "piece": "Ratskin Mold",
+      "per_mille": 50
+    },
+    {
+      "creature": "Cave Rat",
+      "piece": "Rat Signet",
+      "per_mille": 50
+    },
+    {
+      "creature": "Bog Toad",
+      "piece": "Toad Frame",
+      "per_mille": 80
+    },
+    {
+      "creature": "Bog Toad",
+      "piece": "Toad Hide",
+      "per_mille": 80
+    },
+    {
+      "creature": "Bone Archer",
+      "piece": "Bone Crown",
+      "per_mille": 500
+    },
+    {
+      "creature": "Bone Archer",
+      "piece": "Bone Scale",
+      "per_mille": 500
+    },
+    {
+      "creature": "Bone Archer",
+      "piece": "Bone Fletch",
+      "per_mille": 500
+    }
   ]
 }

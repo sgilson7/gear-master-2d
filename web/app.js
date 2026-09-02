@@ -1186,10 +1186,16 @@ function paintLog() {
       : q.pinned ? 'pinned — click to unpin'
       : q.on_this_map ? 'pin it to the map'
       : 'not on this map';
+    // **Where it points, and whether you can get there.** Core's sentence. A
+    // log that pointed a level-one player north past a crossing and said
+    // nothing about it reads as a log that is wrong rather than a road that is
+    // shut — which is what the M9.4 playthrough did for nine thousand steps.
+    const shut = !done && q.shut ? `<span class="why">${q.shut}</span>` : '';
     b.innerHTML = `<b>${q.name}</b>` +
       `<span class="spec">${q.asks}</span>` +
       `<span class="flavour">${q.brief}</span>` +
       `<span class="meta">${q.where} · pays ${q.pays.join(', ')}</span>` +
+      shut +
       `<span class="cost">${foot}</span>`;
     // Hover, and the map answers — before anything is committed to. The pin is
     // what makes the answer outlive the screen.

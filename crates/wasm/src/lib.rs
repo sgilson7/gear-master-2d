@@ -1988,6 +1988,11 @@ pub fn quest_log_json() -> String {
                     // the cave whose errand is on the overworld should be told
                     // so rather than shown an empty map.
                     "on_this_map": on_this_map,
+                    // And whether a crossing stands between them and it. Core's
+                    // sentence: a log that points north at a level-one player
+                    // and says nothing is a log that is wrong rather than a
+                    // road that is shut.
+                    "shut": guide.shut,
                 })
             })
             .collect();

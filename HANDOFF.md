@@ -29,9 +29,11 @@ Break any of these and the failure is silent and expensive.
    two rulebooks. When you catch yourself writing an `if` in the shim, the rule
    belongs in core.
 3. **Content lives in `data/*.json`.** The map, events, the skill tree, town
-   shelves, errands, supplies. Two inherited exceptions: the component catalogue
-   is `piece.rs` and the theme tables are `theme.rs` (mirrored into
+   shelves, errands, supplies, drops. Two inherited exceptions: the component
+   catalogue is `piece.rs` and the theme tables are `theme.rs` (mirrored into
    `data/theme.*.json`, which is *generated* — `REBASELINE_THEME_DATA=1`).
+   `data::FILES` is the list of what is compiled in, and adding a file means
+   adding it there too — `data_is_current` walked four of eleven until M9.1.
 4. **Adding a field to `Character` or `Game` is a compile error until the save
    carries it.** `SaveFile::of` and `into_game` destructure exhaustively. **Do
    not "fix" a destructure by adding `..`** — that hole is the whole point.
@@ -44,14 +46,16 @@ Break any of these and the failure is silent and expensive.
 ## 3. The shape of the code
 
 ```
-crates/core/           the engine — no graphics, no wasm, ~33k lines
-  piece.rs             the component catalogue (536) + Trigger/Action + describe
+crates/core/           the engine — no graphics, no wasm, ~40k lines
+  piece.rs             the component catalogue (544) + Trigger/Action + describe
   loadout.rs           grids, items, recipes, the assembly pipeline
   combat.rs            the fight. No RNG. 50ms ticks. `simulate_*` ladder
   character.rs         the player: boards, xp, fatigue, supplies, skills, class
   world.rs             maps, terrain, regions, places, stepping
   quest.rs             errands: give / carry / hand in
   skills.rs            the tree, and `Effect` — what a node does
+  rule.rs              `Rule` — what a node *or an item* grants that is not a number
+  drops.rs             what a creature leaves behind, and how often
   explain.rs           what one component does, in the engine's own words
   fatigue.rs           what a fight costs beyond the fight, + restoratives
   shop.rs              town shelves, which are content and not state
@@ -74,6 +78,7 @@ make test        # the engine suite, native, seconds
 make check       # fast type-check
 make web         # build dist/web/
 make test-ui     # walk the gate in chromium, firefox and webkit
+make play        # play a new game to the ending and read every screen
 make serve       # build and open locally
 make art         # compile art/*.tex to web/assets/*.svg
 ```
@@ -85,7 +90,7 @@ fighting differently:
 REBASELINE_GOLDEN_COMBAT=1 cargo test -p gm2d-core
 ```
 
-## 5. Six traps, each of which has already cost a day
+## 5. Seven traps, each of which has already cost a day
 
 1. **`Loadout::locks` is state, not geometry.** Two components that touch are
    one item unless a lock says otherwise, and which locks exist depends on the
@@ -107,6 +112,11 @@ REBASELINE_GOLDEN_COMBAT=1 cargo test -p gm2d-core
    giving item cards the same class made each one a full-viewport overlay;
    `id="pack"` is the town's button and giving the restorative rack the same id
    hung the browser walk on a hidden element.
+7. **A set bonus pays off the whole set, and `loadout::set_of` is the one place
+   that decides.** Agreement *and* completeness — every component names the same
+   set, and every component that names it is in the item. Agreement alone lets
+   two thirds of a three-piece set call itself whole, because most recipes have
+   an optional slot; completeness alone lets a stranger in.
 
 ## 6. How the game plays, as of now
 
@@ -128,6 +138,14 @@ REBASELINE_GOLDEN_COMBAT=1 cargo test -p gm2d-core
   gate that wants Marbulon's key. Its boss drops the key to **a door in the
   western wall**, which is not there until the boss is down and is where the
   demo ends.
+- **The north is gated.** Two crossings: the Burnwarp Shallows want level 5 and
+  the Bengulon Verge wants 9, and West Bambulon — and therefore the Cave — is
+  behind the Verge. A crossing guards a *region*, not its own tile.
+- **Every creature in the pit drops pieces of a set**, at 50 / 80 / 500
+  per-mille. Three sets, each one grid's whole recipe; assembled, and made of
+  nothing but themselves, they grant a rule no stat could express: an A. Rat
+  gives up without a fight, the lake's rim becomes ground, or every helmet
+  activation lands a curse.
 - **A class is one of four**, taken at level five and permanent. The Kaklon
   Patent is the one that can bolt **enchs** onto components — a rack on the
   packing screen, one ench a component, and one of them turns the item it is on
@@ -162,58 +180,45 @@ REBASELINE_GOLDEN_COMBAT=1 cargo test -p gm2d-core
 
 ## 9. What is being built next
 
-**`PLAN-M9.md`, five milestones**, each deployable on its own. Start at
-**M9.0**, which is the only one with no content in it: a rule that an assembled
-*item* grants rather than the skill tree, and an item that has the name somebody
-wrote rather than a generated one. Everything after it is small because of it.
+**Nothing is planned.** `PLAN-M9.md` is done — five milestones, committed and
+green, and **not pushed**. `git log origin/main..HEAD` is the check, and see
+*A deployed fix is not a delivered fix* in `CLAUDE.md` before you deploy: M8.0
+through M8.8 sat local for a whole block once, and the first anybody knew was
+the human saying they could not see the quest log.
 
-The block in one line: **every creature in the pit drops pieces of a set, and a
-set does something no stat can.** An A. Rat's three pieces make the Rat King's
-Mandate, which routs rats without a fight; a Bengulon Jungle Toad's two make a
-hide that lets you wade one tile into the lake.
+### The two lists of what to do next, in order of how much they are worth
 
-### Four things to read before you start on it
+- **`PLAN.md` §6b** — what M9.4's playthrough left open. The one that matters is
+  row 1: `draw_enemy` weights a pool so its hardest member is its rarest, which
+  is right for fights and is now also a *content* decision, because a set off
+  the rarest creature is a set behind the rarest creature. M9.4 answered it with
+  the drop rate, which is the knob that exists; the pool is the proper fix and
+  it is a person's.
+- **`PLAN.md` §6a** — M8.8's, and still the best list of what this game gets
+  wrong. Row 1 is a second town, and it answers three of the other rows for
+  nothing.
 
-1. **Most of it already exists, and not where you would look.**
-   `AssemblyBonus` carries a `Stats` lump *and* `&[Trigger]`, and only pays
-   while the item is assembled — so a set bonus that is *combat* behaviour costs
-   no new combat code at all. What does not exist is a set bonus that is **not**
-   combat: routing a creature happens before a fight and wading happens on a
-   step, and neither is a `Trigger`.
-2. **`Effect::Grants { rule: Rule }` is the door those go through.** It was
-   built in M8.3 and is currently granted only by the tree. M9.0 widens it to
-   items and moves `Rule` into its own module, because it stops being the
-   tree's. **The enum and the exhaustive match are the whole guard** — this
-   project has shipped eight nodes that cost a point and did nothing, and that
-   is what the match, `deny_unknown_fields` and `Rule::check` are all for.
-3. **A map does not know about bags**, and M9.0 must not be the change that
-   makes it. `world::step` takes `&mut WorldState`, not the character; wading
-   goes in as a small `Allowances` the caller fills. That is the same division
-   a gate's key and a door's already make, and it is the reason `map()` takes
-   the game rather than reaching for it — trap 4.
-4. **Adding to `CATALOG` moves the save fingerprint.** M9.2 adds eight
-   components and every save written before it is refused, with a sentence
-   naming both catalogues. That is the design; say so in the commit.
+### Four things M9 established, so you do not re-derive them
 
-### Two facts recon established, so you do not re-measure them
-
-- **Lord Drabley Henpeck is not in the first area.** He is `The Hollow King`
-  and lives in rows 1–3. `draw_enemy` picks strictly from a region's own pool,
-  so the pit can only ever deal A. Rat (16), Bengulon Jungle Toad (80) and
-  Wallspider Swarm (95). "Remove the harder ones" is about the *map* — nothing
-  stops a level-one walking fifteen tiles north — and it is M9.3, a crossing.
-- **"A depth of 1" means a water tile that touches land**, confirmed with the
-  human. On this map that is 14 of the lake's 28 tiles: row 9 becomes crossable
-  end to end and the middle 14 stay shut. No new terrain, no repaint.
+1. **`Rule` is `crates/core/src/rule.rs` and two systems grant one** — the skill
+   tree and an assembled item. The enum, `deny_unknown_fields` and `Rule::check`
+   are the whole guard, and every match on it is exhaustive on purpose.
+2. **A set is the set or it is gear.** `loadout::set_of` is the one answer, and
+   both the item's name and the rules it grants read it. Agreement *and*
+   completeness: every component names the same set, and every component that
+   names the set is present.
+3. **A map does not know about bags or about levels.** `world::step` and
+   `World::repair` take a `world::Allowances` the caller fills. `Allowances::of`
+   matches `Rule` exhaustively.
+4. **`make play` reaches the ending** — 1,434 steps. When it stops reaching it,
+   read the transcript before reading the code: twice now the walker was the
+   thing that was wrong and both times it was wrong the way a new player would
+   be.
 
 ### What is not scheduled, and is still the human's
 
 - **What is past the door.** `PLAN-M8.md` §5.6. Nothing in the code assumes a
   second overworld, a chapter count, or an ending beyond the one M8.7 writes.
 - **A second town.** Kettleworks and High Wick are written, shelved, given
-  errands and on no map. The pit's eleven-line shelf is the whole economy, it
-  sells each line once, and the M8.8 playthrough ended holding 11,857 Fnorp
-  with nothing to spend it on. `PLAN.md` §6a, row 1.
-- The other five rows of `PLAN.md` §6a, which are the M8.8 playthrough's
-  deferred findings and are the best list of what this game currently gets
-  wrong.
+  errands and on no map. The pit's eleven-line shelf is the whole economy and it
+  sells each line once. `PLAN.md` §6a, row 1.

@@ -58,6 +58,7 @@ fn item(name: &str, slot: SlotKind, cooldown_ms: u32) -> ItemProfile {
         open_cells: 0,
         turn_cycle: Vec::new(),
         spins: false,
+        fragile: false,
         attracts_curses: false,
         steady: false,
         overtakes: false,

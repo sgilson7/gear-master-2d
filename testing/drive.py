@@ -1542,6 +1542,104 @@ def check_the_van_appears_at_a_level(page, name, fails):
         page.wait_for_selector("#vendor", state="hidden", timeout=5000)
 
 
+def check_a_broken_item_reads(page, name, fails):
+    """An item fires once, stops, and the screen says which one.
+
+    A bar that stops with nothing said about it reads as a bug in the playback
+    rather than as the thing the player bought — the same reason `Event::Stunned`
+    was given a variant of its own. The engine's half is `tests/breaking.rs`.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+
+    def swinging(body):
+        strip_the_boards(body)
+        body["character"]["class"] = "Recycler"
+        body["character"]["enchs_owned"] = ["the-chonga-swing"]
+        body["character"]["skills_taken"] = []
+
+    plant(page, base, swinging, stem="swing-probe")
+    page.evaluate("() => document.getElementById('map').focus()")
+    town = page.evaluate("""() => (window.__world().places ?? []).find(p => p.kind === 'town')""")
+    page.evaluate("(at) => window.__standAt(at)", [town["at"][0] + 1, town["at"][1]])
+    page.keyboard.press("ArrowLeft")
+    page.wait_for_timeout(300)
+    if not page.is_visible("#town"):
+        fails.append(f"{name}: could not reach a town to pack in")
+        return
+    page.click("#pack")
+    page.wait_for_selector("#fight", state="visible", timeout=8000)
+    page.click("#preset")
+    page.wait_for_timeout(150)
+    # Bolt it onto a component of an assembled item, so there is something to
+    # break.
+    got = page.evaluate("""() => {
+      const b = window.__board;
+      const loose = document.querySelector('#rack-loose .wares[data-ench="the-chonga-swing"]');
+      if (!loose) return { none: 'not in the rack' };
+      loose.click();
+      for (const s of b.state.slots) {
+        const item = s.items.find(i => i.assembled);
+        if (!item) continue;
+        const p = s.placed.find(p => item.pieces.includes(p.id));
+        if (p) return { ok: b.onclaim(p.id), item: item.name };
+      }
+      return { none: 'nothing assembled to bolt it to' };
+    }""")
+    if got.get("none") or not got.get("ok"):
+        fails.append(f"{name}: could not bolt the swing on: {got}")
+        close_fight(page)
+        return
+    on = page.evaluate("() => JSON.parse(window.__rack()).on.map(e => e.id)")
+    if "the-chonga-swing" not in on:
+        fails.append(f"{name}: the bolt reported success and the rack disagrees: {on}")
+        close_fight(page)
+        return
+    close_fight(page)
+    if page.is_visible("#town"):
+        page.click("#leave")
+        page.wait_for_selector("#town", state="hidden", timeout=5000)
+
+    # **A fight long enough for the item to come round**, planted rather than
+    # walked into. A weapon's bar is two to four seconds and this character
+    # kills a rat in less than that — the first version of this check walked
+    # into whatever the ground rolled and passed or failed on how much health
+    # the creature happened to have. Downloaded *after* the bolt, so the save
+    # carries it, and re-planted with something big standing in front of it.
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    armed = dl.value.path()
+
+    def in_a_long_fight(body):
+        body["encounter"] = {"enemy": "Rust Colossus", "at": body["world"]["at"]}
+
+    plant(page, armed, in_a_long_fight, stem="swing-fight")
+    page.wait_for_selector("#fight", state="visible", timeout=8000)
+    page.click("#go")
+    page.wait_for_selector("#stage-replay", state="visible", timeout=10000)
+    try:
+        broke = page.evaluate("""() => {
+          const log = JSON.parse(window.__fightJson());
+          const es = log.entries ?? [];
+          const e = es.find(x => x.kind === 'broke');
+          if (!e) return { kinds: [...new Set(es.map(x => x.kind))],
+                           fragile: (window.__character().rules ?? []).length };
+          return { item: e.item, side: e.side,
+                   fired: es.filter(x => x.kind === 'activate'
+                          && x.item && x.item.startsWith(e.item)).length };
+        }""")
+        if "item" not in broke:
+            fails.append(f"{name}: bolted the swing on and nothing ever broke: {broke}")
+        elif broke["fired"] > 1:
+            fails.append(f"{name}: {broke['item']} fired {broke['fired']} times and broke once")
+    finally:
+        page.click("#skip")
+        page.wait_for_selector("#stage-result", state="visible", timeout=20000)
+        page.click("#done")
+        page.wait_for_selector("#fight", state="hidden", timeout=8000)
+
+
 def check_an_ench_you_cannot_use_is_still_shown(page, name, fails):
     """An errand pays an ench to everybody, so everybody has to be able to see it.
 
@@ -2668,6 +2766,7 @@ def walk_the_gate(browser, name, fails=None):
 
     # --- where an ench comes from --------------------------------------------
     check_the_van_appears_at_a_level(page, name, fails)
+    check_a_broken_item_reads(page, name, fails)
 
     # --- scouting ------------------------------------------------------------
     check_scouting_is_earned(page, name, fails)
@@ -2754,6 +2853,7 @@ def main():
     print("ok: the north is shut to a level-one character, and says what the road wants")
     print("ok: an ench you were paid and cannot use yet is on the rack, and says why")
     print("ok: no town sells an ench, and the van on the Verge road is not there until level ten")
+    print("ok: an item with the swing on it fires once, breaks, and the replay says which")
     print("ok: the class fork opens on top of the town it is offered in")
     print("ok: your own figure becomes your class's when you take one")
     print("ok: a mid-fight save reopens the same fight")

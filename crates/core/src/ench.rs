@@ -66,6 +66,19 @@ pub enum Effect {
     /// turns and never stacks. That is not a limitation being worked around;
     /// it is the trade, and it is why the spin costs cells rather than Fnorp.
     Spin,
+    /// The item multiplies its own damage by this much more — and fires **once**.
+    ///
+    /// One effect and not `Power` plus a separate `Fragile`, because the two
+    /// halves are one bargain. An ench that granted the power without the cost
+    /// would be strictly better than everything else on the table, and two
+    /// effects that could be attached separately would let somebody have
+    /// exactly that.
+    ///
+    /// **For the fight, not for good.** `RunningItem` is rebuilt at every bell
+    /// and this rides on it, so the item is whole again next time. A component
+    /// destroyed permanently would be the fight writing to the character, and a
+    /// mid-fight save carries a creature name and a tile because it does not.
+    Fragile { pct: i32 },
 }
 
 impl Effect {
@@ -84,6 +97,11 @@ impl Effect {
                  +{}% power a turn, spent when it goes off",
                 crate::combat::SPIN_PCT_PER_TURN,
             ),
+            // Both halves and both numbers. A spec that named the power and
+            // not the cost would be the half of this that sells it.
+            Effect::Fragile { pct } => format!(
+                "+{pct}% power to the item this is on, and it breaks after 1 activation"
+            ),
         }
     }
 
@@ -100,6 +118,11 @@ impl Effect {
             Effect::Spin => "It turns in place, so it needs the room to: an item packed \
                  flush against its neighbours has nowhere to go and never turns. A slow \
                  item stacks more and fires less, which is the whole of the trade."
+                .into(),
+            Effect::Fragile { .. } => "It fires once and then its bar stops for the rest \
+                 of the fight — the activation that breaks it pays in full, and nothing \
+                 after it does. Whole again at the next bell. Everything else on the board \
+                 plays on, so what this is worth is what one enormous activation is worth."
                 .into(),
         }
     }
@@ -119,6 +142,10 @@ impl Effect {
             // Whether it *can* turn is the board's answer and is already on
             // the profile; this only says that it would like to.
             Effect::Spin => p.spins = true,
+            Effect::Fragile { pct } => {
+                p.power += pct;
+                p.fragile = true;
+            }
         }
     }
 }

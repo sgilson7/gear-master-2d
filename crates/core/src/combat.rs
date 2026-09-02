@@ -2989,6 +2989,21 @@ pub struct RunningItem {
     /// the board leaves it anywhere to turn. An item boxed in does not spin,
     /// which is the trade rather than an oversight.
     pub spins: bool,
+    /// This item fires once and is finished.
+    pub fragile: bool,
+    /// And it has. Its bar does not advance, it does not turn, and it does not
+    /// fire again this fight.
+    ///
+    /// **Its own field rather than `stun_ms = u32::MAX`.** A stun is a curse
+    /// somebody put on you — it is aimed, it is resisted, it is counted by
+    /// `StunAim`, and it ends. This is a property of the gear, and folding the
+    /// two together would have made every question about stuns answer wrongly
+    /// about a broken item.
+    ///
+    /// **And not `has_fired`**, which already exists and is Overtake's: that
+    /// one asks *was this the first?* and this asks *is it finished?* One flag
+    /// answering two questions is how the next person gets it wrong.
+    pub broken: bool,
     /// Turns banked and not yet spent. Cleared the moment the item activates.
     pub spin_stacks: u32,
     /// Where in its turn cycle it currently stands.
@@ -3055,6 +3070,8 @@ impl RunningItem {
             steady: p.steady,
             overtakes: p.overtakes,
             has_fired: false,
+            fragile: p.fragile,
+            broken: false,
             unshakable: false,
             cooldown_ms: p.cooldown_ms,
             progress_ms: 0,
@@ -3106,6 +3123,10 @@ impl RunningItem {
             // Overtake is a glove's, and a creature wears no gloves.
             overtakes: false,
             has_fired: false,
+            // A creature's own teeth do not break. An ench is bolted to a
+            // component and a bite stands on none.
+            fragile: false,
+            broken: false,
             unshakable: false,
             spins: false,
             spin_stacks: 0,
@@ -3866,6 +3887,13 @@ pub enum Event {
     /// `stacks` is the count *after* this one landed, so the interface can
     /// say "curse of searing x3" without keeping its own tally.
     Cursed { on: Side, kind: CurseKind, duration_ms: u32, stacks: u32 },
+    /// An item fired for the last time and stopped.
+    ///
+    /// Its own event for the reason `Stunned` is one: the interface needs to
+    /// know *which* item, because a bar that stops with nothing said about it
+    /// reads as a bug in the playback rather than as the thing the player
+    /// bought. `index` is that item's position in its owner's list.
+    Broke { side: Side, index: usize, item: String },
     /// A stun stopped one item. Its own event rather than a `Cursed`, because
     /// a stun rides on an item and the interface needs to know which one:
     /// `index` is that item's position in its owner's list, and `duration_ms`
@@ -4042,6 +4070,9 @@ impl CombatLog {
         match &e.event {
             Event::Activate { side, item, .. } => {
                 format!("{} {} activates {}", t, self.who(*side), item)
+            }
+            Event::Broke { side, item, .. } => {
+                format!("{} {}'s {} comes apart and stops", t, self.who(*side), item)
             }
             Event::Grew { side, amount, total, paid_armor } if *paid_armor > 0 => format!(
                 "{} {} beds {} of its armour down into {} more to lose ({} max health)",
@@ -4713,11 +4744,14 @@ pub fn simulate_party_holding(
                     // it: a node is taken by a person, not by a blade.
                     let (spin_extra, spin_every) = (c.spin_extra, c.spin_every_ms.max(TICK_MS));
                     let item = &mut c.items[idx];
-                    // A stun stops this item's bar dead. Not a slow: it does
-                    // not advance at all, and what was part-way through stays
-                    // part-way through, so it resumes rather than starting
-                    // over. Only this item - the rest of the kit plays on.
-                    if item.stun_ms > 0 {
+                    // **Broken is finished.** Beside the stun rather than
+                    // folded into it: a stun is a curse somebody put on you and
+                    // ends, and this is the gear. Nothing else about the item
+                    // moves either — a broken bar does not turn, for the same
+                    // reason a stopped one does not.
+                    if item.broken {
+                        (false, None)
+                    } else if item.stun_ms > 0 {
                         item.stun_ms = item.stun_ms.saturating_sub(TICK_MS);
                         // A stopped bar does not turn either. The spin rides
                         // the item's own clock, and a stunned item's clock is
@@ -5078,9 +5112,21 @@ fn land_stun(victim: &mut Combatant, aim: StunAim, at_ms: u32) -> Option<(usize,
         StunAim::Strongest => takers
             .iter()
             .copied()
-            // Among equals take the one still running: stunning what is
-            // already stopped is the one outcome an aimed stun must not have.
-            .max_by_key(|&i| (victim.items[i].rating, victim.items[i].stun_ms == 0))?,
+            // **Never a broken one, whatever it is rated.** Being stopped
+            // breaks a tie between equals — a stun on a stopped item is a
+            // curse wasted for a second — but a stun on a *broken* item is a
+            // curse wasted for the whole fight, which is not a tie-break, it is
+            // a waste. So it sorts ahead of the rating rather than behind it,
+            // and a board of nothing but broken items still takes one
+            // somewhere.
+            //
+            // This cannot move a fight that existed before M10.1: nothing was
+            // ever `broken`, so the first key was constant and the order is the
+            // one it always was.
+            .max_by_key(|&i| {
+                let it = &victim.items[i];
+                (!it.broken, it.rating, it.stun_ms == 0)
+            })?,
         StunAim::Unaimed => {
             let n = takers.len();
             // A cheap integer hash of the fight's own state. Time alone
@@ -5093,7 +5139,10 @@ fn land_stun(victim: &mut Combatant, aim: StunAim, at_ms: u32) -> Option<(usize,
             // falling back to the original pick if every one of them is.
             takers[(0..n)
                 .map(|k| (start + k) % n)
-                .find(|&i| victim.items[takers[i]].stun_ms == 0)
+                .find(|&i| {
+                    let it = &victim.items[takers[i]];
+                    it.stun_ms == 0 && !it.broken
+                })
                 .unwrap_or(start)]
         }
     };
@@ -5718,6 +5767,27 @@ fn activate(
     notify_reactors(p, foes, me, idx, t, log);
     // And the other side, which nothing answered until the feet learned to.
     notify_opponents(p, foes, me, t, log);
+
+    // **And it breaks here, at the end.** After everything the activation pays,
+    // which is the whole bargain: the swing that finishes the item lands in
+    // full, and nothing after it does. Before the payout it would be an ench
+    // that triples an item's power and never lets it use any of it.
+    //
+    // Overtake runs the whole activation twice and sets `has_fired` at the top,
+    // so a fragile item that also overtakes gets both runs and then stops —
+    // which is two items' worth of trade bought with two enchs, and correct.
+    {
+        let it = &mut pick(p, foes, me).items[idx];
+        if it.fragile && !it.broken {
+            it.broken = true;
+            let name = it.name.clone();
+            log.push(LogEntry {
+                who,
+                at_ms: t,
+                event: Event::Broke { side, index: idx, item: name },
+            });
+        }
+    }
 
     overtakes
 }

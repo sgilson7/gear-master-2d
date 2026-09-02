@@ -1409,6 +1409,23 @@ pub fn fight_json() -> String {
                     Event::Spun { side, index, item, stacks, .. } =>
                         ("spun", *side, item.clone(), *index as i64, *stacks as i64),
                     Event::Misfired { side, item } => ("misfire", *side, item.clone(), -1, 0),
+                    // **A chip with no clock on it.** Every other chip expires
+                    // and is pruned by the playback head; this one is the rest
+                    // of the fight, so it is given the fight's own end. A bar
+                    // that stops with nothing said about it reads as a bug in
+                    // the playback rather than as the thing the player bought.
+                    Event::Broke { side, index, item } => {
+                        let chips = if *side == Side::Player { &mut pchips } else { &mut echips };
+                        chips.retain(|c| !(c["kind"] == "broke" && c["item"] == *item));
+                        chips.push(chip(
+                            "broke",
+                            1,
+                            u32::MAX,
+                            "spent".into(),
+                            item.clone(),
+                        ));
+                        ("broke", *side, item.clone(), *index as i64, 0)
+                    }
                     Event::Stunned { on, index, item, duration_ms, .. } => {
                         let chips = if *on == Side::Player { &mut pchips } else { &mut echips };
                         // A stun rides on one item, so the chip names it — two

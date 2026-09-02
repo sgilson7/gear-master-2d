@@ -1,7 +1,7 @@
 {
   "format": "gm2d-enchs",
   "version": 1,
-  "_note": "Enchs. Not enchantments — `PieceKind::Enchantment` is thirteen catalogue pieces laid under the grid, and this is the other thing, which is the book's own word for it (the ench economy, p. 119). An ench has no shape and goes on no grid: it bolts to a component you already own, and it comes off. Everything one does is a number the engine already had, so nothing here retunes combat.",
+  "_note": "Enchs. Not enchantments \u2014 `PieceKind::Enchantment` is thirteen catalogue pieces laid under the grid, and this is the other thing, which is the book's own word for it (the ench economy, p. 119). An ench has no shape and goes on no grid: it bolts to a component you already own, and it comes off. Everything one does is a number the engine already had, so nothing here retunes combat.",
   "enchs": [
     {
       "id": "plug-energy-tap",
@@ -50,6 +50,17 @@
       "effect": {
         "power": {
           "pct": 60
+        }
+      }
+    },
+    {
+      "id": "the-chonga-swing",
+      "name": "The Chonga Swing",
+      "blurb": "Jimmy Chonga hit one thing with it, in the ninth, and the bat did not come back down in one piece. There are four of these and Kaklon's people have written NOT A BAT on all four. It is a bat.",
+      "price": 140,
+      "effect": {
+        "fragile": {
+          "pct": 200
         }
       }
     }

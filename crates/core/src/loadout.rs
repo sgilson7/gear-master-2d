@@ -61,6 +61,15 @@ pub struct ItemProfile {
     /// cycle is what the *board* allows and this is what the *character* has
     /// bolted on.
     pub spins: bool,
+    /// This item fires once and is finished.
+    ///
+    /// Set from an ench, exactly the way `spins` is. **For the fight**, and not
+    /// for good: `RunningItem` is rebuilt at every bell, so the item is whole
+    /// again next time. A component destroyed permanently would be the fight
+    /// writing to the character, and combat is a pure function of the board —
+    /// which is what a mid-fight save carrying a creature name and a tile rests
+    /// on.
+    pub fragile: bool,
     /// **Overtake**: the first time this item fires in a fight, it fires
     /// again immediately. Read off the pieces here so combat does not have to
     /// walk a registry it does not have.
@@ -1184,6 +1193,11 @@ impl Loadout {
                     &item.pieces.iter().flat_map(|&p| slot.cells_of(p)).collect::<Vec<_>>(),
                 ),
                 spins: false,
+                // Both of these are an ench's to switch on, and the loadout
+                // does not know about enchs — `ench::apply` runs over these
+                // profiles afterwards, because a profile is the board's answer
+                // and an ench is the character's.
+                fragile: false,
                 attracts_curses,
                 steady: item
                     .pieces

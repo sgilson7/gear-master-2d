@@ -29,6 +29,9 @@ const CURSE_COLOUR = {
   frost: '#5aa8d8',
   stun: '#9b7ad0',
   misfire: '#c8a33f',
+  // Not a curse. An item that fired once and is finished — the rust the page
+  // uses everywhere else for a thing that has gone wrong for you.
+  broke: '#8b4225',
 };
 
 export class Replay {
@@ -299,8 +302,14 @@ export class Replay {
       let x = 0;
       for (const c of live) {
         const left = ((c.until - this.t) / 1000).toFixed(1);
-        const text = `${c.kind}${c.stacks > 1 ? ` ×${c.stacks}` : ''}` +
-                     `${c.effect ? ` ${c.effect}` : ''} · ${left}s`;
+        // **A break has no clock.** Every other chip counts down and is pruned
+        // when the head passes it; this one is the rest of the fight, so it
+        // says which item rather than how long — a bare countdown of forever
+        // would be a number that means nothing.
+        const text = c.kind === 'broke'
+          ? `${c.item} ${c.effect}`
+          : `${c.kind}${c.stacks > 1 ? ` ×${c.stacks}` : ''}` +
+            `${c.effect ? ` ${c.effect}` : ''} · ${left}s`;
         const w = g.measureText(text).width + 16;
         g.fillStyle = CURSE_COLOUR[c.kind] ?? ink3;
         g.fillRect(x, y - 11, w, 15);

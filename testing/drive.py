@@ -774,13 +774,27 @@ def plant(page, base_path, edit, stem="probe"):
     The pattern the gate check invented and this file now shares: walking to a
     particular state costs twenty minutes of fighting, and what wants proving
     is what happens *at* that state rather than the road to it.
+
+    **Waits for the load rather than sleeping through it.** The page's file
+    handler is `async` — it awaits `arrayBuffer()` — so four hundred
+    milliseconds is a guess, and a guess that is wrong reads every assertion
+    after it against the *previous* game. It says `Loaded <name>.` when it is
+    done, so that is what this waits for.
     """
     save = json.loads(Path(base_path).read_text())
     edit(save.get("state", save))
     out = Path(base_path).parent / f"{stem}.json"
     out.write_text(json.dumps(save))
     page.set_input_files("#file", str(out))
-    page.wait_for_timeout(400)
+    try:
+        page.wait_for_function(
+            "name => (document.getElementById('says').textContent || '')"
+            ".includes('Loaded ' + name)",
+            arg=out.name, timeout=8000)
+    except Exception:
+        # Older callers plant files whose load says something else; the sleep is
+        # what they always had.
+        page.wait_for_timeout(400)
 
 
 def check_an_errand_can_be_handed_in_where_it_was_taken(page, name, fails):
@@ -1281,25 +1295,42 @@ def spin_gestures(page, name, fails):
         fails.append(f"{name}: the card does not say the item turns: {said!r}")
 
 
+def strip_the_boards(body):
+    """Take everything off all five grids, and the locks with them.
+
+    **All five, not the one being planted on.** These checks run late in the
+    walk on a character who has fought fifty times, and since M9 a character who
+    has fought can have *earned* a set — the drops are the block's whole point.
+    So a plant that cleared only its own grid was asking `Character::rules` a
+    question about the board it had just made and getting an answer about the
+    board the walk had made, and CI caught exactly that: two thirds of the
+    Mandate "still granted a rule", which was the Toad's Own Frame sitting in a
+    chest nobody had looked at, and the lake let a dry character through for the
+    same reason.
+
+    A planted board check is about what was planted. This is what makes that
+    true.
+    """
+    for _, board in body["character"]["boards"]:
+        board["placed"] = []
+        board["enchanted"] = []
+    body["character"]["locks"] = []
+    body["character"]["enchanted"] = []
+    body.setdefault("world", {})["map"] = ""
+
+
 def seat_a_set(body, pieces, slot):
-    """Put a whole set on a grid, and give the grid room for it.
+    """Put a whole set on an otherwise empty board.
 
     `pieces` is `[(name, x, y)]`. The registry is written whole and in order,
     so a component appended to it is a `PieceId` at that index — which is what
     `owned` and every board placement are.
     """
+    strip_the_boards(body)
     reg = body["character"].setdefault("registry", [])
     owned = body["character"].setdefault("owned", [])
     board = next(b for b in body["character"]["boards"] if b[0] == slot)[1]
     board["rows"] = max(board.get("rows", 3), 3)
-    # **The grid is cleared first.** These run late in the walk, on a character
-    # that has been shopping, so a set dropped on top of whatever was already
-    # seated would touch it and stop being a set — which is the rule working
-    # and reads here as the rule broken. Locks go too: they are registry
-    # indices into a board that no longer holds those pieces.
-    board["placed"] = []
-    body["character"]["locks"] = []
-    body.setdefault("world", {})["map"] = ""
     for piece, x, y in pieces:
         reg.append({"def": piece, "rot": 0})
         owned.append(len(reg) - 1)
@@ -1391,8 +1422,10 @@ def check_the_toad_walks_on_water(page, name, fails):
     base = dl.value.path()
 
     def dry(body):
+        # **Wearing nothing**, or the character the walk built may already have
+        # earned the very set this half is proving they do not have.
+        strip_the_boards(body)
         body.setdefault("world", {})["at"] = [7, 8]
-        body["world"]["map"] = ""
 
     def wet(body):
         dry(body)
@@ -2308,6 +2341,17 @@ def walk_the_gate(browser, name, fails=None):
     # only place it can be checked is a browser that has actually got there.
     # There is no fast-forward, deliberately — a debug hook that skipped four
     # levels would be a cheat in shipped code, and the first thing to rot.
+    #
+    # **It has to go home, and it did not.** `PATROL` is six east and six west,
+    # and a blocked press does not move — so from the town's own tile the
+    # westward half is spent against the map's edge and the walk drifts east a
+    # tile at a time until it is fifteen from home and can never find it again.
+    # A fight used to level you on the spot, so that cost nothing; a town is the
+    # only place experience becomes a level now, and the instrumented run that
+    # found this ended **carrying 1,115 experience at level 2** after 255
+    # fights. `head_for_town` is the fix, and it is the same fix the levelling
+    # loop above already had — the note on it says so in as many words. This
+    # failed a deploy before it was found.
     for i in range(900):
         if page.is_visible("#fork"):
             break
@@ -2322,7 +2366,9 @@ def walk_the_gate(browser, name, fails=None):
             continue
         if leave_town(page) or dismiss_card(page):
             continue
-        page.keyboard.press(PATROL[i % len(PATROL)])
+        carrying = page.evaluate("() => window.__character().carried")
+        home = head_for_town(page) if carrying >= 15 else None
+        page.keyboard.press(home or PATROL[i % len(PATROL)])
 
     if not page.is_visible("#fork"):
         fails.append(f"{name}: never reached the class fork "

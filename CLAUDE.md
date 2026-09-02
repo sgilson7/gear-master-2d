@@ -1321,8 +1321,38 @@ is:
 **A screen you cannot dismiss must be the top-most thing on the page.**
 `check_the_fork_is_on_top` is what stops a fourth.
 
-And one about the harness rather than the game: **a check that opens a screen
-has to close it on every path out.** A check that appended a failure and
+Three about the harness rather than the game, and the last two cost a deploy.
+
+**A planted board check has to strip every grid, not the one it plants on.**
+These run late in the walk on a character who has fought fifty times, and since
+M9 a character who has fought can have *earned* a set — the drops are the
+block's whole point. So `check_a_set_reads` asked `Character::rules` a question
+about the board it had just planted and got an answer about the board the walk
+had built: "two thirds of the set still grants 1 rule" was the Toad's Own Frame
+sitting in a chest nobody had looked at, and the lake let a dry character
+through for the same reason. Both were green on a laptop and red in CI, because
+what a walk earns depends on the seed. `strip_the_boards` is the fix and it is
+the rule: **a planted check is about what was planted.**
+
+**The fork grind never went home, and had not since M5.** `PATROL` is six east
+and six west, and a blocked press does not move — so from the town's own tile
+the westward half is spent against the map's edge and the walk drifts east a
+tile at a time until it is fifteen away and can never find the town again. A
+fight used to level you on the spot, so that cost nothing; a town has been the
+only place experience becomes a level since M8, and the instrumented run that
+found this ended **carrying 1,115 experience at level 2 after 255 fights**.
+`head_for_town` was written for exactly this and wired into one of the two
+loops. It reported as *"never reached the class fork (level 3)"*, which reads
+like a flake and is not one — the lesson is that **a gate failure that looks
+random is a gate failure nobody has instrumented yet.** Raising the press budget
+was the wrong first move and made it look worse.
+
+**`plant` waits for the load rather than sleeping through it.** The page's file
+handler is `async`; four hundred milliseconds is a guess, and a guess that is
+wrong reads every assertion after it against the previous game.
+
+And the old one: **a check that opens a screen has to close it on every path
+out.** A check that appended a failure and
 returned early left the screen up, the next check died on a click it could not
 land, and the whole failure list went unprinted — so the run reported a
 Playwright traceback and not the one sentence that said what was wrong.

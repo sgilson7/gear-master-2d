@@ -90,7 +90,7 @@ fighting differently:
 REBASELINE_GOLDEN_COMBAT=1 cargo test -p gm2d-core
 ```
 
-## 5. Seven traps, each of which has already cost a day
+## 5. Eight traps, each of which has already cost a day
 
 1. **`Loadout::locks` is state, not geometry.** Two components that touch are
    one item unless a lock says otherwise, and which locks exist depends on the
@@ -112,7 +112,13 @@ REBASELINE_GOLDEN_COMBAT=1 cargo test -p gm2d-core
    giving item cards the same class made each one a full-viewport overlay;
    `id="pack"` is the town's button and giving the restorative rack the same id
    hung the browser walk on a hidden element.
-7. **A set bonus pays off the whole set, and `loadout::set_of` is the one place
+7. **A planted browser check must strip every grid, not the one it plants on.**
+   The gate's plants run on a character who has fought fifty times, and since
+   M9 a character who has fought can have *earned* a set. A check that clears
+   only its own grid asks about the board it made and gets an answer about the
+   board the walk made — green on a laptop, red in CI, because what a walk
+   earns depends on the seed. `strip_the_boards` in `drive.py`.
+8. **A set bonus pays off the whole set, and `loadout::set_of` is the one place
    that decides.** Agreement *and* completeness — every component names the same
    set, and every component that names it is in the item. Agreement alone lets
    two thirds of a three-piece set call itself whole, because most recipes have

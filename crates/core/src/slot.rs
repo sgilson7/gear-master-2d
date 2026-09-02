@@ -326,6 +326,75 @@ impl Slot {
         out
     }
 
+    /// The orientations a set of cells can take **in place**, in order.
+    ///
+    /// # Why this is a board question and not a fight one
+    ///
+    /// Combat has no board. `ItemProfile` is a flat snapshot, which is exactly
+    /// why a mid-fight save carries a creature name and a tile and nothing
+    /// else — putting a live grid into the fight would undo the property the
+    /// whole save format rests on. So the *cycle* is worked out here, at pack
+    /// time, and the fight ticks through a list it was handed.
+    ///
+    /// # In place
+    ///
+    /// Anchored at the same top-left corner, because that is what "it turns
+    /// where it is" means. A quarter turn transposes the bounding box, so a
+    /// four-by-one lying along a row needs four rows under its own left edge
+    /// to stand up in — and **leaving room to turn costs you cells**, which is
+    /// a real packing decision of exactly the kind `PerAdjacentEmpty` already
+    /// trades in. The spin is not free power; it is power bought with space.
+    ///
+    /// # Deduplicated by the cells they produce
+    ///
+    /// A one-by-four turned twice lands on itself. That is not a second
+    /// orientation, it is the same one, and counting it would pay a stack for
+    /// a turn nobody can see. So the answer is *distinct arrangements*, and an
+    /// item that cannot move returns exactly one — which is precisely
+    /// "blocked, so it does not move".
+    ///
+    /// `own` is the item's own cells, which do not block it.
+    pub fn turn_cycle(&self, own: &[(u8, u8)]) -> Vec<Vec<(u8, u8)>> {
+        if own.is_empty() {
+            return Vec::new();
+        }
+        let x0 = own.iter().map(|c| c.0).min().unwrap_or(0);
+        let y0 = own.iter().map(|c| c.1).min().unwrap_or(0);
+        let mine: std::collections::BTreeSet<(u8, u8)> = own.iter().copied().collect();
+
+        let mut out: Vec<Vec<(u8, u8)>> = Vec::new();
+        let mut seen: Vec<std::collections::BTreeSet<(u8, u8)>> = Vec::new();
+        for turns in 0..4u8 {
+            let shape = crate::shape::Shape::new(
+                &own.iter()
+                    .map(|&(x, y)| ((x - x0) as i8, (y - y0) as i8))
+                    .collect::<Vec<_>>(),
+            )
+            .rotated(turns);
+            let cells: Vec<(u8, u8)> =
+                shape.cells().iter().map(|&(x, y)| (x0 + x as u8, y0 + y as u8)).collect();
+            // Off the grid, or standing on somebody else.
+            let fits = cells.iter().all(|&(x, y)| {
+                x < SLOT_W
+                    && y < self.rows
+                    // Its own cells never block it; anything else's do, gear
+                    // and the layer under the gear alike.
+                    && (mine.contains(&(x, y))
+                        || (self.get(x, y).is_none() && self.enchant_at(x, y).is_none()))
+            });
+            if !fits {
+                continue;
+            }
+            let set: std::collections::BTreeSet<(u8, u8)> = cells.iter().copied().collect();
+            if seen.contains(&set) {
+                continue;
+            }
+            seen.push(set);
+            out.push(cells);
+        }
+        out
+    }
+
     /// The four orthogonal neighbours of `(x, y)` that lie inside the grid.
     fn orthogonal(&self, x: u8, y: u8) -> Vec<(u8, u8)> {
         [(0i32, -1i32), (0, 1), (-1, 0), (1, 0)]

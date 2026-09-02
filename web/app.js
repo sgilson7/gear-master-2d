@@ -757,6 +757,18 @@ function oneCard(i, where) {
   }
   if (!active.length) active.push(`<li class="none">it holds its shape and nothing else</li>`);
 
+  // **The spin, and the line that tells a player to repack.** An item that
+  // cannot turn where it stands banks nothing at all, and the card is the only
+  // place that can say so — the board shows a footprint that never moves,
+  // which reads as a feature that is broken rather than as a board that is
+  // full.
+  if (i.spins) {
+    active.push(i.cycle > 1
+      ? `<li>turns every second — <b>+${(i.spin_pct / 100).toFixed(2)}×</b> power a turn, ` +
+        `spent when it goes off <span class="dim">(${i.cycle} ways round)</span></li>`
+      : `<li class="none">it would turn every second, and there is no room where it is</li>`);
+  }
+
   // **What it does to them.** A third half, and the one that was missing:
   // fifty-nine components in the catalogue apply a curse and this card had no
   // arm for one, so a Greave Mold's whole point never reached the screen that

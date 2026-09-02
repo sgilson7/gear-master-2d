@@ -18,6 +18,10 @@ const BAG_THUMB = 34;   // a bag thumbnail's box
 const BAG_COL = 190;    // one bag entry's width
 const BAG_ROW = 42;     // and its height
 const CELL = 34;
+/// One turn a second — `combat::SPIN_EVERY_MS`, and the one number this file
+/// keeps a copy of. It is the clock rather than a rule: nothing is decided
+/// from it, and the fight's own turns are read out of the log.
+const SPIN_MS = 1000;
 const GAP = 2;
 const PAD = 8;
 
@@ -378,6 +382,9 @@ export class Board {
     const g = this.c.getContext('2d');
     const C = this.chrome();
     const L = this.look;
+    // What the spin painted this frame, so the gate can compare it against the
+    // orientations core named rather than against a previous screenshot.
+    this.spun = [];
     g.clearRect(0, 0, this.c.width, this.c.height);
     // The grid colours were picked against a near-black panel, and read as
     // floating holes on anything else. The board brings its own ground.
@@ -477,6 +484,38 @@ export class Board {
         } else {
           this.edge(g, cells, origin, L.unassembled, L.unassembled_width, 1);
         }
+      }
+
+      // **The spin.** The footprint an item would be standing on if it turned
+      // now, drawn over where it is, once a second.
+      //
+      // The cells are core's — `Slot::turn_cycle` worked out which of the four
+      // orientations this arrangement can reach *in place*, and this only
+      // picks which entry of that list the clock is on. A page rotating a
+      // shape itself would be a second answer to "where does it fit", and it
+      // would disagree the first time something was packed against it.
+      //
+      // The components stay where they are, because they are where they are;
+      // what turns is the outline. Eased by fading the mark in over the first
+      // fifth of a second after each turn, so a change reads as a movement
+      // rather than as a jump.
+      for (const item of s.items) {
+        const cycle = item.turns ?? [];
+        if (!item.spins || cycle.length < 2) continue;
+        const ms = performance.now();
+        const which = Math.floor(ms / SPIN_MS) % cycle.length;
+        const into = (ms % SPIN_MS) / SPIN_MS;
+        const cells = cycle[which];
+        this.spun.push({ key: item.pieces.join(','), cells });
+        g.save();
+        g.globalAlpha = 0.30 + 0.35 * Math.min(1, into * 5);
+        g.fillStyle = '#57b3c8';
+        for (const [cx, cy] of cells) {
+          const [px, py] = origin(cx, cy);
+          g.fillRect(px, py, CELL, CELL);
+        }
+        g.restore();
+        this.edge(g, cells, origin, '#57b3c8', 2, 1);
       }
 
       // A ring round whatever the cursor is asking about, so the board and the

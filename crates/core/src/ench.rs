@@ -58,6 +58,14 @@ pub enum Effect {
     Power { pct: i32 },
     /// The item comes round this much more often, in percent.
     Haste { pct: i32 },
+    /// The item turns once a second where it stands, banking power as it goes,
+    /// and spends the lot the moment it activates.
+    ///
+    /// **Where it stands.** Rotation is decided on the board and banked in the
+    /// fight — see `Slot::turn_cycle` — so an item with no room to turn never
+    /// turns and never stacks. That is not a limitation being worked around;
+    /// it is the trade, and it is why the spin costs cells rather than Fnorp.
+    Spin,
 }
 
 impl Effect {
@@ -71,6 +79,11 @@ impl Effect {
             Effect::Haste { pct } => {
                 format!("the item this is on comes round {pct}% more often")
             }
+            Effect::Spin => format!(
+                "the item this is on turns once a second where it stands: \
+                 +{}% power a turn, spent when it goes off",
+                crate::combat::SPIN_PCT_PER_TURN,
+            ),
         }
     }
 
@@ -83,6 +96,10 @@ impl Effect {
             Effect::Haste { .. } => "Cadence is how long an item takes to come round. \
                  Faster is more activations in the same fight, and everything an item \
                  does, it does on its activation."
+                .into(),
+            Effect::Spin => "It turns in place, so it needs the room to: an item packed \
+                 flush against its neighbours has nowhere to go and never turns. A slow \
+                 item stacks more and fires less, which is the whole of the trade."
                 .into(),
         }
     }
@@ -99,6 +116,9 @@ impl Effect {
                 p.cooldown_ms =
                     ((p.cooldown_ms as i64 * 100 / faster as i64) as u32).max(crate::curse::TICK_MS);
             }
+            // Whether it *can* turn is the board's answer and is already on
+            // the profile; this only says that it would like to.
+            Effect::Spin => p.spins = true,
         }
     }
 }

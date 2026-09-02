@@ -781,6 +781,17 @@ fn item_card(
             "passive": passive,
             "active": active,
             "curses": curses,
+            // **The spin, and the sentence that tells a player to repack.**
+            // `cycle` is how many orientations this item can reach where it
+            // stands; one means it is boxed in, and a spinning item that
+            // cannot turn banks nothing at all. That is the trade, and it is
+            // the only place the card can say so.
+            "spins": profile.map(|p| p.spins).unwrap_or(false),
+            "cycle": profile.map(|p| p.turn_cycle.len()).unwrap_or(0),
+            "spin_pct": gm2d_core::combat::SPIN_PCT_PER_TURN,
+            // The orientations themselves, so the board can turn the footprint
+            // without working a rotation out for itself.
+            "turns": profile.map(|p| p.turn_cycle.clone()).unwrap_or_default(),
         })
 
 }
@@ -1287,6 +1298,10 @@ pub fn fight_json() -> String {
                         set_pool(*side, and.0, and.1);
                         ("fused", *side, (*what).to_string(), -1, *total as i64)
                     }
+                    Event::Turned { side, index, item, to, .. } =>
+                        ("turned", *side, item.clone(), *index as i64, *to as i64),
+                    Event::Spun { side, index, item, stacks, .. } =>
+                        ("spun", *side, item.clone(), *index as i64, *stacks as i64),
                     Event::Misfired { side, item } => ("misfire", *side, item.clone(), -1, 0),
                     Event::Stunned { on, index, item, duration_ms, .. } => {
                         let chips = if *on == Side::Player { &mut pchips } else { &mut echips };

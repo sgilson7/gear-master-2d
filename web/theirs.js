@@ -33,6 +33,11 @@ export class Theirs {
     /// `key -> [cells]` for anything currently going off, with how far through
     /// its shake it is. Set by whoever is driving; this file only draws it.
     this.shaking = [];
+    /// The footprint each spinning item is standing on right now. Set from
+    /// outside for the same reason the shake is: **which** orientation the
+    /// fight had at a given moment is read out of the log, and a painter that
+    /// worked it out from a clock would draw a shape the fight never had.
+    this.spinning = [];
     canvas.addEventListener('pointermove', (e) => this.point(e));
     canvas.addEventListener('pointerleave', () => this.point(null));
   }
@@ -104,6 +109,20 @@ export class Theirs {
           paintMotif(g, px, py, CELL, p.motif, p.ink, p.ink_alpha);
         }
       }
+      // The spin, over the components and under the item outline: what the
+      // item would be standing on if it turned now.
+      for (const sp of this.spinning) {
+        if (sp.slot !== s.slot) continue;
+        g.save();
+        g.globalAlpha = 0.42;
+        g.fillStyle = '#57b3c8';
+        for (const [cx, cy] of sp.cells) {
+          g.fillRect(box.x + cx * CELL, box.y + cy * CELL, CELL, CELL);
+        }
+        g.restore();
+        this.edge(sp.cells, box, '#57b3c8');
+      }
+
       // Each assembled item's outline, in the same white the player's board
       // uses for "this came together".
       for (const i of s.items) {

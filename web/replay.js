@@ -113,8 +113,17 @@ export class Replay {
       const acts = this.log.entries
         .filter((e) => e.kind === 'activate' && e.side === side && e.index === i)
         .map((e) => e.at);
+      // Every turn this item made, in order, so the board can be asked which
+      // orientation it was standing on at the head. **Read, never derived**:
+      // a frosted item turns slower for the same reason it fires slower, and
+      // dividing the playback head by a second would draw a shape the fight
+      // never had.
+      const turns = this.log.entries
+        .filter((e) => e.kind === 'turned' && e.side === side && e.index === i)
+        .map((e) => ({ at: e.at, to: e.amount }));
       return { el: row, fill: row.querySelector('i'), cd: item.cooldown_ms || 1, acts,
-               cells: item.cells ?? [] };
+               turns, slot: item.slot,
+               cycle: item.card?.turns ?? [], cells: item.cells ?? [] };
     });
   }
 
@@ -345,8 +354,19 @@ export class Replay {
           shaking.push({ cells: r.cells, at: since / SHAKE_MS });
         }
       }
+      // Which orientation each spinning item is standing on at the head. The
+      // last turn at or before it, and the cells core named for that entry.
+      const spinning = [];
+      for (const r of this.rows[side]) {
+        if (!r.cycle?.length || !r.turns?.length) continue;
+        let to = null;
+        for (const t of r.turns) { if (t.at <= this.t) to = t.to; else break; }
+        if (to === null) continue;
+        const cells = r.cycle[to % r.cycle.length];
+        if (cells) spinning.push({ slot: r.slot, cells });
+      }
       const board = this.boards[side];
-      if (board) board.shaking = shaking;
+      if (board) { board.shaking = shaking; board.spinning = spinning; }
     }
   }
 }

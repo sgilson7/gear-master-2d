@@ -52,6 +52,20 @@ def serve():
     return httpd
 
 
+def close_fight(page):
+    """Leave the fight screen however it was opened.
+
+    **Every check that opens it has to close it, on every path out.** A check
+    that appended a failure and returned early left the screen over the page,
+    and the next check died on a click it could not land — so one real failure
+    arrived as a Playwright traceback with the failure list never printed at
+    all. `try`/`finally` around the body, and this in the `finally`.
+    """
+    if page.is_visible("#fight"):
+        page.click("#run")
+        page.wait_for_selector("#fight", state="hidden", timeout=8000)
+
+
 def dismiss_card(page):
     """Close an event card if one opened, so the walk continues."""
     if page.is_visible("#card"):
@@ -898,7 +912,14 @@ def check_the_rack(page, name, fails):
     page.wait_for_selector("#fight", state="visible", timeout=8000)
     page.click("#preset")
     page.wait_for_timeout(150)
+    try:
+        rack_gestures(page, name, fails)
+    finally:
+        close_fight(page)
 
+
+def rack_gestures(page, name, fails):
+    """Everything on the packing screen; the caller closes it after."""
     if page.is_hidden("#rack"):
         fails.append(f"{name}: a licensee is packing and there is no rack")
         return
@@ -994,8 +1015,106 @@ def check_the_rack(page, name, fails):
         fails.append(f"{name}: took the ench back and the component still carries it")
     if back["on"] != 0 or back["loose"] == 0:
         fails.append(f"{name}: took the ench back and the rack says {back}")
-    page.click("#run")
-    page.wait_for_selector("#fight", state="hidden", timeout=8000)
+
+
+def check_the_spin_animates(page, name, fails):
+    """An item with the turn on it turns, and turns to somewhere core named.
+
+    **The cells are core's.** `Slot::turn_cycle` works out which of the four
+    orientations an arrangement can reach *in place*, and the board only picks
+    which entry of that list the clock is on — a page rotating a shape itself
+    would be a second answer to "where does it fit", and it would disagree the
+    first time something was packed against it.
+
+    Planted, like the rack's check, and for the same reason: a licensee at
+    level five with ninety Fnorp is a long walk.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+
+    def spinning(body):
+        body["character"]["class"] = "Recycler"
+        body["character"]["gold"] = 400
+        body["character"]["enchs_owned"] = ["the-ponkey-turn"]
+
+    plant(page, base, spinning, stem="spin-probe")
+    # Straight to the board: the town is not where this is decided.
+    page.evaluate("() => document.getElementById('map').focus()")
+    town = page.evaluate("""() => (window.__world().places ?? []).find(p => p.kind === 'town')""")
+    page.evaluate("(at) => window.__standAt(at)", [town["at"][0] + 1, town["at"][1]])
+    page.keyboard.press("ArrowLeft")
+    page.wait_for_timeout(300)
+    if not page.is_visible("#town"):
+        fails.append(f"{name}: could not reach a town to pack in")
+        return
+    page.click("#pack")
+    page.wait_for_selector("#fight", state="visible", timeout=8000)
+    page.click("#preset")
+    page.wait_for_timeout(150)
+    try:
+        spin_gestures(page, name, fails)
+    finally:
+        close_fight(page)
+
+
+def spin_gestures(page, name, fails):
+    loose = page.locator('#rack-loose .wares[data-ench="the-ponkey-turn"]')
+    if loose.count() == 0:
+        fails.append(f"{name}: the planted turn is not in the rack")
+        return
+    loose.first.click()
+    got = page.evaluate("""() => {
+      const b = window.__board;
+      // Onto a component of an assembled item, so there is a footprint to turn.
+      for (const s of b.state.slots) {
+        const item = s.items.find(i => i.assembled && (i.turns ?? []).length > 1);
+        if (!item) continue;
+        const p = s.placed.find(p => item.pieces.includes(p.id));
+        if (p) return { ok: b.onclaim(p.id), key: item.pieces.join(','),
+                        turns: item.turns };
+      }
+      return { none: true };
+    }""")
+    if got.get("none"):
+        fails.append(f"{name}: nothing on this board has anywhere to turn, so the "
+                     f"spin cannot be shown")
+        return
+    if not got["ok"]:
+        fails.append(f"{name}: could not bolt the turn onto a component")
+        return
+    page.wait_for_timeout(120)
+
+    # Two frames, a second apart, and both have to be orientations core named.
+    seen = []
+    for _ in range(2):
+        seen.append(page.evaluate("""(key) => {
+          window.__board.draw();
+          const sp = window.__board.spun.find(s => s.key === key);
+          return sp ? sp.cells.map(c => c.join(',')).sort().join(' ') : null;
+        }""", got["key"]))
+        page.wait_for_timeout(560)
+    if any(x is None for x in seen):
+        fails.append(f"{name}: the board drew no footprint for the spinning item")
+        return
+    legal = {" ".join(sorted(f"{c[0]},{c[1]}" for c in cells)) for cells in got["turns"]}
+    for drawn in seen:
+        if drawn not in legal:
+            fails.append(f"{name}: the board drew {drawn!r}, which is not one of the "
+                         f"{len(legal)} orientations core named")
+            return
+    if seen[0] == seen[1]:
+        fails.append(f"{name}: two frames half a second apart drew the same footprint "
+                     f"({seen[0]!r}), so nothing is turning")
+
+    # And the card says what it is worth, in a number.
+    said = page.evaluate("""(key) => {
+      const el = [...document.querySelectorAll('#panel-yours .made-item')]
+        .find(e => e.dataset.key === key);
+      return el ? el.textContent : null;
+    }""", got["key"])
+    if not said or "turns every second" not in said:
+        fails.append(f"{name}: the card does not say the item turns: {said!r}")
 
 
 def check_scouting_is_earned(page, name, fails):
@@ -1148,8 +1267,7 @@ def check_the_replay_reports_a_curse(page, name, fails):
             if want == "cursed" and got["peak"] != got["most"]:
                 fails.append(f"{name}: the log reported {got['most']} stacks and the panel "
                              f"drew {got['peak']}")
-        page.click("#run")
-        page.wait_for_selector("#fight", state="hidden", timeout=8000)
+        close_fight(page)
 
 
 def check_the_advance_button_does_not_move(page, name, fails):
@@ -1922,6 +2040,7 @@ def walk_the_gate(browser, name):
     # them somewhere the walk would take twenty minutes to reach, so anything
     # after them would be checking a game this walk did not play.
     check_the_rack(page, name, fails)
+    check_the_spin_animates(page, name, fails)
     check_a_town_takes_the_tiredness_off(page, name, fails)
     check_the_replay_reports_a_curse(page, name, fails)
     check_the_log_points_somewhere(page, name, fails)
@@ -1999,6 +2118,7 @@ def main():
     print("ok: a town takes the tiredness off, and the panel says so")
     print("ok: the map's odds are a skill somebody took, not a button everybody had")
     print("ok: a licensee buys an ench, bolts it on, switches it off and takes it back")
+    print("ok: a spinning item turns, and turns to somewhere core said it could")
     print("ok: your own figure becomes your class's when you take one")
     print("ok: a mid-fight save reopens the same fight")
     print("ok: walk, download, reload, upload — position and stream both came back")

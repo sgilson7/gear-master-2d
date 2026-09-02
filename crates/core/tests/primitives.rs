@@ -56,6 +56,8 @@ fn item(name: &str, slot: SlotKind, cooldown_ms: u32) -> ItemProfile {
         adjacent_assembled_same_slot: 0,
         diagonal_items: Vec::new(),
         open_cells: 0,
+        turn_cycle: Vec::new(),
+        spins: false,
         attracts_curses: false,
         steady: false,
         overtakes: false,

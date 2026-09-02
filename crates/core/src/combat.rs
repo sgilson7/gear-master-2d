@@ -993,6 +993,20 @@ pub const RUST_GOLEM: MonsterSpec = MonsterSpec {
 /// An unpaid spell is not cancelled - it still fires, which matters, because a
 /// build that runs dry should get weaker rather than stop.
 pub const SPELL_MANA_COST: i32 = 3;
+
+/// What one turn of the spin banks, in hundredths of power.
+///
+/// Ten, which is the `+0.1x` the plan asks for expressed in the unit `power`
+/// already uses — 100 is a plain multiple of one, so ten is a tenth.
+///
+/// **Uncapped, because the spend is the cap.** A slow item stacks more and
+/// fires less and a fast one the other way round, which is a trade rather than
+/// a ceiling, and a ceiling would have had to be tuned against every cadence
+/// in the game.
+pub const SPIN_PCT_PER_TURN: i32 = 10;
+
+/// How long one turn takes.
+pub const SPIN_EVERY_MS: u32 = 1_000;
 pub const WEAK_CAST_PCT: i32 = 45;
 
 /// What a paid cast lands for.
@@ -2969,6 +2983,26 @@ pub struct RunningItem {
     /// overtaking gloves gets two opening double-swings and that is what
     /// building two of them is for.
     pub has_fired: bool,
+    /// This item turns once a second where it stands, banking power.
+    ///
+    /// Set from the profile, which took it from an ench **and** from whether
+    /// the board leaves it anywhere to turn. An item boxed in does not spin,
+    /// which is the trade rather than an oversight.
+    pub spins: bool,
+    /// Turns banked and not yet spent. Cleared the moment the item activates.
+    pub spin_stacks: u32,
+    /// Where in its turn cycle it currently stands.
+    ///
+    /// The index rather than the cells: the cycle is a board fact and lives on
+    /// the profile, and the fight only has to say which of its entries is
+    /// showing. Two copies of the geometry would be two answers to "what shape
+    /// is it right now".
+    pub turn_index: u32,
+    /// How long its cycle is, so the index can wrap without asking the board.
+    pub turn_cycle_len: u32,
+    /// Milliseconds since the last turn, so a turn is a whole second of this
+    /// item's fight rather than a count of ticks somebody has to divide.
+    pub spin_ms: u32,
     /// Neither stunned nor misfiring, for the rest of the fight.
     ///
     /// `steady` is the first half and predates this. The second is the answer
@@ -3025,6 +3059,14 @@ impl RunningItem {
             cooldown_ms: p.cooldown_ms,
             progress_ms: 0,
             stun_ms: 0,
+            // **Both halves.** The ench says it would like to turn and the
+            // board says whether there is anywhere to turn to. One entry in
+            // the cycle is an item that lands on itself or is boxed in.
+            spins: p.spins && p.turn_cycle.len() > 1,
+            spin_stacks: 0,
+            spin_ms: 0,
+            turn_index: 0,
+            turn_cycle_len: p.turn_cycle.len().max(1) as u32,
             owed_ms: 0,
             gold_spent: 0,
             gold_paid: 0,
@@ -3065,6 +3107,11 @@ impl RunningItem {
             overtakes: false,
             has_fired: false,
             unshakable: false,
+            spins: false,
+            spin_stacks: 0,
+            spin_ms: 0,
+            turn_index: 0,
+            turn_cycle_len: 1,
             cooldown_ms: a.cooldown_ms.max(TICK_MS),
             progress_ms: 0,
             stun_ms: 0,
@@ -3817,6 +3864,18 @@ pub enum Event {
     Regen { side: Side, amount: i32, health: i32 },
     /// A reaction pushed an item's cooldown forward.
     Hastened { side: Side, item: String, by_ms: u32 },
+    /// A spinning item turned where it stands. `to` indexes its turn cycle and
+    /// `stacks` is the count *after* this turn, so the interface can draw the
+    /// orientation and say what it is worth without keeping a tally.
+    ///
+    /// **Logged rather than left to the clock.** A frosted item turns slower
+    /// for the same reason it fires slower, so a screen dividing the playback
+    /// head by a second would draw an orientation the fight never had — the
+    /// same class of mistake as subtracting damage from a health total.
+    Turned { side: Side, index: usize, item: String, to: u32, stacks: u32 },
+    /// A spinning item spent everything it had banked. `pct` is what it was
+    /// worth on this one activation, in hundredths of power.
+    Spun { side: Side, index: usize, item: String, stacks: u32, pct: i32 },
     /// Time moved from one bar to another on the same board.
     ///
     /// Both names, because the whole of what a shunt does is take from one and
@@ -4161,6 +4220,23 @@ impl CombatLog {
                 self.who(*side),
                 item,
                 *by_ms as f32 / 1000.0
+            ),
+            Event::Turned { side, item, to, stacks, .. } => format!(
+                "{} {}'s {} turns (position {}, {} banked)",
+                t,
+                self.who(*side),
+                item,
+                to,
+                stacks
+            ),
+            Event::Spun { side, item, stacks, pct, .. } => format!(
+                "{} {}'s {} spends {} turns (+{}.{:02}x power on this one)",
+                t,
+                self.who(*side),
+                item,
+                stacks,
+                pct / 100,
+                pct % 100
             ),
             Event::Hastened { side, item, by_ms } => format!(
                 "{} {}'s {} hastened by {:.1}s",
@@ -4595,7 +4671,7 @@ pub fn simulate_party_holding(
             }
             let count = pick(&mut p, &mut foes, me).items.len();
             for idx in 0..count {
-                let ready = {
+                let (ready, turned) = {
                     let c = pick(&mut p, &mut foes, me);
                     // Frost stretches the cooldown by slowing how fast the
                     // bar fills, rather than by rewriting the cooldown. It is
@@ -4612,7 +4688,10 @@ pub fn simulate_party_holding(
                     // over. Only this item - the rest of the kit plays on.
                     if item.stun_ms > 0 {
                         item.stun_ms = item.stun_ms.saturating_sub(TICK_MS);
-                        false
+                        // A stopped bar does not turn either. The spin rides
+                        // the item's own clock, and a stunned item's clock is
+                        // exactly what a stun stops.
+                        (false, None)
                     } else {
                         let step = (TICK_MS as i32 * (100 - slow) / 100 * (100 - slower) / 100
                             * (100 + haste)
@@ -4630,15 +4709,47 @@ pub fn simulate_party_holding(
                         } else {
                             step
                         };
+                        // **One turn a second, banked.** Off the same slice
+                        // the bar moves in, so a frosted item turns slower for
+                        // the same reason it fires slower and a stunned one
+                        // does not turn at all — the spin is a property of the
+                        // item's own clock rather than of the wall.
+                        let mut turns = 0u32;
+                        if item.spins {
+                            item.spin_ms += step;
+                            while item.spin_ms >= SPIN_EVERY_MS {
+                                item.spin_ms -= SPIN_EVERY_MS;
+                                item.spin_stacks += 1;
+                                item.turn_index = (item.turn_index + 1) % item.turn_cycle_len;
+                                turns += 1;
+                            }
+                        }
+                        let turned = (turns > 0).then(|| {
+                            (item.name.clone(), item.spin_stacks, item.turn_index)
+                        });
                         item.progress_ms += step;
-                        if item.progress_ms >= item.cooldown_ms {
+                        let ready = if item.progress_ms >= item.cooldown_ms {
                             item.progress_ms -= item.cooldown_ms;
                             true
                         } else {
                             false
-                        }
+                        };
+                        (ready, turned)
                     }
                 };
+                // Logged outside the borrow above, in the slice it happened
+                // in. Every turn gets an entry, so the replay reads the
+                // orientation rather than dividing the playback head by a
+                // second — which would draw a shape the fight never had the
+                // moment anything slowed the item down.
+                if let Some((name, stacks, to)) = turned {
+                    let front = aim_of(&foes, p.aim);
+                    log.push(LogEntry {
+                        who: me.logged_as(front),
+                        at_ms: t,
+                        event: Event::Turned { side, index: idx, item: name, to, stacks },
+                    });
+                }
                 if ready {
                     // A misfire eats the activation itself: the cooldown has
                     // already come round, and nothing comes of it.
@@ -4982,6 +5093,28 @@ fn activate(
     // Taken before the local rebindings below shadow `me` with a combatant.
     let who = me.logged_as(front);
     let mut item = pick(p, foes, me).items[idx].clone();
+
+    // **The spin is spent here, on the tick it fires.**
+    //
+    // Taken off the combatant's own copy rather than the clone above, because
+    // the clone is this activation's working copy and the tally belongs to the
+    // item. An overtake runs the whole activation twice and the second run
+    // finds nothing banked, which is right: one spend a spin.
+    let spun = {
+        let it = &mut pick(p, foes, me).items[idx];
+        let n = it.spin_stacks;
+        it.spin_stacks = 0;
+        n
+    };
+    if spun > 0 {
+        let pct = spun as i32 * SPIN_PCT_PER_TURN;
+        item.power += pct;
+        log.push(LogEntry {
+            who,
+            at_ms: t,
+            event: Event::Spun { side, index: idx, item: item.name.clone(), stacks: spun, pct },
+        });
+    }
 
     // A spell swaps in the payload whose turn it is. A book has bound one and
     // casts it every time; a crystal ball cycles through the two or three it

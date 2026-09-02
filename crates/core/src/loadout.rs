@@ -48,6 +48,19 @@ pub struct ItemProfile {
     pub adjacent_assembled_same_slot: usize,
     /// Empty cells touching this item - what `PerAdjacentEmpty` repeats over.
     pub open_cells: usize,
+    /// The orientations this item can take **where it stands**, in order.
+    ///
+    /// A board fact, worked out at pack time, because combat has no board:
+    /// `Slot::turn_cycle` is the rule and this is its answer carried forward.
+    /// One entry means it cannot move — the arrangement is boxed in, or it
+    /// lands on itself — and an item that cannot move never spins.
+    pub turn_cycle: Vec<Vec<(u8, u8)>>,
+    /// Whether this item turns once a second, banking power as it goes.
+    ///
+    /// Set by an ench in `Character::combat_items`, never by the board: the
+    /// cycle is what the *board* allows and this is what the *character* has
+    /// bolted on.
+    pub spins: bool,
     /// **Overtake**: the first time this item fires in a fight, it fires
     /// again immediately. Read off the pieces here so combat does not have to
     /// walk a registry it does not have.
@@ -1076,6 +1089,14 @@ impl Loadout {
                 pieces: item.pieces.clone(),
                 adjacent_assembled_same_slot: adjacent.len(),
                 open_cells: slot.open_cells_around(&item.pieces),
+                // What the board would let this item do if something asked it
+                // to turn. Worked out for every item rather than only for the
+                // enched ones, because it is a fact about the arrangement and
+                // the arrangement is what this function reports.
+                turn_cycle: slot.turn_cycle(
+                    &item.pieces.iter().flat_map(|&p| slot.cells_of(p)).collect::<Vec<_>>(),
+                ),
+                spins: false,
                 attracts_curses,
                 steady: item
                     .pieces

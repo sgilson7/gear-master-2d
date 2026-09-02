@@ -1093,7 +1093,11 @@ def spin_gestures(page, name, fails):
           const sp = window.__board.spun.find(s => s.key === key);
           return sp ? sp.cells.map(c => c.join(',')).sort().join(' ') : null;
         }""", got["key"]))
-        page.wait_for_timeout(560)
+        # **Longer than one turn**, or the two samples can land inside the same
+        # second and the check reports a still picture as a broken feature.
+        # Five hundred and sixty milliseconds did exactly that, about twice in
+        # five runs.
+        page.wait_for_timeout(1060)
     if any(x is None for x in seen):
         fails.append(f"{name}: the board drew no footprint for the spinning item")
         return

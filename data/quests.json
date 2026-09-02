@@ -1,7 +1,7 @@
 {
   "format": "gm2d-quests",
   "version": 1,
-  "_note": "Errands. `giver` is who asks and `turn_in` is who takes it back \u2014 the two differ whenever somebody sends you to tell somebody else, which is the shape half the first map's errands have. `requires` names errands that must be done first, and a questline is that and nothing else. Every reward is a component that is on no shelf and drops from nothing: an errand you could have shopped your way past is a slow shop.",
+  "_note": "Errands. `giver` is who asks and `turn_in` is who takes it back — the two differ whenever somebody sends you to tell somebody else, which is the shape half the first map's errands have. `requires` names errands that must be done first, and a questline is that and nothing else. Every reward is a component that is on no shelf and drops from nothing: an errand you could have shopped your way past is a slow shop.",
   "quests": [
     {
       "id": "the-eyes-have-it",
@@ -27,7 +27,7 @@
       "giver": "the-end-of-all-gears",
       "name": "THE ONES STILL DOWN THERE",
       "brief": "Four hundred Sprocketmen are still in the workings and the office is not permitted to send anything down that could be called a wage. Tins are not a wage. The clerk would like four Long Shift Tins, bought with your own Fnorp, handed to her across the counter, and entered in the register as a donation of nothing.",
-      "thanks": "She writes DONATION: NIL, four times, and stacks the tins behind the counter where the register cannot see them. Then she gives you a frame with somebody's counting scratched into the inside of it \u2014 four numbers, each smaller than the last.",
+      "thanks": "She writes DONATION: NIL, four times, and stacks the tins behind the counter where the register cannot see them. Then she gives you a frame with somebody's counting scratched into the inside of it — four numbers, each smaller than the last.",
       "goal": {
         "bring": {
           "item": "long-shift-tin",
@@ -76,7 +76,7 @@
       "id": "marbulon-asks-first",
       "giver": "marbulons-door",
       "name": "THE FIRST THING SHE WANTS",
-      "brief": "\"Whisperlings,\" says Marbulon. \"Three. Not because I want anything off them \u2014 I want to know whether there are three left, and the only way to know that is somebody comes back and says there are not.\" She does not say what she will do with the answer. She has the key in her apron and she takes it out while she is talking and puts it back.",
+      "brief": "\"Whisperlings,\" says Marbulon. \"Three. Not because I want anything off them — I want to know whether there are three left, and the only way to know that is somebody comes back and says there are not.\" She does not say what she will do with the answer. She has the key in her apron and she takes it out while she is talking and puts it back.",
       "thanks": "\"Three,\" she says. \"So there were three.\" She writes nothing down. Then she gives you a thimble that has been mended twice, and says the first thing is done and the second thing is worse.",
       "goal": {
         "slay": {
@@ -147,6 +147,25 @@
         "Warding Sigil"
       ],
       "gold": 35
+    },
+    {
+      "id": "the-frame-that-stands",
+      "giver": "the-end-of-all-gears",
+      "requires": [
+        "the-eyes-have-it"
+      ],
+      "name": "THE FRAME THAT STANDS",
+      "brief": "The register has a Sprocketman frame standing in the Burnwarp with nothing in it, and has had for thirty years. The clerk wants somebody to go and look at it, because the entry says EMPTY and an entry that has said the same thing for thirty years is an entry nobody has checked. She would like it checked.",
+      "thanks": "She writes STILL EMPTY, and the date, and looks at it for a while. Then she goes into the back and comes out with a card in a sleeve. It is nine lines of somebody working out what a thing they were holding was for, and it was not filed under gear, and she says the office has no heading it goes under either.",
+      "goal": {
+        "word": {
+          "place": "the-standing-frame"
+        }
+      },
+      "enchs": [
+        "the-yodregar-index"
+      ],
+      "gold": 45
     }
   ]
 }

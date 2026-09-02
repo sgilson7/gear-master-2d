@@ -46,7 +46,11 @@ fn the_shipped_errands_parse_and_name_things_that_exist() {
             assert!(q.get(r).is_some(), "{} requires {r}, which is not an errand", e.id);
         }
         assert!(!e.brief.is_empty() && !e.thanks.is_empty(), "{} says nothing", e.id);
-        assert!(!e.reward.is_empty() || e.gold != 0, "{} pays nothing", e.id);
+        assert!(
+            !e.reward.is_empty() || !e.enchs.is_empty() || e.gold != 0,
+            "{} pays nothing",
+            e.id
+        );
     }
 }
 

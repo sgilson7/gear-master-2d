@@ -94,6 +94,18 @@ pub enum Rule {
     /// either here would be two lists to keep in step. [`Rule::check`] is what
     /// stops a misspelling reaching a player, and `SkillsData::parse` runs it.
     CurseOnActivate { slot: String, curse: String },
+    /// Every turn of a spinning item banks this many extra stacks.
+    ///
+    /// The tree tuning a rule it did not invent, which is what M8.3's plumbing
+    /// was for: the spin exists, so the Patent's nodes move its numbers rather
+    /// than each inventing a mechanic of its own.
+    SpinExtra { per_turn: u32 },
+    /// A spinning item keeps this many stacks through an activation instead of
+    /// starting again from nothing.
+    SpinKeep { stacks: u32 },
+    /// A spinning item turns every this many milliseconds instead of every
+    /// thousand.
+    SpinEvery { ms: u32 },
     /// The danger of a region and the odds on a tile become readable.
     ///
     /// Not a combat rule: nothing in a fight reads it. It gates what the map
@@ -118,6 +130,20 @@ impl Rule {
                 }
                 Ok(())
             }
+            // A rule that grants nothing is a node that costs a point and
+            // does nothing, which is the exact failure this file exists to
+            // stop shipping twice.
+            Rule::SpinExtra { per_turn } => {
+                (*per_turn > 0).then_some(()).ok_or_else(|| "no extra stacks at all".into())
+            }
+            Rule::SpinKeep { stacks } => {
+                (*stacks > 0).then_some(()).ok_or_else(|| "keeps nothing".into())
+            }
+            // Slower than a second is not a tuning, it is a downgrade, and
+            // zero is a division by nothing.
+            Rule::SpinEvery { ms } => (*ms > 0 && *ms < crate::combat::SPIN_EVERY_MS)
+                .then_some(())
+                .ok_or_else(|| format!("{ms}ms is not faster than a second")),
             Rule::Scout => Ok(()),
         }
     }
@@ -132,6 +158,23 @@ impl Rule {
             // The odds are per-mille per step, which is the unit the engine
             // actually works in — a spec with no number in it is the vagueness
             // this register exists to remove.
+            Rule::SpinExtra { per_turn } => format!(
+                "a turning item banks {} more per turn, on top of the 1 it banks anyway",
+                per_turn
+            ),
+            // Short on purpose: this line sits under a node's name and shares
+            // the button with a second effect, and
+            // `a_mechanical_line_stays_short_enough_to_read_at_a_glance` is
+            // what caught the first draft at 121 characters. What it means is
+            // the hover's job.
+            Rule::SpinKeep { stacks } => {
+                format!("a turning item keeps {stacks} of its turns when it goes off")
+            }
+            Rule::SpinEvery { ms } => format!(
+                "a turning item turns every {:.1}s instead of every {:.1}s",
+                *ms as f32 / 1000.0,
+                crate::combat::SPIN_EVERY_MS as f32 / 1000.0,
+            ),
             Rule::Scout => format!(
                 "read a region's danger and every tile's odds out of {}, on the map",
                 1000,
@@ -153,6 +196,15 @@ impl Rule {
                         .into(),
                 ]
             }
+            Rule::SpinExtra { .. } | Rule::SpinKeep { .. } | Rule::SpinEvery { .. } => vec![
+                format!(
+                    "A turning item banks {}% of its own power a turn and spends the lot \
+                     the moment it activates. It only turns where it has room to: an item \
+                     packed flush against its neighbours never moves and never banks.",
+                    crate::combat::SPIN_PCT_PER_TURN,
+                ),
+                "This does nothing at all without something on the board that turns.".into(),
+            ],
             Rule::Scout => vec![
                 format!(
                     "Danger is the mean rating of what a region holds. The odds are \

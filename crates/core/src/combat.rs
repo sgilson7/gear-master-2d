@@ -3317,6 +3317,12 @@ pub struct Combatant {
     /// Wellspring: spending a pool refunds this percent of it to each of the
     /// other three.
     pub confluence: i32,
+    /// Extra stacks a turning item banks each turn, on top of the one.
+    pub spin_extra: u32,
+    /// Stacks a turning item keeps through an activation.
+    pub spin_keep: u32,
+    /// How long one turn takes for this fighter's gear.
+    pub spin_every_ms: u32,
     /// Slots whose every activation lands a curse, because the skill tree
     /// said so.
     ///
@@ -3425,6 +3431,9 @@ impl Combatant {
             burn_timer: 0,
             curse_watch_depth: 0,
             curse_on_activate: Vec::new(),
+            spin_extra: 0,
+            spin_keep: 0,
+            spin_every_ms: SPIN_EVERY_MS,
         }
     }
 
@@ -3538,6 +3547,9 @@ impl Combatant {
             burn_timer: 0,
             curse_watch_depth: 0,
             curse_on_activate: Vec::new(),
+            spin_extra: 0,
+            spin_keep: 0,
+            spin_every_ms: SPIN_EVERY_MS,
         }
     }
 
@@ -4448,6 +4460,14 @@ pub fn simulate_party_holding(
             // Not a combat rule at all: it decides what the map screen is
             // allowed to print. Same shape as `Prospector` and `Showstopper`,
             // which are settlement rules and are ignored here too.
+            // The three that tune the spin. They add and take the fastest,
+            // because two nodes granting the same rule is a tree that stacks
+            // rather than a tree with a last-one-wins in it.
+            crate::skills::Rule::SpinExtra { per_turn } => start_player.spin_extra += per_turn,
+            crate::skills::Rule::SpinKeep { stacks } => start_player.spin_keep += stacks,
+            crate::skills::Rule::SpinEvery { ms } => {
+                start_player.spin_every_ms = start_player.spin_every_ms.min(*ms).max(TICK_MS)
+            }
             crate::skills::Rule::Scout => {}
         }
     }
@@ -4681,6 +4701,9 @@ pub fn simulate_party_holding(
                     // The long haul: everything winds up as the fight drags,
                     // to twice speed and no further.
                     let haste = (c.haste_per_s * (t / 1000) as i32).clamp(0, 100);
+                    // The spin's tuning is the fighter's, like the slow above
+                    // it: a node is taken by a person, not by a blade.
+                    let (spin_extra, spin_every) = (c.spin_extra, c.spin_every_ms.max(TICK_MS));
                     let item = &mut c.items[idx];
                     // A stun stops this item's bar dead. Not a slow: it does
                     // not advance at all, and what was part-way through stays
@@ -4717,9 +4740,9 @@ pub fn simulate_party_holding(
                         let mut turns = 0u32;
                         if item.spins {
                             item.spin_ms += step;
-                            while item.spin_ms >= SPIN_EVERY_MS {
-                                item.spin_ms -= SPIN_EVERY_MS;
-                                item.spin_stacks += 1;
+                            while item.spin_ms >= spin_every {
+                                item.spin_ms -= spin_every;
+                                item.spin_stacks += 1 + spin_extra;
                                 item.turn_index = (item.turn_index + 1) % item.turn_cycle_len;
                                 turns += 1;
                             }
@@ -5101,9 +5124,13 @@ fn activate(
     // item. An overtake runs the whole activation twice and the second run
     // finds nothing banked, which is right: one spend a spin.
     let spun = {
+        let keep = pick(p, foes, me).spin_keep;
         let it = &mut pick(p, foes, me).items[idx];
         let n = it.spin_stacks;
-        it.spin_stacks = 0;
+        // Everything banked is spent; what `keep` buys is starting again from
+        // there rather than from nothing. Capped at what was actually there,
+        // so a node cannot hand an item stacks it never earned.
+        it.spin_stacks = keep.min(n);
         n
     };
     if spun > 0 {

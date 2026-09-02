@@ -646,6 +646,90 @@
               "rows": 1
             }
           }
+        },
+        {
+          "id": "k-bench-rights",
+          "name": "Bench Rights",
+          "blurb": "Signed on the back of a form for something else. Two hundred and six of these were issued in one afternoon and the afternoon has not been explained. Yours is the two hundred and seventh.",
+          "requires": [],
+          "effect": {
+            "stat": {
+              "health": 100,
+              "curse_resist": 8
+            }
+          }
+        },
+        {
+          "id": "k-overwind",
+          "name": "Overwind",
+          "blurb": "The instruction is to wind it until it stops and then give it one more. Nobody at the bench has ever needed the instruction twice.",
+          "requires": [
+            "k-bench-rights"
+          ],
+          "effect": {
+            "grants": {
+              "rule": {
+                "spin_extra": {
+                  "per_turn": 1
+                }
+              }
+            }
+          }
+        },
+        {
+          "id": "k-flywheel",
+          "name": "The Flywheel",
+          "blurb": "Kaklon's own drawing has the wheel at four inches and a note beside it reading FIVE. Every flywheel on every bench is five inches and nobody has changed the drawing.",
+          "requires": [
+            "k-overwind"
+          ],
+          "effect": {
+            "grants": {
+              "rule": {
+                "spin_every": {
+                  "ms": 800
+                }
+              }
+            }
+          }
+        },
+        {
+          "id": "k-counterweight",
+          "name": "The Counterweight",
+          "blurb": "Eleven pounds of something the invoice calls BALLAST and the customs form calls the same thing in a different hand. It is on the outside of the work and it is what stops the work coming off.",
+          "requires": [
+            "k-tolerances"
+          ],
+          "effect": {
+            "start_with": {
+              "armor": 18
+            }
+          }
+        },
+        {
+          "id": "k-patent-pending",
+          "name": "Patent Pending",
+          "blurb": "Filed in the ninth year and pending ever since. The office that would grant it was reflected into the Archive in the fourth year and has been answering letters from in there, at a rate of two a decade.",
+          "requires": [
+            "k-flywheel",
+            "k-counterweight"
+          ],
+          "effect": [
+            {
+              "grants": {
+                "rule": {
+                  "spin_keep": {
+                    "stacks": 2
+                  }
+                }
+              }
+            },
+            {
+              "assembly_pct": {
+                "pct": 10
+              }
+            }
+          ]
         }
       ]
     }

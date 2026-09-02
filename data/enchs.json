@@ -31,6 +31,27 @@
       "blurb": "Ponkey Dong scored a five, a two and a negative seven, and the negative seven was for the deadlift. Nobody has explained where the turn came from. Kaklon sells it as a bolt-on and does not explain it either.",
       "price": 90,
       "effect": "spin"
+    },
+    {
+      "id": "sneel-bearing",
+      "name": "Sneel Bearing",
+      "blurb": "Stainless. Eleven of them in a tin and the tin says twelve, which Kaklon has been asked about four times and has answered once.",
+      "price": 120,
+      "effect": {
+        "haste": {
+          "pct": 45
+        }
+      }
+    },
+    {
+      "id": "the-yodregar-index",
+      "name": "The Yodregar Index",
+      "blurb": "One card out of a library of every thought anybody has had. The thought on this card is somebody working out, over nine lines, what the thing they are holding is for. It was not filed under gear.",
+      "effect": {
+        "power": {
+          "pct": 60
+        }
+      }
     }
   ]
 }

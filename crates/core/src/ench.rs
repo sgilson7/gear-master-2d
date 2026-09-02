@@ -130,11 +130,18 @@ pub struct EnchDef {
     pub name: String,
     /// One line, in the world's words. The spec is derived; this is not.
     pub blurb: String,
-    /// What a bench charges. **Every town that trades sells every ench**, the
-    /// same rule the restoratives follow and for the same reason: a licensee
-    /// who walked to the one town that stocks the thing their class is about
-    /// would be a licensee who could be stranded from their own class.
-    pub price: i32,
+    /// What a bench charges, or `None` for one nobody sells.
+    ///
+    /// **Every town that trades sells every ench that has a price**, the same
+    /// rule the restoratives follow and for the same reason: a licensee who
+    /// walked to the one town that stocks the thing their class is about would
+    /// be a licensee who could be stranded from their own class.
+    ///
+    /// `None` is the errands' half. A reward you could have bought makes the
+    /// errand a slow way to shop, which is the rule the component rewards have
+    /// followed since M8 and is worth exactly as much here.
+    #[serde(default)]
+    pub price: Option<i32>,
     pub effect: Effect,
 }
 
@@ -162,8 +169,8 @@ impl EnchsData {
             if e.name.is_empty() || e.blurb.is_empty() {
                 return Err(format!("{}: an ench that says nothing about itself", e.id));
             }
-            if e.price <= 0 {
-                return Err(format!("{}: an ench nobody charges for", e.id));
+            if e.price.is_some_and(|p| p <= 0) {
+                return Err(format!("{}: an ench on a shelf for nothing", e.id));
             }
         }
         Ok(d)

@@ -1562,13 +1562,16 @@ pub fn shop_json() -> String {
         let bench: Vec<_> = gm2d_core::data::enchs()
             .enchs
             .iter()
+            // A priceless ench is not on the bench. It is earned, and a reward
+            // you could have bought makes the errand a slow way to shop.
+            .filter_map(|e| Some((e, e.price?)))
             .filter(|_| licensed)
-            .map(|e| {
+            .map(|(e, price)| {
                 serde_json::json!({
                     "id": e.id, "name": e.name, "blurb": e.blurb,
                     "spec": e.effect.line(), "detail": e.effect.detail(),
-                    "price": e.price,
-                    "afford": g.character.gold >= e.price,
+                    "price": price,
+                    "afford": g.character.gold >= price,
                     "have": g.character.enchs_loose(&e.id),
                 })
             })
@@ -1596,10 +1599,11 @@ pub fn buy_ench(id: &str) -> String {
         }
         let data = gm2d_core::data::enchs();
         let Some(e) = data.get(id) else { return "there is no such ench".into() };
-        if g.character.gold < e.price {
-            return format!("{} Fnorp, and you have not got it.", e.price);
+        let Some(price) = e.price else { return "Nobody sells that one.".into() };
+        if g.character.gold < price {
+            return format!("{price} Fnorp, and you have not got it.");
         }
-        g.character.gold -= e.price;
+        g.character.gold -= price;
         g.character.give_ench(id);
         String::new()
     })
@@ -1736,15 +1740,32 @@ pub fn quests_json() -> String {
                     // player deciding whether to walk four streets for this is
                     // reading a number.
                     "asks": quest_ask(g, q),
-                    "pays": q.reward.iter()
-                        .map(|n| theme_piece(g, n))
-                        .chain((q.gold != 0).then(|| format!("{} Fnorp", q.gold)))
-                        .collect::<Vec<_>>(),
+                    "pays": quest_pays(g, q),
                 })
             })
             .collect();
         serde_json::json!(out).to_string()
     })
+}
+
+/// What an errand hands over. Components, enchs, and the money.
+///
+/// One builder, because the town's board and the log both print it and two
+/// copies would be two answers to "what do I get". An ench is named as itself
+/// rather than themed: `enchs.json` is already the world's words.
+fn quest_pays(
+    g: &gm2d_core::game::Game,
+    q: &gm2d_core::quest::Quest,
+) -> Vec<String> {
+    let enchs = gm2d_core::data::enchs();
+    q.reward
+        .iter()
+        .map(|n| theme_piece(g, n))
+        .chain(q.enchs.iter().map(|id| {
+            enchs.get(id).map(|e| e.name.clone()).unwrap_or_else(|| id.clone())
+        }))
+        .chain((q.gold != 0).then(|| format!("{} Fnorp", q.gold)))
+        .collect()
 }
 
 /// What an errand asks for, unthemed in shape and themed in its nouns.
@@ -1854,10 +1875,7 @@ pub fn quest_log_json() -> String {
                     "have": have,
                     "want": want,
                     "asks": quest_ask(g, q),
-                    "pays": q.reward.iter()
-                        .map(|n| theme_piece(g, n))
-                        .chain((q.gold != 0).then(|| format!("{} Fnorp", q.gold)))
-                        .collect::<Vec<_>>(),
+                    "pays": quest_pays(g, q),
                     "giver": place_name(g, &q.giver),
                     "back_to": place_name(g, gm2d_core::quest::QuestsData::turn_in_of(q)),
                     "pinned": g.world.pinned.as_deref() == Some(q.id.as_str()),

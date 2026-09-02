@@ -508,6 +508,9 @@ fn every_rule_is_described() {
     const THEMED: &[&str] = &["fnorp", "the funny", "cork", "fury", "devotion", "harvest"];
     let every = [
         Rule::CurseOnActivate { slot: "helmet".into(), curse: "searing".into() },
+        Rule::SpinExtra { per_turn: 1 },
+        Rule::SpinKeep { stacks: 2 },
+        Rule::SpinEvery { ms: 800 },
         Rule::Scout,
     ];
     for r in &every {
@@ -525,6 +528,15 @@ fn every_rule_is_described() {
     // rather than discovered by whoever spent the point on it.
     assert!(Rule::CurseOnActivate { slot: "hat".into(), curse: "searing".into() }.check().is_err());
     assert!(Rule::CurseOnActivate { slot: "helmet".into(), curse: "damp".into() }.check().is_err());
+    // A tuning that tunes nothing is a node that costs a point and does
+    // nothing, which is the failure this whole file exists to stop shipping.
+    assert!(Rule::SpinExtra { per_turn: 0 }.check().is_err());
+    assert!(Rule::SpinKeep { stacks: 0 }.check().is_err());
+    assert!(Rule::SpinEvery { ms: 0 }.check().is_err(), "a turn every no time at all");
+    assert!(
+        Rule::SpinEvery { ms: 2000 }.check().is_err(),
+        "slower than a second is a downgrade wearing a node's clothes"
+    );
 }
 
 /// Scouting is a rule the character either has or has not.

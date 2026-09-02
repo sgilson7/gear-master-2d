@@ -120,6 +120,13 @@ pub struct Quest {
     /// Canonical catalogue names handed over on finishing.
     #[serde(default)]
     pub reward: Vec<String>,
+    /// Enchs handed over on finishing, by id.
+    ///
+    /// A separate list because an ench is not a component — no shape, no grid,
+    /// and it goes in a rack rather than in a bag. One field that meant either
+    /// would be one field with two lookups behind it.
+    #[serde(default)]
+    pub enchs: Vec<String>,
     #[serde(default)]
     pub gold: i32,
 }
@@ -157,6 +164,17 @@ impl QuestsData {
             for name in &q.reward {
                 if crate::shop::def_named(name).is_none() {
                     return Err(format!("{}: {name:?} is not in the catalogue", q.id));
+                }
+            }
+            for id in &q.enchs {
+                let Some(e) = crate::data::enchs().get(id).cloned() else {
+                    return Err(format!("{}: {id:?} is not an ench", q.id));
+                };
+                // **A reward you could have bought is a slow way to shop.**
+                // The same rule the component rewards follow, and the reason
+                // an ench's price is optional at all.
+                if e.price.is_some() {
+                    return Err(format!("{}: {id:?} is on every bench already", q.id));
                 }
             }
             if let Some(t) = q.goal.token() {
@@ -519,6 +537,17 @@ pub fn hand_in(game: &mut Game, id: &str) -> Result<Vec<String>, String> {
     for name in &q.reward {
         if game.character.give(name).is_some() {
             given.push(name.clone());
+        }
+    }
+    // Into the rack rather than into the bag. Handed over whether or not the
+    // character is licensed: an errand does not know what you became, and a
+    // reward that vanished for three players in four would be worse than one
+    // they cannot use yet.
+    for id in &q.enchs {
+        let enchs = crate::data::enchs();
+        if let Some(e) = enchs.get(id) {
+            game.character.give_ench(id);
+            given.push(e.name.clone());
         }
     }
     if q.gold != 0 {

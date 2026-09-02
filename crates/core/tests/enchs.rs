@@ -425,3 +425,157 @@ fn a_turn_cycle_only_names_places_a_shape_can_stand() {
         }
     }
 }
+
+// -------------------------------------------------------- the Patent's tuning
+
+/// A Kaklon licensee with the whole tree taken, so the tuning is on.
+fn patented() -> Character {
+    let mut c = licensee();
+    c.skill_points += 20;
+    for id in [
+        "k-licence",
+        "k-bench-rights",
+        "k-tolerances",
+        "k-overwind",
+        "k-flywheel",
+        "k-counterweight",
+        "k-patent-pending",
+    ] {
+        c.take_skill(&data::skills(), id).unwrap_or_else(|e| panic!("{id}: {e}"));
+    }
+    c
+}
+
+/// **The tree tunes a rule it did not invent.**
+///
+/// Which is what M8.3's plumbing was for: `Effect::Grants` exists, so the
+/// Patent's nodes move the spin's numbers rather than each inventing a
+/// mechanic of its own.
+#[test]
+fn the_patent_turns_faster_and_banks_more() {
+    use gm2d_core::combat::Event;
+
+    let spec = gm2d_core::combat::LADDER
+        .iter()
+        .find(|s| s.name == "Rust Golem")
+        .expect("something that lasts");
+
+    let turns = |c: &Character| -> Vec<u32> {
+        let log = gm2d_core::combat::simulate_holding(
+            c.player_stats(),
+            &c.combat_items(),
+            spec,
+            D,
+            &[],
+            0,
+            c.start_with(),
+        );
+        log.entries
+            .iter()
+            .filter_map(|e| match &e.event {
+                Event::Turned { stacks, .. } => Some(*stacks),
+                _ => None,
+            })
+            .collect()
+    };
+
+    let mut plain = licensee();
+    let b = blade(&plain);
+    plain.attach_ench("the-ponkey-turn", b).expect("the turn goes on");
+    let mut tuned = patented();
+    let tb = blade(&tuned);
+    tuned.attach_ench("the-ponkey-turn", tb).expect("the turn goes on");
+
+    let bare = turns(&plain);
+    let with = turns(&tuned);
+    assert!(!bare.is_empty() && !with.is_empty(), "nothing turned either way");
+    // Overwind banks two a turn where it banked one, so the tally climbs twice
+    // as fast — and the Flywheel turns five times in four seconds where it
+    // turned four.
+    assert!(
+        with.len() > bare.len(),
+        "the Flywheel bought no extra turns ({} -> {})",
+        bare.len(),
+        with.len()
+    );
+    assert!(
+        with.windows(2).any(|w| w[1] > w[0] + 1) || with[0] > 1,
+        "Overwind banked one a turn: {with:?}"
+    );
+}
+
+/// Patent Pending keeps stacks through an activation instead of starting again
+/// from nothing.
+#[test]
+fn the_patent_keeps_a_stack_through_an_activation() {
+    use gm2d_core::combat::Event;
+
+    let mut c = patented();
+    let b = blade(&c);
+    c.attach_ench("the-ponkey-turn", b).expect("the turn goes on");
+    let spec = gm2d_core::combat::LADDER
+        .iter()
+        .find(|s| s.name == "Rust Golem")
+        .expect("something that lasts");
+    let log = gm2d_core::combat::simulate_holding(
+        c.player_stats(),
+        &c.combat_items(),
+        spec,
+        D,
+        &[],
+        0,
+        c.start_with(),
+    );
+    let mut kept = None;
+    let mut spent_at = None;
+    for e in &log.entries {
+        match &e.event {
+            Event::Spun { .. } if spent_at.is_none() => spent_at = Some(e.at_ms),
+            Event::Turned { stacks, .. } if spent_at.is_some() && kept.is_none() => {
+                kept = Some(*stacks)
+            }
+            _ => {}
+        }
+    }
+    let kept = kept.expect("it turned again after spending");
+    // Two kept, plus the one banked by the turn being reported, plus the extra
+    // Overwind grants: the number that matters is that it is not starting from
+    // one, which is what it would be with nothing kept.
+    assert!(kept > 2, "the tally restarted at {kept}, so nothing was kept");
+}
+
+/// The errand's ench is not on any bench, and handing the errand in gives it.
+#[test]
+fn an_errand_pays_an_ench_nobody_sells() {
+    let quests = data::quests();
+    let enchs = data::enchs();
+    let paid: Vec<&String> = quests.quests.iter().flat_map(|q| &q.enchs).collect();
+    assert!(!paid.is_empty(), "no errand pays an ench, so the class earns nothing on the map");
+    for id in &paid {
+        let e = enchs.get(id).expect("an ench by that id");
+        assert!(e.price.is_none(), "{id} is a reward and is also on every bench");
+    }
+    // And something without a price is on nobody's bench.
+    assert!(
+        enchs.enchs.iter().any(|e| e.price.is_some()),
+        "nothing is for sale, so a licensee starts with nothing at all"
+    );
+
+    // Walked: take it, go, come back.
+    let mut g = Game::new(31, "td");
+    g.world = gm2d_core::world::WorldState::at_start(&data::world(D));
+    g.character = licensee();
+    let q = quests.get("the-frame-that-stands").expect("the clerk's frame errand");
+    g.world.quests_done.push("the-eyes-have-it".into());
+    gm2d_core::quest::take(&mut g, &q.id).expect("the pit gives it out");
+    let place = q.goal.place().expect("it sends you somewhere");
+    gm2d_core::quest::on_arrival(&mut g, place);
+    assert_eq!(gm2d_core::quest::stage(&g, q), gm2d_core::quest::Stage::Ready);
+    let before = g.character.enchs_loose(&q.enchs[0]);
+    gm2d_core::quest::hand_in(&mut g, &q.id).expect("she takes it back");
+    assert_eq!(
+        g.character.enchs_loose(&q.enchs[0]),
+        before + 1,
+        "handed it in and the rack is no fuller"
+    );
+}

@@ -214,10 +214,34 @@
         "The key turns. It turns the whole way, which the Cave's lock did not do, and the door comes off the wall towards you rather than away.",
         "Behind it is nine feet of cut rock and then the end of what anybody has written down. There is a bracket in the ceiling with nothing hanging off it and a floor that has been swept.",
         "Somebody swept it. That is the last fact this game has for you.",
-        "The demo ends here. What is past the door is not written yet — not hidden, not locked, not saved for later. Not written. You have the key, the wall has a door in it, and the two of those took eight milestones."
+        "The demo ends here. What is past the door is not written yet \u2014 not hidden, not locked, not saved for later. Not written. You have the key, the wall has a door in it, and the two of those took eight milestones."
       ]
+    },
+    {
+      "at": [
+        2,
+        13
+      ],
+      "kind": "crossing",
+      "id": "the-slag-road",
+      "name": "the road out of the Slag Flats",
+      "guards": "the-burnwarp-shallows",
+      "needs_level": 5,
+      "shut": "A Sprocketman with a barrow has stopped where the slag ends. \"Everything past here is water and what lives in it,\" he says. \"You are the fourth this month. The other three went anyway.\""
+    },
+    {
+      "at": [
+        3,
+        8
+      ],
+      "kind": "crossing",
+      "id": "the-shallows-road",
+      "name": "the road up out of the Shallows",
+      "guards": "the-bengulon-verge",
+      "needs_level": 9,
+      "shut": "Somebody has nailed a plank across the road at chest height. Burned into it is a list of eleven names, and a twelfth with nothing written after it."
     }
   ],
-  "_map_note": "The first map: one town and a great deal of wilds. Kettleworks and High Wick are written and are not placed here — they belong on maps that do not exist yet, and their shelves and errands are kept in shops.json and quests.json waiting for them. `towns_on_this_map_all_trade_and_all_want_something` is what stops that becoming an excuse for unreachable content.",
+  "_map_note": "The first map: one town and a great deal of wilds. Kettleworks and High Wick are written and are not placed here \u2014 they belong on maps that do not exist yet, and their shelves and errands are kept in shops.json and quests.json waiting for them. `towns_on_this_map_all_trade_and_all_want_something` is what stops that becoming an excuse for unreachable content. Two crossings gate the north. A crossing guards a *region* rather than its own tile \u2014 rows four to fifteen are twelve tiles of open ground, so a crossing that refused only the square it stands on would need a dozen of them across a row, which is a wall. The place itself stands on the near side of what it guards, so it is a milestone you can walk up to and read.",
   "id": "west-bambulon"
 }

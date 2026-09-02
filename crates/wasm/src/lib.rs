@@ -236,6 +236,11 @@ pub fn world_json() -> String {
                     "id": p.id,
                     "name": p.name,
                     "needs": p.needs,
+                    // A crossing, and what it asks. Sent so the map can draw a
+                    // mark that says which of them is still shut — the number
+                    // is core's and the page prints it.
+                    "guards": p.guards,
+                    "needs_level": p.needs_level,
                 })
             })
             .collect();
@@ -464,6 +469,11 @@ pub fn try_step(dir: &str) -> String {
                 "shut": shut,
                 "ending": ending,
                 "boss": s.boss,
+                // Which kind of refusal it was. `blocked` already carries the
+                // sentence; this is what lets the page put a crossing's in the
+                // message panel and a cliff's in the flash at the bottom of
+                // the map, without the page reading the sentence to guess.
+                "crossing": s.crossing,
                 "routed": routed,
                 // **Nothing to fight.** A rout took the encounter, so this is
                 // null and the fight screen never opens — reported off

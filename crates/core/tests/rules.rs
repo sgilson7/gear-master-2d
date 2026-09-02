@@ -107,7 +107,10 @@ fn a_starting_character_has_no_rules() {
     let c = Character::starting();
     assert!(c.rules().is_empty(), "a starting character got {:?}", c.rules());
     assert!(c.start_with().rules.is_empty());
-    assert_eq!(c.allowances(), Allowances::default());
+    // The level rides in with the allowances and is not a rule — the map has
+    // no other way to be told what a crossing asks about.
+    assert_eq!(c.allowances(), Allowances { level: c.level(), ..Allowances::default() });
+    assert!(!c.allowances().wade);
     assert!(!c.scouting());
 }
 
@@ -181,12 +184,12 @@ fn a_step_into_water_is_refused_until_it_is_allowed() {
     assert_eq!(dry.at, [7, 8], "and a refused step does not move you");
     assert!(s.blocked.as_deref().unwrap().contains("frame"), "{:?}", s.blocked);
 
-    let s = world::step(&w, &mut state, &mut rng, D, Dir::South, &Allowances { wade: true });
+    let s = world::step(&w, &mut state, &mut rng, D, Dir::South, &Allowances { wade: true, ..Allowances::default() });
     assert!(s.moved, "and ground to somebody who is allowed to wade");
     assert_eq!(state.at, [7, 9]);
     // The middle is still shut, allowance or not: depth is a property of the
     // ground, and this is the half of the rule the map answers.
-    let s = world::step(&w, &mut state, &mut rng, D, Dir::South, &Allowances { wade: true });
+    let s = world::step(&w, &mut state, &mut rng, D, Dir::South, &Allowances { wade: true, ..Allowances::default() });
     assert!(!s.moved, "the middle of the lake is still the middle of the lake");
     assert_eq!(state.at, [7, 9]);
 }
@@ -202,7 +205,7 @@ fn a_step_into_water_is_refused_until_it_is_allowed() {
 fn a_repair_reads_the_allowance_going_in_and_ignores_it_coming_out() {
     let w = data::world(D);
     let mut wet = WorldState { at: [7, 9], last_town: String::new(), ..WorldState::at_start(&w) };
-    assert_eq!(w.repair(&mut wet, &Allowances { wade: true }), None, "they are allowed to be there");
+    assert_eq!(w.repair(&mut wet, &Allowances { wade: true, ..Allowances::default() }), None, "they are allowed to be there");
     assert_eq!(wet.at, [7, 9]);
 
     let mut same = WorldState { at: [7, 9], last_town: String::new(), ..WorldState::at_start(&w) };
@@ -215,7 +218,7 @@ fn a_repair_reads_the_allowance_going_in_and_ignores_it_coming_out() {
 #[test]
 fn an_allowance_never_shuts_anything() {
     let w = data::world(D);
-    let allowed = Allowances { wade: true };
+    let allowed = Allowances { wade: true, ..Allowances::default() };
     for y in 0..w.height {
         for x in 0..w.width {
             if w.passable(x, y) {

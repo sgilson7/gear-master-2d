@@ -1429,6 +1429,65 @@ def check_the_toad_walks_on_water(page, name, fails):
     assert window_rules
 
 
+def check_the_north_is_shut(page, name, fails):
+    """A level-one character cannot walk into a region of two-thousand-rated
+    creatures, and is told what the road wants.
+
+    Planted at level one on the crossing's own tile, because the point is the
+    step north out of it. The five-regions-at-nine shape is
+    `tests/crossings.rs`; what a browser has to prove is that the refusal
+    reaches a player where they will read it, rather than only the one-second
+    flash along the bottom of the map.
+    """
+    cross = page.evaluate("""() => (window.__world().places ?? [])
+        .filter(p => p.kind === 'crossing').sort((a, b) => b.at[1] - a.at[1])[0]""")
+    if not cross:
+        fails.append(f"{name}: the overworld has no crossing on it")
+        return
+    if not cross.get("needs_level"):
+        fails.append(f"{name}: {cross['id']} asks for no level")
+        return
+
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+
+    def at_the_crossing(level_xp):
+        def edit(body):
+            body["character"]["xp"] = level_xp
+            body.setdefault("world", {})["at"] = list(cross["at"])
+            body["world"]["map"] = ""
+        return edit
+
+    plant(page, base, at_the_crossing(0), stem="north-probe")
+    if page.text_content("#coords").strip() != f"{cross['at'][0]}, {cross['at'][1]}":
+        fails.append(f"{name}: could not stand on the crossing")
+        return
+    page.keyboard.press("ArrowUp")
+    page.wait_for_timeout(250)
+    dismiss_card(page)
+    close_fight(page)
+    if page.text_content("#coords").strip() != f"{cross['at'][0]}, {cross['at'][1]}":
+        fails.append(f"{name}: a level-one character walked north past {cross['id']}")
+        return
+    said = (page.text_content("#says") or "").strip()
+    if not said:
+        fails.append(f"{name}: the crossing refused in silence")
+    elif str(cross["needs_level"]) not in said:
+        fails.append(f"{name}: the refusal does not name the level it wants: {said!r}")
+
+    # And at the level it asks for, it is a road. 100,000 experience is
+    # comfortably past whatever the number is.
+    plant(page, base, at_the_crossing(100_000), stem="north-probe-2")
+    page.keyboard.press("ArrowUp")
+    page.wait_for_timeout(300)
+    dismiss_card(page)
+    close_fight(page)
+    y = int(page.text_content("#coords").split(",")[1])
+    if y >= cross["at"][1]:
+        fails.append(f"{name}: the crossing would not open at any level; still at row {y}")
+
+
 def check_scouting_is_earned(page, name, fails):
     """The map's danger and its odds are a skill, and `#numbers` is gone.
 
@@ -2384,6 +2443,9 @@ def walk_the_gate(browser, name, fails=None):
     check_a_set_reads(page, name, fails)
     check_the_toad_walks_on_water(page, name, fails)
 
+    # --- the north ------------------------------------------------------------
+    check_the_north_is_shut(page, name, fails)
+
     # --- scouting ------------------------------------------------------------
     check_scouting_is_earned(page, name, fails)
 
@@ -2466,6 +2528,7 @@ def main():
     print("ok: the wall grows a door, the key opens it, and the demo ends there")
     print("ok: a whole set names its own item and says what it does; two thirds of one does not")
     print("ok: the lake is ground at its rim to a toad, and a wall through its middle to everybody")
+    print("ok: the north is shut to a level-one character, and says what the road wants")
     print("ok: the class fork opens on top of the town it is offered in")
     print("ok: your own figure becomes your class's when you take one")
     print("ok: a mid-fight save reopens the same fight")

@@ -379,7 +379,7 @@ fn a_set_that_is_not_assembled_grants_nothing() {
 /// Wading only ever adds, so nothing the map already promised has moved.
 #[test]
 fn wading_does_not_move_a_place_or_a_region() {
-    let allowed = Allowances { wade: true };
+    let allowed = Allowances { wade: true, ..Allowances::default() };
     for (id, _) in data::MAPS {
         let w = data::map(id, D);
         for p in &w.places {

@@ -1286,7 +1286,14 @@ impl Character {
     /// The caller's half of *a map does not know about bags*: `world::step`
     /// takes this, and this is filled from what the character has.
     pub fn allowances(&self) -> crate::world::Allowances {
-        crate::world::Allowances::of(&self.rules())
+        crate::world::Allowances {
+            // **Not a rule, and not a bag.** A crossing asks what you *are*,
+            // which is the first thing on this map that does — so the level
+            // travels with the allowances rather than the map going and
+            // reading a character.
+            level: self.level(),
+            ..crate::world::Allowances::of(&self.rules())
+        }
     }
 
     /// Can this character read the map's numbers?

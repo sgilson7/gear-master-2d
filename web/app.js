@@ -205,6 +205,26 @@ function draw() {
       g.arc(ax + w / 2, ay - h / 2, 2.4, 0, Math.PI * 2);
       g.fill();
       g.fillRect(ax + w / 2 - 1, ay - h / 2, 2, 5);
+    } else if (p.kind === 'crossing') {
+      // **Its own mark, and neither of the two it is nearest.** A gate is a
+      // diamond and leads off the map; a door is an arch and leads out of what
+      // is written. A crossing is a milestone on a road that carries on, so it
+      // is a post with a bar across it — an upright and a crossbar, which is
+      // the one shape on this map that is a line rather than a body.
+      //
+      // Checked against the three channels `look.rs` keeps: the mark is a
+      // shape nothing else here draws, it is the page's ink rather than a
+      // sixth hue, and it stands a whole tile tall so it survives 32px. The
+      // crossbar goes from the post rather than through it, so it reads as a
+      // barrier and not as a plus sign.
+      const bx = cx, top = y * TILE + 5, bot = y * TILE + TILE - 5;
+      g.strokeStyle = ink();
+      g.lineWidth = 3;
+      g.beginPath();
+      g.moveTo(bx, top); g.lineTo(bx, bot);
+      g.moveTo(bx, top + 4); g.lineTo(bx + TILE / 2 - 4, top + 4);
+      g.stroke();
+      g.lineWidth = 2;
     } else if (p.kind === 'town') {
       g.fillStyle = pal.town[0];
       g.fillRect(x * TILE + 6, y * TILE + 6, TILE - 12, TILE - 12);
@@ -1440,6 +1460,11 @@ function walk(dir) {
       !$('ending').hidden) return;
   const r = JSON.parse(try_step(dir));
   blocked = r.moved ? null : r.blocked;
+  // **A crossing gets the message panel, a cliff gets the flash.** Core says
+  // which this was; the page does not read the sentence to work it out. A
+  // refusal that is a fact about where the game goes next is worth more than
+  // one second of 13px text along the bottom of a canvas.
+  if (r.crossing) says(r.blocked, true);
   paintPanel(); draw(); autosave();
   if (blocked) setTimeout(() => { blocked = null; draw(); }, 1100);
   // Arriving is the doing: an errand that says "go and talk to them" is

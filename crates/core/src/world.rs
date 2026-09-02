@@ -79,6 +79,14 @@ pub const WADE_DEPTH: u8 = 1;
 pub struct Allowances {
     /// Water within [`WADE_DEPTH`] of land is ground.
     pub wade: bool,
+    /// How far up the map the walker may go, as a level.
+    ///
+    /// **Not from a rule**, which is why [`Allowances::of`] does not set it —
+    /// it is a fact about the character that a crossing asks for, handed in
+    /// with everything else the map is not allowed to go and read. `Default` is
+    /// zero, which is nobody: a caller that has a character says so, and one
+    /// that does not is refused by every crossing, which is the safe way round.
+    pub level: u32,
 }
 
 impl Allowances {
@@ -86,6 +94,8 @@ impl Allowances {
     ///
     /// **Exhaustive**, which is the point of it being here: a rule added to the
     /// game is a rule somebody has to decide is not about walking.
+    /// Everything a rule list grants. **[`Allowances::level`] is not one of
+    /// them** and is filled in by the caller — see the field.
     pub fn of(rules: &[crate::rule::Rule]) -> Self {
         use crate::rule::Rule;
         let mut out = Allowances::default();
@@ -168,6 +178,26 @@ pub enum PlaceKind {
     /// its own mark rather than borrowing the diamond and reading as a place
     /// you could come back from.
     Door,
+    /// A threshold you may cross only when something is true of you.
+    ///
+    /// A gate's sibling: a gate is a way onto another map and a crossing is a
+    /// way further up this one. It exists because *nothing stopped a level-one
+    /// character walking fifteen tiles north into a region of two-thousand
+    /// rated creatures* — the gradient was a gradient and not a gate.
+    ///
+    /// **It guards a region, not its own tile**, which is a divergence from
+    /// `PLAN-M9.md` and the map is the reason: rows four to fifteen are open
+    /// ground twelve tiles wide, so a crossing that refused only the square it
+    /// stands on would need a dozen of them across a row, which is the wall the
+    /// plan rejected. So the place is a milestone you can walk up to and read,
+    /// standing on the near side of what it guards, and `guards` names the
+    /// region behind it.
+    ///
+    /// **It is the first thing in the game gated on what you *are* rather than
+    /// on what you carry.** A key is in the bag and a level is not, which is
+    /// why the number reaches `step` through [`Allowances`] with everything
+    /// else the map is not allowed to know about the walker.
+    Crossing,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -215,6 +245,18 @@ pub struct PlaceDef {
     /// there is nothing to choose and nothing to answer.
     #[serde(default)]
     pub prose: Vec<String>,
+    /// `Crossing`: the id of the region on the far side of it.
+    #[serde(default)]
+    pub guards: Option<String>,
+    /// `Crossing`: the level it asks for.
+    ///
+    /// **Not a danger number.** Danger is measured — the mean rating of what a
+    /// region holds — and `no_data_file_types_a_danger_number` fails the build
+    /// on one typed into a data file. This is the opposite kind of number: it
+    /// is what the road asks of *you*, and there is nothing to derive it from
+    /// because it is a pacing decision rather than a measurement.
+    #[serde(default)]
+    pub needs_level: Option<u32>,
 }
 
 /// Is this place there yet?
@@ -514,6 +556,51 @@ impl World {
         self.place_at(x, y).filter(|p| place_is_there(p, state))
     }
 
+    /// The crossing guarding the region this tile is in, if one does.
+    ///
+    /// A region rather than a tile — see [`PlaceKind::Crossing`]. Found by
+    /// walking the places rather than by an index, because there are two of
+    /// them on the biggest map this build ships and a cache would be a second
+    /// place for the answer to be stale.
+    pub fn crossing_into(&self, state: &WorldState, x: u8, y: u8) -> Option<&PlaceDef> {
+        let region = self.region_at(x, y)?;
+        self.places.iter().find(|p| {
+            p.kind == PlaceKind::Crossing
+                && p.guards.as_deref() == Some(region.id.as_str())
+                && place_is_there(p, state)
+        })
+    }
+
+    /// Why a crossing refuses this step, if one does.
+    ///
+    /// **Only on the way in.** A step that stays inside the guarded region is
+    /// never refused, which is what stops a crossing being a way to strand
+    /// somebody: a save planted on the far side of one can still walk out of
+    /// it. A threshold is a threshold and not a cage.
+    ///
+    /// The sentence is two registers kept apart, the same split `TONE.md` 13a
+    /// makes everywhere else: `shut` is the world's and is written in
+    /// `tiles.json`, and the numbers are the engine's and are derived here. A
+    /// `shut` line that quoted its own level would be a second copy of
+    /// `needs_level` sitting two lines above it in the same file.
+    pub fn crossing_refuses(
+        &self,
+        state: &WorldState,
+        to: (u8, u8),
+        allowed: &Allowances,
+    ) -> Option<String> {
+        let here = self.region_at(state.at[0], state.at[1]).map(|r| r.id.as_str());
+        let there = self.region_at(to.0, to.1)?;
+        if here == Some(there.id.as_str()) {
+            return None;
+        }
+        let c = self.crossing_into(state, to.0, to.1)?;
+        let need = c.needs_level?;
+        (allowed.level < need).then(|| {
+            format!("{} It wants level {need}, and you are {}.", c.shut, allowed.level)
+        })
+    }
+
     /// Every place on this map that is there right now.
     pub fn places_now(&self, state: &WorldState) -> Vec<&PlaceDef> {
         self.places.iter().filter(|p| place_is_there(p, state)).collect()
@@ -759,6 +846,14 @@ pub struct Step {
     pub gate: Option<String>,
     /// A creature standing here rather than one the ground rolled.
     pub boss: Option<String>,
+    /// The crossing that refused this step, if one did.
+    ///
+    /// `blocked` already carries the sentence; this says *which kind* of
+    /// refusal it was, so the page can put it where a player will read it. A
+    /// cliff is a bump and belongs in the one-line flash at the bottom of the
+    /// map; a crossing is a fact about where the game goes next and deserves
+    /// the message panel.
+    pub crossing: Option<String>,
     /// A fight rolled on entering.
     pub encounter: Option<&'static MonsterSpec>,
 }
@@ -791,6 +886,7 @@ impl Step {
             gate: None,
             door: None,
             boss: None,
+            crossing: None,
             encounter: None,
         }
     }
@@ -835,6 +931,17 @@ pub fn step(
         });
     }
 
+    // **The crossing, before the step rather than after it.** Everything else a
+    // place does happens once you are standing on it; this is the one that has
+    // to happen before, because what it does is refuse. Nothing is drawn and no
+    // roll is made — a refused step is a step that never happened, the same as
+    // walking into a cliff.
+    if let Some(why) = world.crossing_refuses(state, (nx, ny), allowed) {
+        let mut out = Step::nowhere(&why);
+        out.crossing = world.crossing_into(state, nx, ny).map(|c| c.id.clone());
+        return out;
+    }
+
     state.at = [nx, ny];
     state.bump("tiles-walked");
 
@@ -847,6 +954,7 @@ pub fn step(
         gate: None,
         door: None,
         boss: None,
+        crossing: None,
         encounter: None,
     };
 
@@ -884,6 +992,11 @@ pub fn step(
                     return out;
                 }
             }
+            // **You walk over it.** A crossing that stopped you on its own tile
+            // would be a gate, and it is not one: it has already had its say,
+            // above, before the step was taken. Falls through to the encounter
+            // roll like any ordinary ground.
+            PlaceKind::Crossing => {}
         }
     }
 

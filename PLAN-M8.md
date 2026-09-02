@@ -52,14 +52,17 @@ it.** `explain.rs` was written with a duplicate `Action::describe` and
 
 | # | Ask | Where it lands |
 |---|---|---|
-| A | Curses reachable and visible | M8.1, M8.2 |
-| B | A Worm-Fact node: watch activations, curse of searing when a helmet goes off | M8.2 |
-| C | Scouting danger becomes a class skill; remove **Show the numbers** | M8.2 |
-| D | A new class, from the book, that grants **enchantments** | M8.3, M8.5 |
-| E | Enchantment inventory while packing: attach to a piece, toggle, show it clearly | M8.3 |
-| F | The spin: enchanted items rotate each second, stack ×0.1 power, spend on activation | M8.4 |
-| G | Cursor drift — the primary button must stop moving | M8.1 |
-| H | Fatigue resets in town | M8.1 |
+| A | Curses reachable and visible | M8.2, M8.3 |
+| B | A Worm-Fact node: watch activations, curse of searing when a helmet goes off | M8.3 |
+| C | Scouting danger becomes a class skill; remove **Show the numbers** | M8.3 |
+| D | A new class, from the book, that grants **enchantments** | M8.4, M8.6 |
+| E | Enchantment inventory while packing: attach to a piece, toggle, show it clearly | M8.4 |
+| F | The spin: enchanted items rotate each second, stack ×0.1 power, spend on activation | M8.5 |
+| G | Cursor drift — the primary button must stop moving | M8.2 |
+| H | Fatigue resets in town | M8.2 |
+| **I** | **Revisit an event that has an errand on it**, and draw it differently | **M8.0** |
+| **J** | **Save and load carry everything** — answered events, doors, errands, wear | **M8.0** |
+| **K** | **A quest log that points at the map** — where to go, or where the creature is | **M8.1** |
 
 ---
 
@@ -68,25 +71,117 @@ it.** `explain.rs` was written with a duplicate `Action::describe` and
 Each milestone ends at a deployable state. The order is chosen to avoid three
 specific rewrites:
 
-- **Plumbing before content.** M8.2 builds the first skill effect that grants a
-  *rule* rather than a stat. M8.5 writes eight nodes for the new class, several
+- **Plumbing before content.** M8.3 builds the first skill effect that grants a
+  *rule* rather than a stat. M8.6 writes eight nodes for the new class, several
   of which will want rules. Building the plumbing once, two milestones early,
   is the difference between writing eight nodes and writing them twice.
 - **The model before the thing delivered on it.** The spin (F) is delivered *as*
   an enchantment. If it were built first it would invent its own attachment,
   its own save field and its own board mark, and all three would be thrown away
   when the general system (E) arrived. E first, F second.
-- **The spin before the class's tree.** M8.5's nodes will tune the spin
+- **The spin before the class's tree.** M8.6's nodes will tune the spin
   (a node that adds ×0.05 a turn, a node that keeps one stack through an
   activation). Writing them before the spin exists means guessing at numbers
   and retuning every one.
 
-M8.1 is first because it is entirely presentation, ships value immediately, and
-the fixed action bar it introduces makes every later browser walk simpler.
+- **The broken thing first.** M8.0 is a live blocker: Marbulon's errands cannot
+  be handed in, because answering her card once puts her id in `answered` and
+  the tile goes dead. Everything after it builds on a questline that does not
+  currently finish.
+- **The two map-painting jobs adjacent.** M8.0 changes how a place is drawn
+  (revisitable events are not diamonds) and M8.1 draws onto the map again (the
+  quest log highlights where to go). Together that is one pass over the painter
+  instead of two.
+
+M8.2 leads the rest because it is entirely presentation, ships value at once,
+and the fixed action bar it introduces makes every later browser walk simpler.
 
 ---
 
-## M8.1 — Make what is there visible, and stop the cursor moving
+## M8.0 — The two things that are broken
+
+**Theme:** a live blocker, and a gap in the one guarantee this project has
+always made about saves.
+
+### Deliverables
+
+1. **An event with an errand on it can be revisited.** `world::step` opens an
+   event only if its id is not in `answered`, so answering Marbulon's card once
+   makes her tile inert — and her two errands, the questline that unlocks the
+   cave, can never be taken or handed in.
+   - The rule to write: **the card always opens; the choices are spent, the
+     errands are not.** Prose and choices are answered once, which is right; an
+     errand board is a standing feature of a place, which is what a town's
+     already is.
+   - `Step` grows a way to say *opened, and its choices are spent*, so the page
+     can reopen a visited event without offering a spent choice.
+2. **A revisitable place is drawn differently.** A diamond is a gate or a boss.
+   A place that still has something for you wants its own shape — proposed: a
+   **ring** drawn over whatever the place already is, so the map answers *where
+   do I go* without a legend. Three states worth telling apart: nothing here for
+   me, an errand I could take, an errand I could hand in.
+3. **A save carries everything, and a test says so.** The structure is already
+   safe — `SaveFile::of` and `into_game` destructure exhaustively, so a new
+   field is a compile error until the save carries it. What is missing is proof
+   the *values* survive: nothing asserts `fatigue`, `supplies`, `carried`,
+   `quests_taken`, `quests_done`, `bought`, `answered` or `map`.
+   - The test: build a **thoroughly used** game — walked, events answered,
+     errands taken and finished, gear bought off a shelf, tired, carrying
+     experience, standing in a dungeon — round-trip it, and assert every field
+     matches. Not a fresh game, which is the shape that passes while proving
+     least.
+
+### Tests
+
+- `a_used_game_survives_a_round_trip` — the fat save above, field by field.
+- `an_event_with_an_errand_reopens` (core).
+- `check_an_errand_can_be_handed_in_where_it_was_taken` (browser) — the exact
+  reported case, walked.
+
+### Deploy point
+
+After 3. This is the milestone that unblocks the game as it stands.
+
+---
+
+## M8.1 — The quest log, and the map it points at
+
+**Theme:** the errands exist, there is nowhere to see them all, and no way to
+find out where a Whisperling lives.
+
+### Deliverables
+
+1. **A quest log**, as a tab beside the tree: every errand taken, what it asks,
+   how far along, where it is handed in. `quests_json` already reports stage,
+   `have`, `want`, giver and turn-in, so this is a screen over data that already
+   crosses the boundary.
+2. **Hover, or pin, and the map answers.** Pointing at an errand highlights the
+   **place** to go when the errand names one, and the **region** a creature can
+   be met in when the goal is a slaying. `world.regions[].enemies` already
+   crosses the boundary.
+3. **Pinning outlives the screen.** A pinned errand keeps its highlight after
+   the log is closed — the difference between a reference and a tool. One pin at
+   a time; the pin is state and goes in the save.
+4. **The highlight is not a fourth colour.** The map already carries terrain
+   hue, region shade, place marks and the player. Proposed: a pulse on the
+   region's tiles plus a ring on the target place — motion rather than another
+   hue, the same argument the spin's animation makes.
+
+### Tests
+
+- `every_slaying_errand_names_a_creature_some_region_holds` (core) — the
+  highlight always has somewhere to point.
+- `check_the_log_points_somewhere` (browser) — pin Marbulon's first errand and
+  assert the Whisperling region lights up.
+- A pinned errand survives a round trip.
+
+### Deploy point
+
+After 3. The pulse can follow.
+
+---
+
+## M8.2 — Make what is there visible, and stop the cursor moving
 
 **Theme:** nothing new in the engine. Three things the player cannot currently
 see, and one thing that makes them chase a button.
@@ -142,7 +237,7 @@ be more than it looks, ship the rest without it.
 
 ---
 
-## M8.2 — Skills that grant rules
+## M8.3 — Skills that grant rules
 
 **Theme:** the skill tree can currently grant a stat, a starting balance, a row
 or an assembly percentage. It cannot grant a *rule*. Two of the asks need one.
@@ -168,8 +263,8 @@ or an assembly percentage. It cannot grant a *rule*. Two of the asks need one.
    Rotting — so it is where a "watch the board and curse them" node belongs.
 5. **Scouting moves into a tree and `#numbers` is deleted.** Proposed home:
    also the Worm-Fact Keeper, so the button can go in this milestone rather
-   than waiting for M8.5. *(One line of data to move it into the new class's
-   tree instead, if that reads better once M8.5 exists.)*
+   than waiting for M8.6. *(One line of data to move it into the new class's
+   tree instead, if that reads better once M8.6 exists.)*
 
 ### Tests
 
@@ -195,7 +290,7 @@ answers to one question.
 
 ---
 
-## M8.3 — Enchantments you attach, and the class that grants them
+## M8.4 — Enchantments you attach, and the class that grants them
 
 **Theme:** the new subsystem, and the class whose identity it is.
 
@@ -253,7 +348,7 @@ After 5.
 
 ---
 
-## M8.4 — The spin
+## M8.5 — The spin
 
 **Theme:** the ench that turns an item, and the stacking power it earns.
 
@@ -313,7 +408,7 @@ After 5.
 
 ---
 
-## M8.5 — The Kaklon Patent
+## M8.6 — The Kaklon Patent
 
 **Theme:** the class's tree, and enough enchs to spend it on.
 
@@ -365,8 +460,8 @@ After 3.
 
 ## 5. Open questions for the human
 
-1. **Scouting's home** — Worm-Fact Keeper (available in M8.2) or the Kaklon
-   Patent (waits for M8.5)? Planned as the former; one line to move.
+1. **Scouting's home** — Worm-Fact Keeper (available in M8.3) or the Kaklon
+   Patent (waits for M8.6)? Planned as the former; one line to move.
 2. **Does a town reset fatigue completely, or to a floor?** Planned as
    completely, as asked. A floor would keep the tins relevant on the way home.
 3. **Can a component carry two enchs?** Planned as one. Two is a bigger space

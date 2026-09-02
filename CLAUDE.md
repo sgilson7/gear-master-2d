@@ -213,6 +213,20 @@ against a genuine mismatch looping anyway.
 
 `packaging/package-web.sh` fails the build if the stamp is not applied.
 
+**The stamp hashes everything the browser caches**, and two holes have been
+found in that line by hand rather than by a test:
+
+1. The modules were listed by name, so `shape.js` was left out when it was
+   added — and its own import of `board.js` with it.
+2. `index.html` and `styles.css` were left out, so a markup- or CSS-only change
+   produced an **identical stamp**. `styles.css?v=…` kept its old URL and was
+   served from cache for ever, and the entry point's self-heal never fired
+   because the two stamps matched. A CSS fix could ship and never reach anybody
+   who had already loaded the page.
+
+The hash is taken **before** stamping, which is what makes it stable — the
+`?v=` values and `__BUILD__` are written into those files afterwards.
+
 ## How the board reads
 
 Lifted from upstream's `crates/gui`, which had a documented, tested,

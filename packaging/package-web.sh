@@ -63,9 +63,20 @@ say "Stamping build version"
 sha256() { if command -v shasum >/dev/null; then shasum -a 256; else sha256sum; fi }
 bust() { S="$2" R="$3" perl -0777 -pi -e 's/\Q$ENV{S}\E/$ENV{R}/g' "$1"; }
 
-# Every shipped module, whatever it is called. Listing them by name is how
-# `shape.js` got left out of the hash and out of the stamping below.
-BUILD=$(cat "$WEB"/*.js "$WEB/pkg/$WASM.js" "$WEB/pkg/${WASM}_bg.wasm" | sha256 | cut -c1-8)
+# **Everything the browser caches**, whatever it is called. Two holes have been
+# found in this line by hand:
+#
+#   1. Listing the modules by name left `shape.js` out when it was added.
+#   2. Leaving `index.html` and `styles.css` out meant a markup- or CSS-only
+#      change produced an *identical* stamp — so `styles.css?v=…` kept its old
+#      URL and was served from cache for ever, and the entry point's self-heal
+#      never fired because the stamps matched. A deployed fix that a returning
+#      player cannot receive is not a delivered fix.
+#
+# Hashed before stamping, which is what makes it stable: the `?v=` values and
+# `__BUILD__` are written into these files afterwards.
+BUILD=$(cat "$WEB"/*.js "$WEB/index.html" "$WEB/styles.css" \
+            "$WEB/pkg/$WASM.js" "$WEB/pkg/${WASM}_bg.wasm" | sha256 | cut -c1-8)
 
 bust "$WEB/app.js"       "from './pkg/$WASM.js'" "from './pkg/$WASM.js?v=$BUILD'"
 

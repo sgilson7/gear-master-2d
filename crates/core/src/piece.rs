@@ -11367,6 +11367,211 @@ pub static CATALOG: &[PieceDef] = &[
         power_bonus: 0,
         price: 30,
     },
+    // ---- what a creature leaves behind -------------------------------
+    //
+    // Eight components off the three creatures the pit deals, at a per-mille
+    // named in `data/drops.json`. Appended rather than inserted, like
+    // everything before them: catalogue order is not a save's business, but it
+    // is `def_index`'s and the golden fixture's, and neither should move for a
+    // block that adds content.
+    //
+    // **They are ordinary gear here and a set in M9.2.** What makes a set a
+    // set is `AssemblyBonus::names` and `AssemblyBonus::grants`, and both
+    // arrive with the rules they hand out; the milestone split is deliberate,
+    // because the rate is the thing that gets retuned and the gear is the thing
+    // that gets added to, and the two should not be one commit.
+    //
+    // Every one of them is `EVENT_ONLY`. A drop you could buy is worse than a
+    // quest reward you could buy, which is already refused.
+    //
+    // ---- the Rat King's three, off a Cave Rat. Gloves: material, mold, ring,
+    // which is the whole recipe, so three drops make one finished item and
+    // nothing has to be bought to complete them.
+    PieceDef {
+        name: "Ratskin Material",
+        slot: SlotKind::Gloves,
+        kind: PieceKind::Material,
+        cells: &[(0, 0), (1, 0), (0, 1), (1, 1)],
+        base: Stats { armor: 5, health: 14, ..Stats::ZERO },
+        assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: None,
+            label: "Ratskin",
+            stats: Stats::health(40),
+            triggers: &[],
+        }),
+        // **Nothing that belongs to a grid.** A Material floats — it fits
+        // gloves and greaves alike — so an identity mechanic on one is a claim
+        // about the source rather than about the board.
+        // `identity_carriers` is budgeted at zero and caught the first draft,
+        // which handed this a gloves reaction. The mold and the signet carry
+        // the hands' axis, and both stay where they were written.
+        effect: None,
+        cooldown_ms: 0,
+        speed_bonus: 0,
+        triggers: &[],
+        quest: None,
+        power_bonus: 0,
+        price: 9,
+    },
+    PieceDef {
+        name: "Ratskin Mold",
+        slot: SlotKind::Gloves,
+        kind: PieceKind::Mold,
+        cells: &[(0, 0), (1, 0), (0, 1)],
+        base: Stats::ZERO,
+        assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: None,
+            label: "Ratgrip",
+            stats: Stats::strength(3),
+            triggers: &[],
+        }),
+        effect: None,
+        cooldown_ms: 0,
+        speed_bonus: 0,
+        triggers: &[Trigger::OnAdjacentActivate(Action::Gain {
+            what: Resource::Rage,
+            amount: 3,
+        })],
+        quest: None,
+        power_bonus: 0,
+        price: 8,
+    },
+    PieceDef {
+        name: "Rat Signet",
+        slot: SlotKind::Gloves,
+        kind: PieceKind::Ring,
+        cells: &[(0, 0)],
+        base: Stats { armor: 6, ..Stats::ZERO },
+        assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: None,
+            label: "Ratmark",
+            stats: Stats::health(20),
+            triggers: &[],
+        }),
+        effect: None,
+        cooldown_ms: 0,
+        speed_bonus: 0,
+        triggers: &[Trigger::OnAdjacentActivate(Action::GainArmor(3))],
+        quest: None,
+        power_bonus: 0,
+        price: 7,
+    },
+    // ---- the toad's two, off a Bog Toad. Chest: a base and a layer, which is
+    // that recipe entire.
+    PieceDef {
+        name: "Toad Frame",
+        slot: SlotKind::Chest,
+        kind: PieceKind::Base,
+        cells: &[(0, 0), (1, 0), (2, 0), (0, 1), (1, 1), (2, 1)],
+        base: Stats { health: 55, regen: 2, ..Stats::ZERO },
+        assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: None,
+            label: "Broadback",
+            stats: Stats::health(60),
+            triggers: &[Trigger::OnActivate(Action::GainArmor(8))],
+        }),
+        effect: None,
+        cooldown_ms: 4200,
+        speed_bonus: 0,
+        triggers: &[],
+        quest: None,
+        power_bonus: 0,
+        price: 22,
+    },
+    PieceDef {
+        name: "Toad Hide",
+        slot: SlotKind::Chest,
+        kind: PieceKind::Layer,
+        cells: &[(0, 0), (1, 0), (0, 1), (1, 1)],
+        base: Stats { health: 30, armor: 9, ..Stats::ZERO },
+        assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: None,
+            label: "Wetleather",
+            stats: Stats::regen(4),
+            triggers: &[],
+        }),
+        effect: None,
+        cooldown_ms: 0,
+        speed_bonus: 0,
+        triggers: &[],
+        quest: None,
+        power_bonus: 0,
+        price: 18,
+    },
+    // ---- the swarm's three, off a Bone Archer. Helmet: a frame, a plating
+    // and a crest, which is that recipe entire. The head's axis is economy,
+    // and a thing made of watchers banks what it sees.
+    PieceDef {
+        name: "Bone Crown",
+        slot: SlotKind::Helmet,
+        kind: PieceKind::Frame,
+        cells: &[(0, 0), (1, 0), (2, 0), (0, 1), (2, 1)],
+        base: Stats { mind_resist: 6, mana: 2, ..Stats::ZERO },
+        assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: None,
+            label: "Manybones",
+            stats: Stats::mind(6),
+            triggers: &[Trigger::OnActivate(Action::GainMana(6))],
+        }),
+        effect: None,
+        cooldown_ms: 3600,
+        speed_bonus: 0,
+        triggers: &[],
+        quest: None,
+        power_bonus: 0,
+        price: 21,
+    },
+    PieceDef {
+        name: "Bone Scale",
+        slot: SlotKind::Helmet,
+        kind: PieceKind::Plating,
+        cells: &[(0, 0), (1, 0)],
+        // Plating floats into greaves, so this carries nothing the head owns —
+        // the same refusal the Ratskin Material takes, and the first draft's
+        // mind resist was exactly the identity mechanic the budget forbids.
+        base: Stats { armor: 7, ..Stats::ZERO },
+        assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: None,
+            label: "Splintered",
+            stats: Stats::health(25),
+            triggers: &[],
+        }),
+        effect: None,
+        cooldown_ms: 0,
+        speed_bonus: 0,
+        triggers: &[],
+        quest: None,
+        power_bonus: 0,
+        price: 12,
+    },
+    PieceDef {
+        name: "Bone Fletch",
+        slot: SlotKind::Helmet,
+        kind: PieceKind::Crest,
+        cells: &[(0, 0), (0, 1)],
+        base: Stats { mana: 3, ..Stats::ZERO },
+        assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: None,
+            label: "Fletched",
+            stats: Stats::health(20),
+            triggers: &[Trigger::OnActivate(Action::GainMana(3))],
+        }),
+        effect: None,
+        cooldown_ms: 0,
+        speed_bonus: 0,
+        triggers: &[],
+        quest: None,
+        power_bonus: 0,
+        price: 11,
+    },
 ];
 
 /// Gear that exists only on a boss.
@@ -11410,6 +11615,20 @@ pub const EVENT_ONLY: &[&str] = &[
     "Nine-Plane Lens",
     "The Witch's Key",
     "The Deep Gate Key",
+    // **What the pit's three creatures leave behind.** A drop you could buy is
+    // worse than a quest reward you could buy: it makes the creature that owns
+    // it a formality rather than the reason to go and meet one. Here for the
+    // same four jobs the block below names — off every shelf, out of `melt`,
+    // out of `dearer_than`, and out of every footprint family the creature
+    // stepper walks.
+    "Ratskin Material",
+    "Ratskin Mold",
+    "Rat Signet",
+    "Toad Frame",
+    "Toad Hide",
+    "Bone Crown",
+    "Bone Scale",
+    "Bone Fletch",
     // THE HUNDRED. Three enchantments dug out of a county and two orbs that
     // are how you get back into it - none of them for sale anywhere, and the
     // three enchantments not on a town's shelf either, because the county's

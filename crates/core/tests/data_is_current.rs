@@ -14,12 +14,13 @@ fn on_disk(name: &str) -> String {
 
 #[test]
 fn the_compiled_in_data_matches_the_files() {
-    for (name, embedded) in [
-        ("terrain.json", data::TERRAIN_JSON),
-        ("tiles.json", data::TILES_JSON),
-        ("events.json", data::EVENTS_JSON),
-        ("theme.td.json", data::THEME_TD_JSON),
-    ] {
+    // **Every file, not four of them.** This was a list of four written out by
+    // hand while `data.rs` embedded eleven, so a stale `shops.json`,
+    // `quests.json`, `skills.json`, `supplies.json`, `enchs.json`,
+    // `dungeon.json` or `drops.json` would have shipped without a word. The
+    // list lives in `data::FILES` now, beside the things it names.
+    assert!(data::FILES.len() >= 11, "content was added to data.rs and not to FILES");
+    for (name, embedded) in data::FILES.iter().copied() {
         assert_eq!(
             on_disk(name),
             embedded,

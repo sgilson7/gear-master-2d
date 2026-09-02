@@ -1,0 +1,15 @@
+{
+  "format": "gm2d-drops",
+  "version": 1,
+  "_note": "What a creature leaves behind, by canonical name and in per-mille. The order matters: it is the order the stream is drawn in, so a seeded walk replays only while it holds. Every rate here is 50 - one win in twenty - which `a_set_is_a_few_hours_and_not_a_lifetime` walks and holds between fifteen and a hundred and twenty wins for a whole set. It is a starting point and it is meant to be argued with once somebody has played it.",
+  "drops": [
+    { "creature": "Cave Rat", "piece": "Ratskin Material", "per_mille": 50 },
+    { "creature": "Cave Rat", "piece": "Ratskin Mold", "per_mille": 50 },
+    { "creature": "Cave Rat", "piece": "Rat Signet", "per_mille": 50 },
+    { "creature": "Bog Toad", "piece": "Toad Frame", "per_mille": 50 },
+    { "creature": "Bog Toad", "piece": "Toad Hide", "per_mille": 50 },
+    { "creature": "Bone Archer", "piece": "Bone Crown", "per_mille": 50 },
+    { "creature": "Bone Archer", "piece": "Bone Scale", "per_mille": 50 },
+    { "creature": "Bone Archer", "piece": "Bone Fletch", "per_mille": 50 }
+  ]
+}

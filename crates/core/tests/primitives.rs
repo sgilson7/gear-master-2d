@@ -672,12 +672,15 @@ fn every_assembly_bonus_carries_a_stat() {
 fn the_catalogue_carries_the_assembly_bonuses_it_says_it_does() {
     let n = assembly_bonuses().len();
     assert_eq!(
-        n, 37,
-        "thirty-seven. It was thirty-six for a long time: it had been \
+        n, 45,
+        "forty-five. It was thirty-seven until M9.1, which added eight \
+         components the pit's three creatures drop and gave every one of them \
+         a bonus - because an assembly bonus is what makes a set a set, and \
+         M9.2 hangs the names and the granted rules off exactly these eight. \
+         Before that it was thirty-six for a long time: it had been \
          thirty-seven until this test found that Leaden Tome's was a label \
          over Stats::ZERO - a heading for its power_bonus, which is \
-         unconditional and printed elsewhere - and the thirty-seventh now is \
-         Counting Frame's, which the pit's clerk pays out for four tins"
+         unconditional and printed elsewhere"
     );
 }
 
@@ -705,6 +708,15 @@ fn the_armed_assembly_bonuses_are_the_ones_that_were_authored() {
         armed,
         vec![
             "Ambush Mold",
+            // M9.1. Three of the eight the pit's creatures drop, and the only
+            // three in this list that **cannot** move the ladder: every one of
+            // the eight is `EVENT_ONLY`, which keeps them out of every
+            // footprint family `stepped_component` walks, so no creature can
+            // ever be dealt one. The golden fixture and the calibration walk
+            // are unmoved and say so, which is the re-measurement this line
+            // asks for.
+            "Bone Crown",
+            "Bone Fletch",
             // M8. Arming these two moved the ladder, which is what this
             // assertion exists to make somebody look at: owner 41/50 -> 42/50
             // at the hard setting, friend 97.3% -> 97.4%, Warded Idol 2.80s ->
@@ -719,6 +731,7 @@ fn the_armed_assembly_bonuses_are_the_ones_that_were_authored() {
             "Pilgrim Sole",
             "Ridge Runner",
             "Rimebound Mold",
+            "Toad Frame",
             "Worldstrider Sole",
         ],
         "an assembly bonus was armed or disarmed. That moves the ladder, so the \

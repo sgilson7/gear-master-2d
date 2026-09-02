@@ -77,6 +77,23 @@ impl Game {
         crate::theme::by_id(&self.theme).monster(canonical).to_string()
     }
 
+    /// A component's name in the theme that is talking.
+    ///
+    /// Takes a `&str` where `theme_name` takes a `&'static str`, because the
+    /// callers have one out of a data file rather than out of `CATALOG` — so
+    /// the catalogue is what turns it back into a literal, and a name the
+    /// catalogue does not know comes back unchanged.
+    ///
+    /// A receipt naming a component in the engine's words is a receipt about a
+    /// thing no other screen in the game calls that. The three lines that do it
+    /// are here: an errand's tally, a boss's drop, and a set piece.
+    pub fn theme_piece(&self, canonical: &str) -> String {
+        match crate::piece::CATALOG.iter().find(|d| d.name == canonical) {
+            Some(d) => crate::theme::by_id(&self.theme).piece(d.name).to_string(),
+            None => canonical.to_string(),
+        }
+    }
+
     /// Walking into a town takes the tiredness off. Returns how much came off.
     ///
     /// **This is not a rest, and there still is not one.** Health has reset at

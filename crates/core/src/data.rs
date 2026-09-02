@@ -19,6 +19,28 @@ pub const SHOPS_JSON: &str = include_str!("../../../data/shops.json");
 pub const QUESTS_JSON: &str = include_str!("../../../data/quests.json");
 pub const SUPPLIES_JSON: &str = include_str!("../../../data/supplies.json");
 pub const ENCHS_JSON: &str = include_str!("../../../data/enchs.json");
+pub const DROPS_JSON: &str = include_str!("../../../data/drops.json");
+
+/// Every content file this build compiled in, by name.
+///
+/// A list, because `tests/data_is_current.rs` walked four of the eleven and had
+/// no way to know it. The drift it catches goes in exactly one direction — an
+/// edit that never reached a rebuild — and a partial list catches it for a
+/// quarter of the content. Adding a file here is the second half of adding one
+/// above, and the test is what says so.
+pub const FILES: &[(&str, &str)] = &[
+    ("terrain.json", TERRAIN_JSON),
+    ("tiles.json", TILES_JSON),
+    ("dungeon.json", DUNGEON_JSON),
+    ("events.json", EVENTS_JSON),
+    ("theme.td.json", THEME_TD_JSON),
+    ("skills.json", SKILLS_JSON),
+    ("shops.json", SHOPS_JSON),
+    ("quests.json", QUESTS_JSON),
+    ("supplies.json", SUPPLIES_JSON),
+    ("enchs.json", ENCHS_JSON),
+    ("drops.json", DROPS_JSON),
+];
 
 /// The shipped map, loaded and checked.
 ///
@@ -94,4 +116,9 @@ pub fn supplies() -> crate::fatigue::SuppliesData {
 /// What a licensee can bolt to a component.
 pub fn enchs() -> crate::ench::EnchsData {
     crate::ench::EnchsData::parse(ENCHS_JSON).expect("the shipped enchs are broken")
+}
+
+/// What a creature leaves behind, and how often.
+pub fn drops() -> crate::drops::DropsData {
+    crate::drops::DropsData::parse(DROPS_JSON).expect("the shipped drops are broken")
 }

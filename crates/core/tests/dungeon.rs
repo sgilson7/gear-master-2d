@@ -210,8 +210,13 @@ fn the_boss_drops_its_key_and_a_field_fight_does_not() {
     assert_eq!(log.outcome, gm2d_core::combat::Outcome::Victory, "the test board lost");
     let s = fight::settle(&mut g, &log, D).unwrap();
     assert_eq!(gm2d_core::quest::holding(&g, &key), 1, "the boss left nothing");
+    // **In the theme's words.** The receipt used to name the key canonically,
+    // which is the one screen in the game that called it that; M9.1 put the
+    // three lines that hand a component over through `Game::theme_piece`.
+    let said = g.theme_piece(&key);
+    assert_ne!(said, key, "the theme has a name for the key and this is testing that it is used");
     assert!(
-        s.receipt.iter().any(|l| l.contains(&key)),
+        s.receipt.iter().any(|l| l.contains(&said)),
         "the receipt does not mention it: {:?}",
         s.receipt
     );

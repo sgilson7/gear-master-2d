@@ -19,6 +19,7 @@ pub mod event;
 pub mod curse;
 pub mod ench;
 pub mod data;
+pub mod drops;
 pub mod fight;
 pub mod game;
 pub mod loadout;

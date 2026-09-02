@@ -937,6 +937,27 @@ pub static TURTLE_DICK: Theme = Theme {
         ("Mirror Shard", "Shard of the Long Mirror"),
         ("The Bog Census", "The Bengulon Tally"),
         ("Census Bolt", "Count The Legs"),
+        // **What the pit's three creatures leave behind**, at a per-mille in
+        // `data/drops.json`. The name is the human's where there is one and the
+        // creature's where there is not: a set you got off an A. Rat should
+        // read as an A. Rat's, so a player who finds the third piece knows what
+        // they have without opening a screen.
+        //
+        // The rat is cheese all the way down, which is the human's joke and not
+        // a describable mechanic — the mechanical half is `AssemblyBonus`'s
+        // label and is unthemed, TONE 13a.
+        ("Ratskin Material", "Cheesy Fingers"),
+        ("Ratskin Mold", "Cheese Touch"),
+        ("Rat Signet", "Cheese Finder"),
+        // The toad is already the Bengulon Jungle Toad, so its hide is, exactly
+        // as its eyes already were.
+        ("Toad Frame", "Bengulon Toad Frame"),
+        ("Toad Hide", "Bengulon Toad Hide"),
+        // And the Bone Archer is the Wallspider Swarm, which is five other
+        // components' word for it already.
+        ("Bone Crown", "Wallspider Crown"),
+        ("Bone Scale", "Wallspider Scale"),
+        ("Bone Fletch", "Wallspider Fletch"),
         ("A Word About the Sidings", "A Word About the Cork Yards"),
         ("A Word About the Points", "A Word About the Sprocketman's Lever"),
         // THE HUNDRED. A county is land, so the three enchantments are places

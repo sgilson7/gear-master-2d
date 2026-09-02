@@ -162,11 +162,11 @@ pub fn rout(game: &mut Game) -> Option<Rout> {
     }
     game.world.bump("wins");
     game.world.bump("routs");
-    // An errand that counts this creature counts it. A set that broke a town's
-    // errand would be a reward that took something away.
-    for name in crate::quest::on_victory(game, spec.name) {
-        receipt.push(format!("Took a {name}."));
-    }
+    // An errand that counts this creature counts it, and it still leaves what
+    // it leaves. A set that broke a town's errand would be a reward that took
+    // something away, and one that stopped the drops would be a set that shut
+    // the door behind itself.
+    pay_a_win(game, spec.name, &mut receipt);
     // **And no tiredness.** A fight takes 4% of you whatever happens in it;
     // this was not one, and a player will check.
     receipt.push(format!(
@@ -181,6 +181,36 @@ pub fn rout(game: &mut Game) -> Option<Rout> {
         carried: game.character.carried,
         receipt,
     })
+}
+
+/// What a beaten creature leaves, whether it was fought or routed.
+///
+/// One function rather than two lists, because a rout pays what a win pays and
+/// two copies of "what a win pays" is two answers to one question. Both halves
+/// are gated, and on different things:
+///
+/// - **An errand's tally is gated on the errand**, not on the creature. A bag
+///   filling with toad eyes before anybody wanted one is litter.
+/// - **A drop is gated on nothing but the roll**, and refused afterwards if the
+///   piece is already in the bag. A set is three specific pieces and not three
+///   of a kind, and the refusal is *after* the roll on purpose: skipping the
+///   draw would make the stream a function of what the player is carrying
+///   rather than of the fights they had.
+fn pay_a_win(game: &mut Game, creature: &'static str, receipt: &mut Vec<String>) {
+    for name in crate::quest::on_victory(game, creature) {
+        receipt.push(format!("Took a {}.", game.theme_piece(&name)));
+    }
+    for name in crate::drops::roll(&crate::data::drops(), &mut game.rng, creature) {
+        if game.character.holds(&name) {
+            continue;
+        }
+        // Its own voice. The errand's line is "Took a ...", which is somebody
+        // collecting what they were sent for, and the boss's is "It was
+        // carrying ...", which is a thing that was always going to be there.
+        // This one is luck and should read like it.
+        receipt.push(format!("It had a {} on it. They do not usually.", game.theme_piece(&name)));
+        game.character.give(&name);
+    }
 }
 
 /// Bank the result and clear the encounter.
@@ -223,12 +253,7 @@ pub fn settle(game: &mut Game, log: &CombatLog, difficulty: Difficulty) -> Optio
                 ));
             }
             game.world.bump("wins");
-            // What the corpse leaves for an errand that asked for it. Gated on
-            // the errand rather than on the creature: a bag filling with toad
-            // eyes before anybody wanted one is litter.
-            for name in crate::quest::on_victory(game, spec.name) {
-                receipt.push(format!("Took a {name}."));
-            }
+            pay_a_win(game, spec.name, &mut receipt);
             // **What a boss leaves behind.**
             //
             // Looked up by the tile the fight happened on rather than by the
@@ -239,8 +264,8 @@ pub fn settle(game: &mut Game, log: &CombatLog, difficulty: Difficulty) -> Optio
                 if !game.world.answered.iter().any(|a| *a == id) {
                     game.world.answered.push(id);
                     if let Some(name) = drop {
+                        receipt.push(format!("It was carrying {}.", game.theme_piece(&name)));
                         game.character.give(&name);
-                        receipt.push(format!("It was carrying {name}."));
                     }
                 }
             }

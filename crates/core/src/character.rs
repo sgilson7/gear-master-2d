@@ -134,10 +134,17 @@ pub struct Character {
     /// Maximum health earned outside the boards — the one stat a reward can
     /// add to the character rather than to a grid.
     pub grown_health: i32,
-    /// Experience banked, ever. **Not per level**: the level is derived from
-    /// this, so the two cannot disagree, and a save carrying both would have a
-    /// pair of numbers that could contradict each other.
+    /// Experience **spent on levels**, ever. **Not per level**: the level is
+    /// derived from this, so the two cannot disagree, and a save carrying both
+    /// would have a pair of numbers that could contradict each other.
     pub xp: i32,
+    /// Experience won and not yet spent.
+    ///
+    /// **At risk.** A town turns this into levels; a defeat takes all of it.
+    /// It is a second number and it is not a second answer to the same
+    /// question: `xp` is what you have become and this is what you are
+    /// carrying, and the whole tension of the road is the gap between them.
+    pub carried: i32,
     /// Points earned and not yet spent. One a level.
     pub skill_points: u32,
     /// Node ids taken, in the order they were taken.
@@ -176,6 +183,7 @@ impl Character {
             gold: 0,
             grown_health: 0,
             xp: 0,
+            carried: 0,
             skill_points: 0,
             skills_taken: Vec::new(),
             class: None,
@@ -622,19 +630,48 @@ impl Character {
 
     // ------------------------------------------------------------ levels
 
-    /// The level this character's experience buys.
+    /// The level this character's **spent** experience buys.
     ///
     /// Derived, never stored. A level and a total that could disagree is a
-    /// save with two answers to the same question.
+    /// save with two answers to the same question — and note the number it is
+    /// derived from is `xp`, which is what has been *banked*. What you are
+    /// carrying does not count until you have taken it somewhere safe.
     pub fn level(&self) -> u32 {
         crate::progression::level_for(self.xp)
     }
 
-    /// Bank experience, returning every level crossed.
+    /// Win experience. It goes in your pocket, not into a level.
     ///
-    /// Returns the levels rather than just the new one, because a single fight
-    /// can cross two and a screen that only said "you reached 7" would have
-    /// swallowed a skill point and a row.
+    /// **This is the whole of the souls rule.** Experience is carried out of a
+    /// fight and is worth nothing until a town turns it into levels; a defeat
+    /// takes all of it. Nothing on the road calls [`gain_xp`](Self::gain_xp) —
+    /// the road calls this, and only [`bank`](Self::bank) crosses a level.
+    pub fn carry(&mut self, by: i32) {
+        self.carried = (self.carried + by.max(0)).max(0);
+    }
+
+    /// Turn everything carried into levels. Only a town calls this.
+    ///
+    /// Returns the levels crossed, same as `gain_xp`, so the receipt a town
+    /// prints is the receipt a fight used to.
+    pub fn bank(&mut self) -> Vec<u32> {
+        let held = std::mem::take(&mut self.carried);
+        self.gain_xp(held)
+    }
+
+    /// Lose what has not been banked. A defeat, and nothing else.
+    ///
+    /// Returns what was lost, because a receipt that does not name the number
+    /// is a receipt nobody believes.
+    pub fn drop_carried(&mut self) -> i32 {
+        std::mem::take(&mut self.carried)
+    }
+
+    /// Spend experience on levels, returning every level crossed.
+    ///
+    /// Returns the levels rather than just the new one, because a single
+    /// banking can cross two and a screen that only said "you reached 7" would
+    /// have swallowed a skill point and a row.
     pub fn gain_xp(&mut self, by: i32) -> Vec<u32> {
         if by <= 0 {
             self.xp = (self.xp + by).max(0);

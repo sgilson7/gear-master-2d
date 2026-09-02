@@ -13,10 +13,12 @@ player reads.
 board was then rebuilt against the original's colourblind design; M6 added the
 art and the tone pass. Live at <https://sgilson7.github.io/gear-master-2d/>.
 
-**No rest point, and there should not be one.** M2 carried it forward; M3 is
-where it turns out to be nothing. Combat health resets every fight, so a rest
-would restore something that was never spent. If M4 gives damage a way to
-persist between fights, the town is where the rest goes.
+**No rest point, and there still should not be one — but the town is no longer
+nothing.** Combat health resets every fight, so a rest would restore something
+that was never spent, and that is still true. What a town is *for* arrived
+instead: it is the only place experience becomes a level, and everything you
+are carrying is lost if you fall before you reach one. The thing the note was
+looking for was never a rest; it was a stake.
 
 ## Rules
 
@@ -682,6 +684,67 @@ Two things this broke, both worth knowing:
   base tree". Only the open tree is drawn now, so that question stopped
   meaning anything; it counts tabs and opens the class one instead.
 
+## Experience is carried, and a town is the bonfire
+
+**A fight pays into your pocket. A town is the only thing that turns it into a
+level. A defeat takes everything you are carrying and nothing you have spent.**
+
+- `Character::xp` is what has been **spent**, and the level is derived from it
+  and nothing else — the old rule holds, it just names a different number.
+  `Character::carried` is what is on you. Two numbers, and not two answers to
+  one question: one is what you have become and the other is what you are
+  going to become.
+- `carry` on a win, `bank` in a town, `drop_carried` on a defeat. **Nothing on
+  the road calls `gain_xp`** — that is the spending primitive and `bank` is its
+  only caller.
+- `Settlement` lost `levels` and `grew`, because a fight cannot produce either
+  any more. They are `fight::Banking`, which is where they happen.
+- **Banking spends the whole pocket at once**, so it can cross several levels
+  in one go: a character who walks home carrying a hundred and forty arrives at
+  level five having passed two, three and four on the way. Anything asserting
+  "the fork opens at exactly five" is wrong now — it opens at five *or more*,
+  at the banking that crossed it.
+- The class fork is offered from the town, because that is where a level lands.
+- **Health was already free.** Combat health resets every fight — `Combatant`
+  is built from `Stats` at the bell and nothing persists — so "health recovers
+  after a fight" needed no change and is not one. What the souls rule adds is
+  the thing that *is* at stake, which is what the note at the top of this file
+  meant by there being no rest point: there was nothing to restore. Now there
+  is something to lose.
+
+### What it did to the browser walk
+
+Two failures worth keeping, because both were the walk telling the truth:
+
+- **The patrol cannot get you home.** `PATROL` is six steps east and six west;
+  from more than six tiles away it never finds the town again. That did not
+  matter while a fight levelled you on the spot, and it is the whole loop now.
+  The grind heads for the nearest town once it is carrying enough
+  (`head_for_town`), which is what a player does. It failed on one run and
+  passed the next before that — a flaky gate is worse than a red one.
+- **A level lands wherever you happen to be standing in a town**, not in the
+  fight that earned it, so the receipt naming the frame is the town's.
+  `BANKINGS` records every banking receipt as the walk makes them, and the
+  level-up check reads that rather than the receipt of one particular fight.
+
+## The first map has one town
+
+One town and a great deal of wilds. Kettleworks and High Wick are written,
+shelved and given errands, and are **not placed** — they belong on maps that do
+not exist yet.
+
+- `towns_on_this_map_all_trade_and_all_want_something` replaces a set equality
+  that held only while one map carried every town. The direction that still
+  holds is that a town you can walk into trades and wants something; the other
+  direction is a named `STAGED` list, which is the point: **content waiting for
+  a map is fine and content waiting for nothing is an orphan, and the only
+  difference is somebody having written the name down.** A third stray shelf
+  fails there.
+- A save can now remember a town this map does not have — a file from before
+  they moved, or from a map this build does not ship. `World::repair` falls
+  back to the start, and `world.rs` tests exactly that; without it such a save
+  would put a player nowhere.
+
 ## Tone, as a lint
 
 `tests/tone.rs` holds the eight rules from `TONE.md` a machine can check. Not
@@ -741,15 +804,16 @@ and M5's trees may spend them again.
 | Components that show their shape and explain themselves | 427 passing |
 | The sheet, and a fight that opens holding what it holds | 429 passing |
 | A tree drawn as a tree | 431 passing |
+| Souls experience, and one town on the map | 432 passing |
 | Catalogue | 528 components |
 | Ladder | 50 creatures |
 | `crates/core` | ~33k lines, down from ~50k |
 | wasm | 888 KB |
 | Save format | v1 |
-| Map | 20×20, 5 regions, 3 towns, 6 events |
+| Map | 20×20, 5 regions, **1 town**, 6 events |
 | Bestiary | 50 creatures, rated 16 to 2958 |
 | Starting kit | **2 components**, 28 Fnorp, 1 assembled weapon |
-| Towns | 3, fixed shelves of 11 / 15 / 17, no reroll |
+| Towns | 1 placed, 2 staged; fixed shelves of 11 / 15 / 17, no reroll |
 | Errands | 3, one to a town |
 | Boards | 6×3 at level 1, one row a level, 6×8 ceiling |
 | Level 5 | ~27 fights, mean of nine seeded walks |

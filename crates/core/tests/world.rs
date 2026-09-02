@@ -383,12 +383,34 @@ fn a_position_off_the_walkable_map_is_repaired() {
     assert!(w.passable(state.at[0], state.at[1]), "repaired onto {:?}", state.at);
     assert_eq!(state.at, [w.start.0, w.start.1], "with no town known, go to the start");
 
-    // With a town remembered, that is where they wake up.
+    // With a town remembered, that is where they wake up. Taken off the map
+    // rather than named, because which towns are on which map is content and
+    // this rule is not about any one of them.
+    let town = w
+        .places
+        .iter()
+        .find(|p| p.kind == gm2d_core::world::PlaceKind::Town)
+        .expect("the map has a town");
+    let mut state = WorldState::default();
+    state.last_town = town.id.clone();
+    w.repair(&mut state);
+    assert_eq!(state.at, town.at, "a remembered town is a better answer than the start");
+
+    // **A town this map does not have.** The first map carries one town and
+    // the others are written and waiting for maps that do not exist, so a save
+    // can remember somewhere that is not here — a file from before they moved,
+    // or from a map this build does not ship. It has to fall back rather than
+    // wedge, which is the whole job of `repair`.
     let mut state = WorldState::default();
     state.last_town = "kettleworks".into();
+    state.at = [0, 0];
     w.repair(&mut state);
-    let town = w.places.iter().find(|p| p.id == "kettleworks").unwrap();
-    assert_eq!(state.at, town.at, "a remembered town is a better answer than the start");
+    assert_eq!(
+        state.at,
+        [w.start.0, w.start.1],
+        "a town that is not on this map should send you to the start, not nowhere"
+    );
+    assert!(w.passable(state.at[0], state.at[1]));
 
     // Off the map entirely.
     let mut state = WorldState::default();

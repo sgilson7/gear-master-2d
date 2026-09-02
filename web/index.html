@@ -38,6 +38,7 @@
             <div><dt>Fnorp</dt><dd id="gold">&mdash;</dd></div>
             <div><dt>level</dt><dd id="level">&mdash;</dd></div>
             <div><dt>experience</dt><dd id="xp">&mdash;</dd></div>
+            <div><dt>carrying</dt><dd id="carrying-panel">&mdash;</dd></div>
             <div><dt>points</dt><dd id="points">&mdash;</dd></div>
             <div><dt>class</dt><dd id="class">&mdash;</dd></div>
           </dl>
@@ -143,7 +144,12 @@
           <div id="quests" class="shelf"></div>
         </div>
         <p id="town-says" class="says" hidden></p>
+        <!-- Experience is only worth something where somebody can write it
+             down. This is that place. -->
+        <h3 class="sub-h">What you are carrying</h3>
+        <p id="carrying" class="note"></p>
         <div class="row">
+          <button id="bank" type="button">Spend it</button>
           <button id="pack" type="button" class="primary">Pack your frames</button>
           <button id="leave" type="button">Back out</button>
         </div>

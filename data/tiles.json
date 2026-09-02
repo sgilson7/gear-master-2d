@@ -129,24 +129,6 @@
     },
     {
       "at": [
-        11,
-        16
-      ],
-      "kind": "town",
-      "id": "kettleworks",
-      "name": "Kettleworks"
-    },
-    {
-      "at": [
-        7,
-        7
-      ],
-      "kind": "town",
-      "id": "high-wick",
-      "name": "High Wick"
-    },
-    {
-      "at": [
         9,
         17
       ],
@@ -193,5 +175,6 @@
       "kind": "event",
       "id": "the-gate-that-was-yours"
     }
-  ]
+  ],
+  "_map_note": "The first map: one town and a great deal of wilds. Kettleworks and High Wick are written and are not placed here \u2014 they belong on maps that do not exist yet, and their shelves and errands are kept in shops.json and quests.json waiting for them. `towns_on_this_map_all_trade_and_all_want_something` is what stops that becoming an excuse for unreachable content."
 }

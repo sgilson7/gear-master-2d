@@ -394,6 +394,12 @@ fn level_five_lands_where_the_plan_says() {
             );
             if log.outcome == gm2d_core::combat::Outcome::Victory {
                 let rating = gm2d_core::rating::creature_rating(m, D);
+                // Banked as it is won, which makes this **the floor rather
+                // than the expectation**. Experience is carried now and a
+                // defeat takes all of it, so a real walk to level five is this
+                // many fights or more — never fewer. The band is still the
+                // contract for what the map *offers*; what a player keeps is
+                // their own business and is the point of the rule.
                 g.character.gain_xp(progression::xp_for_rating(rating));
                 g.character.resize_boards([0; 5]);
                 g.character.apply_preset();

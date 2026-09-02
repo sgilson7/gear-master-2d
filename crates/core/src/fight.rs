@@ -46,12 +46,12 @@ pub struct Settlement {
     pub outcome: Outcome,
     pub gold: i32,
     pub xp: i32,
-    /// Levels crossed. More than one is possible off a single fight, and a
-    /// receipt that only named the last would swallow a point and a row.
-    pub levels: Vec<u32>,
-    /// Which grids grew, and by how much. The plan asks the level-up to say
-    /// *which* board grew, so it is recorded rather than left to be inferred.
-    pub grew: Vec<(String, u8)>,
+    /// Experience carried away from this fight, and what is on you now.
+    ///
+    /// **Not levels.** A fight cannot level you any more: it pays into your
+    /// pocket and a town is the only place that spends it. `levels` and `grew`
+    /// used to be here and moved to [`Banking`], which is where they happen.
+    pub carried: i32,
     /// Set when a loss sent the player home, naming the town.
     pub sent_home: Option<String>,
     /// One line each, in the order they happened, for the result card.
@@ -103,29 +103,22 @@ pub fn settle(game: &mut Game, log: &CombatLog, difficulty: Difficulty) -> Optio
 
     let mut receipt = Vec::new();
     let mut sent_home = None;
-    let mut levels = Vec::new();
-    let mut grew = Vec::new();
 
     match log.outcome {
         Outcome::Victory => {
             game.character.gold += gold;
             receipt.push(format!("+{gold} Fnorp"));
+            // **Carried, not spent.** A win pays experience into your pocket
+            // and nothing else: no level, no point, no row. A town is the only
+            // place that turns it into any of those, and a defeat before you
+            // reach one takes the lot.
             if xp > 0 {
-                levels = game.character.gain_xp(xp);
-                receipt.push(format!("+{xp} experience"));
-            }
-            for level in &levels {
-                receipt.push(format!("Level {level}. One point to spend."));
-            }
-            if !levels.is_empty() {
-                let granted = crate::data::skills().granted_rows(&game.character.skills_taken);
-                for (slot, rows) in game.character.resize_boards(granted) {
-                    let name = format!("{slot:?}").to_lowercase();
-                    receipt.push(format!(
-                        "+{rows} row on the {name} frame",
-                    ));
-                    grew.push((name, rows));
-                }
+                game.character.carry(xp);
+                receipt.push(format!("+{xp} experience, carried"));
+                receipt.push(format!(
+                    "{} on you. It is worth nothing until you bank it.",
+                    game.character.carried
+                ));
             }
             game.world.bump("wins");
             // What the corpse leaves for an errand that asked for it. Gated on
@@ -141,9 +134,12 @@ pub fn settle(game: &mut Game, log: &CombatLog, difficulty: Difficulty) -> Optio
             // is that upstream's reasoning held because a ladder is a corridor
             // and this is not one.
             receipt.push("No bounty. Nothing was beaten.".into());
-            if xp < 0 {
-                game.character.gain_xp(xp);
-                receipt.push(format!("−{} experience", -xp));
+            // Everything unbanked, gone. Not a share and not a penalty on the
+            // total: what you had spent is what you are, and what you were
+            // carrying is what you were going to be.
+            let lost = game.character.drop_carried();
+            if lost > 0 {
+                receipt.push(format!("The {lost} experience you were carrying is gone."));
             }
             sent_home = Some(game.world.last_town.clone()).filter(|t| !t.is_empty());
             receipt.push(match &sent_home {
@@ -153,5 +149,63 @@ pub fn settle(game: &mut Game, log: &CombatLog, difficulty: Difficulty) -> Optio
         }
     }
 
-    Some(Settlement { outcome: log.outcome, gold, xp, levels, grew, sent_home, receipt })
+    Some(Settlement {
+        outcome: log.outcome,
+        gold,
+        xp,
+        carried: game.character.carried,
+        sent_home,
+        receipt,
+    })
+}
+
+/// What a town does with what you were carrying.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Banking {
+    /// What went in. Zero means there was nothing to bank.
+    pub spent: i32,
+    /// Every level crossed, in order.
+    pub levels: Vec<u32>,
+    /// Which grids grew, and by how much.
+    pub grew: Vec<(String, u8)>,
+    pub receipt: Vec<String>,
+}
+
+/// Turn what the character is carrying into levels.
+///
+/// **The only place a level happens.** A fight used to do this the instant the
+/// experience was won, which made the walk home a formality; now the walk home
+/// is the game. Everything a level-up used to print — the level, the point,
+/// the row — prints here instead, because here is where it occurs.
+///
+/// Safe to call with nothing carried: it says so and changes nothing.
+pub fn bank(game: &mut Game) -> Banking {
+    let spent = game.character.carried;
+    if spent <= 0 {
+        return Banking {
+            spent: 0,
+            levels: Vec::new(),
+            grew: Vec::new(),
+            receipt: vec!["You are carrying nothing to spend.".into()],
+        };
+    }
+    let levels = game.character.bank();
+    let mut receipt = vec![format!("{spent} experience spent.")];
+    for level in &levels {
+        receipt.push(format!("Level {level}. One point to spend."));
+    }
+    let mut grew = Vec::new();
+    if !levels.is_empty() {
+        let granted = crate::data::skills().granted_rows(&game.character.skills_taken);
+        for (slot, rows) in game.character.resize_boards(granted) {
+            let name = format!("{slot:?}").to_lowercase();
+            receipt.push(format!("+{rows} row on the {name} frame"));
+            grew.push((name, rows));
+        }
+    }
+    if levels.is_empty() {
+        let (into, need) = crate::progression::progress(game.character.xp);
+        receipt.push(format!("{into} of {need} towards the next level."));
+    }
+    Banking { spent, levels, grew, receipt }
 }

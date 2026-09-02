@@ -63,8 +63,68 @@ def dismiss_card(page):
     return False
 
 
-def leave_town(page):
+def head_for_town(page):
+    """One step towards the nearest town, or None when there is none to take.
+
+    **The patrol cannot get you home.** It is six steps east and six west,
+    which finds fights and, from more than six tiles away, never finds the town
+    again. That did not matter while a fight levelled you on the spot; it is
+    the whole loop now, and it is what made the grind pass on one run and fail
+    on the next.
+    """
+    here = page.evaluate("""() => {
+      const c = document.getElementById('coords').textContent.split(',');
+      const at = [parseInt(c[0]), parseInt(c[1])];
+      const towns = (window.__places() ?? []).filter(p => p.kind === 'town');
+      if (!towns.length) return null;
+      const d = (t) => Math.abs(t.at[0] - at[0]) + Math.abs(t.at[1] - at[1]);
+      towns.sort((a, b) => d(a) - d(b));
+      return { at, to: towns[0].at };
+    }""")
+    if not here:
+        return None
+    ax, ay = here["at"]
+    tx, ty = here["to"]
+    if ax == tx and ay == ty:
+        return None
+    # One axis at a time; a blocked step draws nothing, so a wall just costs a
+    # turn of the loop rather than stalling it.
+    if ax != tx:
+        return "ArrowRight" if tx > ax else "ArrowLeft"
+    return "ArrowDown" if ty > ay else "ArrowUp"
+
+
+# Every banking receipt the walk has seen, in order.
+#
+# A level lands wherever the walk happens to be standing in a town, which is
+# not necessarily where a check is looking — the level-up section used to read
+# the receipt of the fight that caused it, and a fight causes none of this now.
+# Recording them as they happen is what makes "did a level-up say which frame
+# grew" answerable from anywhere.
+BANKINGS = []
+
+
+def bank_here(page):
+    """Spend what is carried, if this town will take it. Returns the receipt."""
+    if page.is_disabled("#bank"):
+        return ""
+    page.click("#bank")
+    page.wait_for_timeout(90)
+    said = page.text_content("#town-says") or ""
+    BANKINGS.append(said)
+    return said
+
+
+def leave_town(page, bank=True):
+    """Leave, banking what is carried on the way out.
+
+    **A town is the only place experience becomes a level**, so a walk that
+    never spends is a walk that stays level one for ever. Banking on the way
+    out is what a player does and what this loop has to do.
+    """
     if page.is_visible("#town"):
+        if bank:
+            bank_here(page)
         page.click("#leave")
         page.wait_for_selector("#town", state="hidden", timeout=5000)
         return True
@@ -650,6 +710,37 @@ def check_a_starting_balance_is_on_the_bar(page, name, fails):
                      f"not reading what the fight began with")
 
 
+def check_the_result_is_a_pocket_not_a_level(page, name, fails, lines, before):
+    """A win fills your pocket and moves nothing else.
+
+    Called around the fight the walk always runs, so it is not waiting for a
+    state that may not arrive: the first version of this checked the town while
+    the pocket was usually empty and returned without asserting anything, which
+    is the vacuous-check trap in a fresh coat.
+
+    That a town *can* spend it is proved by the level-up grind further down —
+    it only ever reaches level two by banking, and it failed loudly when the
+    button was not yet wired.
+    """
+    after = page.evaluate("() => window.__character()")
+    won = any("Fnorp" in l for l in lines)
+    # **A fight never crosses a level and never spends a point.** Whatever it
+    # did to the pocket, the two numbers a town owns must be untouched.
+    if after["level"] != before["level"]:
+        fails.append(f"{name}: a fight took the character from level "
+                     f"{before['level']} to {after['level']} — only a town does that")
+    if after["xp"] != before["xp"]:
+        fails.append(f"{name}: a fight spent experience: {before['xp']} -> {after['xp']}")
+    if won:
+        if after["carried"] <= before["carried"]:
+            fails.append(f"{name}: a win carried nothing: "
+                         f"{before['carried']} -> {after['carried']}")
+        if not any("carried" in l for l in lines):
+            fails.append(f"{name}: the receipt never says the experience is carried: {lines}")
+    elif after["carried"] != 0:
+        fails.append(f"{name}: a defeat left {after['carried']} in the pocket")
+
+
 def check_turning_in_hand(page, name, fails):
     """A component turned in hand actually turns.
 
@@ -747,6 +838,7 @@ def check_a_stale_autosave(browser, name):
     that the game repairs it rather than trusting it.
     """
     fails = []
+    BANKINGS.clear()
     ctx = browser.new_context()
     page = ctx.new_page()
     page.on("pageerror", lambda e: fails.append(f"{name}: pageerror: {e}"))
@@ -891,6 +983,7 @@ def walk_the_gate(browser, name):
         if '"encounter"' not in Path(mid).read_text():
             fails.append(f"{name}: a save taken mid-fight does not carry the encounter")
 
+        was = page.evaluate("() => window.__character()")
         page.click("#go")
         page.wait_for_selector("#stage-replay", state="visible", timeout=10000)
         check_the_replay_shows_both_sides(page, name, fails)
@@ -899,6 +992,7 @@ def walk_the_gate(browser, name):
         page.click("#skip")
         page.wait_for_selector("#stage-result", state="visible", timeout=15000)
         receipt = page.locator("#result-receipt p").all_text_contents()
+        check_the_result_is_a_pocket_not_a_level(page, name, fails, receipt, was)
         if not receipt:
             fails.append(f"{name}: the fight settled with an empty receipt")
         page.click("#done")
@@ -972,33 +1066,47 @@ def walk_the_gate(browser, name):
     # Grind the pit until a level lands. The receipt has to name which frame
     # grew, because "you levelled" without saying what it bought is the thing
     # the plan asks the level-up to say.
-    grew_line = None
-    for i in range(300):
+    # **Six hundred, because a level now costs a walk home.**
+    # Experience is carried and only a town spends it, so this loop has to
+    # fight *and* come back — where it used to level on the spot. Three hundred
+    # was enough on a good run and not on a bad one, which is the worst budget
+    # a loop can have.
+    for i in range(600):
         if int(page.text_content("#level")) >= 2:
             break
+        # A level is banked, not won, so the receipt that names the frame is
+        # the town's now rather than the fight's.
+        if page.is_visible("#town"):
+            bank_here(page)
+            page.click("#leave")
+            page.wait_for_selector("#town", state="hidden", timeout=5000)
+            continue
         if page.is_visible("#fight"):
             page.click("#preset")
             page.click("#go")
             page.wait_for_selector("#stage-replay", state="visible", timeout=10000)
             page.click("#skip")
             page.wait_for_selector("#stage-result", state="visible", timeout=20000)
-            lines = page.locator("#result-receipt p").all_text_contents()
-            for line in lines:
-                if "row on the" in line:
-                    grew_line = line
             page.click("#done")
             page.wait_for_selector("#fight", state="hidden", timeout=8000)
             continue
-        if leave_town(page) or dismiss_card(page):
+        if dismiss_card(page):
             continue
-        page.keyboard.press(PATROL[i % len(PATROL)])
+        # Fight until there is something worth banking, then go and bank it.
+        carrying = page.evaluate("() => window.__character().carried")
+        home = head_for_town(page) if carrying >= 15 else None
+        page.keyboard.press(home or PATROL[i % len(PATROL)])
 
     level = int(page.text_content("#level"))
     if level < 2:
-        fails.append(f"{name}: three hundred steps of grinding the pit and still level {level}")
+        fails.append(f"{name}: six hundred steps of grinding the pit and still level {level} "
+                     f"({len(BANKINGS)} bankings)")
     else:
-        if grew_line is None:
-            fails.append(f"{name}: a level-up never said which frame grew")
+        # Read off every banking the walk has done, wherever it happened.
+        if not any("row on the" in r for r in BANKINGS):
+            fails.append(f"{name}: no banking ever said which frame grew: {BANKINGS[-3:]}")
+        if not any("Level " in r for r in BANKINGS):
+            fails.append(f"{name}: no banking ever announced a level: {BANKINGS[-3:]}")
         if int(page.text_content("#points")) < 1:
             fails.append(f"{name}: level {level} and no point to spend")
 
@@ -1048,8 +1156,16 @@ def walk_the_gate(browser, name):
         fails.append(f"{name}: never reached the class fork "
                      f"(level {page.text_content('#level')})")
     else:
-        if page.text_content("#level") != "5":
-            fails.append(f"{name}: the fork opened at level {page.text_content('#level')}")
+        # **Five or more**, not exactly five. Banking spends a whole pocket at
+        # once and can cross several levels in one go, so a character who
+        # walked home carrying a lot arrives at seven and is asked there. What
+        # has to hold is that it is asked at the first opportunity, which is
+        # the banking that crossed five.
+        at = int(page.text_content("#level"))
+        if at < 5:
+            fails.append(f"{name}: the fork opened at level {at}, before it is owed")
+        if not any("Level 5" in r for r in BANKINGS):
+            fails.append(f"{name}: no banking announced level five: {BANKINGS[-2:]}")
         offered = page.locator("#fork-choices .wares").count()
         if offered != 3:
             fails.append(f"{name}: the fork offers {offered} classes, and the plan says three")
@@ -1199,6 +1315,7 @@ def main():
     print("ok: a component is a shape, on the shelf and in the bag, and it explains itself")
     print("ok: both boards are drawn in the replay, and what fires jolts")
     print("ok: the sheet says what you are, and a fight opens holding what the tree granted")
+    print("ok: experience is carried out of a fight and only a town spends it")
     print("ok: your own figure becomes your class's when you take one")
     print("ok: a mid-fight save reopens the same fight")
     print("ok: walk, download, reload, upload — position and stream both came back")

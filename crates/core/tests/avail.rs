@@ -33,24 +33,53 @@ fn every_town_stocks_something_and_stocks_it_from_the_catalogue() {
     }
 }
 
-/// Every shelf names a town on the map, and every town on the map has a shelf.
+/// **Every town on the map trades, and every shelf is meant for a town.**
 ///
-/// A shelf for a place that does not exist is dead content; a town with no
-/// shelf is a room a player walks into and cannot leave any different.
+/// This used to be a set equality, which held while the first map carried
+/// every town there was. It cannot now: the first map has one town, and
+/// Kettleworks and High Wick are written, shelved and given errands while the
+/// maps that will carry them do not exist.
+///
+/// The direction that still has to hold is that a town you can walk into
+/// trades — a room you can enter and leave no different is not a place.
+///
+/// The other direction is replaced by `STAGED`, which is the point of this
+/// test now: content waiting for a map is fine and content waiting for nothing
+/// is an orphan, and the only difference between them is somebody having
+/// written the name down. A third stray shelf fails here.
+const STAGED: &[&str] = &["kettleworks", "high-wick"];
+
 #[test]
-fn the_shelves_and_the_towns_are_the_same_set() {
+fn towns_on_this_map_all_trade_and_all_want_something() {
     use gm2d_core::world::PlaceKind;
     let w = data::world(gm2d_core::combat::Difficulty::Easy);
     let towns: HashSet<&str> =
         w.places.iter().filter(|p| p.kind == PlaceKind::Town).map(|p| p.id.as_str()).collect();
+    assert!(!towns.is_empty(), "the map has no town at all");
+
     let shops = data::shops();
+    let quests = data::quests();
+    for t in &towns {
+        assert!(shops.town(t).is_some(), "{t} is on the map and sells nothing");
+        assert!(!quests.at(t).is_empty(), "{t} is on the map and wants nothing");
+    }
+
+    // Anything shelved for a place that is not on the map is staged, and has
+    // to be named as such.
     let shelves: HashSet<&str> = shops.towns.iter().map(|t| t.id.as_str()).collect();
-    let mut missing: Vec<&str> = towns.difference(&shelves).copied().collect();
-    let mut extra: Vec<&str> = shelves.difference(&towns).copied().collect();
-    missing.sort();
-    extra.sort();
-    assert!(missing.is_empty(), "towns with nothing to sell: {missing:?}");
-    assert!(extra.is_empty(), "shelves for places that are not towns: {extra:?}");
+    let mut orphans: Vec<&str> =
+        shelves.iter().copied().filter(|id| !towns.contains(id) && !STAGED.contains(id)).collect();
+    orphans.sort();
+    assert!(
+        orphans.is_empty(),
+        "shelves for nowhere: {orphans:?} — put the town on a map or add it to STAGED"
+    );
+    let mut waiting: Vec<&str> = STAGED.iter().copied().filter(|id| towns.contains(id)).collect();
+    waiting.sort();
+    assert!(
+        waiting.is_empty(),
+        "{waiting:?} are on the map now and still listed as staged"
+    );
 }
 
 /// **Three towns, three places.**

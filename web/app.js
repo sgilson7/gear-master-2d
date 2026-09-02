@@ -6,7 +6,7 @@
 import init, {
   world_json, position, try_step, event_json, answer,
   save_json, load_json, new_game, apply_preset,
-  shop_json, buy, quests_json, take_quest, hand_in_quest,
+  shop_json, buy, quests_json, take_quest, hand_in_quest, bank_xp,
   character_json, skills_json, take_skill,
   class_offer_json, choose_class, class_name, all_trees_json,
   gold, piece_count, version, save_version,
@@ -168,6 +168,9 @@ function paintPanel() {
   const c = JSON.parse(character_json());
   $('level').textContent = c.level;
   $('xp').textContent = `${c.into} / ${c.needed}`;
+  // What a defeat would cost. Named on the standing panel because it is the
+  // number the next step out of town is weighed against.
+  $('carrying-panel').textContent = c.carried > 0 ? `${c.carried} at risk` : 'nothing';
   $('points').textContent = c.points;
   $('skills').classList.toggle('primary', c.points > 0);
   $('class').textContent = class_name() || '—';
@@ -759,6 +762,7 @@ function openTown(id) {
   portrait($('town-art'), figure('places', id), place?.name ?? id);
   paintShelf();
   paintQuests();
+  paintCarrying();
   $('town').hidden = false;
 }
 
@@ -843,6 +847,21 @@ function paintQuests() {
     };
     box.appendChild(b);
   }
+}
+
+/// What is in your pocket, and what spending it would buy.
+///
+/// A town is the only place experience becomes a level, so this is the only
+/// place the number means anything but risk.
+function paintCarrying() {
+  const c = JSON.parse(character_json());
+  const n = c.carried ?? 0;
+  $('carrying').textContent = n > 0
+    ? `${n} experience, and it is only yours once it is spent. ` +
+      `You are ${c.needed - c.into} short of level ${c.level + 1}.`
+    : 'Nothing. Everything you have won is already spent.';
+  $('bank').disabled = n <= 0;
+  $('bank').classList.toggle('primary', n > 0);
 }
 
 /// What one component is, pinned near whatever is being pointed at.
@@ -1051,11 +1070,22 @@ async function main() {
   window.__encounter = () => JSON.parse(encounter_json());
   window.__character = () => JSON.parse(character_json());
   window.__trees = () => JSON.parse(all_trees_json());
+  window.__places = () => world.places;
   window.__fightJson = () => fight_json();
 
   $('skills').onclick = openTree;
   $('tree-done').onclick = closeTree;
 
+  $('bank').onclick = () => {
+    const r = JSON.parse(bank_xp());
+    if (r.error) { townSays(r.error, true); return; }
+    // Separated, because banking a full pocket crosses several levels at
+              // once and four rows in a row read as one sentence otherwise.
+    townSays(r.receipt.join('  ·  '), false);
+    paintCarrying(); paintPanel(); draw(); autosave();
+    // A level lands here now, so the fork is offered here.
+    offerClass();
+  };
   $('leave').onclick = closeTown;
   // Packing in town: the same board, with the fight buttons swapped for a way
   // back out. A player who cannot re-pack between fights is a player who

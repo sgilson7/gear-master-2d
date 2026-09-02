@@ -57,7 +57,19 @@ fn winning_pays_and_losing_does_not() {
     assert_eq!(won.character.gold, purse + s.gold);
     assert!(s.sent_home.is_none(), "a win sent the player home");
     assert!(won.encounter.is_none(), "the encounter outlived its settlement");
-    assert!(won.character.xp > 0, "a win banked no experience");
+    // **Carried, not banked.** A fight pays into your pocket; only a town
+    // turns it into a level, so `xp` — which is what has been *spent* — has
+    // not moved.
+    assert!(won.character.carried > 0, "a win carried no experience");
+    assert_eq!(won.character.xp, 0, "a fight levelled the character on the road");
+    assert_eq!(won.character.level(), 1, "a fight crossed a level by itself");
+
+    // And a town turns it into levels.
+    let held = won.character.carried;
+    let b = fight::bank(&mut won);
+    assert_eq!(b.spent, held);
+    assert_eq!(won.character.carried, 0, "banking left something in the pocket");
+    assert_eq!(won.character.xp, held, "banking spent a different number");
 
     let mut lost = facing("Francis");
     let log = fight::run(&lost, D).unwrap();
@@ -68,6 +80,47 @@ fn winning_pays_and_losing_does_not() {
     assert_eq!(lost.character.gold, purse, "the purse moved on a loss");
     assert_eq!(s.sent_home.as_deref(), Some("the-end-of-all-gears"));
     assert!(lost.encounter.is_none());
+}
+
+/// **A defeat takes everything you were carrying, and nothing you had spent.**
+///
+/// The whole of the souls rule in one test: what you have become is safe, what
+/// you were going to become is not.
+#[test]
+fn dying_costs_what_is_in_your_pocket_and_not_what_you_are() {
+    let mut g = facing("Cave Rat");
+    let log = fight::run(&g, D).unwrap();
+    fight::settle(&mut g, &log, D).unwrap();
+    fight::bank(&mut g);
+    let spent = g.character.xp;
+    let level = g.character.level();
+    assert!(spent > 0, "nothing was banked, so this test proves nothing");
+
+    // Win once more, carry it, and then lose.
+    g.encounter = Some(gm2d_core::fight::Encounter {
+        enemy: "Cave Rat".into(),
+        at: g.world.at,
+    });
+    let log = fight::run(&g, D).unwrap();
+    fight::settle(&mut g, &log, D).unwrap();
+    let carried = g.character.carried;
+    assert!(carried > 0, "the second win carried nothing");
+
+    g.encounter = Some(gm2d_core::fight::Encounter {
+        enemy: "Francis".into(),
+        at: g.world.at,
+    });
+    let log = fight::run(&g, D).unwrap();
+    let s = fight::settle(&mut g, &log, D).unwrap();
+    assert_ne!(s.outcome, Outcome::Victory);
+    assert_eq!(g.character.carried, 0, "a defeat left experience in the pocket");
+    assert_eq!(g.character.xp, spent, "a defeat took banked experience too");
+    assert_eq!(g.character.level(), level, "a defeat cost a level");
+    assert!(
+        s.receipt.iter().any(|l| l.contains(&carried.to_string())),
+        "the receipt does not say how much was lost: {:?}",
+        s.receipt
+    );
 }
 
 /// Settling twice does not pay twice.

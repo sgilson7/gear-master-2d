@@ -118,6 +118,13 @@ pub struct CharacterSave {
     /// stored: two numbers that could disagree is two answers to one question.
     #[serde(default)]
     pub xp: i32,
+    /// Experience won and not yet spent at a town.
+    ///
+    /// `default` so a file written before the souls rule opens: it arrives
+    /// carrying nothing, which is exactly what it was doing — every point it
+    /// had won was already spent the moment it was won.
+    #[serde(default)]
+    pub carried: i32,
     #[serde(default)]
     pub skill_points: u32,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
@@ -199,6 +206,7 @@ impl SaveFile {
             gold,
             grown_health,
             xp,
+            carried,
             skill_points,
             skills_taken,
             class,
@@ -255,6 +263,7 @@ impl SaveFile {
                 character: CharacterSave {
                     gold: *gold,
                     grown_health: *grown_health,
+                    carried: *carried,
                     registry: instances,
                     owned: owned.iter().map(|p| p.0).collect(),
                     boards,
@@ -376,6 +385,7 @@ impl SaveFile {
             name_seed,
             assembly_pct,
             xp,
+            carried,
             skill_points,
             skills_taken,
             class,
@@ -445,6 +455,7 @@ impl SaveFile {
         character.gold = gold;
         character.grown_health = grown_health;
         character.xp = xp;
+        character.carried = carried;
         character.skill_points = skill_points;
         character.skills_taken = skills_taken;
         character.class = class;

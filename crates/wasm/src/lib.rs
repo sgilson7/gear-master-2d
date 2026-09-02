@@ -1166,6 +1166,7 @@ pub fn settle_fight() -> String {
             "outcome": format!("{:?}", s.outcome).to_lowercase(),
             "gold": s.gold,
             "xp": s.xp,
+            "carried": s.carried,
             "sent_home": s.sent_home,
             "receipt": s.receipt,
         })
@@ -1251,6 +1252,27 @@ pub fn buy(index: usize) -> String {
         // this is the only record that the entry is gone.
         g.world.bought.push((town, index as u16));
         String::new()
+    })
+}
+
+/// Spend what you are carrying. Only a town may.
+#[wasm_bindgen]
+pub fn bank_xp() -> String {
+    with_mut(|g| {
+        if town_here(g).is_none() {
+            return serde_json::json!({
+                "error": "Experience is only worth something where somebody can write it down."
+            })
+            .to_string();
+        }
+        let b = gm2d_core::fight::bank(g);
+        serde_json::json!({
+            "spent": b.spent,
+            "levels": b.levels,
+            "grew": b.grew,
+            "receipt": b.receipt,
+        })
+        .to_string()
     })
 }
 
@@ -1373,6 +1395,7 @@ pub fn character_json() -> String {
             "into": into,
             "needed": needed,
             "points": c.skill_points,
+            "carried": c.carried,
             "taken": c.skills_taken,
             "gold": c.gold,
             "rows": rows,

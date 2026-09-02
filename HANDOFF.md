@@ -162,17 +162,58 @@ REBASELINE_GOLDEN_COMBAT=1 cargo test -p gm2d-core
 
 ## 9. What is being built next
 
-**Nothing is scheduled.** `PLAN-M8.md` is finished, all nine milestones, and
-the demo ends at a door in the western wall. What is past that door is not
-written, and the game's overall structure past it is the human's to decide —
-`PLAN-M8.md` §5.6 is where that question is written down. Nothing in the code
-assumes a second overworld, a chapter count, or an ending beyond the one the
-door gives.
+**`PLAN-M9.md`, five milestones**, each deployable on its own. Start at
+**M9.0**, which is the only one with no content in it: a rule that an assembled
+*item* grants rather than the skill tree, and an item that has the name somebody
+wrote rather than a generated one. Everything after it is small because of it.
 
-The two things most obviously worth doing next, and neither is a defect:
+The block in one line: **every creature in the pit drops pieces of a set, and a
+set does something no stat can.** An A. Rat's three pieces make the Rat King's
+Mandate, which routs rats without a fight; a Bengulon Jungle Toad's two make a
+hide that lets you wade one tile into the lake.
 
-- **Place a second town.** Kettleworks and High Wick are written, shelved and
-  given errands, and are on no map. The pit's eleven-line shelf is the whole
-  economy, and it is why a player who buys everything still cannot fill five
-  frames without errand rewards.
-- **Something past the door.** See above.
+### Four things to read before you start on it
+
+1. **Most of it already exists, and not where you would look.**
+   `AssemblyBonus` carries a `Stats` lump *and* `&[Trigger]`, and only pays
+   while the item is assembled — so a set bonus that is *combat* behaviour costs
+   no new combat code at all. What does not exist is a set bonus that is **not**
+   combat: routing a creature happens before a fight and wading happens on a
+   step, and neither is a `Trigger`.
+2. **`Effect::Grants { rule: Rule }` is the door those go through.** It was
+   built in M8.3 and is currently granted only by the tree. M9.0 widens it to
+   items and moves `Rule` into its own module, because it stops being the
+   tree's. **The enum and the exhaustive match are the whole guard** — this
+   project has shipped eight nodes that cost a point and did nothing, and that
+   is what the match, `deny_unknown_fields` and `Rule::check` are all for.
+3. **A map does not know about bags**, and M9.0 must not be the change that
+   makes it. `world::step` takes `&mut WorldState`, not the character; wading
+   goes in as a small `Allowances` the caller fills. That is the same division
+   a gate's key and a door's already make, and it is the reason `map()` takes
+   the game rather than reaching for it — trap 4.
+4. **Adding to `CATALOG` moves the save fingerprint.** M9.2 adds eight
+   components and every save written before it is refused, with a sentence
+   naming both catalogues. That is the design; say so in the commit.
+
+### Two facts recon established, so you do not re-measure them
+
+- **Lord Drabley Henpeck is not in the first area.** He is `The Hollow King`
+  and lives in rows 1–3. `draw_enemy` picks strictly from a region's own pool,
+  so the pit can only ever deal A. Rat (16), Bengulon Jungle Toad (80) and
+  Wallspider Swarm (95). "Remove the harder ones" is about the *map* — nothing
+  stops a level-one walking fifteen tiles north — and it is M9.3, a crossing.
+- **"A depth of 1" means a water tile that touches land**, confirmed with the
+  human. On this map that is 14 of the lake's 28 tiles: row 9 becomes crossable
+  end to end and the middle 14 stay shut. No new terrain, no repaint.
+
+### What is not scheduled, and is still the human's
+
+- **What is past the door.** `PLAN-M8.md` §5.6. Nothing in the code assumes a
+  second overworld, a chapter count, or an ending beyond the one M8.7 writes.
+- **A second town.** Kettleworks and High Wick are written, shelved, given
+  errands and on no map. The pit's eleven-line shelf is the whole economy, it
+  sells each line once, and the M8.8 playthrough ended holding 11,857 Fnorp
+  with nothing to spend it on. `PLAN.md` §6a, row 1.
+- The other five rows of `PLAN.md` §6a, which are the M8.8 playthrough's
+  deferred findings and are the best list of what this game currently gets
+  wrong.

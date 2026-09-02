@@ -19,11 +19,18 @@ from `sgilson7/gear-master`. `PLANNING-BRIEF.md` is the brief; `PLAN.md` is the
 plan and **wins where the two disagree**; `TONE.md` governs every string a
 player reads.
 
-**Every milestone is done, M0 through M8.** M0–M5 shipped the MVP, tagged
-`v0.1.0-mvp`; the board was rebuilt against the original's colourblind design;
-M6 added the art and the tone pass; M7 the shops, errands and the first
-dungeon; M8 curses made visible, a quest log, enchs, a fourth class, and a door
-at the end of it. Live at <https://sgilson7.github.io/gear-master-2d/>.
+**Every milestone is done, M0 through M8, and M8 is live.** M0–M5 shipped the
+MVP, tagged `v0.1.0-mvp`; the board was rebuilt against the original's
+colourblind design; M6 added the art and the tone pass; M7 the shops, errands
+and the first dungeon; M8 curses made visible, a quest log, enchs, a fourth
+class, and a door at the end of it. Deployed at `ce46848` and verified against
+the live page rather than the local build — see *A deployed fix is not a
+delivered fix*. <https://sgilson7.github.io/gear-master-2d/>
+
+**`PLAN-M9.md` is the next block**, written and not started: every creature in
+the pit drops pieces of a set, and a set does something no stat can. Read
+`HANDOFF.md` §9 before touching it — the four things it names are the ones that
+will cost you a day otherwise.
 
 **The demo ends at a door in the western wall**, which appears once the Cave's
 boss is down and opens to the key it drops. What is past it is not written —
@@ -72,9 +79,13 @@ something cost a day.
   `SaveFile::of` and `into_game` destructure exhaustively. Two fields are
   skipped on purpose and each says so where it is skipped. Do not "fix" a
   destructure by adding `..`.
-- **The agent does not run `git push` or `make publish`.** Only a human
-  deploys. (The one exception was the repo's creation and first push, which the
-  human asked for explicitly. The rule is back in force.)
+- **The agent does not run `git push` or `make publish` on its own judgement.**
+  The default is that only a human deploys, and it holds even when the work is
+  green and the human is clearly going to want it. **The exception is an
+  explicit ask** — "deploy this", "push it" — and it has been taken twice: the
+  repo's creation, and M8's thirteen commits. Neither was inferred. When it is
+  taken, the deploy is not finished until it has been verified *against the live
+  page*, which is a separate step and has its own section below.
 - Do not start a milestone before the previous gate is live and the human has
   seen it.
 - **The page draws numbers core sent it, and never recomputes one.** Violated
@@ -1163,6 +1174,26 @@ re-serve the same cached document and would loop. `sessionStorage` guards
 against a genuine mismatch looping anyway.
 
 `packaging/package-web.sh` fails the build if the stamp is not applied.
+
+**Deploying is three things, and finishing the first is not finishing.**
+`make publish` runs the engine suite and pushes; Actions then runs the suite
+again, builds, **walks the full gate in three browsers**, and only then uploads
+the Pages artifact — so a red gate stops a deploy rather than publishing one.
+That took 6m02s for M8. The third thing is a person, or a script, loading the
+live URL and asking a player's question of it. M8's was:
+
+```
+live build 7808e551
+  ok  Errands button    ok  ench rack      ok  ending screen
+  ok  log screen        ok  scout button   ok  one action bar
+  ok  #numbers gone     console errors: none
+```
+
+The failure this catches is the one that has happened here: **the work was
+never deployed at all.** M8.0 through M8.8 sat local for a whole block while
+`origin/main` was still on the plan document, and the first anybody knew was
+the human saying they could not see the quest log. `git log origin/main..HEAD`
+is the check, and it costs nothing.
 
 **The stamp hashes everything the browser caches**, and two holes have been
 found in that line by hand rather than by a test:

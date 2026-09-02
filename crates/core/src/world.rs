@@ -111,6 +111,13 @@ pub enum PlaceKind {
     /// pool. It is at the end of a dungeon because that is what a dungeon is:
     /// a corridor with something certain at the end of it.
     Boss,
+    /// A way out of everything that is written.
+    ///
+    /// **Not a gate.** A gate leads to another map and this leads to whatever
+    /// is past the demo, which is nothing yet — so it gets its own kind and
+    /// its own mark rather than borrowing the diamond and reading as a place
+    /// you could come back from.
+    Door,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -137,6 +144,40 @@ pub struct PlaceDef {
     /// `Boss`: the canonical component beating it leaves behind.
     #[serde(default)]
     pub drops: Option<String>,
+    /// Not here at all until this id is in `answered` or in `flags`.
+    ///
+    /// **The first conditional place.** A rock in the wall that is a door once
+    /// the Cave's boss is down — not drawn, not steppable, and absent from
+    /// [`World::place_now`] until then.
+    ///
+    /// Spawning one at runtime was the other option and is rejected for the
+    /// reason the map is not in the save: **places are content and content is
+    /// not state.** A place that is always in the file and sometimes invisible
+    /// keeps that true; a place that appears in a save does not.
+    ///
+    /// It reads `answered` rather than the bag, because a `World` does not know
+    /// about bags — the same rule that puts a gate's key in the shim. What the
+    /// door *wants* is still a component, and `needs` is where that lives.
+    #[serde(default)]
+    pub hidden_until: Option<String>,
+    /// `Door`: what it says when it opens. The only prose a place carries, and
+    /// it is here rather than in `events.json` because a door is not a card:
+    /// there is nothing to choose and nothing to answer.
+    #[serde(default)]
+    pub prose: Vec<String>,
+}
+
+/// Is this place there yet?
+///
+/// A free function rather than a method, so the check is one place and every
+/// caller is obviously asking the same question.
+pub fn place_is_there(p: &PlaceDef, state: &WorldState) -> bool {
+    match &p.hidden_until {
+        None => true,
+        Some(k) => {
+            state.answered.iter().any(|a| a == k) || state.flags.iter().any(|f| f == k)
+        }
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -373,8 +414,24 @@ impl World {
         self.region_index(x, y).map(|i| &self.regions[i])
     }
 
+    /// The place on this tile, **whether or not it is there yet**.
+    ///
+    /// The raw map query. Everything a player can see or walk into goes
+    /// through [`World::place_now`]; this is for the questions that are about
+    /// the file rather than about a game — where the last town is, whether the
+    /// data is well formed.
     pub fn place_at(&self, x: u8, y: u8) -> Option<&PlaceDef> {
         self.places.iter().find(|p| p.at == [x, y])
+    }
+
+    /// The place on this tile that is there right now.
+    pub fn place_now(&self, state: &WorldState, x: u8, y: u8) -> Option<&PlaceDef> {
+        self.place_at(x, y).filter(|p| place_is_there(p, state))
+    }
+
+    /// Every place on this map that is there right now.
+    pub fn places_now(&self, state: &WorldState) -> Vec<&PlaceDef> {
+        self.places.iter().filter(|p| place_is_there(p, state)).collect()
     }
 
     /// The regions whose pool holds this creature.
@@ -601,6 +658,9 @@ pub struct Step {
     pub spent: bool,
     /// A town on the tile.
     pub town: Option<String>,
+    /// A door you are now standing on. Whether it opens is the caller's, for
+    /// the reason a gate's is: it depends on what is in the bag.
+    pub door: Option<String>,
     /// A gate you are now standing on. Whether it opens is the caller's
     /// question, because it depends on what is in the bag.
     pub gate: Option<String>,
@@ -636,6 +696,7 @@ impl Step {
             spent: false,
             town: None,
             gate: None,
+            door: None,
             boss: None,
             encounter: None,
         }
@@ -686,11 +747,15 @@ pub fn step(
         spent: false,
         town: None,
         gate: None,
+        door: None,
         boss: None,
         encounter: None,
     };
 
-    if let Some(p) = world.place_at(nx, ny) {
+    // **Not there is not there.** A hidden place is not walked onto, not
+    // reported and not drawn, so a door in a wall is a wall until the thing
+    // that opens it has happened.
+    if let Some(p) = world.place_now(state, nx, ny) {
         match p.kind {
             PlaceKind::Town => {
                 state.last_town = p.id.clone();
@@ -707,6 +772,12 @@ pub fn step(
                 // world's business, because it depends on what is in the bag
                 // and a `World` does not know about bags.
                 out.gate = Some(p.id.clone());
+                return out;
+            }
+            PlaceKind::Door => {
+                // Whether it opens depends on what is in the bag, and a map
+                // does not know about bags — the same division a gate makes.
+                out.door = Some(p.id.clone());
                 return out;
             }
             PlaceKind::Boss => {

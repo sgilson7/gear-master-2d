@@ -182,6 +182,29 @@ function draw() {
       g.strokeStyle = ink();
       g.lineWidth = 1.5;
       g.stroke();
+    } else if (p.kind === 'door') {
+      // **Its own mark, not the diamond.** A gate leads to another map and a
+      // door leads out of everything that is written; drawing them the same
+      // would say you could come back from one the way you come back from the
+      // other. An arch with a keyhole in it, on the tile rather than over it.
+      const w = TILE - 12, h = TILE - 8;
+      const ax = x * TILE + 6, ay = y * TILE + TILE - 4;
+      g.fillStyle = '#f0c85a';
+      g.beginPath();
+      g.moveTo(ax, ay);
+      g.lineTo(ax, ay - h + w / 2);
+      g.arc(ax + w / 2, ay - h + w / 2, w / 2, Math.PI, 0);
+      g.lineTo(ax + w, ay);
+      g.closePath();
+      g.fill();
+      g.strokeStyle = ink();
+      g.lineWidth = 1.5;
+      g.stroke();
+      g.fillStyle = ink();
+      g.beginPath();
+      g.arc(ax + w / 2, ay - h / 2, 2.4, 0, Math.PI * 2);
+      g.fill();
+      g.fillRect(ax + w / 2 - 1, ay - h / 2, 2, 5);
     } else if (p.kind === 'town') {
       g.fillStyle = pal.town[0];
       g.fillRect(x * TILE + 6, y * TILE + 6, TILE - 12, TILE - 12);
@@ -1062,6 +1085,29 @@ function closeTree() {
   paintPanel(); draw(); $('map').focus();
 }
 
+// ------------------------------------------------------------- the ending
+
+/// The one screen that is not a loop.
+///
+/// It does not take the fork's treatment — you *can* back out of it, because
+/// the world is still there behind you and there is an errand about the door
+/// to hand in. What it must not do is pretend there is more.
+function openEnding(e) {
+  $('ending-name').textContent = e.name || 'the door in the wall';
+  $('ending-prose').replaceChildren(...(e.prose ?? []).map((t) => {
+    const p = document.createElement('p');
+    p.textContent = t;
+    return p;
+  }));
+  $('ending').hidden = false;
+}
+
+function closeEnding() {
+  $('ending').hidden = true;
+  paintPanel(); draw(); autosave();
+  $('map').focus();
+}
+
 // ---------------------------------------------------------------- the log
 
 /// Everything you said you would do, and where it wants you.
@@ -1371,7 +1417,8 @@ function closeTown() {
 
 function walk(dir) {
   if (!$('card').hidden || !$('fight').hidden || !$('town').hidden ||
-      !$('tree').hidden || !$('fork').hidden || !$('log').hidden) return;
+      !$('tree').hidden || !$('fork').hidden || !$('log').hidden ||
+      !$('ending').hidden) return;
   const r = JSON.parse(try_step(dir));
   blocked = r.moved ? null : r.blocked;
   paintPanel(); draw(); autosave();
@@ -1388,6 +1435,7 @@ function walk(dir) {
     paintPanel(); draw(); autosave();
   }
   if (r.shut) says(r.shut, true);
+  if (r.ending) openEnding(r.ending);
   if (r.mended > 0) says(`Somebody puts a chair out. ${r.mended}% of you comes back.`);
   if (r.town) openTown(r.town);
   else if (r.event) openEvent(r.event);
@@ -1487,6 +1535,10 @@ async function main() {
     }
     if (!$('log').hidden) {
       if (e.key === 'Escape') closeLog();
+      return;
+    }
+    if (!$('ending').hidden) {
+      if (e.key === 'Escape') closeEnding();
       return;
     }
     // The fork has no way out but through. It is the one screen in the game
@@ -1592,6 +1644,7 @@ async function main() {
   $('tree-done').onclick = closeTree;
   $('errands-open').onclick = openLog;
   $('log-close').onclick = closeLog;
+  $('ending-close').onclick = closeEnding;
 
   $('bank').onclick = () => {
     const r = JSON.parse(bank_xp());

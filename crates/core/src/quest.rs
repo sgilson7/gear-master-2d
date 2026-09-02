@@ -111,6 +111,14 @@ pub struct Quest {
     /// Errands that must be done first. A questline is this and nothing else.
     #[serde(default)]
     pub requires: Vec<String>,
+    /// Ids that must be in `world.answered` first.
+    ///
+    /// **An errand gated on something that is not an errand.** A boss tile
+    /// writes its own id into `answered` when it is cleared, and a door in a
+    /// wall reads the same set — so "once the Cave is done" is one field
+    /// rather than a second kind of prerequisite with its own bookkeeping.
+    #[serde(default)]
+    pub requires_answered: Vec<String>,
     pub name: String,
     /// Why somebody is asking. The world's words.
     pub brief: String,
@@ -283,6 +291,13 @@ pub fn stage(game: &Game, q: &Quest) -> Stage {
         return Stage::Done;
     }
     if !q.requires.iter().all(|r| done(game, r)) {
+        return Stage::Locked;
+    }
+    if !q
+        .requires_answered
+        .iter()
+        .all(|k| game.world.answered.iter().any(|a| a == k))
+    {
         return Stage::Locked;
     }
     if !game.world.quests_taken.iter().any(|t| *t == q.id) {

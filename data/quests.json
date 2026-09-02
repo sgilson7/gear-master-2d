@@ -166,6 +166,22 @@
         "the-yodregar-index"
       ],
       "gold": 45
+    },
+    {
+      "id": "a-door-where-there-was-not-one",
+      "giver": "the-end-of-all-gears",
+      "requires_answered": [
+        "the-bottom-of-the-cave"
+      ],
+      "name": "A DOOR WHERE THERE WAS NOT ONE",
+      "brief": "The register has a line for the western wall and the line has said ROCK, NINE MILES, NO OPENINGS for a hundred and four years. Somebody came in this morning and said there is a door in it. The clerk would like that either confirmed or taken back, and she would like it confirmed by whoever is carrying the Cave's key, because she has worked out which of those two facts came first.",
+      "thanks": "She writes ONE OPENING, and the date, and under it the words AS OF TODAY, which she says is the only honest way to file a thing that was not there yesterday. Then she pays you out of a drawer she has to unlock, and says the office has no procedure for what is on the other side and will be inventing one.",
+      "goal": {
+        "word": {
+          "place": "the-door-in-the-wall"
+        }
+      },
+      "gold": 220
     }
   ]
 }

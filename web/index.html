@@ -165,6 +165,23 @@
       </div>
     </div>
 
+    <!-- The one screen in the game that is not a loop. It says the demo is
+         over and says plainly that what is past the door is not written — and
+         then it lets you back out, because the world is still there and there
+         is an errand to hand in about it. -->
+    <div id="ending" class="screen" hidden>
+      <div class="screenbox">
+        <header class="fighthead">
+          <div>
+            <p class="eyebrow">the door in the wall</p>
+            <h2 id="ending-name">&mdash;</h2>
+          </div>
+        </header>
+        <div id="ending-prose"></div>
+        <div class="row"><button id="ending-close" type="button" class="primary">Back out</button></div>
+      </div>
+    </div>
+
     <div id="town" class="screen framed" hidden>
       <div class="screenbox">
         <header class="fighthead">

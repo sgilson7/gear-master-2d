@@ -222,9 +222,12 @@ pub fn world_json() -> String {
             }
             rows.push(row);
         }
+        // **Only what is there.** A hidden place is not drawn, which is half
+        // of what makes it hidden — the other half is `world::step` refusing
+        // to walk onto one.
         let places: Vec<_> = w
-            .places
-            .iter()
+            .places_now(&g.world)
+            .into_iter()
             .map(|p| {
                 serde_json::json!({
                     "at": p.at,
@@ -339,7 +342,7 @@ pub fn try_step(dir: &str) -> String {
             // player who walks over the tile and keeps going has still been.
             let mut spoke = Vec::new();
             if s.moved {
-                if let Some(p) = w.place_at(g.world.at[0], g.world.at[1]) {
+                if let Some(p) = w.place_now(&g.world, g.world.at[0], g.world.at[1]) {
                     let id = p.id.clone();
                     spoke = gm2d_core::quest::on_arrival(g, &id);
                 }
@@ -378,6 +381,38 @@ pub fn try_step(dir: &str) -> String {
                 }
             }
 
+            // **The door in the wall.** The same division a gate makes and
+            // for the same reason: whether it opens depends on what is in the
+            // bag, and a map does not know about bags.
+            let mut ending = None;
+            if let Some(id) = &s.door {
+                if let Some(p) = w.places.iter().find(|p| p.id == *id).cloned() {
+                    let has = p
+                        .needs
+                        .as_deref()
+                        .map(|n| gm2d_core::quest::holding(g, n) > 0)
+                        .unwrap_or(true);
+                    if has {
+                        // Remembered, so a save taken after it opens comes back
+                        // to an open door rather than to a locked one.
+                        if !g.world.answered.iter().any(|a| *a == p.id) {
+                            g.world.answered.push(p.id.clone());
+                        }
+                        ending = Some(serde_json::json!({
+                            "id": p.id,
+                            "name": p.name,
+                            "prose": p.prose,
+                        }));
+                    } else {
+                        shut = Some(if p.shut.is_empty() {
+                            "It is locked.".to_string()
+                        } else {
+                            p.shut.clone()
+                        });
+                    }
+                }
+            }
+
             // A creature standing here rather than one the ground rolled.
             if let Some(id) = &s.boss {
                 if let Some(p) = w.places.iter().find(|p| p.id == *id) {
@@ -404,6 +439,7 @@ pub fn try_step(dir: &str) -> String {
                 "spoke": spoke,
                 "went": went,
                 "shut": shut,
+                "ending": ending,
                 "boss": s.boss,
                 "encounter": s.encounter.or_else(|| {
                     g.encounter.as_ref().and_then(|e| gm2d_core::fight::spec(e))
@@ -1458,7 +1494,7 @@ pub fn errand_marks_json() -> String {
         let here = g.world.map_id();
         let mut out: Vec<serde_json::Value> = Vec::new();
         map_for(g, |w| {
-            for p in &w.places {
+            for p in w.places_now(&g.world) {
                 let mut take = false;
                 let mut give = false;
                 for q in quests.at(&p.id) {
@@ -1494,7 +1530,7 @@ pub fn errand_marks_json() -> String {
 /// the caller name it means a caller can name the wrong one.
 /// The place the player is standing on, town or event.
 fn place_here(g: &gm2d_core::game::Game) -> Option<String> {
-    map_for(g, |w| w.place_at(g.world.at[0], g.world.at[1]).map(|p| p.id.clone()))
+    map_for(g, |w| w.place_now(&g.world, g.world.at[0], g.world.at[1]).map(|p| p.id.clone()))
 }
 
 fn town_here(g: &gm2d_core::game::Game) -> Option<String> {

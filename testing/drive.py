@@ -852,6 +852,80 @@ def check_an_errand_can_be_handed_in_where_it_was_taken(page, name, fails):
     page.wait_for_selector("#card", state="hidden", timeout=5000)
 
 
+def check_the_door_ends_the_demo(page, name, fails):
+    """A wall with no door in it grows one, and opening it ends the demo.
+
+    Three firsts in one tile: a place that is not there until it is, a lock
+    answered against the bag rather than against the map, and the one screen in
+    the game that is not a loop. Planted at each stage rather than walked,
+    because the walk to it is the whole game.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+
+    door = page.evaluate("""() => JSON.parse(window.__save()).state.world""")
+    del door  # only the save's shape is wanted; the door is not on the map yet
+
+    if page.evaluate("""() => (window.__world().places ?? [])
+            .some(p => p.kind === 'door')"""):
+        fails.append(f"{name}: the door is on the map before the Cave's boss is down")
+
+    # --- the boss is down, so the wall has a door in it ----------------------
+    def cleared(body, key=False):
+        w = body.setdefault("world", {})
+        w["map"] = ""
+        w["answered"] = list(w.get("answered", [])) + ["the-bottom-of-the-cave"]
+        if key:
+            reg = body["character"].setdefault("registry", [])
+            reg.append({"def": "The Deep Gate Key", "rot": 0})
+            body["character"]["owned"].append(len(reg) - 1)
+
+    plant(page, base, cleared, stem="door-shut")
+    spot = page.evaluate("""() => (window.__world().places ?? []).find(p => p.kind === 'door')""")
+    if not spot:
+        fails.append(f"{name}: the Cave's boss is down and the wall still has no door")
+        return
+
+    # Stand beside it and walk in without the key.
+    page.evaluate("(at) => window.__standAt(at)", [spot["at"][0] + 1, spot["at"][1]])
+    page.keyboard.press("ArrowLeft")
+    page.wait_for_timeout(300)
+    if page.is_visible("#ending"):
+        fails.append(f"{name}: the door opened with no key in the bag")
+        page.click("#ending-close")
+    said = (page.text_content("#says") or "").strip()
+    if not said:
+        fails.append(f"{name}: a locked door said nothing")
+
+    # --- and with the key ----------------------------------------------------
+    plant(page, base, lambda b: cleared(b, key=True), stem="door-open")
+    page.evaluate("(at) => window.__standAt(at)", [spot["at"][0] + 1, spot["at"][1]])
+    page.keyboard.press("ArrowLeft")
+    page.wait_for_timeout(350)
+    if page.is_hidden("#ending"):
+        fails.append(f"{name}: carried the key onto the door and nothing happened")
+        return
+    prose = page.evaluate("""() => [...document.querySelectorAll('#ending-prose p')]
+        .map(p => p.textContent).join(' ')""")
+    if "demo" not in prose.lower():
+        fails.append(f"{name}: the ending does not say the demo is over: {prose[:80]!r}")
+    # It is not the fork: you can back out of it, because the world is still
+    # there and there is an errand about the door to hand in.
+    page.click("#ending-close")
+    page.wait_for_selector("#ending", state="hidden", timeout=5000)
+    if page.text_content("#coords") != f"{spot['at'][0]}, {spot['at'][1]}":
+        fails.append(f"{name}: the ending left the player at "
+                     f"{page.text_content('#coords')}, not on the door")
+
+    # And the errand about it is on offer now, and only now.
+    log = page.evaluate("() => window.__log()")
+    del log
+    marks = page.evaluate("() => window.__errandMarks()")
+    if not any(m["id"] == "the-end-of-all-gears" for m in marks):
+        fails.append(f"{name}: the boss is down and the clerk has nothing new to say: {marks}")
+
+
 def check_the_rack(page, name, fails):
     """A licensee buys an ench, bolts it on, switches it off, and takes it back.
 
@@ -2043,6 +2117,7 @@ def walk_the_gate(browser, name):
     # **Last, because these plant saves.** They replace the character to stand
     # them somewhere the walk would take twenty minutes to reach, so anything
     # after them would be checking a game this walk did not play.
+    check_the_door_ends_the_demo(page, name, fails)
     check_the_rack(page, name, fails)
     check_the_spin_animates(page, name, fails)
     check_a_town_takes_the_tiredness_off(page, name, fails)
@@ -2123,6 +2198,7 @@ def main():
     print("ok: the map's odds are a skill somebody took, not a button everybody had")
     print("ok: a licensee buys an ench, bolts it on, switches it off and takes it back")
     print("ok: a spinning item turns, and turns to somewhere core said it could")
+    print("ok: the wall grows a door, the key opens it, and the demo ends there")
     print("ok: your own figure becomes your class's when you take one")
     print("ok: a mid-fight save reopens the same fight")
     print("ok: walk, download, reload, upload — position and stream both came back")

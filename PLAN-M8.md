@@ -1,8 +1,16 @@
 # PLAN-M8.md — the ench, the spin, and what was already there
 
 Written 2026-09-02, against `c4e004f`. `PLAN.md` remains the plan of record for
-M0–M7; this is the plan for the next block of work and follows its conventions.
-Nothing here is built yet.
+M0–M7; this is the plan for the next block and follows its conventions.
+
+**Nine milestones, each deployable on its own.** M8.0 is a live blocker, M8.7
+is where the demo ends, and M8.8 is the one that is not a feature: play it,
+triage it, write it down, ship it.
+
+**What is past the door is not planned here**, deliberately. The game's overall
+structure is the human's to decide and they have said they will come back with
+it; until then nothing in this plan assumes a second overworld or an ending
+beyond the door.
 
 ---
 
@@ -63,6 +71,8 @@ it.** `explain.rs` was written with a duplicate `Action::describe` and
 | **I** | **Revisit an event that has an errand on it**, and draw it differently | **M8.0** |
 | **J** | **Save and load carry everything** — answered events, doors, errands, wear | **M8.0** |
 | **K** | **A quest log that points at the map** — where to go, or where the creature is | **M8.1** |
+| **L** | **The door in the wall** — the key opens it, and the demo ends there | **M8.7** |
+| **M** | **Play it, triage it, write it down, ship it** | **M8.8** |
 
 ---
 
@@ -92,6 +102,14 @@ specific rewrites:
   (revisitable events are not diamonds) and M8.1 draws onto the map again (the
   quest log highlights where to go). Together that is one pass over the painter
   instead of two.
+
+- **The ending last, but nothing blocks it.** M8.7 needs only the dungeon key,
+  which already drops — so it could be pulled forward to sit right after M8.0
+  and make the game completable before the rest is built. It is placed last
+  because it is the *capstone*: a demo should end on a finished feature set
+  rather than a half-built one. **This is a call worth making deliberately** —
+  if playing the whole thing end to end sooner is worth more than shipping the
+  ending onto finished content, move it.
 
 M8.2 leads the rest because it is entirely presentation, ships value at once,
 and the fixed action bar it introduces makes every later browser walk simpler.
@@ -430,6 +448,101 @@ After 3.
 
 ---
 
+## M8.7 — The door in the wall
+
+**Theme:** the key from the bottom of the Cave has nothing to open. This gives
+it a door, and the demo an ending.
+
+### What it needs that does not exist yet
+
+Three small things, and each is a first:
+
+1. **A place that is not there until it is.** Every place in `tiles.json` is
+   static. A rock in the wall that becomes a door once you carry the Deep Gate
+   Key is the first **conditional** place. Proposed: `PlaceDef` gains
+   `hidden_until` — a flag or a held component — and a place with one is not
+   drawn, not steppable, and absent from `place_at` until the condition holds.
+   - Rejected: spawning a place at runtime. Places are content and content is
+     not state; a place that is always in the file and sometimes invisible
+     keeps that true.
+2. **An errand gated on something other than another errand.**
+   `Quest::requires` names errands. The town's *go and open it* errand appears
+   once the boss is down, which is a **flag** — the boss tile already writes its
+   id into `answered` when cleared, so the gate reads the same set.
+3. **An ending.** The first screen in the game that is not a loop. It says the
+   demo is over and says plainly that what is past the door is not written yet.
+
+### Deliverables
+
+1. **The door**, on the overworld's western rock wall — the side the Cave's
+   workings run under, which is where a way through belongs. `hidden_until` the
+   Deep Gate Key.
+2. **The errand**, from the pit's clerk, once the Cave's boss is down: the
+   register has a line for a wall that has never had a door in it and now does.
+3. **Opening it ends the demo** — a screen in the game's own voice that does not
+   pretend there is more.
+4. **The map draws it.** A door is not a gate to another map, so it wants its
+   own mark rather than reusing the diamond.
+
+### Tests
+
+- `a_hidden_place_is_not_there_until_its_condition_holds` — not drawn, not
+  steppable, absent from `place_at`.
+- `the_door_wants_the_key_the_boss_drops` — the same shape as
+  `the_witchs_key_is_the_key_the_cave_wants`: a lock whose key nothing hands out
+  is a door nobody opens.
+- `the_ending_errand_waits_for_the_boss`, and a browser check that the ending is
+  reachable.
+
+### Deploy point
+
+After 3. The mark can follow.
+
+---
+
+## M8.8 — Play it, triage it, write it down, ship it
+
+**Theme:** the milestone that is not a feature. Everything above is tested by
+its own checks; none of it has been **played**.
+
+### Deliverables
+
+1. **A real playthrough, new game to ending.** Not the gate walk — that is a
+   robot's route, and it has never once bought the wrong thing, walked into a
+   region it could not survive, or misread a screen. One pass, written down as
+   it goes.
+2. **A triage table**, everything the playthrough turned up, with a severity and
+   a call:
+   - **Blocker** — cannot progress. Fixed here, no exceptions.
+   - **Wrong** — the game says or does something untrue. Fixed.
+   - **Rough** — works, reads badly. Fixed if cheap, listed if not.
+   - **Later** — a design question, not a defect. Goes to `PLAN.md` §6.
+
+   The table ships in the commit, so anything deferred is deferred *visibly*
+   rather than forgotten.
+3. **`CLAUDE.md` brought up to date.** It has grown by accretion — one section
+   per lesson, in the order they were learned — and is now long enough that the
+   thing it exists for is getting harder. The job is not to trim the lessons; it
+   is to **reorganise**: load-bearing rules together at the top, war stories
+   grouped by the system they belong to. `HANDOFF.md` stays the short door in.
+   Every number in the closing table re-measured, not assumed.
+4. **Push, deploy, and verify the deploy arrived** — the build stamp live, and a
+   smoke pass over the *deployed* site rather than the local build. Two deploys
+   have failed silently in this project's history, and one shipped a stamp that
+   could not change.
+
+### Tests
+
+The suite is the test. What this milestone adds is the one thing the suite
+cannot do: somebody playing it. **If the playthrough finds something no check
+would have caught, that is a missing check**, and writing it is part of the fix.
+
+### Deploy point
+
+The end of it — the point at which the demo is a thing somebody can be handed.
+
+---
+
 ## 3. Cross-cutting rules this work must not break
 
 - `crates/core` stays graphics-free and wasm-free.
@@ -451,11 +564,12 @@ After 3.
 
 | | now | after |
 |---|---|---|
-| Tests | 447 | expect ~490 |
+| Tests | 447 | expect ~515 |
 | Catalogue | 536 | +2 to +4 (enchs are not components) |
 | Skill trees | 3 + base | 4 + base |
 | Effect kinds | 4 | 5 |
-| `PlaceKind` | 4 | 4 |
+| `PlaceKind` | 4 | 5 — a door is not a gate to another map |
+| Maps | 2 | 2 — the door ends the demo rather than opening a third |
 | Save format | v1 | v1 — every new field defaults |
 
 ## 5. Open questions for the human
@@ -468,3 +582,11 @@ After 3.
    and a bigger UI.
 4. **Is the spin's ×0.1 per turn, uncapped?** Planned uncapped, because the
    spend-on-activation is the cap — a slow item stacks more and fires less.
+5. **Should M8.7 come early?** The door needs only the dungeon key, which
+   already drops, so it could land right after M8.0 and make the game
+   completable while the rest is built. Planned last, as a capstone.
+6. **What is the game's overall structure?** Open, and yours to answer. This
+   plan builds a demo that ends at the door and deliberately does not guess at
+   what is on the other side. Until it is answered, nothing here should assume
+   a second overworld, a chapter count, or an ending beyond the one M8.7
+   writes.

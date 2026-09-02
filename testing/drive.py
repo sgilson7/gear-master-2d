@@ -1462,6 +1462,94 @@ def check_the_toad_walks_on_water(page, name, fails):
     assert window_rules
 
 
+def check_an_ench_you_cannot_use_is_still_shown(page, name, fails):
+    """An errand pays an ench to everybody, so everybody has to be able to see it.
+
+    Reported from a real session: *"the quest the frame that stands did not pay
+    the yodregar index"*. It did — core hands it over, the save carries it, the
+    town's receipt names it — and then the rack, which is the only screen an
+    ench appears on, was hidden outright unless the character was a Kaklon
+    Licensee. Paid, and invisible, which from where the player sits is not paid.
+
+    `quest.rs` is deliberate about handing it over regardless: *a reward that
+    vanished for three players in four would be worse than one they cannot use
+    yet.* This is the half of that sentence the screen owed.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+
+    def holding(licensed):
+        def edit(body):
+            strip_the_boards(body)
+            body["character"]["enchs_owned"] = ["the-yodregar-index"]
+            # **A class, and not the licensee's.** Taking the class *off* is not
+            # the same as not being a licensee: a level-five character with no
+            # class is owed one, so the load opens the fork — which is the one
+            # screen that does not come off, and everything after it clicks into
+            # a modal. Gorillathon is a real answer that is not the Patent.
+            body["character"]["class"] = "Recycler" if licensed else "Berserker"
+        return edit
+
+    def open_the_board():
+        # Focus the map first. A keypress goes to whatever has focus, and after
+        # a file load that is the file input — `check_the_spin_animates` learned
+        # this and it is the same gesture.
+        page.evaluate("() => document.getElementById('map').focus()")
+        town = page.evaluate("""() => (window.__world().places ?? [])
+            .find(p => p.kind === 'town')""")
+        page.evaluate("(at) => window.__standAt(at)", [town["at"][0] + 1, town["at"][1]])
+        page.keyboard.press("ArrowLeft")
+        page.wait_for_timeout(300)
+        if not page.is_visible("#town"):
+            return False
+        page.click("#pack")
+        page.wait_for_selector("#fight", state="visible", timeout=8000)
+        return True
+
+    plant(page, base, holding(False), stem="ench-unlicensed")
+    if not open_the_board():
+        fails.append(f"{name}: could not reach a town to pack in")
+        return
+    try:
+        got = page.evaluate("""() => ({
+          rack: !document.getElementById('rack').hidden,
+          named: [...document.querySelectorAll('#rack-loose b')].map(b => b.textContent),
+          note: document.getElementById('rack-note').textContent,
+          buttons: document.querySelectorAll('#rack-loose button').length,
+          owned: JSON.parse(window.__rack()).loose.length,
+        })""")
+        if not got["owned"]:
+            fails.append(f"{name}: the planted ench never reached the character")
+            return
+        if not got["rack"]:
+            fails.append(f"{name}: unlicensed and holding an ench, and the rack is hidden")
+        elif not any("Yodregar" in n for n in got["named"]):
+            fails.append(f"{name}: the rack is up and does not name the ench: {got['named']}")
+        if "licensee" not in got["note"].lower():
+            fails.append(f"{name}: the rack does not say why it cannot be used: {got['note']!r}")
+        if got["buttons"]:
+            fails.append(f"{name}: offered {got['buttons']} click(s) core is going to refuse")
+    finally:
+        close_fight(page)
+
+    # And a rack of nothing stays hidden, which is what hiding it was for.
+    def empty(body):
+        strip_the_boards(body)
+        body["character"]["enchs_owned"] = []
+        body["character"]["class"] = "Berserker"
+
+    plant(page, base, empty, stem="ench-none")
+    if not open_the_board():
+        fails.append(f"{name}: could not reach a town the second time")
+        return
+    try:
+        if page.evaluate("() => !document.getElementById('rack').hidden"):
+            fails.append(f"{name}: an empty rack is on the screen of somebody who cannot use one")
+    finally:
+        close_fight(page)
+
+
 def check_the_north_is_shut(page, name, fails):
     """A level-one character cannot walk into a region of two-thousand-rated
     creatures, and is told what the road wants.
@@ -2491,6 +2579,7 @@ def walk_the_gate(browser, name, fails=None):
 
     # --- the north ------------------------------------------------------------
     check_the_north_is_shut(page, name, fails)
+    check_an_ench_you_cannot_use_is_still_shown(page, name, fails)
 
     # --- scouting ------------------------------------------------------------
     check_scouting_is_earned(page, name, fails)
@@ -2575,6 +2664,7 @@ def main():
     print("ok: a whole set names its own item and says what it does; two thirds of one does not")
     print("ok: the lake is ground at its rim to a toad, and a wall through its middle to everybody")
     print("ok: the north is shut to a level-one character, and says what the road wants")
+    print("ok: an ench you were paid and cannot use yet is on the rack, and says why")
     print("ok: the class fork opens on top of the town it is offered in")
     print("ok: your own figure becomes your class's when you take one")
     print("ok: a mid-fight save reopens the same fight")

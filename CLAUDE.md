@@ -1281,6 +1281,34 @@ Two things came out of it, and the second is the one that matters:
    `check_the_portrait_shows` says the same thing from the browser, including
    `naturalWidth != 0` — a portrait that 404s is not a portrait.
 
+## An ench you were paid and cannot use yet
+
+Reported as *"the quest the frame that stands did not pay the yodregar index"*.
+It did. Core handed it over, the save carried it, the town's receipt named it,
+and `an_errand_pays_its_ench_to_a_character_who_cannot_use_one` says so. The
+rack is the only screen in the game an ench appears on, and it was `hidden`
+outright to anybody without the Kaklon Patent — so the errand paid, and no
+screen anywhere would show it.
+
+**The engine was right and the screen was the bug**, which is the third time
+that shape has been found here: four skills worked and were reported broken, a
+starting balance was on the bar and the bar opened at zero, and this. The rule
+is the same one and it keeps earning its place — *a thing that works and cannot
+be seen is a thing that does not work.*
+
+- **The design already said so and only did half of it.** `quest.rs` hands an
+  ench over regardless of licence because *"a reward that vanished for three
+  players in four would be worse than one they cannot use yet"* — and that
+  sentence only holds if the player can see they have one. This is the other
+  half of it.
+- **Shown, and not offered.** The rack lists what you own read-only and says
+  what it wants: the licence. `attach_ench` refuses an unlicensed character in
+  core, and offering a click that is going to be refused is a worse screen than
+  not offering it.
+- **Still hidden when you hold none**, which is what hiding it was for: a rack
+  of nothing on a screen you cannot use is noise. The condition is *unlicensed
+  **and** empty*, not *unlicensed*.
+
 ## Your figure is your class's
 
 `art.player` is the Sprocketman — who you are before anybody has decided what
@@ -1522,7 +1550,8 @@ Every figure below was re-measured for M9.4 rather than carried forward.
 | M9.1: a creature leaves something behind | 503 passing |
 | M9.2: three sets | 518 passing |
 | M9.3: the north is a decision | 526 passing |
-| **M9.4: played to the ending, triaged, written down** | **526 passing** |
+| M9.4: played to the ending, triaged, written down | 526 passing |
+| **An ench you were paid and cannot use yet** | **527 passing** |
 
 | | |
 |---|---|

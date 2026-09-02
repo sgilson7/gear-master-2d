@@ -579,3 +579,71 @@ fn an_errand_pays_an_ench_nobody_sells() {
         "handed it in and the rack is no fuller"
     );
 }
+
+/// **An errand pays an ench to everybody, licensed or not.**
+///
+/// `quest.rs` says why in as many words: *a reward that vanished for three
+/// players in four would be worse than one they cannot use yet.* This is the
+/// engine's half, and it was already right when the bug was reported — *"the
+/// quest the frame that stands did not pay the yodregar index"* was the rack
+/// being hidden outright to anybody without the Patent, so an ench that was
+/// paid, banked and saved appeared on no screen in the game.
+///
+/// Kept here so the engine's half cannot quietly become the screen's excuse.
+#[test]
+fn an_errand_pays_its_ench_to_a_character_who_cannot_use_one() {
+    use gm2d_core::game::Game;
+    use gm2d_core::quest;
+
+    let quests = gm2d_core::data::quests();
+    let paying: Vec<&gm2d_core::quest::Quest> =
+        quests.quests.iter().filter(|q| !q.enchs.is_empty()).collect();
+    assert!(!paying.is_empty(), "no errand pays an ench, so this proves nothing");
+
+    for q in paying {
+        let mut g = Game::new(7, "td");
+        for need in &q.requires {
+            g.world.quests_done.push(need.clone());
+        }
+        for need in &q.requires_answered {
+            g.world.answered.push(need.clone());
+        }
+        g.world.quests_taken.push(q.id.clone());
+        assert!(!g.character.licensed(), "the fixture must not be a licensee");
+
+        match &q.goal {
+            gm2d_core::quest::Goal::Word { place } => {
+                quest::on_arrival(&mut g, place);
+            }
+            gm2d_core::quest::Goal::Slay { token, count, .. } => {
+                for _ in 0..*count {
+                    g.character.give(token);
+                }
+            }
+            gm2d_core::quest::Goal::Bring { item, count } => {
+                for _ in 0..*count {
+                    if g.character.give(item).is_none() {
+                        g.character.give_supply(item, 1);
+                    }
+                }
+            }
+        }
+
+        let given = quest::hand_in(&mut g, &q.id)
+            .unwrap_or_else(|e| panic!("{}: could not hand in: {e}", q.id));
+        for id in &q.enchs {
+            assert!(
+                g.character.enchs_owned.iter().any(|o| o == id),
+                "{} pays {id} and an unlicensed character did not get it",
+                q.id
+            );
+            let name = gm2d_core::data::enchs().get(id).map(|e| e.name.clone()).unwrap();
+            assert!(given.contains(&name), "{}: the receipt did not name {name}", q.id);
+        }
+        // And it survives being written down, which is the half that makes
+        // "you have one, you cannot use it yet" a true sentence rather than a
+        // consolation.
+        let back = gm2d_core::save::load(&gm2d_core::save::save(&g)).expect("reloads");
+        assert_eq!(back.character.enchs_owned, g.character.enchs_owned);
+    }
+}

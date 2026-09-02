@@ -664,8 +664,47 @@ let holdingEnch = null;
 /// compared for itself.
 function paintRack() {
   const r = JSON.parse(ench_rack_json());
-  $('rack').hidden = !r.licensed;
-  if (!r.licensed) { holdingEnch = null; return; }
+  // **An ench you own is shown whether or not you can use one.**
+  //
+  // An errand pays The Yodregar Index and pays it to everybody — `quest.rs`
+  // says why in as many words: *a reward that vanished for three players in
+  // four would be worse than one they cannot use yet.* That reasoning assumes
+  // the player can see they have it, and they could not: the rack is the only
+  // screen an ench appears on and it was hidden outright unless you were a
+  // Kaklon Licensee. So the town said it had paid you, the save carried it, and
+  // no screen in the game would show it. Reported as *"the quest the frame that
+  // stands did not pay the yodregar index"*, and from where the player sits
+  // that is exactly what happened.
+  //
+  // Still hidden for somebody holding none, which is what it was for: a rack
+  // of nothing on a screen you cannot use is noise.
+  const shelved = (r.loose ?? []).length || (r.on ?? []).length;
+  $('rack').hidden = !r.licensed && !shelved;
+  $('rack-note').textContent = r.licensed
+    ? `Click an ench, then click the component you want it on. Click a bolted ` +
+      `one to switch it off; click it again to take it back. One ench a component.`
+    : `Yours, and nothing you can do with one yet — bolting an ench to a ` +
+      `component is the Kaklon Patent's, and you are not a licensee.`;
+  if (!r.licensed) {
+    holdingEnch = null;
+    $('rack-on').replaceChildren();
+    const loose = $('rack-loose');
+    loose.replaceChildren();
+    for (const e of r.loose) {
+      const d = document.createElement('div');
+      // Not a button. The gesture is refused in core — `attach_ench` says "The
+      // bench is not for you" — and offering a click that is going to be
+      // refused is a worse screen than not offering it.
+      d.className = 'wares ench sold';
+      d.dataset.ench = e.id;
+      d.innerHTML = `<b>${e.name}${e.have > 1 ? ` ×${e.have}` : ''}</b>` +
+        `<span class="spec">${e.spec}</span>` +
+        `<span class="flavour">${e.blurb}</span>` +
+        `<span class="cost">waiting on a licence</span>`;
+      loose.appendChild(d);
+    }
+    return;
+  }
 
   const loose = $('rack-loose');
   loose.replaceChildren();

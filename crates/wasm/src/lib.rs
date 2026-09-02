@@ -472,6 +472,7 @@ pub fn try_step(dir: &str) -> String {
                 "shut": shut,
                 "ending": ending,
                 "boss": s.boss,
+                "bench": s.bench,
                 // Which kind of refusal it was. `blocked` already carries the
                 // sentence; this is what lets the page put a crossing's in the
                 // message panel and a cliff's in the flash at the bottom of
@@ -1614,6 +1615,64 @@ fn town_here(g: &gm2d_core::game::Game) -> Option<String> {
     })
 }
 
+/// The bench on this tile, if the walker can see one.
+///
+/// **`place_now`, not `place_at`.** A bench can be hidden until a level, and a
+/// shop you cannot see is a shop you cannot buy from — asking the raw map would
+/// let a level-nine character stand on a van that is not there and spend money
+/// at it.
+fn bench_here(g: &gm2d_core::game::Game) -> Option<gm2d_core::world::PlaceDef> {
+    let allowed = g.character.allowances();
+    map_for(g, |w| {
+        w.place_now(&g.world, g.world.at[0], g.world.at[1], &allowed)
+            .filter(|p| p.kind == gm2d_core::world::PlaceKind::Bench)
+            .cloned()
+    })
+}
+
+/// What the bench on this tile has, and what is gone off it.
+///
+/// **Sold once each, and the sold ones stay on the table**, greyed — the same
+/// rule and the same reason a town's shelf keeps a bought line: the gap is the
+/// memory of what you took.
+#[wasm_bindgen]
+pub fn bench_json() -> String {
+    with(|g| {
+        let Some(p) = bench_here(g) else { return "null".to_string() };
+        let data = gm2d_core::data::enchs();
+        let rows: Vec<_> = p
+            .sells
+            .iter()
+            .filter_map(|id| {
+                let e = data.get(id)?;
+                let price = e.price?;
+                let sold = g.world.bought_enchs.iter().any(|b| b == id);
+                Some(serde_json::json!({
+                    "id": e.id, "name": e.name, "blurb": e.blurb,
+                    "spec": e.effect.line(), "detail": e.effect.detail(),
+                    "price": price,
+                    "sold": sold,
+                    "afford": g.character.gold >= price,
+                    "have": g.character.enchs_loose(&e.id),
+                }))
+            })
+            .collect();
+        serde_json::json!({
+            "id": p.id,
+            "name": p.name,
+            "prose": p.prose,
+            "gold": g.character.gold,
+            // Whether anything can be *done* with what he sells. He will take
+            // the money either way, and the screen says so rather than
+            // refusing — an ench you cannot bolt on yet is still an ench you
+            // own, which is the rule the rack had to learn.
+            "licensed": g.character.licensed(),
+            "stock": rows,
+        })
+        .to_string()
+    })
+}
+
 /// What this town sells, in order, sold entries included.
 #[wasm_bindgen]
 pub fn shop_json() -> String {
@@ -1660,36 +1719,14 @@ pub fn shop_json() -> String {
                 })
             })
             .collect();
-        // The bench. Every trading town keeps one, the same rule the tins
-        // follow: a licensee who had to walk to the one town that stocks the
-        // thing their class is *about* would be a licensee who could be
-        // stranded from their own class.
-        //
-        // Only shown to somebody licensed to use one, because a shelf of
-        // things you can buy and cannot use is a shelf that reads as a bug.
-        let licensed = g.character.licensed();
-        let bench: Vec<_> = gm2d_core::data::enchs()
-            .enchs
-            .iter()
-            // A priceless ench is not on the bench. It is earned, and a reward
-            // you could have bought makes the errand a slow way to shop.
-            .filter_map(|e| Some((e, e.price?)))
-            .filter(|_| licensed)
-            .map(|(e, price)| {
-                serde_json::json!({
-                    "id": e.id, "name": e.name, "blurb": e.blurb,
-                    "spec": e.effect.line(), "detail": e.effect.detail(),
-                    "price": price,
-                    "afford": g.character.gold >= price,
-                    "have": g.character.enchs_loose(&e.id),
-                })
-            })
-            .collect();
+        // **No town sells an ench.** Every trading town kept a bench until M10,
+        // which made an ench a thing you bought rather than a thing you went
+        // and got — the same reason the shelves stopped rolling in M7. What a
+        // skill tree does not award is sold by one person, on one tile, who is
+        // not there below level ten. See `PlaceKind::Bench`.
         serde_json::json!({
             "gold": g.character.gold, "town": town, "shelf": shelf,
             "supplies": tins,
-            "licensed": licensed,
-            "bench": bench,
             "fatigue": g.character.fatigue,
         })
         .to_string()
@@ -1700,11 +1737,16 @@ pub fn shop_json() -> String {
 #[wasm_bindgen]
 pub fn buy_ench(id: &str) -> String {
     with_mut(|g| {
-        if town_here(g).is_none() {
-            return "you are not in a town".into();
+        // **At the bench, not in a town.** And not gated on the licence: being
+        // handed an ench and being able to bolt one on are two questions, which
+        // is the rule `quest::hand_in` has followed since M8 and the one the
+        // rack was breaking until it was reported.
+        let Some(here) = bench_here(g) else { return "there is nobody selling here".into() };
+        if !here.sells.iter().any(|s| s == id) {
+            return "He does not have one of those.".into();
         }
-        if !g.character.licensed() {
-            return "The bench is not for you.".into();
+        if g.world.bought_enchs.iter().any(|b| b == id) {
+            return "He had one, and you have it.".into();
         }
         let data = gm2d_core::data::enchs();
         let Some(e) = data.get(id) else { return "there is no such ench".into() };
@@ -1713,6 +1755,7 @@ pub fn buy_ench(id: &str) -> String {
             return format!("{price} Fnorp, and you have not got it.");
         }
         g.character.gold -= price;
+        g.world.bought_enchs.push(id.to_string());
         g.character.give_ench(id);
         String::new()
     })
@@ -2167,8 +2210,13 @@ pub fn ench_rack_json() -> String {
     with(|g| {
         let data = gm2d_core::data::enchs();
         let ch = &g.character;
+        // **Everything you have, minus what is bolted on.** `enchs` is what was
+        // bought or paid over *plus* what the tree grants, and `enchs_loose`
+        // subtracts the board — reading `enchs_owned` here would have shown a
+        // Patent who took Bench Rights an empty rack.
+        let mine = ch.enchs();
         let mut seen: Vec<(&str, usize)> = Vec::new();
-        for id in &ch.enchs_owned {
+        for id in &mine {
             match seen.iter_mut().find(|(k, _)| *k == id.as_str()) {
                 Some((_, n)) => *n += 1,
                 None => seen.push((id.as_str(), 1)),
@@ -2176,8 +2224,12 @@ pub fn ench_rack_json() -> String {
         }
         let loose: Vec<_> = seen
             .iter()
-            .filter_map(|(id, n)| {
+            .filter_map(|(id, _)| {
                 let d = data.get(id)?;
+                let n = ch.enchs_loose(id);
+                if n == 0 {
+                    return None;
+                }
                 Some(serde_json::json!({
                     "id": d.id, "name": d.name, "blurb": d.blurb,
                     "spec": d.effect.line(), "detail": d.effect.detail(),

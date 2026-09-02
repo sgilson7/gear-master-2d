@@ -74,6 +74,19 @@ pub enum Effect {
     /// something the engine already totals up; this one says the game works
     /// differently for you now.
     Grants { rule: Rule },
+    /// An ench, by id into `data/enchs.json`.
+    ///
+    /// The sixth kind, and the first that hands over a *thing* rather than
+    /// changing a number or a rule. M10 took the ench bench off every town, so
+    /// a tree is now one of the two places an ench comes from.
+    ///
+    /// **Derived, never banked**, like every other effect: the character's
+    /// enchs are what they were given plus what their taken nodes grant, read
+    /// fresh — so retuning which ench a node hands over retunes every save that
+    /// took it. Banking it when the point was spent would be the one effect in
+    /// this enum that wrote to the save, and `Character::enchs` is what makes
+    /// that unnecessary.
+    GivesEnch { ench: String },
 }
 
 /// What a node can grant that is not a number.
@@ -111,6 +124,16 @@ impl Effect {
             }
             Effect::AssemblyPct { pct } => format!("+{pct}% to every assembly bonus"),
             Effect::Grants { rule } => rule.line(),
+            // **The ench's name, not its id, and not its spec.** A node that
+            // named a key would be a node the player has to go and look up,
+            // and one that quoted the whole spec put Bench Rights over the
+            // ninety characters `a_mechanical_line_stays_short_enough_to_read_at_a_glance`
+            // allows. What it does is the hover's job, below. `+1` because
+            // that is the register every other effect on the button uses.
+            Effect::GivesEnch { ench } => match crate::data::enchs().get(ench) {
+                Some(e) => format!("+1 {} in the rack", e.name),
+                None => format!("+1 {ench} in the rack"),
+            },
         }
     }
 
@@ -172,6 +195,17 @@ impl Effect {
                 crate::progression::MAX_ROWS,
             )),
             Effect::Grants { rule } => out.extend(rule.detail()),
+            Effect::GivesEnch { ench } => {
+                if let Some(e) = crate::data::enchs().get(ench) {
+                    out.push(format!("{}: {}", e.name, e.effect.detail()));
+                }
+                out.push(
+                    "An ench bolts onto one component and works on the item that component \
+                     is part of. Bolting one on wants a class that may; being given one does \
+                     not."
+                        .into(),
+                );
+            }
             Effect::AssemblyPct { .. } => out.push(
                 "An assembly bonus is the lump a component pays only when the item it is part                  of is complete. This raises every one of them, on all five grids — so it pays                  a board that finishes what it seats and nothing at all to one that does not."
                     .into(),
@@ -359,11 +393,20 @@ impl SkillsData {
         // A rule naming a grid or a curse the engine has not got is a node that
         // costs a point and does nothing. Refused here rather than discovered
         // by whoever spent the point.
+        let enchs = crate::data::enchs();
         for t in &d.trees {
             for n in &t.nodes {
                 for e in &n.effects {
                     if let Effect::Grants { rule } = e {
                         rule.check().map_err(|why| format!("{}: {why}", n.id))?;
+                    }
+                    // A node handing over an ench nobody has heard of is a
+                    // point spent on nothing, which is the failure this file
+                    // exists to stop shipping. Same guard `Rule::check` is.
+                    if let Effect::GivesEnch { ench } = e {
+                        if enchs.get(ench).is_none() {
+                            return Err(format!("{}: there is no ench called {ench:?}", n.id));
+                        }
                     }
                 }
             }
@@ -512,6 +555,22 @@ impl SkillsData {
 }
 
 impl SkillsData {
+    /// Every ench a set of taken nodes hands over, by id.
+    ///
+    /// A list rather than a set: two nodes granting the same ench is two of
+    /// them, the same way two of anything else is.
+    pub fn enchs_from(&self, taken: &[String]) -> Vec<String> {
+        taken
+            .iter()
+            .filter_map(|id| self.node(id))
+            .flat_map(|n| &n.effects)
+            .filter_map(|e| match e {
+                Effect::GivesEnch { ench } => Some(ench.clone()),
+                _ => None,
+            })
+            .collect()
+    }
+
     /// Every rule a set of taken nodes grants.
     ///
     /// One list rather than one accessor a rule, so adding a rule is adding a

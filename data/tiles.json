@@ -240,8 +240,28 @@
       "guards": "the-bengulon-verge",
       "needs_level": 9,
       "shut": "Somebody has nailed a plank across the road at chest height. Burned into it is a list of eleven names, and a twelfth with nothing written after it."
+    },
+    {
+      "at": [
+        4,
+        6
+      ],
+      "kind": "bench",
+      "id": "the-kaklon-van",
+      "name": "the Kaklon van",
+      "hidden_until_level": 10,
+      "sells": [
+        "plug-energy-tap",
+        "grungo-elastic-band",
+        "sneel-bearing"
+      ],
+      "prose": [
+        "A van is parked across the Verge road with the back doors open and a folding table out, and the table has six things on it under a cloth with four of them showing.",
+        "\"Licensed,\" the man says, before you have asked. He turns the paper round so you can read it. It is signed by somebody whose name is nine letters of which two are K, and the date on it is next year.",
+        "\"I do not come this far south twice,\" he says, and goes back to the cloth."
+      ]
     }
   ],
-  "_map_note": "The first map: one town and a great deal of wilds. Kettleworks and High Wick are written and are not placed here \u2014 they belong on maps that do not exist yet, and their shelves and errands are kept in shops.json and quests.json waiting for them. `towns_on_this_map_all_trade_and_all_want_something` is what stops that becoming an excuse for unreachable content. Two crossings gate the north. A crossing guards a *region* rather than its own tile \u2014 rows four to fifteen are twelve tiles of open ground, so a crossing that refused only the square it stands on would need a dozen of them across a row, which is a wall. The place itself stands on the near side of what it guards, so it is a milestone you can walk up to and read.",
+  "_map_note": "The first map: one town and a great deal of wilds. Kettleworks and High Wick are written and are not placed here \u2014 they belong on maps that do not exist yet, and their shelves and errands are kept in shops.json and quests.json waiting for them. `towns_on_this_map_all_trade_and_all_want_something` is what stops that becoming an excuse for unreachable content. Two crossings gate the north. A crossing guards a *region* rather than its own tile \u2014 rows four to fifteen are twelve tiles of open ground, so a crossing that refused only the square it stands on would need a dozen of them across a row, which is a wall. The place itself stands on the near side of what it guards, so it is a milestone you can walk up to and read. The Kaklon van stands on the Verge road at [4, 6] and is not there below level ten \u2014 the only shop in the game that is not a town, and the only place gated on what you are rather than on what you carry or what you have answered. It is past the crossing that opens the Verge at nine, so it is a walk you earned twice.",
   "id": "west-bambulon"
 }

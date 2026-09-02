@@ -148,6 +148,9 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
    swallowing clicks, and this. All three were found by `elementFromPoint` and
    none of them by reading. `check_the_fork_is_on_top` is what stops a fourth. */
 #tree, #log, #ending { z-index: 30; }
+/* The van is *where you are*, like a town and the fight — tier 20. Putting it
+   above the town would have been a screen you could open on top of one you
+   cannot walk out of. See the stack in CLAUDE.md. */
 #fork { z-index: 40; }
 /* The board is the game's main screen and was being squeezed into the same
    column as a paragraph of prose. The original ran at 1600x980 with 36px

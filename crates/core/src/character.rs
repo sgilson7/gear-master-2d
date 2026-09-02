@@ -1338,9 +1338,63 @@ impl Character {
         self.enchs_owned.push(id.to_string());
     }
 
+    /// May this character bolt an ench onto anything?
+    ///
+    /// **Being given one and being able to use one are two questions.** An
+    /// errand pays an ench to everybody and a tree may grant one; whether it
+    /// goes on a component is the class's.
+    pub fn licensed_to_ench(&self) -> bool {
+        self.licensed()
+    }
+
+    /// Every ench this character has, loose or bolted on, by id.
+    ///
+    /// **Banked plus granted.** `enchs_owned` is what was bought or paid over;
+    /// the tree's are derived and read fresh, for the reason `player_stats`
+    /// reads the tree fresh — retuning which ench a node hands over retunes
+    /// every save that took it.
+    pub fn enchs(&self) -> Vec<String> {
+        let mut out = self.enchs_owned.clone();
+        if !self.skills_taken.is_empty() {
+            out.extend(crate::data::skills().enchs_from(&self.skills_taken));
+        }
+        out
+    }
+
     /// How many of an ench are loose in the rack.
+    ///
+    /// **Everything you have, minus what is bolted on.** `enchs_owned` used to
+    /// mean *loose* and `attach` moved an entry out of it; that stopped working
+    /// the moment a tree could grant one, because a derived list cannot have an
+    /// entry taken out of it. So `enchs_owned` means *banked* now and this
+    /// subtracts. `repair_enchs` is what carries a save written under the old
+    /// meaning across.
     pub fn enchs_loose(&self, id: &str) -> usize {
-        self.enchs_owned.iter().filter(|e| *e == id).count()
+        let have = self.enchs().iter().filter(|e| *e == id).count();
+        let on = self.enchanted.iter().filter(|e| e.id == id).count();
+        have.saturating_sub(on)
+    }
+
+    /// Put a save written before an ench could be granted back on its feet.
+    ///
+    /// Under the old meaning `enchs_owned` held only the loose ones, so an ench
+    /// that was bolted on is in `enchanted` and nowhere else. Left alone it
+    /// would go on working and would vanish the moment it was taken off. A
+    /// field whose meaning changed is a field that will arrive wrong, and the
+    /// loader is where that is caught — the same rule `World::repair` follows.
+    pub fn repair_enchs(&mut self) {
+        for e in self.enchanted.clone() {
+            let have = self.enchs_owned.iter().filter(|o| **o == e.id).count();
+            let on = self.enchanted.iter().filter(|o| o.id == e.id).count();
+            let granted = crate::data::skills()
+                .enchs_from(&self.skills_taken)
+                .iter()
+                .filter(|g| **g == e.id)
+                .count();
+            if have + granted < on {
+                self.enchs_owned.push(e.id.clone());
+            }
+        }
     }
 
     /// Bolt an ench to a component. Returns why not.
@@ -1370,12 +1424,10 @@ impl Character {
             let what = data.get(&there.id).map(|d| d.name.clone()).unwrap_or_else(|| there.id.clone());
             return Err(Refusal::AlreadyEnched(what));
         }
-        let at = self
-            .enchs_owned
-            .iter()
-            .position(|e| e == id)
-            .ok_or(Refusal::NotYours)?;
-        self.enchs_owned.remove(at);
+        // **Nothing comes out of `enchs_owned`.** It is what you have rather
+        // than what is loose, and `enchs_loose` subtracts what is bolted on —
+        // which is the only way a *derived* ench can be attached at all, since
+        // there is nothing to take an entry out of.
         self.enchanted.push(crate::ench::Ench {
             on: piece,
             id: id.to_string(),
@@ -1388,7 +1440,10 @@ impl Character {
     pub fn detach_ench(&mut self, piece: PieceId) -> Option<String> {
         let at = self.enchanted.iter().position(|e| e.on == piece)?;
         let e = self.enchanted.remove(at);
-        self.enchs_owned.push(e.id.clone());
+        // **And nothing goes back into `enchs_owned`.** It never left: taking
+        // one off is one fewer entry in `enchanted`, and `enchs_loose` reads
+        // the difference. Pushing here would have handed out a second copy of
+        // every ench a player ever unbolted.
         Some(e.id)
     }
 

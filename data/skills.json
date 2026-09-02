@@ -575,7 +575,7 @@
         {
           "id": "w-roast",
           "name": "Filed Under The Roast",
-          "blurb": "Two hundred and nine helmets are in the Keeper’s book, filed by what was still coming off them when they were handed back. Yours goes down as two hundred and ten, under the Roast.",
+          "blurb": "Two hundred and nine helmets are in the Keeper\u2019s book, filed by what was still coming off them when they were handed back. Yours goes down as two hundred and ten, under the Roast.",
           "requires": [
             "w-ledger"
           ],
@@ -611,7 +611,7 @@
         {
           "id": "k-licence",
           "name": "The Licence",
-          "blurb": "Nine pages, and eight of them are the list of what the licence does not cover. Page one is a drawing of a hand holding a thing, and under it, in Kaklon’s own writing, the words BOLT IT ON.",
+          "blurb": "Nine pages, and eight of them are the list of what the licence does not cover. Page one is a drawing of a hand holding a thing, and under it, in Kaklon\u2019s own writing, the words BOLT IT ON.",
           "requires": [],
           "effect": {
             "assembly_pct": {
@@ -650,14 +650,21 @@
         {
           "id": "k-bench-rights",
           "name": "Bench Rights",
-          "blurb": "Signed on the back of a form for something else. Two hundred and six of these were issued in one afternoon and the afternoon has not been explained. Yours is the two hundred and seventh.",
+          "blurb": "Signed on the back of a form for something else. Two hundred and six of these were issued in one afternoon and the afternoon has not been explained. Yours is the two hundred and seventh, and it comes with the turn already in the envelope.",
           "requires": [],
-          "effect": {
-            "stat": {
-              "health": 100,
-              "curse_resist": 8
+          "effect": [
+            {
+              "stat": {
+                "health": 100,
+                "curse_resist": 8
+              }
+            },
+            {
+              "gives_ench": {
+                "ench": "the-ponkey-turn"
+              }
             }
-          }
+          ]
         },
         {
           "id": "k-overwind",

@@ -178,6 +178,18 @@ pub enum PlaceKind {
     /// its own mark rather than borrowing the diamond and reading as a place
     /// you could come back from.
     Door,
+    /// Somebody selling what no town does.
+    ///
+    /// **The only shop in the game that is not a town.** M10 took the ench
+    /// bench off every town shelf, because a thing every town sells is not a
+    /// thing you went and got — so what a skill tree does not award is sold
+    /// here, by one person, on a tile that is not there until level ten.
+    ///
+    /// It is a `PlaceKind` and not an `Event` because an event's choices are
+    /// spent as a set: `answer` refuses a second choice and writes the whole
+    /// event id into `answered`, so a card could sell one thing once. A bench
+    /// sells each line once, which is the shelf rule the towns already follow.
+    Bench,
     /// A threshold you may cross only when something is true of you.
     ///
     /// A gate's sibling: a gate is a way onto another map and a crossing is a
@@ -258,6 +270,16 @@ pub struct PlaceDef {
     /// getting *past* something. This is about whether the place is there.
     #[serde(default)]
     pub hidden_until_level: Option<u32>,
+    /// `Bench`: the enchs this one keeps, by id, in the order they are shown.
+    ///
+    /// **Here rather than in `enchs.json`**, which is the division the
+    /// components already make: the catalogue says what a thing is and what it
+    /// costs, and the shelf says who sells it. `World::load` refuses a bench
+    /// naming an ench the catalogue has not got, and one selling an ench that
+    /// has no price — *a priceless ench is on nobody's bench*, which is the
+    /// errands' half of the rule and has been since M8.
+    #[serde(default)]
+    pub sells: Vec<String>,
     /// `Crossing`: the id of the region on the far side of it.
     #[serde(default)]
     pub guards: Option<String>,
@@ -491,6 +513,31 @@ impl World {
         }
         if !world.passable(world.start.0, world.start.1) {
             return Err("the starting tile is impassable".into());
+        }
+        // A bench selling an ench the catalogue has not got is a shop nobody
+        // can buy from, and nothing else in the game would say so. The same
+        // guard `Rule::check` is, and it runs where the map is read.
+        let enchs = crate::ench::EnchsData::parse(crate::data::ENCHS_JSON)
+            .map_err(|e| format!("the shipped enchs are broken: {e}"))?;
+        for p in &world.places {
+            if p.kind != PlaceKind::Bench && !p.sells.is_empty() {
+                return Err(format!("{}: only a bench sells anything", p.id));
+            }
+            if p.kind == PlaceKind::Bench && p.sells.is_empty() {
+                return Err(format!("{}: a bench with nothing on it", p.id));
+            }
+            for id in &p.sells {
+                match enchs.get(id) {
+                    None => return Err(format!("{}: there is no ench called {id:?}", p.id)),
+                    // **A priceless ench is on nobody's bench**, which is the
+                    // errands' half of the rule and has been since M8: a reward
+                    // you could have bought makes the errand a slow way to shop.
+                    Some(e) if e.price.is_none() => {
+                        return Err(format!("{}: {id:?} is not for sale anywhere", p.id))
+                    }
+                    Some(_) => {}
+                }
+            }
         }
         Ok(world)
     }
@@ -794,6 +841,14 @@ pub struct WorldState {
     /// somebody already bought.
     #[serde(default)]
     pub bought: Vec<(String, u16)>,
+    /// Enchs bought off a bench, by id.
+    ///
+    /// **A separate list from `bought`**, which is `(town, index)` into a
+    /// shelf. An ench is bought by name and there is exactly one of each, so an
+    /// index would be one list answering two questions — and the shelf's index
+    /// rule exists because dropping a sold entry would renumber the rest.
+    #[serde(default)]
+    pub bought_enchs: Vec<String>,
     /// Errands taken and not yet handed in.
     #[serde(default)]
     pub quests_taken: Vec<String>,
@@ -890,6 +945,8 @@ pub struct Step {
     pub gate: Option<String>,
     /// A creature standing here rather than one the ground rolled.
     pub boss: Option<String>,
+    /// A bench you are now standing at.
+    pub bench: Option<String>,
     /// The crossing that refused this step, if one did.
     ///
     /// `blocked` already carries the sentence; this says *which kind* of
@@ -930,6 +987,7 @@ impl Step {
             gate: None,
             door: None,
             boss: None,
+            bench: None,
             crossing: None,
             encounter: None,
         }
@@ -998,6 +1056,7 @@ pub fn step(
         gate: None,
         door: None,
         boss: None,
+        bench: None,
         crossing: None,
         encounter: None,
     };
@@ -1035,6 +1094,13 @@ pub fn step(
                     out.boss = Some(p.id.clone());
                     return out;
                 }
+            }
+            // Somebody standing there with things for sale. Whether you can
+            // afford any of it is not the world's business — the same division
+            // a gate's key makes.
+            PlaceKind::Bench => {
+                out.bench = Some(p.id.clone());
+                return out;
             }
             // **You walk over it.** A crossing that stopped you on its own tile
             // would be a gate, and it is not one: it has already had its say,

@@ -182,6 +182,26 @@
       </div>
     </div>
 
+    <!-- The van. The only shop in the game that is not a town, and the only
+         place that is not there until you are a level — see PlaceKind::Bench.
+         A `screen`, at the same tier a town is: it is where you are, not
+         something you opened from somewhere else. -->
+    <div id="vendor" class="screen framed" hidden>
+      <div class="screenbox">
+        <header class="fighthead">
+          <div>
+            <p class="eyebrow">on the road</p>
+            <h2 id="vendor-name">&mdash;</h2>
+          </div>
+          <dl class="figures"><div><dt>Fnorp</dt><dd id="vendor-gold">&mdash;</dd></div></dl>
+        </header>
+        <div id="vendor-prose"></div>
+        <div id="vendor-stock" class="shelf"></div>
+        <p id="vendor-says" class="says" hidden></p>
+        <div class="row"><button id="vendor-close" type="button" class="primary">Walk on</button></div>
+      </div>
+    </div>
+
     <div id="town" class="screen framed" hidden>
       <div class="screenbox">
         <header class="fighthead">
@@ -210,12 +230,6 @@
              down. This is that place. -->
         <h3 class="sub-h">Supplies</h3>
         <div id="tins" class="shelf"></div>
-        <!-- The bench. Only a licensee sees it: a shelf of things you can buy
-             and cannot use reads as a bug rather than as a tease. -->
-        <div id="bench-wrap" hidden>
-          <h3 class="sub-h">The bench</h3>
-          <div id="bench" class="shelf"></div>
-        </div>
         <h3 class="sub-h">What you are carrying</h3>
         <p id="carrying" class="note"></p>
         </div><!-- /.stages -->

@@ -1044,36 +1044,37 @@ def check_the_rack(page, name, fails):
         fails.append(f"{name}: an unlicensed character is licensed")
 
     # --- licensed ------------------------------------------------------------
+    #
+    # **The tree hands the ench over, not a town.** M10 took the bench off every
+    # town shelf, and the node at the root of the Patent's spin spine is called
+    # Bench Rights and grants The Ponkey Turn — which is what stops the class
+    # being inert from level five to level ten.
     def licensed(body):
         body["character"]["class"] = "Recycler"
         body["character"]["gold"] = 400
+        taken = list(body["character"].get("skills_taken", []))
+        if "k-bench-rights" not in taken:
+            taken.append("k-bench-rights")
+        body["character"]["skills_taken"] = taken
 
     plant(page, base, licensed, stem="rack-probe")
     rack = page.evaluate("() => JSON.parse(window.__rack())")
     if not rack["licensed"]:
         fails.append(f"{name}: took the Kaklon Patent and the rack is shut")
         return
+    if not rack["loose"]:
+        fails.append(f"{name}: took Bench Rights and the rack is empty, so the class is inert")
+        return
 
-    # Walk into the town and buy one off the bench.
+    # Into a town to pack, which is where the rack lives.
+    page.evaluate("() => document.getElementById('map').focus()")
     town = page.evaluate("""() => (window.__world().places ?? []).find(p => p.kind === 'town')""")
     page.evaluate("(at) => window.__standAt(at)", [town["at"][0] + 1, town["at"][1]])
     page.keyboard.press("ArrowLeft")
     page.wait_for_timeout(300)
     if not page.is_visible("#town"):
-        fails.append(f"{name}: could not get into a town to reach the bench")
+        fails.append(f"{name}: could not get into a town to pack in")
         return
-    if page.is_hidden("#bench-wrap"):
-        fails.append(f"{name}: a licensee walked into a town and there is no bench")
-        return
-    bench = page.locator("#bench .wares:not(:disabled)")
-    if bench.count() == 0:
-        fails.append(f"{name}: 400 Fnorp and nothing on the bench is affordable")
-        return
-    purse = int(page.text_content("#town-gold"))
-    bench.first.click()
-    page.wait_for_timeout(150)
-    if int(page.text_content("#town-gold")) >= purse:
-        fails.append(f"{name}: an ench cost nothing")
     page.click("#pack")
     page.wait_for_selector("#fight", state="visible", timeout=8000)
     page.click("#preset")
@@ -1462,6 +1463,85 @@ def check_the_toad_walks_on_water(page, name, fails):
     assert window_rules
 
 
+def check_the_van_appears_at_a_level(page, name, fails):
+    """He is not there below level ten, and he is there at it.
+
+    Planted, because levelling to ten is the whole game. What a browser has to
+    prove is the half no test can: that the map **redraws** when the level
+    lands. A place hidden until a level appears when you bank, and banking was
+    the one moment nothing re-fetched the world — so the van would have been on
+    the road, in the save, steppable and invisible.
+    """
+    # **And no town sells one.** The bench came off the town screen entirely —
+    # a thing every town sells is not a thing you went and got.
+    if page.query_selector("#bench-wrap") is not None:
+        fails.append(f"{name}: the town still has a bench on it")
+
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+
+    def at_level(xp):
+        def edit(body):
+            body["character"]["xp"] = xp
+            body["character"]["class"] = "Berserker"
+            body.setdefault("world", {})["map"] = ""
+        return edit
+
+    # Below it first. Planted rather than assumed about the walk, which by this
+    # point has levelled well past ten.
+    plant(page, base, at_level(0), stem="van-none")
+    if page.evaluate("""() => (window.__world().places ?? [])
+        .some(p => p.kind === 'bench')"""):
+        fails.append(f"{name}: the van is on the map for a level-one character")
+
+    # Ten is a lot of experience; a hundred thousand is comfortably past it.
+    plant(page, base, at_level(100_000), stem="van-probe")
+    van = page.evaluate("""() => (window.__world().places ?? [])
+        .find(p => p.kind === 'bench')""")
+    if not van:
+        fails.append(f"{name}: past level ten and the van is still not on the map")
+        return
+
+    page.evaluate("() => document.getElementById('map').focus()")
+    page.evaluate("(at) => window.__standAt(at)", [van["at"][0], van["at"][1] + 1])
+    page.keyboard.press("ArrowUp")
+    page.wait_for_timeout(300)
+    dismiss_card(page)
+    close_fight(page)
+    if not page.is_visible("#vendor"):
+        fails.append(f"{name}: walked onto the van's tile and no vendor opened")
+        return
+    try:
+        shown = page.evaluate("""() => ({
+          stock: [...document.querySelectorAll('#vendor-stock .wares b')].map(b => b.textContent),
+          prose: document.querySelectorAll('#vendor-prose p').length,
+          buyable: document.querySelectorAll('#vendor-stock .wares:not(:disabled)').length,
+        })""")
+        if not shown["stock"]:
+            fails.append(f"{name}: the van has nothing on the table")
+        if not shown["prose"]:
+            fails.append(f"{name}: the van says nothing")
+        if shown["buyable"]:
+            # Buy one, and watch it go off the table for good.
+            first = page.locator("#vendor-stock .wares:not(:disabled)").first
+            bought = first.locator("b").text_content()
+            first.click()
+            page.wait_for_timeout(150)
+            gone = page.evaluate("""(n) => {
+              const b = [...document.querySelectorAll('#vendor-stock .wares')]
+                .find(e => e.querySelector('b').textContent === n);
+              return b ? { sold: b.classList.contains('sold'), off: b.disabled } : null;
+            }""", bought)
+            if not gone or not gone["sold"] or not gone["off"]:
+                fails.append(f"{name}: bought {bought!r} and it is still for sale: {gone}")
+            if not JSON_NULL != page.evaluate("() => window.__rack()"):
+                fails.append(f"{name}: bought an ench and the rack does not know")
+    finally:
+        page.click("#vendor-close")
+        page.wait_for_selector("#vendor", state="hidden", timeout=5000)
+
+
 def check_an_ench_you_cannot_use_is_still_shown(page, name, fails):
     """An errand pays an ench to everybody, so everybody has to be able to see it.
 
@@ -1537,6 +1617,11 @@ def check_an_ench_you_cannot_use_is_still_shown(page, name, fails):
     def empty(body):
         strip_the_boards(body)
         body["character"]["enchs_owned"] = []
+        # **And no nodes.** A tree grants an ench now, and the check before this
+        # one plants a Patent who has taken Bench Rights — so a character
+        # "holding none" has to have taken none either, or the rack is right to
+        # be showing one.
+        body["character"]["skills_taken"] = []
         body["character"]["class"] = "Berserker"
 
     plant(page, base, empty, stem="ench-none")
@@ -2581,6 +2666,9 @@ def walk_the_gate(browser, name, fails=None):
     check_the_north_is_shut(page, name, fails)
     check_an_ench_you_cannot_use_is_still_shown(page, name, fails)
 
+    # --- where an ench comes from --------------------------------------------
+    check_the_van_appears_at_a_level(page, name, fails)
+
     # --- scouting ------------------------------------------------------------
     check_scouting_is_earned(page, name, fails)
 
@@ -2665,6 +2753,7 @@ def main():
     print("ok: the lake is ground at its rim to a toad, and a wall through its middle to everybody")
     print("ok: the north is shut to a level-one character, and says what the road wants")
     print("ok: an ench you were paid and cannot use yet is on the rack, and says why")
+    print("ok: no town sells an ench, and the van on the Verge road is not there until level ten")
     print("ok: the class fork opens on top of the town it is offered in")
     print("ok: your own figure becomes your class's when you take one")
     print("ok: a mid-fight save reopens the same fight")

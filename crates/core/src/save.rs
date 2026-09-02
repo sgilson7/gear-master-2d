@@ -526,6 +526,13 @@ impl SaveFile {
         // The one pointer the file could not carry, put back from the id it
         // carried instead.
         game.character.loadout.naming = crate::theme::by_id(&game.theme).naming;
+        // **`enchs_owned` changed meaning in M10** — it was what is loose and
+        // it is what you have — so a file written before it holds only the
+        // unbolted ones. Left alone, an ench that was bolted on would go on
+        // working and would vanish the moment it was taken off. A field whose
+        // meaning moved is a field that will arrive wrong, and the loader is
+        // where that is caught, exactly as `World::repair` is.
+        game.character.repair_enchs();
         Ok(game)
     }
 }

@@ -90,6 +90,7 @@ fn every_effect_key_is_one_the_engine_actually_reads() {
         ("grow_slot_rows", &["slot", "rows"]),
         ("assembly_pct", &["pct"]),
         ("grants", &["rule"]),
+        ("gives_ench", &["ench"]),
     ];
     let raw: serde_json::Value =
         serde_json::from_str(include_str!("../../../data/skills.json")).unwrap();

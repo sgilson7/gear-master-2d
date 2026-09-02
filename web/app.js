@@ -6,7 +6,7 @@
 import init, {
   world_json, position, try_step, event_json, answer,
   save_json, load_json, new_game, apply_preset,
-  shop_json, buy, buy_supply, buy_ench, use_supply, quests_json, take_quest, hand_in_quest, bank_xp,
+  shop_json, bench_json, buy, buy_supply, buy_ench, use_supply, quests_json, take_quest, hand_in_quest, bank_xp,
   quest_log_json, guide_json, pin_quest,
   character_json, skills_json, take_skill,
   class_offer_json, choose_class, class_name, all_trees_json,
@@ -205,6 +205,19 @@ function draw() {
       g.arc(ax + w / 2, ay - h / 2, 2.4, 0, Math.PI * 2);
       g.fill();
       g.fillRect(ax + w / 2 - 1, ay - h / 2, 2, 5);
+    } else if (p.kind === 'bench') {
+      // **A table, and it is the only one.** Not a town's filled square — he
+      // is not a place, he is a man who is there this week. Two legs and a top,
+      // in the page's ink, which is a shape nothing else on this map draws.
+      const w = TILE - 12, top = y * TILE + 10, bot = y * TILE + TILE - 6;
+      g.strokeStyle = ink();
+      g.lineWidth = 3;
+      g.beginPath();
+      g.moveTo(cx - w / 2, top); g.lineTo(cx + w / 2, top);
+      g.moveTo(cx - w / 2 + 2, top); g.lineTo(cx - w / 2 + 2, bot);
+      g.moveTo(cx + w / 2 - 2, top); g.lineTo(cx + w / 2 - 2, bot);
+      g.stroke();
+      g.lineWidth = 2;
     } else if (p.kind === 'crossing') {
       // **Its own mark, and neither of the two it is nearest.** A gate is a
       // diamond and leads off the map; a door is an arch and leads out of what
@@ -1284,7 +1297,6 @@ function openTown(id) {
   paintShelf();
   paintQuests();
   paintTins();
-  paintBench();
   paintCarrying();
   $('town').hidden = false;
 }
@@ -1360,33 +1372,76 @@ function paintTins() {
   }
 }
 
-/// What a town's bench sells, for somebody who may use one.
+/// What the van has on the table.
 ///
-/// Every trading town keeps one, the same rule the tins follow — a licensee who
-/// had to find the one town that stocks the thing their class is about could be
-/// stranded from their own class.
-function paintBench() {
-  const s = JSON.parse(shop_json());
-  $('bench-wrap').hidden = !s.licensed;
-  const box = $('bench');
+/// **No town sells an ench.** Every trading town kept a bench until M10, which
+/// made an ench a thing you bought rather than a thing you went and got. What a
+/// skill tree does not award is sold here, by one man, on one tile, who is not
+/// there below level ten.
+///
+/// Sold entries stay on the table, greyed — the town's shelf rule, and the gap
+/// is the memory of what you took.
+function paintVendor() {
+  const v = JSON.parse(bench_json());
+  if (!v) return;
+  $('vendor-name').textContent = v.name || v.id;
+  $('vendor-gold').textContent = v.gold;
+  $('vendor-prose').replaceChildren(...(v.prose ?? []).map((t) => {
+    const p = document.createElement('p');
+    p.textContent = t;
+    return p;
+  }));
+  const box = $('vendor-stock');
   box.replaceChildren();
-  for (const e of s.bench ?? []) {
+  for (const e of v.stock ?? []) {
     const b = document.createElement('button');
     b.type = 'button';
-    b.className = 'wares ench';
+    b.className = 'wares ench' + (e.sold ? ' sold' : '');
     b.dataset.buyEnch = e.id;
-    b.disabled = !e.afford;
+    b.disabled = e.sold || !e.afford;
     b.innerHTML = `<b>${e.name}</b>` +
       `<span class="spec">${e.spec}</span>` +
       `<span class="flavour">${e.blurb}</span>` +
-      `<span class="cost">${e.price} Fnorp${e.have ? ` · ${e.have} in the rack` : ''}</span>`;
+      `<span class="cost">${e.sold ? 'gone' : `${e.price} Fnorp`}` +
+      `${e.have ? ` · ${e.have} in the rack` : ''}</span>`;
     b.onclick = () => {
       const why = buy_ench(e.id);
-      townSays(why || `Bought ${e.name}. It goes on when you pack.`, !!why);
-      paintBench(); paintShelf(); paintPanel(); autosave();
+      vendorSays(why || `Bought ${e.name}. It goes on when you pack.`, !!why);
+      paintVendor(); paintPanel(); autosave();
     };
     box.appendChild(b);
   }
+  // **He will take the money either way.** Being handed an ench and being able
+  // to bolt one on are two questions — the rule `quest::hand_in` has followed
+  // since M8, and the one the rack was breaking until it was reported. So this
+  // says so rather than refusing the sale.
+  if (!v.licensed) {
+    const p = document.createElement('p');
+    p.className = 'note';
+    p.textContent = 'He does not ask what you are. Bolting one onto a component is the '
+      + 'Kaklon Patent\u2019s, and you are not a licensee — what you buy here goes in the '
+      + 'rack and waits.';
+    box.appendChild(p);
+  }
+}
+
+function vendorSays(text, bad) {
+  const el = $('vendor-says');
+  el.textContent = text;
+  el.hidden = !text;
+  el.classList.toggle('bad', !!bad);
+}
+
+function openVendor() {
+  paintVendor();
+  vendorSays('');
+  $('vendor').hidden = false;
+}
+
+function closeVendor() {
+  $('vendor').hidden = true;
+  paintPanel(); draw(); autosave();
+  $('map').focus();
 }
 
 function paintQuests() {
@@ -1502,7 +1557,7 @@ function closeTown() {
 function walk(dir) {
   if (!$('card').hidden || !$('fight').hidden || !$('town').hidden ||
       !$('tree').hidden || !$('fork').hidden || !$('log').hidden ||
-      !$('ending').hidden) return;
+      !$('ending').hidden || !$('vendor').hidden) return;
   const r = JSON.parse(try_step(dir));
   blocked = r.moved ? null : r.blocked;
   // **A crossing gets the message panel, a cliff gets the flash.** Core says
@@ -1532,6 +1587,7 @@ function walk(dir) {
   // pays and must not learn.
   if (r.routed) says(r.routed.receipt.join(' '));
   if (r.town) openTown(r.town);
+  else if (r.bench) openVendor();
   else if (r.event) openEvent(r.event);
   else if (r.encounter) openFight();
 }
@@ -1736,6 +1792,7 @@ async function main() {
 
   $('skills').onclick = openTree;
   $('tree-done').onclick = closeTree;
+  $('vendor-close').onclick = closeVendor;
   $('errands-open').onclick = openLog;
   $('log-close').onclick = closeLog;
   $('ending-close').onclick = closeEnding;
@@ -1746,6 +1803,13 @@ async function main() {
     // Separated, because banking a full pocket crosses several levels at
               // once and four rows in a row read as one sentence otherwise.
     townSays(r.receipt.join('  ·  '), false);
+    // **Re-read the map, not just repaint it.** A place can be hidden until a
+    // level and a level lands *here* — so without this the van is on the road,
+    // in the save, steppable, and invisible until you happen to walk through a
+    // gate or reload. `PLAN-M10.md` named this as the easy thing to miss and it
+    // was right: the map is drawn from `world`, which is fetched, and banking
+    // was the one moment nothing re-fetched it.
+    world = JSON.parse(world_json());
     paintCarrying(); paintPanel(); draw(); autosave();
     // A level lands here now, so the fork is offered here.
     offerClass();

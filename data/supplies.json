@@ -1,0 +1,28 @@
+{
+  "format": "gm2d-supplies",
+  "version": 1,
+  "_note": "What a town sells to take the tiredness off. Fatigue is the only thing a fight spends for good, so these are the only thing in the game you buy to undo something rather than to become something — and they are priced against a bounty rather than against gear, because that is the trade being offered: a fight's pay for a fight's wear.",
+  "supplies": [
+    {
+      "id": "cork-tea",
+      "name": "Cork Tea",
+      "blurb": "Boiled off the fence. It tastes of the fence and it works.",
+      "restores": 10,
+      "price": 6
+    },
+    {
+      "id": "long-shift-tin",
+      "name": "Long Shift Tin",
+      "blurb": "Issued to whoever was going down and not coming up before Tuesday.",
+      "restores": 25,
+      "price": 16
+    },
+    {
+      "id": "the-full-stop",
+      "name": "The Full Stop",
+      "blurb": "One tin, one sitting, and the next four hours are not yours.",
+      "restores": 60,
+      "price": 40
+    }
+  ]
+}

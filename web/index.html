@@ -39,6 +39,7 @@
             <div><dt>level</dt><dd id="level">&mdash;</dd></div>
             <div><dt>experience</dt><dd id="xp">&mdash;</dd></div>
             <div><dt>carrying</dt><dd id="carrying-panel">&mdash;</dd></div>
+            <div><dt>worn out</dt><dd id="fatigue">&mdash;</dd></div>
             <div><dt>points</dt><dd id="points">&mdash;</dd></div>
             <div><dt>class</dt><dd id="class">&mdash;</dd></div>
           </dl>
@@ -46,6 +47,13 @@
                +60 max health and there was nowhere at all to see either. -->
           <h4 class="sub-h">What you are</h4>
           <ul id="sheet" class="stats"></ul>
+          <!-- What you are carrying to take the tiredness off, usable here:
+               the decision this mechanic exists for is the one on the road.
+               **Not `id="pack"`** — the town already has a Pack Your Frames
+               button by that name, and two elements answering to one id is the
+               `.card` collision in a new coat: Playwright resolved to the
+               button, waited for a hidden element and hung. -->
+          <div id="kit" class="pack"></div>
           <div class="row">
             <button id="skills" type="button">The tree</button>
             <button id="numbers" type="button" aria-pressed="false">Show the numbers</button>
@@ -71,6 +79,8 @@
         <h2 id="card-title"></h2>
         <div id="card-prose"></div>
         <div id="card-choices" class="choices"></div>
+        <!-- Errands somebody standing here has, or has sent you back with. -->
+        <div id="card-errands" class="shelf" hidden></div>
         <div id="card-receipt" class="receipt" hidden></div>
         <button id="card-close" type="button" hidden>Walk on</button>
       </div>
@@ -146,6 +156,8 @@
         <p id="town-says" class="says" hidden></p>
         <!-- Experience is only worth something where somebody can write it
              down. This is that place. -->
+        <h3 class="sub-h">Supplies</h3>
+        <div id="tins" class="shelf"></div>
         <h3 class="sub-h">What you are carrying</h3>
         <p id="carrying" class="note"></p>
         <div class="row">

@@ -6,7 +6,7 @@
 import init, {
   world_json, position, try_step, event_json, answer,
   save_json, load_json, new_game, apply_preset,
-  shop_json, buy, quests_json, take_quest, hand_in_quest, bank_xp,
+  shop_json, buy, buy_supply, use_supply, quests_json, take_quest, hand_in_quest, bank_xp,
   character_json, skills_json, take_skill,
   class_offer_json, choose_class, class_name, all_trees_json,
   gold, piece_count, version, save_version,
@@ -171,6 +171,9 @@ function paintPanel() {
   // What a defeat would cost. Named on the standing panel because it is the
   // number the next step out of town is weighed against.
   $('carrying-panel').textContent = c.carried > 0 ? `${c.carried} at risk` : 'nothing';
+  $('fatigue').textContent = c.fatigue > 0
+    ? `${c.fatigue}%${c.fatigue >= c.fatigue_cap ? ' — all of it' : ''}` : 'not at all';
+  paintPack(c);
   $('points').textContent = c.points;
   $('skills').classList.toggle('primary', c.points > 0);
   $('class').textContent = class_name() || '—';
@@ -203,10 +206,48 @@ function paintYou(canonical) {
   portrait($('player-art'), src, cls ? class_name() : 'you');
 }
 
+/// The tins you are carrying, usable where you stand.
+///
+/// On the standing panel rather than in town, because the decision fatigue
+/// exists to create is the one on the road: another fight, or open the tin, or
+/// turn round. A restorative you could only drink somewhere safe would be a
+/// restorative you never needed.
+function paintPack(c) {
+  const box = $('kit');
+  const tins = c.supplies ?? [];
+  if (!tins.length) {
+    box.innerHTML = c.fatigue > 0
+      ? `<p class="note">Nothing to take for it. A town sells tins.</p>` : '';
+    return;
+  }
+  box.replaceChildren();
+  for (const t of tins) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'tin';
+    b.disabled = c.fatigue === 0;
+    b.innerHTML = `<b>${t.name} ×${t.n}</b><span class="meta">takes off ${t.restores}%</span>`;
+    b.title = t.blurb;
+    b.onclick = () => {
+      const r = JSON.parse(use_supply(t.id));
+      says(r.error || `${t.name}. ${r.took}% of it comes off; ${r.fatigue}% left.`, !!r.error);
+      paintPanel(); draw(); autosave();
+    };
+    box.appendChild(b);
+  }
+}
+
 function paintSheet(c) {
   const rows = (c.stats ?? [])
     .filter((s) => s.n)
     .map((s) => `<li><b>${s.n}${s.unit}</b> ${s.label}</li>`);
+  // Both numbers, because "160, and 24 of it is missing" is the pair a player
+  // decides on.
+  if (c.fatigue > 0) {
+    const now = (c.stats ?? []).find((s) => s.label === 'max health')?.n ?? 0;
+    rows.push(`<li class="dim">${c.rested_health} rested — ` +
+              `<b>${c.rested_health - now}</b> of it worn off</li>`);
+  }
   // Armour and mana are the odd pair: at the character level they are only
   // meaningful as what you *begin* a fight with, which is the tree's doing.
   //
@@ -267,6 +308,7 @@ function showCard(title, prose, choices, onPick) {
 }
 
 function closeCard() {
+  $('card-errands').hidden = true;
   $('card').hidden = true;
   $('map').focus();
 }
@@ -274,6 +316,7 @@ function closeCard() {
 function openEvent(id) {
   const e = JSON.parse(event_json(id));
   if (e.error) { says(e.error, true); return; }
+  paintErrands($('card-errands'), null);
   showCard(e.title, e.prose, e.choices, (i) => {
     const r = JSON.parse(answer(id, i));
     if (r.error) { says(r.error, true); return; }
@@ -762,6 +805,7 @@ function openTown(id) {
   portrait($('town-art'), figure('places', id), place?.name ?? id);
   paintShelf();
   paintQuests();
+  paintTins();
   paintCarrying();
   $('town').hidden = false;
 }
@@ -812,38 +856,86 @@ function paintShelf() {
 /// An errand states what it asks for in the engine's words and a number — the
 /// same rule the skill tree follows — and says it in the world's words in the
 /// brief above it. The two registers do not mix.
+/// The tins a town sells. Every town sells them: a place that had run out of
+/// the only thing that undoes tiredness would be a place you could strand
+/// yourself at.
+function paintTins() {
+  const s = JSON.parse(shop_json());
+  const box = $('tins');
+  box.replaceChildren();
+  for (const t of s.supplies ?? []) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'wares';
+    b.disabled = !t.afford;
+    b.innerHTML = `<b>${t.name}</b>` +
+      `<span class="spec">takes off ${t.restores}% of the tiredness</span>` +
+      `<span class="flavour">${t.blurb}</span>` +
+      `<span class="cost">${t.price} Fnorp${t.have ? ` · ${t.have} in the pack` : ''}</span>`;
+    b.onclick = () => {
+      const why = buy_supply(t.id);
+      townSays(why || `Bought ${t.name}.`, !!why);
+      paintTins(); paintShelf(); paintPanel(); autosave();
+    };
+    box.appendChild(b);
+  }
+}
+
 function paintQuests() {
+  paintErrands($('quests'), $('errands'));
+}
+
+/// The errands here, wherever here is.
+///
+/// **One renderer for a counter and a field.** An errand given by a woman on a
+/// kitchen chair and one given by a clerk are the same object and the same
+/// question; only the room changes.
+function paintErrands(box, wrapper) {
   const all = JSON.parse(quests_json());
-  $('errands').hidden = !all.length;
-  const box = $('quests');
+  if (wrapper) wrapper.hidden = !all.length;
+  if (box.id === 'card-errands') box.hidden = !all.length;
   box.replaceChildren();
   for (const q of all) {
     const b = document.createElement('button');
     b.type = 'button';
     const done = q.stage === 'done';
-    b.className = 'wares errand' + (done ? ' sold' : '') + (q.stage === 'ready' ? ' ready' : '');
-    b.disabled = done;
-    const foot = {
-      offered: 'Take it on',
-      carrying: `${q.have} of ${q.want}`,
-      ready: `${q.have} of ${q.want} — hand it in`,
-      done: 'done',
-    }[q.stage];
+    const locked = q.stage === 'locked';
+    b.className = 'wares errand' + (done || locked ? ' sold' : '')
+                + (q.stage === 'ready' && q.here_takes ? ' ready' : '');
+    // What you can do about it *here*. An errand taken in a field and reported
+    // in town is not actionable in the field, and saying so is the whole of
+    // what makes "go and tell them" legible.
+    // Carrying counts as actionable where it is handed in: clicking says how
+    // far along you are, which is information rather than an error, and a
+    // button that will not answer that question is a button that has nothing
+    // to say about the only thing you want to know.
+    const actionable = locked ? false
+      : q.stage === 'offered' ? q.here_gives
+      : q.stage === 'done' ? false
+      : q.here_takes;
+    b.disabled = !actionable;
+    const foot = locked ? 'something else first'
+      : q.stage === 'offered' ? (q.here_gives ? 'Take it on' : `Ask at ${q.giver}`)
+      : q.stage === 'ready' ? (q.here_takes ? 'Hand it in' : `Take it back to ${q.back_to}`)
+      : `${q.have} of ${q.want}` + (q.here_takes ? '' : ` · back to ${q.back_to}`);
     b.innerHTML = `<b>${q.name}</b>` +
       `<span class="spec">${q.asks}</span>` +
       `<span class="flavour">${q.brief}</span>` +
       `<span class="meta">pays ${q.pays.join(', ')}</span>` +
       `<span class="cost">${foot}</span>`;
     b.onclick = () => {
+      const say = box.id === 'card-errands' ? says : townSays;
       if (q.stage === 'offered') {
         const why = take_quest(q.id);
-        townSays(why || `Taken. ${q.asks}.`, !!why);
+        say(why || `Taken. ${q.asks}.`, !!why);
       } else {
         const r = JSON.parse(hand_in_quest(q.id));
-        if (r.error) townSays(r.error, true);
-        else townSays(`${r.thanks} — ${r.given.join(' and ')}.`);
+        if (r.error) say(r.error, true);
+        else say(`${r.thanks} — ${r.given.join(' and ')}.`);
       }
-      paintQuests(); paintShelf(); paintPanel(); autosave();
+      paintErrands(box, wrapper);
+      if (box.id === 'quests') paintShelf();
+      paintPanel(); autosave();
     };
     box.appendChild(b);
   }
@@ -906,6 +998,9 @@ function walk(dir) {
   blocked = r.moved ? null : r.blocked;
   paintPanel(); draw(); autosave();
   if (blocked) setTimeout(() => { blocked = null; draw(); }, 1100);
+  // Arriving is the doing: an errand that says "go and talk to them" is
+  // finished by standing there, and core says so on the step.
+  if ((r.spoke ?? []).length) says(`You have been. ${r.spoke.join(', ')}.`);
   if (r.town) openTown(r.town);
   else if (r.event) openEvent(r.event);
   else if (r.encounter) openFight();

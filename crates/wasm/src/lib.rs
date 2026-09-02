@@ -287,11 +287,23 @@ pub fn try_step(dir: &str) -> String {
                     at: g.world.at,
                 });
             }
+            // **Arriving is the doing.** An errand that says "go and talk to
+            // them" is finished by standing there, so this is where it is
+            // noticed — on the step, rather than when some screen opens. A
+            // player who walks over the tile and keeps going has still been.
+            let mut spoke = Vec::new();
+            if s.moved {
+                if let Some(p) = w.place_at(g.world.at[0], g.world.at[1]) {
+                    let id = p.id.clone();
+                    spoke = gm2d_core::quest::on_arrival(g, &id);
+                }
+            }
             serde_json::json!({
                 "moved": s.moved,
                 "blocked": s.blocked,
                 "event": s.event,
                 "town": s.town,
+                "spoke": spoke,
                 "encounter": s.encounter.map(|m| serde_json::json!({
                     "name": g.theme_name(m.name),
                     "canonical": m.name,
@@ -1188,6 +1200,11 @@ pub fn flee() {
 /// which town it had just opened and could have said so, and that is exactly
 /// the problem: a shelf is a property of where you are standing, and letting
 /// the caller name it means a caller can name the wrong one.
+/// The place the player is standing on, town or event.
+fn place_here(g: &gm2d_core::game::Game) -> Option<String> {
+    map(|w| w.place_at(g.world.at[0], g.world.at[1]).map(|p| p.id.clone()))
+}
+
 fn town_here(g: &gm2d_core::game::Game) -> Option<String> {
     map(|w| {
         w.place_at(g.world.at[0], g.world.at[1])
@@ -1225,7 +1242,28 @@ pub fn shop_json() -> String {
                 v
             })
             .collect();
-        serde_json::json!({ "gold": g.character.gold, "town": town, "shelf": shelf }).to_string()
+        // Restoratives, which every town carries. Not part of the fixed stock:
+        // stock is a place's character and a tin of tea is not — a town that
+        // ran out of the only thing that undoes tiredness would be a town you
+        // could strand yourself at.
+        let tins: Vec<_> = gm2d_core::data::supplies()
+            .supplies
+            .iter()
+            .map(|s| {
+                serde_json::json!({
+                    "id": s.id, "name": s.name, "blurb": s.blurb,
+                    "restores": s.restores, "price": s.price,
+                    "afford": g.character.gold >= s.price,
+                    "have": g.character.supply_count(&s.id),
+                })
+            })
+            .collect();
+        serde_json::json!({
+            "gold": g.character.gold, "town": town, "shelf": shelf,
+            "supplies": tins,
+            "fatigue": g.character.fatigue,
+        })
+        .to_string()
     })
 }
 
@@ -1276,17 +1314,63 @@ pub fn bank_xp() -> String {
     })
 }
 
+/// Buy a restorative. Empty string, or why not.
+#[wasm_bindgen]
+pub fn buy_supply(id: &str) -> String {
+    with_mut(|g| {
+        if town_here(g).is_none() {
+            return "you are not in a town".into();
+        }
+        let all = gm2d_core::data::supplies();
+        let Some(def) = all.get(id) else { return "there is no such thing".into() };
+        if g.character.gold < def.price {
+            return format!("{} Fnorp, and you have {}.", def.price, g.character.gold);
+        }
+        g.character.gold -= def.price;
+        g.character.give_supply(&def.id, 1);
+        String::new()
+    })
+}
+
+/// Drink one. What it took off, or why not.
+///
+/// **Anywhere.** The whole point of carrying one is the moment on the road
+/// where you decide between turning round and opening it.
+#[wasm_bindgen]
+pub fn use_supply(id: &str) -> String {
+    with_mut(|g| match g.character.use_supply(id) {
+        Ok(n) => serde_json::json!({ "took": n, "fatigue": g.character.fatigue }).to_string(),
+        Err(why) => serde_json::json!({ "error": why }).to_string(),
+    })
+}
+
 // ---------------------------------------------------------------- errands
 
 /// The errands this town has, and where each one stands.
 #[wasm_bindgen]
 pub fn quests_json() -> String {
     with(|g| {
-        let Some(town) = town_here(g) else { return "[]".into() };
+        // **Wherever you are standing**, not only in a town. An errand is not
+        // a town's any more: somebody in a field with a bread knife can ask
+        // you for something, and the difference between that and a clerk
+        // behind a counter should be where they are rather than which system
+        // they are in.
+        let Some(town) = place_here(g) else { return "[]".into() };
         let quests = gm2d_core::data::quests();
         let out: Vec<_> = quests
             .at(&town)
             .into_iter()
+            // **You do not hear about an errand at the place it is handed in.**
+            // `at` returns both ends so a screen can find it either way, but a
+            // clerk who has not been told about the heap has nothing to say
+            // about it — an errand shows at its turn-in only once it is on you.
+            .filter(|q| {
+                q.giver == town
+                    || !matches!(
+                        gm2d_core::quest::stage(g, q),
+                        gm2d_core::quest::Stage::Offered | gm2d_core::quest::Stage::Locked
+                    )
+            })
             .map(|q| {
                 let stage = gm2d_core::quest::stage(g, q);
                 let (have, want) = match stage {
@@ -1294,22 +1378,26 @@ pub fn quests_json() -> String {
                     gm2d_core::quest::Stage::Ready => (q.goal.count(), q.goal.count()),
                     _ => (0, q.goal.count()),
                 };
+                let _ = &want;
                 serde_json::json!({
                     "id": q.id,
                     "name": q.name,
                     "brief": q.brief,
                     "stage": stage.name(),
+                    "giver": place_name(g, &q.giver),
+                    "here_gives": q.giver == town,
+                    "back_to": place_name(g, gm2d_core::quest::QuestsData::turn_in_of(q)),
+                    "here_takes": gm2d_core::quest::QuestsData::turn_in_of(q) == town,
                     "have": have,
                     "want": want,
                     // Unthemed, and derived from the goal — the same rule the
                     // skill tree follows. What somebody needs here is a number
                     // and a creature, not a sentence about a clipboard.
+                    // Unthemed in shape and themed in its nouns: a count and
+                    // a thing, the same register a skill node's line uses. A
+                    // player deciding whether to walk four streets for this is
+                    // reading a number.
                     "asks": match &q.goal {
-                        // `5 × Bengulon Jungle Toad`, not "5 Bengulon Jungle
-                        // Toads": a creature's name is a proper noun and some
-                        // of them are already plural — The Rice Criers, The
-                        // Drowned Court — so there is no suffix that is right
-                        // for all fifty.
                         gm2d_core::quest::Goal::Slay { creature, count, token } => format!(
                             "beat {count} × {}, then hand in {count} × {}",
                             g.theme_name(
@@ -1321,6 +1409,12 @@ pub fn quests_json() -> String {
                             ),
                             theme_piece(g, token),
                         ),
+                        gm2d_core::quest::Goal::Bring { item, count } => {
+                            format!("hand over {count} × {}", theme_thing(g, item))
+                        }
+                        gm2d_core::quest::Goal::Word { place } => {
+                            format!("go to {}, then report back", place_name(g, place))
+                        }
                     },
                     "pays": q.reward.iter()
                         .map(|n| theme_piece(g, n))
@@ -1331,6 +1425,34 @@ pub fn quests_json() -> String {
             .collect();
         serde_json::json!(out).to_string()
     })
+}
+
+/// A component or a restorative, whichever it is.
+fn theme_thing(g: &gm2d_core::game::Game, id: &str) -> String {
+    let supplies = gm2d_core::data::supplies();
+    match supplies.get(id) {
+        Some(s) => s.name.clone(),
+        None => theme_piece(g, id),
+    }
+}
+
+/// What a place is called, whether it is a town or something standing in a
+/// field. A town has a name on the map; an event's name is its title.
+fn place_name(g: &gm2d_core::game::Game, id: &str) -> String {
+    let from_map = map(|w| w.places.iter().find(|p| p.id == id).map(|p| p.name.clone()));
+    if let Some(n) = from_map.filter(|n| !n.is_empty()) {
+        return n;
+    }
+    // `Theme::place` takes a `&'static str` fallback because an event's title
+    // is one everywhere else; here the title comes off a parsed file, so the
+    // lookup happens first and the owned string is the fallback.
+    let events = gm2d_core::data::events();
+    let title = events.events.iter().find(|e| e.id == id).map(|e| e.title.clone());
+    let told = gm2d_core::theme::by_id(&g.theme).place(id, "");
+    if !told.is_empty() {
+        return told.to_string();
+    }
+    title.unwrap_or_else(|| id.to_string())
 }
 
 fn theme_piece(g: &gm2d_core::game::Game, canonical: &str) -> String {
@@ -1345,22 +1467,43 @@ fn theme_piece(g: &gm2d_core::game::Game, canonical: &str) -> String {
 /// Take an errand on. Empty string, or why not.
 #[wasm_bindgen]
 pub fn take_quest(id: &str) -> String {
-    with_mut(|g| gm2d_core::quest::take(g, id).err().unwrap_or_default())
+    with_mut(|g| {
+        let here = place_here(g);
+        let quests = gm2d_core::data::quests();
+        match quests.get(id) {
+            Some(q) if here.as_deref() != Some(q.giver.as_str()) => {
+                format!("{} is not here.", q.name)
+            }
+            _ => gm2d_core::quest::take(g, id).err().unwrap_or_default(),
+        }
+    })
 }
 
 /// Hand one in. The reward as JSON, or `{"error": ...}`.
 #[wasm_bindgen]
 pub fn hand_in_quest(id: &str) -> String {
-    with_mut(|g| match gm2d_core::quest::hand_in(g, id) {
-        Err(why) => serde_json::json!({ "error": why }).to_string(),
-        Ok(given) => {
-            let quests = gm2d_core::data::quests();
-            let thanks = quests.get(id).map(|q| q.thanks.clone()).unwrap_or_default();
-            serde_json::json!({
-                "thanks": thanks,
-                "given": given.iter().map(|n| theme_piece(g, n)).collect::<Vec<_>>(),
-            })
-            .to_string()
+    with_mut(|g| {
+        let here = place_here(g);
+        let quests = gm2d_core::data::quests();
+        if let Some(q) = quests.get(id) {
+            let back = gm2d_core::quest::QuestsData::turn_in_of(q);
+            if here.as_deref() != Some(back) {
+                return serde_json::json!({
+                    "error": format!("That is not handed in here.")
+                })
+                .to_string();
+            }
+        }
+        match gm2d_core::quest::hand_in(g, id) {
+            Err(why) => serde_json::json!({ "error": why }).to_string(),
+            Ok(given) => {
+                let thanks = quests.get(id).map(|q| q.thanks.clone()).unwrap_or_default();
+                serde_json::json!({
+                    "thanks": thanks,
+                    "given": given.iter().map(|n| theme_piece(g, n)).collect::<Vec<_>>(),
+                })
+                .to_string()
+            }
         }
     })
 }
@@ -1418,6 +1561,22 @@ pub fn character_json() -> String {
                 { "n": stats.physical_resist, "label": "physical resist", "unit": "%" },
                 { "n": stats.magic_resist, "label": "magic resist", "unit": "%" },
             ],
+            // How worn out, and what the character would be if they were not.
+            // Both, because "160, and 24 of it is missing" is two facts and a
+            // player needs the pair to decide whether to turn round.
+            "fatigue": c.fatigue,
+            "rested_health": c.rested_stats().health,
+            "fatigue_cap": gm2d_core::fatigue::CAP,
+            "supplies": c.supplies.iter().map(|(id, n)| {
+                let all = gm2d_core::data::supplies();
+                let def = all.get(id);
+                serde_json::json!({
+                    "id": id, "n": n,
+                    "name": def.map(|d| d.name.clone()).unwrap_or_else(|| id.clone()),
+                    "blurb": def.map(|d| d.blurb.clone()).unwrap_or_default(),
+                    "restores": def.map(|d| d.restores).unwrap_or(0),
+                })
+            }).collect::<Vec<_>>(),
             // What the tree says you begin every fight already holding.
             "held": {
                 "armor": c.start_with().armor,

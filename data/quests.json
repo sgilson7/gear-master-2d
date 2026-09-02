@@ -1,11 +1,11 @@
 {
   "format": "gm2d-quests",
   "version": 1,
-  "_note": "Errands a town hands out. Content, not state: the save carries which are taken and which are done, and nothing else. The tally is a real bag item rather than a counter, so the middle of an errand is a walk home carrying something.",
+  "_note": "Errands. `giver` is who asks and `turn_in` is who takes it back \u2014 the two differ whenever somebody sends you to tell somebody else, which is the shape half the first map's errands have. `requires` names errands that must be done first, and a questline is that and nothing else. Every reward is a component that is on no shelf and drops from nothing: an errand you could have shopped your way past is a slow shop.",
   "quests": [
     {
       "id": "the-eyes-have-it",
-      "town": "the-end-of-all-gears",
+      "giver": "the-end-of-all-gears",
       "name": "THE EYES HAVE IT",
       "brief": "A clerk in the pit's own office keeps the register of what lives here. Bengulon jungle toads are not on it, and are four streets in. Nine planes over is where they are from; somebody brought forty and did not stay. She will not write down a thing she has not been handed, and what she will accept is eyes. Five toads. Ten eyes, which she is counting as five.",
       "thanks": "She writes for a while. Then she gives you a ledger with a spine like a brick and a page of counting-out that she says works, and has not said on what. The register now runs to a hundred and nine species and one line that says PENDING.",
@@ -23,8 +23,96 @@
       "gold": 12
     },
     {
+      "id": "the-ones-still-down-there",
+      "giver": "the-end-of-all-gears",
+      "name": "THE ONES STILL DOWN THERE",
+      "brief": "Four hundred Sprocketmen are still in the workings and the office is not permitted to send anything down that could be called a wage. Tins are not a wage. The clerk would like four Long Shift Tins, bought with your own Fnorp, handed to her across the counter, and entered in the register as a donation of nothing.",
+      "thanks": "She writes DONATION: NIL, four times, and stacks the tins behind the counter where the register cannot see them. Then she gives you a frame with somebody's counting scratched into the inside of it \u2014 four numbers, each smaller than the last.",
+      "goal": {
+        "bring": {
+          "item": "long-shift-tin",
+          "count": 4
+        }
+      },
+      "reward": [
+        "Counting Frame"
+      ],
+      "gold": 30
+    },
+    {
+      "id": "word-with-the-fencecutter",
+      "giver": "the-end-of-all-gears",
+      "name": "SOMEBODY SHOULD TELL HIM",
+      "brief": "The register has a line for the cork fence and the line says GOING WEST, A HAND A YEAR. The clerk would like somebody to walk out to the man cutting through it and tell him that the office is aware, that the office has been aware since the fourth doorway, and that being aware is the whole of what the office intends to do.",
+      "thanks": "He takes it well. He says he had assumed as much and has been cutting on that assumption for nine doorways. Then he gives you the knife, which is not a gift so much as a handover, and starts on the tenth with a piece of the fence.",
+      "goal": {
+        "word": {
+          "place": "the-cork-boundary"
+        }
+      },
+      "reward": [
+        "Bread Knife"
+      ],
+      "gold": 6
+    },
+    {
+      "id": "the-count-is-wrong",
+      "giver": "the-counted-heap",
+      "turn_in": "the-end-of-all-gears",
+      "name": "THE COUNT IS WRONG",
+      "brief": "The board by the heap has been corrected four times and each correction is smaller. Somebody is counting a pile that is going down and writing the number as though the pile is the thing that changed. The office keeps a register. The office should be told there is a heap on the slag that is eleven thousand teeth and falling, and that nobody is standing near it.",
+      "thanks": "The clerk writes it into the register under a heading she has to invent, reads it back twice, and gets quieter. Then she gives you a strip of the fence out of a drawer, which she says grows back, and which she says the office is aware of.",
+      "goal": {
+        "word": {
+          "place": "the-end-of-all-gears"
+        }
+      },
+      "reward": [
+        "Boundary Cork"
+      ],
+      "gold": 10
+    },
+    {
+      "id": "marbulon-asks-first",
+      "giver": "marbulons-door",
+      "name": "THE FIRST THING SHE WANTS",
+      "brief": "\"Whisperlings,\" says Marbulon. \"Three. Not because I want anything off them \u2014 I want to know whether there are three left, and the only way to know that is somebody comes back and says there are not.\" She does not say what she will do with the answer. She has the key in her apron and she takes it out while she is talking and puts it back.",
+      "thanks": "\"Three,\" she says. \"So there were three.\" She writes nothing down. Then she gives you a thimble that has been mended twice, and says the first thing is done and the second thing is worse.",
+      "goal": {
+        "slay": {
+          "creature": "Whisperling",
+          "count": 3,
+          "token": "Whisper Jar"
+        }
+      },
+      "reward": [
+        "Witch's Thimble"
+      ],
+      "gold": 25
+    },
+    {
+      "id": "marbulon-asks-second",
+      "giver": "marbulons-door",
+      "requires": [
+        "marbulon-asks-first"
+      ],
+      "name": "THE SECOND THING SHE WANTS",
+      "brief": "\"Now go and look at the gate,\" she says. \"Not through it. At it. Henpeck's people put cork over sneel over your own people's bracket work, and the bracket work is still holding the hinges, and I want somebody who has stood in front of that to be the one carrying my key.\" She is facing the door again. \"Come back and tell me it is still standing.\"",
+      "thanks": "\"Still standing,\" she repeats, and does not sound surprised. She gives you the key off her apron, and a piece of glass she says is ground for nine planes over and works best on this one. Then she turns the chair to face the door and does not turn it back.",
+      "goal": {
+        "word": {
+          "place": "the-gate-that-was-yours"
+        }
+      },
+      "reward": [
+        "The Witch's Key",
+        "Nine-Plane Lens"
+      ],
+      "gold": 30
+    },
+    {
       "id": "a-quiver-of-nocks",
-      "town": "kettleworks",
+      "giver": "kettleworks",
       "name": "A QUIVER OF NOCKS",
       "brief": "The fletcher at Kettleworks has been buying arrows back off the wallspider swarms for six years and has never once got a nock returned with them. He has a drawer of eight hundred shafts and nothing to put on the end of any of them. Four nocks. He is not asking where they come from and neither should you.",
       "thanks": "He fits one, looks down the shaft, and puts it in the drawer with the other eight hundred. Then he gives you a frame and a visor off the shelf behind him, which was not on the shelf in front of him, and does not explain the difference.",
@@ -43,7 +131,7 @@
     },
     {
       "id": "the-long-mirror-inventory",
-      "town": "high-wick",
+      "giver": "high-wick",
       "name": "THE LONG MIRROR INVENTORY",
       "brief": "High Wick keeps an inventory of everything the Yodregar Archive has reflected, on the grounds that a thing seen twice has been in the world twice. The inventory is nine volumes and none of them agree. Three shards, and the clerk will start volume ten, which she says will be the last one, as she has said of the previous four.",
       "thanks": "She holds a shard up, looks at what is behind her in it, and writes for eleven minutes. Volume ten is open. Then she hands you an ink and a word she says goes with it, and adds that neither is in the inventory and she would rather they stayed out of it.",

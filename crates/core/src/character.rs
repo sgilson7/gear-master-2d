@@ -138,6 +138,15 @@ pub struct Character {
     /// derived from this, so the two cannot disagree, and a save carrying both
     /// would have a pair of numbers that could contradict each other.
     pub xp: i32,
+    /// How worn out you are, in percent of maximum health.
+    ///
+    /// **The only thing a fight spends for good.** Health resets at the bell,
+    /// so this is what makes a fourth fight in a row a different fight from
+    /// the first. Only a restorative takes it off — a town does not, or the
+    /// restoratives would be decoration.
+    pub fatigue: i32,
+    /// Restoratives carried, by id and count.
+    pub supplies: Vec<(String, u32)>,
     /// Experience won and not yet spent.
     ///
     /// **At risk.** A town turns this into levels; a defeat takes all of it.
@@ -184,6 +193,8 @@ impl Character {
             grown_health: 0,
             xp: 0,
             carried: 0,
+            fatigue: 0,
+            supplies: Vec::new(),
             skill_points: 0,
             skills_taken: Vec::new(),
             class: None,
@@ -901,12 +912,70 @@ impl Character {
     /// because a bought node's *effect* is not state — the node is. Reading it
     /// every time means retuning a node retunes every save that took it.
     pub fn player_stats(&self) -> Stats {
+        let mut base = self.rested_stats();
+        // **Last, and on the total.** Fatigue is a share of the maximum you
+        // would otherwise have, so it has to be applied after everything that
+        // adds to it — a board, the grown health and the tree. Taking it off
+        // the base and then adding gear back would make a helmet cure
+        // tiredness.
+        base.health = crate::fatigue::worn(base.health, self.fatigue);
+        base
+    }
+
+    /// The same, as if you had just got up.
+    ///
+    /// What the character *is*, before the road is taken off it. The sheet
+    /// shows both, because "160, and 24 of it is missing" is two facts and a
+    /// player needs the pair to decide whether to turn round.
+    pub fn rested_stats(&self) -> Stats {
         let mut base = self.loadout.total_stats(&self.registry);
         base.health += self.grown_health;
         if !self.skills_taken.is_empty() {
             base += crate::data::skills().stats_from(&self.skills_taken);
         }
         base
+    }
+
+    /// One fight's wear.
+    pub fn tire(&mut self, by: i32) {
+        self.fatigue = (self.fatigue + by).clamp(0, crate::fatigue::CAP);
+    }
+
+    /// How many of a restorative are in the pack.
+    pub fn supply_count(&self, id: &str) -> u32 {
+        self.supplies.iter().find(|(s, _)| s == id).map(|(_, n)| *n).unwrap_or(0)
+    }
+
+    pub fn give_supply(&mut self, id: &str, n: u32) {
+        match self.supplies.iter_mut().find(|(s, _)| s == id) {
+            Some((_, have)) => *have += n,
+            None => self.supplies.push((id.to_string(), n)),
+        }
+    }
+
+    /// Drink one. Returns how much tiredness actually came off, or why not.
+    ///
+    /// Reports what was *used* rather than what the tin claims, because
+    /// drinking a sixty against twelve points of tiredness is a thing a player
+    /// should be told they did.
+    pub fn use_supply(&mut self, id: &str) -> Result<i32, String> {
+        let supplies = crate::data::supplies();
+        let Some(def) = supplies.get(id) else { return Err("there is no such thing".into()) };
+        if self.supply_count(id) == 0 {
+            return Err(format!("You have no {}.", def.name));
+        }
+        if self.fatigue == 0 {
+            return Err("You are not tired.".into());
+        }
+        let took = def.restores.min(self.fatigue);
+        self.fatigue -= took;
+        for (s, n) in self.supplies.iter_mut() {
+            if s == id {
+                *n -= 1;
+            }
+        }
+        self.supplies.retain(|(_, n)| *n > 0);
+        Ok(took)
     }
 
     /// The board's shape, as the class ranker reads it.

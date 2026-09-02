@@ -30,6 +30,7 @@ pub mod reward;
 pub mod rng;
 pub mod save;
 pub mod explain;
+pub mod fatigue;
 pub mod quest;
 pub mod shop;
 pub mod skills;

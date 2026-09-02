@@ -36,6 +36,19 @@ pub enum Goal {
         /// The canonical name of the catalogue piece each win drops.
         token: String,
     },
+    /// Carry `count` of a component to whoever is asking.
+    ///
+    /// No token and no drop: what it wants is a thing that already exists in
+    /// the world, so the errand is a reason to go and find one rather than a
+    /// counter that fills itself.
+    Bring { item: String, count: u32 },
+    /// Go and speak to somebody, then come back and say so.
+    ///
+    /// The one errand with nothing in the bag at the end of it. Standing on
+    /// the tile is the whole of the doing; `answered` is where that is
+    /// recorded, which is the same set a tile-event writes to, so a word and a
+    /// door are remembered the same way.
+    Word { place: String },
 }
 
 impl Goal {
@@ -43,18 +56,40 @@ impl Goal {
     pub fn creature(&self) -> Option<&str> {
         match self {
             Goal::Slay { creature, .. } => Some(creature),
+            _ => None,
         }
     }
 
+    /// The component it tallies, if it tallies one.
     pub fn token(&self) -> Option<&str> {
         match self {
             Goal::Slay { token, .. } => Some(token),
+            Goal::Bring { item, .. } => Some(item),
+            Goal::Word { .. } => None,
         }
+    }
+
+    /// Whether the token is one the errand *hands out* as you go.
+    ///
+    /// A slain toad drops its eye; a component somebody wants was already in
+    /// the world. The difference decides whether `on_victory` pays.
+    pub fn drops_its_own(&self) -> bool {
+        matches!(self, Goal::Slay { .. })
     }
 
     pub fn count(&self) -> u32 {
         match self {
             Goal::Slay { count, .. } => *count,
+            Goal::Bring { count, .. } => *count,
+            Goal::Word { .. } => 1,
+        }
+    }
+
+    /// The place it sends you to, if it sends you anywhere.
+    pub fn place(&self) -> Option<&str> {
+        match self {
+            Goal::Word { place } => Some(place),
+            _ => None,
         }
     }
 }
@@ -62,8 +97,20 @@ impl Goal {
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Quest {
     pub id: String,
-    /// The place id that gives it out and takes it back.
-    pub town: String,
+    /// The place that offers it — a town or an event tile.
+    ///
+    /// An errand is not a town's any more. Somebody standing in a field with a
+    /// bread knife can ask you for something, and the difference between that
+    /// and a clerk behind a counter should be where they are standing rather
+    /// than which system they are in.
+    pub giver: String,
+    /// Where it is handed in. The giver, unless it says otherwise — which is
+    /// what makes "go and tell them in town" an errand rather than two.
+    #[serde(default)]
+    pub turn_in: Option<String>,
+    /// Errands that must be done first. A questline is this and nothing else.
+    #[serde(default)]
+    pub requires: Vec<String>,
     pub name: String,
     /// Why somebody is asking. The world's words.
     pub brief: String,
@@ -105,9 +152,23 @@ impl QuestsData {
                     return Err(format!("{}: no creature called {c:?}", q.id));
                 }
             }
-            for name in q.goal.token().into_iter().chain(q.reward.iter().map(|s| s.as_str())) {
+            // A reward is always a component; a tally may be a component or a
+            // restorative, because `Bring` names either.
+            for name in &q.reward {
                 if crate::shop::def_named(name).is_none() {
                     return Err(format!("{}: {name:?} is not in the catalogue", q.id));
+                }
+            }
+            if let Some(t) = q.goal.token() {
+                let known = crate::shop::def_named(t).is_some()
+                    || crate::data::supplies().get(t).is_some();
+                if !known {
+                    return Err(format!("{}: {t:?} is neither a component nor a supply", q.id));
+                }
+            }
+            if let Some(p) = q.goal.place() {
+                if p == q.giver {
+                    return Err(format!("{}: sends you to the person asking", q.id));
                 }
             }
         }
@@ -118,15 +179,26 @@ impl QuestsData {
         self.quests.iter().find(|q| q.id == id)
     }
 
-    /// The errands a given town hands out.
-    pub fn at(&self, town: &str) -> Vec<&Quest> {
-        self.quests.iter().filter(|q| q.town == town).collect()
+    /// Where an errand is handed in — the giver unless it says otherwise.
+    pub fn turn_in_of(q: &Quest) -> &str {
+        q.turn_in.as_deref().unwrap_or(&q.giver)
+    }
+
+    /// The errands a place is concerned with: the ones it gives out, and the
+    /// ones somebody else sent you here to report.
+    pub fn at(&self, place: &str) -> Vec<&Quest> {
+        self.quests
+            .iter()
+            .filter(|q| q.giver == place || Self::turn_in_of(q) == place)
+            .collect()
     }
 }
 
 /// Where an errand stands for this character.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Stage {
+    /// Behind an errand that has not been done.
+    Locked,
     /// On the board and not yet taken.
     Offered,
     /// Taken, and short of what it asked for.
@@ -139,6 +211,7 @@ pub enum Stage {
 impl Stage {
     pub fn name(self) -> &'static str {
         match self {
+            Stage::Locked => "locked",
             Stage::Offered => "offered",
             Stage::Carrying { .. } => "carrying",
             Stage::Ready => "ready",
@@ -156,30 +229,89 @@ impl Stage {
 
 use crate::game::Game;
 
-/// How many of a named component the character is holding, seated or not.
+/// How many of a named thing the character is holding.
+///
+/// **Components or restoratives**, because an errand asking for four of
+/// something does not care which drawer of the game they live in — and the
+/// alternative was a second goal kind that asked the same question of a
+/// different list.
 pub fn holding(game: &Game, name: &str) -> u32 {
-    game.character
+    let gear = game
+        .character
         .owned
         .iter()
         .filter(|&&id| game.character.registry.def(id).name == name)
-        .count() as u32
+        .count() as u32;
+    gear + game.character.supply_count(name)
 }
 
 /// Where this errand stands right now.
+/// Has this errand been finished?
+pub fn done(game: &Game, id: &str) -> bool {
+    game.world.quests_done.iter().any(|d| d == id)
+}
+
+/// The word-of-mouth marker: standing on the place an errand sent you to.
+///
+/// Written into `world.answered`, the same set a tile-event writes to, so a
+/// word and a door are remembered the same way and a save carries one field
+/// rather than two.
+pub fn spoken(id: &str) -> String {
+    format!("word:{id}")
+}
+
 pub fn stage(game: &Game, q: &Quest) -> Stage {
-    if game.world.quests_done.iter().any(|d| *d == q.id) {
+    if done(game, &q.id) {
         return Stage::Done;
+    }
+    if !q.requires.iter().all(|r| done(game, r)) {
+        return Stage::Locked;
     }
     if !game.world.quests_taken.iter().any(|t| *t == q.id) {
         return Stage::Offered;
     }
-    let want = q.goal.count();
-    let have = q.goal.token().map(|t| holding(game, t)).unwrap_or(0);
-    if have >= want {
-        Stage::Ready
-    } else {
-        Stage::Carrying { have, want }
+    match &q.goal {
+        Goal::Word { .. } => {
+            if game.world.answered.iter().any(|a| *a == spoken(&q.id)) {
+                Stage::Ready
+            } else {
+                Stage::Carrying { have: 0, want: 1 }
+            }
+        }
+        _ => {
+            let want = q.goal.count();
+            let have = q.goal.token().map(|t| holding(game, t)).unwrap_or(0);
+            if have >= want {
+                Stage::Ready
+            } else {
+                Stage::Carrying { have, want }
+            }
+        }
     }
+}
+
+/// Standing somewhere: mark any errand that sent you here as spoken to.
+///
+/// Returns the errands that just advanced, so the page can say something.
+/// Called on arriving at a place rather than on opening a screen, because the
+/// errand is "go and talk to them" and the talking is the arriving.
+pub fn on_arrival(game: &mut Game, place: &str) -> Vec<String> {
+    let quests = crate::data::quests();
+    let mut moved = Vec::new();
+    for q in &quests.quests {
+        if q.goal.place() != Some(place) {
+            continue;
+        }
+        if !matches!(stage(game, q), Stage::Carrying { .. }) {
+            continue;
+        }
+        let mark = spoken(&q.id);
+        if !game.world.answered.iter().any(|a| *a == mark) {
+            game.world.answered.push(mark);
+            moved.push(q.name.clone());
+        }
+    }
+    moved
 }
 
 /// Take an errand on. Returns why not.
@@ -188,6 +320,7 @@ pub fn take(game: &mut Game, id: &str) -> Result<(), String> {
     let Some(q) = quests.get(id) else { return Err("there is no such errand".into()) };
     match stage(game, q) {
         Stage::Done => Err("you have already done that one".into()),
+        Stage::Locked => Err("there is something else they want doing first".into()),
         Stage::Offered => {
             game.world.quests_taken.push(q.id.clone());
             Ok(())
@@ -210,6 +343,12 @@ pub fn on_victory(game: &mut Game, creature: &str) -> Vec<String> {
         if q.goal.creature() != Some(creature) {
             continue;
         }
+        // Only an errand that hands out its own tally pays here. A errand
+        // asking for a component that already exists in the world is a reason
+        // to go and find one, not a counter that fills itself.
+        if !q.goal.drops_its_own() {
+            continue;
+        }
         let Some(token) = q.goal.token() else { continue };
         if !matches!(stage(game, q), Stage::Carrying { .. }) {
             continue;
@@ -226,12 +365,14 @@ pub fn hand_in(game: &mut Game, id: &str) -> Result<Vec<String>, String> {
     let quests = crate::data::quests();
     let Some(q) = quests.get(id) else { return Err("there is no such errand".into()) };
     match stage(game, q) {
+        Stage::Locked => return Err("there is something else they want doing first".into()),
         Stage::Offered => return Err("you have not taken that one".into()),
         Stage::Done => return Err("you have already handed that in".into()),
         Stage::Carrying { have, want } => {
-            return Err(format!(
-                "{have} of {want}. She will not write down a thing she has not been handed."
-            ));
+            return Err(match &q.goal {
+                Goal::Word { .. } => "You have not been yet.".to_string(),
+                _ => format!("{have} of {want}, and nobody writes down what they are not handed."),
+            });
         }
         Stage::Ready => {}
     }
@@ -241,17 +382,31 @@ pub fn hand_in(game: &mut Game, id: &str) -> Result<Vec<String>, String> {
     // a component in two places.
     if let Some(token) = q.goal.token() {
         for _ in 0..q.goal.count() {
-            let Some(id) = game
+            let seated = game
                 .character
                 .owned
                 .iter()
                 .copied()
-                .find(|&p| game.character.registry.def(p).name == token)
-            else {
-                break;
-            };
-            game.character.loadout.remove_anywhere(id);
-            game.character.owned.retain(|&p| p != id);
+                .find(|&p| game.character.registry.def(p).name == token);
+            match seated {
+                Some(id) => {
+                    // Off the board first. A component handed over the counter
+                    // and still occupying a cell is a component in two places.
+                    game.character.loadout.remove_anywhere(id);
+                    game.character.owned.retain(|&p| p != id);
+                }
+                None => {
+                    // A restorative, then. Spent the same way it would be if it
+                    // were drunk, minus the drinking.
+                    for (s, n) in game.character.supplies.iter_mut() {
+                        if s == token && *n > 0 {
+                            *n -= 1;
+                            break;
+                        }
+                    }
+                    game.character.supplies.retain(|(_, n)| *n > 0);
+                }
+            }
         }
     }
 

@@ -104,6 +104,14 @@ pub fn settle(game: &mut Game, log: &CombatLog, difficulty: Difficulty) -> Optio
     let mut receipt = Vec::new();
     let mut sent_home = None;
 
+    // **Every battle, won or lost.** Fatigue is what a fight costs whatever
+    // happens in it: walking away from a hard one still leaves you the weaker
+    // for having stood in it, and a rule that only tired the winner would make
+    // losing the cheaper option.
+    let before = game.character.fatigue;
+    game.character.tire(crate::fatigue::PER_FIGHT);
+    let tired = game.character.fatigue - before;
+
     match log.outcome {
         Outcome::Victory => {
             game.character.gold += gold;
@@ -147,6 +155,18 @@ pub fn settle(game: &mut Game, log: &CombatLog, difficulty: Difficulty) -> Optio
                 None => "You wake up where you fell.".into(),
             });
         }
+    }
+
+    if tired > 0 {
+        receipt.push(format!(
+            "{tired}% more tired. {}% of you is missing until you take something for it.",
+            game.character.fatigue
+        ));
+    } else if game.character.fatigue >= crate::fatigue::CAP {
+        receipt.push(format!(
+            "You cannot get any more tired than this. {}% of you is missing.",
+            game.character.fatigue
+        ));
     }
 
     Some(Settlement {

@@ -16,6 +16,7 @@ pub const THEME_TD_JSON: &str = include_str!("../../../data/theme.td.json");
 pub const SKILLS_JSON: &str = include_str!("../../../data/skills.json");
 pub const SHOPS_JSON: &str = include_str!("../../../data/shops.json");
 pub const QUESTS_JSON: &str = include_str!("../../../data/quests.json");
+pub const SUPPLIES_JSON: &str = include_str!("../../../data/supplies.json");
 
 /// The shipped map, loaded and checked.
 ///
@@ -50,4 +51,9 @@ pub fn shops() -> crate::shop::ShopsData {
 /// The errands the towns hand out.
 pub fn quests() -> crate::quest::QuestsData {
     crate::quest::QuestsData::parse(QUESTS_JSON).expect("the shipped errands are broken")
+}
+
+/// What a town sells to take the tiredness off.
+pub fn supplies() -> crate::fatigue::SuppliesData {
+    crate::fatigue::SuppliesData::parse(SUPPLIES_JSON).expect("the shipped supplies are broken")
 }

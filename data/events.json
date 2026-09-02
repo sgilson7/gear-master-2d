@@ -15,26 +15,54 @@
           "label": "Take a strip",
           "blurb": "It comes away like bark and starts back while you are holding it.",
           "requires": "none",
-          "outcome": { "all": [{ "flag": "has-cork" }, { "xp": 6 }] },
+          "outcome": {
+            "all": [
+              {
+                "flag": "has-cork"
+              },
+              {
+                "xp": 6
+              }
+            ]
+          },
           "unmet": ""
         },
         {
           "label": "Buy the knife",
           "blurb": "Forty Fnorp. He says he has nine more and you believe him.",
-          "requires": { "gold": 40 },
-          "outcome": { "all": [{ "gold": -40 }, { "give": "Serrated Edge" }] },
+          "requires": {
+            "gold": 40
+          },
+          "outcome": {
+            "all": [
+              {
+                "gold": -40
+              },
+              {
+                "give": "Serrated Edge"
+              }
+            ]
+          },
           "unmet": "Forty Fnorp, and you have not got it."
         },
         {
           "label": "Cut the tenth with him",
           "blurb": "Four down, four across, and a pause. It takes most of an afternoon.",
           "requires": "none",
-          "outcome": { "all": [{ "flag": "cut-the-tenth" }, { "xp": 14 }] },
+          "outcome": {
+            "all": [
+              {
+                "flag": "cut-the-tenth"
+              },
+              {
+                "xp": 14
+              }
+            ]
+          },
           "unmet": ""
         }
       ]
     },
-
     {
       "id": "the-counted-heap",
       "title": "THE COUNTED HEAP",
@@ -48,19 +76,39 @@
           "label": "Take four",
           "blurb": "The number on the board becomes wrong by four, which is what the crossings-out are.",
           "requires": "none",
-          "outcome": { "all": [{ "gold": 25 }, { "flag": "took-from-the-heap" }, { "xp": 8 }] },
+          "outcome": {
+            "all": [
+              {
+                "gold": 25
+              },
+              {
+                "flag": "took-from-the-heap"
+              },
+              {
+                "xp": 8
+              }
+            ]
+          },
           "unmet": ""
         },
         {
           "label": "Correct the board",
           "blurb": "Cross out the number, write 11,200, and leave the teeth where they are.",
           "requires": "none",
-          "outcome": { "all": [{ "flag": "corrected-the-heap" }, { "xp": 18 }] },
+          "outcome": {
+            "all": [
+              {
+                "flag": "corrected-the-heap"
+              },
+              {
+                "xp": 18
+              }
+            ]
+          },
           "unmet": ""
         }
       ]
     },
-
     {
       "id": "the-shallows-marker",
       "title": "THE SHALLOWS MARKER",
@@ -74,19 +122,36 @@
           "label": "Cut your name at the sixth",
           "blurb": "Then the post has six names and five of them are crossed through.",
           "requires": "none",
-          "outcome": { "all": [{ "flag": "named-on-the-post" }, { "xp": 12 }] },
+          "outcome": {
+            "all": [
+              {
+                "flag": "named-on-the-post"
+              },
+              {
+                "xp": 12
+              }
+            ]
+          },
           "unmet": ""
         },
         {
           "label": "Read the five and go",
           "blurb": "Two of them are Sprocketman names. You did not know either of them.",
           "requires": "none",
-          "outcome": { "all": [{ "flag": "read-the-post" }, { "xp": 20 }] },
+          "outcome": {
+            "all": [
+              {
+                "flag": "read-the-post"
+              },
+              {
+                "xp": 20
+              }
+            ]
+          },
           "unmet": ""
         }
       ]
     },
-
     {
       "id": "the-standing-frame",
       "title": "THE STANDING FRAME",
@@ -100,26 +165,57 @@
           "label": "Take the frame",
           "blurb": "It is a frame. You have five. This would be a sixth thing to carry and not a sixth frame.",
           "requires": "none",
-          "outcome": { "all": [{ "gold": 60 }, { "flag": "took-the-frame" }, { "xp": 10 }] },
+          "outcome": {
+            "all": [
+              {
+                "gold": 60
+              },
+              {
+                "flag": "took-the-frame"
+              },
+              {
+                "xp": 10
+              }
+            ]
+          },
           "unmet": ""
         },
         {
           "label": "Leave it standing",
           "blurb": "Whoever set it up did the same arithmetic and reached the same answer.",
           "requires": "none",
-          "outcome": { "all": [{ "flag": "left-it-standing" }, { "xp": 26 }] },
+          "outcome": {
+            "all": [
+              {
+                "flag": "left-it-standing"
+              },
+              {
+                "xp": 26
+              }
+            ]
+          },
           "unmet": ""
         },
         {
           "label": "Fit your cork to it",
           "blurb": "A strip of cork, wedged where the water sits. It buys the frame another thirty years.",
-          "requires": { "flag": "has-cork" },
-          "outcome": { "all": [{ "flag": "corked-the-frame" }, { "xp": 34 }] },
+          "requires": {
+            "flag": "has-cork"
+          },
+          "outcome": {
+            "all": [
+              {
+                "flag": "corked-the-frame"
+              },
+              {
+                "xp": 34
+              }
+            ]
+          },
           "unmet": "You would need cork, and the fence is four days behind you."
         }
       ]
     },
-
     {
       "id": "the-toad-census",
       "title": "THE TOAD CENSUS",
@@ -133,19 +229,39 @@
           "label": "Count the west side for her",
           "blurb": "Two hours. You reach two hundred and eleven and stop trusting yourself at about a hundred and forty.",
           "requires": "none",
-          "outcome": { "all": [{ "gold": 30 }, { "flag": "counted-toads" }, { "xp": 22 }] },
+          "outcome": {
+            "all": [
+              {
+                "gold": 30
+              },
+              {
+                "flag": "counted-toads"
+              },
+              {
+                "xp": 22
+              }
+            ]
+          },
           "unmet": ""
         },
         {
           "label": "Ask who brought forty",
           "blurb": "She has an answer and it is not the one you want, but it is a name.",
           "requires": "none",
-          "outcome": { "all": [{ "flag": "knows-who-brought-them" }, { "xp": 16 }] },
+          "outcome": {
+            "all": [
+              {
+                "flag": "knows-who-brought-them"
+              },
+              {
+                "xp": 16
+              }
+            ]
+          },
           "unmet": ""
         }
       ]
     },
-
     {
       "id": "the-gate-that-was-yours",
       "title": "THE GATE THAT WAS YOURS",
@@ -159,22 +275,100 @@
           "label": "Read the six notices",
           "blurb": "They are all still nailed up, one over another. The oldest one says what.",
           "requires": "none",
-          "outcome": { "all": [{ "flag": "read-the-notices" }, { "xp": 40 }] },
+          "outcome": {
+            "all": [
+              {
+                "flag": "read-the-notices"
+              },
+              {
+                "xp": 40
+              }
+            ]
+          },
           "unmet": ""
         },
         {
           "label": "Take the hinges",
           "blurb": "Your people cut them. They will come off in your hands and the gate will not.",
           "requires": "none",
-          "outcome": { "all": [{ "give": "Steel Frame" }, { "flag": "took-the-hinges" }, { "xp": 24 }] },
+          "outcome": {
+            "all": [
+              {
+                "give": "Steel Frame"
+              },
+              {
+                "flag": "took-the-hinges"
+              },
+              {
+                "xp": 24
+              }
+            ]
+          },
           "unmet": ""
         },
         {
           "label": "Pay the toll and walk in",
           "blurb": "Two hundred Fnorp, at a gate onto ground that was yours.",
-          "requires": { "gold": 200 },
-          "outcome": { "all": [{ "gold": -200 }, { "flag": "paid-at-your-own-gate" }, { "xp": 60 }] },
+          "requires": {
+            "gold": 200
+          },
+          "outcome": {
+            "all": [
+              {
+                "gold": -200
+              },
+              {
+                "flag": "paid-at-your-own-gate"
+              },
+              {
+                "xp": 60
+              }
+            ]
+          },
           "unmet": "Two hundred Fnorp. You have stood here before with less."
+        }
+      ]
+    },
+    {
+      "id": "marbulons-door",
+      "title": "MARBULON'S DOOR",
+      "prose": [
+        "There is a door in the shallows with no house behind it, and an old woman sitting in front of it on a kitchen chair. The door is shut. She is facing away from it, which is the detail you keep coming back to.",
+        "\"Forty-one,\" she says, before you have said anything. \"Forty-one people have walked past me on their way to the Cave this year, and Henpeck has a gate on it, and I have the key, and forty-one of them did not ask.\"",
+        "She turns the chair round to face the door, counts to four under her breath, and turns it back. She does this twice more while you are standing there."
+      ],
+      "choices": [
+        {
+          "label": "Ask what would count",
+          "blurb": "Two things, she says, and she has been saving them for somebody with your build.",
+          "requires": "none",
+          "outcome": {
+            "all": [
+              {
+                "flag": "met-marbulon"
+              },
+              {
+                "xp": 14
+              }
+            ]
+          },
+          "unmet": ""
+        },
+        {
+          "label": "Ask what is behind the door",
+          "blurb": "She says nothing is behind the door, and that this is not the same as there being no door.",
+          "requires": "none",
+          "outcome": {
+            "all": [
+              {
+                "flag": "asked-about-the-door"
+              },
+              {
+                "xp": 9
+              }
+            ]
+          },
+          "unmet": ""
         }
       ]
     }

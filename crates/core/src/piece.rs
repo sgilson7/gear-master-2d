@@ -11055,6 +11055,156 @@ pub static CATALOG: &[PieceDef] = &[
         power_bonus: 0,
         price: 1,
     },
+    // ---- what the first map's errands pay ----------------------------
+    //
+    // **Unique, and on no shelf.** A reward you could have bought is a reward
+    // that makes the errand a slow way to shop. Every one of these is the only
+    // one of it in the game.
+    PieceDef {
+        name: "Bread Knife",
+        slot: SlotKind::Weapon,
+        kind: PieceKind::Damaging,
+        // Long and thin, like the thing it is. It wants a handle beside it and
+        // leaves the rest of the frame for accessories.
+        cells: &[(0, 0), (0, 1), (0, 2)],
+        base: Stats { physical_damage: 11, ..Stats::new(0, 3, 0, 60) },
+        assembly_bonus: None,
+        effect: None,
+        cooldown_ms: 0,
+        speed_bonus: 12,
+        // Four strokes down, four across, and a pause to let the cut close a
+        // little before he widens it again. The man has a system and the knife
+        // keeps it: every fourth thing that happens on your board, it takes
+        // another pass.
+        triggers: &[Trigger::Watch {
+            what: Watched::AnyActivation,
+            count: 4,
+            then: Action::Damage {
+                amount: 22,
+                kind: DamageType::Physical,
+                target: Target::Enemy,
+            },
+            repeats: true,
+        }],
+        quest: None,
+        power_bonus: 0,
+        price: 18,
+    },
+    PieceDef {
+        name: "Counting Frame",
+        slot: SlotKind::Helmet,
+        kind: PieceKind::Frame,
+        cells: &[(0, 0), (1, 0), (2, 0), (0, 1), (2, 1)],
+        base: Stats { mind_resist: 9, ..Stats::ZERO },
+        assembly_bonus: Some(AssemblyBonus {
+            label: "counted twice",
+            stats: Stats { mind_resist: 6, curse_resist: 6, ..Stats::ZERO },
+            triggers: &[],
+        }),
+        effect: None,
+        cooldown_ms: 3600,
+        speed_bonus: 0,
+        triggers: &[Trigger::OnActivate(Action::Gain { what: Resource::Insight, amount: 2 })],
+        quest: None,
+        power_bonus: 0,
+        price: 22,
+    },
+    PieceDef {
+        name: "Boundary Cork",
+        slot: SlotKind::Chest,
+        kind: PieceKind::Layer,
+        cells: &[(0, 0), (1, 0), (2, 0), (0, 1)],
+        base: Stats { physical_resist: 7, ..Stats::ZERO },
+        assembly_bonus: None,
+        effect: None,
+        cooldown_ms: 0,
+        speed_bonus: 0,
+        // It grows back. That is the whole joke and it is also the mechanic.
+        triggers: &[Trigger::OnActivate(Action::GainArmor(9))],
+        quest: None,
+        power_bonus: 0,
+        price: 20,
+    },
+    PieceDef {
+        name: "Witch's Thimble",
+        slot: SlotKind::Gloves,
+        kind: PieceKind::Ring,
+        cells: &[(0, 0)],
+        base: Stats { curse_resist: 10, magic_damage: 3, ..Stats::ZERO },
+        assembly_bonus: None,
+        effect: None,
+        cooldown_ms: 0,
+        speed_bonus: 0,
+        triggers: &[Trigger::OnActivate(Action::Gain { what: Resource::Faith, amount: 2 })],
+        quest: None,
+        power_bonus: 0,
+        price: 24,
+    },
+    PieceDef {
+        name: "Nine-Plane Lens",
+        slot: SlotKind::Helmet,
+        kind: PieceKind::Crest,
+        cells: &[(0, 0), (0, 1)],
+        base: Stats { magic_pierce: 14, mind: 4, ..Stats::ZERO },
+        assembly_bonus: None,
+        effect: None,
+        cooldown_ms: 0,
+        speed_bonus: 0,
+        triggers: &[],
+        quest: None,
+        power_bonus: 0,
+        price: 30,
+    },
+    // ---- the two keys ------------------------------------------------
+    //
+    // Neither is gear. Both are typed as quest items and cost you a cell if
+    // you insist on carrying one seated — the same as the Platinum Chip, and
+    // for the same reason: a key is proof, not equipment.
+    PieceDef {
+        name: "The Witch's Key",
+        slot: SlotKind::Weapon,
+        kind: PieceKind::Quest,
+        cells: &[(0, 0)],
+        base: Stats::ZERO,
+        assembly_bonus: None,
+        effect: None,
+        cooldown_ms: 0,
+        speed_bonus: 0,
+        triggers: &[],
+        quest: None,
+        power_bonus: 0,
+        price: 1,
+    },
+    PieceDef {
+        name: "The Deep Gate Key",
+        slot: SlotKind::Weapon,
+        kind: PieceKind::Quest,
+        cells: &[(0, 0)],
+        base: Stats::ZERO,
+        assembly_bonus: None,
+        effect: None,
+        cooldown_ms: 0,
+        speed_bonus: 0,
+        triggers: &[],
+        quest: None,
+        power_bonus: 0,
+        price: 1,
+    },
+    PieceDef {
+        name: "Whisper Jar",
+        slot: SlotKind::Weapon,
+        kind: PieceKind::Quest,
+        cells: &[(0, 0)],
+        base: Stats::ZERO,
+        assembly_bonus: None,
+        effect: None,
+        cooldown_ms: 0,
+        speed_bonus: 0,
+        triggers: &[],
+        quest: None,
+        power_bonus: 0,
+        price: 1,
+    },
     PieceDef {
         name: "Bone Nock",
         slot: SlotKind::Weapon,
@@ -11154,6 +11304,27 @@ pub fn is_boss_only(name: &str) -> bool {
 /// got them - a Platinum Chip bought off a shelf is a door key with no door
 /// behind it.
 pub const EVENT_ONLY: &[&str] = &[
+    // **What the first map's errands pay, and the tallies they count.**
+    //
+    // Here for the reason everything below is: a footprint family sorted by
+    // worth does not know that some of its members are things you are *given*,
+    // so a creature was being handed the astronomer's lens — and, once these
+    // were added, Marbulon's glass off a Harvest Crest. Unique means unique:
+    // not on a shelf, not on a creature, and not something the stepper can
+    // walk into.
+    "Toad Eye",
+    "Bone Nock",
+    "Mirror Shard",
+    "Whisper Jar",
+    "The Bog Census",
+    "Census Bolt",
+    "Bread Knife",
+    "Counting Frame",
+    "Boundary Cork",
+    "Witch's Thimble",
+    "Nine-Plane Lens",
+    "The Witch's Key",
+    "The Deep Gate Key",
     // THE HUNDRED. Three enchantments dug out of a county and two orbs that
     // are how you get back into it - none of them for sale anywhere, and the
     // three enchantments not on a town's shelf either, because the county's

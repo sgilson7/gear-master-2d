@@ -453,7 +453,13 @@ def check_the_errand_board(page, name, fails):
         fails.append(f"{name}: the errand says nothing about what it pays")
     if q["foot"].strip().lower() != "take it on":
         fails.append(f"{name}: an untaken errand reads {q['foot']!r}")
-    page.locator("#quests .wares").first.click()
+    # The first one you can actually act on here. An errand taken in a field
+    # and reported in town shows in both places and is only clickable in one.
+    live = page.locator("#quests .wares:not(:disabled)")
+    if live.count() == 0:
+        fails.append(f"{name}: the starting town offers nothing you can take")
+        return
+    live.first.click()
     foot = page.locator("#quests .wares .cost").first.text_content()
     if "of" not in foot:
         fails.append(f"{name}: after taking it the errand reads {foot!r}, not a tally")
@@ -461,7 +467,7 @@ def check_the_errand_board(page, name, fails):
     # And handing in early is refused with a sentence rather than a silence.
     # The grind to five toads is not worth walking here — the whole loop is in
     # `tests/quests.rs` — but the button being wired to the answer is.
-    page.locator("#quests .wares").first.click()
+    page.locator("#quests .wares:not(:disabled)").first.click()
     said = page.text_content("#town-says") or ""
     if not said.strip():
         fails.append(f"{name}: handing in an unfinished errand said nothing")

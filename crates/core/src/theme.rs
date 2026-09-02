@@ -919,7 +919,16 @@ pub static TURTLE_DICK: Theme = Theme {
         // The toad is already the Bengulon Jungle Toad, so its eyes are, and
         // the ledger is a count of them.
         ("Toad Eye", "Bengulon Toad Eye"),
+        // What the first map's errands pay, and the two keys.
+        ("Bread Knife", "The Ninth Doorway"),
+        ("Counting Frame", "Sherman's Own Frame"),
+        ("Boundary Cork", "A Strip of the Fence"),
+        ("Witch's Thimble", "Marbulon's Thimble"),
+        ("Nine-Plane Lens", "The Bengulon Glass"),
+        ("The Witch's Key", "Marbulon's Key"),
+        ("The Deep Gate Key", "The Key to the Deep Chocolate"),
         ("Bone Nock", "Rice Crier's Nock"),
+        ("Whisper Jar", "A Jar of It"),
         ("Mirror Shard", "Shard of the Long Mirror"),
         ("The Bog Census", "The Bengulon Tally"),
         ("Census Bolt", "Count The Legs"),

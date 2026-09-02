@@ -670,10 +670,12 @@ fn every_assembly_bonus_carries_a_stat() {
 fn the_catalogue_carries_the_assembly_bonuses_it_says_it_does() {
     let n = assembly_bonuses().len();
     assert_eq!(
-        n, 36,
-        "thirty-six. It was thirty-seven until this test found that Leaden \
-         Tome's was a label over Stats::ZERO - a heading for its power_bonus, \
-         which is unconditional and printed elsewhere"
+        n, 37,
+        "thirty-seven. It was thirty-six for a long time: it had been \
+         thirty-seven until this test found that Leaden Tome's was a label \
+         over Stats::ZERO - a heading for its power_bonus, which is \
+         unconditional and printed elsewhere - and the thirty-seventh now is \
+         Counting Frame's, which the pit's clerk pays out for four tins"
     );
 }
 

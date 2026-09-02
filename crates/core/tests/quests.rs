@@ -29,14 +29,22 @@ fn the_shipped_errands_parse_and_name_things_that_exist() {
     // check that there is an errand at all and that it is somebody's.
     let q = data::quests();
     assert!(!q.quests.is_empty(), "no errands anywhere");
+    let w = data::world(D);
     let shops = data::shops();
+    let places: Vec<&str> = w.places.iter().map(|p| p.id.as_str()).collect();
     for e in &q.quests {
-        assert!(
-            shops.town(&e.town).is_some(),
-            "{} is given out by {:?}, which is not a town",
-            e.id,
-            e.town
-        );
+        // A giver is a town or an event tile now, and either is fine — but it
+        // has to be somewhere. A staged town counts: its map is coming.
+        let known = |id: &str| places.contains(&id) || shops.town(id).is_some();
+        assert!(known(&e.giver), "{} is given out by {:?}, which is nowhere", e.id, e.giver);
+        let back = e.turn_in.as_deref().unwrap_or(&e.giver);
+        assert!(known(back), "{} is handed in at {:?}, which is nowhere", e.id, back);
+        if let Some(p) = e.goal.place() {
+            assert!(known(p), "{} sends you to {p:?}, which is nowhere", e.id);
+        }
+        for r in &e.requires {
+            assert!(q.get(r).is_some(), "{} requires {r}, which is not an errand", e.id);
+        }
         assert!(!e.brief.is_empty() && !e.thanks.is_empty(), "{} says nothing", e.id);
         assert!(!e.reward.is_empty() || e.gold != 0, "{} pays nothing", e.id);
     }
@@ -75,7 +83,7 @@ fn every_town_has_an_errand() {
         .iter()
         .filter(|p| p.kind == PlaceKind::Town)
         .map(|p| p.id.as_str())
-        .filter(|id| q.at(id).is_empty())
+        .filter(|id| q.quests.iter().all(|e| e.giver != *id))
         .collect();
     bare.sort();
     assert!(bare.is_empty(), "towns that want nothing: {bare:?}");
@@ -108,7 +116,7 @@ fn five_toads_and_a_walk_home() {
     at_town(&mut g, "the-end-of-all-gears");
     let quests = data::quests();
     let q = quests.get("the-eyes-have-it").expect("the toad errand");
-    let Goal::Slay { count, token, .. } = &q.goal;
+    let Goal::Slay { count, token, .. } = &q.goal else { panic!("the toad errand is a slaying") };
     let (count, token) = (*count, token.clone());
 
     assert_eq!(quest::stage(&g, q), Stage::Offered);

@@ -125,6 +125,13 @@ pub struct CharacterSave {
     /// had won was already spent the moment it was won.
     #[serde(default)]
     pub carried: i32,
+    /// How worn out, in percent. `default` so a file written before fatigue
+    /// existed opens rested, which is what it was.
+    #[serde(default)]
+    pub fatigue: i32,
+    /// Restoratives carried, by id and count.
+    #[serde(default)]
+    pub supplies: Vec<(String, u32)>,
     #[serde(default)]
     pub skill_points: u32,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
@@ -207,6 +214,8 @@ impl SaveFile {
             grown_health,
             xp,
             carried,
+            fatigue,
+            supplies,
             skill_points,
             skills_taken,
             class,
@@ -264,6 +273,8 @@ impl SaveFile {
                     gold: *gold,
                     grown_health: *grown_health,
                     carried: *carried,
+                    fatigue: *fatigue,
+                    supplies: supplies.clone(),
                     registry: instances,
                     owned: owned.iter().map(|p| p.0).collect(),
                     boards,
@@ -386,6 +397,8 @@ impl SaveFile {
             assembly_pct,
             xp,
             carried,
+            fatigue,
+            supplies,
             skill_points,
             skills_taken,
             class,
@@ -456,6 +469,8 @@ impl SaveFile {
         character.grown_health = grown_health;
         character.xp = xp;
         character.carried = carried;
+        character.fatigue = fatigue;
+        character.supplies = supplies;
         character.skill_points = skill_points;
         character.skills_taken = skills_taken;
         character.class = class;

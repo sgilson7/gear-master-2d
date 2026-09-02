@@ -437,3 +437,13 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
 #tree-tabs button { flex: 0 1 auto; padding: 8px 16px; display: grid; gap: 1px; }
 #tree-tabs button .meta { font-size: 10px; letter-spacing: .06em; opacity: .8; }
 @media (max-width: 720px) { .skilltree .node { width: 100%; } }
+
+/* Restoratives, on the standing panel where the decision is made. */
+.pack { display: grid; gap: 4px; margin-bottom: 14px; }
+.pack .tin {
+  display: grid; gap: 1px; text-align: left; padding: 7px 10px;
+  border: 1px solid var(--line); background: transparent; border-radius: 0;
+}
+.pack .tin:hover:not(:disabled) { background: var(--surface-2); }
+.pack .tin b { font-size: 13px; }
+.pack .tin .meta { font-family: var(--mono); font-size: 11px; color: var(--ink-3); }

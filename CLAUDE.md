@@ -27,10 +27,10 @@ at the end of it; M9 what a creature leaves behind — three sets, two rules no
 stat could express, and two crossings that make the north a decision.
 <https://sgilson7.github.io/gear-master-2d/>
 
-**M8 is the last block that was deployed.** M9.0 through M9.4 are committed and
-green and have not been pushed — `git log origin/main..HEAD` is the check and it
-costs nothing. See *A deployed fix is not a delivered fix*: the failure this
-catches has happened here, and the deploy is a human's.
+**M9 is live**, deployed at `bff4f77` on the human's word and verified against
+the live page rather than the local build — see *A deployed fix is not a
+delivered fix*, which is the section that says why those are two different
+things.
 
 **There is no plan for the next block.** `PLAN-M9.md` is done; `PLAN.md` §6b is
 the list of what M9.4's playthrough left open, and §6a is M8.8's.
@@ -1362,6 +1362,23 @@ live build 7808e551
   ok  log screen        ok  scout button   ok  one action bar
   ok  #numbers gone     console errors: none
 ```
+
+M9's was:
+
+```
+live build 20ac2295
+  crossings on the map        2       what they ask  [5, 9]
+  the north is shut           yes     the set names its item   yes
+  the card says what it does  yes     the sheet says it too    yes
+  console errors: none
+```
+
+**The live stamp will not match the one your laptop built**, and that is not a
+fault: the hash covers the built wasm, which is not bit-identical across
+toolchains, so CI's number is CI's. What has to match is the page against
+*itself* — `index.html` asking for `app.js?v=X` and that `app.js` carrying
+`BUILD = 'X'`. When those two disagree the self-heal navigates; when they agree
+a pinned tab is carried forward. Check that pair, not the number.
 
 The failure this catches is the one that has happened here: **the work was
 never deployed at all.** M8.0 through M8.8 sat local for a whole block while

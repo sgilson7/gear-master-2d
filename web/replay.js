@@ -22,6 +22,15 @@ const SHAKE_MS = 260;
 
 const POOL_COLOUR = ['#5aa8d8', '#c0553f', '#c8a33f', '#4f9e63'];
 
+/// One colour a curse. Four kinds, and the chip names itself in words as well,
+/// so the hue is a second channel rather than the only one.
+const CURSE_COLOUR = {
+  searing: '#c2643f',
+  frost: '#5aa8d8',
+  stun: '#9b7ad0',
+  misfire: '#c8a33f',
+};
+
 export class Replay {
   /// `card(item)` renders one item as a card. Passed in rather than imported
   /// so this file does not reach back into `app.js` — and so the fight screen
@@ -54,13 +63,16 @@ export class Replay {
     // starting combatants — not zero. A character who had taken Corked watched
     // the bar open empty and concluded the skill did nothing.
     const zero = [0, 0, 0, 0];
+    // The sixth column is the curses up on that side. Read off `Cursed` and
+    // `Stunned`, which carry the stack count and the whole time left; nothing
+    // here works one out.
     this.track = {
-      player: [[0, p.max_health, p.max_health, p.armor ?? 0, p.pools ?? zero]],
-      enemy: [[0, e?.max_health ?? 1, e?.max_health ?? 1, e?.armor ?? 0, e?.pools ?? zero]],
+      player: [[0, p.max_health, p.max_health, p.armor ?? 0, p.pools ?? zero, []]],
+      enemy: [[0, e?.max_health ?? 1, e?.max_health ?? 1, e?.armor ?? 0, e?.pools ?? zero, []]],
     };
     for (const x of log.entries) {
-      this.track.player.push([x.at, x.ph, x.pmax, x.pa, x.pp]);
-      this.track.enemy.push([x.at, x.eh, x.emax, x.ea, x.ep]);
+      this.track.player.push([x.at, x.ph, x.pmax, x.pa, x.pp, x.pc ?? []]);
+      this.track.enemy.push([x.at, x.eh, x.emax, x.ea, x.ep, x.ec ?? []]);
     }
     this.buildRows('player', this.you, log.player?.items ?? []);
     this.buildRows('enemy', this.them, e?.items ?? []);
@@ -138,7 +150,8 @@ export class Replay {
   at(track) {
     let v = track[0];
     for (const row of track) { if (row[0] <= this.t) v = row; else break; }
-    return { health: v[1], max: v[2], armor: v[3], pools: v[4] ?? [0, 0, 0, 0] };
+    return { health: v[1], max: v[2], armor: v[3], pools: v[4] ?? [0, 0, 0, 0],
+             chips: v[5] ?? [] };
   }
 
   /// The canvas sizes its own backing store to its box.
@@ -148,7 +161,8 @@ export class Replay {
   /// a third of a screen empty underneath it.
   fit() {
     const w = this.c.clientWidth || 900;
-    const h = 168;
+    // Two rows taller than it was: each side gained a line for its curses.
+    const h = 200;
     const dpr = window.devicePixelRatio || 1;
     this.c.width = Math.round(w * dpr);
     this.c.height = Math.round(h * dpr);
@@ -258,6 +272,35 @@ export class Replay {
       }
     };
 
+    /// The curses up on one side, each with its stacks, what it is doing,
+    /// and how long is left.
+    ///
+    /// **Read, never derived.** `until` is the event's own timestamp plus the
+    /// duration the event reported, and the countdown is that minus the
+    /// playback head. The effect string — "30/s", "-75%", "1 in 2" — is core's,
+    /// off the same constants the simulation reads, so a chip cannot drift
+    /// from the fight it is describing.
+    const chips = (y, up) => {
+      const live = up.filter((c) => c.until > this.t);
+      if (!live.length) {
+        g.fillStyle = ink3;
+        g.fillText('nothing on them', 0, y);
+        return;
+      }
+      let x = 0;
+      for (const c of live) {
+        const left = ((c.until - this.t) / 1000).toFixed(1);
+        const text = `${c.kind}${c.stacks > 1 ? ` ×${c.stacks}` : ''}` +
+                     `${c.effect ? ` ${c.effect}` : ''} · ${left}s`;
+        const w = g.measureText(text).width + 16;
+        g.fillStyle = CURSE_COLOUR[c.kind] ?? ink3;
+        g.fillRect(x, y - 11, w, 15);
+        g.fillStyle = '#14141c';
+        g.fillText(text, x + 8, y);
+        x += w + 8;
+      }
+    };
+
     const P = this.at(this.track.player), E = this.at(this.track.enemy);
     g.fillStyle = ink3;
     g.fillText('you', 0, 12);
@@ -265,13 +308,15 @@ export class Replay {
     armour(39, P.armor, P.max);
     g.fillStyle = ink;
     pools(70, P.pools);
+    chips(88, P.chips);
 
     g.fillStyle = ink3;
-    g.fillText(this.log.enemy?.name ?? 'it', 0, 96);
-    health(100, [E.health, E.max], rust);
-    armour(123, E.armor, E.max);
+    g.fillText(this.log.enemy?.name ?? 'it', 0, 112);
+    health(116, [E.health, E.max], rust);
+    armour(139, E.armor, E.max);
     g.fillStyle = ink;
-    pools(154, E.pools);
+    pools(170, E.pools);
+    chips(188, E.chips);
 
     g.fillStyle = ink3;
     g.textAlign = 'right';

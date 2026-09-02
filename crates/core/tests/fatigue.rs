@@ -149,20 +149,57 @@ fn a_restorative_is_spent_and_says_what_it_took() {
     assert_eq!(c.supply_count(&big.id), 0);
 }
 
-/// Everything on the shelf can be paid for by the fights that made you need it.
+
+/// **A town takes the tiredness off.**
+///
+/// Not a rest — there still is not one, and there should not be: health resets
+/// at every bell, so a rest would restore something that was never spent. What
+/// a town undoes is the one thing a fight *does* spend, which is what makes
+/// the walk home worth taking rather than a formality.
 #[test]
-fn a_restorative_costs_about_what_a_fight_pays() {
+fn a_town_takes_the_tiredness_off() {
+    let mut g = ready();
+    g.character.tire(PER_FIGHT * 6);
+    assert!(g.character.fatigue > 0, "nothing to take off");
+    let worn_health = g.character.player_stats().health;
+
+    let took = g.arrive_in_town("the-end-of-all-gears");
+    assert_eq!(took, PER_FIGHT * 6, "the town said it took the wrong amount off");
+    assert_eq!(g.character.fatigue, 0, "walked into a town and stayed worn out");
+    assert!(g.character.player_stats().health > worn_health, "the maximum did not come back");
+    assert_eq!(
+        g.character.player_stats().health,
+        g.character.rested_stats().health,
+        "a town left something worn off"
+    );
+    // And it remembers where you were, which is what a defeat walks you to.
+    assert_eq!(g.world.last_town, "the-end-of-all-gears");
+
+    // Arriving rested takes nothing off and says so with a zero.
+    assert_eq!(g.arrive_in_town("the-end-of-all-gears"), 0);
+}
+
+/// The tins are not decoration, and the shelf is priced for the world they are
+/// now in.
+///
+/// **A town mends you for nothing**, so a tin no longer buys back tiredness —
+/// it buys the walk home. Priced under what the fights it undoes pay, rather
+/// than at several times over, which is what the ceiling was when the only way
+/// to mend was to buy one.
+#[test]
+fn a_restorative_costs_less_than_the_walk_home() {
     let supplies = data::supplies();
     for s in &supplies.supplies {
         let fights = (s.restores + fatigue::PER_FIGHT - 1) / fatigue::PER_FIGHT;
-        // A tin should not cost more Fnorp than the fights it undoes are worth
-        // several times over; the pit pays about six a win.
+        // The pit pays about six a win.
         assert!(
-            s.price <= fights * 6,
-            "{} undoes {fights} fights and costs {} Fnorp",
+            s.price <= fights * 4,
+            "{} undoes {fights} fights and costs {} Fnorp, and a town does it for nothing",
             s.id,
             s.price
         );
-        assert!(s.price > 0, "{} is free", s.id);
+        // And not so cheap that carrying six is free. A tin has to be a
+        // purchase or the decision it exists to create is not one.
+        assert!(s.price >= fights, "{} is {} Fnorp, which is nothing", s.id, s.price);
     }
 }

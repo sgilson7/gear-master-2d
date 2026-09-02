@@ -16,7 +16,7 @@
 //! compile error here until somebody says what it does, which is the only way
 //! this stays true as the catalogue grows.
 
-use crate::piece::PieceDef;
+use crate::piece::{Action, PieceDef, Trigger};
 
 /// `+3` / `−3`, so a cost and a gain never read alike.
 fn signed(n: i32) -> String {
@@ -97,4 +97,33 @@ pub fn piece_lines(def: &PieceDef) -> Vec<(&'static str, String)> {
         out.push(("trigger", t.describe()));
     }
     out
+}
+
+/// What an item does **to somebody**: the curses it lands, and the stuns.
+///
+/// The third group on an item card, beside *standing still* and *every
+/// activation*. Fifty-nine components in the catalogue apply a curse and the
+/// card had no arm for `Action::Curse` at all — so a player could buy a Greave
+/// Mold, seat it, fight with it and never be told what it was for. The system
+/// was there; nothing said so.
+///
+/// **A curse is an every-activation effect with a target**, not a standing
+/// stat, which is why it is its own group rather than a line in the first one.
+/// The sentence is `Trigger::describe`'s and names who it lands on, so a
+/// component that curses its own wearer reads as the downside it is.
+pub fn curse_lines(triggers: &[Trigger]) -> Vec<String> {
+    triggers.iter().filter(|t| lands_a_curse(t)).map(|t| t.describe()).collect()
+}
+
+/// Does any action this trigger can reach put a curse on somebody?
+///
+/// Through `piece::walk_actions`, which is the engine's own walker — a second
+/// one here would miss the next trigger variant, which is exactly how the test
+/// suite's private copy went wrong.
+pub fn lands_a_curse(t: &Trigger) -> bool {
+    let mut hit = false;
+    crate::piece::walk_actions(t, &mut |a| {
+        hit |= matches!(a, Action::Curse { .. } | Action::StunStrongest { .. });
+    });
+    hit
 }

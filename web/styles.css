@@ -118,7 +118,6 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
 .receipt { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line);
   font-family: var(--mono); font-size: 13px; }
 .receipt p { margin: 0 0 4px; }
-#card-close { margin-top: 20px; }
 
 @media (max-width: 1040px) {
   .board { grid-template-columns: 1fr; }
@@ -134,6 +133,34 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
    column as a paragraph of prose. The original ran at 1600x980 with 36px
    cells; this gets as close as the viewport allows. */
 .screenbox { max-width: min(1560px, 97vw); margin: 0 auto; }
+/* **A framed screen: header, a scrolling middle, and one action row.**
+   The fight screen's three stages are 15, 19 and 3 lines tall, so a primary
+   button at the bottom of whichever one was showing sat at three different
+   heights — Fight, Skip to the end and Walk on were three targets. The bar is
+   pinned and the stages scroll under it, so the advance gesture is one place. */
+.screen.framed { display: flex; flex-direction: column; overflow: hidden;
+  padding-bottom: 0; }
+/* **The `.card[hidden]` trap again, and it bit again.** `.screen[hidden]` and
+   `.screen.framed` have the same specificity, so the later rule wins and a
+   hidden fight screen stayed laid out over the whole page — the town's Spend
+   it button resolved, was visible and enabled, and `#run` from the hidden
+   fight screen swallowed every click on it. Anything that sets `display` on an
+   element it also hides needs this line. */
+.screen.framed[hidden] { display: none; }
+.screen.framed > .screenbox { display: flex; flex-direction: column;
+  width: 100%; flex: 1; min-height: 0; }
+.stages { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding-bottom: 10px; }
+.actionbar { flex: none; display: flex; flex-wrap: wrap; gap: 8px;
+  border-top: 2px solid var(--ink); padding: 12px 0 16px; background: var(--ground); }
+.actionbar[hidden] { display: none; }
+/* One width for the three, so the box a player is aiming at is identical on
+   every stage and not merely in the same corner. */
+.actionbar .advance { min-width: 190px; text-align: center; justify-content: center; }
+/* The event card is a dialog rather than a screen: its box scrolls, so the bar
+   sticks to the bottom of the box. */
+.actionbar.sticky { position: sticky; bottom: -26px; margin-top: 20px;
+  background: var(--surface); }
+
 .fighthead { display: flex; flex-wrap: wrap; justify-content: space-between;
   gap: 20px; align-items: flex-start; border-bottom: 2px solid var(--ink);
   padding-bottom: 18px; margin-bottom: 20px; }

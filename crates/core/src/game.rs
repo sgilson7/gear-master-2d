@@ -76,6 +76,27 @@ impl Game {
     pub fn theme_name(&self, canonical: &'static str) -> String {
         crate::theme::by_id(&self.theme).monster(canonical).to_string()
     }
+
+    /// Walking into a town takes the tiredness off. Returns how much came off.
+    ///
+    /// **This is not a rest, and there still is not one.** Health has reset at
+    /// every bell since M0, so a rest would restore something that was never
+    /// spent — the note at the top of `CLAUDE.md` has said so for five
+    /// milestones. What a town undoes is the one thing a fight *does* spend.
+    ///
+    /// It does not make the tins decoration: a tin is what you drink four
+    /// tiles into the Verge with a Rust Colossus on the next square, and the
+    /// decision fatigue exists to create is that one. The town is what makes
+    /// the walk home worth taking rather than a formality.
+    ///
+    /// In core rather than in the shim, because "a town mends you" is a rule
+    /// and the shim decides nothing.
+    pub fn arrive_in_town(&mut self, id: &str) -> i32 {
+        self.world.last_town = id.to_string();
+        let took = self.character.fatigue;
+        self.character.fatigue = 0;
+        took
+    }
 }
 
 impl Default for Game {

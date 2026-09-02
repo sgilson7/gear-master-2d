@@ -352,3 +352,63 @@ fn the_four_nodes_a_player_took_all_do_something() {
     assert_eq!(after.strength - before.strength, 6, "Handspan");
     assert_eq!(c.start_with(), Held { armor: 12, mana: 20 }, "Corked and Funnel Drill");
 }
+
+// ------------------------------------------------- what an item does to them
+
+/// **Every piece that lands a curse says so.**
+///
+/// Fifty-nine components of five hundred and thirty-six apply one, six of them
+/// on a town shelf and two on the *starting* shelf — a Greave Mold and a Plain
+/// Sole, three Fnorp each. So a player has almost certainly bought, seated and
+/// fought with curse gear and been told nothing about it: the item card had no
+/// arm for `Action::Curse` at all.
+///
+/// The failure was never "curses are missing". They have been in the engine
+/// since the fork. It was that the one screen whose whole job is to say what a
+/// thing does did not mention them.
+#[test]
+fn the_card_says_what_an_item_does_to_them() {
+    use gm2d_core::explain::{curse_lines, lands_a_curse};
+    use gm2d_core::piece::{is_event_only, CATALOG};
+    let mut bad = Vec::new();
+    let mut counted = 0;
+    for d in CATALOG {
+        if !d.triggers.iter().any(lands_a_curse) {
+            continue;
+        }
+        counted += 1;
+        let lines = curse_lines(d.triggers);
+        if lines.is_empty() {
+            bad.push(d.name);
+            continue;
+        }
+        // And the sentence names the curse rather than merely admitting there
+        // is one. "It does something to them" is what the card said before.
+        let said = lines.join(" ").to_lowercase();
+        let named = gm2d_core::curse::CurseKind::ALL
+            .iter()
+            .any(|k| said.contains(k.name()))
+            || said.contains("stun");
+        if !named {
+            bad.push(d.name);
+        }
+        let _ = is_event_only(d.name);
+    }
+    assert!(bad.is_empty(), "pieces that curse and do not say so:\n  {}", bad.join("\n  "));
+    assert!(counted >= 50, "only {counted} pieces reach a curse, which is not the catalogue");
+}
+
+/// A piece that curses nobody says nothing about curses.
+///
+/// The inverse, because a group that appeared on every card would be a group
+/// that told you nothing.
+#[test]
+fn a_piece_that_curses_nobody_has_nothing_in_that_group() {
+    use gm2d_core::explain::curse_lines;
+    use gm2d_core::piece::CATALOG;
+    let plain = CATALOG
+        .iter()
+        .find(|d| d.name == "Oak Handle")
+        .expect("the starting handle");
+    assert!(curse_lines(plain.triggers).is_empty(), "the Oak Handle curses somebody");
+}

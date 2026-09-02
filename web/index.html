@@ -83,7 +83,11 @@
         <!-- Errands somebody standing here has, or has sent you back with. -->
         <div id="card-errands" class="shelf" hidden></div>
         <div id="card-receipt" class="receipt" hidden></div>
-        <button id="card-close" type="button" hidden>Walk on</button>
+        <!-- Pinned to the bottom of the box rather than to the bottom of the
+             prose. A long card used to put Walk on below the fold. -->
+        <div class="actionbar sticky" id="card-bar" hidden>
+          <button id="card-close" type="button" class="primary advance">Walk on</button>
+        </div>
       </div>
     </div>
 
@@ -156,7 +160,7 @@
       </div>
     </div>
 
-    <div id="town" class="screen" hidden>
+    <div id="town" class="screen framed" hidden>
       <div class="screenbox">
         <header class="fighthead">
           <div>
@@ -171,6 +175,7 @@
             <div><dt>Fnorp</dt><dd id="town-gold">&mdash;</dd></div>
           </dl>
         </header>
+        <div class="stages">
         <h3 class="sub-h">What they have</h3>
         <div id="shelf" class="shelf"></div>
         <!-- The errands. Hidden entirely where a town has none, rather than
@@ -179,22 +184,27 @@
           <h3 class="sub-h">What they want</h3>
           <div id="quests" class="shelf"></div>
         </div>
-        <p id="town-says" class="says" hidden></p>
         <!-- Experience is only worth something where somebody can write it
              down. This is that place. -->
         <h3 class="sub-h">Supplies</h3>
         <div id="tins" class="shelf"></div>
         <h3 class="sub-h">What you are carrying</h3>
         <p id="carrying" class="note"></p>
-        <div class="row">
+        </div><!-- /.stages -->
+        <p id="town-says" class="says" hidden></p>
+        <div class="actionbar">
+          <button id="pack" type="button" class="primary advance">Pack your frames</button>
           <button id="bank" type="button">Spend it</button>
-          <button id="pack" type="button" class="primary">Pack your frames</button>
           <button id="leave" type="button">Back out</button>
         </div>
       </div>
     </div>
 
-    <div id="fight" class="screen" hidden>
+    <!-- `framed`: the header and the action bar are pinned and the stages
+         scroll between them. The three stages are 15, 19 and 3 lines tall, so
+         a primary button at the bottom of whichever one is showing sat at
+         three different heights — the advance gesture was a moving target. -->
+    <div id="fight" class="screen framed" hidden>
       <div class="screenbox">
         <header class="fighthead">
           <div>
@@ -210,6 +220,7 @@
           </dl>
         </header>
 
+        <div class="stages">
         <div id="stage-board">
           <p class="note">Click a piece to pick it up, click a cell to seat it, right-click to turn it.
             Shift-click a finished item to lock it. Green is where it fits &mdash; core decides that, not the page.</p>
@@ -218,14 +229,6 @@
               <canvas id="board" width="900" height="420"></canvas>
               <p id="holding" class="holding"></p>
               <p id="board-says" class="says" hidden></p>
-              <div class="row">
-                <button id="go" type="button" class="primary">Fight</button>
-                <button id="undo" type="button">Undo</button>
-                <button id="preset" type="button">Auto-pack</button>
-                <button id="clear" type="button">Clear</button>
-                <button id="run" type="button">Walk away</button>
-                <button id="fight-save" type="button">Download save</button>
-              </div>
             </div>
             <aside class="made" id="made">
               <!-- Two boards, one panel. Yours and its, side by side in the
@@ -266,9 +269,6 @@
               <div id="ticks-them" class="tick-list"></div>
             </div>
           </div>
-          <div class="row">
-            <button id="skip" type="button">Skip to the end</button>
-          </div>
         </div>
         <!-- The hovered item's card. Pinned to the viewport, like the skill
              tree's, so a scrolling list does not drag it around. -->
@@ -277,7 +277,22 @@
         <div id="stage-result" hidden>
           <h3 id="result-title">&mdash;</h3>
           <div id="result-receipt" class="receipt"></div>
-          <div class="row"><button id="done" type="button" class="primary">Walk on</button></div>
+        </div>
+        </div><!-- /.stages -->
+
+        <!-- **One action row, in one place, for all three stages.** The
+             advance button is always the first thing in it and always the same
+             width, so Fight, Skip to the end and Walk on are one target rather
+             than three. -->
+        <div class="actionbar" id="fight-bar">
+          <button id="go" type="button" class="primary advance">Fight</button>
+          <button id="skip" type="button" class="primary advance" hidden>Skip to the end</button>
+          <button id="done" type="button" class="primary advance" hidden>Walk on</button>
+          <button id="run" type="button">Walk away</button>
+          <button id="undo" type="button">Undo</button>
+          <button id="preset" type="button">Auto-pack</button>
+          <button id="clear" type="button">Clear</button>
+          <button id="fight-save" type="button">Download save</button>
         </div>
       </div>
     </div>

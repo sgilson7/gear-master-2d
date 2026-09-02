@@ -424,7 +424,7 @@ function showCard(title, prose, choices, onPick) {
     box.appendChild(b);
   });
   $('card-receipt').hidden = true;
-  $('card-close').hidden = choices.length > 0;
+  $('card-bar').hidden = choices.length > 0;
   $('card').hidden = false;
 }
 
@@ -449,7 +449,7 @@ function openEvent(id) {
     box.replaceChildren(...(r.receipt.length ? r.receipt : ['Nothing you could point to'])
       .map((line) => { const p = document.createElement('p'); p.textContent = line; return p; }));
     box.hidden = false;
-    $('card-close').hidden = false;
+    $('card-bar').hidden = false;
     paintPanel(); draw(); autosave();
   });
 }
@@ -460,8 +460,28 @@ let board = null;
 let replay = null;
 let theirs = null;
 
+/// Packing in a town rather than in front of something. There is nothing to
+/// fight, so the advance slot belongs to the way out.
+let packingOnly = false;
+
+/// Which stage is showing, and what the one action row holds while it does.
+///
+/// **The bar does not move; its contents change.** The advance button is
+/// always first and always the same width, so Fight, Skip to the end and Walk
+/// on are one target. Before this each stage carried its own row and the three
+/// stages are 15, 19 and 3 lines tall.
 function stage(which) {
   for (const s of ['board', 'replay', 'result']) $(`stage-${s}`).hidden = s !== which;
+  const board = which === 'board';
+  $('go').hidden = !board || packingOnly;
+  $('skip').hidden = which !== 'replay';
+  $('done').hidden = which !== 'result';
+  for (const id of ['run', 'undo', 'preset', 'clear', 'fight-save']) $(id).hidden = !board;
+  // In a town there is nothing to fight, so the way out takes the slot rather
+  // than leaving it empty and sliding everything left.
+  const takes = packingOnly && board;
+  $('run').classList.toggle('advance', takes);
+  $('run').classList.toggle('primary', takes);
 }
 
 function openFight() {
@@ -640,6 +660,16 @@ function oneCard(i, where) {
   }
   if (!active.length) active.push(`<li class="none">it holds its shape and nothing else</li>`);
 
+  // **What it does to them.** A third half, and the one that was missing:
+  // fifty-nine components in the catalogue apply a curse and this card had no
+  // arm for one, so a Greave Mold's whole point never reached the screen that
+  // exists to explain it. Core's sentence, which names who it lands on — a
+  // piece that curses its own wearer reads as the downside it is.
+  const curses = (i.curses ?? []).length
+    ? `<span class="head">curses</span><ul class="stats curses">` +
+      i.curses.map((c) => `<li>${c}</li>`).join('') + `</ul>`
+    : '';
+
   return (`
     <div class="made-item" data-key="${i.pieces.join(',')}">
   <b>${i.name}</b>
@@ -650,6 +680,7 @@ function oneCard(i, where) {
   <ul class="stats">${passive}</ul>
   <span class="head">every activation — one every ${secs(i.cooldown_ms ?? 0)}s</span>
   <ul class="stats">${active.join('')}</ul>
+  ${curses}
     </div>`);
 }
 
@@ -1215,6 +1246,7 @@ function walk(dir) {
     paintPanel(); draw(); autosave();
   }
   if (r.shut) says(r.shut, true);
+  if (r.mended > 0) says(`Somebody puts a chair out. ${r.mended}% of you comes back.`);
   if (r.town) openTown(r.town);
   else if (r.event) openEvent(r.event);
   else if (r.encounter) openFight();
@@ -1391,6 +1423,9 @@ async function main() {
   window.__log = () => JSON.parse(quest_log_json());
   window.__guide = (id) => JSON.parse(guide_json(id));
   window.__hoverGuide = () => hoverGuide;
+  // Layout is the one claim reading the source cannot settle, so the gate has
+  // to be able to put the fight screen on each stage and measure it.
+  window.__stage = (which) => stage(which);
   window.__save = () => save_json();
   window.__errandMarks = () => JSON.parse(errand_marks_json()).places;
 
@@ -1424,7 +1459,7 @@ async function main() {
     // encounters and was keeping the last creature's portrait up while you
     // packed in a town.
     portrait($('fight-art'), null, '');
-    $('go').hidden = true;
+    packingOnly = true;
     $('run').textContent = 'Done';
     $('fight').hidden = false;
     stage('board');
@@ -1445,7 +1480,7 @@ async function main() {
   $('preset').onclick = () => { apply_preset(); board.refresh(); };
   $('clear').onclick = () => { clear_board(); board.refresh(); };
   $('run').onclick = () => {
-    if ($('go').hidden) { $('go').hidden = false; $('run').textContent = 'Walk away'; }
+    if (packingOnly) { packingOnly = false; $('run').textContent = 'Walk away'; }
     else flee();
     closeFight();
   };

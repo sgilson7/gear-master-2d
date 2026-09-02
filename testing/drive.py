@@ -838,6 +838,143 @@ def check_an_errand_can_be_handed_in_where_it_was_taken(page, name, fails):
     page.wait_for_selector("#card", state="hidden", timeout=5000)
 
 
+def check_the_replay_reports_a_curse(page, name, fails):
+    """A curse lands and the screen moves.
+
+    `Event::Cursed`, `Warded` and `Stunned` used to fall into the replay's
+    `_ => ("other", ...)` arm, so a Whisperling could stack frost on you for a
+    whole fight and nothing on the panel said a word. Curses have been in the
+    engine since the fork; the screen was the part that was missing.
+
+    Driven against **named** creatures rather than whatever the walk met: the
+    encounter is state, so planting one is the only way to ask this question of
+    a particular fight. Two of them, because a curse and a stun are two arms —
+    a stun rides on one named item and a curse stacks on the fighter, and a
+    check that only ever saw one would let the other rot. Both are creatures
+    this map actually holds.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+
+    for who, want in (("Whisperling", "cursed"), ("Bone Archer", "stunned")):
+        def against(body, who=who):
+            body["encounter"] = {"enemy": who, "at": body["world"]["at"]}
+
+        plant(page, base, against, stem="curse-probe")
+        page.wait_for_selector("#fight", state="visible", timeout=8000)
+
+        got = page.evaluate("""(want) => {
+          const log = JSON.parse(window.__fightJson());
+          const lands = log.entries.filter(e => e.kind === want);
+          if (!lands.length) return { none: true, kinds: [...new Set(log.entries.map(e => e.kind))] };
+          const first = lands[0];
+          const side = first.side === 'player' ? 'player' : 'enemy';
+          const r = window.__replay;
+          r.load(log);
+          // At the moment it lands.
+          r.t = first.at;
+          const up = r.at(r.track[side]).chips.filter(c => c.until > r.t);
+          // And after the last of them has run out.
+          const latest = Math.max(...up.map(c => c.until), 0);
+          r.t = latest + 1;
+          const after = r.at(r.track[side]).chips.filter(c => c.until > r.t);
+          // The stack count has to be the log's, not a tally the page kept.
+          const most = Math.max(...lands.map(e => e.index));
+          r.t = log.duration_ms;
+          const ever = r.track[side].flatMap(row => row[5] ?? []);
+          r.draw();
+          return { side, at: first.at, up, after: after.length, most,
+                   // What the log said landed. For a curse the entry carries
+                   // the kind; for a stun it carries the item that stopped,
+                   // and which item it was is the whole reason a stun is its
+                   // own event rather than a `Cursed`.
+                   want: want === 'cursed' ? first.item : 'stun',
+                   onItem: want === 'stunned' ? first.item : null,
+                   peak: Math.max(...ever.map(c => c.stacks), 0) };
+        }""", want)
+        if got.get("none"):
+            fails.append(f"{name}: a {who} landed no {want}; kinds were {got['kinds']}")
+        else:
+            if not got["up"]:
+                fails.append(f"{name}: a {want} landed at {got['at']}ms and no chip was up")
+            else:
+                c = got["up"][0]
+                for k in ("kind", "stacks", "until", "effect"):
+                    if k not in c:
+                        fails.append(f"{name}: a {who}'s chip is missing {k}: {c}")
+                if c.get("until", 0) <= got["at"]:
+                    fails.append(f"{name}: a {who}'s chip landed already expired: {c}")
+                if not str(c.get("effect", "")).strip():
+                    fails.append(f"{name}: the chip says {c.get('kind')!r} and not what it does")
+            named = [c for c in got["up"] if c.get("kind") == got["want"]
+                     and (got["onItem"] is None or c.get("item") == got["onItem"])]
+            if not named:
+                fails.append(f"{name}: the log landed {got['want']!r}"
+                             f"{'' if got['onItem'] is None else ' on ' + got['onItem']}"
+                             f" and the chips up are {got['up']}")
+            if got["after"] != 0:
+                fails.append(f"{name}: {got['after']} of a {who}'s chip(s) outlived their clock")
+            # Read, never derived: the deepest stack drawn is the deepest the
+            # log reported, not one the page counted for itself.
+            if want == "cursed" and got["peak"] != got["most"]:
+                fails.append(f"{name}: the log reported {got['most']} stacks and the panel "
+                             f"drew {got['peak']}")
+        page.click("#run")
+        page.wait_for_selector("#fight", state="hidden", timeout=8000)
+
+
+def check_the_advance_button_does_not_move(page, name, fails):
+    """The primary button is in the same place on all three fight stages.
+
+    The three stages are 15, 19 and 3 lines tall, so a button at the bottom of
+    whichever one was showing put Fight, Skip to the end and Walk on at three
+    different heights — the whole advance gesture was a moving target and the
+    cursor had to chase it.
+
+    Measured rather than read: this is a layout claim and layout is the one
+    thing reading the source cannot settle.
+    """
+    def box():
+        return page.evaluate("""() => {
+          const b = [...document.querySelectorAll('#fight-bar .advance')]
+            .find(e => !e.hidden && e.offsetParent !== null);
+          if (!b) return null;
+          const r = b.getBoundingClientRect();
+          return { id: b.id, x: Math.round(r.x), y: Math.round(r.y),
+                   w: Math.round(r.width), h: Math.round(r.height) };
+        }""")
+
+    was = page.evaluate(
+        "() => ['board','replay','result']"
+        ".find(s => !document.getElementById('stage-' + s).hidden) ?? 'board'")
+    seen = {}
+    try:
+        for which in ("board", "replay", "result"):
+            page.evaluate("(w) => window.__stage(w)", which)
+            page.wait_for_timeout(60)
+            got = box()
+            if not got:
+                fails.append(f"{name}: the {which} stage shows no advance button at all")
+                return
+            seen[which] = got
+    finally:
+        # Put the screen back where the walk left it. This check moves the
+        # stage in order to measure it, and a walk that carried on from the
+        # result stage would be clicking buttons that are not there.
+        page.evaluate("(w) => window.__stage(w)", was)
+    ids = {v["id"] for v in seen.values()}
+    if len(ids) != 3:
+        fails.append(f"{name}: the three stages share {len(ids)} advance button(s): {seen}")
+    first = seen["board"]
+    for which, got in seen.items():
+        for k in ("x", "y", "w", "h"):
+            if abs(got[k] - first[k]) > 2:
+                fails.append(f"{name}: the advance button's {k} is {got[k]} on the {which} "
+                             f"stage and {first[k]} on the board: {seen}")
+                return
+
+
 def check_the_log_points_somewhere(page, name, fails):
     """The log lists what is on you, and pinning one lights the map.
 
@@ -967,8 +1104,20 @@ def check_the_cave_is_shut_until_it_is_not(page, name, fails):
 
 
 def check_fatigue_wears_and_mends(page, name, fails):
-    """A fight tires you, the panel says so, and a tin takes it off."""
+    """A fight tires you and the panel says so.
+
+    **A defeat walks you home, and home is a town, and a town takes the
+    tiredness off.** So a lost fight ends rested — the wear happened and the
+    walk undid it — and this check has to know which fight it is looking at
+    rather than reporting the two rules meeting as a bug. That a town mends at
+    all is `check_a_town_takes_the_tiredness_off`, walked on its own.
+    """
+    lost = "You stop moving" in (page.text_content("#result-title") or "")
     before = page.evaluate("() => window.__character()")
+    if lost:
+        if before["fatigue"] != 0:
+            fails.append(f"{name}: walked home beaten and arrived {before['fatigue']}% worn")
+        return
     if before["fatigue"] <= 0:
         fails.append(f"{name}: fights have happened and nothing is worn off")
         return
@@ -977,6 +1126,51 @@ def check_fatigue_wears_and_mends(page, name, fails):
     worn = next((s["n"] for s in before["stats"] if s["label"] == "max health"), 0)
     if worn >= before["rested_health"]:
         fails.append(f"{name}: {before['fatigue']}% worn and the maximum did not move")
+
+
+def check_a_town_takes_the_tiredness_off(page, name, fails):
+    """Walking into a town undoes the wear, and says so.
+
+    Not a rest, and there still is not one: health resets at every bell, so a
+    rest would restore something that was never spent. What a town undoes is
+    the one thing a fight does spend, and it is what makes the walk home worth
+    taking rather than a formality.
+
+    Planted, because the walk cannot be relied on to arrive at a town tired —
+    and a check that only fires when it happens to is a check that stops
+    firing.
+    """
+    town = page.evaluate("""() => (window.__world().places ?? [])
+        .find(p => p.kind === 'town')""")
+    if not town:
+        fails.append(f"{name}: the overworld has no town on it")
+        return
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+
+    def tired(body):
+        body["world"]["at"] = [town["at"][0] + 1, town["at"][1]]
+        body["world"]["map"] = ""
+        body["character"]["fatigue"] = 32
+
+    plant(page, base, tired, stem="tired-probe")
+    if page.evaluate("() => window.__character().fatigue") != 32:
+        fails.append(f"{name}: the planted save did not arrive worn out")
+        return
+    page.keyboard.press("ArrowLeft")
+    page.wait_for_timeout(350)
+    after = page.evaluate("() => window.__character()")
+    if after["fatigue"] != 0:
+        fails.append(f"{name}: walked into a town 32% worn and came out {after['fatigue']}%")
+    if not page.is_visible("#town"):
+        fails.append(f"{name}: the step onto the town opened no town")
+    else:
+        page.click("#leave")
+        page.wait_for_selector("#town", state="hidden", timeout=5000)
+    if "not at all" not in (page.text_content("#fatigue") or ""):
+        fails.append(f"{name}: mended, and the panel still says "
+                     f"{page.text_content('#fatigue')!r}")
 
 
 def check_turning_in_hand(page, name, fails):
@@ -1214,6 +1408,9 @@ def walk_the_gate(browser, name):
             fails.append(f"{name}: a fight opened against nothing")
         check_the_portrait_shows(page, name, fails)
         check_their_gear_is_on_the_screen(page, name, fails)
+        # In a real fight, so the board stage's advance button is Fight rather
+        # than the town's Done — the three the ask actually names.
+        check_the_advance_button_does_not_move(page, name, fails)
         # A save taken here has to reopen the same fight.
         with page.expect_download(timeout=20000) as dl:
             page.click("#fight-save")
@@ -1494,6 +1691,8 @@ def walk_the_gate(browser, name):
     # **Last, because these plant saves.** They replace the character to stand
     # them somewhere the walk would take twenty minutes to reach, so anything
     # after them would be checking a game this walk did not play.
+    check_a_town_takes_the_tiredness_off(page, name, fails)
+    check_the_replay_reports_a_curse(page, name, fails)
     check_the_log_points_somewhere(page, name, fails)
     check_an_errand_can_be_handed_in_where_it_was_taken(page, name, fails)
     check_the_cave_is_shut_until_it_is_not(page, name, fails)
@@ -1567,6 +1766,9 @@ def main():
     print("ok: the cave is shut until you have the key, and short once you are in it")
     print("ok: a door you have already read reopens, and takes its errand back")
     print("ok: the log says where every errand wants you, and a pin outlives the screen")
+    print("ok: a curse lands, says what it is doing, and comes off its own clock")
+    print("ok: the advance button is the same box on all three fight stages")
+    print("ok: a town takes the tiredness off, and the panel says so")
     print("ok: your own figure becomes your class's when you take one")
     print("ok: a mid-fight save reopens the same fight")
     print("ok: walk, download, reload, upload — position and stream both came back")

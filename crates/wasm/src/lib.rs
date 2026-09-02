@@ -376,9 +376,14 @@ pub fn try_step(dir: &str) -> String {
                 }
             }
 
+            // **A town takes the tiredness off**, and says so. The rule is
+            // core's; this is where the arriving happens.
+            let mended = s.town.as_ref().map(|t| g.arrive_in_town(t)).unwrap_or(0);
+
             serde_json::json!({
                 "moved": s.moved,
                 "blocked": s.blocked,
+                "mended": mended,
                 "event": s.event,
                 "spent": s.spent,
                 "town": s.town,
@@ -702,6 +707,16 @@ fn item_card(
         push(banked[2] + st.faith, "devotion");
         push(banked[3] + st.nature, "harvest");
 
+        // **What it does to them.** Fifty-nine components in the catalogue
+        // apply a curse and this card had no arm for one, so a Greave Mold's
+        // whole point was missing from the screen that exists to explain it.
+        // Core's sentence, through `Trigger::describe`, which names who it
+        // lands on — so a piece that curses its own wearer reads as the
+        // downside it is rather than as an upgrade.
+        let curses: Vec<String> = profile
+            .map(|p| gm2d_core::explain::curse_lines(&p.triggers))
+            .unwrap_or_default();
+
         serde_json::json!({
             "pieces": i.pieces.iter().map(|p| p.0).collect::<Vec<_>>(),
             "cells": i.pieces.iter()
@@ -726,6 +741,7 @@ fn item_card(
             "cast_cost": gm2d_core::combat::SPELL_MANA_COST,
             "passive": passive,
             "active": active,
+            "curses": curses,
         })
 
 }
@@ -1125,6 +1141,26 @@ pub fn fight_json() -> String {
         let mut ep = e0
             .map(|c| [c.mana, c.rage, c.faith, c.nature])
             .unwrap_or([0; 4]);
+        // **The chips, read and never derived.** `Event::Cursed` carries the
+        // stack count *after* this one landed and the whole time left on the
+        // clock; `Event::Stunned` carries the whole time that item is now
+        // stopped for. So a chip is `{kind, stacks, until}` where `until` is
+        // the event's own timestamp plus its own duration — two numbers off
+        // the log and one addition. Nothing here works out how long a curse
+        // lasts, which is the mistake the health bar made and the armour bar
+        // made after it.
+        //
+        // A curse expiring produces no event, so a chip is dropped when the
+        // clock passes it. Pruned here by the entry's time and again by the
+        // playback head, which is what covers the gap between two entries.
+        let mut pchips: Vec<serde_json::Value> = Vec::new();
+        let mut echips: Vec<serde_json::Value> = Vec::new();
+        let chip = |kind: &str, stacks: u32, until: u32, effect: String, item: String| {
+            serde_json::json!({
+                "kind": kind, "stacks": stacks, "until": until,
+                "effect": effect, "item": item,
+            })
+        };
         let pool_index = |what: &str| match what {
             "mana" => Some(0),
             "rage" => Some(1),
@@ -1142,6 +1178,10 @@ pub fn fight_json() -> String {
                         if side == Side::Player { pp[i] = v } else { ep[i] = v }
                     }
                 };
+                // Anything whose clock has run out before this entry.
+                for chips in [&mut pchips, &mut echips] {
+                    chips.retain(|c| c["until"].as_u64().unwrap_or(0) > e.at_ms as u64);
+                }
                 let (kind, side, item, index, amount) = match &e.event {
                     Event::Activate { side, item, index } =>
                         ("activate", *side, item.clone(), *index as i64, 0),
@@ -1203,8 +1243,38 @@ pub fn fight_json() -> String {
                         ("fused", *side, (*what).to_string(), -1, *total as i64)
                     }
                     Event::Misfired { side, item } => ("misfire", *side, item.clone(), -1, 0),
-                    Event::Stunned { on, index, item, duration_ms, .. } =>
-                        ("stunned", *on, item.clone(), *index as i64, *duration_ms as i64),
+                    Event::Stunned { on, index, item, duration_ms, .. } => {
+                        let chips = if *on == Side::Player { &mut pchips } else { &mut echips };
+                        // A stun rides on one item, so the chip names it — two
+                        // items stopped at once is two chips, not two stacks.
+                        chips.retain(|c| !(c["kind"] == "stun" && c["item"] == *item));
+                        chips.push(chip(
+                            "stun",
+                            1,
+                            e.at_ms + duration_ms,
+                            "stopped".into(),
+                            item.clone(),
+                        ));
+                        ("stunned", *on, item.clone(), *index as i64, *duration_ms as i64)
+                    }
+                    Event::Cursed { on, kind, duration_ms, stacks } => {
+                        let chips = if *on == Side::Player { &mut pchips } else { &mut echips };
+                        chips.retain(|c| c["kind"] != kind.name());
+                        chips.push(chip(
+                            kind.name(),
+                            *stacks,
+                            e.at_ms + duration_ms,
+                            // The one number that says what it is *doing*:
+                            // "30/s", "-75%", "1 in 2". Core's, off the same
+                            // constants the simulation reads, so a chip cannot
+                            // drift from the fight.
+                            kind.effect_at(*stacks),
+                            String::new(),
+                        ));
+                        ("cursed", *on, kind.name().to_string(), *stacks as i64,
+                         *duration_ms as i64)
+                    }
+                    Event::Warded { side, item } => ("warded", *side, item.clone(), -1, 0),
                     Event::SuddenDeath { .. } => ("sudden", Side::Player, String::new(), -1, 0),
                     _ => ("other", Side::Player, String::new(), -1, 0),
                 };
@@ -1215,6 +1285,7 @@ pub fn fight_json() -> String {
                     "ph": ph.max(0), "pmax": pmax.max(1), "pa": pa.max(0),
                     "eh": eh.max(0), "emax": emax.max(1), "ea": ea.max(0),
                     "pp": pp, "ep": ep,
+                    "pc": pchips.clone(), "ec": echips.clone(),
                 })
             })
             .collect();
@@ -1277,6 +1348,11 @@ pub fn settle_fight() -> String {
                     }
                 });
                 if moved {
+                    // You arrived in a town, however you got there. It takes
+                    // the tiredness off the same as walking in would — a
+                    // defeat costs everything you were carrying, and arriving
+                    // wrecked on top of that is the same loss twice.
+                    g.arrive_in_town(&want);
                     break;
                 }
             }

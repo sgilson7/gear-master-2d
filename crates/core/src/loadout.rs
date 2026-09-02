@@ -404,6 +404,60 @@ pub fn agreed_name<'a>(names: impl IntoIterator<Item = Option<&'a str>>) -> Opti
     it.all(|n| n == Some(first)).then_some(first)
 }
 
+/// Every component in the catalogue that names this set.
+///
+/// **Derived, never listed.** A written-out list of what is in a set would be a
+/// second copy of the eight `names` fields, and this project has been bitten
+/// twice by a list of names written out by hand. Adding a fourth piece to a set
+/// is one `names` field and nothing else.
+pub fn set_pieces(name: &str) -> Vec<&'static str> {
+    crate::piece::CATALOG
+        .iter()
+        .filter(|d| d.assembly_bonus.is_some_and(|b| b.names == Some(name)))
+        .map(|d| d.name)
+        .collect()
+}
+
+/// The set this item **is**, if it is one whole.
+///
+/// Two conditions, and neither is enough on its own:
+///
+/// 1. **Agreement.** Every component in the item names the same set. This is
+///    what keeps a stranger out: two thirds of the Mandate plus somebody else's
+///    ring is not the Mandate, and an item that could pick up a set bonus by
+///    including one of its pieces would be a bonus off one component.
+/// 2. **Completeness.** Every component that names the set is in the item. Most
+///    recipes have an optional slot — gloves take nought to two rings and a
+///    helmet takes nought or one crest — so agreement alone would let two
+///    thirds of a three-piece set assemble and call itself the whole thing.
+///
+/// Both the name and the granted rules read this, which is the point: *a set is
+/// the set or it is gear*, and there is one answer to that question rather than
+/// one for the label and another for the rule.
+///
+/// Takes name pairs rather than a registry so it stays a function about a list.
+pub fn whole_set<'a>(
+    parts: impl IntoIterator<Item = (&'a str, Option<&'a str>)>,
+) -> Option<&'a str> {
+    let parts: Vec<(&str, Option<&str>)> = parts.into_iter().collect();
+    let agreed = agreed_name(parts.iter().map(|(_, s)| *s))?;
+    set_pieces(agreed)
+        .iter()
+        .all(|want| parts.iter().any(|(have, _)| have == want))
+        .then_some(agreed)
+}
+
+/// The same, for a group on a board.
+///
+/// The one call site everything else goes through, so `report` and
+/// `Character::rules` cannot answer "is this the Mandate" differently.
+pub fn set_of(reg: &PieceRegistry, pieces: &[PieceId]) -> Option<&'static str> {
+    whole_set(pieces.iter().map(|&p| {
+        let d = reg.def(p);
+        (d.name, d.assembly_bonus.and_then(|b| b.names))
+    }))
+}
+
 pub fn item_cooldown_ms(reg: &PieceRegistry, pieces: &[PieceId], kind: SlotKind) -> u32 {
     let core = pieces.iter().copied().find(|&p| reg.def(p).kind.is_core());
     let base = core
@@ -757,13 +811,7 @@ impl Loadout {
             // **A set has the name somebody wrote.** Only once it is finished:
             // three loose components in a bag are three components, and the
             // Mandate is what they make.
-            let written = assembled[gi]
-                .then(|| {
-                    agreed_name(group.iter().map(|&p| {
-                        reg.def(p).assembly_bonus.and_then(|b| b.names)
-                    }))
-                })
-                .flatten();
+            let written = assembled[gi].then(|| set_of(reg, group)).flatten();
             items.push(GearItem {
                 name: match written {
                     // Both halves the same: there is no short form of a name

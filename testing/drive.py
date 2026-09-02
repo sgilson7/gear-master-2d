@@ -1237,18 +1237,26 @@ def spin_gestures(page, name, fails):
         return
     page.wait_for_timeout(120)
 
-    # Two frames, a second apart, and both have to be orientations core named.
+    # Frames a second apart, and every one of them has to be an orientation
+    # core named.
+    #
+    # **Sampled until it moves, not exactly twice.** The board turns on the
+    # wall clock, so two samples a second apart are two samples of a moving
+    # thing and can land on the same face of it: a two-entry cycle sampled at
+    # 1060ms lands on the other face, and at 2120ms — one hiccup on a loaded
+    # machine — lands back on the first. That was a still picture reported as a
+    # broken feature, which is a flaky gate, which is worse than a red one. Six
+    # samples of a cycle of at least two cannot all be the same unless nothing
+    # is turning.
     seen = []
-    for _ in range(2):
+    for _ in range(6):
         seen.append(page.evaluate("""(key) => {
           window.__board.draw();
           const sp = window.__board.spun.find(s => s.key === key);
           return sp ? sp.cells.map(c => c.join(',')).sort().join(' ') : null;
         }""", got["key"]))
-        # **Longer than one turn**, or the two samples can land inside the same
-        # second and the check reports a still picture as a broken feature.
-        # Five hundred and sixty milliseconds did exactly that, about twice in
-        # five runs.
+        if len(set(seen)) > 1:
+            break
         page.wait_for_timeout(1060)
     if any(x is None for x in seen):
         fails.append(f"{name}: the board drew no footprint for the spinning item")
@@ -1259,8 +1267,8 @@ def spin_gestures(page, name, fails):
             fails.append(f"{name}: the board drew {drawn!r}, which is not one of the "
                          f"{len(legal)} orientations core named")
             return
-    if seen[0] == seen[1]:
-        fails.append(f"{name}: two frames half a second apart drew the same footprint "
+    if len(set(seen)) == 1:
+        fails.append(f"{name}: {len(seen)} frames a second apart drew the same footprint "
                      f"({seen[0]!r}), so nothing is turning")
 
     # And the card says what it is worth, in a number.
@@ -1271,6 +1279,154 @@ def spin_gestures(page, name, fails):
     }""", got["key"])
     if not said or "turns every second" not in said:
         fails.append(f"{name}: the card does not say the item turns: {said!r}")
+
+
+def seat_a_set(body, pieces, slot):
+    """Put a whole set on a grid, and give the grid room for it.
+
+    `pieces` is `[(name, x, y)]`. The registry is written whole and in order,
+    so a component appended to it is a `PieceId` at that index — which is what
+    `owned` and every board placement are.
+    """
+    reg = body["character"].setdefault("registry", [])
+    owned = body["character"].setdefault("owned", [])
+    board = next(b for b in body["character"]["boards"] if b[0] == slot)[1]
+    board["rows"] = max(board.get("rows", 3), 3)
+    # **The grid is cleared first.** These run late in the walk, on a character
+    # that has been shopping, so a set dropped on top of whatever was already
+    # seated would touch it and stop being a set — which is the rule working
+    # and reads here as the rule broken. Locks go too: they are registry
+    # indices into a board that no longer holds those pieces.
+    board["placed"] = []
+    body["character"]["locks"] = []
+    body.setdefault("world", {})["map"] = ""
+    for piece, x, y in pieces:
+        reg.append({"def": piece, "rot": 0})
+        owned.append(len(reg) - 1)
+        board["placed"].append([len(reg) - 1, x, y])
+
+
+MANDATE = [("Ratskin Material", 0, 0), ("Ratskin Mold", 2, 0), ("Rat Signet", 4, 0)]
+TOAD_SET = [("Toad Frame", 0, 0), ("Toad Hide", 3, 0)]
+
+
+def check_a_set_reads(page, name, fails):
+    """Three pieces in the bag, seated, and the card names the item and its rule.
+
+    Planted, because collecting a set is thirty-odd wins against one creature
+    and what a browser has to prove is what the screen says once you have it.
+    The engine's half — that the rule reaches the fight, that two thirds of a
+    set grants nothing — is `tests/sets.rs`.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+
+    def show_the_board(pieces, stem):
+        plant(page, base, lambda b: seat_a_set(b, pieces, "gloves"), stem=stem)
+        # **Refresh the board.** Loading a file repaints the map and the panel
+        # and deliberately not the packing board, which is not on screen when a
+        # save is loaded — so without this the cards below are the ones the
+        # previous plant drew, and the negative half of this check would read a
+        # stale name as a name that would not go away.
+        page.evaluate("() => window.__board.refresh()")
+        page.wait_for_timeout(150)
+
+    show_the_board(MANDATE, "set-probe")
+
+    got = page.evaluate("""() => {
+      const c = [...document.querySelectorAll('#panel-yours .made-item')]
+        .find(e => (e.querySelector('b')?.textContent ?? '').includes('Mandate'));
+      return {
+        rules: (window.__character().rules ?? []).map(r => r.line),
+        found: !!c,
+        isSet: c ? c.classList.contains('is-set') : false,
+        heads: c ? [...c.querySelectorAll('.head')].map(h => h.textContent.trim()) : [],
+        set: c ? [...c.querySelectorAll('.set-rules li')].map(li => li.textContent.trim()) : [],
+      };
+    }""")
+    if not got["found"]:
+        fails.append(f"{name}: the whole set is on the board and no card is called the Mandate")
+        return
+    if not got["isSet"]:
+        fails.append(f"{name}: the Mandate's card is not marked as a set")
+    if not got["set"]:
+        fails.append(f"{name}: the Mandate's card says nothing about what the set does: "
+                     f"{got['heads']}")
+    elif not any(ch.isdigit() for ch in " ".join(got["set"])):
+        fails.append(f"{name}: the set's line names no number: {got['set']}")
+    # And the sheet says it too, because a rule moves no bar and a screen that
+    # never printed it could not be told from a rule that does nothing.
+    if not got["rules"]:
+        fails.append(f"{name}: wearing a whole set and the character reports no rules")
+    sheet = page.evaluate(
+        "() => [...document.querySelectorAll('#sheet li.rule')].map(li => li.textContent.trim())")
+    if not sheet:
+        fails.append(f"{name}: the sheet prints no rule for a set that grants one")
+
+    # Two thirds of it is a glove. Break the thing the check guards and watch
+    # the name go away — the negative half, in the same run.
+    show_the_board(MANDATE[:2], "set-probe-2")
+    still = page.evaluate("""() => ({
+      named: [...document.querySelectorAll('#panel-yours .made-item b')]
+        .some(b => b.textContent.includes('Mandate')),
+      rules: (window.__character().rules ?? []).length,
+    })""")
+    if still["named"]:
+        fails.append(f"{name}: two thirds of the set still answers to the whole name")
+    if still["rules"]:
+        fails.append(f"{name}: two thirds of the set still grants {still['rules']} rule(s)")
+
+
+def check_the_toad_walks_on_water(page, name, fails):
+    """The lake is a wall at its middle and ground at its rim, and only for a toad.
+
+    One step, planted: stand on the grass at the top of the lake, walk south
+    into the rim, and then south again into water that touches nothing but
+    water. The fourteen-and-fourteen shape is `tests/sets.rs`; what this proves
+    is that the allowance reaches `world::step` in a browser.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+
+    def dry(body):
+        body.setdefault("world", {})["at"] = [7, 8]
+        body["world"]["map"] = ""
+
+    def wet(body):
+        dry(body)
+        seat_a_set(body, TOAD_SET, "chest")
+
+    plant(page, base, dry, stem="wade-probe")
+    page.keyboard.press("ArrowDown")
+    page.wait_for_timeout(250)
+    dismiss_card(page)
+    close_fight(page)
+    if page.text_content("#coords").strip() != "7, 8":
+        fails.append(f"{name}: water let a frame through at {page.text_content('#coords')!r}")
+
+    plant(page, base, wet, stem="wade-probe-2")
+    if not (window_rules := page.evaluate("() => (window.__character().rules ?? []).length")):
+        fails.append(f"{name}: the toad set is on the board and grants nothing")
+        return
+    page.keyboard.press("ArrowDown")
+    page.wait_for_timeout(250)
+    dismiss_card(page)
+    close_fight(page)
+    at = page.text_content("#coords").strip()
+    if at != "7, 9":
+        fails.append(f"{name}: the toad set did not open the rim; stopped at {at!r}")
+        return
+    # And the middle is still the middle.
+    page.keyboard.press("ArrowDown")
+    page.wait_for_timeout(250)
+    dismiss_card(page)
+    close_fight(page)
+    at = page.text_content("#coords").strip()
+    if at != "7, 9":
+        fails.append(f"{name}: the middle of the lake opened as well; walked to {at!r}")
+    assert window_rules
 
 
 def check_scouting_is_earned(page, name, fails):
@@ -2224,6 +2380,10 @@ def walk_the_gate(browser, name, fails=None):
     check_an_errand_can_be_handed_in_where_it_was_taken(page, name, fails)
     check_the_cave_is_shut_until_it_is_not(page, name, fails)
 
+    # --- what a creature leaves behind ---------------------------------------
+    check_a_set_reads(page, name, fails)
+    check_the_toad_walks_on_water(page, name, fails)
+
     # --- scouting ------------------------------------------------------------
     check_scouting_is_earned(page, name, fails)
 
@@ -2304,6 +2464,8 @@ def main():
     print("ok: a licensee buys an ench, bolts it on, switches it off and takes it back")
     print("ok: a spinning item turns, and turns to somewhere core said it could")
     print("ok: the wall grows a door, the key opens it, and the demo ends there")
+    print("ok: a whole set names its own item and says what it does; two thirds of one does not")
+    print("ok: the lake is ground at its rim to a toad, and a wall through its middle to everybody")
     print("ok: the class fork opens on top of the town it is offered in")
     print("ok: your own figure becomes your class's when you take one")
     print("ok: a mid-fight save reopens the same fight")

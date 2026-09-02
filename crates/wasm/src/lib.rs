@@ -690,6 +690,7 @@ fn ench_json(
 fn item_card(
     i: &gm2d_core::loadout::GearItem,
     slot: &gm2d_core::slot::Slot,
+    reg: &gm2d_core::piece::PieceRegistry,
     profiles: &[gm2d_core::loadout::ItemProfile],
     stats: gm2d_core::stats::Stats,
 ) -> serde_json::Value {
@@ -819,6 +820,21 @@ fn item_card(
             .map(|p| gm2d_core::explain::curse_lines(&p.triggers))
             .unwrap_or_default();
 
+        // **A set, if it is one whole.** A rule pays off the set and not off a
+        // component, so the card asks the same question `Character::rules`
+        // does rather than reading the pieces itself.
+        let set = i.assembled.then(|| gm2d_core::loadout::set_of(reg, &i.pieces)).flatten();
+        let rules: Vec<serde_json::Value> = match set {
+            None => Vec::new(),
+            Some(_) => i
+                .pieces
+                .iter()
+                .filter_map(|&p| reg.def(p).assembly_bonus)
+                .flat_map(|b| b.grants)
+                .map(|r| serde_json::json!({ "line": r.line(), "detail": r.detail() }))
+                .collect(),
+        };
+
         serde_json::json!({
             "pieces": i.pieces.iter().map(|p| p.0).collect::<Vec<_>>(),
             "cells": i.pieces.iter()
@@ -855,6 +871,19 @@ fn item_card(
             // The orientations themselves, so the board can turn the footprint
             // without working a rotation out for itself.
             "turns": profile.map(|p| p.turn_cycle.clone()).unwrap_or_default(),
+            // **What the set is, and what it does that no stat can.**
+            //
+            // `set_of` is the same answer `Character::rules` reads, so the card
+            // and the rule cannot disagree about whether this is the Mandate.
+            // `null` for the five hundred and thirty-six components that are
+            // not part of one, which is nearly every card ever drawn.
+            //
+            // The lines are `Rule::line`, unthemed and with the number in them
+            // — TONE 13a, the same register the sheet prints them in and the
+            // same one a skill node's spec is written in. The item's *name* is
+            // the world's; this is the engine's.
+            "set": set,
+            "rules": rules,
         })
 
 }
@@ -917,7 +946,7 @@ pub fn board_json() -> String {
                 let items: Vec<_> = report
                     .items
                     .iter()
-                    .map(|i| item_card(i, slot, &profiles, stats))
+                    .map(|i| item_card(i, slot, &ch.registry, &profiles, stats))
                     .collect();
                 serde_json::json!({
                     "slot": slot_name(k),
@@ -1126,7 +1155,7 @@ fn side_slots(
                 .report(reg, k)
                 .items
                 .iter()
-                .map(|i| item_card(i, slot, profiles, stats))
+                .map(|i| item_card(i, slot, reg, profiles, stats))
                 .collect();
             serde_json::json!({
                 "slot": slot_name(k),
@@ -1159,7 +1188,7 @@ fn side_items(
         let slot = lo.slot(k);
         for i in &lo.report(reg, k).items {
             if i.assembled {
-                cards.push((i.pieces.clone(), item_card(i, slot, profiles, stats)));
+                cards.push((i.pieces.clone(), item_card(i, slot, reg, profiles, stats)));
             }
         }
     }

@@ -1,5 +1,8 @@
+use std::borrow::Cow;
+
 use crate::combat::DamageType;
 use crate::curse::CurseKind;
+use crate::rule::Rule;
 use crate::shape::Shape;
 use crate::stats::{StatKind, Stats};
 
@@ -1473,6 +1476,25 @@ impl PieceRegistry {
 /// diagonal sevenfold, adjacent fivefold, aligned fourfold, and
 /// `PerAdjacentItem` threefold because the count multiplies it again. Capped at
 /// twenty-six so the top of the range answers a swing rather than replacing it.
+/// The three sets the pit's creatures drop, by the name their finished item
+/// takes.
+///
+/// **Constants and not literals**, because a set's name is a key: it is what
+/// `loadout::set_pieces` matches on to work out what else belongs to the set,
+/// so a typo in one of eight `names` fields would be a set that can never be
+/// whole and nothing would say so.
+///
+/// **Not themed.** Every other name in this file is canonical and the theme
+/// gives the player's word for it; these are the player's word already. A name
+/// somebody wrote is a proper noun and a proper noun is not translated — which
+/// is also why they read in the book's voice rather than the engine's.
+pub const MANDATE: &str = "The Rat King's Mandate";
+pub const TOAD_FRAME: &str = "The Toad's Own Frame";
+pub const WEAVE: &str = "The Wallspider Weave";
+
+/// Every set this build ships. `tests/sets.rs` walks it.
+pub const SETS: &[&str] = &[MANDATE, TOAD_FRAME, WEAVE];
+
 pub static CATALOG: &[PieceDef] = &[
     // ---- Gear that is going somewhere ----
     //
@@ -11395,7 +11417,7 @@ pub static CATALOG: &[PieceDef] = &[
         base: Stats { armor: 5, health: 14, ..Stats::ZERO },
         assembly_bonus: Some(AssemblyBonus {
             grants: &[],
-            names: None,
+            names: Some(MANDATE),
             label: "Ratskin",
             stats: Stats::health(40),
             triggers: &[],
@@ -11422,7 +11444,7 @@ pub static CATALOG: &[PieceDef] = &[
         base: Stats::ZERO,
         assembly_bonus: Some(AssemblyBonus {
             grants: &[],
-            names: None,
+            names: Some(MANDATE),
             label: "Ratgrip",
             stats: Stats::strength(3),
             triggers: &[],
@@ -11445,8 +11467,12 @@ pub static CATALOG: &[PieceDef] = &[
         cells: &[(0, 0)],
         base: Stats { armor: 6, ..Stats::ZERO },
         assembly_bonus: Some(AssemblyBonus {
-            grants: &[],
-            names: None,
+            // **The rule rides one component and pays off the whole set.**
+            // `loadout::set_of` is what makes that true: an item grants what
+            // its components grant only when it is the set entire, so the
+            // signet in somebody else's glove is a signet in a glove.
+            grants: &[Rule::Rout { creature: Cow::Borrowed("Cave Rat") }],
+            names: Some(MANDATE),
             label: "Ratmark",
             stats: Stats::health(20),
             triggers: &[],
@@ -11469,7 +11495,7 @@ pub static CATALOG: &[PieceDef] = &[
         base: Stats { health: 55, regen: 2, ..Stats::ZERO },
         assembly_bonus: Some(AssemblyBonus {
             grants: &[],
-            names: None,
+            names: Some(TOAD_FRAME),
             label: "Broadback",
             stats: Stats::health(60),
             triggers: &[Trigger::OnActivate(Action::GainArmor(8))],
@@ -11489,8 +11515,8 @@ pub static CATALOG: &[PieceDef] = &[
         cells: &[(0, 0), (1, 0), (0, 1), (1, 1)],
         base: Stats { health: 30, armor: 9, ..Stats::ZERO },
         assembly_bonus: Some(AssemblyBonus {
-            grants: &[],
-            names: None,
+            grants: &[Rule::Wade],
+            names: Some(TOAD_FRAME),
             label: "Wetleather",
             stats: Stats::regen(4),
             triggers: &[],
@@ -11514,7 +11540,7 @@ pub static CATALOG: &[PieceDef] = &[
         base: Stats { mind_resist: 6, mana: 2, ..Stats::ZERO },
         assembly_bonus: Some(AssemblyBonus {
             grants: &[],
-            names: None,
+            names: Some(WEAVE),
             label: "Manybones",
             stats: Stats::mind(6),
             triggers: &[Trigger::OnActivate(Action::GainMana(6))],
@@ -11538,7 +11564,7 @@ pub static CATALOG: &[PieceDef] = &[
         base: Stats { armor: 7, ..Stats::ZERO },
         assembly_bonus: Some(AssemblyBonus {
             grants: &[],
-            names: None,
+            names: Some(WEAVE),
             label: "Splintered",
             stats: Stats::health(25),
             triggers: &[],
@@ -11558,8 +11584,17 @@ pub static CATALOG: &[PieceDef] = &[
         cells: &[(0, 0), (0, 1)],
         base: Stats { mana: 3, ..Stats::ZERO },
         assembly_bonus: Some(AssemblyBonus {
-            grants: &[],
-            names: None,
+            // **A set that does not change the world.** The cheapest good
+            // bonus is a rule the engine already reads end to end: the
+            // Patent's nodes have granted this one since M8.3 and combat
+            // translates it into a `Combatant` field at the bell. So the third
+            // set costs no new combat code at all, and it teaches that a set
+            // is not always a key to somewhere.
+            grants: &[Rule::CurseOnActivate {
+                slot: Cow::Borrowed("helmet"),
+                curse: Cow::Borrowed("misfire"),
+            }],
+            names: Some(WEAVE),
             label: "Fletched",
             stats: Stats::health(20),
             triggers: &[Trigger::OnActivate(Action::GainMana(3))],

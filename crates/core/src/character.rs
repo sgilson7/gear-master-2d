@@ -1263,6 +1263,15 @@ impl Character {
         let mut out = Vec::new();
         for report in self.loadout.reports(&self.registry) {
             for item in report.items.iter().filter(|i| i.assembled) {
+                // **The set or nothing.** A rule off one component would be a
+                // rule off one component, and the whole ask was that a set
+                // bonus applies when the assembled item is recombined.
+                // `set_of` is the single answer to "is this the Mandate" —
+                // the same one the name reads, so the card and the rule cannot
+                // disagree.
+                if crate::loadout::set_of(&self.registry, &item.pieces).is_none() {
+                    continue;
+                }
                 for &p in &item.pieces {
                     let Some(b) = self.registry.def(p).assembly_bonus else { continue };
                     out.extend(b.grants.iter().cloned());

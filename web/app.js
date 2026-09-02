@@ -810,10 +810,20 @@ function oneCard(i, where) {
       i.curses.map((c) => `<li>${c}</li>`).join('') + `</ul>`
     : '';
 
+  // **What a set does that no stat can.** Only on a whole set — core answers
+  // that, and the card and the rule read the same answer. Unthemed and with
+  // the number in it, the same register the sheet prints a rule in: the name
+  // above carries the world and this carries the rule.
+  const rules = (i.rules ?? []).length
+    ? `<span class="head">the whole set</span><ul class="stats set-rules">` +
+      i.rules.map((r) => `<li title="${(r.detail ?? []).join(' ')}">${r.line}</li>`).join('') +
+      `</ul>`
+    : '';
+
   return (`
-    <div class="made-item" data-key="${i.pieces.join(',')}">
+    <div class="made-item${i.set ? ' is-set' : ''}" data-key="${i.pieces.join(',')}">
   <b>${i.name}</b>
-  <span class="built">${where} · built on ${article(i.core)}</span>
+  <span class="built">${i.set ? 'a set · ' : ''}${where} · built on ${article(i.core)}</span>
   <span class="rank"><span class="pips">${pips}</span> ${i.rarity.toUpperCase()}
     · rating ${i.rating}${next}</span>
   <span class="head">standing still</span>
@@ -821,6 +831,7 @@ function oneCard(i, where) {
   <span class="head">every activation — one every ${secs(i.cooldown_ms ?? 0)}s</span>
   <ul class="stats">${active.join('')}</ul>
   ${curses}
+  ${rules}
     </div>`);
 }
 

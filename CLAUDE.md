@@ -119,6 +119,19 @@ something cost a day.
 - **A derived number needs somewhere it is shown**, or it cannot be told from a
   bug. Four skills worked perfectly and were reported as broken because nothing
   printed them.
+- **A promise on an irreversible screen must reach something.** Two shipped
+  classes advertised a number and delivered nothing — `Showstopper` for two
+  milestones and `Recycler` for one — and the fork does not come off, so a
+  player who took either spent the one choice the game does not let them retake.
+  `every_offered_class_reaches_something` is the guard and it has to **call
+  rather than declare**: its first version matched the variant and named where
+  the power was honoured, which a stubbed payout passed cleanly. *A lint that
+  reads a list rather than the behaviour is the failure it exists to catch, one
+  level up.*
+- **Derived, never banked — and that includes a thing, not only a number.** A
+  node that hands over an ench does not write it into the save; the save carries
+  the node. `Character::enchs` reads it fresh, the same way `player_stats` reads
+  the tree, so retuning what a node awards retunes every character who took it.
 
 ## Commands
 
@@ -136,6 +149,11 @@ chosen to exercise checks and asserts; the second starts a new game and plays
 it, and its output is a transcript rather than a verdict. The second is the one
 that found an Auto-pack seating the starting kit for the whole game and a class
 fork opening underneath the town — both of which the first was green through.
+
+**`make test-ui` builds and `testing/drive.py` does not.** Running the driver
+directly walks whatever is in `dist/web`, which is how a new `Event` variant was
+reported missing for two runs in M10.1. If a check is failing on something you
+have just written, rebuild before you believe it.
 
 **It reaches the ending now**, which it never had before: M9.4 taught it two
 things a player already knew — that a road refused three times is a road you
@@ -1491,6 +1509,19 @@ was the wrong first move and made it look worse.
 handler is `async`; four hundred milliseconds is a guess, and a guess that is
 wrong reads every assertion after it against the previous game.
 
+**A check that needs something to happen has to make sure it can.** The first
+version of the broken-item check walked into whatever the ground rolled — and a
+weapon's bar is two to four seconds against a rat that dies in less, so the item
+under test never came round. It passed once and then failed in two browsers of
+three. It plants the fight now: bolt the ench on, download *that* save, and
+re-plant it with a Rust Colossus standing in front of you.
+
+**Taking a class off a save is not the same as not being a licensee.** A
+level-five character with no class is *owed* one, so the load opens the fork —
+the one screen that does not come off — and every click after it lands in a
+modal. A plant that wants an unlicensed character sets a class that is not the
+Patent's, rather than removing the field.
+
 And the old one: **a check that opens a screen has to close it on every path
 out.** A check that appended a failure and
 returned early left the screen up, the next check died on a click it could not
@@ -1607,6 +1638,7 @@ about a string. Every one caught something on its first run:
 | 1.10 | Actions builds and publishes to Pages. No `docs/`, no human-run `make publish` rebuild. The brief described gear-master, which predates both house web repos and ships macroquad. | `.github/workflows/deploy.yml` |
 | 9.1 | **A crossing guards a region, not its own tile.** `PLAN-M9.md` §M9.3 wrote it as a tile you may pass; the map is twelve tiles of open ground across every boundary, so that is a dozen crossings in a row, which is the wall the same section rejects. | `crates/core/src/world.rs`, `PlaceKind::Crossing` |
 | 9.2 | **The third set grants a `Rule` rather than an assembly trigger.** §M9.2 proposed the trigger because it costs nothing; it also pays on any assembled item holding the piece, which is not a *set* bonus. The rule it grants is one the tree has granted since M8.3, so it still costs no combat code. `Rule` kinds went 5 → 7, not the table's 8. | `crates/core/src/piece.rs`, `WEAVE` |
+| 10.1 | **No divergences from `PLAN-M10.md`.** The row is here because its absence is worth stating: every deliverable landed as written, the three questions the human answered are folded in, and the two decisions the plan delegated — where the van's stock lives, and whether he restocks — were made in the commits that made them. What the plan did **not** contain is `ClassPower::Recycler` being dead, which is not a divergence but a discovery: see *Two promises that reached nothing*. | — |
 
 Also true, and not in the brief because it could not have been:
 
@@ -1734,9 +1766,18 @@ and level 9; the drop rate started at one in twenty and was retuned in M9.4
 against what a player counts. The Wallspider Weave was left unnamed by the human
 and is named here; say the word for a different one.
 
+**Answered by the human for `PLAN-M10.md`:** an item with the Swing on it breaks
+**for the fight** and not for good; **no town sells an ench**; and what a tree
+does not award is sold by one vendor who is not there until level ten. Everything
+else in that plan's §5 was taken as proposed — the Chonga Swing's name, where
+the van stands, `+200%`, no node that makes a fragile item fire twice, and no
+restocking.
+
 **`PLAN.md` §6b** is what M9.4's playthrough left open — the pool weight that
 makes one set three times dearer than the others, and whether Auto-pack should
-know what a set is.
+know what a set is. **§6c** is M10.3's, and its top row is the only number in
+either that nobody has argued about: Top of the Bill's ten-second window is open
+two thirds of the time.
 
 **No longer open:** errands exist, as `crates/core/src/quest.rs` — a new module
 rather than upstream's, which was a chain of receipts along a road. `town.rs`

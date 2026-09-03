@@ -144,6 +144,11 @@ pub fn rout(game: &mut Game) -> Option<Rout> {
     }
     let e = game.encounter.take()?;
     let difficulty = Difficulty::Easy;
+    // **The plain bounty, and no speed bonus.** `Showstopper` pays for winning
+    // a fight quickly and there was no fight to be quick about — the same
+    // reasoning that makes a rout cost no tiredness. A routed rat paying half
+    // again for taking no time at all would be the one arrangement in the game
+    // where a class is paid for something not happening.
     let gold = reward::bounty_for(Outcome::Victory, spec.bounty);
     let rating = crate::rating::creature_rating(spec, difficulty);
     let xp = reward::xp_for(Outcome::Victory, crate::progression::xp_for_rating(rating));
@@ -221,7 +226,13 @@ pub fn settle(game: &mut Game, log: &CombatLog, difficulty: Difficulty) -> Optio
     let e = game.encounter.take()?;
     let spec = spec(&e)?;
 
-    let gold = reward::bounty_for(log.outcome, spec.bounty);
+    // **What the class adds, if it adds anything.** A settlement rule is read
+    // where a settlement happens; `combat` ignores these on purpose and would
+    // have gone on ignoring them for ever.
+    let worn: Vec<crate::class::ClassDef> =
+        game.character.class_def().into_iter().cloned().collect();
+    let plain = reward::bounty_for(log.outcome, spec.bounty);
+    let gold = reward::bounty_with_class(log.outcome, spec.bounty, &worn, log.duration_ms);
     let rating = crate::rating::creature_rating(spec, difficulty);
     let xp = reward::xp_for(log.outcome, crate::progression::xp_for_rating(rating));
 
@@ -239,7 +250,18 @@ pub fn settle(game: &mut Game, log: &CombatLog, difficulty: Difficulty) -> Optio
     match log.outcome {
         Outcome::Victory => {
             game.character.gold += gold;
-            receipt.push(format!("+{gold} Fnorp"));
+            // Two facts and two lines: what it was worth, and what being quick
+            // about it was worth. One number would have hidden the whole of
+            // what the class does — *a derived number needs somewhere it is
+            // shown*, and this is the only place this one appears.
+            receipt.push(format!("+{plain} Fnorp"));
+            if gold > plain {
+                receipt.push(format!(
+                    "+{} more for the speed of it. {:.1}s.",
+                    gold - plain,
+                    log.duration_ms as f32 / 1000.0
+                ));
+            }
             // **Carried, not spent.** A win pays experience into your pocket
             // and nothing else: no level, no point, no row. A town is the only
             // place that turns it into any of those, and a defeat before you

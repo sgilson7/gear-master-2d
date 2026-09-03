@@ -2452,16 +2452,17 @@ pub fn take_skill(id: &str) -> String {
 /// a sentence about the rule.
 #[wasm_bindgen]
 pub fn class_offer_json() -> String {
-    // Four now. The Kaklon Patent is the ench class, and enching is what it
-    // *is* rather than a node inside it — so the fork is the gate.
-    const OFFERED: [&str; 4] = ["Berserker", "Hexweaver", "Bloodletter", "Recycler"];
+    // **The roster is core's.** It was a `const` here and a second copy in
+    // `tests/classes.rs`, which is a rule decided in the shim written down
+    // twice — see `class::OFFERED`.
+    let offered = gm2d_core::class::OFFERED;
     with(|g| {
         if !g.character.owed_a_class() {
             return "null".into();
         }
         let theme = gm2d_core::theme::by_id(&g.theme);
         let tree = gm2d_core::data::skills();
-        let offer: Vec<_> = OFFERED
+        let offer: Vec<_> = offered
             .iter()
             .filter_map(|canonical| {
                 let def = gm2d_core::class::CLASSES.iter().find(|c| c.name == *canonical)?;

@@ -230,11 +230,17 @@ fn an_aimed_stun_passes_over_a_broken_item() {
 
 // ------------------------------------------------------------------ the file
 
-/// The ench is on the van's table and nowhere else, and it says both halves.
+/// **The Swing is a class's, and it says both halves of what it does.**
+///
+/// M10.1 shipped it on the van's table with no class attached, so the mechanic
+/// could get a player's opinion before anything was built on it —
+/// `PLAN-M10.md` said moving it into the tree afterwards would cost nothing,
+/// and M10.2 moved it. It is priceless now, like the Yodregar Index and for the
+/// same reason: a thing you can buy is not a thing a class is *about*.
 #[test]
-fn the_swing_is_sold_and_says_what_it_costs() {
+fn the_swing_is_a_class_s_and_says_what_it_costs() {
     let e = fragile();
-    assert!(e.price.is_some(), "the van cannot sell what has no price");
+    assert!(e.price.is_none(), "it is awarded, so nothing prices it");
     let line = e.effect.line();
     assert!(line.contains("200"), "the spec does not name the power: {line:?}");
     assert!(
@@ -248,7 +254,21 @@ fn the_swing_is_sold_and_says_what_it_costs() {
         .flat_map(|w| w.places.clone())
         .flat_map(|p| p.sells)
         .collect();
-    assert!(sold.contains(&e.id), "{} is on nobody's table", e.id);
+    assert!(!sold.contains(&e.id), "{} is on a table, and it is a class's", e.id);
+
+    let tree = data::skills();
+    let by = tree
+        .trees
+        .iter()
+        .find(|t| {
+            t.nodes.iter().any(|n| {
+                n.effects.iter().any(|f| {
+                    matches!(f, gm2d_core::skills::Effect::GivesEnch { ench } if *ench == e.id)
+                })
+            })
+        })
+        .unwrap_or_else(|| panic!("nothing awards {}", e.id));
+    assert!(by.class.is_some(), "the Swing is awarded by the base tree, so it is nobody's");
 }
 
 /// Bolting it on and taking it off leaves the board where it was.

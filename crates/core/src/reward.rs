@@ -52,6 +52,86 @@ pub fn bounty_for(outcome: Outcome, bounty: i32) -> i32 {
     }
 }
 
+/// What the classes add to a bounty, and what they add nothing to.
+///
+/// # Why this is here and not in `combat`
+///
+/// `Showstopper` — *a fight won under ten seconds pays fifty percent more* —
+/// existed, was tuned, was themed, and was **honoured nowhere**. `combat.rs`
+/// ignores it on purpose and correctly: it is a settlement rule and not a
+/// combat one, and the fight has nothing to do with it. But `fight::settle`
+/// never read the class either, so a player who took it would have paid an
+/// irreversible choice at level five for nothing at all — which is the failure
+/// eight skill nodes already cost this project two milestones.
+///
+/// So it lands where "what a fight pays" is argued, which is this file. §C.1 is
+/// the precedent: the bounty's rules live here even when the thing that moves
+/// them does not.
+///
+/// **Exhaustive**, so a class added to the game is a class somebody has decided
+/// does not pay, rather than one that quietly does not.
+/// `every_offered_class_reaches_something` is the other half of that guard.
+pub fn bounty_with_class(
+    outcome: Outcome,
+    bounty: i32,
+    classes: &[crate::class::ClassDef],
+    duration_ms: u32,
+) -> i32 {
+    use crate::class::ClassPower;
+    let base = bounty_for(outcome, bounty);
+    if base == 0 {
+        return 0;
+    }
+    let mut pct = 0;
+    for c in classes {
+        match c.power {
+            // The one that pays. Quick is measured off the log's own duration,
+            // so it is the fight that happened rather than an estimate of it.
+            ClassPower::Showstopper { pct: more, under_ms } => {
+                if duration_ms < under_ms {
+                    pct += more;
+                }
+            }
+            // Everything else is the fight's or the map's, and says so here so
+            // that adding a class is a decision about the purse rather than a
+            // silence. `Prospector` would belong here if anything in GM2D dealt
+            // a named creature's gear; nothing does.
+            ClassPower::Standing(_)
+            | ClassPower::SlowTime(_)
+            | ClassPower::Leeching(_)
+            | ClassPower::Overflowing(_)
+            | ClassPower::Echo(_)
+            | ClassPower::Bastion(_)
+            | ClassPower::Contagion(_)
+            | ClassPower::Longhaul { .. }
+            | ClassPower::Trundle { .. }
+            | ClassPower::Recycler { .. }
+            | ClassPower::Piety { .. }
+            | ClassPower::Tired { .. }
+            | ClassPower::Ticket { .. }
+            | ClassPower::Guilt
+            | ClassPower::Reprisal(_)
+            | ClassPower::Riposte(_)
+            | ClassPower::Momentum(_)
+            | ClassPower::Resonance(_)
+            | ClassPower::Transmute(_)
+            | ClassPower::Adaptable(_)
+            | ClassPower::Untimely(_)
+            | ClassPower::Cascade(_)
+            | ClassPower::Consecrate(_)
+            | ClassPower::Bloodscent(_)
+            | ClassPower::Confluence(_)
+            | ClassPower::Splintered(_)
+            | ClassPower::Unionized { .. }
+            | ClassPower::Prospector(_)
+            | ClassPower::FirstBlood
+            | ClassPower::WrongSense(_)
+            | ClassPower::Avenged(_) => {}
+        }
+    }
+    base + base * pct / 100
+}
+
 /// XP for a finished fight, before the level curve is consulted.
 ///
 /// A win pays the creature's rating; a loss pays [`LOSS_XP_PCT`] of it back,

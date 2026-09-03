@@ -533,6 +533,13 @@ impl SaveFile {
         // meaning moved is a field that will arrive wrong, and the loader is
         // where that is caught, exactly as `World::repair` is.
         game.character.repair_enchs();
+        // **What the nodes and the class imply, re-derived.** The save carries
+        // which nodes were taken and which class was chosen, not what they did,
+        // so `assembly_pct` was whatever was banked when the file was written —
+        // and the class's half of it was zero for every file ever saved,
+        // because nothing added it. The frames are deliberately left alone:
+        // they are in the file and resizing on load is a different decision.
+        game.character.refresh_assembly_pct();
         Ok(game)
     }
 }

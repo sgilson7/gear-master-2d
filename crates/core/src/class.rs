@@ -1037,6 +1037,21 @@ pub struct Match {
 /// class does, so every invariant about requirements has to know about them.
 /// Classes handed out by a town, which no fountain offers and no build
 /// qualifies for.
+/// The classes the fork deals, in the order it deals them.
+///
+/// **In core, because it is a rule.** It was a `const` in `crates/wasm` and a
+/// second copy in `tests/classes.rs` whose own comment admitted it — *"named
+/// here rather than read from the shim, because the shim is wasm and this is
+/// the list it holds"*. A rule decided in the shim is a rule the fast suite
+/// cannot reach, and two copies of one is how they part.
+///
+/// **Every one of them is upstream's**, and nothing new has been invented in
+/// combat for any of them. `every_offered_class_reaches_something` is what
+/// stops a fifth being offered that does nothing — which is exactly what
+/// `Showstopper` was until M10.2: tuned, themed, and honoured nowhere.
+pub const OFFERED: &[&str] =
+    &["Berserker", "Hexweaver", "Bloodletter", "Recycler", "Showstopper"];
+
 pub const TOWN_CLASSES: &[&str] = &["Piety", "Ticket to Ride", "Tired", "Recycler"];
 
 /// Classes you can hold more than one of at once.

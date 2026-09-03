@@ -1,0 +1,76 @@
+% Top of the Bill — what Hanglo Chiemstar was called for eleven seasons (p. 31).
+% Showstopper: a fight won inside ten seconds pays half again, so the figure is
+% the one enormous swing and the moment after it. A bat that is coming apart at
+% the top of the arc, a stadium light, and a crowd that has stood up.
+%
+% Not a gortball match: the class is what the crowd came for. So the figure is
+% one player, mid-follow-through, and the bat is already in two pieces — which
+% is The Chonga Swing, the ench this class is built on.
+%
+% Written by filling in tikz_figure_prompt.md.
+\documentclass[tikz,border=4pt]{standalone}
+\usetikzlibrary{calc}
+\newcommand{\Unit}{0.055cm}
+\newcommand{\Edge}{2.4pt}
+\newcommand{\Rays}{7}
+\newcommand{\Heads}{9}
+
+\definecolor{strip}{HTML}{9E2B3A}
+\definecolor{stripdark}{HTML}{5E1622}
+\definecolor{bat}{HTML}{B8853A}
+\definecolor{lamp}{HTML}{E8C65A}
+\definecolor{crowd}{HTML}{3A3F4A}
+\definecolor{ink}{HTML}{101018}
+
+\begin{document}
+\begin{tikzpicture}[x=\Unit,y=\Unit, line join=round, line cap=round]
+
+  % ---- the crowd, stood up ------------------------------------------------
+  % Behind everything and low, so it reads as a band rather than as people.
+  \fill[crowd,draw=ink,line width=1.6pt] (0,0) rectangle (66,13);
+  \foreach \i in {1,...,\Heads} {
+    \pgfmathsetmacro\x{4+(\i-1)*7.2}
+    \fill[crowd,draw=ink,line width=1.4pt] (\x,13) circle (2.6);
+  }
+
+  % ---- the light over the whole thing -------------------------------------
+  \fill[lamp,draw=ink,line width=\Edge] (50,62) rectangle ++(13,7);
+  \draw[ink,line width=2.0pt] (56,62) -- (56,56);
+  \foreach \i in {1,...,\Rays} {
+    \pgfmathsetmacro\a{196+(\i-1)*16}
+    \draw[lamp,line width=1.8pt]
+      ({56+8*cos(\a)},{62+8*sin(\a)}) -- ({56+15*cos(\a)},{62+15*sin(\a)});
+  }
+
+  % ---- legs, planted through the swing ------------------------------------
+  \fill[stripdark,draw=ink,line width=\Edge] (24,13) rectangle ++(8,14);
+  \fill[stripdark,draw=ink,line width=\Edge] (36,13) rectangle ++(8,14);
+
+  % ---- the body, turned into it -------------------------------------------
+  \fill[strip,draw=ink,line width=\Edge] (21,27) -- (47,27) -- (43,52) -- (25,52) -- cycle;
+  % Two bars across the front: a strip, and the number nobody can read at 64px.
+  \draw[stripdark,line width=2.4pt] (23,36) -- (45,36);
+  \draw[stripdark,line width=2.4pt] (23,43) -- (45,43);
+
+  % ---- head ---------------------------------------------------------------
+  \fill[strip,draw=ink,line width=\Edge] (34,58) circle (8);
+  \fill[ink] (31,59) circle (1.5);
+  \fill[ink] (37,59) circle (1.5);
+
+  % ---- the arms, at the end of the follow-through -------------------------
+  \draw[strip,line width=5.2pt] (25,49) -- (14,58);
+  \draw[strip,line width=5.2pt] (43,49) -- (52,44);
+
+  % ---- the bat, in two pieces ---------------------------------------------
+  % The handle is still in the hand; the rest of it is going away and up, which
+  % is the whole of the ench this class is built on.
+  \fill[bat,draw=ink,line width=\Edge]
+    (11,56) -- (17,52) -- (23,60) -- (17,64) -- cycle;
+  \fill[bat,draw=ink,line width=\Edge]
+    (25,66) -- (31,62) -- (41,74) -- (35,78) -- cycle;
+  % The break itself: a gap, and two splinters across it.
+  \draw[ink,line width=2.0pt] (23,61) -- (26,65);
+  \draw[ink,line width=1.6pt] (22,64) -- (27,62);
+
+\end{tikzpicture}
+\end{document}

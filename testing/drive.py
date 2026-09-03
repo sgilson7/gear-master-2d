@@ -2655,11 +2655,17 @@ def walk_the_gate(browser, name, fails=None):
             fails.append(f"{name}: the fork opened at level {at}, before it is owed")
         if not any("Level 5" in r for r in BANKINGS):
             fails.append(f"{name}: no banking announced level five: {BANKINGS[-2:]}")
-        # **Four now.** The Kaklon Patent arrived with the ench system, and
-        # the licence is the class rather than a node inside it.
+        # **Five now.** Top of the Bill is the fifth, and its promise is the
+        # first one in the game that is about the purse rather than the fight —
+        # which is why M10.2's first deliverable was wiring it up rather than
+        # adding it. The count is core's; asserting a literal here would be the
+        # second copy of `class::OFFERED` all over again.
         offered = page.locator("#fork-choices .wares").count()
-        if offered != 4:
-            fails.append(f"{name}: the fork offers {offered} classes, and there are four")
+        want = page.evaluate("() => (window.__classOffer()?.classes ?? []).length")
+        if offered != want:
+            fails.append(f"{name}: core offers {want} classes and the screen drew {offered}")
+        if offered < 5:
+            fails.append(f"{name}: the fork offers {offered} classes, and there are five")
         promises = page.locator("#fork-choices .wares .promise").all_text_contents()
         if any(not p.strip() for p in promises):
             fails.append(f"{name}: a class promises nothing mechanical: {promises}")

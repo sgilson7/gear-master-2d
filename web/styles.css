@@ -363,9 +363,37 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
    face — and it is the last thing on this screen that comes off, so it is not
    behind a hover. */
 .wares .promise { font-size: 13.5px; line-height: 1.5; color: var(--ink); }
-/* Three classes are offered and `auto-fill` left the row padded out with empty
-   track. `auto-fit` collapses the empty tracks and the three share the width. */
-#fork-choices { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+/* **Five classes, in two rows.** Three were offered and `auto-fill` left the
+   row padded out with empty track; `auto-fit` collapsed it and the three shared
+   the width. Four still fitted a 1280x720 viewport, measured — and `PLAN.md`
+   §6a row 3 wrote down that a fifth would not, and that the fix was a two-row
+   grid rather than a shorter portrait. This is that: a floor of three tracks,
+   so five wrap to three and two rather than shrinking to five slivers, and a
+   card that is still tall enough to read the promise on.
+   `check_the_fork_is_on_top` measures the result with `elementFromPoint`. */
+#fork-choices {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  max-width: 1000px;
+  gap: 10px;
+}
+/* Three across and two down at 1280x720, which is the viewport the gate
+   measures. Under nine hundred the third column is more than a card can be
+   read at, so it goes to two across and three down and the screen scrolls —
+   which is the ordinary phone case and is not what §6a row 3 was about. */
+@media (max-width: 900px) {
+  #fork-choices { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+/* The fork's own cards are shorter than a shelf's: there are five of them and
+   they have to fit without the promise falling below the fold. */
+/* The fork's own header is shorter than a screen's: five cards in two rows and
+   a paragraph explaining the choice do not both fit 720px otherwise, and the
+   cards are the part somebody is reading. */
+#fork { padding-top: 14px; padding-bottom: 14px; }
+#fork .fighthead { margin-bottom: 8px; }
+#fork .fighthead .note { font-size: 13px; margin-top: 4px; }
+#fork-choices .wares { padding: 9px 12px 11px; gap: 3px; }
+#fork-choices .wares .promise { font-size: 12.5px; line-height: 1.42; }
+#fork-choices .wares .flavour { font-size: 11.5px; line-height: 1.35; }
 
 /* A shelf entry already bought, and an errand already run. The gap is the
    memory of what you took — a fixed shelf that silently closed up would look
@@ -386,10 +414,11 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
    board's "why" line is the same fact about a different thing. */
 .wares.errand .why { display: block; font-size: 12px; color: var(--rust); margin-top: 3px; }
 
-/* The class figures. Wide and short so three of them sit in a row without the
-   promise under each one falling below the fold. */
+/* The class figures. Wide and short so a row of them sits without the promise
+   under each one falling below the fold — shorter again since there are two
+   rows of cards to fit rather than one. */
 #fork-choices .portrait.wide {
-  width: 100%; height: 150px; margin-bottom: 8px; order: 0; padding: 6px;
+  width: 100%; height: 72px; margin-bottom: 4px; order: 0; padding: 4px;
 }
 
 /* --- the replay ---------------------------------------------------------- */

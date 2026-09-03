@@ -739,6 +739,146 @@
           ]
         }
       ]
+    },
+    {
+      "id": "top-of-the-bill",
+      "name": "Top of the Bill",
+      "class": "Showstopper",
+      "nodes": [
+        {
+          "id": "b-billing",
+          "name": "Top Billing",
+          "blurb": "Eleven seasons of it, and the poster is the same poster with a new date pasted over the old one. They have run out of room and started pasting over the eleven.",
+          "cost": 1,
+          "requires": [],
+          "effect": {
+            "gives_ench": {
+              "ench": "the-chonga-swing"
+            }
+          }
+        },
+        {
+          "id": "b-follow-through",
+          "name": "The Follow-Through",
+          "blurb": "The bat leaves your hands at the top of it and nobody in the ground looks at where it lands. They are all still looking at you.",
+          "cost": 1,
+          "requires": [
+            "b-billing"
+          ],
+          "effect": {
+            "stat": {
+              "strength": 9
+            }
+          }
+        },
+        {
+          "id": "b-ninth",
+          "name": "In the Ninth",
+          "blurb": "Chonga hit one thing in the ninth and it was the ninth for eleven years afterwards. Nobody says which season.",
+          "cost": 2,
+          "requires": [
+            "b-follow-through"
+          ],
+          "effect": [
+            {
+              "stat": {
+                "strength": 7
+              }
+            },
+            {
+              "assembly_pct": {
+                "pct": 14
+              }
+            }
+          ]
+        },
+        {
+          "id": "b-warm-house",
+          "name": "A Warm House",
+          "blurb": "Six thousand of them and every one already standing. The two who sat down are discussed afterwards and at length.",
+          "cost": 1,
+          "requires": [],
+          "effect": {
+            "start_with": {
+              "armor": 22
+            }
+          }
+        },
+        {
+          "id": "b-first-bell",
+          "name": "First Bell",
+          "blurb": "He is out of the tunnel before the bell finishes. The stewards have written to him about it four times.",
+          "cost": 2,
+          "requires": [
+            "b-warm-house"
+          ],
+          "effect": {
+            "start_with": {
+              "mana": 12
+            }
+          }
+        },
+        {
+          "id": "b-house-lights",
+          "name": "House Lights",
+          "blurb": "One lamp over the whole ground and it is pointed at one man. The other nine lamps were taken down in a season nobody will name.",
+          "cost": 2,
+          "requires": [
+            "b-warm-house"
+          ],
+          "effect": {
+            "stat": {
+              "health": 140
+            }
+          }
+        },
+        {
+          "id": "b-the-incident",
+          "name": "The Incident",
+          "blurb": "It is on the record as an incident because the word they wanted was not available to the clerk writing it down.",
+          "cost": 2,
+          "requires": [
+            "b-ninth",
+            "b-house-lights"
+          ],
+          "effect": [
+            {
+              "stat": {
+                "strength": 6,
+                "curse_resist": 10
+              }
+            },
+            {
+              "assembly_pct": {
+                "pct": 10
+              }
+            }
+          ]
+        },
+        {
+          "id": "b-eleven-seasons",
+          "name": "Eleven Seasons",
+          "blurb": "They gave him a rack with eleven hooks on it and he has used one. The weapon frame that came with it has a row on it nobody has filled either.",
+          "cost": 2,
+          "requires": [
+            "b-the-incident"
+          ],
+          "effect": [
+            {
+              "stat": {
+                "health": 180,
+                "strength": 5
+              }
+            },
+            {
+              "grow_slot_rows": {
+                "slot": "weapon",
+                "rows": 1
+              }
+            }
+          ]
+        }
+      ]
     }
   ]
 }

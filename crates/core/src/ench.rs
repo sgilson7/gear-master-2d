@@ -32,13 +32,28 @@ use serde::{Deserialize, Serialize};
 use crate::loadout::ItemProfile;
 use crate::piece::PieceId;
 
-/// The class that may bolt one on, by **canonical** name.
+/// The classes that may bolt one on, by **canonical** name.
 ///
-/// `Recycler` in the engine and the Kaklon Patent in the book — the theme
-/// renames it on the way to the screen, like every other name. Nothing new was
-/// invented in combat for it: its `ClassPower` is the one upstream already
+/// `Recycler` is the Kaklon Patent — the theme renames it on the way to the
+/// screen, like every other name — and `Showstopper` is Top of the Bill, which
+/// M10.2 added and which is built on an ench of its own. Nothing new was
+/// invented in combat for either: both `ClassPower`s are ones upstream already
 /// wrote and already tuned.
+///
+/// **A list, because it stopped being one class's.** It was a single `&str`
+/// until a second class needed it, and what separates the two is not *whether*
+/// they may ench but *which* enchs they can get — which is the thing M10.0 made
+/// possible by taking the bench off every town.
+pub const LICENSED_CLASSES: &[&str] = &["Recycler", "Showstopper"];
+
+/// The first of them, for the places that want one name — the Patent is still
+/// the class enching is *about*.
 pub const LICENSED_CLASS: &str = "Recycler";
+
+/// May a character of this class bolt an ench onto a component?
+pub fn licences(class: Option<&str>) -> bool {
+    class.is_some_and(|c| LICENSED_CLASSES.contains(&c))
+}
 
 pub const FORMAT: &str = "gm2d-enchs";
 pub const VERSION: u32 = 1;

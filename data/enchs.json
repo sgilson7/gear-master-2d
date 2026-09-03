@@ -57,7 +57,6 @@
       "id": "the-chonga-swing",
       "name": "The Chonga Swing",
       "blurb": "Jimmy Chonga hit one thing with it, in the ninth, and the bat did not come back down in one piece. There are four of these and Kaklon's people have written NOT A BAT on all four. It is a bat.",
-      "price": 140,
       "effect": {
         "fragile": {
           "pct": 200

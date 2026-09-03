@@ -761,9 +761,42 @@ impl Character {
     /// worked out from the tree every time. A save that stored the consequences
     /// would go stale the first time a node was retuned.
     pub fn apply_skills(&mut self, tree: &crate::skills::SkillsData) {
-        self.loadout.assembly_pct = tree.assembly_pct(&self.skills_taken);
+        self.loadout.assembly_pct =
+            tree.assembly_pct(&self.skills_taken) + self.class_assembly_pct();
         let granted = tree.granted_rows(&self.skills_taken);
         self.resize_boards(granted);
+    }
+
+    /// What the class adds to every assembly bonus.
+    ///
+    /// **`ClassPower::Recycler` was honoured nowhere.** The Kaklon Patent has
+    /// promised *"+N% assembly bonuses"* on the fork since M8.4 and delivered
+    /// nothing: `combat.rs` ignores it with a comment saying it is a board rule
+    /// already in the profiles, and `apply_skills` only ever read the tree. So
+    /// the one number the class advertises was the tree's and the class's half
+    /// was zero.
+    ///
+    /// Found by `every_offered_class_reaches_something`, which is the lint M10.2
+    /// wrote for `Showstopper` and which caught this on its first run — which is
+    /// the second time this project has shipped a promise with nothing behind
+    /// it, after the eight skill nodes.
+    /// Re-derive the one number the tree and the class both move.
+    ///
+    /// Split from `apply_skills` because that one also resizes the frames, and
+    /// the two other places this is needed — taking a class, and loading a save
+    /// — must not do that.
+    pub fn refresh_assembly_pct(&mut self) {
+        self.loadout.assembly_pct =
+            crate::data::skills().assembly_pct(&self.skills_taken) + self.class_assembly_pct();
+    }
+
+    fn class_assembly_pct(&self) -> i32 {
+        self.class_def()
+            .map(|c| match c.power {
+                crate::class::ClassPower::Recycler { pct } => pct,
+                _ => 0,
+            })
+            .unwrap_or(0)
     }
 
     /// The level a class may be chosen at.
@@ -801,6 +834,13 @@ impl Character {
             .find(|c| c.name == canonical)
             .ok_or_else(|| format!("there is no such class as {canonical}"))?;
         self.class = Some(def.name.to_string());
+        // A class can change what a board is worth, so that is re-derived the
+        // moment one is taken rather than at the next node bought.
+        //
+        // **This and not `apply_skills`**, which also resizes the frames: a
+        // class is not a level, and growing somebody's boards because they took
+        // one would be the fork quietly handing out rows.
+        self.refresh_assembly_pct();
         Ok(def)
     }
 
@@ -1326,7 +1366,7 @@ impl Character {
     /// identity waited on a point spent would be a class you could take and not
     /// notice you had taken.
     pub fn licensed(&self) -> bool {
-        self.class.as_deref() == Some(crate::ench::LICENSED_CLASS)
+        crate::ench::licences(self.class.as_deref())
     }
 
     /// What is bolted to this component, if anything.

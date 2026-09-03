@@ -158,3 +158,43 @@ Two things this run does **not** do, both in the triage:
   wet route — a whole Toad set walking out to the grating before the tower falls
   — is `check_the_toad_walks_on_water` in the gate, which lands under the lake
   with the water rows still in place.
+
+## M11.9, twice, and the two runs disagree
+
+`m11.9.txt` is the **second** run, and it is here because it loops. The first
+one reached the ending — the door under the lake at step 4,406, level 14, 342
+wins to 170 losses. The second spent 240 cycles doing this:
+
+    door       -> The End of All Gears, carrying 0
+    road west  -> The First Treyway
+    the stack  -> The Kettleworks Field, lose, carrying 0 again
+    door       -> The End of All Gears, carrying 0
+
+It walks out of the pit town, dies in the Kettleworks Field, is walked home,
+and heads straight back out. It passes *through* a town every single cycle and
+banks nothing, because it has nothing to bank — a defeat takes what you are
+carrying, and its next destination is on another map, so it never once goes
+home while it still has something.
+
+**The game is fine and the instrument is not.** M11.7 proved the block is
+finishable and the first run of this pair proved it again; what the second run
+found is that our walker, once it has a cross-map goal, stops doing the one
+thing a player does without thinking, which is cash in before pressing on.
+
+The general version is worth more than the fix:
+
+> **A walker with a destination stops being a player.** `head_for_town` has
+> existed since M8 and is wired into the loops that have no better idea. A
+> per-map branch that knows where it is going outranks it, and that is exactly
+> when banking matters most, because the fights on the way are the ones you
+> lose.
+
+It is `PLAN.md` §6d row 3 rather than a fix, and the reason it is a question
+rather than a bug is M11.8: there is a second playtest instrument now, and it
+is not ours. How much more the first one is worth is a real decision.
+
+**Keep both kinds of transcript.** A run that loops is still a transcript —
+read *where* it loops. This one names the exact map, the exact three creatures
+it could not beat at level 11 (High Cork Priest 999, What Was Left On Five 892,
+and, once, Galapagos Jim at 453), and the fact that a loss in that field is a
+loss of everything carried since the last town.

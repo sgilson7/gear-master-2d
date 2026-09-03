@@ -41,7 +41,13 @@ ROOT = Path(__file__).resolve().parent.parent
 # under a run in progress.
 WEB = Path(os.environ.get("GM2D_WEB") or ROOT / "dist" / "web")
 PORT = 8127
-ORIGIN = f"http://127.0.0.1:{PORT}"
+# Where to walk. `GM2D_ORIGIN` points the gate at a page that is already
+# being served — which in practice means the **live one**. CLAUDE.md has said
+# since M8 that a deploy is not finished until somebody loads the live URL and
+# asks a player's question of it, and every one of those notes was written by
+# hand. This is that step, done by the thing that already knows the questions.
+LIVE = (os.environ.get("GM2D_ORIGIN") or "").rstrip("/")
+ORIGIN = LIVE or f"http://127.0.0.1:{PORT}"
 JSON_NULL = None
 
 
@@ -3445,10 +3451,13 @@ def walk_the_gate(browser, name, fails=None):
 
 
 def main():
-    if not (WEB / "index.html").exists():
-        sys.exit("dist/web is not built. Run: make web")
+    if not LIVE and not (WEB / "index.html").exists():
+        sys.exit(f"{WEB} is not built. Run: make web")
     wanted = sys.argv[1:] or ["chromium"]
-    httpd = serve()
+    # Nothing to serve when the page is already up somewhere.
+    httpd = None if LIVE else serve()
+    if LIVE:
+        print(f"walking {ORIGIN} rather than a build of its own")
     fails = []
     try:
         with sync_playwright() as p:
@@ -3482,7 +3491,8 @@ def main():
                 if not any(f.startswith(name + ":") for f in fails):
                     print(f"ok: {name} walked the gate")
     finally:
-        httpd.shutdown()
+        if httpd:
+            httpd.shutdown()
 
     if fails:
         print("\n".join(f"FAIL: {f}" for f in fails))

@@ -1046,6 +1046,37 @@ fixed there. These are the **Later** rows.
    nobody has built a board around it and found out whether one enormous swing
    is worth a slot.
 
+### 6d. Left open by M11
+
+The triage table is `TRIAGE-M11.md` — twelve findings, severity × cost. Five
+were fixed in M11.7 and seven carried with the reason written down. These are
+the three that are a person's rather than a commit's.
+
+1. **What is past the door under the lake.** The same question `PLAN-M8.md`
+   §5.6 asked about the door in the wall, one map further on. The block's
+   ending screen says nobody has decided yet, which is true and is the only
+   honest thing it could say; the block that answers it is the one that decides
+   whether this game has an ending or a middle. Nothing in the code is waiting
+   on it.
+2. **The pool weight — §6b row one, now with nine sets on it.**
+   `draw_enemy` makes a pool's hardest member its rarest, so *what a region
+   contains* and *what a region deals you* are different questions. That gap has
+   cost three separate days: M9.4's drop rates, M11.7's whole-block
+   unfinishability, and M11.9's sets.
+   `a_set_is_never_behind_the_rarest_fight_in_its_region` **obeys** the
+   weighting — it refuses a set whose owner is drawn under a fifth of the time.
+   Changing the weighting itself is the fix and it retunes every region in the
+   game at once, which is why it is still here.
+3. **`make play` is a walker with a destination, and a walker with a
+   destination stops being a player.** One M11.9 run reached the ending at step
+   4,406; the next spent 240 cycles walking out of the pit town, losing in the
+   Kettleworks Field and walking back — never banking, because a cross-map goal
+   outranked going home, and only a town spends what you carry. The game is
+   fine; the instrument is not. M11.8 built a second instrument that is not
+   ours — an agent playing blind through `testing/agent_driver.py` — so the
+   real question is how much more the first one is worth now that the second
+   exists.
+
 ## 7. What happens next
 
 On approval: M0, in the order — scaffold the workspace, capture the golden combat fixtures

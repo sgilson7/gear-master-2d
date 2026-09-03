@@ -273,49 +273,64 @@ fn the_field_has_a_witness_to_the_tower_coming_down() {
     );
 }
 
-/// **You can start the climb with what the road pays, and not with what you
-/// started with.**
+/// **The climb is possible, and the floors are what cost you.**
 ///
 /// Not a golden transcript. `PLAN-M11.md` asks for fixtures per boss, and a
 /// fixture would pin *how* five existing ladder creatures fight — which the
 /// ladder's own tests already do and which nothing in this milestone changes.
-/// What is new and unpinned is whether the tower is reachable content at all,
-/// and that is a question about the board a player brings to it.
 ///
-/// `common::geared_from` is the board: both reachable shelves bought out, every
-/// errand reward, every set piece, arranged by Auto-pack on a full frame.
-/// Measured when this was written, it takes floors five, four and three and
-/// loses two and one — which is the shape the tower wants. A board that took
-/// all five would make the top of it free; one that took none would make the
-/// door decoration.
+/// **What this pins moved in M11.7.** The first version asked that the best
+/// board the game hands out take two to four of the five bosses, on the theory
+/// that a tower whose bosses all fall is a tower that is free. The measurement
+/// said it took three — and that the *second* floor's boss beat it, which is
+/// not a cost, it is a wall: the tower cannot be dropped, so the lake cannot be
+/// drained, so the ending is unreachable, and five hundred and ninety-seven
+/// tests were green through it.
+///
+/// So the boss half is a floor rather than a band now, and lives in
+/// `reach.rs::every_region_has_a_fight_you_can_win_and_every_boss_can_be_beaten`
+/// with everything else that stands on a tile. What is measured here is where
+/// the cost actually is: **the walk to the boss.** Every floor's pool holds
+/// something this board loses to, because `draw_enemy` makes the hardest member
+/// the rarest and a region's teeth are the fight you sometimes lose.
 #[test]
-fn the_top_of_the_stack_is_reachable_and_the_bottom_of_it_is_not_free() {
+fn the_floors_cost_more_than_the_things_at_the_end_of_them() {
     let ch = common::geared_from(&["the-end-of-all-gears", "kettleworks"]);
-    let outcome = |floor: &str| {
-        let w = data::map(floor, D);
-        let name = w.places.iter().find_map(|p| p.creature.as_deref()).expect("a boss");
-        let spec = combat::creature(name).expect("in the ladder");
+    let beats = |name: &str| {
+        let m = combat::creature(name).expect("in the ladder");
         // Each floor is its own sitting, so each fight opens rested: the wear
         // is spent on the walk to the door and not carried down the tower.
-        combat::simulate_at(ch.player_stats(), &ch.combat_items(), spec, D).outcome
+        combat::simulate_at(ch.player_stats(), &ch.combat_items(), m, D).outcome
+            == Outcome::Victory
     };
-    assert_eq!(outcome(FLOORS[0]), Outcome::Victory, "the top floor cannot be cleared at all");
-    assert_eq!(outcome(FLOORS[1]), Outcome::Victory, "the tower stops at one floor");
-    let taken = FLOORS.iter().filter(|f| outcome(f) == Outcome::Victory).count();
-    assert!(
-        (2..5).contains(&taken),
-        "this board takes {taken} of the five floors, and the tower wants to cost something"
-    );
+
+    for id in FLOORS {
+        let w = data::map(id, D);
+        let boss = w.places.iter().find_map(|p| p.creature.as_deref()).expect("a boss");
+        assert!(beats(boss), "{id}: {boss} cannot be beaten, so the tower cannot be dropped");
+        let pool = &w.regions[0].enemies;
+        let lost = pool.iter().filter(|m| !beats(m.name)).count();
+        assert!(
+            lost >= 1,
+            "{id}: every one of the {} things wandering this floor is a win, so the walk \
+             to the boss costs nothing",
+            pool.len()
+        );
+        assert!(
+            lost < pool.len(),
+            "{id}: nothing on this floor can be beaten, so it is a wall and not a floor"
+        );
+    }
 
     // And the other end: the kit you start with does not walk into a tower.
-    let mut new = Character::starting();
-    new.apply_preset();
+    let mut fresh = Character::starting();
+    fresh.apply_preset();
     let top = data::map(FLOORS[0], D);
     let first = combat::creature(
         top.places.iter().find_map(|p| p.creature.as_deref()).expect("a boss"),
     )
     .expect("in the ladder");
-    let log = combat::simulate_at(new.player_stats(), &new.combat_items(), first, D);
+    let log = combat::simulate_at(fresh.player_stats(), &fresh.combat_items(), first, D);
     assert_ne!(
         log.outcome,
         Outcome::Victory,

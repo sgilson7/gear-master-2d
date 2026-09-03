@@ -134,3 +134,27 @@ most of a tower.
 
 Both halves go to `TRIAGE-M11.md` — the length, and the rate that makes the
 length what it is.
+
+**M11.7's run is `m11.7.txt`, and it is the first that reaches the end of the
+block.** 6,546 steps, 703 wins, 187 losses, level 21 — through the door, west to
+Kettleworks, all five floors of the Drambus Stack, the lake drained, and the
+door under it read.
+
+What changed between `m11.6.txt` (three floors of five in twenty thousand
+presses) and this one is not the walker: it is the **measurement**. M11.7
+simulated the whole ladder against the best board the game actually hands out
+and found that seven of the nine new pools had a most-drawn creature that board
+could not beat, and that the tower's second floor was a wall. The pools were
+retuned off the measurement rather than off the ratings, and the win rate went
+from four-to-three to four-to-one. `TRIAGE-M11.md` rows 1 to 3.
+
+Two things this run does **not** do, both in the triage:
+
+- **It never surveys.** Auto-pack collects six map shards and packs none of them,
+  because a compass rates worse than the blade it would replace. The reach is
+  content `make play` cannot reach; the browser gate is the only thing that
+  walks it. Row 9, and the same shape as M10.3's finding about enchs.
+- **It takes the dry route.** The lake is drained by dropping the tower. The
+  wet route — a whole Toad set walking out to the grating before the tower falls
+  — is `check_the_toad_walks_on_water` in the gate, which lands under the lake
+  with the water rows still in place.

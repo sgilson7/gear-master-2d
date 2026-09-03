@@ -2,7 +2,7 @@
   "format": "gm2d-tiles",
   "version": 1,
   "id": "kettleworks-field",
-  "_note": "The dense map. Twenty by twenty like West Bambulon and nothing like it: forty of its four hundred tiles carry a place or something to read, which is the Look Outside register written down as a budget a test can check. Most of the readables sit off the roads on purpose — a card that opens every time you cross the field is a card a player learns to shut without reading. The Drambus Stack is four tiles of `curd` in the middle, which is its own terrain because a two-hundred-and-ten-foot cheese drawn as rock is a hill. Its door is written as an event and not a gate: the floors behind it are M11.3's, and a gate onto a map this build has not got is a hole where a promise should be. The two pools are ordered on purpose: `draw_enemy` weights a pool so its hardest member is its rarest, so the creature an errand asks for is the *easiest* thing in its region and never the hardest. Getting that backwards is `PLAN.md` §6b row 1 written into content — a set behind the rarest creature, one map further out. **The shadow was retuned down in M11.3.** At a mean of eight hundred it was a gauntlet you crossed to reach the tower and then crossed again after every floor, and a walk that had to cross it six times lost eighteen hundred fights doing it. The hard part of a tower should be the tower.",
+  "_note": "The dense map. Twenty by twenty like West Bambulon and nothing like it: forty of its four hundred tiles carry a place or something to read, which is the Look Outside register written down as a budget a test can check. Most of the readables sit off the roads on purpose — a card that opens every time you cross the field is a card a player learns to shut without reading. The Drambus Stack is four tiles of `curd` in the middle, which is its own terrain because a two-hundred-and-ten-foot cheese drawn as rock is a hill. Its door is written as an event and not a gate: the floors behind it are M11.3's, and a gate onto a map this build has not got is a hole where a promise should be. The two pools are ordered on purpose: `draw_enemy` weights a pool so its hardest member is its rarest, so the creature an errand asks for is the *easiest* thing in its region and never the hardest. Getting that backwards is `PLAN.md` §6b row 1 written into content — a set behind the rarest creature, one map further out. **The shadow was retuned down in M11.3.** At a mean of eight hundred it was a gauntlet you crossed to reach the tower and then crossed again after every floor, and a walk that had to cross it six times lost eighteen hundred fights doing it. The hard part of a tower should be the tower. **A fourth creature joined the shadow in M11.7**, and the reason is the weighting rather than the danger: `draw_enemy` makes the hardest member the rarest, so Bone Cantor at the top of three was one draw in five hundred and the living earth off it was seven hundred and fifty wins. Crowned Hollow stands above it now and the earth is seventeen. `PLAN.md` §6b row 1, paid a third time.",
   "width": 20,
   "height": 20,
   "start": [
@@ -69,7 +69,8 @@
       "enemies": [
         "Ember Wisp",
         "Slag Warden",
-        "Bone Cantor"
+        "Bone Cantor",
+        "Crowned Hollow"
       ]
     }
   ],

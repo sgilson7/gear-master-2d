@@ -50,7 +50,7 @@
         ]
       ],
       "enemies": [
-        "Vermin Sovereign",
+        "Cog Priest",
         "Silence",
         "The Long Mirror"
       ]
@@ -68,8 +68,8 @@
       ],
       "enemies": [
         "Iron Abbot",
-        "Rimefather",
-        "Obsidian Colossus"
+        "Obsidian Colossus",
+        "Rimefather"
       ]
     }
   ],

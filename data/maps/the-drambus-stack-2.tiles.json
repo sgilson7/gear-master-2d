@@ -35,9 +35,9 @@
         ]
       ],
       "enemies": [
-        "Rimefather",
-        "Obsidian Colossus",
-        "The Last Gearwright"
+        "Iron Abbot",
+        "Mire Behemoth",
+        "The Tallow Saint"
       ]
     }
   ],
@@ -50,7 +50,7 @@
       "kind": "boss",
       "id": "the-drambus-stack-2-boss",
       "name": "what is standing on floor 2",
-      "creature": "The Tallow Saint",
+      "creature": "Rimefather",
       "drops": [
         "The Common Ground",
         "Map Shard"

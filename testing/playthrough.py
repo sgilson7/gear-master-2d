@@ -742,11 +742,30 @@ def main():
                         want, why = gate["at"], "out"
                     elif boss or gate:
                         want, why = (boss or gate)["at"], "boss"
-                elif grate and floors_down >= 5 and not lake_done:
+                elif (grate and floors_down >= 5 and not lake_done
+                      and c["fatigue"] < 30 and c["carried"] < 400):
                     # The Stack is down, the lake is a bed, and the last thing
                     # written is at the bottom of it.
+                    #
+                    # **Rested and with nothing in your pocket**, and both
+                    # halves were learned the hard way. Under the lake the walk
+                    # turns round at forty percent worn; without the same
+                    # threshold on this side it walked straight back down, and
+                    # one run thrashed the grating six thousand times, finished
+                    # at the sixty percent cap with three hundred and eighty
+                    # health, and carried twenty-five thousand experience it
+                    # could never bank. A branch that sends you somewhere must
+                    # agree with the branch that sends you back.
                     want, why = grate["at"], "the lake"
-                elif wall_door and have_deep and not read_the_lot:
+                elif (wall_door and have_deep and not read_the_lot
+                      and (len(recent) < 6 or sum(recent) * 2 >= len(recent))):
+                    # **The same guard the road west has, and for the same
+                    # reason.** Without it the two branches disagree: the
+                    # Treyway sends a losing walk home and Bambulon sends it
+                    # straight back through the door, and the run spends a
+                    # hundred presses crossing a doorway sixty times. A walk
+                    # that is losing goes and fights something smaller, on
+                    # whichever side of the wall it is standing.
                     # **Bank and mend before a border.** The first run through
                     # crossed carrying nine hundred and thirty-two experience
                     # and twenty-two percent worn, lost the first fight on the

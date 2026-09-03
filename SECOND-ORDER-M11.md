@@ -506,3 +506,54 @@ you more often, and a golem takes the first fight.
   falls off a win and what a win pays, and a player sees none of those directly.
   A derived number with nowhere it is shown cannot be told from a bug, and this
   block has now written that sentence four times.
+
+---
+
+## M11.7 — the bug and triage pass
+
+### The block was unfinishable and every test was green
+
+**The change.** Nine enemy pools and one boss retuned; a lint that would have
+caught it; `TRIAGE-M11.md`; a tone pass; and the walker taught to rest before it
+goes underground.
+
+**Follows from.**
+
+- **The measurement, and it is the whole milestone.** Ratings are not
+  difficulty for this engine: the best board the game hands out beats
+  Gallowglass at 1,534 and loses to Silence at 1,006, because matchups and burst
+  decide it. So every pool in this block had been tuned against a number that
+  does not predict the outcome, and the honest way to tune them was to simulate
+  the whole ladder against `common::geared_from` and read the answer off.
+- **`every_region_has_a_fight_you_can_win_and_every_boss_can_be_beaten`.** It
+  checks the *most drawn* creature, because `draw_enemy` makes the easiest
+  member the commonest — a region's teeth are supposed to be the fight you
+  sometimes lose, and what must not happen is that the fight you meet three
+  times in five is one you cannot win. And every boss, because a boss is not
+  drawn: it stands there and there is no going round it.
+- **`the_top_of_the_stack_is_reachable_and_the_bottom_of_it_is_not_free`
+  became `the_floors_cost_more_than_the_things_at_the_end_of_them`.** Its old
+  band said the best board should take two to four of the five bosses, which
+  read as *the tower should cost something* and meant *the tower may be
+  impossible*. The cost moved to where it actually is: the walk to the boss.
+
+**Watch.**
+
+- **A band that permits a wall.** The old assertion was `(2..5).contains(&taken)`
+  and it *passed* on a tower that could not be finished. A range whose lower
+  bound is "not everything works" cannot tell a cost from a wall, and this is
+  the second time in the block a lint has been wrong in that direction (the
+  first was `every_offered_class_reaches_something`'s ancestor, which read a
+  list rather than the behaviour). **Prefer a floor to a band** wherever the
+  thing being bounded is *reachability*.
+- **The pools were tuned against one board and there is only one.** Boards stop
+  growing at level six and Kettleworks is the last shop, so everything past the
+  door is fought with the same grid — which is why a single fixed yardstick was
+  the right one and is also triage rows 6 and 7. If a second town or a third
+  shelf ever lands, every number in this milestone is measured against a board
+  that no longer exists.
+- **`make play` reaches the ending and never surveys.** Auto-pack collects six
+  shards and packs none, because a compass rates worse than the blade it would
+  replace. The reach is content the walk cannot reach, which means the browser
+  gate is the only thing standing between it and rotting. Same shape as M10.3's
+  ench finding, and the same answer: the button is not an optimiser.

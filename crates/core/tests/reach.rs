@@ -16,6 +16,8 @@ use gm2d_core::game::Game;
 use gm2d_core::survey::{self, SurveyMod};
 use gm2d_core::world::{PlaceKind, World, WorldState};
 
+mod common;
+
 const D: Difficulty = Difficulty::Easy;
 const REACH: &str = "the-reach";
 
@@ -301,4 +303,65 @@ fn no_survey_is_the_map_as_written() {
     assert_eq!(survey::shift(180, 0), 180);
     assert_eq!(survey::shift(180, -20), 144);
     assert_eq!(survey::shift(0, 40), 0);
+}
+
+// ------------------------------------------------- what the block asks of you
+
+/// **Every region has a fight you can win in it, and every boss can be beaten.**
+///
+/// The M4 soft-lock's shape, one block out. M11.7 measured the tower against the
+/// best board the game hands out — both shelves bought out, every errand reward,
+/// every set piece, auto-packed — and found the second floor's boss beat it.
+/// That is a wall: the tower cannot be dropped, so the lake cannot be drained,
+/// so the ending is unreachable, and 597 tests were green through it.
+///
+/// **The *most drawn* creature, not every creature.** `draw_enemy` weights a
+/// pool so its hardest member is its rarest, so a region's teeth are supposed to
+/// be a fight you sometimes lose — what must not happen is that the fight you
+/// meet three times in five is one you cannot win. And every boss, because a
+/// boss is not drawn: it stands there, and there is no going round it.
+///
+/// The yardstick is generous on purpose. It assumes you bought the whole of
+/// both shelves and finished everything, which no real player will have done —
+/// generous about *reachable* content is the safe direction for a check that
+/// says "this is possible at all".
+#[test]
+fn every_region_has_a_fight_you_can_win_and_every_boss_can_be_beaten() {
+    use gm2d_core::combat::{self, Outcome};
+
+    let ch = common::geared_from(&["the-end-of-all-gears", "kettleworks"]);
+    let beats = |name: &str| -> bool {
+        let m = combat::creature(name).unwrap_or_else(|| panic!("no {name}"));
+        combat::simulate_at(ch.player_stats(), &ch.combat_items(), m, D).outcome
+            == Outcome::Victory
+    };
+
+    for (id, _) in data::MAPS {
+        let w = data::map(id, D);
+        for r in &w.regions {
+            // The most drawn is the *lowest rated*: the weight is
+            // `(max + 1 − rating)`, so the easiest member is the commonest.
+            let common = r
+                .enemies
+                .iter()
+                .min_by_key(|m| gm2d_core::rating::creature_rating(m, D))
+                .expect("a region with an empty pool");
+            assert!(
+                beats(common.name),
+                "{id}/{}: the creature you meet most often is {} and the best board the \
+                 game hands out cannot beat it",
+                r.id,
+                common.name
+            );
+        }
+        for p in w.places.iter().filter_map(|p| p.creature.as_deref().map(|c| (p, c))) {
+            let (place, who) = p;
+            assert!(
+                beats(who),
+                "{id}/{}: {who} is standing on a tile and cannot be beaten, so nothing \
+                 behind it can ever be reached",
+                place.id
+            );
+        }
+    }
 }

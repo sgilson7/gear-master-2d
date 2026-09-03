@@ -10,8 +10,17 @@
 //! reaches a rebuild is caught rather than shipped.
 
 pub const TERRAIN_JSON: &str = include_str!("../../../data/terrain.json");
-pub const TILES_JSON: &str = include_str!("../../../data/tiles.json");
-pub const DUNGEON_JSON: &str = include_str!("../../../data/dungeon.json");
+
+// **One file per map, under `data/maps/<id>.tiles.json`.** They were
+// `tiles.json` and `dungeon.json` at the top of `data/`, which was two names
+// for one kind of thing and no room for a third — and the third was going to
+// be called `overworld.json` beside a `tiles.json` that *is* an overworld.
+// The name of the file is the id of the map now, so a map that is misfiled is
+// a map that will not load rather than a map that loads as somebody else.
+pub const TILES_JSON: &str = include_str!("../../../data/maps/west-bambulon.tiles.json");
+pub const DUNGEON_JSON: &str = include_str!("../../../data/maps/the-great-gear-cave.tiles.json");
+/// The DQ-scale map behind the door in the western wall.
+pub const TREYWAY_JSON: &str = include_str!("../../../data/maps/the-treyway.tiles.json");
 pub const EVENTS_JSON: &str = include_str!("../../../data/events.json");
 pub const THEME_TD_JSON: &str = include_str!("../../../data/theme.td.json");
 pub const SKILLS_JSON: &str = include_str!("../../../data/skills.json");
@@ -30,8 +39,9 @@ pub const DROPS_JSON: &str = include_str!("../../../data/drops.json");
 /// above, and the test is what says so.
 pub const FILES: &[(&str, &str)] = &[
     ("terrain.json", TERRAIN_JSON),
-    ("tiles.json", TILES_JSON),
-    ("dungeon.json", DUNGEON_JSON),
+    ("maps/west-bambulon.tiles.json", TILES_JSON),
+    ("maps/the-great-gear-cave.tiles.json", DUNGEON_JSON),
+    ("maps/the-treyway.tiles.json", TREYWAY_JSON),
     ("events.json", EVENTS_JSON),
     ("theme.td.json", THEME_TD_JSON),
     ("skills.json", SKILLS_JSON),
@@ -55,6 +65,7 @@ pub fn world(difficulty: crate::combat::Difficulty) -> crate::world::World {
 pub const MAPS: &[(&str, &str)] = &[
     ("west-bambulon", TILES_JSON),
     ("the-great-gear-cave", DUNGEON_JSON),
+    ("the-treyway", TREYWAY_JSON),
 ];
 
 /// One map by id, falling back to the overworld.

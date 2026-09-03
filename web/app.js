@@ -60,6 +60,13 @@ const LIGHT = {
   town:  ['#8a5c1c', '#8a5c1c'],
   rock:  ['#77796f', '#71736a'],
   water: ['#7ba0ad', '#7399a7'],
+  // The Treyway's, at the scale of a country. Paler and flatter than
+  // Bambulon's on purpose: a plain is a week of walking drawn as one tile, and
+  // it should not read as a field you can see the far side of.
+  plain: ['#d6d8bc', '#d1d4b6'],
+  coast: ['#e8e2c8', '#e4dec2'],
+  range: ['#8c8478', '#867e72'],
+  sea:   ['#5d8494', '#567d8e'],
 };
 const DARK = {
   road:  ['#4a4132', '#514837'],
@@ -71,6 +78,10 @@ const DARK = {
   town:  ['#d3a05a', '#d3a05a'],
   rock:  ['#232622', '#282b27'],
   water: ['#223941', '#264048'],
+  plain: ['#3a3f2f', '#404535'],
+  coast: ['#4a4a36', '#50503b'],
+  range: ['#2a2723', '#302d28'],
+  sea:   ['#1a2c33', '#1e323a'],
 };
 
 function dark() {
@@ -306,7 +317,7 @@ function drawDebug(g, pos) {
   for (let y = 0; y < world.height; y++) {
     for (let x = 0; x < world.width; x++) {
       const name = world.rows[y][x];
-      if (name === 'rock' || name === 'water') continue;
+      if (!world.walk[y][x]) continue;
       const chance = world.chances[y][x];
       g.fillStyle = 'rgba(0,0,0,.55)';
       g.fillRect(x * TILE, y * TILE + TILE - 12, TILE, 12);
@@ -324,6 +335,22 @@ function drawDebug(g, pos) {
 
 function paintPanel() {
   const p = JSON.parse(position());
+  // **The map the page is holding is the map core says you are on.**
+  //
+  // The grid is cached because building it is four hundred strings, and a
+  // cached grid goes stale exactly when the player is *moved* rather than
+  // walked. Seven call sites re-read it by hand and an eighth did not: a
+  // defeat walks you home, home can be on another map since M8, and nothing
+  // on that path told the page — so dying in the Cave left the canvas drawing
+  // a nine-by-five room with the player standing at (1, 18) of it. Found by
+  // `make play` on the Treyway, where the same defeat is three times likelier.
+  //
+  // Fixed as a class rather than as an eighth call site: every path that moves
+  // anybody repaints this panel, and the cheap call now carries the map id.
+  if (world && p.map && p.map !== world.id) {
+    world = JSON.parse(world_json());
+    draw();
+  }
   const c = JSON.parse(character_json());
   $('level').textContent = c.level;
   $('xp').textContent = `${c.into} / ${c.needed}`;
@@ -1652,6 +1679,12 @@ function walk(dir) {
     world = JSON.parse(world_json());
     log(`You go through.`);
     paintPanel(); draw(); autosave();
+    // A gate may carry a paragraph, and one does: the door in the western wall
+    // is a crossing that happens once. Core says whether this was the once —
+    // the page does not keep a list of which doors it has read.
+    if ((r.went.prose ?? []).length) {
+      showCard('THE DOOR IN THE WALL', r.went.prose, [], null);
+    }
   }
   if (r.shut) log(r.shut, true);
   if (r.ending) openEnding(r.ending);

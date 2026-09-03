@@ -1,0 +1,2310 @@
+[1m==>[0m Building gm2d-wasm for wasm32-unknown-unknown
+warning: unused variable: `game`
+   --> crates/core/src/fight.rs:363:14
+    |
+363 | fn opened_by(game: &Game, was: u32, now: u32) -> Vec<String> {
+    |              ^^^^ help: if this is intentional, prefix it with an underscore: `_game`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `STARTER` is never used
+  --> crates/core/src/character.rs:44:7
+   |
+44 | const STARTER: &[(&str, SlotKind, u8, u8, u8)] = &[
+   |       ^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `seat` is never used
+    --> crates/core/src/character.rs:1141:8
+     |
+ 194 | impl Character {
+     | -------------- method in this implementation
+...
+1141 |     fn seat(&mut self, layout: &[(&str, SlotKind, u8, u8, u8)]) {
+     |        ^^^^
+
+warning: `gm2d-core` (lib) generated 3 warnings (run `cargo fix --lib -p gm2d-core` to apply 1 suggestion)
+    Finished `release` profile [optimized] target(s) in 0.01s
+[1m==>[0m Assembling /Users/samgilson/Documents/GearMaster2D/dist/web
+[1m==>[0m Generating JS bindings
+[1m==>[0m Stamping build version
+[1m==>[0m Done: /Users/samgilson/Documents/GearMaster2D/dist/web (build b1aff41e)
+    2.1M	/Users/samgilson/Documents/GearMaster2D/dist/web
+    wasm: 1192 KB
+
+--- a new game ----------------------------------------------------------
+  level 1 · 1,18 in The End of All Gears · 28 Fnorp · carrying 0 · worn 0% · no class
+  town at [1, 18], cave gate at [16, 2]
+
+--- the road ------------------------------------------------------------
+
+--- errand --------------------------------------------------------------
+  level 1 · 1,18 in The End of All Gears · 28 Fnorp · carrying 0 · worn 0% · no class
+  fight: A. Rat (rates 16) with 1 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  card: THE COUNTED HEAP
+        Somebody has stacked eleven thousand two hundred gear-teeth in a cone on the slag, sorted by pitch, and writte
+        errand: THE COUNT IS WRONG — Taken. go to The End of All Gears, then report back.
+        chose: Take four
+        +25 Fnorp
+        +8 toward the next level
+  fight: Frosty Kev (rates 103) with 1 items -> You stop moving
+         No bounty. Nothing was beaten.
+         The 3 experience you were carrying is gone.
+         You wake up walking, and you have been walking a while.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: Bengulon Jungle Toad (rates 80) with 1 items -> It stops moving
+         +8 Fnorp
+         +16 experience, carried
+         16 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 10) is not reachable yet — A Sprocketman with a barrow has stopped where the slag ends. "Everything past here is water and what lives in it," he says. "You are the fourth this month. The other three went anyway." It wants level 5, and you are 1.
+
+--- grind ---------------------------------------------------------------
+  level 1 · 1,13 in The Slag Flats · 67 Fnorp · carrying 16 · worn 4% · no class
+  fight: Frosty Kev (rates 103) with 1 items -> You stop moving
+         No bounty. Nothing was beaten.
+         The 16 experience you were carrying is gone.
+         You wake up walking, and you have been walking a while.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 1 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 1 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         6 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        chose: Take a strip
+        +6 toward the next level
+  fight: Bengulon Jungle Toad (rates 80) with 1 items -> It stops moving
+         +8 Fnorp
+         +16 experience, carried
+         22 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+  fight: Bengulon Jungle Toad (rates 80) with 1 items -> It stops moving
+         +8 Fnorp
+         +16 experience, carried
+         38 on you. It is worth nothing until you bank it.
+         4% more tired. 16% of you is missing until you take something for it.
+
+--- home ----------------------------------------------------------------
+  level 1 · 2,17 in The End of All Gears · 95 Fnorp · carrying 38 · worn 16% · no class
+  in town: level 1 · 1,18 in The End of All Gears · 95 Fnorp · carrying 38 · worn 0% · no class
+  town: 38 experience spent.  ·  Level 2. One point to spend.  ·  +1 row on the weapon frame
+  town: bought Spindrift-Can Frame
+  town: bought Cork Plating
+  town: bought Soft Drink Cap
+  town: bought Boiled Gooster Hide
+  town: bought Crank-Turner's Mold
+  town: bought Cork Greave Mold
+  town: bought Slow Trundler Sole
+  town: bought Gray Smock
+  town: bought Robe Scrap
+  town: bought Trillion-Pound Plate
+  town: bought Rhinestone Inset
+  town: bought a tin
+  town: errand: THE EYES HAVE IT — Taken. beat 5 × Bengulon Jungle Toad, then hand in 5 × Bengulon Toad Eye.
+  town: errand: THE ONES STILL DOWN THERE — Taken. hand over 4 × Long Shift Tin.
+  town: errand: SOMEBODY SHOULD TELL HIM — Taken. go to THE CORK BOUNDARY, then report back.
+  town: errand: THE COUNT IS WRONG — The clerk writes it into the register under a heading she has to invent, reads it back twice, and gets quieter. Then she gives you a strip of the fence out of a drawer, which she says grows back, and which she says the office is aware of. — A Strip of the Fence.
+  tree: took Frame Sense
+
+--- errand --------------------------------------------------------------
+  level 2 · 1,18 in The End of All Gears · 63 Fnorp · carrying 0 · worn 0% · no class
+  fight: A. Rat (rates 16) with 4 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 4 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         6 on you. It is worth nothing until you bank it.
+         It had a Cheese Finder on it. They do not usually.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 4 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         9 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+  fight: A. Rat (rates 16) with 4 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         12 on you. It is worth nothing until you bank it.
+         4% more tired. 16% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 4 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         15 on you. It is worth nothing until you bank it.
+         4% more tired. 20% of you is missing until you take something for it.
+  in town: level 2 · 1,18 in The End of All Gears · 93 Fnorp · carrying 15 · worn 0% · no class
+  town: 15 experience spent.  ·  Level 3. One point to spend.  ·  +1 row on the chest frame
+  town: bought a tin
+  town: errand: THE EYES HAVE IT — 0 of 5, and nobody writes down what they are not handed.
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+  town: errand: SOMEBODY SHOULD TELL HIM — He takes it well. He says he had assumed as much and has been cutting on that assumption for nine doorways. Then he gives you the knife, which is not a gift so much as a handover, and starts on the tenth with a piece of the fence. — The Ninth Doorway.
+  tree: took Thick Skull
+  fight: A. Rat (rates 16) with 4 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 4 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         6 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 4 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         9 on you. It is worth nothing until you bank it.
+         It had a Cheese Touch on it. They do not usually.
+         4% more tired. 12% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 4 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         12 on you. It is worth nothing until you bank it.
+         4% more tired. 16% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 4 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         15 on you. It is worth nothing until you bank it.
+         4% more tired. 20% of you is missing until you take something for it.
+  fight: Bengulon Jungle Toad (rates 80) with 4 items -> It stops moving
+         +8 Fnorp
+         +16 experience, carried
+         31 on you. It is worth nothing until you bank it.
+         Took a Bengulon Toad Eye.
+         4% more tired. 24% of you is missing until you take something for it.
+  drank a tin: Cork Tea. 10% of it comes off; 14% left.
+
+--- home ----------------------------------------------------------------
+  level 3 · 2,17 in The End of All Gears · 133 Fnorp · carrying 31 · worn 14% · no class
+  fight: A. Rat (rates 16) with 4 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         34 on you. It is worth nothing until you bank it.
+         4% more tired. 18% of you is missing until you take something for it.
+  in town: level 3 · 1,18 in The End of All Gears · 139 Fnorp · carrying 34 · worn 0% · no class
+  town: 34 experience spent.  ·  Level 4. One point to spend.  ·  +1 row on the helmet frame
+  town: bought a tin
+  town: errand: THE EYES HAVE IT — 1 of 5, and nobody writes down what they are not handed.
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+  tree: took Corked
+
+--- errand --------------------------------------------------------------
+  level 4 · 1,18 in The End of All Gears · 135 Fnorp · carrying 0 · worn 0% · no class
+  fight: A. Rat (rates 16) with 4 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 4 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         6 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 4 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         9 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 4 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         12 on you. It is worth nothing until you bank it.
+         4% more tired. 16% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 4 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         15 on you. It is worth nothing until you bank it.
+         4% more tired. 20% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 4 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         18 on you. It is worth nothing until you bank it.
+         4% more tired. 24% of you is missing until you take something for it.
+  drank a tin: Cork Tea. 10% of it comes off; 14% left.
+  fight: Bengulon Jungle Toad (rates 80) with 4 items -> It stops moving
+         +8 Fnorp
+         +16 experience, carried
+         34 on you. It is worth nothing until you bank it.
+         Took a Bengulon Toad Eye.
+         4% more tired. 18% of you is missing until you take something for it.
+
+--- home ----------------------------------------------------------------
+  level 4 · 6,18 in The End of All Gears · 179 Fnorp · carrying 34 · worn 18% · no class
+  fight: A. Rat (rates 16) with 4 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         37 on you. It is worth nothing until you bank it.
+         It had a Cheesy Fingers on it. They do not usually.
+         4% more tired. 22% of you is missing until you take something for it.
+  in town: level 4 · 1,18 in The End of All Gears · 185 Fnorp · carrying 37 · worn 0% · no class
+  town: 37 experience spent.  ·  41 of 49 towards the next level.
+  town: bought a tin
+  town: errand: THE EYES HAVE IT — 2 of 5, and nobody writes down what they are not handed.
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+
+--- errand --------------------------------------------------------------
+  level 4 · 1,18 in The End of All Gears · 181 Fnorp · carrying 0 · worn 0% · no class
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         6 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         9 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         12 on you. It is worth nothing until you bank it.
+         4% more tired. 16% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         15 on you. It is worth nothing until you bank it.
+         4% more tired. 20% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         18 on you. It is worth nothing until you bank it.
+         4% more tired. 24% of you is missing until you take something for it.
+  drank a tin: Cork Tea. 10% of it comes off; 14% left.
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         21 on you. It is worth nothing until you bank it.
+         4% more tired. 18% of you is missing until you take something for it.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         24 on you. It is worth nothing until you bank it.
+         4% more tired. 22% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         27 on you. It is worth nothing until you bank it.
+         4% more tired. 26% of you is missing until you take something for it.
+  drank a tin: Cork Tea. 10% of it comes off; 16% left.
+
+--- home ----------------------------------------------------------------
+  level 4 · 12,16 in The End of All Gears · 235 Fnorp · carrying 27 · worn 16% · no class
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         30 on you. It is worth nothing until you bank it.
+         4% more tired. 20% of you is missing until you take something for it.
+  in town: level 4 · 1,18 in The End of All Gears · 241 Fnorp · carrying 30 · worn 0% · no class
+  town: 30 experience spent.  ·  Level 5. One point to spend.  ·  +1 row on the gloves frame
+  fork: 5 classes offered
+        [0] Gorillathon at [25, 187, 326, 218] clickable=True (Gorillathon)
+        [1] Funnel Sergeant at [361, 187, 326, 218] clickable=True (Funnel Sergeant)
+        [2] Worm-Fact Keeper at [697, 187, 326, 218] clickable=True (Worm-Fact Keeper)
+        [3] Kaklon Licensee at [25, 415, 326, 252] clickable=True (Every assembly bonus on )
+        [4] Top of the Bill at [361, 415, 326, 252] clickable=True (Top of the BillA fight w)
+  fork: took Top of the Bill
+  in town: level 5 · 1,18 in The End of All Gears · 241 Fnorp · carrying 0 · worn 0% · Showstopper
+  town: bought a tin
+  town: errand: THE EYES HAVE IT — 2 of 5, and nobody writes down what they are not handed.
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+  tree: took Cave Lungs
+
+--- errand --------------------------------------------------------------
+  level 5 · 1,18 in The End of All Gears · 237 Fnorp · carrying 0 · worn 0% · Showstopper
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: Frosty Kev (rates 103) with 5 items -> It stops moving
+         +12 Fnorp
+         +6 more for the speed of it. 2.7s.
+         +20 experience, carried
+         23 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         26 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+
+--- home ----------------------------------------------------------------
+  level 5 · 6,16 in The End of All Gears · 273 Fnorp · carrying 26 · worn 12% · Showstopper
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         29 on you. It is worth nothing until you bank it.
+         4% more tired. 16% of you is missing until you take something for it.
+  in town: level 5 · 1,18 in The End of All Gears · 282 Fnorp · carrying 29 · worn 0% · Showstopper
+  town: 29 experience spent.  ·  51 of 66 towards the next level.
+  town: bought a tin
+  town: errand: THE EYES HAVE IT — 2 of 5, and nobody writes down what they are not handed.
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+
+--- errand --------------------------------------------------------------
+  level 5 · 1,18 in The End of All Gears · 278 Fnorp · carrying 0 · worn 0% · Showstopper
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: Frosty Kev (rates 103) with 5 items -> It stops moving
+         +12 Fnorp
+         +6 more for the speed of it. 2.7s.
+         +20 experience, carried
+         23 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         26 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+
+--- home ----------------------------------------------------------------
+  level 5 · 9,16 in The End of All Gears · 314 Fnorp · carrying 26 · worn 12% · Showstopper
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         29 on you. It is worth nothing until you bank it.
+         4% more tired. 16% of you is missing until you take something for it.
+  in town: level 5 · 1,18 in The End of All Gears · 323 Fnorp · carrying 29 · worn 0% · Showstopper
+  town: 29 experience spent.  ·  Level 6. One point to spend.  ·  +1 row on the greaves frame
+  town: bought a tin
+  town: errand: THE EYES HAVE IT — 2 of 5, and nobody writes down what they are not handed.
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+  tree: took Top Billing
+
+--- errand --------------------------------------------------------------
+  level 6 · 1,18 in The End of All Gears · 319 Fnorp · carrying 0 · worn 0% · Showstopper
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         6 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: The Brumpus (rates 114) with 5 items -> It stops moving
+         +14 Fnorp
+         +7 more for the speed of it. 2.7s.
+         +22 experience, carried
+         28 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         31 on you. It is worth nothing until you bank it.
+         4% more tired. 16% of you is missing until you take something for it.
+
+--- home ----------------------------------------------------------------
+  level 6 · 17,16 in The End of All Gears · 367 Fnorp · carrying 31 · worn 16% · Showstopper
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         34 on you. It is worth nothing until you bank it.
+         4% more tired. 20% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         37 on you. It is worth nothing until you bank it.
+         4% more tired. 24% of you is missing until you take something for it.
+  drank a tin: Cork Tea. 10% of it comes off; 14% left.
+  in town: level 6 · 1,18 in The End of All Gears · 385 Fnorp · carrying 37 · worn 0% · Showstopper
+  town: 37 experience spent.  ·  51 of 90 towards the next level.
+  town: bought a tin
+  town: errand: THE EYES HAVE IT — 2 of 5, and nobody writes down what they are not handed.
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+
+--- errand --------------------------------------------------------------
+  level 6 · 1,18 in The End of All Gears · 381 Fnorp · carrying 0 · worn 0% · Showstopper
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: Wallspider Swarm (rates 95) with 5 items -> It stops moving
+         +9 Fnorp
+         +4 more for the speed of it. 5.0s.
+         +19 experience, carried
+         22 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: The Brumpus (rates 114) with 5 items -> It stops moving
+         +14 Fnorp
+         +7 more for the speed of it. 2.7s.
+         +22 experience, carried
+         44 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+
+--- home ----------------------------------------------------------------
+  level 6 · 8,15 in The Slag Flats · 424 Fnorp · carrying 44 · worn 12% · Showstopper
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         47 on you. It is worth nothing until you bank it.
+         4% more tired. 16% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         50 on you. It is worth nothing until you bank it.
+         4% more tired. 20% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         53 on you. It is worth nothing until you bank it.
+         4% more tired. 24% of you is missing until you take something for it.
+  drank a tin: Cork Tea. 10% of it comes off; 14% left.
+  in town: level 6 · 1,18 in The End of All Gears · 451 Fnorp · carrying 53 · worn 0% · Showstopper
+  town: 53 experience spent.  ·  Level 7. One point to spend.  ·  +1 row on the weapon frame
+  town: bought a tin
+  town: errand: THE EYES HAVE IT — 2 of 5, and nobody writes down what they are not handed.
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+  tree: took A Warm House
+
+--- errand --------------------------------------------------------------
+  level 7 · 1,18 in The End of All Gears · 447 Fnorp · carrying 0 · worn 0% · Showstopper
+  fight: Frosty Kev (rates 103) with 5 items -> It stops moving
+         +12 Fnorp
+         +6 more for the speed of it. 2.7s.
+         +20 experience, carried
+         20 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: The Brumpus (rates 114) with 5 items -> It stops moving
+         +14 Fnorp
+         +7 more for the speed of it. 2.7s.
+         +22 experience, carried
+         42 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+
+--- home ----------------------------------------------------------------
+  level 7 · 9,15 in The Slag Flats · 486 Fnorp · carrying 42 · worn 8% · Showstopper
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+  fight: Wallspider Swarm (rates 95) with 5 items -> It stops moving
+         +9 Fnorp
+         +4 more for the speed of it. 5.0s.
+         +19 experience, carried
+         61 on you. It is worth nothing until you bank it.
+         It had a Wallspider Scale on it. They do not usually.
+         It had a Wallspider Fletch on it. They do not usually.
+         4% more tired. 12% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         64 on you. It is worth nothing until you bank it.
+         4% more tired. 16% of you is missing until you take something for it.
+  in town: level 7 · 1,18 in The End of All Gears · 508 Fnorp · carrying 64 · worn 0% · Showstopper
+  town: 64 experience spent.  ·  78 of 121 towards the next level.
+  town: bought a tin
+  town: errand: THE EYES HAVE IT — 2 of 5, and nobody writes down what they are not handed.
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+
+--- errand --------------------------------------------------------------
+  level 7 · 1,18 in The End of All Gears · 504 Fnorp · carrying 0 · worn 0% · Showstopper
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         6 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         9 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+  fight: Frosty Kev (rates 103) with 5 items -> It stops moving
+         +12 Fnorp
+         +6 more for the speed of it. 2.7s.
+         +20 experience, carried
+         29 on you. It is worth nothing until you bank it.
+         4% more tired. 16% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         32 on you. It is worth nothing until you bank it.
+         4% more tired. 20% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         35 on you. It is worth nothing until you bank it.
+         4% more tired. 24% of you is missing until you take something for it.
+  drank a tin: Cork Tea. 10% of it comes off; 14% left.
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         38 on you. It is worth nothing until you bank it.
+         4% more tired. 18% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         41 on you. It is worth nothing until you bank it.
+         4% more tired. 22% of you is missing until you take something for it.
+
+--- home ----------------------------------------------------------------
+  level 7 · 12,17 in The End of All Gears · 585 Fnorp · carrying 41 · worn 22% · Showstopper
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         44 on you. It is worth nothing until you bank it.
+         4% more tired. 26% of you is missing until you take something for it.
+  drank a tin: Cork Tea. 10% of it comes off; 16% left.
+  fight: Bengulon Jungle Toad (rates 80) with 5 items -> It stops moving
+         +8 Fnorp
+         +4 more for the speed of it. 1.4s.
+         +16 experience, carried
+         60 on you. It is worth nothing until you bank it.
+         Took a Bengulon Toad Eye.
+         4% more tired. 20% of you is missing until you take something for it.
+  in town: level 7 · 1,18 in The End of All Gears · 606 Fnorp · carrying 60 · worn 0% · Showstopper
+  town: 60 experience spent.  ·  Level 8. One point to spend.  ·  +1 row on the chest frame
+  town: bought a tin
+  town: errand: THE EYES HAVE IT — 3 of 5, and nobody writes down what they are not handed.
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+  tree: took The Follow-Through
+
+--- errand --------------------------------------------------------------
+  level 8 · 1,18 in The End of All Gears · 602 Fnorp · carrying 0 · worn 0% · Showstopper
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         6 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: Frosty Kev (rates 103) with 5 items -> It stops moving
+         +12 Fnorp
+         +6 more for the speed of it. 1.4s.
+         +20 experience, carried
+         26 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         29 on you. It is worth nothing until you bank it.
+         4% more tired. 16% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         32 on you. It is worth nothing until you bank it.
+         4% more tired. 20% of you is missing until you take something for it.
+  fight: Frosty Kev (rates 103) with 5 items -> It stops moving
+         +12 Fnorp
+         +6 more for the speed of it. 1.4s.
+         +20 experience, carried
+         52 on you. It is worth nothing until you bank it.
+         4% more tired. 24% of you is missing until you take something for it.
+  drank a tin: Cork Tea. 10% of it comes off; 14% left.
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         55 on you. It is worth nothing until you bank it.
+         4% more tired. 18% of you is missing until you take something for it.
+
+--- home ----------------------------------------------------------------
+  level 8 · 18,17 in The End of All Gears · 683 Fnorp · carrying 55 · worn 18% · Showstopper
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         58 on you. It is worth nothing until you bank it.
+         4% more tired. 22% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         61 on you. It is worth nothing until you bank it.
+         4% more tired. 26% of you is missing until you take something for it.
+  drank a tin: Cork Tea. 10% of it comes off; 16% left.
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         64 on you. It is worth nothing until you bank it.
+         4% more tired. 20% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         67 on you. It is worth nothing until you bank it.
+         4% more tired. 24% of you is missing until you take something for it.
+  drank a tin: Cork Tea. 10% of it comes off; 14% left.
+  fight: Bengulon Jungle Toad (rates 80) with 5 items -> It stops moving
+         +8 Fnorp
+         +4 more for the speed of it. 1.4s.
+         +16 experience, carried
+         83 on you. It is worth nothing until you bank it.
+         Took a Bengulon Toad Eye.
+         It had a Bengulon Toad Frame on it. They do not usually.
+         4% more tired. 18% of you is missing until you take something for it.
+  in town: level 8 · 1,18 in The End of All Gears · 731 Fnorp · carrying 83 · worn 0% · Showstopper
+  town: 83 experience spent.  ·  100 of 163 towards the next level.
+  town: bought a tin
+  town: errand: THE EYES HAVE IT — 4 of 5, and nobody writes down what they are not handed.
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+
+--- errand --------------------------------------------------------------
+  level 8 · 1,18 in The End of All Gears · 727 Fnorp · carrying 0 · worn 0% · Showstopper
+  fight: A. Rat (rates 16) with 6 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: Bengulon Jungle Toad (rates 80) with 6 items -> It stops moving
+         +8 Fnorp
+         +4 more for the speed of it. 1.4s.
+         +16 experience, carried
+         19 on you. It is worth nothing until you bank it.
+         Took a Bengulon Toad Eye.
+         4% more tired. 8% of you is missing until you take something for it.
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+        chose: Cut your name at the sixth
+        +12 toward the next level
+  card: MARBULON'S DOOR
+        There is a door in the shallows with no house behind it, and an old woman sitting in front of it on a kitchen 
+        errand: THE FIRST THING SHE WANTS — Taken. beat 3 × Nesbit the Asker, then hand in 3 × A Jar of It.
+        chose: Ask what would count
+        +14 toward the next level
+  card: MARBULON'S DOOR
+        There is a door in the shallows with no house behind it, and an old woman sitting in front of it on a kitchen 
+        errand: THE FIRST THING SHE WANTS — 0 of 3, and nobody writes down what they are not handed.
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+  fight: Nesbit the Asker (rates 192) with 6 items -> It stops moving
+         +26 Fnorp
+         +13 more for the speed of it. 6.1s.
+         +38 experience, carried
+         57 on you. It is worth nothing until you bank it.
+         Took a A Jar of It.
+         4% more tired. 12% of you is missing until you take something for it.
+
+--- home ----------------------------------------------------------------
+  level 8 · 4,10 in The Burnwarp Shallows · 787 Fnorp · carrying 57 · worn 12% · Showstopper
+  fight: Velothi High Guard (rates 161) with 6 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 4.1s.
+         +32 experience, carried
+         89 on you. It is worth nothing until you bank it.
+         4% more tired. 16% of you is missing until you take something for it.
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+  in town: level 8 · 1,18 in The End of All Gears · 823 Fnorp · carrying 89 · worn 0% · Showstopper
+  town: 89 experience spent.  ·  Level 9. One point to spend.  ·  +1 row on the helmet frame
+  town: bought a tin
+  town: errand: THE EYES HAVE IT — She writes for a while. Then she gives you a ledger with a spine like a brick and a page of counting-out that she says works, and has not said on what. The register now runs to a hundred and nine species and one line that says PENDING. — The Bengulon Tally and Count The Legs.
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+  town: errand: THE FRAME THAT STANDS — Taken. go to THE STANDING FRAME, then report back.
+  tree: took Handspan
+
+--- errand --------------------------------------------------------------
+  level 9 · 1,18 in The End of All Gears · 831 Fnorp · carrying 0 · worn 0% · Showstopper
+  fight: A. Rat (rates 16) with 7 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 7 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         6 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: Velothi High Guard (rates 161) with 7 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 4.0s.
+         +32 experience, carried
+         38 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+  fight: Nesbit the Asker (rates 192) with 7 items -> It stops moving
+         +26 Fnorp
+         +13 more for the speed of it. 4.7s.
+         +38 experience, carried
+         76 on you. It is worth nothing until you bank it.
+         Took a A Jar of It.
+         4% more tired. 16% of you is missing until you take something for it.
+
+--- home ----------------------------------------------------------------
+  level 9 · 7,8 in The Burnwarp Shallows · 924 Fnorp · carrying 76 · worn 16% · Showstopper
+  fight: Velothi High Guard (rates 161) with 7 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 4.0s.
+         +32 experience, carried
+         108 on you. It is worth nothing until you bank it.
+         4% more tired. 20% of you is missing until you take something for it.
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+  fight: Bengulon Jungle Toad (rates 80) with 7 items -> It stops moving
+         +8 Fnorp
+         +4 more for the speed of it. 1.4s.
+         +16 experience, carried
+         124 on you. It is worth nothing until you bank it.
+         4% more tired. 24% of you is missing until you take something for it.
+  drank a tin: Cork Tea. 10% of it comes off; 14% left.
+  in town: level 9 · 1,18 in The End of All Gears · 972 Fnorp · carrying 124 · worn 0% · Showstopper
+  town: 124 experience spent.  ·  150 of 221 towards the next level.
+  town: bought a tin
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+  town: errand: THE FRAME THAT STANDS — You have not been yet.
+
+--- errand --------------------------------------------------------------
+  level 9 · 1,18 in The End of All Gears · 968 Fnorp · carrying 0 · worn 0% · Showstopper
+  fight: The Brumpus (rates 114) with 7 items -> It stops moving
+         +14 Fnorp
+         +7 more for the speed of it. 2.7s.
+         +22 experience, carried
+         22 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: The Brumpus (rates 114) with 7 items -> It stops moving
+         +14 Fnorp
+         +7 more for the speed of it. 2.7s.
+         +22 experience, carried
+         44 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: Velothi High Guard (rates 161) with 7 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 4.0s.
+         +32 experience, carried
+         76 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+
+--- home ----------------------------------------------------------------
+  level 9 · 13,12 in The Burnwarp Shallows · 1046 Fnorp · carrying 76 · worn 12% · Showstopper
+  fight: A. Rat (rates 16) with 7 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         79 on you. It is worth nothing until you bank it.
+         4% more tired. 16% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 7 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         82 on you. It is worth nothing until you bank it.
+         4% more tired. 20% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 7 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         85 on you. It is worth nothing until you bank it.
+         4% more tired. 24% of you is missing until you take something for it.
+  drank a tin: Cork Tea. 10% of it comes off; 14% left.
+  in town: level 9 · 1,18 in The End of All Gears · 1073 Fnorp · carrying 85 · worn 0% · Showstopper
+  town: 85 experience spent.  ·  Level 10. One point to spend.  ·  +1 row on the gloves frame  ·  Somebody is at the Kaklon van who was not there before.
+  town: bought a tin
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+  town: errand: THE FRAME THAT STANDS — You have not been yet.
+  tree: took Funnel Drill
+
+--- errand --------------------------------------------------------------
+  level 10 · 1,18 in The End of All Gears · 1069 Fnorp · carrying 0 · worn 0% · Showstopper
+  fight: The Brumpus (rates 114) with 7 items -> It stops moving
+         +14 Fnorp
+         +7 more for the speed of it. 2.7s.
+         +22 experience, carried
+         22 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: Frosty Kev (rates 103) with 7 items -> It stops moving
+         +12 Fnorp
+         +6 more for the speed of it. 1.4s.
+         +20 experience, carried
+         42 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: Frosty Kev (rates 103) with 7 items -> It stops moving
+         +12 Fnorp
+         +6 more for the speed of it. 1.4s.
+         +20 experience, carried
+         62 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+  card: THE STANDING FRAME
+        A gear-frame, upright in the shallows, empty. Chest height. It has been standing here long enough that the wat
+        chose: Take the frame
+        +60 Fnorp
+        +10 toward the next level
+  fight: A. Rat (rates 16) with 7 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         65 on you. It is worth nothing until you bank it.
+         4% more tired. 16% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 7 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         68 on you. It is worth nothing until you bank it.
+         4% more tired. 20% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 7 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         71 on you. It is worth nothing until you bank it.
+         4% more tired. 24% of you is missing until you take something for it.
+  drank a tin: Cork Tea. 10% of it comes off; 14% left.
+  fight: A. Rat (rates 16) with 7 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         74 on you. It is worth nothing until you bank it.
+         4% more tired. 18% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 7 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         77 on you. It is worth nothing until you bank it.
+         4% more tired. 22% of you is missing until you take something for it.
+  fight: Bengulon Jungle Toad (rates 80) with 7 items -> It stops moving
+         +8 Fnorp
+         +4 more for the speed of it. 1.4s.
+         +16 experience, carried
+         93 on you. It is worth nothing until you bank it.
+         4% more tired. 26% of you is missing until you take something for it.
+  drank a tin: Cork Tea. 10% of it comes off; 16% left.
+  fight: A. Rat (rates 16) with 7 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         96 on you. It is worth nothing until you bank it.
+         4% more tired. 20% of you is missing until you take something for it.
+  in town: level 10 · 1,18 in The End of All Gears · 1252 Fnorp · carrying 96 · worn 0% · Showstopper
+  town: 96 experience spent.  ·  110 of 298 towards the next level.
+  town: bought a tin
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+  town: errand: THE FRAME THAT STANDS — She writes STILL EMPTY, and the date, and looks at it for a while. Then she goes into the back and comes out with a card in a sleeve. It is nine lines of somebody working out what a thing they were holding was for, and it was not filed under gear, and she says the office has no heading it goes under either. — The Yodregar Index.
+  fight: A. Rat (rates 16) with 7 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: Velothi High Guard (rates 161) with 7 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 4.0s.
+         +32 experience, carried
+         35 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: Velothi High Guard (rates 161) with 7 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 4.0s.
+         +32 experience, carried
+         67 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+  card: MARBULON'S DOOR
+        There is a door in the shallows with no house behind it, and an old woman sitting in front of it on a kitchen 
+        errand: THE FIRST THING SHE WANTS — 2 of 3, and nobody writes down what they are not handed.
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+  fight: Idol of Marbulon (rates 204) with 7 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 4.1s.
+         +40 experience, carried
+         107 on you. It is worth nothing until you bank it.
+         4% more tired. 16% of you is missing until you take something for it.
+
+--- home ----------------------------------------------------------------
+  level 10 · 8,7 in The Bengulon Verge · 1419 Fnorp · carrying 107 · worn 16% · Showstopper
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+  fight: A. Rat (rates 16) with 7 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         110 on you. It is worth nothing until you bank it.
+         4% more tired. 20% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 7 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         113 on you. It is worth nothing until you bank it.
+         4% more tired. 24% of you is missing until you take something for it.
+  drank a tin: Cork Tea. 10% of it comes off; 14% left.
+  fight: A. Rat (rates 16) with 7 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         116 on you. It is worth nothing until you bank it.
+         4% more tired. 18% of you is missing until you take something for it.
+  in town: level 10 · 1,18 in The End of All Gears · 1446 Fnorp · carrying 116 · worn 0% · Showstopper
+  town: 116 experience spent.  ·  226 of 298 towards the next level.
+  town: bought a tin
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+
+--- errand --------------------------------------------------------------
+  level 10 · 1,18 in The End of All Gears · 1442 Fnorp · carrying 0 · worn 0% · Showstopper
+  fight: Velothi High Guard (rates 161) with 7 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 4.0s.
+         +32 experience, carried
+         32 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+  card: MARBULON'S DOOR
+        There is a door in the shallows with no house behind it, and an old woman sitting in front of it on a kitchen 
+        errand: THE FIRST THING SHE WANTS — 2 of 3, and nobody writes down what they are not handed.
+  card: MARBULON'S DOOR
+        There is a door in the shallows with no house behind it, and an old woman sitting in front of it on a kitchen 
+        errand: THE FIRST THING SHE WANTS — 2 of 3, and nobody writes down what they are not handed.
+  card: MARBULON'S DOOR
+        There is a door in the shallows with no house behind it, and an old woman sitting in front of it on a kitchen 
+        errand: THE FIRST THING SHE WANTS — 2 of 3, and nobody writes down what they are not handed.
+  fight: Velothi High Guard (rates 161) with 7 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 4.0s.
+         +32 experience, carried
+         64 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: Velothi High Guard (rates 161) with 7 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 4.0s.
+         +32 experience, carried
+         96 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+  fight: Idol of Marbulon (rates 204) with 7 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 4.1s.
+         +40 experience, carried
+         136 on you. It is worth nothing until you bank it.
+         4% more tired. 16% of you is missing until you take something for it.
+
+--- home ----------------------------------------------------------------
+  level 10 · 6,7 in The Bengulon Verge · 1595 Fnorp · carrying 136 · worn 16% · Showstopper
+  fight: Velothi High Guard (rates 161) with 7 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 4.0s.
+         +32 experience, carried
+         168 on you. It is worth nothing until you bank it.
+         4% more tired. 20% of you is missing until you take something for it.
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+  fight: A. Rat (rates 16) with 7 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         171 on you. It is worth nothing until you bank it.
+         4% more tired. 24% of you is missing until you take something for it.
+  drank a tin: Cork Tea. 10% of it comes off; 14% left.
+  in town: level 10 · 1,18 in The End of All Gears · 1640 Fnorp · carrying 171 · worn 0% · Showstopper
+  town: 171 experience spent.  ·  Level 11. One point to spend.  ·  +1 row on the greaves frame
+  town: bought a tin
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+  tree: took The Second Frame
+
+--- errand --------------------------------------------------------------
+  level 11 · 1,18 in The End of All Gears · 1636 Fnorp · carrying 0 · worn 0% · Showstopper
+  fight: A. Rat (rates 16) with 7 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  card: MARBULON'S DOOR
+        There is a door in the shallows with no house behind it, and an old woman sitting in front of it on a kitchen 
+        errand: THE FIRST THING SHE WANTS — 2 of 3, and nobody writes down what they are not handed.
+  card: MARBULON'S DOOR
+        There is a door in the shallows with no house behind it, and an old woman sitting in front of it on a kitchen 
+        errand: THE FIRST THING SHE WANTS — 2 of 3, and nobody writes down what they are not handed.
+  fight: Velothi High Guard (rates 161) with 7 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 4.0s.
+         +32 experience, carried
+         35 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  card: MARBULON'S DOOR
+        There is a door in the shallows with no house behind it, and an old woman sitting in front of it on a kitchen 
+        errand: THE FIRST THING SHE WANTS — 2 of 3, and nobody writes down what they are not handed.
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+  fight: Nesbit the Asker (rates 192) with 7 items -> It stops moving
+         +26 Fnorp
+         +13 more for the speed of it. 4.7s.
+         +38 experience, carried
+         73 on you. It is worth nothing until you bank it.
+         Took a A Jar of It.
+         4% more tired. 12% of you is missing until you take something for it.
+
+--- grind ---------------------------------------------------------------
+  level 11 · 4,11 in The Burnwarp Shallows · 1720 Fnorp · carrying 73 · worn 12% · Showstopper
+  fight: Velothi High Guard (rates 161) with 7 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 4.0s.
+         +32 experience, carried
+         105 on you. It is worth nothing until you bank it.
+         4% more tired. 16% of you is missing until you take something for it.
+  fight: Velothi High Guard (rates 161) with 7 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 4.0s.
+         +32 experience, carried
+         137 on you. It is worth nothing until you bank it.
+         4% more tired. 20% of you is missing until you take something for it.
+
+--- home ----------------------------------------------------------------
+  level 11 · 2,11 in The Burnwarp Shallows · 1792 Fnorp · carrying 137 · worn 20% · Showstopper
+  fight: Bengulon Jungle Toad (rates 80) with 7 items -> It stops moving
+         +8 Fnorp
+         +4 more for the speed of it. 1.4s.
+         +16 experience, carried
+         153 on you. It is worth nothing until you bank it.
+         4% more tired. 24% of you is missing until you take something for it.
+  drank a tin: Cork Tea. 10% of it comes off; 14% left.
+  in town: level 11 · 1,18 in The End of All Gears · 1804 Fnorp · carrying 153 · worn 0% · Showstopper
+  town: 153 experience spent.  ·  252 of 402 towards the next level.
+  town: bought a tin
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+
+--- errand --------------------------------------------------------------
+  level 11 · 1,18 in The End of All Gears · 1800 Fnorp · carrying 0 · worn 0% · Showstopper
+  card: MARBULON'S DOOR
+        There is a door in the shallows with no house behind it, and an old woman sitting in front of it on a kitchen 
+        errand: THE FIRST THING SHE WANTS — "Three," she says. "So there were three." She writes nothing down. Then she gives you a thimble that has been mended twice, and says the first thing is done and the second thing is worse. — Marbulon's Thimble.
+        errand: THE SECOND THING SHE WANTS — Taken. go to THE GATE THAT WAS YOURS, then report back.
+  fight: The Rice Criers (rates 471) with 7 items -> It stops moving
+         +80 Fnorp
+         +94 experience, carried
+         94 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: The Rice Criers (rates 471) with 7 items -> It stops moving
+         +80 Fnorp
+         +94 experience, carried
+         188 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+
+--- home ----------------------------------------------------------------
+  level 11 · 13,2 in West Bambulon · 1985 Fnorp · carrying 188 · worn 8% · Showstopper
+  fight: Idol of Marbulon (rates 204) with 7 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 4.1s.
+         +40 experience, carried
+         228 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+  fight: Frosty Kev (rates 103) with 7 items -> It stops moving
+         +12 Fnorp
+         +6 more for the speed of it. 1.4s.
+         +20 experience, carried
+         248 on you. It is worth nothing until you bank it.
+         4% more tired. 16% of you is missing until you take something for it.
+  fight: Bengulon Jungle Toad (rates 80) with 7 items -> It stops moving
+         +8 Fnorp
+         +4 more for the speed of it. 1.4s.
+         +16 experience, carried
+         264 on you. It is worth nothing until you bank it.
+         4% more tired. 20% of you is missing until you take something for it.
+  in town: level 11 · 1,18 in The End of All Gears · 2060 Fnorp · carrying 264 · worn 0% · Showstopper
+  town: 264 experience spent.  ·  Level 12. One point to spend.  ·  +1 row on the weapon frame
+  town: bought a tin
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+  tree: took Flush Fit
+
+--- errand --------------------------------------------------------------
+  level 12 · 1,18 in The End of All Gears · 2056 Fnorp · carrying 0 · worn 0% · Showstopper
+  fight: A. Rat (rates 16) with 7 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 7 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         6 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: Frosty Kev (rates 103) with 7 items -> It stops moving
+         +12 Fnorp
+         +6 more for the speed of it. 1.4s.
+         +20 experience, carried
+         26 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+  fight: The Rice Criers (rates 471) with 7 items -> It stops moving
+         +80 Fnorp
+         +94 experience, carried
+         120 on you. It is worth nothing until you bank it.
+         4% more tired. 16% of you is missing until you take something for it.
+  fight: Lord Drabley Henpeck (rates 521) with 7 items -> You stop moving
+         No bounty. Nothing was beaten.
+         The 120 experience you were carrying is gone.
+         You wake up walking, and you have been walking a while.
+         4% more tired. 20% of you is missing until you take something for it.
+  fight: Idol of Marbulon (rates 204) with 7 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 4.1s.
+         +40 experience, carried
+         40 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: Lord Drabley Henpeck (rates 521) with 7 items -> You stop moving
+         No bounty. Nothing was beaten.
+         The 40 experience you were carrying is gone.
+         You wake up walking, and you have been walking a while.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 7 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: Ponkey Dong (rates 306) with 7 items -> It stops moving
+         +44 Fnorp
+         +22 more for the speed of it. 8.1s.
+         +61 experience, carried
+         64 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: The Rice Criers (rates 471) with 7 items -> It stops moving
+         +80 Fnorp
+         +94 experience, carried
+         158 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+  fight: Lord Drabley Henpeck (rates 521) with 7 items -> You stop moving
+         No bounty. Nothing was beaten.
+         The 158 experience you were carrying is gone.
+         You wake up walking, and you have been walking a while.
+         4% more tired. 16% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 7 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: The Brumpus (rates 114) with 7 items -> It stops moving
+         +14 Fnorp
+         +7 more for the speed of it. 2.7s.
+         +22 experience, carried
+         25 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: The Rice Criers (rates 471) with 7 items -> It stops moving
+         +80 Fnorp
+         +94 experience, carried
+         119 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+  fight: The Rice Criers (rates 471) with 7 items -> It stops moving
+         +80 Fnorp
+         +94 experience, carried
+         213 on you. It is worth nothing until you bank it.
+         4% more tired. 16% of you is missing until you take something for it.
+
+--- home ----------------------------------------------------------------
+  level 12 · 5,2 in West Bambulon · 2562 Fnorp · carrying 213 · worn 16% · Showstopper
+  fight: The Yodregar Archive (rates 227) with 7 items -> It stops moving
+         +34 Fnorp
+         +17 more for the speed of it. 4.1s.
+         +45 experience, carried
+         258 on you. It is worth nothing until you bank it.
+         4% more tired. 20% of you is missing until you take something for it.
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+  in town: level 12 · 1,18 in The End of All Gears · 2613 Fnorp · carrying 258 · worn 0% · Showstopper
+  town: 258 experience spent.  ·  372 of 543 towards the next level.
+  town: bought a tin
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+
+--- errand --------------------------------------------------------------
+  level 12 · 1,18 in The End of All Gears · 2609 Fnorp · carrying 0 · worn 0% · Showstopper
+  fight: A. Rat (rates 16) with 7 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: Lord Drabley Henpeck (rates 521) with 7 items -> You stop moving
+         No bounty. Nothing was beaten.
+         The 3 experience you were carrying is gone.
+         You wake up walking, and you have been walking a while.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: Lord Drabley Henpeck (rates 521) with 7 items -> You stop moving
+         No bounty. Nothing was beaten.
+         You wake up walking, and you have been walking a while.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: Frosty Kev (rates 103) with 7 items -> It stops moving
+         +12 Fnorp
+         +6 more for the speed of it. 1.4s.
+         +20 experience, carried
+         20 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: Idol of Marbulon (rates 204) with 7 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 4.1s.
+         +40 experience, carried
+         60 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: The Yodregar Archive (rates 227) with 7 items -> It stops moving
+         +34 Fnorp
+         +17 more for the speed of it. 4.1s.
+         +45 experience, carried
+         105 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+  fight: The Rice Criers (rates 471) with 7 items -> It stops moving
+         +80 Fnorp
+         +94 experience, carried
+         199 on you. It is worth nothing until you bank it.
+         4% more tired. 16% of you is missing until you take something for it.
+
+--- home ----------------------------------------------------------------
+  level 12 · 1,2 in West Bambulon · 2812 Fnorp · carrying 199 · worn 16% · Showstopper
+  fight: The Rice Criers (rates 471) with 7 items -> It stops moving
+         +80 Fnorp
+         +94 experience, carried
+         293 on you. It is worth nothing until you bank it.
+         4% more tired. 20% of you is missing until you take something for it.
+  fight: The Brumpus (rates 114) with 7 items -> It stops moving
+         +14 Fnorp
+         +7 more for the speed of it. 2.7s.
+         +22 experience, carried
+         315 on you. It is worth nothing until you bank it.
+         4% more tired. 24% of you is missing until you take something for it.
+  drank a tin: Cork Tea. 10% of it comes off; 14% left.
+  in town: level 12 · 1,18 in The End of All Gears · 2913 Fnorp · carrying 315 · worn 0% · Showstopper
+  town: 315 experience spent.  ·  Level 13. One point to spend.  ·  +1 row on the chest frame
+  town: bought a tin
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+  tree: took Jinx Read
+
+--- errand --------------------------------------------------------------
+  level 13 · 1,18 in The End of All Gears · 2909 Fnorp · carrying 0 · worn 0% · Showstopper
+  fight: Wallspider Swarm (rates 95) with 7 items -> It stops moving
+         +9 Fnorp
+         +4 more for the speed of it. 2.7s.
+         +19 experience, carried
+         19 on you. It is worth nothing until you bank it.
+         It had a Wallspider Crown on it. They do not usually.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: Velothi High Guard (rates 161) with 8 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.6s.
+         +32 experience, carried
+         51 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: The Rice Criers (rates 471) with 8 items -> It stops moving
+         +80 Fnorp
+         +94 experience, carried
+         145 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+  fight: The Rice Criers (rates 471) with 8 items -> It stops moving
+         +80 Fnorp
+         +94 experience, carried
+         239 on you. It is worth nothing until you bank it.
+         4% more tired. 16% of you is missing until you take something for it.
+  fight: Lord Drabley Henpeck (rates 521) with 8 items -> You stop moving
+         No bounty. Nothing was beaten.
+         The 239 experience you were carrying is gone.
+         You wake up walking, and you have been walking a while.
+         4% more tired. 20% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 8 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: Frosty Kev (rates 103) with 8 items -> It stops moving
+         +12 Fnorp
+         +6 more for the speed of it. 1.4s.
+         +20 experience, carried
+         23 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: Ponkey Dong (rates 306) with 8 items -> It stops moving
+         +44 Fnorp
+         +22 more for the speed of it. 8.1s.
+         +61 experience, carried
+         84 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+  fight: Lord Drabley Henpeck (rates 521) with 8 items -> You stop moving
+         No bounty. Nothing was beaten.
+         The 84 experience you were carrying is gone.
+         You wake up walking, and you have been walking a while.
+         4% more tired. 16% of you is missing until you take something for it.
+  fight: The Brumpus (rates 114) with 8 items -> It stops moving
+         +14 Fnorp
+         +7 more for the speed of it. 2.7s.
+         +22 experience, carried
+         22 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: Ponkey Dong (rates 306) with 8 items -> It stops moving
+         +44 Fnorp
+         +22 more for the speed of it. 8.1s.
+         +61 experience, carried
+         83 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: Lord Drabley Henpeck (rates 521) with 8 items -> You stop moving
+         No bounty. Nothing was beaten.
+         The 83 experience you were carrying is gone.
+         You wake up walking, and you have been walking a while.
+         4% more tired. 12% of you is missing until you take something for it.
+  fight: Lord Drabley Henpeck (rates 521) with 8 items -> You stop moving
+         No bounty. Nothing was beaten.
+         You wake up walking, and you have been walking a while.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 8 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 8 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         6 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: The Yodregar Archive (rates 227) with 8 items -> It stops moving
+         +34 Fnorp
+         +17 more for the speed of it. 4.1s.
+         +45 experience, carried
+         51 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+  fight: The Yodregar Archive (rates 227) with 8 items -> It stops moving
+         +34 Fnorp
+         +17 more for the speed of it. 4.1s.
+         +45 experience, carried
+         96 on you. It is worth nothing until you bank it.
+         4% more tired. 16% of you is missing until you take something for it.
+  fight: The Rice Criers (rates 471) with 8 items -> It stops moving
+         +80 Fnorp
+         +94 experience, carried
+         190 on you. It is worth nothing until you bank it.
+         4% more tired. 20% of you is missing until you take something for it.
+  fight: The Rice Criers (rates 471) with 8 items -> It stops moving
+         +80 Fnorp
+         +94 experience, carried
+         284 on you. It is worth nothing until you bank it.
+         4% more tired. 24% of you is missing until you take something for it.
+  drank a tin: Cork Tea. 10% of it comes off; 14% left.
+
+--- home ----------------------------------------------------------------
+  level 13 · 6,2 in West Bambulon · 3578 Fnorp · carrying 284 · worn 14% · Showstopper
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+  fight: A. Rat (rates 16) with 8 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         287 on you. It is worth nothing until you bank it.
+         4% more tired. 18% of you is missing until you take something for it.
+  in town: level 13 · 1,18 in The End of All Gears · 3587 Fnorp · carrying 287 · worn 0% · Showstopper
+  town: 287 experience spent.  ·  431 of 733 towards the next level.
+  town: bought a tin
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+
+--- errand --------------------------------------------------------------
+  level 13 · 1,18 in The End of All Gears · 3583 Fnorp · carrying 0 · worn 0% · Showstopper
+  fight: Nesbit the Asker (rates 192) with 8 items -> It stops moving
+         +26 Fnorp
+         +13 more for the speed of it. 4.5s.
+         +38 experience, carried
+         38 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: The Rice Criers (rates 471) with 8 items -> It stops moving
+         +80 Fnorp
+         +94 experience, carried
+         132 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: Lord Drabley Henpeck (rates 521) with 8 items -> You stop moving
+         No bounty. Nothing was beaten.
+         The 132 experience you were carrying is gone.
+         You wake up walking, and you have been walking a while.
+         4% more tired. 12% of you is missing until you take something for it.
+  fight: Lord Drabley Henpeck (rates 521) with 8 items -> You stop moving
+         No bounty. Nothing was beaten.
+         You wake up walking, and you have been walking a while.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 8 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: Bengulon Jungle Toad (rates 80) with 8 items -> It stops moving
+         +8 Fnorp
+         +4 more for the speed of it. 1.4s.
+         +16 experience, carried
+         19 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: Lord Drabley Henpeck (rates 521) with 8 items -> You stop moving
+         No bounty. Nothing was beaten.
+         The 19 experience you were carrying is gone.
+         You wake up walking, and you have been walking a while.
+         4% more tired. 12% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 8 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: The Crimper (rates 125) with 8 items -> It stops moving
+         +10 Fnorp
+         +5 more for the speed of it. 2.7s.
+         +25 experience, carried
+         28 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: The Rice Criers (rates 471) with 8 items -> It stops moving
+         +80 Fnorp
+         +94 experience, carried
+         122 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+  fight: The Rice Criers (rates 471) with 8 items -> It stops moving
+         +80 Fnorp
+         +94 experience, carried
+         216 on you. It is worth nothing until you bank it.
+         4% more tired. 16% of you is missing until you take something for it.
+  fight: The Rice Criers (rates 471) with 8 items -> It stops moving
+         +80 Fnorp
+         +94 experience, carried
+         310 on you. It is worth nothing until you bank it.
+         4% more tired. 20% of you is missing until you take something for it.
+
+--- home ----------------------------------------------------------------
+  level 13 · 5,2 in West Bambulon · 3987 Fnorp · carrying 310 · worn 20% · Showstopper
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+  fight: A. Rat (rates 16) with 8 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         313 on you. It is worth nothing until you bank it.
+         4% more tired. 24% of you is missing until you take something for it.
+  drank a tin: Cork Tea. 10% of it comes off; 14% left.
+  fight: A. Rat (rates 16) with 8 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         316 on you. It is worth nothing until you bank it.
+         4% more tired. 18% of you is missing until you take something for it.
+  in town: level 13 · 1,18 in The End of All Gears · 4005 Fnorp · carrying 316 · worn 0% · Showstopper
+  town: 316 experience spent.  ·  Level 14. One point to spend.  ·  +1 row on the helmet frame
+  town: bought a tin
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+
+--- errand --------------------------------------------------------------
+  level 14 · 1,18 in The End of All Gears · 4001 Fnorp · carrying 0 · worn 0% · Showstopper
+  fight: A. Rat (rates 16) with 8 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: Frosty Kev (rates 103) with 8 items -> It stops moving
+         +12 Fnorp
+         +6 more for the speed of it. 1.4s.
+         +20 experience, carried
+         23 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: Idol of Marbulon (rates 204) with 8 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 4.1s.
+         +40 experience, carried
+         63 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+  fight: The Yodregar Archive (rates 227) with 8 items -> It stops moving
+         +34 Fnorp
+         +17 more for the speed of it. 4.1s.
+         +45 experience, carried
+         108 on you. It is worth nothing until you bank it.
+         4% more tired. 16% of you is missing until you take something for it.
+  fight: The Rice Criers (rates 471) with 8 items -> It stops moving
+         +80 Fnorp
+         +94 experience, carried
+         202 on you. It is worth nothing until you bank it.
+         4% more tired. 20% of you is missing until you take something for it.
+  fight: The Rice Criers (rates 471) with 8 items -> It stops moving
+         +80 Fnorp
+         +94 experience, carried
+         296 on you. It is worth nothing until you bank it.
+         4% more tired. 24% of you is missing until you take something for it.
+  drank a tin: Cork Tea. 10% of it comes off; 14% left.
+  fight: Lord Drabley Henpeck (rates 521) with 8 items -> You stop moving
+         No bounty. Nothing was beaten.
+         The 296 experience you were carrying is gone.
+         You wake up walking, and you have been walking a while.
+         4% more tired. 18% of you is missing until you take something for it.
+  fight: Bengulon Jungle Toad (rates 80) with 8 items -> It stops moving
+         +8 Fnorp
+         +4 more for the speed of it. 1.4s.
+         +16 experience, carried
+         16 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: Idol of Marbulon (rates 204) with 8 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 4.1s.
+         +40 experience, carried
+         56 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: Idol of Marbulon (rates 204) with 8 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 4.1s.
+         +40 experience, carried
+         96 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+  fight: Lord Drabley Henpeck (rates 521) with 8 items -> You stop moving
+         No bounty. Nothing was beaten.
+         The 96 experience you were carrying is gone.
+         You wake up walking, and you have been walking a while.
+         4% more tired. 16% of you is missing until you take something for it.
+  fight: Bengulon Jungle Toad (rates 80) with 8 items -> It stops moving
+         +8 Fnorp
+         +4 more for the speed of it. 1.4s.
+         +16 experience, carried
+         16 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 8 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         19 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: The Brumpus (rates 114) with 8 items -> It stops moving
+         +14 Fnorp
+         +7 more for the speed of it. 2.7s.
+         +22 experience, carried
+         41 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+  fight: Velothi High Guard (rates 161) with 8 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.6s.
+         +32 experience, carried
+         73 on you. It is worth nothing until you bank it.
+         4% more tired. 16% of you is missing until you take something for it.
+  fight: Ponkey Dong (rates 306) with 8 items -> It stops moving
+         +44 Fnorp
+         +22 more for the speed of it. 8.1s.
+         +61 experience, carried
+         134 on you. It is worth nothing until you bank it.
+         4% more tired. 20% of you is missing until you take something for it.
+  fight: Lord Drabley Henpeck (rates 521) with 8 items -> You stop moving
+         No bounty. Nothing was beaten.
+         The 134 experience you were carrying is gone.
+         You wake up walking, and you have been walking a while.
+         4% more tired. 24% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 8 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 8 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         6 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: Idol of Marbulon (rates 204) with 8 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 4.1s.
+         +40 experience, carried
+         46 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+  fight: Idol of Marbulon (rates 204) with 8 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 4.1s.
+         +40 experience, carried
+         86 on you. It is worth nothing until you bank it.
+         4% more tired. 16% of you is missing until you take something for it.
+  fight: Lord Drabley Henpeck (rates 521) with 8 items -> You stop moving
+         No bounty. Nothing was beaten.
+         The 86 experience you were carrying is gone.
+         You wake up walking, and you have been walking a while.
+         4% more tired. 20% of you is missing until you take something for it.
+  fight: The Rice Criers (rates 471) with 8 items -> It stops moving
+         +80 Fnorp
+         +94 experience, carried
+         94 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: The Rice Criers (rates 471) with 8 items -> It stops moving
+         +80 Fnorp
+         +94 experience, carried
+         188 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: The Rice Criers (rates 471) with 8 items -> It stops moving
+         +80 Fnorp
+         +94 experience, carried
+         282 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+  fight: The Rice Criers (rates 471) with 8 items -> It stops moving
+         +80 Fnorp
+         +94 experience, carried
+         376 on you. It is worth nothing until you bank it.
+         4% more tired. 16% of you is missing until you take something for it.
+
+--- home ----------------------------------------------------------------
+  level 14 · 6,2 in West Bambulon · 4958 Fnorp · carrying 376 · worn 16% · Showstopper
+  fight: Velothi High Guard (rates 161) with 8 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.6s.
+         +32 experience, carried
+         408 on you. It is worth nothing until you bank it.
+         4% more tired. 20% of you is missing until you take something for it.
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+  fight: A. Rat (rates 16) with 8 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         411 on you. It is worth nothing until you bank it.
+         4% more tired. 24% of you is missing until you take something for it.
+  drank a tin: Cork Tea. 10% of it comes off; 14% left.
+  in town: level 14 · 1,18 in The End of All Gears · 5003 Fnorp · carrying 411 · worn 0% · Showstopper
+  town: 411 experience spent.  ·  425 of 989 towards the next level.
+  town: bought a tin
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+
+--- errand --------------------------------------------------------------
+  level 14 · 1,18 in The End of All Gears · 4999 Fnorp · carrying 0 · worn 0% · Showstopper
+  fight: Lord Drabley Henpeck (rates 521) with 8 items -> You stop moving
+         No bounty. Nothing was beaten.
+         You wake up walking, and you have been walking a while.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 8 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: The Brumpus (rates 114) with 8 items -> It stops moving
+         +14 Fnorp
+         +7 more for the speed of it. 2.7s.
+         +22 experience, carried
+         25 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: Ponkey Dong (rates 306) with 8 items -> It stops moving
+         +44 Fnorp
+         +22 more for the speed of it. 8.1s.
+         +61 experience, carried
+         86 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+  fight: Idol of Marbulon (rates 204) with 8 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 4.1s.
+         +40 experience, carried
+         126 on you. It is worth nothing until you bank it.
+         4% more tired. 16% of you is missing until you take something for it.
+  fight: The Rice Criers (rates 471) with 8 items -> It stops moving
+         +80 Fnorp
+         +94 experience, carried
+         220 on you. It is worth nothing until you bank it.
+         4% more tired. 20% of you is missing until you take something for it.
+  fight: Lord Drabley Henpeck (rates 521) with 8 items -> You stop moving
+         No bounty. Nothing was beaten.
+         The 220 experience you were carrying is gone.
+         You wake up walking, and you have been walking a while.
+         4% more tired. 24% of you is missing until you take something for it.
+  fight: Velothi High Guard (rates 161) with 8 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.6s.
+         +32 experience, carried
+         32 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: Lord Drabley Henpeck (rates 521) with 8 items -> You stop moving
+         No bounty. Nothing was beaten.
+         The 32 experience you were carrying is gone.
+         You wake up walking, and you have been walking a while.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 8 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: The Brumpus (rates 114) with 8 items -> It stops moving
+         +14 Fnorp
+         +7 more for the speed of it. 2.7s.
+         +22 experience, carried
+         25 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: Velothi High Guard (rates 161) with 8 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.6s.
+         +32 experience, carried
+         57 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+  fight: Lord Drabley Henpeck (rates 521) with 8 items -> You stop moving
+         No bounty. Nothing was beaten.
+         The 57 experience you were carrying is gone.
+         You wake up walking, and you have been walking a while.
+         4% more tired. 16% of you is missing until you take something for it.
+  fight: Bengulon Jungle Toad (rates 80) with 8 items -> It stops moving
+         +8 Fnorp
+         +4 more for the speed of it. 1.4s.
+         +16 experience, carried
+         16 on you. It is worth nothing until you bank it.
+         It had a Bengulon Toad Hide on it. They do not usually.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 8 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         19 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: Ponkey Dong (rates 306) with 8 items -> It stops moving
+         +44 Fnorp
+         +22 more for the speed of it. 8.1s.
+         +61 experience, carried
+         80 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+  fight: Lord Drabley Henpeck (rates 521) with 8 items -> You stop moving
+         No bounty. Nothing was beaten.
+         The 80 experience you were carrying is gone.
+         You wake up walking, and you have been walking a while.
+         4% more tired. 16% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 8 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 8 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         6 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: The Crimper (rates 125) with 8 items -> It stops moving
+         +10 Fnorp
+         +5 more for the speed of it. 2.7s.
+         +25 experience, carried
+         31 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+  fight: Velothi High Guard (rates 161) with 8 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.6s.
+         +32 experience, carried
+         63 on you. It is worth nothing until you bank it.
+         4% more tired. 16% of you is missing until you take something for it.
+  fight: The Rice Criers (rates 471) with 8 items -> It stops moving
+         +80 Fnorp
+         +94 experience, carried
+         157 on you. It is worth nothing until you bank it.
+         4% more tired. 20% of you is missing until you take something for it.
+  fight: Lord Drabley Henpeck (rates 521) with 8 items -> You stop moving
+         No bounty. Nothing was beaten.
+         The 157 experience you were carrying is gone.
+         You wake up walking, and you have been walking a while.
+         4% more tired. 24% of you is missing until you take something for it.
+  fight: The Brumpus (rates 114) with 8 items -> It stops moving
+         +14 Fnorp
+         +7 more for the speed of it. 2.7s.
+         +22 experience, carried
+         22 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: Velothi High Guard (rates 161) with 8 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.6s.
+         +32 experience, carried
+         54 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: The Rice Criers (rates 471) with 8 items -> It stops moving
+         +80 Fnorp
+         +94 experience, carried
+         148 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+  fight: The Rice Criers (rates 471) with 8 items -> It stops moving
+         +80 Fnorp
+         +94 experience, carried
+         242 on you. It is worth nothing until you bank it.
+         4% more tired. 16% of you is missing until you take something for it.
+  fight: The Rice Criers (rates 471) with 8 items -> It stops moving
+         +80 Fnorp
+         +94 experience, carried
+         336 on you. It is worth nothing until you bank it.
+         4% more tired. 20% of you is missing until you take something for it.
+
+--- home ----------------------------------------------------------------
+  level 14 · 3,2 in West Bambulon · 5855 Fnorp · carrying 336 · worn 20% · Showstopper
+  card: MARBULON'S DOOR
+        There is a door in the shallows with no house behind it, and an old woman sitting in front of it on a kitchen 
+        errand: THE SECOND THING SHE WANTS — You have not been yet.
+  fight: The Brumpus (rates 114) with 8 items -> It stops moving
+         +14 Fnorp
+         +7 more for the speed of it. 2.7s.
+         +22 experience, carried
+         358 on you. It is worth nothing until you bank it.
+         4% more tired. 24% of you is missing until you take something for it.
+  drank a tin: Cork Tea. 10% of it comes off; 14% left.
+  in town: level 14 · 1,18 in The End of All Gears · 5876 Fnorp · carrying 358 · worn 0% · Showstopper
+  town: 358 experience spent.  ·  783 of 989 towards the next level.
+  town: bought a tin
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+
+--- errand --------------------------------------------------------------
+  level 14 · 1,18 in The End of All Gears · 5872 Fnorp · carrying 0 · worn 0% · Showstopper
+  fight: Frosty Kev (rates 103) with 8 items -> It stops moving
+         +12 Fnorp
+         +6 more for the speed of it. 1.4s.
+         +20 experience, carried
+         20 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: The Rice Criers (rates 471) with 8 items -> It stops moving
+         +80 Fnorp
+         +94 experience, carried
+         114 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: Lord Drabley Henpeck (rates 521) with 8 items -> You stop moving
+         No bounty. Nothing was beaten.
+         The 114 experience you were carrying is gone.
+         You wake up walking, and you have been walking a while.
+         4% more tired. 12% of you is missing until you take something for it.
+  fight: Velothi High Guard (rates 161) with 8 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.6s.
+         +32 experience, carried
+         32 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: Ponkey Dong (rates 306) with 8 items -> It stops moving
+         +44 Fnorp
+         +22 more for the speed of it. 8.1s.
+         +61 experience, carried
+         93 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: Idol of Marbulon (rates 204) with 8 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 4.1s.
+         +40 experience, carried
+         133 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+  fight: Lord Drabley Henpeck (rates 521) with 8 items -> You stop moving
+         No bounty. Nothing was beaten.
+         The 133 experience you were carrying is gone.
+         You wake up walking, and you have been walking a while.
+         4% more tired. 16% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 8 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: The Brumpus (rates 114) with 8 items -> It stops moving
+         +14 Fnorp
+         +7 more for the speed of it. 2.7s.
+         +22 experience, carried
+         25 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: Ponkey Dong (rates 306) with 8 items -> It stops moving
+         +44 Fnorp
+         +22 more for the speed of it. 8.1s.
+         +61 experience, carried
+         86 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+  fight: Idol of Marbulon (rates 204) with 8 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 4.1s.
+         +40 experience, carried
+         126 on you. It is worth nothing until you bank it.
+         4% more tired. 16% of you is missing until you take something for it.
+  fight: The Rice Criers (rates 471) with 8 items -> It stops moving
+         +80 Fnorp
+         +94 experience, carried
+         220 on you. It is worth nothing until you bank it.
+         4% more tired. 20% of you is missing until you take something for it.
+  fight: The Rice Criers (rates 471) with 8 items -> It stops moving
+         +80 Fnorp
+         +94 experience, carried
+         314 on you. It is worth nothing until you bank it.
+         4% more tired. 24% of you is missing until you take something for it.
+  drank a tin: Cork Tea. 10% of it comes off; 14% left.
+  fight: The Rice Criers (rates 471) with 8 items -> It stops moving
+         +80 Fnorp
+         +94 experience, carried
+         408 on you. It is worth nothing until you bank it.
+         4% more tired. 18% of you is missing until you take something for it.
+
+--- home ----------------------------------------------------------------
+  level 14 · 2,2 in West Bambulon · 6498 Fnorp · carrying 408 · worn 18% · Showstopper
+  fight: Idol of Marbulon (rates 204) with 8 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 4.1s.
+         +40 experience, carried
+         448 on you. It is worth nothing until you bank it.
+         4% more tired. 22% of you is missing until you take something for it.
+  fight: The Yodregar Archive (rates 227) with 8 items -> It stops moving
+         +34 Fnorp
+         +17 more for the speed of it. 4.1s.
+         +45 experience, carried
+         493 on you. It is worth nothing until you bank it.
+         4% more tired. 26% of you is missing until you take something for it.
+  drank a tin: Cork Tea. 10% of it comes off; 16% left.
+  fight: Idol of Marbulon (rates 204) with 8 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 4.1s.
+         +40 experience, carried
+         533 on you. It is worth nothing until you bank it.
+         4% more tired. 20% of you is missing until you take something for it.
+  in town: level 14 · 1,18 in The End of All Gears · 6639 Fnorp · carrying 533 · worn 0% · Showstopper
+  town: 533 experience spent.  ·  Level 15. One point to spend.  ·  +1 row on the gloves frame
+  town: bought a tin
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+  tree: took First Bell
+
+--- errand --------------------------------------------------------------
+  level 15 · 1,18 in The End of All Gears · 6635 Fnorp · carrying 0 · worn 0% · Showstopper
+  fight: The Yodregar Archive (rates 227) with 8 items -> It stops moving
+         +34 Fnorp
+         +17 more for the speed of it. 4.1s.
+         +45 experience, carried
+         45 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: The Rice Criers (rates 471) with 8 items -> It stops moving
+         +80 Fnorp
+         +94 experience, carried
+         139 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: The Rice Criers (rates 471) with 8 items -> It stops moving
+         +80 Fnorp
+         +94 experience, carried
+         233 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+  fight: The Rice Criers (rates 471) with 8 items -> It stops moving
+         +80 Fnorp
+         +94 experience, carried
+         327 on you. It is worth nothing until you bank it.
+         4% more tired. 16% of you is missing until you take something for it.
+  card: THE GATE THAT WAS YOURS
+        The Great Gear Cave has a gate on it now. Cork, over sneel, over the old bracket work, which is still there un
+        chose: Read the six notices
+        +40 toward the next level
+  fight: The Rice Criers (rates 471) with 8 items -> It stops moving
+         +80 Fnorp
+         +94 experience, carried
+         421 on you. It is worth nothing until you bank it.
+         4% more tired. 20% of you is missing until you take something for it.
+  fight: Idol of Marbulon (rates 204) with 8 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 4.1s.
+         +40 experience, carried
+         461 on you. It is worth nothing until you bank it.
+         4% more tired. 24% of you is missing until you take something for it.
+  drank a tin: Cork Tea. 10% of it comes off; 14% left.
+
+--- home ----------------------------------------------------------------
+  level 15 · 17,4 in The Bengulon Verge · 7051 Fnorp · carrying 461 · worn 14% · Showstopper
+  fight: The Yodregar Archive (rates 227) with 8 items -> It stops moving
+         +34 Fnorp
+         +17 more for the speed of it. 4.1s.
+         +45 experience, carried
+         506 on you. It is worth nothing until you bank it.
+         4% more tired. 18% of you is missing until you take something for it.
+  card: THE STANDING FRAME
+        A gear-frame, upright in the shallows, empty. Chest height. It has been standing here long enough that the wat
+  fight: A. Rat (rates 16) with 8 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         509 on you. It is worth nothing until you bank it.
+         4% more tired. 22% of you is missing until you take something for it.
+  fight: Bengulon Jungle Toad (rates 80) with 8 items -> It stops moving
+         +8 Fnorp
+         +4 more for the speed of it. 1.4s.
+         +16 experience, carried
+         525 on you. It is worth nothing until you bank it.
+         4% more tired. 26% of you is missing until you take something for it.
+  in town: level 15 · 1,18 in The End of All Gears · 7123 Fnorp · carrying 525 · worn 0% · Showstopper
+  town: 525 experience spent.  ·  852 of 1336 towards the next level.
+  town: bought a tin
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+
+--- errand --------------------------------------------------------------
+  level 15 · 1,18 in The End of All Gears · 7119 Fnorp · carrying 0 · worn 0% · Showstopper
+  fight: Velothi High Guard (rates 161) with 8 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.6s.
+         +32 experience, carried
+         32 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  card: MARBULON'S DOOR
+        There is a door in the shallows with no house behind it, and an old woman sitting in front of it on a kitchen 
+        errand: THE SECOND THING SHE WANTS — "Still standing," she repeats, and does not sound surprised. She gives you the key off her apron, and a piece of glass she says is ground for nine planes over and works best on this one. Then she turns the chair to face the door and does not turn it back. — Marbulon's Key and The Bengulon Glass.
+
+--- cave ----------------------------------------------------------------
+  level 15 · 3,10 in The Burnwarp Shallows · 7185 Fnorp · carrying 32 · worn 4% · Showstopper
+  fight: Velothi High Guard (rates 161) with 8 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.6s.
+         +32 experience, carried
+         64 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: Idol of Marbulon (rates 204) with 8 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 4.1s.
+         +40 experience, carried
+         104 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+  fight: The Rice Criers (rates 471) with 8 items -> It stops moving
+         +80 Fnorp
+         +94 experience, carried
+         198 on you. It is worth nothing until you bank it.
+         4% more tired. 16% of you is missing until you take something for it.
+  fight: The Rice Criers (rates 471) with 8 items -> It stops moving
+         +80 Fnorp
+         +94 experience, carried
+         292 on you. It is worth nothing until you bank it.
+         4% more tired. 20% of you is missing until you take something for it.
+  fight: Lord Drabley Henpeck (rates 521) with 8 items -> You stop moving
+         No bounty. Nothing was beaten.
+         The 292 experience you were carrying is gone.
+         You wake up walking, and you have been walking a while.
+         4% more tired. 24% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 8 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: The Yodregar Archive (rates 227) with 8 items -> It stops moving
+         +34 Fnorp
+         +17 more for the speed of it. 4.1s.
+         +45 experience, carried
+         48 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: Idol of Marbulon (rates 204) with 8 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 4.1s.
+         +40 experience, carried
+         88 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+  fight: The Rice Criers (rates 471) with 8 items -> It stops moving
+         +80 Fnorp
+         +94 experience, carried
+         182 on you. It is worth nothing until you bank it.
+         4% more tired. 16% of you is missing until you take something for it.
+  fight: The Rice Criers (rates 471) with 8 items -> It stops moving
+         +80 Fnorp
+         +94 experience, carried
+         276 on you. It is worth nothing until you bank it.
+         4% more tired. 20% of you is missing until you take something for it.
+  fight: Lord Drabley Henpeck (rates 521) with 8 items -> You stop moving
+         No bounty. Nothing was beaten.
+         The 276 experience you were carrying is gone.
+         You wake up walking, and you have been walking a while.
+         4% more tired. 24% of you is missing until you take something for it.
+  fight: Nesbit the Asker (rates 192) with 8 items -> It stops moving
+         +26 Fnorp
+         +13 more for the speed of it. 4.5s.
+         +38 experience, carried
+         38 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: The Rice Criers (rates 471) with 8 items -> It stops moving
+         +80 Fnorp
+         +94 experience, carried
+         132 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: The Rice Criers (rates 471) with 8 items -> It stops moving
+         +80 Fnorp
+         +94 experience, carried
+         226 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+  fight: The Rice Criers (rates 471) with 8 items -> It stops moving
+         +80 Fnorp
+         +94 experience, carried
+         320 on you. It is worth nothing until you bank it.
+         4% more tired. 16% of you is missing until you take something for it.
+  fight: The Rice Criers (rates 471) with 8 items -> It stops moving
+         +80 Fnorp
+         +94 experience, carried
+         414 on you. It is worth nothing until you bank it.
+         4% more tired. 20% of you is missing until you take something for it.
+
+--- boss ----------------------------------------------------------------
+  level 15 · 2,1 in The Great Gear Cave · 8050 Fnorp · carrying 414 · worn 20% · Showstopper
+  fight: Velothi High Guard (rates 161) with 8 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.6s.
+         +32 experience, carried
+         446 on you. It is worth nothing until you bank it.
+         4% more tired. 24% of you is missing until you take something for it.
+  drank a tin: Cork Tea. 10% of it comes off; 14% left.
+  fight: Velothi High Guard (rates 161) with 8 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.6s.
+         +32 experience, carried
+         478 on you. It is worth nothing until you bank it.
+         4% more tired. 18% of you is missing until you take something for it.
+  fight: Velothi High Guard (rates 161) with 8 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.6s.
+         +32 experience, carried
+         510 on you. It is worth nothing until you bank it.
+         4% more tired. 22% of you is missing until you take something for it.
+  fight: Ponkey Dong (rates 306) with 8 items -> It stops moving
+         +44 Fnorp
+         +22 more for the speed of it. 8.1s.
+         +61 experience, carried
+         571 on you. It is worth nothing until you bank it.
+         It was carrying The Key to the Deep Chocolate.
+         4% more tired. 26% of you is missing until you take something for it.
+
+--- out -----------------------------------------------------------------
+  level 15 · 7,3 in The Great Gear Cave · 8224 Fnorp · carrying 571 · worn 26% · Showstopper
+  fight: Velothi High Guard (rates 161) with 8 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.6s.
+         +32 experience, carried
+         603 on you. It is worth nothing until you bank it.
+         4% more tired. 30% of you is missing until you take something for it.
+
+--- home before the door ------------------------------------------------
+  level 15 · 16,2 in West Bambulon · 8260 Fnorp · carrying 603 · worn 30% · Showstopper
+  fight: The Yodregar Archive (rates 227) with 8 items -> It stops moving
+         +34 Fnorp
+         +17 more for the speed of it. 4.1s.
+         +45 experience, carried
+         648 on you. It is worth nothing until you bank it.
+         4% more tired. 34% of you is missing until you take something for it.
+  fight: Velothi High Guard (rates 161) with 8 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.6s.
+         +32 experience, carried
+         680 on you. It is worth nothing until you bank it.
+         4% more tired. 38% of you is missing until you take something for it.
+  card: THE COUNTED HEAP
+        Somebody has stacked eleven thousand two hundred gear-teeth in a cone on the slag, sorted by pitch, and writte
+  fight: A. Rat (rates 16) with 8 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         683 on you. It is worth nothing until you bank it.
+         4% more tired. 42% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 8 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         686 on you. It is worth nothing until you bank it.
+         4% more tired. 46% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 8 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         689 on you. It is worth nothing until you bank it.
+         4% more tired. 50% of you is missing until you take something for it.
+  in town: level 15 · 1,18 in The End of All Gears · 8374 Fnorp · carrying 689 · worn 0% · Showstopper
+  town: 689 experience spent.  ·  Level 16. One point to spend.  ·  +1 row on the greaves frame
+  town: bought a tin
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+  town: errand: A DOOR WHERE THERE WAS NOT ONE — Taken. go to the door in the wall, then report back.
+
+--- door ----------------------------------------------------------------
+  level 16 · 1,18 in The End of All Gears · 8370 Fnorp · carrying 0 · worn 0% · Showstopper
+  fight: A. Rat (rates 16) with 8 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.4s.
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  card: THE DOOR IN THE WALL
+        The key turns. It turns the whole way, which the Cave's lock did not do, and the door comes off the wall towar
+
+--- the treyway ---------------------------------------------------------
+  level 16 · 13,13 in The First Treyway · 8379 Fnorp · carrying 3 · worn 4% · Showstopper
+  16x16, 3 regions: The First Treyway, The Kolok Downs, The Wextreen Heights
+  fight: Galapagos Jim (rates 453) with 8 items -> You stop moving
+         No bounty. Nothing was beaten.
+         The 3 experience you were carrying is gone.
+         You wake up walking, and you have been walking a while.
+         4% more tired. 8% of you is missing until you take something for it.
+
+--- door ----------------------------------------------------------------
+  level 16 · 1,18 in The End of All Gears · 8379 Fnorp · carrying 0 · worn 0% · Showstopper
+  fight: Bengulon Jungle Toad (rates 80) with 8 items -> It stops moving
+         +8 Fnorp
+         +4 more for the speed of it. 1.4s.
+         +16 experience, carried
+         16 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+
+--- the treyway ---------------------------------------------------------
+  level 16 · 7,13 in The First Treyway · 8391 Fnorp · carrying 16 · worn 4% · Showstopper
+  card: THE KETTLEWORKS ROAD
+        The road goes west and there is a milestone at the turn with two numbers cut into it. The top one says eleven 
+        chose: Ask what they want
+        +8 toward the next level
+  card: THE WEXTREEN REACH
+        The plain stops. It does not stop at anything — no cliff, no water, no fence — it simply stops being the sort 
+        chose: Read the five
+        +10 toward the next level
+
+--- back ----------------------------------------------------------------
+  level 16 · 6,1 in The Wextreen Heights · 8391 Fnorp · carrying 16 · worn 4% · Showstopper
+  fight: Skeleton Tool Wizard (rates 790) with 8 items -> You stop moving
+         No bounty. Nothing was beaten.
+         The 16 experience you were carrying is gone.
+         You wake up walking, and you have been walking a while.
+         4% more tired. 8% of you is missing until you take something for it.
+
+--- back through the door -----------------------------------------------
+  level 16 · 1,18 in The End of All Gears · 8391 Fnorp · carrying 0 · worn 0% · Showstopper
+
+CROSSED, READ BOTH ROADS AND CAME BACK at step 2385. level 16 · 1,18 in The End of All Gears · 8391 Fnorp · carrying 0 · worn 0% · Showstopper
+  (1958 of 9000 presses actually moved)
+
+--- what happened -------------------------------------------------------
+  277 wins, 30 losses
+  level 16 · 1,18 in The End of All Gears · 8391 Fnorp · carrying 0 · worn 0% · Showstopper
+  errands: THE EYES HAVE IT [done], THE ONES STILL DOWN THERE [carrying], SOMEBODY SHOULD TELL HIM [done], THE COUNT IS WRONG [done], THE FIRST THING SHE WANTS [done], THE SECOND THING SHE WANTS [done], THE FRAME THAT STANDS [done], A DOOR WHERE THERE WAS NOT ONE [ready]
+  sheet: 530 max health, 33 strength, 6 regen a second, 300% weapon power, 16% mind resist, 35% curse resist, 7% physical resist
+
+--- the page ------------------------------------------------------------
+  no console errors

@@ -17,9 +17,10 @@ fn the_compiled_in_data_matches_the_files() {
     // **Every file, not four of them.** This was a list of four written out by
     // hand while `data.rs` embedded eleven, so a stale `shops.json`,
     // `quests.json`, `skills.json`, `supplies.json`, `enchs.json`,
-    // `dungeon.json` or `drops.json` would have shipped without a word. The
-    // list lives in `data::FILES` now, beside the things it names.
-    assert!(data::FILES.len() >= 11, "content was added to data.rs and not to FILES");
+    // a map file or `drops.json` would have shipped without a word. The list
+    // lives in `data::FILES` now, beside the things it names — and a name in
+    // it may have a directory in it, because the maps live in `data/maps/`.
+    assert!(data::FILES.len() >= 12, "content was added to data.rs and not to FILES");
     for (name, embedded) in data::FILES.iter().copied() {
         assert_eq!(
             on_disk(name),

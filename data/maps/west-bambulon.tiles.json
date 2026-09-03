@@ -204,7 +204,7 @@
         1,
         10
       ],
-      "kind": "door",
+      "kind": "gate",
       "id": "the-door-in-the-wall",
       "name": "the door in the wall",
       "needs": "The Deep Gate Key",
@@ -212,10 +212,11 @@
       "hidden_until": "the-bottom-of-the-cave",
       "prose": [
         "The key turns. It turns the whole way, which the Cave's lock did not do, and the door comes off the wall towards you rather than away.",
-        "Behind it is nine feet of cut rock and then the end of what anybody has written down. There is a bracket in the ceiling with nothing hanging off it and a floor that has been swept.",
-        "Somebody swept it. That is the last fact this game has for you.",
-        "The demo ends here. What is past the door is not written yet \u2014 not hidden, not locked, not saved for later. Not written. You have the key, the wall has a door in it, and the two of those took eight milestones."
-      ]
+        "Behind it is nine feet of cut rock and then the light changes. The anthology has four maps of Bambulon in it and every one of them puts a border here, and every one of the four draws the border as the edge of the paper.",
+        "It is not the edge of the paper. It is a road, and it goes down, and at the bottom of it the ground stops being the sort of ground you have been walking on for eight milestones and starts being the Treyway.",
+        "Nobody swept this. That is the first fact on the other side."
+      ],
+      "to": "the-treyway"
     },
     {
       "at": [
@@ -262,6 +263,6 @@
       ]
     }
   ],
-  "_map_note": "The first map: one town and a great deal of wilds. Kettleworks and High Wick are written and are not placed here \u2014 they belong on maps that do not exist yet, and their shelves and errands are kept in shops.json and quests.json waiting for them. `towns_on_this_map_all_trade_and_all_want_something` is what stops that becoming an excuse for unreachable content. Two crossings gate the north. A crossing guards a *region* rather than its own tile \u2014 rows four to fifteen are twelve tiles of open ground, so a crossing that refused only the square it stands on would need a dozen of them across a row, which is a wall. The place itself stands on the near side of what it guards, so it is a milestone you can walk up to and read. The Kaklon van stands on the Verge road at [4, 6] and is not there below level ten \u2014 the only shop in the game that is not a town, and the only place gated on what you are rather than on what you carry or what you have answered. It is past the crossing that opens the Verge at nine, so it is a walk you earned twice.",
+  "_map_note": "The first map: one town and a great deal of wilds. Kettleworks and High Wick are written and are not placed here — they belong on maps that do not exist yet, and their shelves and errands are kept in shops.json and quests.json waiting for them. `towns_on_this_map_all_trade_and_all_want_something` is what stops that becoming an excuse for unreachable content. Two crossings gate the north. A crossing guards a *region* rather than its own tile — rows four to fifteen are twelve tiles of open ground, so a crossing that refused only the square it stands on would need a dozen of them across a row, which is a wall. The place itself stands on the near side of what it guards, so it is a milestone you can walk up to and read. The Kaklon van stands on the Verge road at [4, 6] and is not there below level ten — the only shop in the game that is not a town, and the only place gated on what you are rather than on what you carry or what you have answered. It is past the crossing that opens the Verge at nine, so it is a walk you earned twice.",
   "id": "west-bambulon"
 }

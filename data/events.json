@@ -371,6 +371,86 @@
           "unmet": ""
         }
       ]
+    },
+    {
+      "id": "the-kettleworks-road",
+      "title": "THE KETTLEWORKS ROAD",
+      "prose": [
+        "The road goes west and there is a milestone at the turn with two numbers cut into it. The top one says eleven and the bottom one says nine, and somebody has scratched a third under both of them that says neither.",
+        "A woman is sitting against the milestone with a kettle between her boots and no fire under it. She has been there long enough to have worn a shape into the grass.",
+        "\"Kettleworks,\" she says. \"Eleven if you take the road and nine if you do not, and the nine is a lie people tell about the marsh.\" She turns the kettle a quarter turn, the way you would a thing that was cooking. \"They are expecting somebody. It has been a while.\""
+      ],
+      "choices": [
+        {
+          "label": "Ask what they want",
+          "blurb": "She tells you the whole of it and it takes four sentences.",
+          "requires": "none",
+          "outcome": {
+            "all": [
+              {
+                "flag": "heard-about-kettleworks"
+              },
+              {
+                "xp": 8
+              }
+            ]
+          },
+          "unmet": ""
+        },
+        {
+          "label": "Turn the kettle for her",
+          "blurb": "A quarter turn. She lets you, and does not thank you for it.",
+          "requires": "none",
+          "outcome": {
+            "all": [
+              {
+                "xp": 4
+              }
+            ]
+          },
+          "unmet": ""
+        }
+      ]
+    },
+    {
+      "id": "the-wextreen-reach",
+      "title": "THE WEXTREEN REACH",
+      "prose": [
+        "The plain stops. It does not stop at anything — no cliff, no water, no fence — it simply stops being the sort of ground that has a next tile, and what is past it is the same colour as what is behind you and will not hold a footprint.",
+        "There is a post driven in at the edge with six clipboards chained to it, one under the other. Five have been filled in. The sixth is blank and the pencil on its string has been sharpened to two inches.",
+        "The five that are filled in all say the same thing in five hands, which is that the reach is nine miles across and that nobody has ever agreed on that."
+      ],
+      "choices": [
+        {
+          "label": "Read the five",
+          "blurb": "Five surveys of one place, and no two of them the same shape.",
+          "requires": "none",
+          "outcome": {
+            "all": [
+              {
+                "flag": "read-the-reach"
+              },
+              {
+                "xp": 10
+              }
+            ]
+          },
+          "unmet": ""
+        },
+        {
+          "label": "Step off the edge",
+          "blurb": "Your boot goes down and comes back up and there is no mark where it was.",
+          "requires": "none",
+          "outcome": {
+            "all": [
+              {
+                "xp": 4
+              }
+            ]
+          },
+          "unmet": ""
+        }
+      ]
     }
   ]
 }

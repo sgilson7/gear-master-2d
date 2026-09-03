@@ -1,10 +1,11 @@
-"""Play the demo from a new game to the ending, and write down what it said.
+"""Play the demo from a new game through the door and back, and write it down.
 
 **Not the gate.** `drive.py` walks a route chosen to exercise checks: it
 teleports, plants saves, and asserts. This does none of that. It starts a new
 game, buys with the money it has, packs with the button a player is given,
 walks where a player would walk, reads every screen it is shown, and stops when
-the door opens or when it cannot get any further.
+it has been through the door in the western wall, read the two roads on the
+other side and come back — or when it cannot get any further.
 
 The output is a transcript, and the transcript is the deliverable. What it
 catches is the thing a suite cannot: a game that is green and unplayable.
@@ -29,6 +30,11 @@ ORIGIN = f"http://127.0.0.1:{PORT}"
 # How long the run is allowed to be. A demo nobody can finish in this many
 # steps is a demo nobody finishes.
 STEPS = 9000
+
+# The two roads on the Treyway that promise a map this build has not built.
+# Reading both is what makes a run *have been there* rather than having been
+# knocked over on the doorstep.
+TREYWAY_PROMISES = {"the-kettleworks-road", "the-wextreen-reach"}
 
 
 class Quiet(http.server.SimpleHTTPRequestHandler):
@@ -80,7 +86,12 @@ def at(page):
     return page.evaluate("() => document.getElementById('coords').textContent")
 
 
-SHUT = {"rock", "water"}
+# **What the ground takes a foot on is core's answer, not a list here.** This
+# was `{"rock", "water"}` — a second copy of the terrain table, written in
+# Python — and the Treyway added `range` and `sea`, so the walker pathed
+# straight through a mountain range and pressed into it forty times. Same
+# failure as the odds overlay's, found in the same run. `world_json` reports
+# passability per tile now and this reads it.
 KEYS = {(1, 0): "ArrowRight", (-1, 0): "ArrowLeft", (0, 1): "ArrowDown", (0, -1): "ArrowUp"}
 
 
@@ -95,9 +106,9 @@ def toward(world, here, target):
     """
     if tuple(here) == tuple(target):
         return None
-    rows = world["rows"]
+    walk = world["walk"]
     w, h = world["width"], world["height"]
-    ok = lambda x, y: 0 <= x < w and 0 <= y < h and rows[y][x] not in SHUT
+    ok = lambda x, y: 0 <= x < w and 0 <= y < h and walk[y][x]
     from collections import deque
     seen = {tuple(target)}
     q = deque([tuple(target)])
@@ -338,6 +349,16 @@ def main():
             wins = 0
             moved = 0
             patrol = 0
+            # M11.1's three: whether the Treyway has been seen, which of its
+            # promises have been read, and whether the walk has come back
+            # through the door — which is where the run now finishes, because
+            # the door stopped being an ending and became a border.
+            seen_treyway = False
+            came_back = False
+            # Tiles on the Treyway that were walked to and turned out to hold
+            # nothing readable. `answered` is the real record; this is the
+            # walker's own give-up list, the same one `done_marks` is.
+            read_over = set()
             # Targets that would not let us in, by how many presses were spent
             # finding that out.
             stuck = {}
@@ -362,6 +383,28 @@ def main():
                     continue
                 if page.is_visible("#card"):
                     card(page)
+                    continue
+                if page.is_visible("#vendor"):
+                    # **The man in the van.** M10 put him on the Verge road at
+                    # level ten and the M10.3 walk never got there on foot, so
+                    # nothing in this file knew the screen existed — and it is
+                    # a `.screen`, so `walk()` refuses every keypress while it
+                    # is up. The symptom was a walk that stopped dead at [4, 6]
+                    # and reported the road home as unreachable.
+                    head("the van")
+                    say(f"  {panel(page)}")
+                    for line in page.locator("#vendor-prose p").all_text_contents()[:1]:
+                        say(f"  {line[:110]}")
+                    n = page.locator("#vendor-stock .wares:not(:disabled)").count()
+                    if n:
+                        b = page.locator("#vendor-stock .wares:not(:disabled)").first
+                        what = b.locator("b").text_content()
+                        b.click()
+                        page.wait_for_timeout(80)
+                        say(f"  bought {what} — {last_said(page)}")
+                    page.click("#vendor-close")
+                    page.wait_for_selector("#vendor", state="hidden", timeout=5000)
+                    phase = ""
                     continue
                 if page.is_visible("#town"):
                     say(f"  in town: {panel(page)}")
@@ -388,9 +431,36 @@ def main():
                     say(f"  drank a tin: {last_said(page)}")
                     continue
 
-                door = next((p for p in world["places"] if p["kind"] == "door"), None)
+                # **By id, not by kind.** There are two gates on West Bambulon
+                # since M11.1 and they want opposite things — the Cave's mouth
+                # wants Marbulon's key and a level, the door in the wall wants
+                # what the Cave's boss drops — so `the first place whose kind is
+                # gate` is a coin flip on file order.
+                def place_by_id(pid):
+                    return next((p for p in world["places"] if p["id"] == pid), None)
+
                 boss = next((p for p in world["places"] if p["kind"] == "boss"), None)
+                cave_mouth = place_by_id("the-cave-mouth")
+                wall_door = place_by_id("the-door-in-the-wall")
+                door_back = place_by_id("the-door-back")
                 gate = next((p for p in world["places"] if p["kind"] == "gate"), None)
+                answered = set(page.evaluate(
+                    "() => JSON.parse(window.__save()).state.world.answered || []"))
+                # **Read them, then come home.** The run finishes when the
+                # walk has been through the door, read both roads on the other
+                # side and come back — not the first time it is on Bambulon
+                # again, because the first time is usually a defeat carrying it
+                # home after one fight, and a run that ends on being beaten
+                # once has measured nothing about the map it was beaten on.
+                read_the_lot = TREYWAY_PROMISES <= answered
+                if seen_treyway and world["id"] == "west-bambulon" and read_the_lot:
+                    came_back = True
+                    head("back through the door")
+                    say(f"  {panel(page)}")
+                    say("")
+                    say(f"CROSSED, READ BOTH ROADS AND CAME BACK at step {step}. "
+                        f"{panel(page)}")
+                    break
                 keys = page.evaluate(
                     "() => JSON.parse(window.__save()).state.character.registry"
                     ".map(r => r.def)")
@@ -398,7 +468,36 @@ def main():
                 have_witch = "The Witch's Key" in keys
 
                 want = None
-                if world["id"] != "west-bambulon":
+                if world["id"] == "the-treyway":
+                    # **Past the door.** Read what the two roads say and then
+                    # go back, which is the whole of what M11.1 ships: a map at
+                    # a different scale, and a border that remembers.
+                    if not seen_treyway:
+                        seen_treyway = True
+                        head("the treyway")
+                        say(f"  {panel(page)}")
+                        say(f"  {world['width']}x{world['height']}, "
+                            f"{len(world['regions'])} regions: "
+                            + ", ".join(r["name"] for r in world["regions"]))
+                        phase = "the treyway"
+                    # Read, rather than merely stood on: an event's id lands in
+                    # `answered` when a choice is taken, which is the same set
+                    # the game itself reads and not a tally this file keeps.
+                    promises = [tuple(p["at"]) for p in world["places"]
+                                if p["kind"] == "event"
+                                and p["id"] not in answered
+                                and tuple(p["at"]) not in read_over]
+                    if c["fatigue"] >= 36 and door_back:
+                        # Worn through on a map with no town on it. The way
+                        # home is a target like any other — M9.4's lesson,
+                        # which is the same one one map further out.
+                        want, why = door_back["at"], "back"
+                    elif promises:
+                        promises.sort(key=lambda a: abs(a[0] - here[0]) + abs(a[1] - here[1]))
+                        want, why = list(promises[0]), "the treyway"
+                    elif door_back:
+                        want, why = door_back["at"], "back"
+                elif world["id"] != "west-bambulon":
                     # **In the cave, and the way out is a target too.** The
                     # boss while it is standing; the gate once the key is in
                     # hand, because what the key opens is on the other map and
@@ -410,15 +509,26 @@ def main():
                         want, why = gate["at"], "out"
                     elif boss or gate:
                         want, why = (boss or gate)["at"], "boss"
-                elif door and have_deep:
-                    want, why = door["at"], "door"
-                elif have_witch and c["level"] >= 9 and gate:
+                elif wall_door and have_deep and not read_the_lot:
+                    # **Bank and mend before a border.** The first run through
+                    # crossed carrying nine hundred and thirty-two experience
+                    # and twenty-two percent worn, lost the first fight on the
+                    # other side to a four-hundred-rated creature, and was
+                    # carried home having read nothing. That is not the map
+                    # being too hard; it is walking into a country you have
+                    # never seen with everything you own in your pocket, and a
+                    # player does the other thing.
+                    if c["carried"] >= 25 or c["fatigue"] >= 12:
+                        want, why = town["at"], "home before the door"
+                    else:
+                        want, why = wall_door["at"], "door"
+                elif have_witch and c["level"] >= 9 and cave_mouth and not have_deep:
                     # **No tiredness gate on setting out.** The Cave's mouth is
                     # thirty tiles from the only town and there are fights on
                     # the way, so a walker that only set out while fresh turned
                     # round after two of them and never once arrived. A player
                     # with the key and a level sets out, and drinks on the road.
-                    want, why = gate["at"], "cave"
+                    want, why = cave_mouth["at"], "cave"
                 elif c["carried"] >= max(25, c["needed"] // 3) or c["fatigue"] >= 44:
                     # **What is worth the walk grows.** Twenty-five experience
                     # is a level at the start and a rounding error at eighteen,
@@ -478,6 +588,7 @@ def main():
                 if want is not None and tuple(want) == here:
                     # Standing on it and nothing opened, so there is nothing
                     # here for us. Do not walk back to it.
+                    read_over.add(here)
                     #
                     # Cleared whenever an errand finishes, because what a place
                     # is worth changes when the log does — a tile with nothing
@@ -515,12 +626,15 @@ def main():
                         say(f"  shut: {tuple(want)} is not reachable yet"
                             f" — {last_said(page) or 'no reason given'}")
                         done_marks.add(tuple(want))
+                        read_over.add(tuple(want))
                         done_marks.add(here)
                         errand_turn += 1
                         stuck.clear()
             else:
                 say("")
-                say(f"DID NOT REACH THE ENDING in {STEPS} steps. {panel(page)}")
+                say(f"DID NOT CROSS AND COME BACK in {STEPS} steps. {panel(page)}")
+                say(f"  read on the Treyway: "
+                    f"{sorted(TREYWAY_PROMISES & answered) or 'nothing'}")
             say(f"  ({moved} of {STEPS} presses actually moved)")
 
             head("what happened")

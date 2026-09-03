@@ -863,6 +863,25 @@ pub struct WorldState {
     /// log itself cannot do.
     #[serde(default)]
     pub pinned: Option<String>,
+    /// Where you were last standing on each map you have left, by map id.
+    ///
+    /// **[`at`](Self::at) is where you are; this is where you were.** One pair
+    /// was enough while a map change was a dungeon — a dungeon has one door and
+    /// it names the tile on both sides, so the trip round is a constant. It
+    /// stops being enough the moment a map is a place you *live on* and come
+    /// back to: the Treyway is sixteen tiles of country and coming back to its
+    /// southern corner every time would make the door a chute.
+    ///
+    /// So a gate that names `at_to` still lands you there, and a gate that does
+    /// not lands you where you left off — which is the difference between a
+    /// dungeon's mouth and a border. Both are content decisions, written in the
+    /// map file, and neither is a branch in the shim.
+    ///
+    /// A list of pairs rather than a map, like `counters` and `bought`: the
+    /// save is JSON and a `BTreeMap` would serialise as an object whose key
+    /// order is the only thing distinguishing two identical saves.
+    #[serde(default)]
+    pub positions: Vec<(String, [u8; 2])>,
 }
 
 impl WorldState {
@@ -876,6 +895,25 @@ impl WorldState {
                 .unwrap_or_default(),
             ..Default::default()
         }
+    }
+
+    /// Write down where you are on the map you are on.
+    ///
+    /// Called on the way *out* of a map, by whoever moves you off it. Not on
+    /// every step: the only reader is the arrival on the far side, and a
+    /// position written every keypress would be a save that grew a row per map
+    /// per session and told nobody anything more.
+    pub fn remember(&mut self) {
+        let here = self.map_id();
+        match self.positions.iter_mut().find(|(k, _)| *k == here) {
+            Some((_, at)) => *at = self.at,
+            None => self.positions.push((here, self.at)),
+        }
+    }
+
+    /// Where you last stood on that map, if you have ever stood on it.
+    pub fn recall(&self, map: &str) -> Option<[u8; 2]> {
+        self.positions.iter().find(|(k, _)| k == map).map(|(_, at)| *at)
     }
 
     pub fn bump(&mut self, what: &str) {

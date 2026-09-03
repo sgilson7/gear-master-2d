@@ -28,6 +28,7 @@ import socketserver
 import sys
 import threading
 import json
+import traceback
 from pathlib import Path
 
 from playwright.sync_api import sync_playwright
@@ -964,23 +965,25 @@ def check_the_fork_is_on_top(page, name, fails):
         page.wait_for_selector("#town", state="hidden", timeout=5000)
 
 
-def check_the_door_ends_the_demo(page, name, fails):
-    """A wall with no door in it grows one, and opening it ends the demo.
+def check_the_door_opens_on_the_treyway(page, name, fails):
+    """A wall with no door in it grows one, and opening it crosses a map.
 
-    Three firsts in one tile: a place that is not there until it is, a lock
-    answered against the bag rather than against the map, and the one screen in
-    the game that is not a loop. Planted at each stage rather than walked,
-    because the walk to it is the whole game.
+    Three firsts in one tile, and M11.1 gives it a fourth. The three: a place
+    that is not there until it is, a lock answered against the bag rather than
+    against the map, and a paragraph you read once. The fourth is that it is a
+    **border** — a gate that names no landing tile, so the far side puts you
+    where you left off and its start the first time.
+
+    Planted at each stage rather than walked, because the walk to it is the
+    whole game.
     """
     with page.expect_download(timeout=20000) as dl:
         page.click("#download")
     base = dl.value.path()
 
-    door = page.evaluate("""() => JSON.parse(window.__save()).state.world""")
-    del door  # only the save's shape is wanted; the door is not on the map yet
-
-    if page.evaluate("""() => (window.__world().places ?? [])
-            .some(p => p.kind === 'door')"""):
+    on_map = page.evaluate("""() => (window.__world().places ?? [])
+            .some(p => p.id === 'the-door-in-the-wall')""")
+    if on_map:
         fails.append(f"{name}: the door is on the map before the Cave's boss is down")
 
     # --- the boss is down, so the wall has a door in it ----------------------
@@ -994,18 +997,22 @@ def check_the_door_ends_the_demo(page, name, fails):
             body["character"]["owned"].append(len(reg) - 1)
 
     plant(page, base, cleared, stem="door-shut")
-    spot = page.evaluate("""() => (window.__world().places ?? []).find(p => p.kind === 'door')""")
+    spot = page.evaluate("""() => (window.__world().places ?? [])
+        .find(p => p.id === 'the-door-in-the-wall')""")
     if not spot:
         fails.append(f"{name}: the Cave's boss is down and the wall still has no door")
         return
+    if spot.get("kind") != "gate":
+        fails.append(f"{name}: the door is a {spot.get('kind')!r} and not a way through")
 
     # Stand beside it and walk in without the key.
     page.evaluate("(at) => window.__standAt(at)", [spot["at"][0] + 1, spot["at"][1]])
     page.keyboard.press("ArrowLeft")
     page.wait_for_timeout(300)
-    if page.is_visible("#ending"):
+    dismiss_card(page)
+    if page.evaluate("() => window.__world().id") != "west-bambulon":
         fails.append(f"{name}: the door opened with no key in the bag")
-        page.click("#ending-close")
+        return
     said_it = last_said(page)
     if not said_it:
         fails.append(f"{name}: a locked door said nothing")
@@ -1014,28 +1021,68 @@ def check_the_door_ends_the_demo(page, name, fails):
     plant(page, base, lambda b: cleared(b, key=True), stem="door-open")
     page.evaluate("(at) => window.__standAt(at)", [spot["at"][0] + 1, spot["at"][1]])
     page.keyboard.press("ArrowLeft")
-    page.wait_for_timeout(350)
-    if page.is_hidden("#ending"):
-        fails.append(f"{name}: carried the key onto the door and nothing happened")
+    page.wait_for_timeout(400)
+    where = page.evaluate("() => window.__world().id")
+    if where == "west-bambulon":
+        fails.append(f"{name}: carried the key onto the door and stayed in Bambulon")
         return
-    prose = page.evaluate("""() => [...document.querySelectorAll('#ending-prose p')]
-        .map(p => p.textContent).join(' ')""")
-    if "demo" not in prose.lower():
-        fails.append(f"{name}: the ending does not say the demo is over: {prose[:80]!r}")
-    # It is not the fork: you can back out of it, because the world is still
-    # there and there is an errand about the door to hand in.
-    page.click("#ending-close")
-    page.wait_for_selector("#ending", state="hidden", timeout=5000)
-    if page.text_content("#coords") != f"{spot['at'][0]}, {spot['at'][1]}":
-        fails.append(f"{name}: the ending left the player at "
-                     f"{page.text_content('#coords')}, not on the door")
+    if where != "the-treyway":
+        fails.append(f"{name}: the door opened onto {where!r}")
+        return
 
-    # And the errand about it is on offer now, and only now.
-    log = page.evaluate("() => window.__log()")
-    del log
-    marks = page.evaluate("() => window.__errandMarks()")
-    if not any(m["id"] == "the-end-of-all-gears" for m in marks):
-        fails.append(f"{name}: the boss is down and the clerk has nothing new to say: {marks}")
+    # It says something on the way through, once, and the card is a card:
+    # you walk on from it rather than being held in it.
+    prose = page.evaluate("""() => [...document.querySelectorAll('#card-prose p')]
+        .map(p => p.textContent).join(' ')""")
+    if len(prose) < 80:
+        fails.append(f"{name}: crossing out of Bambulon said {prose!r}")
+    if "demo" in prose.lower():
+        fails.append(f"{name}: the crossing still says the demo ends here")
+    dismiss_card(page)
+
+    # A different map: its own size, its own ground, its own regions.
+    shape = page.evaluate("() => { const w = window.__world(); "
+                          "return [w.width, w.height, (w.places||[]).length]; }")
+    if shape[0] != 16 or shape[1] != 16:
+        fails.append(f"{name}: the Treyway came back {shape[0]}x{shape[1]}")
+    here = page.text_content("#region") or ""
+    if "Bambulon" in here or not here.strip():
+        fails.append(f"{name}: standing on the Treyway and the panel says {here!r}")
+
+    # --- a border remembers ---------------------------------------------------
+    #
+    # **Planted, and it has to be.** Walking back out through `the-door-back`
+    # records the tile you were standing on, which is the door itself — so a
+    # there-and-back walk would land you on the Treyway's start and pass
+    # whether or not `positions` exists at all. The case that matters is the
+    # one you cannot walk to on purpose: you were carried off this map by a
+    # defeat, and the door puts you back where you fell.
+    fell_at = [7, 8]
+
+    def carried_off(body):
+        cleared(body, key=True)
+        body["world"]["positions"] = [["the-treyway", fell_at]]
+
+    plant(page, base, carried_off, stem="door-remembers")
+    page.evaluate("(at) => window.__standAt(at)", [spot["at"][0] + 1, spot["at"][1]])
+    page.keyboard.press("ArrowLeft")
+    page.wait_for_timeout(400)
+    dismiss_card(page)
+    close_fight(page)
+    if page.evaluate("() => window.__world().id") != "the-treyway":
+        fails.append(f"{name}: the door stopped opening on the second crossing")
+        return
+    landed = (page.text_content("#coords") or "").strip()
+    if landed != f"{fell_at[0]}, {fell_at[1]}":
+        fails.append(f"{name}: fell at {fell_at} and the door landed you at {landed!r}")
+
+    # **Put the walk back where it was standing.** Every check after this one
+    # downloads the current save as its own base, and this is the first check
+    # in the gate that leaves the player on a *different map* — so without the
+    # restore, the next plant is a Treyway save and the one after it looks for
+    # a town on a map that has none. It cost one run to find and it is the
+    # eighth trap in a new coat: a check that changes the world puts it back.
+    plant(page, base, lambda body: None, stem="door-restore")
 
 
 def check_the_rack(page, name, fails):
@@ -2191,7 +2238,7 @@ def check_the_cave_is_shut_until_it_is_not(page, name, fails):
     # The dungeon is short, has a way back, and something standing at the end.
     got = page.evaluate("""() => {
       const w = window.__world();
-      const walk = w.rows.flat().filter(t => t !== 'rock' && t !== 'water').length;
+      const walk = w.walk.flat().filter(Boolean).length;
       return { id: w.id, walk,
                gates: w.places.filter(p => p.kind === 'gate').length,
                bosses: w.places.filter(p => p.kind === 'boss').length };
@@ -2405,8 +2452,15 @@ def check_a_stale_autosave(browser, name):
     page.reload(wait_until="networkidle")
     page.wait_for_function("document.getElementById('coords').textContent !== '—'", timeout=20000)
 
+    # **Ask the map, do not list the walls.** `("rock", "water")` was a copy of
+    # the terrain table written in Python, and the Treyway added two more walls.
     terrain = page.text_content("#terrain")
-    if terrain in ("rock", "water"):
+    if not page.evaluate("""() => {
+      const w = window.__world();
+      const [x, y] = (document.getElementById('coords').textContent || '0, 0')
+        .split(',').map(v => parseInt(v, 10));
+      return !!(w.walk[y] && w.walk[y][x]);
+    }"""):
         fails.append(f"{name}: a stale autosave spawned the player in {terrain}")
 
     walked = page.text_content("#walked")
@@ -2833,7 +2887,7 @@ def walk_the_gate(browser, name, fails=None):
     # them somewhere the walk would take twenty minutes to reach, so anything
     # after them would be checking a game this walk did not play.
     check_the_fork_is_on_top(page, name, fails)
-    check_the_door_ends_the_demo(page, name, fails)
+    check_the_door_opens_on_the_treyway(page, name, fails)
     check_the_rack(page, name, fails)
     check_the_spin_animates(page, name, fails)
     check_a_town_takes_the_tiredness_off(page, name, fails)
@@ -2896,7 +2950,11 @@ def main():
                 except Exception as e:
                     # Keep whatever was found before the crash. The crash is a
                     # failure too, and usually a consequence of the first one.
-                    mine.append(f"{name}: the walk stopped: {str(e).splitlines()[0]}")
+                    # The traceback too. A crash used to report one line —
+                    # "'NoneType' object is not subscriptable" — with no way to
+                    # tell which of forty checks it came out of.
+                    mine.append(f"{name}: the walk stopped: {str(e).splitlines()[0]}\n"
+                                + traceback.format_exc())
                 fails += mine
                 b.close()
                 if not any(f.startswith(name + ":") for f in fails):
@@ -2936,7 +2994,7 @@ def main():
     print("ok: the map's odds are a skill somebody took, not a button everybody had")
     print("ok: a licensee buys an ench, bolts it on, switches it off and takes it back")
     print("ok: a spinning item turns, and turns to somewhere core said it could")
-    print("ok: the wall grows a door, the key opens it, and the demo ends there")
+    print("ok: the wall grows a door, the key opens it, and behind it is a map")
     print("ok: a whole set names its own item and says what it does; two thirds of one does not")
     print("ok: the lake is ground at its rim to a toad, and a wall through its middle to everybody")
     print("ok: the north is shut to a level-one character, and says what the road wants")

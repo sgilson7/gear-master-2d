@@ -1,6 +1,7 @@
 {
   "format": "gm2d-terrain",
   "version": 1,
+  "_note": "Shared by every map. The first nine are West Bambulon's, at the scale of a walk; the last four are the Treyway's, at the scale of a country \u2014 a plain is a day of it and a range is a week you do not have. **`sea` is not `water`**, and the difference is load-bearing: `Rule::Wade` opens the *rim* of anything drawn `~`, so an ocean drawn with it would be an ocean a toad set walks the edge of. The Treyway's sea is its own terrain and no rule opens it.",
   "terrain": {
     "road":   { "glyph": "=", "passable": true,  "cost": 1, "encounter_per_mille": 30 },
     "grass":  { "glyph": ".", "passable": true,  "cost": 1, "encounter_per_mille": 90 },
@@ -10,6 +11,11 @@
     "cork":   { "glyph": "o", "passable": true,  "cost": 2, "encounter_per_mille": 180 },
     "town":   { "glyph": "#", "passable": true,  "cost": 1, "encounter_per_mille": 0 },
     "rock":   { "glyph": "^", "passable": false, "cost": 0, "encounter_per_mille": 0 },
-    "water":  { "glyph": "~", "passable": false, "cost": 0, "encounter_per_mille": 0 }
+    "water":  { "glyph": "~", "passable": false, "cost": 0, "encounter_per_mille": 0 },
+
+    "plain":  { "glyph": "-", "passable": true,  "cost": 1, "encounter_per_mille": 70 },
+    "coast":  { "glyph": ":", "passable": true,  "cost": 1, "encounter_per_mille": 40 },
+    "range":  { "glyph": "A", "passable": false, "cost": 0, "encounter_per_mille": 0 },
+    "sea":    { "glyph": "S", "passable": false, "cost": 0, "encounter_per_mille": 0 }
   }
 }

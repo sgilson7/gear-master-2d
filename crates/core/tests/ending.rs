@@ -1,9 +1,12 @@
-//! The door in the wall, and the one screen that is not a loop.
+//! The door in the wall, and what is on the other side of it.
 //!
-//! The key from the bottom of the Cave had nothing to open. This gives it a
-//! door and the demo an ending — and each of the three things it needs is a
-//! first: a place that is not there until it is, an errand gated on something
-//! that is not another errand, and a screen that does not loop.
+//! The key from the bottom of the Cave had nothing to open until M8.7, which
+//! gave it a door and gave the demo an ending. **M11.1 took the ending off it.**
+//! The door is a `Gate` now and it crosses onto the Treyway, which is the map
+//! the anthology has been drawing as the edge of the paper for eight
+//! milestones. Everything else about it is unchanged and still first of its
+//! kind: a place that is not there until it is, an errand gated on something
+//! that is not another errand, and a lock whose key falls off one tile.
 
 use gm2d_core::combat::Difficulty;
 use gm2d_core::data;
@@ -13,12 +16,15 @@ use gm2d_core::world::{self, Allowances, Dir, PlaceKind, WorldState};
 
 const D: Difficulty = Difficulty::Easy;
 
+/// The one place in the game that is hidden until something has happened.
+const DOOR: &str = "the-door-in-the-wall";
+
 fn overworld() -> world::World {
     data::world(D)
 }
 
 fn the_door(w: &world::World) -> &world::PlaceDef {
-    w.places.iter().find(|p| p.kind == PlaceKind::Door).expect("a door somewhere")
+    w.places.iter().find(|p| p.id == DOOR).expect("the door in the western wall")
 }
 
 /// **Not drawn, not steppable, absent from `place_now`.**
@@ -49,14 +55,14 @@ fn a_hidden_place_is_not_there_until_its_condition_holds() {
     let mut rng = g.rng.clone();
     let s = world::step(&w, &mut g.world, &mut rng, D, Dir::West, &Allowances::default());
     assert!(s.moved, "the tile itself is walkable");
-    assert_eq!(s.door, None, "a hidden door opened");
+    assert_eq!(s.gate, None, "a hidden door opened");
 
     // Open, once the thing that opens it has happened.
     g.world.answered.push(key);
     assert!(w.places_now(&g.world, &Allowances::default()).iter().any(|p| p.id == door.id));
     g.world.at = [door.at[0] + 1, door.at[1]];
     let s = world::step(&w, &mut g.world, &mut rng, D, Dir::West, &Allowances::default());
-    assert_eq!(s.door.as_deref(), Some(door.id.as_str()), "the door is not answering");
+    assert_eq!(s.gate.as_deref(), Some(door.id.as_str()), "the door is not answering");
 }
 
 /// **The door wants the key the boss drops.**
@@ -94,15 +100,51 @@ fn the_door_wants_the_key_the_boss_drops() {
     );
 }
 
-/// The ending says something, and says the demo is over.
+/// **It crosses now, and it says so on the way through.**
+///
+/// M8.7 ended the demo here and the prose said as much in as many words. That
+/// sentence was true for two blocks and is a lie the moment there is a map on
+/// the far side, so the test that used to demand the word "demo" now demands
+/// the two things that make it a crossing: somewhere real to arrive, and a
+/// paragraph about arriving there.
 #[test]
-fn the_door_says_what_is_behind_it() {
+fn the_door_opens_onto_a_map_that_exists() {
     let w = overworld();
     let door = the_door(&w);
-    assert!(!door.prose.is_empty(), "the door opens onto nothing at all");
+    assert_eq!(door.kind, PlaceKind::Gate, "the door stopped being a way through");
+    let to = door.to.as_deref().expect("it opens onto nothing");
+    assert!(
+        data::MAPS.iter().any(|(m, _)| *m == to),
+        "the door opens onto {to:?}, which is not a map"
+    );
+    assert_ne!(to, w.id, "the door opens onto the map it is in");
+    assert!(!door.prose.is_empty(), "you cross out of Bambulon and nobody says anything");
     let said = door.prose.join(" ").to_lowercase();
-    assert!(said.contains("demo"), "the ending does not say the demo is over: {said:?}");
+    assert!(
+        !said.contains("demo ends"),
+        "the door still ends the demo, and there is a map behind it: {said:?}"
+    );
     assert!(!door.shut.is_empty(), "a locked door that says nothing");
+}
+
+/// **A border lands you where you left off; a dungeon's mouth names its tile.**
+///
+/// The difference is `at_to`, and it is written in the map file rather than
+/// decided in the shim. The Cave names one because a corridor has one door; the
+/// door in the wall does not, because coming back to the Treyway's southern
+/// corner every time would make it a chute.
+#[test]
+fn a_gate_without_a_landing_tile_is_a_border() {
+    let w = overworld();
+    assert!(the_door(&w).at_to.is_none(), "the door names a landing tile, so it is a chute");
+
+    let cave = data::map("the-great-gear-cave", D);
+    let up = cave
+        .places
+        .iter()
+        .find(|p| p.kind == PlaceKind::Gate)
+        .expect("the way back up");
+    assert!(up.at_to.is_some(), "the Cave's mouth stopped naming its tile on the far side");
 }
 
 /// **An errand gated on something that is not another errand.**
@@ -125,16 +167,7 @@ fn the_ending_errand_waits_for_the_boss() {
 
     // It sends you to the door, and standing there is the whole of the doing.
     let place = q.goal.place().expect("it sends you somewhere");
-    let w = overworld();
-    assert_eq!(
-        w.place_at(
-            w.places.iter().find(|p| p.id == place).expect("the place exists").at[0],
-            w.places.iter().find(|p| p.id == place).expect("the place exists").at[1],
-        )
-        .map(|p| p.kind),
-        Some(PlaceKind::Door),
-        "the errand sends you somewhere that is not the door"
-    );
+    assert_eq!(place, DOOR, "the errand sends you somewhere that is not the door");
     quest::take(&mut g, &q.id).expect("the clerk gives it out");
     quest::on_arrival(&mut g, place);
     assert_eq!(quest::stage(&g, q), quest::Stage::Ready, "standing at the door was not enough");
@@ -150,7 +183,8 @@ fn every_hidden_place_names_something_that_happens() {
     for (id, _) in data::MAPS {
         let w = data::map(id, D);
         // Everything any map can write into `answered`: a boss tile's own id,
-        // an event's id, a door's own id, and an errand's word marker.
+        // an event's id, a gate's own id where it carries a paragraph, and an
+        // errand's word marker.
         let mut writable: Vec<String> = Vec::new();
         for (other, _) in data::MAPS {
             for p in data::map(other, D).places {

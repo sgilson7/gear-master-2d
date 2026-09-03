@@ -147,3 +147,56 @@ the sitting.
   the absence than to find the writer that found it.
 - The strip getting long enough to push the panel below the fold on a laptop.
   Four lines is a guess; if it wants to be three, that is `TAPE`.
+
+---
+
+## M11.1 — the overworld
+
+### Three maps in a directory, a border, and two lists of walls
+
+**The change.** `data/maps/<id>.tiles.json`; a sixteen-by-sixteen Treyway with
+its own terrain vocabulary; `WorldState::positions`; and the door in the western
+wall stops being an ending and becomes a gate.
+
+**Follows from.**
+
+- **Every map lint that walked one map now walks all of them.** Reachability,
+  places-on-walkable-ground, encounter bounds and placed-events were written
+  when there was one map and stayed that way through a second. A mistyped glyph
+  on the Treyway would have been silent. `no_two_maps_name_a_place_the_same` is
+  new and is the one nobody had noticed was needed: `answered`, `bought` and
+  `quests_done` are one set each for the whole game.
+- **`PlaceKind::Door` is now used by nothing**, and the `#ending` screen with
+  it. Both stay: M11.4 has an ending to write and this is the screen for it.
+  Stated here rather than discovered, because dead code that is *scheduled* and
+  dead code that is *forgotten* look identical from the outside.
+- **A gate's key may come off a boss now, not only off an errand.**
+  `the_witchs_key_is_the_key_the_cave_wants` asserted one faucet and there are
+  two. The list is closed in the test, which is where the closing is stated.
+- **`at_to` became optional in meaning as well as in type.** A gate that names
+  it is a dungeon's mouth; one that does not is a border. That is now a content
+  decision written in the map file, which is where it belongs, and it is why
+  `every_gate_leads_somewhere_you_can_stand` checks the map's `start` when no
+  landing tile is named.
+
+**Watch.**
+
+- **A defeat that crosses maps** — entry 2's watch, and it fired on the first
+  run. The page caches the grid and seven call sites re-read it by hand; the
+  eighth, the loss walk home, did not, so dying in the Cave left the canvas
+  drawing a nine-by-five room around a player standing at (1, 18) of it. It has
+  been shipped since M8 and nothing found it because nothing had lost a fight
+  in the Cave. Fixed as a *class*: `position()` carries the map id and
+  `paintPanel` compares it, so every path that moves anybody is covered rather
+  than an eighth site being added to a list of seven.
+- **A list of terrain names written outside `terrain.json`.** Two were found in
+  one run — the odds overlay's `rock`/`water` skip and the walker's
+  pathfinder's — and both were correct until a map added a wall they had never
+  heard of. `world_json` reports per-tile passability now and both read it.
+  Anything that grows a third such list should be looked for here first.
+- **A `.screen` the walker does not know about.** The van has swallowed every
+  keypress at [4, 6] since M10 and nothing noticed, because no run had reached
+  level ten on foot before this one. The symptom is the walk stopping dead and
+  blaming the *road*: "not reachable yet" about a tile that is perfectly
+  reachable. Any new screen wants a branch in `playthrough.py`'s loop in the
+  same commit.

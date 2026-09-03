@@ -1,0 +1,79 @@
+{
+  "format": "gm2d-tiles",
+  "version": 1,
+  "id": "the-treyway",
+  "_note": "The map behind the door in the western wall, and the first one drawn at a different scale. West Bambulon is twenty tiles of walking; this is sixteen tiles of country, and one of them is West Bambulon. So the terrain vocabulary is its own — plain, coast, range, sea — and a range is not a cliff you walk round in an afternoon. **`sea` is not `water`**: `Rule::Wade` opens the rim of anything drawn `~`, and an ocean drawn with it would be an ocean the Toad set walks the edge of. Three regions, banded south to north, and the band the door opens onto is rated where West Bambulon's hardest one leaves off — a player who has beaten the Cave arrives at level twelve or better, so bracketing this at five to nine would have put a whole continent below the map it opens off. Two places are written as events rather than gates because the maps they promise are not built yet: a road that says where it goes is a promise, and a gate onto a map this build has not got is a hole.",
+  "width": 16,
+  "height": 16,
+  "start": [13, 13],
+  "rows": [
+    "SSSSSSSSSSSSSSSS",
+    "SS::----::--:AAS",
+    "S:--AAA---AA--:S",
+    "S:-,AAA==,,A--:S",
+    "S:--,,,=,,,,--:S",
+    "S:-,TT==AA=,,-:S",
+    "S:--,T=,,,=,--:S",
+    "S::--,,=,,,--::S",
+    "S:---,-=--,---:S",
+    "S:--AA=,,,A,--:S",
+    "S:-,AA=,,,A,,-:S",
+    "S:--,,=,,,,,--:S",
+    "S:--,==,,,,,--:S",
+    "S:-#=,,,,,,,-#:S",
+    "S:::--------:::S",
+    "SSSSSSSSSSSSSSSS"
+  ],
+  "regions": [
+    {
+      "id": "the-first-treyway",
+      "name": "The First Treyway",
+      "bounds": [[0, 11, 15, 15]],
+      "enemies": [
+        "The Curator",
+        "The Gearwright",
+        "Pale Twin"
+      ]
+    },
+    {
+      "id": "the-kolok-downs",
+      "name": "The Kolok Downs",
+      "bounds": [[0, 6, 15, 10]],
+      "enemies": [
+        "Ember Wisp",
+        "Slag Warden",
+        "Ruin Hound"
+      ]
+    },
+    {
+      "id": "the-wextreen-heights",
+      "name": "The Wextreen Heights",
+      "bounds": [[0, 0, 15, 5]],
+      "enemies": [
+        "Bone Cantor",
+        "Null Sentinel",
+        "Crowned Hollow"
+      ]
+    }
+  ],
+  "places": [
+    {
+      "at": [13, 13],
+      "kind": "gate",
+      "id": "the-door-back",
+      "name": "the door back into Bambulon",
+      "to": "west-bambulon",
+      "at_to": [1, 10]
+    },
+    {
+      "at": [3, 13],
+      "kind": "event",
+      "id": "the-kettleworks-road"
+    },
+    {
+      "at": [6, 1],
+      "kind": "event",
+      "id": "the-wextreen-reach"
+    }
+  ]
+}

@@ -13,13 +13,16 @@ use gm2d_core::world::{step, Allowances, Dir, PlaceKind, World, WorldState};
 
 const D: Difficulty = Difficulty::Easy;
 
+/// The overworld's layout, by path. One file per map since M11.1.
+const WEST_BAMBULON: &str = "maps/west-bambulon.tiles.json";
+
 fn data(name: &str) -> String {
     let p = format!("{}/../../data/{name}", env!("CARGO_MANIFEST_DIR"));
     std::fs::read_to_string(&p).unwrap_or_else(|e| panic!("cannot read {p}: {e}"))
 }
 
 fn world() -> World {
-    World::load(&data("terrain.json"), &data("tiles.json"), D).expect("the shipped map loads")
+    World::load(&data("terrain.json"), &data(WEST_BAMBULON), D).expect("the shipped map loads")
 }
 
 fn events() -> EventsData {
@@ -35,68 +38,103 @@ fn events() -> EventsData {
 /// the only symptom is a player who never finds the third town.
 #[test]
 fn the_whole_map_is_reachable_from_the_start() {
-    let w = world();
-    let mut seen: HashSet<(u8, u8)> = HashSet::new();
-    let mut queue = vec![w.start];
-    seen.insert(w.start);
-    while let Some((x, y)) = queue.pop() {
-        for (dx, dy) in [(0i32, -1i32), (0, 1), (1, 0), (-1, 0)] {
-            let (nx, ny) = (x as i32 + dx, y as i32 + dy);
-            if !w.in_bounds(nx, ny) {
-                continue;
-            }
-            let (nx, ny) = (nx as u8, ny as u8);
-            if w.passable(nx, ny) && seen.insert((nx, ny)) {
-                queue.push((nx, ny));
+    // **Every map, not the first one.** This walked West Bambulon alone while
+    // three maps shipped, and a mistyped glyph on any of the others would have
+    // walled off a quarter of it in silence — which is exactly the failure the
+    // flood fill exists for and exactly the one a per-map test cannot see.
+    for (id, _) in gm2d_core::data::MAPS {
+        let w = gm2d_core::data::map(id, D);
+        let mut seen: HashSet<(u8, u8)> = HashSet::new();
+        let mut queue = vec![w.start];
+        seen.insert(w.start);
+        while let Some((x, y)) = queue.pop() {
+            for (dx, dy) in [(0i32, -1i32), (0, 1), (1, 0), (-1, 0)] {
+                let (nx, ny) = (x as i32 + dx, y as i32 + dy);
+                if !w.in_bounds(nx, ny) {
+                    continue;
+                }
+                let (nx, ny) = (nx as u8, ny as u8);
+                if w.passable(nx, ny) && seen.insert((nx, ny)) {
+                    queue.push((nx, ny));
+                }
             }
         }
-    }
 
-    let mut stranded = Vec::new();
-    for y in 0..w.height {
-        for x in 0..w.width {
-            if w.passable(x, y) && !seen.contains(&(x, y)) {
-                stranded.push((x, y));
+        let mut stranded = Vec::new();
+        for y in 0..w.height {
+            for x in 0..w.width {
+                if w.passable(x, y) && !seen.contains(&(x, y)) {
+                    stranded.push((x, y));
+                }
             }
         }
+        assert!(
+            stranded.is_empty(),
+            "{id}: {} walkable tiles cannot be reached from the start: {:?}",
+            stranded.len(),
+            &stranded[..stranded.len().min(12)]
+        );
     }
-    assert!(
-        stranded.is_empty(),
-        "{} walkable tiles cannot be reached from the start: {:?}",
-        stranded.len(),
-        &stranded[..stranded.len().min(12)]
-    );
 }
 
-/// Every place named on the map is somewhere a player can stand.
+/// Every place named on any map is somewhere a player can stand.
 #[test]
 fn every_place_is_on_walkable_ground() {
-    let w = world();
-    for p in &w.places {
-        let (x, y) = (p.at[0], p.at[1]);
-        assert!(w.passable(x, y), "{:?} stands on {}", p.id, w.terrain_name(x, y));
+    for (id, _) in gm2d_core::data::MAPS {
+        let w = gm2d_core::data::map(id, D);
+        for p in &w.places {
+            let (x, y) = (p.at[0], p.at[1]);
+            assert!(w.passable(x, y), "{id}: {:?} stands on {}", p.id, w.terrain_name(x, y));
+        }
     }
 }
 
-/// Every event the map places exists, and no event is placed twice.
+/// **No two maps share a place id.**
+///
+/// `answered`, `bought` and `quests_done` are one set each for the whole game,
+/// so two places called the same thing on two maps are one place remembered in
+/// one of them. It has never happened and it is one copy-paste away.
+#[test]
+fn no_two_maps_name_a_place_the_same() {
+    let mut seen: Vec<(String, &str)> = Vec::new();
+    for (id, _) in gm2d_core::data::MAPS {
+        for p in gm2d_core::data::map(id, D).places {
+            if let Some((_, other)) = seen.iter().find(|(k, _)| *k == p.id) {
+                panic!("{:?} is a place on both {other} and {id}", p.id);
+            }
+            seen.push((p.id.clone(), id));
+        }
+    }
+}
+
+/// Every event any map places exists, and no event is placed twice.
 ///
 /// Both halves matter. A missing event is a tile that does nothing; a doubled
-/// one is an event that can be answered in two places and remembered in one.
+/// one is an event that can be answered in two places and remembered in one —
+/// and since M11.1 "twice" means *across every map*, because `answered` is one
+/// set for the whole game and always was.
 #[test]
 fn every_placed_event_exists_exactly_once() {
-    let w = world();
+    use gm2d_core::data;
     let e = events();
 
-    let mut placed: Vec<&str> = Vec::new();
-    for p in w.places.iter().filter(|p| p.kind == PlaceKind::Event) {
-        assert!(e.get(&p.id).is_some(), "the map places {:?}, which events.json has not got", p.id);
-        assert!(!placed.contains(&p.id.as_str()), "{:?} is placed twice", p.id);
-        placed.push(&p.id);
+    let mut placed: Vec<String> = Vec::new();
+    for (id, _) in data::MAPS {
+        let w = data::map(id, D);
+        for p in w.places.iter().filter(|p| p.kind == PlaceKind::Event) {
+            assert!(
+                e.get(&p.id).is_some(),
+                "{id} places {:?}, which events.json has not got",
+                p.id
+            );
+            assert!(!placed.contains(&p.id), "{:?} is placed twice", p.id);
+            placed.push(p.id.clone());
+        }
     }
 
     for ev in &e.events {
         assert!(
-            placed.contains(&ev.id.as_str()),
+            placed.contains(&ev.id),
             "{:?} is written and never placed, so no player will read it",
             ev.id
         );
@@ -161,7 +199,7 @@ fn every_event_outcome_is_real() {
 /// quietly, because whoever typed the number would trust it.
 #[test]
 fn no_data_file_types_a_danger_number() {
-    for name in ["tiles.json", "terrain.json", "events.json"] {
+    for name in [WEST_BAMBULON, "terrain.json", "events.json"] {
         let text = data(name);
         assert!(
             !text.contains("\"danger\""),
@@ -207,22 +245,25 @@ fn the_map_has_a_difficulty_gradient() {
 #[test]
 fn encounter_chances_stay_inside_their_bounds() {
     use gm2d_core::world::MAX_ENCOUNTER_PER_MILLE;
-    let w = world();
-    for y in 0..w.height {
-        for x in 0..w.width {
-            let c = w.encounter_per_mille(x, y);
-            assert!(
-                (0..=MAX_ENCOUNTER_PER_MILLE).contains(&c),
-                "({x}, {y}) rolls {c} per mille"
-            );
-            if !w.passable(x, y) {
-                continue;
-            }
-            if w.terrain_at(x, y).encounter_per_mille == 0 {
-                assert_eq!(c, 0, "({x}, {y}) is safe terrain and rolls {c}");
+    for (id, _) in gm2d_core::data::MAPS {
+        let w = gm2d_core::data::map(id, D);
+        for y in 0..w.height {
+            for x in 0..w.width {
+                let c = w.encounter_per_mille(x, y);
+                assert!(
+                    (0..=MAX_ENCOUNTER_PER_MILLE).contains(&c),
+                    "{id}: ({x}, {y}) rolls {c} per mille"
+                );
+                if !w.passable(x, y) {
+                    continue;
+                }
+                if w.terrain_at(x, y).encounter_per_mille == 0 {
+                    assert_eq!(c, 0, "{id}: ({x}, {y}) is safe terrain and rolls {c}");
+                }
             }
         }
     }
+    let w = world();
 
     // Same terrain, harder region, higher chance. The monotonicity the brief
     // asks for, read off the map rather than off the formula.

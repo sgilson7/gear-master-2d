@@ -70,6 +70,10 @@ fn a_used_game() -> Game {
     g.character.choose_class("Berserker").expect("a class");
     g.world.map = "the-great-gear-cave".into();
     g.world.at = [2, 1];
+    // Where you were standing on the map you came off. Since M11.1 a gate that
+    // names no landing tile reads this, so a save that dropped it would put
+    // everybody who ever crossed a border back at that map's start.
+    g.world.positions.push(("west-bambulon".into(), [5, 16]));
     g.encounter = Some(fight::Encounter { enemy: "Iron Sentinel".into(), at: g.world.at });
     g
 }
@@ -93,6 +97,7 @@ fn a_used_game_survives_a_round_trip() {
     assert_eq!(after.world.quests_taken, before.world.quests_taken, "errands taken");
     assert_eq!(after.world.quests_done, before.world.quests_done, "errands finished");
     assert_eq!(after.world.pinned, before.world.pinned, "the pinned errand");
+    assert_eq!(after.world.positions, before.world.positions, "where you were on each map");
 
     // --- the character -----------------------------------------------------
     let (a, b) = (&after.character, &before.character);
@@ -134,6 +139,7 @@ fn the_used_game_is_actually_used() {
     assert!(!g.world.quests_taken.is_empty(), "no errand taken");
     assert!(!g.world.quests_done.is_empty(), "no errand finished");
     assert!(g.world.pinned.is_some(), "nothing pinned, so the map points nowhere");
+    assert!(!g.world.positions.is_empty(), "never left a map, so the border is untested");
     assert!(g.character.fatigue > 0, "not tired");
     assert!(!g.character.supplies.is_empty(), "carrying no tins");
     assert!(g.character.carried > 0, "carrying no experience");

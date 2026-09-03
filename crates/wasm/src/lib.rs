@@ -219,12 +219,21 @@ pub fn world_json() -> String {
         let allowed = g.character.allowances();
         map_for(g, |w| {
         let mut rows = Vec::new();
+        // **Whether the ground takes a foot, said once, by core.** The odds
+        // overlay used to skip `rock` and `water` by name, which is a list of
+        // terrains written in the page — and the Treyway added four the page
+        // had never heard of, two of them walls. A list of names is a second
+        // copy of the terrain table; this is the table's own answer.
+        let mut walk = Vec::new();
         for y in 0..w.height {
             let mut row = Vec::new();
+            let mut can = Vec::new();
             for x in 0..w.width {
                 row.push(w.terrain_name(x, y).to_string());
+                can.push(w.passable(x, y));
             }
             rows.push(row);
+            walk.push(can);
         }
         // **Only what is there.** A hidden place is not drawn, which is half
         // of what makes it hidden — the other half is `world::step` refusing
@@ -279,7 +288,7 @@ pub fn world_json() -> String {
             // The id, so the page can tell one map from another — a gate that
             // led somewhere identical would look like a gate that did nothing.
             "id": w.id,
-            "width": w.width, "height": w.height, "rows": rows,
+            "width": w.width, "height": w.height, "rows": rows, "walk": walk,
             "scouting": scouting,
             "chances": chances, "places": places, "regions": regions,
         })
@@ -296,6 +305,13 @@ pub fn position() -> String {
             let [x, y] = g.world.at;
             serde_json::json!({
                 "x": x, "y": y,
+                // **Which map, on every position report.** The page caches the
+                // grid — it has to; `world_json` builds four hundred strings —
+                // and cached grids go stale exactly when the player is moved
+                // rather than walked. So the cheap call carries the id and the
+                // page can tell in one comparison whether the expensive one is
+                // owed. See `paintPanel`.
+                "map": w.id,
                 "terrain": w.terrain_name(x, y),
                 "region": w.region_at(x, y).map(|r| r.name.clone()),
                 // Null until the tree grants the reading. Not zero: zero is a
@@ -393,14 +409,41 @@ pub fn try_step(dir: &str) -> String {
                         .map(|n| gm2d_core::quest::holding(g, n) > 0)
                         .unwrap_or(true);
                     if has {
-                        if let (Some(to), Some(at)) = (p.to.clone(), p.at_to) {
+                        if let Some(to) = p.to.clone() {
+                            // **Where you left off, unless the gate says
+                            // otherwise.** A dungeon's mouth names its landing
+                            // tile on both sides, because a corridor has one
+                            // door and the trip round is a constant. A border
+                            // does not: the Treyway is sixteen tiles of country
+                            // and coming back to its southern corner every time
+                            // would make the door a chute. So `at_to` wins where
+                            // it is written, and where it is not the far side
+                            // remembers — which is a content decision in the map
+                            // file rather than a branch here.
+                            let landing = p
+                                .at_to
+                                .or_else(|| g.world.recall(&to))
+                                .unwrap_or_else(|| map_named(&to, |d| [d.start.0, d.start.1]));
+                            // Written down before the move, or the map you are
+                            // leaving forgets where you were standing on it.
+                            g.world.remember();
                             g.world.map = to.clone();
-                            g.world.at = at;
+                            g.world.at = landing;
                             // Repaired on the far side: a gate whose landing
                             // tile is not walkable would strand somebody on a
                             // map they cannot leave.
                             map_named(&to, |dest| dest.repair(&mut g.world, &allowed));
-                            went = Some(to);
+                            // A gate may carry a paragraph — the door in the
+                            // western wall does, because crossing out of
+                            // Bambulon is a thing that happens once. Shown the
+                            // first time and remembered, so a save taken after
+                            // it comes back to a road rather than to the speech.
+                            let first = !p.prose.is_empty()
+                                && !g.world.answered.iter().any(|a| *a == p.id);
+                            if first {
+                                g.world.answered.push(p.id.clone());
+                            }
+                            went = Some((to, if first { p.prose.clone() } else { Vec::new() }));
                         }
                     } else {
                         shut = Some(if p.shut.is_empty() {
@@ -468,7 +511,13 @@ pub fn try_step(dir: &str) -> String {
                 "spent": s.spent,
                 "town": s.town,
                 "spoke": spoke,
-                "went": went,
+                // **A crossing, and what it said on the way through.** The
+                // map id so the page knows to redraw, and the paragraph the
+                // gate carries the first time — empty every time after.
+                "went": went.as_ref().map(|(to, prose)| serde_json::json!({
+                    "to": to,
+                    "prose": prose,
+                })),
                 "shut": shut,
                 "ending": ending,
                 "boss": s.boss,
@@ -1520,6 +1569,12 @@ pub fn settle_fight() -> String {
             // the same way a gate does.
             let want = g.world.last_town.clone();
             let mut moved = false;
+            // Where you fell is where you were, and a defeat is a placement
+            // rather than a step — so the map you are carried off remembers
+            // you, the same as a gate would. Without this a player who dies on
+            // the Treyway walks back through the door into its southern corner
+            // instead of into the fight they lost.
+            g.world.remember();
             for (id, _) in gm2d_core::data::MAPS {
                 map_named(id, |w| {
                     if !moved {
@@ -1540,8 +1595,8 @@ pub fn settle_fight() -> String {
                 }
             }
             if !moved {
-                // No town remembered anywhere. The overworld's start is
-                // always somewhere you can stand.
+                // No town remembered anywhere. The first map's start is always
+                // somewhere you can stand.
                 let over = gm2d_core::world::overworld();
                 map_named(&over, |w| {
                     g.world.map = w.id.clone();

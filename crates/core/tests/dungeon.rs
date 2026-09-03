@@ -50,8 +50,15 @@ fn every_gate_leads_somewhere_you_can_stand() {
                 "{}: opens onto {to:?}, which is not a map",
                 p.id
             );
-            let at = p.at_to.unwrap_or_else(|| panic!("{}: opens onto no tile", p.id));
+            // **A gate may name its landing tile or leave it to the far
+            // side.** `at_to` is a dungeon's mouth: one door, one tile, the
+            // trip round a constant. Leaving it out is a border, and the far
+            // side lands you where you last stood on it — falling back to that
+            // map's start the first time. Both have to be somewhere you can
+            // stand, and the start already is, so this checks the one a gate
+            // actually names.
             let dest = data::map(to, D);
+            let at = p.at_to.unwrap_or([dest.start.0, dest.start.1]);
             assert!(
                 dest.passable(at[0], at[1]),
                 "{}: lands you on {:?} of {to}, which is not walkable",
@@ -154,19 +161,30 @@ fn the_witchs_key_is_the_key_the_cave_wants() {
         .filter(|p| p.kind == PlaceKind::Gate)
         .filter_map(|p| p.needs.as_deref())
         .collect();
-    let paid: Vec<String> =
+    // **Two faucets, and a key wants exactly one of them.** An errand pays the
+    // Cave's; the Cave's own boss pays the wall's, looked up by the tile. A
+    // third kind of source would be a third place to look when a lock turns out
+    // to open for nobody, so the list is closed and this is where it is stated.
+    let mut paid: Vec<String> =
         data::quests().quests.iter().flat_map(|q| q.reward.iter().cloned()).collect();
+    for (id, _) in data::MAPS {
+        for p in data::map(id, D).places.iter() {
+            if let Some(d) = &p.drops {
+                paid.push(d.clone());
+            }
+        }
+    }
     for w in &wants {
         assert!(paid.iter().any(|r| r == w), "{w:?} opens a gate and nothing hands it out");
     }
-    // And the errand that pays it is behind another one, which is what makes
-    // it a questline rather than a fetch.
+    // And the errand that pays the Cave's key is behind another one, which is
+    // what makes it a questline rather than a fetch.
     let quests = data::quests();
     let giver = quests
         .quests
         .iter()
         .find(|q| q.reward.iter().any(|r| wants.contains(&r.as_str())))
-        .expect("something pays the key");
+        .expect("something pays a gate's key");
     assert!(!giver.requires.is_empty(), "{}: the key is one errand deep", giver.id);
 }
 

@@ -429,7 +429,14 @@ pub fn guide(game: &Game, q: &Quest, worlds: &[crate::world::World]) -> Guide {
     // behind a crossing would be a second copy of the rule, and it would go on
     // saying so after the number moved.
     let allowed = game.character.allowances();
-    for w in worlds {
+    // **The map the player is standing on, and only that one.** This looped
+    // over all eleven and asked each of them whether a crossing stood between
+    // `game.world.at` and a tile of theirs — but a position belongs to one
+    // map, so ten of those eleven answers were about coordinates the player
+    // was nowhere near, and the ones on a map smaller than the position
+    // indexed off the end of the grid and stopped the game dead. See
+    // `World::crossing_between`.
+    for w in worlds.iter().filter(|w| w.id == game.world.map_id()) {
         let spots = out
             .places
             .iter()

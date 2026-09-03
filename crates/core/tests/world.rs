@@ -266,7 +266,10 @@ fn encounter_chances_stay_inside_their_bounds() {
                 if !w.passable(x, y) {
                     continue;
                 }
-                if w.terrain_at(x, y).encounter_per_mille == 0 {
+                // In bounds by construction — the loops walk the grid — so
+                // the terrain is there; `terrain_at` is an `Option` since
+                // M12.B because a coordinate off the map has no tile.
+                if w.terrain_at(x, y).expect("a tile inside the map").encounter_per_mille == 0 {
                     assert_eq!(c, 0, "{id}: ({x}, {y}) is safe terrain and rolls {c}");
                 }
             }

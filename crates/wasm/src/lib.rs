@@ -1194,6 +1194,26 @@ pub fn board_json() -> String {
                     "cols": gm2d_core::slot::SLOT_W,
                     "placed": placed,
                     "items": items,
+                    // **What this grid takes, and it is core's.**
+                    // `piece::recipe_parts` has read the recipe table since
+                    // the fork and `explain.rs` prints it for an instrument's
+                    // part; no screen has ever printed it for a *grid*. So a
+                    // player who could not see that a chest wants a base and
+                    // a layer packed by guesswork — and the M12.0 probe
+                    // measured the consequence: the greaves grid sits at 0%
+                    // for fourteen levels.
+                    //
+                    // Derived, unthemed, TONE 13a. Somebody comparing what two
+                    // grids need is comparing counts, and a count wearing a
+                    // joke has to be translated first.
+                    "recipes": gm2d_core::piece::recipe_parts(k)
+                        .into_iter()
+                        .map(|w| serde_json::json!({
+                            "title": w.title,
+                            "required": w.required,
+                            "optional": w.optional,
+                        }))
+                        .collect::<Vec<_>>(),
                 })
             })
             .collect();

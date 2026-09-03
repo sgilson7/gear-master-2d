@@ -119,12 +119,27 @@ Outcome* records the trap for whoever greps next.
 
 ```
 M12.0  the measure               (no push — instrumentation)
+M12.B  the freeze on the field   deploy point 0  <- reported by a player; first
 M12.1  the bargain barrel        deploy point A
 M12.2  commissions               deploy point B
 M12.5  events that pay           deploy point C   <- new, and it moves
 M12.3  slower cells              deploy point D   (scope set by the measure)
 M12.4  triage, the friend, close deploy point E = the block ships
 ```
+
+**M12.B is first and it outranks the block.** A player sent in a save that
+cannot be played: after clearing a floor of the Drambus Stack the character
+stops moving, every reload buys one action and then nothing works, and the
+strip reads `unreachable`. A block about making the board tense comes second to
+a game that will not take a keypress. It is written up in §11 and it deploys
+on its own, ahead of A, because a live build that eats a player's save should
+not wait behind three features.
+
+Two screens the same player asked for ride with it, because they are the same
+file and the same sitting: **an item's recipe, shown** — the game has never
+said what a grid needs, and a player who cannot see that a chest wants a base
+and a layer is packing by guesswork — and **the controls blurb removed** from
+the top of the page, which buys back the screen space to put a recipe in.
 
 **M12.5 goes third, before the cells.** The frame's ordering argument is that
 throughput comes before the schedule change so M12.3's scope can be decided by
@@ -382,7 +397,17 @@ The frame seeds four. M12.5 adds three, and the third is the one to watch.
    arrival prose, first-visit flags, `remember_at`, the quest log's guide, and
    `World::repair`'s idea of home. Watch: a warp into a map whose gate carries
    a paragraph — does the paragraph fire, and should it?
-7. **An outcomes box is a promise on a screen** (M12.5). This project has
+7. **A coordinate is only meaningful with the map it came from** (M12.B).
+   Eleven maps from 9×5 to 20×20, and anything holding a position and a map has
+   to be asked whether they belong together. `idx` answers that now, but the
+   *callers* are the surface: anything that walks `data::MAPS` and reaches for
+   `world.at` is the same fault in a new room. Watch: `errand_marks_json`, the
+   odds overlay, and anything the next block adds that loops over maps.
+8. **The cross-map "is it behind a crossing" answer is missing rather than
+   wrong** (M12.B). `WorldState::positions` is the material. Watch: whether a
+   player reading the log in Kettleworks about an errand behind the Verge is
+   worse off than one who is told nothing.
+9. **An outcomes box is a promise on a screen** (M12.5). This project has
    shipped four promises that reached nothing — `Showstopper`, `Recycler`, the
    ench rack, and event experience — and every one was a screen saying a thing
    the engine did not do. A box is that failure mode with a printing press.
@@ -474,3 +499,80 @@ close-out cannot disagree about what was aimed at: **fill ≥ 70% by level 3,
 | # | the frame said | this plan says | why |
 |---|---|---|---|
 | 7 | barrel stock is 1×1 and 1×2 commons at single-digit Fnorp | **≤2 cells and ≤12 Fnorp for weapon, helmet and gloves; ≤3 cells and ≤20 Fnorp for chest and greaves** | after removing quest tokens, `EVENT_ONLY` and everything already on a shelf, the tight bounds leave **3 chest and 4 greaves** candidates against 26 weapon, 14 helmet and 20 gloves. The loose bounds give 17 and 30. A barrel that fills three grids and leaves the two emptiest ones bare is a barrel aimed away from the finding — and M12.0 measured greaves at 0% for fourteen levels. Still zero new components: §7 row 1 is untouched |
+
+---
+
+## 11. M12.B — the freeze on the field *(deploy point 0, and it is first)*
+
+Reported by a player with the save attached, which is the whole reason it was
+diagnosed in an afternoon rather than argued about. `crates/core/tests/fixtures/
+frozen-on-the-field.json` is their file, kept because the shape of the state
+*is* the bug report.
+
+**What they saw.** After clearing a floor of the Drambus Stack, the character
+would not move. Reloading bought exactly one action and then nothing worked —
+one keypress, or one button, and the game was inert. A new game was fine. And
+loading the save looked like it had put them back on the first map.
+
+**What it was.** `quest::guide` asks whether a crossing stands between the
+player and an errand. It asked **all eleven maps**, handing each of them
+`world.at` — a position that belongs to exactly one map. Standing at (4, 16) on
+the 20×20 Kettleworks field, the 16×16 Treyway was asked for index 260 of its
+256-tile grid and the wasm module trapped. The page catches the throw and logs
+it, so the entire failure surfaces as the word `unreachable` on the strip.
+
+Nothing about the tower was involved. What the tower did was hand them the
+errand and the walk that put them at y = 16.
+
+**Three layers, and each is a different mistake.**
+
+1. **The wrong question.** A crossing is a rule about *walking*, and walking
+   happens on the map you are on. `World::crossing_between` now answers only
+   about the map the state is standing on, and `quest::guide` only asks that
+   map. **The guard is the fix and the filter is the call site made honest** —
+   restoring the eleven-map loop on its own now breaks nothing, which is worth
+   knowing rather than hiding.
+2. **`idx` was `y * width + x` with no check, and both halves were wrong
+   differently.** Past the bottom it ran off the end and trapped. Past the
+   right-hand edge it did not trap at all — it wrapped into the next row and
+   returned a real tile from somewhere else on the map, which is the worse of
+   the two because nothing says so. Eleven maps from 9×5 to 20×20 means a
+   coordinate is only meaningful with the map it came from, so `idx` returns an
+   `Option` and `terrain_at`, `region_index`, `passable`, `walkable` and
+   `encounter_per_mille` all answer *nothing is there* off the map.
+3. **`Guide::shut` had no test at all.** The `shut` this suite checks
+   elsewhere is `PlaceDef::shut`, the map's sentence — a different field on a
+   different type. So narrowing `crossing_between` could have deleted M9.4's
+   "the log says when a road is shut" outright and 638 tests would have stayed
+   green. It is pinned now.
+
+**What is deliberately not fixed here.** A *cross-map* answer to "is this
+errand behind a crossing" is a real feature — an errand behind the Bengulon
+Verge is behind it whichever map you are reading the log on — and it needs
+somewhere to reason *from* on the far map, which `world.at` is not.
+`WorldState::positions` remembers where you left each map and is the obvious
+material. It is not built here, because a bug fix that quietly grows a feature
+is a bug fix nobody can review. Carried to §6 as an entry.
+
+**Two screens ride with it**, both asked for by the same player in the same
+breath, and both in the same two files:
+
+- **An item's recipe, shown.** The game has never told anybody what a grid
+  wants. A chest needs a base and one to three layers; a weapon needs a handle
+  and a damaging piece, *or* a book and a spell, *or* an orb and two. That is
+  `piece::recipes`, it has been in core since the fork, and no screen has ever
+  printed it — so packing is guesswork until you have read the source. Derived
+  from `recipes`, unthemed, TONE 13a, for the same reason a skill node's line
+  is: somebody comparing what two grids need is comparing counts.
+- **The controls blurb goes.** The WASD-and-tilde paragraph at the top of the
+  page is read once and then occupies that space for ever. Removing it is what
+  pays for the recipe box.
+
+**Acceptance.**
+- The player's own save loads, reads its quest log, and takes a keypress, in
+  all three engines, with no console errors.
+- Every errand can be guided from any position on any map, including positions
+  that are off the map, without trapping.
+- Off-map reads answer *nothing is there* rather than a tile from the next row.
+- `Guide::shut` still fires for a level-one character in the pit.
+- Every grid names its recipe on the packing screen, derived and unthemed.

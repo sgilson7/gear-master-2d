@@ -693,20 +693,42 @@ impl World {
         x >= 0 && y >= 0 && x < self.width as i32 && y < self.height as i32
     }
 
-    fn idx(&self, x: u8, y: u8) -> usize {
-        y as usize * self.width as usize + x as usize
+    /// The tile at `(x, y)`, or nothing if that is not on this map.
+    ///
+    /// **It was `y * width + x` with no check, and both halves of that were
+    /// wrong in different ways.** With `y` past the bottom it indexed off the
+    /// end and panicked; with `x` past the right-hand edge it did not panic at
+    /// all — it wrapped into the *next row* and returned a real tile from
+    /// somewhere else on the map, which is the worse of the two because
+    /// nothing says so.
+    ///
+    /// Every map is a different size — eleven of them, from 9x5 to 20x20 — so
+    /// a coordinate is only meaningful together with the map it came from, and
+    /// anything holding one of each has to be asked whether they belong to one
+    /// another. That is a question, so this returns an answer to it.
+    fn idx(&self, x: u8, y: u8) -> Option<usize> {
+        (x < self.width && y < self.height)
+            .then(|| y as usize * self.width as usize + x as usize)
     }
 
-    pub fn terrain_at(&self, x: u8, y: u8) -> &TerrainDef {
-        &self.terrain[self.tiles[self.idx(x, y)]].1
+    /// The terrain on this tile, or nothing if the tile is not on this map.
+    pub fn terrain_at(&self, x: u8, y: u8) -> Option<&TerrainDef> {
+        self.idx(x, y).map(|i| &self.terrain[self.tiles[i]].1)
     }
 
+    /// The terrain's name, and **the empty string off the map**.
+    ///
+    /// Not an `Option`, because every caller compares it against a name — and
+    /// `""` is no terrain this game has, so every one of those comparisons is
+    /// already right about a tile that does not exist.
     pub fn terrain_name(&self, x: u8, y: u8) -> &str {
-        &self.terrain[self.tiles[self.idx(x, y)]].0
+        self.idx(x, y).map_or("", |i| self.terrain[self.tiles[i]].0.as_str())
     }
 
+    /// **Nothing off the map is passable**, which is the same answer
+    /// `in_bounds` gives and the reason a step never needed both.
     pub fn passable(&self, x: u8, y: u8) -> bool {
-        self.terrain_at(x, y).passable
+        self.terrain_at(x, y).is_some_and(|t| t.passable)
     }
 
     /// Is this tile within [`WADE_DEPTH`] of somewhere you could stand?
@@ -748,8 +770,17 @@ impl World {
         self.passable(x, y) || (allowed.wade && self.terrain_name(x, y) == "water")
     }
 
+    /// **A tile that is not on this map is in none of its regions.**
+    ///
+    /// This is where the M12 freeze landed: `quest::guide` asked every one of
+    /// the eleven maps whether a crossing stood between the player and an
+    /// errand, handing each of them the player's position — which belongs to
+    /// exactly one map. Standing at (4, 16) on a 20x20 field, the 16x16
+    /// Treyway was asked about index 260 of a 256-tile grid and the whole wasm
+    /// module stopped. See `crossing_between`, which is where the wrong
+    /// question was being asked, and `idx`, which is why it was fatal.
     fn region_index(&self, x: u8, y: u8) -> Option<usize> {
-        let i = self.region_of[self.idx(x, y)];
+        let i = *self.region_of.get(self.idx(x, y)?)?;
         (i != usize::MAX).then_some(i)
     }
 
@@ -828,12 +859,31 @@ impl World {
     /// log asks about somewhere thirty tiles away. One answer to it, because
     /// two would be a map that refused a step for one reason and explained it
     /// with another.
+    ///
+    /// **Only about the map the player is standing on**, and that guard is the
+    /// M12 freeze. `state.at` is a position on exactly one map; a crossing is
+    /// a rule about *walking*, and walking happens on the map you are on. The
+    /// quest log was asking all eleven maps this question and handing each of
+    /// them the same coordinates, which was two faults at once: on a map big
+    /// enough to hold them it answered about a tile the player is nowhere
+    /// near, and on a smaller one it read off the end of the grid and took the
+    /// whole module down with it.
+    ///
+    /// A *cross-map* version of this question is real — an errand behind the
+    /// Bengulon Verge is behind it whichever map you are reading the log on —
+    /// and it is not this function, because answering it needs somewhere to
+    /// reason *from* on the far map and `state.at` is not that. It is worth
+    /// building and is deliberately not built here: a bug fix that quietly
+    /// grows a feature is a bug fix nobody can review.
     pub fn crossing_between(
         &self,
         state: &WorldState,
         to: (u8, u8),
         allowed: &Allowances,
     ) -> Option<&PlaceDef> {
+        if state.map_id() != self.id {
+            return None;
+        }
         let here = self.region_at(state.at[0], state.at[1]).map(|r| r.id.as_str());
         let there = self.region_at(to.0, to.1)?;
         if here == Some(there.id.as_str()) {
@@ -883,7 +933,11 @@ impl World {
     /// for: a region of harder creatures is a region you get stopped in more
     /// often, and there is no arrangement of the table where it is not.
     pub fn encounter_per_mille(&self, x: u8, y: u8) -> i32 {
-        let base = self.terrain_at(x, y).encounter_per_mille;
+        // Nothing happens on a tile that is not there. Same answer as a
+        // terrain whose base rate is zero, which is what rock already is.
+        let Some(base) = self.terrain_at(x, y).map(|t| t.encounter_per_mille) else {
+            return 0;
+        };
         if base <= 0 {
             return 0;
         }

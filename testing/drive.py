@@ -406,6 +406,109 @@ def wait_for_images(page, selector, timeout=8000):
         pass
 
 
+def check_a_grid_says_what_it_takes(page, name, fails):
+    """Every grid names its recipe, and an empty grid names it too.
+
+    **M12.B.** `piece::recipe_parts` has read the recipe table since the fork
+    and no screen ever printed it for a *grid* — so a player who had not read
+    the source had no way to learn that a chest wants a base and one to three
+    layers. The M12.0 probe measured what that costs: the greaves grid sits at
+    0% for fourteen levels of a whole playthrough.
+
+    The empty grid is the point. The panel used to skip a slot with no items,
+    which meant the one place the question is asked was the one place nothing
+    was said — so this counts five grids rather than however many are packed.
+
+    **Read off the screen and not out of the page's objects.** The first
+    version of this reached for `window.__board.slots`, which is the canvas
+    painter rather than the payload, and failed in all three engines on the
+    word `undefined`. What is being checked is whether a player can read it.
+    """
+    got = page.evaluate("""() => ({
+      heads: [...document.querySelectorAll('#panel-yours .grid-of')].map(e => e.textContent),
+      boxes: [...document.querySelectorAll('#panel-yours .recipe')].map(e => ({
+        lines: [...e.querySelectorAll('li')].map(li => (li.textContent || '').trim()),
+      })),
+    })""")
+    want = {"weapon", "helmet", "chest", "gloves", "greaves"}
+    heads = set(got["heads"])
+    if not want <= heads:
+        fails.append(f"{name}: the packing panel names {sorted(heads)}, "
+                     f"and never says what {sorted(want - heads)} take")
+    if len(got["boxes"]) != len(got["heads"]):
+        fails.append(f"{name}: {len(got['heads'])} grid headings and "
+                     f"{len(got['boxes'])} recipe boxes")
+    # **Not vacuous:** every box carries a count, and the set names more than
+    # one kind of part — a box reading "1 thing" everywhere would pass a check
+    # that only counted boxes.
+    kinds = set()
+    for head, box in zip(got["heads"], got["boxes"]):
+        if not box["lines"]:
+            fails.append(f"{name}: the {head} grid has a recipe box with nothing in it")
+            continue
+        for line in box["lines"]:
+            if not any(c.isdigit() for c in line):
+                fails.append(f"{name}: the {head} recipe reads {line!r}, which names no count")
+            kinds.update(w for w in line.replace("+", " ").split() if w.isalpha())
+    for wanted in ("handle", "base", "mold", "plating"):
+        if not any(wanted in k for k in kinds):
+            fails.append(f"{name}: no recipe mentions a {wanted}: {sorted(kinds)}")
+    # A themed word here would be TONE 13a broken on a new screen.
+    themed = {"cork", "funny", "fnorp", "roast"}
+    for k in kinds:
+        if k.lower() in themed:
+            fails.append(f"{name}: a recipe says {k!r}, which is the theme's word for it")
+
+
+def check_the_frozen_save_is_playable(page, name, fails):
+    """A player's save that used to trap the module, loaded and walked.
+
+    **M12.B, and it is the reported bug rather than a reconstruction of it.**
+    `quest::guide` asked all eleven maps whether a crossing stood between the
+    player and an errand and handed each of them `world.at` — a position that
+    belongs to one map. At (4, 16) on the 20x20 field, the 16x16 Treyway was
+    asked for index 260 of 256 and the wasm trapped, so the page logged
+    `unreachable` and the game stopped taking input.
+
+    **Check the second keypress.** One press was always going to work, because
+    the trap is sprung by whatever reads the quest log after it. A check that
+    plants this save and steps once is the check that would have passed.
+    """
+    fixture = ROOT / "crates" / "core" / "tests" / "fixtures" / "frozen-on-the-field.json"
+    if not fixture.exists():
+        fails.append(f"{name}: the reported save is missing from {fixture}")
+        return
+    errors = []
+    page.on("pageerror", lambda e: errors.append(str(e)))
+    page.set_input_files("#file", str(fixture))
+    try:
+        page.wait_for_function(
+            "() => Array.from(document.querySelectorAll('#tape li'))"
+            ".some(e => (e.textContent || '').includes('Loaded'))", timeout=10000)
+    except Exception:
+        said = page.eval_on_selector_all("#tape li", "e => e.map(x => x.textContent)")
+        fails.append(f"{name}: the reported save never loaded. The strip says {said[-1:]!r}")
+        return
+    where = json.loads(page.evaluate("() => window.__position()"))
+    if where["map"] != "kettleworks-field":
+        fails.append(f"{name}: the save is on the field and the game opened on {where['map']!r}")
+    # The log is what trapped, so read it before anything else.
+    try:
+        page.evaluate("() => window.__log()")
+    except Exception as e:
+        fails.append(f"{name}: reading the quest log threw {str(e).splitlines()[0][:60]}")
+    walked = []
+    for key in ("ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"):
+        page.click("#map")
+        page.keyboard.press(key)
+        page.wait_for_timeout(180)
+        walked.append(page.text_content("#coords"))
+    if len(set(walked)) < 2:
+        fails.append(f"{name}: four presses and the character stood still: {walked}")
+    if errors:
+        fails.append(f"{name}: the reported save still throws: {errors[:2]}")
+
+
 def check_the_shelf_is_the_shelf(page, name, fails):
     """A town sells what it sells, and what you buy is gone from it.
 
@@ -3140,6 +3243,7 @@ def walk_the_gate(browser, name, fails=None):
         check_the_card_halves(page, name, fails)
         check_hovering_an_item(page, name, fails)
         check_the_bag_shows_shapes(page, name, fails)
+        check_a_grid_says_what_it_takes(page, name, fails)
         page.click("#run")
         page.wait_for_selector("#fight", state="hidden", timeout=8000)
 
@@ -3246,6 +3350,15 @@ def walk_the_gate(browser, name, fails=None):
     junk.unlink()
     if page.text_content("#coords") != pos_before:
         fails.append(f"{name}: a refused file still moved the player")
+
+    # --- and the save a player sent in, which used to stop the module --------
+    # Last in the upload block, because it replaces the game with somebody
+    # else's: everything above wants the walk's own state.
+    check_the_frozen_save_is_playable(page, name, fails)
+    # Put the walk's own game back, or every check after this reads a stranger's.
+    page.set_input_files("#file", str(path))
+    page.wait_for_function(
+        f"document.getElementById('coords').textContent === {pos_before!r}", timeout=20000)
 
     # --- levelling and the tree ----------------------------------------------
     # Grind the pit until a level lands. The receipt has to name which frame

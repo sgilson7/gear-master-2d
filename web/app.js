@@ -904,10 +904,13 @@ function bolt(pieceId) {
 // did not. The panel renders `status` unchanged — that sentence is the engine's
 // and it is better than any summary of it.
 function paintMade(st) {
-  const { html, any } = cards(st.slots);
+  const { html, any } = cards(st.slots, true);
+  // The recipes are drawn whether or not anything is seated — an empty grid is
+  // exactly where the question is asked — so the nudge sits above them rather
+  // than instead of them.
   $('panel-yours').innerHTML = `<h4>What the frames made</h4>` +
-    (any ? html
-         : `<p class="empty">Nothing seated yet. Click a component in the bag, then click a cell.</p>`);
+    (any ? '' : `<p class="empty">Nothing seated yet. Click a component in the bag, then click a cell.</p>`) +
+    html;
 }
 
 /// Every item on a set of grids, as cards.
@@ -1018,13 +1021,45 @@ function oneCard(i, where) {
 }
 
 /// Every item on a set of grids, as cards.
-function cards(slots) {
+/// What a grid takes, in the engine's words.
+///
+/// **Derived in core and never typed.** `piece::recipe_parts` reads the recipe
+/// table, so retuning a recipe retunes this — the same reason a skill node's
+/// line is derived rather than written into a blurb. Unthemed, TONE 13a:
+/// somebody comparing what two grids want is comparing counts.
+///
+/// The weapon grid has six ways of being built and the other four have one
+/// each, so the way's name is printed only where there is a choice to make
+/// between them.
+function recipeBox(slot) {
+  const ways = slot.recipes ?? [];
+  if (!ways.length) return '';
+  const rows = ways.map((w) => {
+    const name = ways.length > 1 ? `<b>${w.title}</b> ` : '';
+    const opt = w.optional.length
+      ? ` <span class="dim">and up to ${w.optional.join(' + ')}</span>` : '';
+    return `<li>${name}${w.required.join(' + ')}${opt}</li>`;
+  }).join('');
+  return `<div class="recipe"><span class="recipe-h">what it takes</span><ul>${rows}</ul></div>`;
+}
+
+/// **`recipes` is opt-in, because a creature's board is not something you
+/// pack.** The same builder draws your grids, the creature's panel and both
+/// sides of the replay; only your packing screen is a place where "what it
+/// takes" is a thing you can act on.
+///
+/// And your side no longer skips an empty grid. Skipping it is what hid the
+/// question: a grid with nothing in it printed no heading, no card and no
+/// hint, so the one place a player most needs to be told what a chest wants
+/// was the one place that said nothing at all.
+function cards(slots, showRecipes = false) {
   const parts = [];
   let any = false;
   for (const slot of slots) {
-    if (!slot.items.length) continue;
-    any = true;
+    if (!slot.items.length && !showRecipes) continue;
+    if (slot.items.length) any = true;
     parts.push(`<p class="grid-of">${slot.slot}</p>`);
+    if (showRecipes) parts.push(recipeBox(slot));
     for (const i of slot.items) parts.push(oneCard(i, slot.slot));
   }
   return { html: parts.join(''), any };

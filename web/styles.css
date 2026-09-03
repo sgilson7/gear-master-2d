@@ -299,6 +299,19 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
 .wares:disabled { opacity: .5; cursor: not-allowed; }
 .wares:disabled .cost { color: var(--rust); }
 .wares.pinned { outline: 2px solid var(--brass); outline-offset: -2px; }
+/* --- M12.B: what a grid takes ------------------------------------------- */
+/*
+ * A spec, not prose, so it reads like the skill tree's line rather than like
+ * an item's flavour: mono, quiet, and on the panel's own recessed ground.
+ */
+.recipe { margin: 2px 0 8px; padding: 6px 9px; background: var(--surface-2);
+  border-left: 2px solid var(--line); }
+.recipe-h { font-family: var(--mono); font-size: 10px; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--ink-3); }
+.recipe ul { margin: 3px 0 0; padding: 0; list-style: none; }
+.recipe li { font-family: var(--mono); font-size: 11.5px; color: var(--ink-2);
+  line-height: 1.5; }
+.recipe li b { color: var(--ink); font-weight: 600; }
 
 /* --- M6: the figures ---------------------------------------------------- */
 /* TikZ, compiled to SVG by `make art`. Flat fills and heavy outlines, so a

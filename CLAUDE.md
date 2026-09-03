@@ -36,9 +36,20 @@ walks all forty-two gate checks against the deployed page, three engines. See
 *A deployed fix is not a delivered fix* for why that is a separate step from
 the deploy going green.
 
-**There is no plan for the next block.** `PLAN-M9.md`, `PLAN-M10.md` and
-`PLAN-M11.md` are done; `PLAN.md` §6d is what M11 left open, §6c is M10.3's,
-§6b is M9.4's and §6a is M8.8's.
+**M12 is the next block and it is planned but not started.** `PLAN-M12.md` is
+the frame, written while M11 was in flight; **`PLAN-M12-EXEC.md` is the
+execution plan and wins where the two disagree**, the same way `PLAN.md` wins
+over `PLANNING-BRIEF.md`. It carries one milestone the frame does not have —
+events that pay something and say what they pay — added on the human's ask.
+`PLAN-M9.md`, `PLAN-M10.md` and `PLAN-M11.md` are done; `PLAN.md` §6d is what
+M11 left open, §6c is M10.3's, §6b is M9.4's and §6a is M8.8's.
+
+**M12's thesis is board pressure.** Cells outnumber pieces, so a board reads
+as inventory space rather than a puzzle, and there is no moment where putting
+one thing down means taking another up. Everything in the block is a lever on
+that: a bargain barrel and commissions raise throughput, earned rows slow
+cells, and events that pay gear are a third faucet. **No reroll** — the ask
+that started the block is declined by name, and `PLAN-M12.md` §0 says why.
 
 **The demo ends under the lake now**, at a door behind the thing at the bottom
 of it, and getting there means dropping a five-floor tower or walking on water.
@@ -442,13 +453,18 @@ the rename was cheaper before the nine than after.
 - **A dense map is a different kind of map, and it needed no new code.** The
   Kettleworks field is 41 events on 400 tiles. West Bambulon is 7 on 400. The
   difference is entirely in the file, which is the point of content living in
-  `data/` — a map whose texture is *reading things* rather than *walking* is a
-  content decision and not an engine one.
-  **It did need one line of engine, and not having it made the map worse than
-  no map.** All 41 ask nothing, and an event that asks nothing could never be
-  marked answered, so every one of them re-opened on every step onto its tile.
-  See *An event that asks nothing is read once*. The density was the right
-  call; shipping it without checking the second visit was not.
+  `data/`.
+  **And that is the whole of what it is, which is the problem.** Asked
+  directly whether the field's events hint at anything, the measurement is:
+  **six of the forty-seven do something** — they are errand waypoints, a
+  `word` goal you stand on — and **forty-one are prose and nothing else.** No
+  flags, no choices, no `hidden_until`, no cross-references, no chain. The
+  nouns they share are "Stack", "Kettleworks" and "Somebody". There is no
+  puzzle in them because none was written.
+  A map whose texture is *reading things* is a legitimate content decision;
+  forty-one dismissals that pay nothing and ask nothing are texture only if
+  something on the map rewards having read them, and nothing does. `PLAN-
+  M12-EXEC.md` §M12.5 is where that is answered rather than defended.
 
 ## The Drambus Stack, and the counter that is not there
 
@@ -1766,6 +1782,44 @@ worked, which is the finding underneath the finding.
 M11.8's harness is for, and it earned its place on its first run: a fault three
 milestones old, in a line every reader of the source had skimmed past because
 the comment beside it explained why it was right.
+
+## Two types called Outcome, and the describer is on the dead one
+
+**`event::Outcome` is the campaign's and `tile_event::Outcome` is the game's.**
+The campaign was cut in `48203ee` and `event.rs` survived it, so the module
+still carries upstream's ladder outcomes — `FightAsWritten`, `BuyOff`,
+`Claim`, `Step` — with a full `describe()` on them. The type the game actually
+uses is `tile_event::Outcome`: `All`, `Gold`, `Flag`, `Give`, `Xp`, `Nothing`,
+and it has **no describer at all**.
+
+So the pattern the tile events want was written years ago, by somebody else,
+on the wrong type — and its doc comment is the design:
+
+> Static: what this outcome *is*, for a tooltip before it is taken. What it
+> *did*, with the run's own numbers in it, is `Run::receipt`.
+
+**`Requirement` is the same story and the more useful half.** The campaign's
+carries a `describe` whose doc names a distinction the live type has never
+had:
+
+> Not the same thing as `Choice::unmet`, and both are needed. `unmet` is
+> flavour written for the moment after you have tried; this is the plain
+> statement *before* an attempt.
+
+Which is why a locked choice in GM2D reads as a wall rather than as a target:
+it has the flavour and has never had the statement.
+
+That is the split `Node::line()` and a level-up receipt already make, and it
+is why a tile event's outcomes box is a port rather than an invention. **Grep
+for it, and then check which of the two you found** — this file's rule about
+building something twice has a second edge, which is finding the thing and
+attaching to the wrong copy.
+
+The live type also already has more reach than any content uses: `Give` hands
+over a component and `Flag` sets a world flag that `PlaceDef::hidden_until`
+reads, so **gear rewards and event chains have been possible in the data
+format since M2 and are used twice and never respectively.** What is missing
+is not machinery, it is content and a sentence.
 
 ## The game talks in one place
 

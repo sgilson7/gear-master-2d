@@ -332,6 +332,30 @@ quest log. `git log origin/main..HEAD` is the check and it costs nothing.
    game to an agent forbidden the source, the data, the tests and this file. If
    it wants a number it cannot get, that is the finding.
 
+### What M12 is, if you are picking this up cold
+
+`PLAN-M12.md` is the frame and **`PLAN-M12-EXEC.md` is the execution plan and
+wins where they disagree** — the same relationship `PLANNING-BRIEF.md` and
+`PLAN.md` have. Six milestones, five deploy points, **no save seam anywhere**
+(M11 spent two and that is enough for a while).
+
+The thesis is **board pressure**: cells outnumber pieces, so a board reads as
+inventory space instead of a puzzle and nothing you pick up ever costs you
+something you already had. Three faucets raise piece throughput — a bargain
+barrel, commissions you order and fight your way to, and events that pay gear
+— and one lever slows cells: rows stop arriving with levels and become
+something you spend a skill point or finish a quest line for. That last one
+retires an MVP pillar on purpose.
+
+**No reroll.** The ask that started the block is declined by name and §0 of
+the frame says why.
+
+Two things to know before you touch the events milestone. `Outcome::Give` and
+`Outcome::Flag` have been able to hand over gear and open a chain since M2 and
+are used twice and never — so most of that work is content, not engine. And
+there are **two types called `Outcome`**: the describer you want already
+exists, on the cut campaign's type in `event.rs`, not on the live one.
+
 ### What is not scheduled, and is still the human's
 
 - **What is past the door under the lake.** `PLAN-M8.md` §5.6, asked one map

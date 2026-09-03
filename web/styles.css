@@ -113,6 +113,13 @@ aside { display: flex; flex-direction: column; gap: 20px; }
 .panel dl > div { display: flex; justify-content: space-between; gap: 12px;
   font-size: 13.5px; border-bottom: 1px dotted var(--line); padding-bottom: 5px; }
 .panel dl > div:last-child { border-bottom: none; }
+/* **Trap 6, fourth coat.** Anything that sets `display` on an element it also
+   hides needs its own `[hidden]` rule, because the two have equal specificity
+   and the later one wins. The survey row is hidden on every map but one and was
+   showing "surveying with —" on all of them; the playtest driver found it
+   before the playtest did. `.card`, `.screen.framed` and the z-index stack were
+   the first three. */
+.panel dl > div[hidden] { display: none; }
 .panel dt { color: var(--ink-3); }
 .panel dd { margin: 0; font-family: var(--mono); font-variant-numeric: tabular-nums;
   color: var(--ink); }

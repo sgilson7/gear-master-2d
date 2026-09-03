@@ -2,3 +2,6 @@
 /dist
 .DS_Store
 .venv-test
+
+# The playtest driver imports itself for its detached server process.
+testing/__pycache__/

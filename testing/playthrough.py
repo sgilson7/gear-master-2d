@@ -24,7 +24,11 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parent.parent
-WEB = ROOT / "dist" / "web"
+# `GM2D_WEB` plays a build other than dist/web — the same override the gate and
+# `packaging/package-web.sh` take. M11.8 put a long-running playtest on
+# dist/web, and swapping that build out mid-run also moves the save
+# fingerprint, so the run's own save stops loading.
+WEB = Path(os.environ.get("GM2D_WEB") or ROOT / "dist" / "web")
 PORT = 8131
 ORIGIN = f"http://127.0.0.1:{PORT}"
 

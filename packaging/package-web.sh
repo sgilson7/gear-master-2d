@@ -8,7 +8,12 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-DIST="$ROOT/dist"; WEB="$DIST/web"
+# `GM2D_WEB` builds somewhere other than dist/web. The gate and the agent
+# playtest driver both serve a directory, and M11.8 put a long-running
+# playtest on dist/web — so the gate needs somewhere of its own to build
+# rather than swapping the build out from under a run in progress. Default
+# unchanged, so nothing that does not set it can tell.
+WEB="${GM2D_WEB:-$ROOT/dist/web}"; DIST="$(dirname "$WEB")"
 CRATE=gm2d-wasm
 WASM=gm2d_wasm
 TARGET=wasm32-unknown-unknown

@@ -23,6 +23,7 @@ is uploaded" is tested rather than asserted.
     python testing/drive.py [chromium|firefox|webkit ...]
 """
 import functools
+import os
 import http.server
 import socketserver
 import sys
@@ -34,7 +35,11 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parent.parent
-WEB = ROOT / "dist" / "web"
+# The directory to serve. `GM2D_WEB` points the gate at a build of its own —
+# see the same variable in `packaging/package-web.sh`. M11.8 put a long-running
+# playtest on dist/web, and a gate that rebuilds it swaps the game out from
+# under a run in progress.
+WEB = Path(os.environ.get("GM2D_WEB") or ROOT / "dist" / "web")
 PORT = 8127
 ORIGIN = f"http://127.0.0.1:{PORT}"
 JSON_NULL = None

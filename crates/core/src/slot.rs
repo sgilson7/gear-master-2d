@@ -240,6 +240,26 @@ impl Slot {
         ax: u8,
         ay: u8,
     ) -> Result<(), PlaceError> {
+        self.can_place_shape(reg, id, &reg.shape(id), ax, ay)
+    }
+
+    /// The same question, asked of a footprint the piece is not currently
+    /// wearing.
+    ///
+    /// **Only for asking, never for placing.** `can_place` is this with the
+    /// piece's own shape, which is the only shape `place` will ever write. The
+    /// separate entry exists because *would this fit if it were turned* is a
+    /// real question — it is what `Character::fits_anywhere` asks four times —
+    /// and the alternative was turning the piece to find out, which mutates a
+    /// registry and pushes an undo entry to answer a query.
+    pub fn can_place_shape(
+        &self,
+        reg: &PieceRegistry,
+        id: PieceId,
+        shape: &crate::shape::Shape,
+        ax: u8,
+        ay: u8,
+    ) -> Result<(), PlaceError> {
         // `fits` rather than an equality check: materials and plating are
         // shared between two grids each.
         if !reg.def(id).fits(self.kind) {
@@ -251,7 +271,7 @@ impl Slot {
         // grid's *current* rows,
         // because a board that has been granted extra rows is that tall now.
         let underlay = Self::layer_of(reg, id);
-        for &(dx, dy) in reg.shape(id).cells() {
+        for &(dx, dy) in shape.cells() {
             let (nx, ny) = (ax as i32 + dx as i32, ay as i32 + dy as i32);
             if !self.in_bounds(nx, ny) {
                 return Err(PlaceError::OutOfBounds);

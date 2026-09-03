@@ -198,3 +198,49 @@ read *where* it loops. This one names the exact map, the exact three creatures
 it could not beat at level 11 (High Cork Priest 999, What Was Left On Five 892,
 and, once, Galapagos Jim at 453), and the fact that a loss in that field is a
 loss of everything carried since the last town.
+
+---
+
+**M12.0's run is `m12.0.txt`, and it is the first that measures rather than
+reads.** 447 wins, 236 losses, level 15, `Under the Lake`, no console errors —
+which is a better run than M11.9's and is not why it is here. It is here for
+sixteen `probe:` lines and the table under `--- the measure ---`.
+
+The block's thesis is *board pressure*, and the thesis was an argument until
+this run. It is now a number:
+
+    level  fill   helmet    chest   gloves  greaves   weapon   bench   want
+        3   35%      44%      41%      38%       0%      43%       0   70% UNDER
+        5   43%      62%      41%      58%       0%      43%       0   70% UNDER / bench 2 UNDER
+        8   37%      62%      33%      58%       0%      36%       0   80% UNDER / bench 2 UNDER
+       11   51%      73%      55%      70%       0%      55%       0   80% UNDER / bench 2 UNDER
+       14   46%      61%      47%      70%       0%      47%       0   80% UNDER / bench 2 UNDER
+
+Four things it says that nobody could have said before it:
+
+1. **Fill never passes 51% until level fifteen**, against a target of 70% by
+   three. The whole playable game is a board about half covered.
+2. **Fill goes *down* as you level.** 43% at five, 37% at eight. Rows arrive on
+   a schedule and pieces do not, so levelling *dilutes* you — which is M12.3's
+   entire argument, and it was a hypothesis until this table.
+3. **The greaves grid is 0% for fourteen levels.** Not sparse: empty. An entire
+   grid, forty-eight cells by the end, that a whole playthrough never puts one
+   component in. The pit shelf sells two greaves-capable pieces and six of the
+   nine sets' drops are greaves, so this is not a content shortage — Auto-pack
+   never finds a greaves item worth seating, because a Mold with no Material is
+   not an item and the Materials go to the gloves.
+4. **Bench depth is 0 for fourteen levels.** Nothing is ever waiting for room,
+   so the board never once poses the question the game is made of. It reaches
+   ten at level fifteen, when the Drover's Stride drops — which is the first
+   moment in a whole run that putting something down means taking something up.
+
+And the by-source count, which is the exec plan's addition and earns its place
+immediately: **shelf 26, drop 47, quest 7, event 0.** The largest faucet in the
+game is luck, and the one this block is about to open pays nothing today.
+
+`elsewhere` is 0, so the attribution has no gap in it.
+
+**The L14 → L15 row is a walker artifact, not a cliff.** It banks rarely once
+it has a cross-map goal — `PLAN.md` §6d row 3, still true — so thousands of
+steps and twenty-three drops sit between those two readings. Read rows 3 to 14
+as the game and row 15 as the endgame arriving all at once.

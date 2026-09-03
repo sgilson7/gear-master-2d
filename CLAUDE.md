@@ -36,10 +36,12 @@ walks all forty-two gate checks against the deployed page, three engines. See
 *A deployed fix is not a delivered fix* for why that is a separate step from
 the deploy going green.
 
-**M12 is the next block and it is planned but not started.** `PLAN-M12.md` is
-the frame, written while M11 was in flight; **`PLAN-M12-EXEC.md` is the
-execution plan and wins where the two disagree**, the same way `PLAN.md` wins
-over `PLANNING-BRIEF.md`. It carries one milestone the frame does not have —
+**M12 is in flight. M12.0 is done and it deployed nothing** — its whole job
+was to make board pressure a number before anything tried to move it, and the
+number is in `testing/transcripts/m12.0.txt`. `PLAN-M12.md` is the frame,
+written while M11 was in flight; **`PLAN-M12-EXEC.md` is the execution plan and
+wins where the two disagree**, the same way `PLAN.md` wins over
+`PLANNING-BRIEF.md`; its §10 carries the baseline. It carries one milestone the frame does not have —
 events that pay something and say what they pay — added on the human's ask.
 `PLAN-M9.md`, `PLAN-M10.md` and `PLAN-M11.md` are done; `PLAN.md` §6d is what
 M11 left open, §6c is M10.3's, §6b is M9.4's and §6a is M8.8's.
@@ -648,6 +650,74 @@ What replaced it, and why each part of it is there:
 Auto-pack to get one; they are about recipes and about `hit_for`, not about the
 button, and sharing one list meant a change to how the button packs broke tests
 about what an assembly bonus does.
+
+## Board pressure, as a number
+
+M12's thesis is that cells outnumber pieces, so a board reads as inventory
+space rather than as a puzzle and nothing you pick up ever costs you something
+you already had. That was an argument until M12.0 measured it. It is
+`crates/core/src/pressure.rs`, `testing/playthrough.py` prints it at every
+level, and the baseline is `testing/transcripts/m12.0.txt`.
+
+- **Two numbers, and they are a pair.** **Fill** is cells under something;
+  **bench** is owned components that fit nowhere at all. High fill alone is a
+  board that never grew; a full bench alone is a bag of things in the wrong
+  slot. Tension is both at once — no room, *and* something worth making room
+  for — so nothing reduces them to one score, because a single figure hides
+  exactly the case the block is trying to produce.
+- **Bench depth is core's answer, not the walker's.** `Character::fits_anywhere`
+  is the rulebook; the probe prints it. A number a design stakes itself on —
+  M12.3 stakes one on bench depth — that is worked out in Python by the thing
+  measuring it is the page recomputing a total, one level up.
+- **Every turn, not the one the piece happens to be wearing.** A component that
+  would seat if you turned it is not benched, because the player turns it. That
+  is why `Slot::can_place_shape` and `Character::can_equip_shape` exist:
+  answering by *rotating* the piece four times mutates a registry and pushes
+  four undo entries to answer a query. The shape-taking pair is for asking
+  only — `equip` goes through `can_equip`, which reads the shape the piece is
+  actually in, and a test says so.
+- **A quest item is carried, never benched.** `can_equip` refuses
+  `PieceKind::Quest`, so a tally of toad eyes and two keys would otherwise sit
+  in the number for ever — and it would climb every time an errand was taken,
+  which is the one metric the block stakes a decision on moving for the *right*
+  reason. The exclusion is in `pressure::of`, where the meaning is, and not in
+  `fits_anywhere`, whose honest answer about a toad eye is still no.
+- **Fill is cells, not components.** A four-cell blade fills four and a ring
+  fills one; the difference between a packed board and a tidy one is entirely
+  this.
+- **An enchantment is under the grid and is not counted.** Gear sits on top of
+  it, so it takes no cell away from anything, and counting it would report a
+  board as full whose every cell is free.
+- **The curve lives in `pressure::target`**, so the engine and the close-out
+  cannot disagree about what was aimed at. They are **targets, not
+  assertions** — today's game does not meet them, which is the premise of the
+  block, so nothing there fails a build.
+- **Pieces are counted by source** — shelf, barrel, commission, event, drop,
+  quest. Three faucets open in M12 and they can mask each other; a claim that
+  the curve moved is a claim nobody can act on if it cannot say which tap did
+  it. Attribution is by what the bag gained around a known action, in the
+  walker, because *where a component came from* is not something the engine
+  should carry in a save for ever to answer a question only a probe asks. A
+  nonzero `elsewhere` is a gap in the probe and is reported as one.
+
+**What it found on its first run, and two of the four were not in the plan:**
+
+1. Fill never passes **51%** before level fifteen, against 70% by three.
+2. **Fill falls as you level** — 43% at five, 37% at eight. `PLAN-M12.md`
+   called a scheduled row "dilution on a timer"; this is that sentence as a
+   measurement, and it is the strongest evidence in the block for M12.3.
+3. **The greaves grid is 0% for fourteen levels.** Not thin — empty. That is a
+   fifth of the canvas contributing nothing for the whole playable game, and it
+   is not a content shortage: the pit sells two greaves-capable pieces and six
+   of the nine sets drop greaves. Auto-pack never seats one, because a Mold
+   without a Material assembles nothing and the shared Materials go to the
+   gloves first.
+4. **Bench is 0 for fourteen levels**, so the decision this game is made of has
+   never once been posed. It reaches ten at fifteen, when the Drover's Stride
+   drops.
+
+And **events pay 0 components**, which is M12.5's premise confirmed rather
+than assumed.
 
 ## What you are about to fight
 
@@ -2223,7 +2293,8 @@ Every figure below was re-measured for M10.3 rather than carried forward.
 | M11.7: the block was unfinishable, and every test was green | 609 passing |
 | M11.8: hands, eyes, and a brief for somebody who is not the builder | 609 passing |
 | M11.9: what the new maps leave behind, and the long way back | 619 passing |
-| **A key that never left the bag, and an event that never shut up** | **630 passing** |
+| A key that never left the bag, and an event that never shut up | 630 passing |
+| **M12.0: board pressure, measured before anything tries to move it** | **638 passing** |
 
 Note M11.0 and M11.8 add none, and both are honest. M11.0 moved every string
 the game says through one door and changed no behaviour the suite could see;

@@ -12,6 +12,7 @@ catches is the thing a suite cannot: a game that is green and unplayable.
 
     python testing/playthrough.py [chromium] > transcript.txt
 """
+import collections
 import functools
 import os
 import http.server
@@ -100,6 +101,116 @@ def panel(page):
 
 def at(page):
     return page.evaluate("() => document.getElementById('coords').textContent")
+
+
+# ------------------------------------------------------------------ the measure
+
+# **M12.0. Board pressure becomes a number before anything tries to move it.**
+#
+# The block's thesis is that cells outnumber pieces, so a board reads as
+# inventory space rather than as a puzzle. That is a claim about a number, and
+# the block closes by claiming the number moved — so the number has to exist
+# first, and the baseline has to be committed before anything is built.
+#
+# **It prints core's answer and works nothing out.** `pressure::of` is the
+# rulebook; `window.__pressure()` moves it across. A walker that added up cells
+# from a board payload would be a second answer to "how full is this", and the
+# one nobody tested would be the one in the transcript.
+class Probe:
+    """Fill, bench depth, and where the pieces came from."""
+
+    # The faucets this block opens, plus the two that were always there. Three
+    # of them open in M12 and **they can mask each other** — a curve that moved
+    # is a claim nobody can act on if it does not say which tap did it. That is
+    # the whole reason this is counted by source and not only in total.
+    SOURCES = ("shelf", "barrel", "commission", "event", "drop", "quest", "elsewhere")
+
+    def __init__(self, page):
+        self.page = page
+        self.owned = self._owned()
+        self.by_source = collections.Counter()
+        self.rows = []
+
+    def _read(self):
+        return self.page.evaluate("() => window.__pressure()")
+
+    def _owned(self):
+        return collections.Counter(self._read()["owned"])
+
+    def took(self, source):
+        """Everything acquired since the last call belongs to `source`.
+
+        Attribution by what the bag gained, because the engine does not record
+        where a component came from and **should not**: provenance would be a
+        field on a save carried for ever to answer a question only a probe
+        asks. What the walker does know is what it just did, so it says so
+        here — and anything gained between two calls lands on the next one,
+        which is why `elsewhere` exists and why a nonzero `elsewhere` is a
+        finding rather than a rounding error.
+        """
+        now = self._owned()
+        gained = now - self.owned
+        self.owned = now
+        n = sum(gained.values())
+        if n:
+            self.by_source[source] += n
+        return n
+
+    def at_level(self, level):
+        """One line, at every level. The deliverable."""
+        self.took("elsewhere")
+        p = self._read()
+        per = " ".join(f"{s['slot']} {s['pct']}%" for s in p["slots"])
+        src = " ".join(f"{k} {self.by_source[k]}" for k in self.SOURCES if self.by_source[k])
+        say(f"  probe: level {level} · fill {p['pct']}% ({per}) · bench {p['bench']} · "
+            f"from {src or 'nothing yet'}")
+        self.rows.append({"level": level, "pct": p["pct"], "bench": p["bench"],
+                          "slots": {s["slot"]: s["pct"] for s in p["slots"]},
+                          "by_source": dict(self.by_source)})
+
+    # The curve, and it is written in core so the close-out and the engine
+    # cannot disagree about what was being aimed at. Floors, from that level on.
+    FILL = ((3, 70), (6, 80))
+    BENCH = ((5, 2),)
+
+    def curve(self):
+        """The table the close-out diffs against."""
+        if not self.rows:
+            say("  no level was reached, so there is no curve to report")
+            return
+        head("the measure")
+        # **The reading at the moment the level landed**, which is what the
+        # curve is written about. A run stops somewhere and takes one more
+        # reading; that one is printed under the table rather than in it,
+        # because a second row at the same level would compare a level's first
+        # minute with its last.
+        first = []
+        seen = set()
+        for r in self.rows:
+            if r["level"] not in seen:
+                seen.add(r["level"])
+                first.append(r)
+        slots = list(self.rows[-1]["slots"])
+        say("  level  fill  " + "  ".join(f"{s[:7]:>7}" for s in slots) + "   bench   want")
+        for r in first:
+            want = max([p for l, p in self.FILL if r["level"] >= l], default=None)
+            b = max([n for l, n in self.BENCH if r["level"] >= l], default=None)
+            note = ""
+            if want is not None:
+                note = f"{want}%" + (" ok" if r["pct"] >= want else " UNDER")
+            if b is not None:
+                note += f" / bench {b}" + (" ok" if r["bench"] >= b else " UNDER")
+            say(f"  {r['level']:>5}  {r['pct']:>3}%  "
+                + "  ".join(f"{r['slots'][s]:>6}%" for s in slots)
+                + f"   {r['bench']:>5}   {note}")
+        last = self.rows[-1]
+        say(f"  at the end, level {last['level']}: fill {last['pct']}%, bench {last['bench']}")
+        say("")
+        say("  pieces by source: " + (", ".join(
+            f"{k} {self.by_source[k]}" for k in self.SOURCES if self.by_source[k]) or "none"))
+        if self.by_source["elsewhere"]:
+            say(f"  NOTE: {self.by_source['elsewhere']} components arrived between two "
+                f"attributions and could not be told apart. That is a gap in the probe.")
 
 
 # **What the ground takes a foot on is core's answer, not a list here.** This
@@ -193,7 +304,7 @@ def toward(world, here, target, barred=()):
     return pick
 
 
-def fight(page, note=None):
+def fight(page, note=None, probe=None):
     """Pack with the button a player is given, fight, and read the receipt."""
     page.click("#preset")
     made = page.text_content("#fight-yours")
@@ -210,10 +321,15 @@ def fight(page, note=None):
     say(f"  fight: {creature} (rates {rating}) with {made} items -> {title}")
     for l in lines:
         say(f"         {l}")
+    # What a won fight left behind: a set piece off `drops.json`, a boss's
+    # certainty, or an errand's tally. All of them are the ground paying, which
+    # is one faucet however many tables it comes out of.
+    if probe is not None:
+        probe.took("drop")
     return "It stops moving" in (title or "")
 
 
-def in_town(page, buy=True):
+def in_town(page, buy=True, probe=None):
     """Bank, buy what is affordable, take every errand, drink nothing."""
     said = []
     if not page.is_disabled("#bank"):
@@ -251,6 +367,10 @@ def in_town(page, buy=True):
             tins.first.click()
             page.wait_for_timeout(40)
             said.append("bought a tin")
+        # The shelf, before the errands, because they are two faucets and the
+        # whole point of counting by source is telling them apart.
+        if probe is not None:
+            probe.took("shelf")
     # By name, not by "the first enabled one": a taken errand stays clickable
     # on purpose — clicking it says how far along you are, which is
     # information rather than an error — so a loop that keeps pressing the
@@ -270,6 +390,8 @@ def in_town(page, buy=True):
         live.click()
         page.wait_for_timeout(60)
         said.append(f"errand: {name} — {page.text_content('#town-says')}")
+    if probe is not None:
+        probe.took("quest")
     for s in said:
         if s.strip():
             say(f"  town: {s.strip()}")
@@ -277,7 +399,7 @@ def in_town(page, buy=True):
     page.wait_for_selector("#town", state="hidden", timeout=5000)
 
 
-def card(page):
+def card(page, probe=None):
     """Read an event card, take the first choice, take any errand."""
     title = page.text_content("#card-title")
     prose = page.locator("#card-prose p").all_text_contents()
@@ -299,6 +421,8 @@ def card(page):
         live.click()
         page.wait_for_timeout(60)
         say(f"        errand: {name} — {last_said(page)}")
+    if probe is not None:
+        probe.took("quest")
     if page.is_visible("#card-choices button:not(:disabled)"):
         pick = page.locator("#card-choices button:not(:disabled)").first
         say(f"        chose: {pick.locator('b').text_content()}")
@@ -307,6 +431,8 @@ def card(page):
         got = page.locator("#card-receipt p").all_text_contents()
         for g in got:
             say(f"        {g}")
+        if probe is not None:
+            probe.took("event")
     page.wait_for_selector("#card-close", state="visible", timeout=5000)
     page.click("#card-close")
     page.wait_for_selector("#card", state="hidden", timeout=5000)
@@ -400,6 +526,11 @@ def main():
 
             head("a new game")
             say(" ", panel(page))
+            # The baseline starts at level one, before a single fight, because
+            # a curve that starts at the first level *gained* is missing the
+            # only reading nobody can argue about.
+            probe = Probe(page)
+            probe.at_level(page.evaluate("() => window.__character()")["level"])
             # Where the map is.
             world = page.evaluate("() => window.__world()")
             town = next(p for p in world["places"] if p["kind"] == "town")
@@ -468,7 +599,7 @@ def main():
                     fork(page)
                     continue
                 if page.is_visible("#fight"):
-                    won_it = fight(page)
+                    won_it = fight(page, probe=probe)
                     recent.append(won_it)
                     if won_it:
                         wins += 1
@@ -476,7 +607,7 @@ def main():
                         losses += 1
                     continue
                 if page.is_visible("#card"):
-                    card(page)
+                    card(page, probe=probe)
                     continue
                 if page.is_visible("#vendor"):
                     # **The man in the van.** M10 put him on the Verge road at
@@ -508,7 +639,7 @@ def main():
                     if page.evaluate("() => window.__world().id") == "kettleworks-field":
                         seen_kettleworks = True
                     say(f"  in town: {panel(page)}")
-                    in_town(page)
+                    in_town(page, probe=probe)
                     spend_points(page)
                     target = None
                     # **A level lands in a town, and a level is what a crossing
@@ -527,6 +658,10 @@ def main():
                         done_marks.clear()
                         stuck.clear()
                         barred.clear()
+                    # **A level lands in a town**, so this is where the probe
+                    # reads. Every level, not every visit.
+                    if after["level"] != last_level:
+                        probe.at_level(after["level"])
                     last_level, last_done = after["level"], finished
                     # **You have just been in.** Whatever sent the walk here is
                     # answered now, and something kept sending it back: eight
@@ -988,6 +1123,10 @@ def main():
                 f"{q['name']} [{q['stage']}]" for q in log["errands"]) or "none")
             say(f"  sheet: " + ", ".join(
                 f"{s['n']}{s['unit']} {s['label']}" for s in c["stats"] if s["n"]))
+            # The last reading, whatever level the run stopped at, so a run
+            # that never banked again still ends with a measurement.
+            probe.at_level(c["level"])
+            probe.curve()
             ctx.close()
             b.close()
     finally:

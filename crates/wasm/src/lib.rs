@@ -2627,6 +2627,40 @@ pub fn character_json() -> String {
 /// `takeable` and `why` are worked out here for the same reason legality is on
 /// the board: a screen that greys a button out for its own reasons is a fourth
 /// rule nobody tested.
+/// Board pressure: how full the grids are, and what has nowhere to go.
+///
+/// **M12.0's instrument, and every number in it is core's.**
+/// `testing/playthrough.py` prints these at every level; it does not work them
+/// out. A walker that computed fill from a board payload would be a second
+/// answer to "how full is this", and the one that mattered would be the one
+/// nobody tested.
+///
+/// `owned` is here and is not a pressure number: it is what the probe
+/// attributes acquisitions with. Canonical names, because a source count is a
+/// measurement and not a sentence — the theme has no business in it.
+#[wasm_bindgen]
+pub fn pressure_json() -> String {
+    with(|g| {
+        let p = gm2d_core::pressure::of(&g.character);
+        serde_json::json!({
+            "slots": p.slots.iter().map(|s| serde_json::json!({
+                "slot": slot_name(s.slot),
+                "used": s.used,
+                "total": s.total,
+                "pct": s.pct(),
+            })).collect::<Vec<_>>(),
+            "used": p.used,
+            "total": p.total,
+            "pct": p.pct(),
+            "bench": p.bench,
+            "owned": g.character.owned.iter()
+                .map(|&id| g.character.registry.def(id).name)
+                .collect::<Vec<_>>(),
+        })
+        .to_string()
+    })
+}
+
 #[wasm_bindgen]
 pub fn skills_json() -> String {
     with(|g| {

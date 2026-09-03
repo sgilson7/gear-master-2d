@@ -428,3 +428,49 @@ M12.5 adds three of its own:
 - **No rewriting the forty-one.** Their prose stays. What changes is that
   twenty of them start asking something, and that the map around them stops
   being only notes.
+
+---
+
+## 10. The baseline, measured (M12.0)
+
+`testing/transcripts/m12.0.txt`, and `testing/transcripts/README.md` carries
+the reading. The curve lives in `core::pressure::target` so the engine and the
+close-out cannot disagree about what was aimed at: **fill ≥ 70% by level 3,
+≥ 80% by level 6, bench ≥ 2 by level 5.**
+
+    level  fill  greaves  bench   want
+        3   35%       0%      0    70% UNDER
+        5   43%       0%      0    70% UNDER / bench 2 UNDER
+        8   37%       0%      0    80% UNDER / bench 2 UNDER
+       11   51%       0%      0    80% UNDER / bench 2 UNDER
+       14   46%       0%      0    80% UNDER / bench 2 UNDER
+       15   73%      66%     10    80% UNDER / bench 2 ok
+
+    pieces by source: shelf 26, drop 47, quest 7, event 0
+
+**Nothing meets the curve, and two of the findings were not in the frame.**
+
+- **Fill falls as you level** — 43% at five to 37% at eight. `PLAN-M12.md` §3
+  M12.3 argued that a scheduled row is "dilution on a timer" and this is that
+  sentence as a measurement. It is the strongest evidence in the block for
+  M12.3 shipping, and it was an opinion until now.
+- **The greaves grid is empty for fourteen levels.** Not thin — 0%. That is
+  ~20% of the whole canvas contributing nothing for the entire playable game,
+  and it is not a content shortage: the pit sells two greaves-capable pieces
+  and six of the nine sets drop greaves. Auto-pack never seats one, because a
+  Mold without a Material assembles nothing and the shared Materials go to the
+  gloves first. **M12.1's barrel must cover greaves and chest specifically**,
+  which is where §7 row 1's tight bounds are thinnest — see the row added to §7
+  below.
+- **Bench is 0 for fourteen levels**, so the decision the block exists to
+  create has never once been posed to a player. It reaches 10 at level fifteen
+  and that is the first time in a whole run that seating something means
+  unseating something.
+- **Events pay 0 pieces**, which is M12.5's premise confirmed rather than
+  assumed.
+
+### One addition to §7, from the measurement
+
+| # | the frame said | this plan says | why |
+|---|---|---|---|
+| 7 | barrel stock is 1×1 and 1×2 commons at single-digit Fnorp | **≤2 cells and ≤12 Fnorp for weapon, helmet and gloves; ≤3 cells and ≤20 Fnorp for chest and greaves** | after removing quest tokens, `EVENT_ONLY` and everything already on a shelf, the tight bounds leave **3 chest and 4 greaves** candidates against 26 weapon, 14 helmet and 20 gloves. The loose bounds give 17 and 30. A barrel that fills three grids and leaves the two emptiest ones bare is a barrel aimed away from the finding — and M12.0 measured greaves at 0% for fourteen levels. Still zero new components: §7 row 1 is untouched |

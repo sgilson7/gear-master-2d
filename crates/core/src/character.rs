@@ -356,6 +356,23 @@ impl Character {
         ax: u8,
         ay: u8,
     ) -> Result<(), RuleError> {
+        self.can_equip_shape(id, kind, &self.registry.shape(id), ax, ay)
+    }
+
+    /// The same question about a footprint the piece is not currently wearing.
+    ///
+    /// Every rule is the same rule; only the geometry is supplied rather than
+    /// read. `can_equip` is this with the piece's own shape, and it is the only
+    /// one `equip` may use — asking about a turn the piece has not taken must
+    /// never be a way to seat it in a shape it is not in.
+    pub fn can_equip_shape(
+        &self,
+        id: PieceId,
+        kind: SlotKind,
+        shape: &crate::shape::Shape,
+        ax: u8,
+        ay: u8,
+    ) -> Result<(), RuleError> {
         // A quest item is carried, never worn. One place has to know this;
         // upstream let it be enforced by such items not being worth seating,
         // which is a rule nothing states and everything has to remember.
@@ -389,7 +406,45 @@ impl Character {
         }
         // A piece being moved within its own slot must not collide with
         // itself; `Slot::can_place` already allows that.
-        Ok(self.loadout.can_place(&self.registry, id, kind, ax, ay)?)
+        Ok(self.loadout.slot(kind).can_place_shape(&self.registry, id, shape, ax, ay)?)
+    }
+
+    /// Is there anywhere at all this component could go, at any turn?
+    ///
+    /// **Bench depth is core's answer, not a walker's.** M12.0 needs "owned
+    /// components that fit nowhere" as a number, and M12.3 stakes a design
+    /// decision on it — a row bought while the bench is empty means the
+    /// tension inverted again. A number a design stakes itself on that is
+    /// worked out in Python by the thing measuring it is the page recomputing
+    /// a total, one level up: two answers to "does this fit", and only one of
+    /// them is the rulebook.
+    ///
+    /// **Every turn, not the one it happens to be wearing.** A piece that
+    /// would seat if you turned it is not benched — the player turns it. The
+    /// lenient reading would have counted it, which inflates the one metric
+    /// this block is trying to move.
+    ///
+    /// It answers about a quest item too, and the answer is no — `can_equip`
+    /// refuses `PieceKind::Quest` outright. That is the truth about where a
+    /// toad eye can go; whether a toad eye *counts* as something waiting for a
+    /// cell is a different question and belongs to whoever is counting. See
+    /// `pressure::of`.
+    pub fn fits_anywhere(&self, id: PieceId) -> bool {
+        let base = crate::shape::Shape::new(self.registry.def(id).cells);
+        for turns in 0..4u8 {
+            let shape = base.rotated(turns);
+            for &kind in SlotKind::ALL.iter() {
+                let rows = self.loadout.slot(kind).rows();
+                for y in 0..rows {
+                    for x in 0..SLOT_W {
+                        if self.can_equip_shape(id, kind, &shape, x, y).is_ok() {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        false
     }
 
     /// Place `id` into `kind` at `(ax, ay)`, taking it out of wherever it was.

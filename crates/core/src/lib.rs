@@ -26,6 +26,7 @@ pub mod loadout;
 pub mod look;
 pub mod naming;
 pub mod piece;
+pub mod pressure;
 pub mod progression;
 pub mod rating;
 pub mod reward;

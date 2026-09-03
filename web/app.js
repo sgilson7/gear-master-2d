@@ -8,7 +8,7 @@ import init, {
   save_json, load_json, new_game, apply_preset,
   shop_json, bench_json, buy, buy_supply, buy_ench, use_supply, quests_json, take_quest, hand_in_quest, bank_xp,
   quest_log_json, guide_json, pin_quest,
-  character_json, skills_json, take_skill,
+  character_json, skills_json, take_skill, pressure_json,
   class_offer_json, choose_class, class_name, all_trees_json,
   gold, piece_count, version, save_version,
   board_json, legal_anchors, place, pick_up, rotate, toggle_lock, undo, clear_board,
@@ -1926,6 +1926,10 @@ async function main() {
   window.__classOffer = () => JSON.parse(class_offer_json());
   window.__encounter = () => JSON.parse(encounter_json());
   window.__character = () => JSON.parse(character_json());
+  // **M12.0's probe reads this and works nothing out.** Board pressure is
+  // `core::pressure`, and the walker printing it is the same discipline as the
+  // page drawing a number core sent it.
+  window.__pressure = () => JSON.parse(pressure_json());
   window.__trees = () => JSON.parse(all_trees_json());
   window.__places = () => world.places;
   window.__world = () => world;

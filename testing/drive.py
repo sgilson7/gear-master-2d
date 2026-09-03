@@ -1272,6 +1272,101 @@ def check_the_tower_drops(page, name, fails):
     plant(page, base, lambda body: None, stem="stack-restore")
 
 
+def check_the_lake_drains_and_the_demo_ends_under_it(page, name, fails):
+    """The Stack comes down, the lake empties, and there is a door at the bottom.
+
+    **M11.4.** Terrain that is derived from what has happened is new, and the
+    thing a browser has to prove is the half no engine test can: that the page
+    *redraws* it. The lake is twenty-eight tiles the canvas has painted blue
+    since M2, and the map is a cached object — a drain the page never re-read
+    would be a lake that is bed in core and water on the screen.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+
+    def count_water():
+        return page.evaluate("""() => {
+          const w = window.__world();
+          return { water: w.rows.flat().filter(t => t === 'water').length,
+                   bed: w.rows.flat().filter(t => t === 'lakebed').length };
+        }""")
+
+    def outside_the_lake(body, tower_down):
+        strip_the_boards(body)
+        w = body.setdefault("world", {})
+        w["map"] = ""
+        w["at"] = [7, 8]
+        answered = list(w.get("answered", []))
+        if tower_down:
+            answered += [f"the-drambus-stack-{n}-boss" for n in (5, 4, 3, 2, 1)]
+        w["answered"] = answered
+
+    plant(page, base, lambda b: outside_the_lake(b, False), stem="lake-full")
+    full = count_water()
+    if full["water"] != 28 or full["bed"]:
+        fails.append(f"{name}: the lake before the Stack comes down is {full}")
+
+    plant(page, base, lambda b: outside_the_lake(b, True), stem="lake-dry")
+    dry = count_water()
+    if dry["water"] or dry["bed"] != 28:
+        fails.append(f"{name}: the Stack is down and the lake is {dry}")
+        plant(page, base, lambda body: None, stem="lake-restore")
+        return
+
+    # And you can walk out onto it wearing nothing.
+    page.keyboard.press("ArrowDown")
+    page.wait_for_timeout(300)
+    dismiss_card(page)
+    close_fight(page)
+    if page.text_content("#coords").strip() != "7, 9":
+        fails.append(f"{name}: the lake drained and is still a wall: "
+                     f"{page.text_content('#coords')!r}")
+
+    # --- the door at the bottom of it ----------------------------------------
+    def under_it(body, beaten):
+        strip_the_boards(body)
+        w = body.setdefault("world", {})
+        w["map"] = "under-the-lake"
+        w["at"] = [7, 7]
+        answered = list(w.get("answered", []))
+        answered += [f"the-drambus-stack-{n}-boss" for n in (5, 4, 3, 2, 1)]
+        if beaten:
+            answered.append("the-bottom-of-the-lake")
+        w["answered"] = answered
+
+    plant(page, base, lambda b: under_it(b, False), stem="lake-boss-up")
+    still_there = page.evaluate("""() => (window.__world().places ?? [])
+        .some(p => p.kind === 'door')""")
+    if still_there:
+        fails.append(f"{name}: the door under the lake is there before the boss is down")
+
+    plant(page, base, lambda b: under_it(b, True), stem="lake-boss-down")
+    door = page.evaluate("""() => (window.__world().places ?? [])
+        .find(p => p.kind === 'door')""")
+    if not door:
+        fails.append(f"{name}: the boss is down and there is nothing behind it")
+        plant(page, base, lambda body: None, stem="lake-restore")
+        return
+    page.evaluate("(at) => window.__standHere(at)", [door["at"][0] - 1, door["at"][1]])
+    close_fight(page)
+    dismiss_card(page)
+    page.keyboard.press("ArrowRight")
+    page.wait_for_timeout(400)
+    if page.is_hidden("#ending"):
+        fails.append(f"{name}: walked onto the last door in the game and nothing happened")
+    else:
+        prose = page.evaluate("""() => [...document.querySelectorAll('#ending-prose p')]
+            .map(p => p.textContent).join(' ')""")
+        if "decided" not in prose.lower():
+            fails.append(f"{name}: the ending does not say what it is: {prose[:80]!r}")
+        # It is not the fork: you can back out of it.
+        page.click("#ending-close")
+        page.wait_for_selector("#ending", state="hidden", timeout=5000)
+
+    plant(page, base, lambda body: None, stem="lake-restore")
+
+
 def check_the_rack(page, name, fails):
     """A licensee buys an ench, bolts it on, switches it off, and takes it back.
 
@@ -1665,12 +1760,18 @@ def check_a_set_reads(page, name, fails):
 
 
 def check_the_toad_walks_on_water(page, name, fails):
-    """The lake is a wall at its middle and ground at its rim, and only for a toad.
+    """The lake is a wall to everybody, and ground to a toad — all of it.
 
-    One step, planted: stand on the grass at the top of the lake, walk south
-    into the rim, and then south again into water that touches nothing but
-    water. The fourteen-and-fourteen shape is `tests/sets.rs`; what this proves
-    is that the allowance reaches `world::step` in a browser.
+    Planted, and walked twice: stand on the grass at the top of the lake and
+    press south. Wearing nothing, that is a wall. Wearing the whole Toad set,
+    it is the rim, and then the middle, and then the grating with two hundred
+    and six steps under it.
+
+    **M11.4 widened the rule.** It opened the rim and not the middle for two
+    blocks — the measurement is still in `tests/rules.rs` — and there is
+    something under the middle now, so the set somebody ground three Bog Toads
+    for is how you reach it before the Drambus Stack drains the whole thing.
+    What this proves is that the allowance reaches `world::step` in a browser.
     """
     with page.expect_download(timeout=20000) as dl:
         page.click("#download")
@@ -1706,15 +1807,45 @@ def check_the_toad_walks_on_water(page, name, fails):
     if at != "7, 9":
         fails.append(f"{name}: the toad set did not open the rim; stopped at {at!r}")
         return
-    # And the middle is still the middle.
+    # And on into the middle, which is the widening.
     page.keyboard.press("ArrowDown")
     page.wait_for_timeout(250)
     dismiss_card(page)
     close_fight(page)
     at = page.text_content("#coords").strip()
-    if at != "7, 9":
-        fails.append(f"{name}: the middle of the lake opened as well; walked to {at!r}")
+    if at != "7, 10":
+        fails.append(f"{name}: the middle of the lake is shut to a whole set; stopped at {at!r}")
+        assert window_rules
+        return
+
+    # And the way down is out there, and stepping on it goes down.
+    grate = page.evaluate("""() => (window.__world().places ?? [])
+        .find(p => p.id === 'the-way-under-the-lake')""")
+    if not grate:
+        fails.append(f"{name}: there is no way under the lake")
+        assert window_rules
+        return
+    page.evaluate("(at) => window.__standHere(at)",
+                  [grate["at"][0], grate["at"][1] - 1])
+    close_fight(page)
+    dismiss_card(page)
+    page.keyboard.press("ArrowDown")
+    page.wait_for_timeout(400)
+    dismiss_card(page)
+    where = page.evaluate("() => window.__world().id")
+    if where != "under-the-lake":
+        fails.append(f"{name}: walked onto the grating in a Toad set and stayed on {where!r}")
+    else:
+        # Entered wet, the two middle rows are water and the straight run down
+        # the middle is shut — the long way round is what the early way costs.
+        wet = page.evaluate("""() => {
+          const w = window.__world();
+          return w.rows.flat().filter(t => t === 'water').length;
+        }""")
+        if wet < 10:
+            fails.append(f"{name}: under the lake came up with {wet} tiles of water in it")
     assert window_rules
+    plant(page, base, lambda body: None, stem="wade-restore")
 
 
 def check_the_van_appears_at_a_level(page, name, fails):
@@ -3077,6 +3208,7 @@ def walk_the_gate(browser, name, fails=None):
     check_the_door_opens_on_the_treyway(page, name, fails)
     check_the_road_west_reaches_a_town(page, name, fails)
     check_the_tower_drops(page, name, fails)
+    check_the_lake_drains_and_the_demo_ends_under_it(page, name, fails)
     check_the_rack(page, name, fails)
     check_the_spin_animates(page, name, fails)
     check_a_town_takes_the_tiredness_off(page, name, fails)
@@ -3186,8 +3318,9 @@ def main():
     print("ok: the wall grows a door, the key opens it, and behind it is a map")
     print("ok: two maps out there is a town, and one field tile in ten answers")
     print("ok: the Drambus Stack opens onto a different floor every time, then a stump")
+    print("ok: the Stack comes down, the lake empties, and there is a door at the bottom")
     print("ok: a whole set names its own item and says what it does; two thirds of one does not")
-    print("ok: the lake is ground at its rim to a toad, and a wall through its middle to everybody")
+    print("ok: the lake is ground to a toad, edge to middle, and the middle has a way down in it")
     print("ok: the north is shut to a level-one character, and says what the road wants")
     print("ok: an ench you were paid and cannot use yet is on the rack, and says why")
     print("ok: no town sells an ench, and the van on the Verge road is not there until level ten")

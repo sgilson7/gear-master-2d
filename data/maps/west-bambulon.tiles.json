@@ -262,8 +262,30 @@
         "\"Licensed,\" the man says, before you have asked. He turns the paper round so you can read it. It is signed by somebody whose name is nine letters of which two are K, and the date on it is next year.",
         "\"I do not come this far south twice,\" he says, and goes back to the cloth."
       ]
+    },
+    {
+      "at": [
+        8,
+        11
+      ],
+      "kind": "gate",
+      "id": "the-way-under-the-lake",
+      "name": "the way under the lake",
+      "to": "under-the-lake",
+      "prose": [
+        "There is a ring of cut stone in the middle of the lake with a grating in it, and the grating has been open the whole time.",
+        "It is nine feet across and there are steps. Whoever cut them cut them for people carrying something, because they are shallow and they are wide and there are two hundred and six of them.",
+        "The Bengulon Tally has four entries under WATER, LAKE, THINGS UNDER. Three of them are the same handwriting and the fourth is a drawing."
+      ]
     }
   ],
-  "_map_note": "The first map: one town and a great deal of wilds. Kettleworks and High Wick are written and are not placed here — they belong on maps that do not exist yet, and their shelves and errands are kept in shops.json and quests.json waiting for them. `towns_on_this_map_all_trade_and_all_want_something` is what stops that becoming an excuse for unreachable content. Two crossings gate the north. A crossing guards a *region* rather than its own tile — rows four to fifteen are twelve tiles of open ground, so a crossing that refused only the square it stands on would need a dozen of them across a row, which is a wall. The place itself stands on the near side of what it guards, so it is a milestone you can walk up to and read. The Kaklon van stands on the Verge road at [4, 6] and is not there below level ten — the only shop in the game that is not a town, and the only place gated on what you are rather than on what you carry or what you have answered. It is past the crossing that opens the Verge at nine, so it is a walk you earned twice. **Bone Archer lives in the Slag Flats as well as the pit, since M11.2.** `draw_enemy` weights a pool so its hardest member is its rarest, and in the pit the Archer is the hardest of three — one draw in ninety-seven. That is right for fights and wrong for everything farmed off it: it is the Wallspider Weave's whole rate problem (`PLAN.md` §6b row 1) and it made Kettleworks' four-nock errand a four-hundred-fight errand the moment the town was placed. In the Flats it is the *easiest* of four and drawn about half the time, and the Flats' danger moves by five.",
-  "id": "west-bambulon"
+  "_map_note": "The first map: one town and a great deal of wilds. Kettleworks and High Wick are written and are not placed here — they belong on maps that do not exist yet, and their shelves and errands are kept in shops.json and quests.json waiting for them. `towns_on_this_map_all_trade_and_all_want_something` is what stops that becoming an excuse for unreachable content. Two crossings gate the north. A crossing guards a *region* rather than its own tile — rows four to fifteen are twelve tiles of open ground, so a crossing that refused only the square it stands on would need a dozen of them across a row, which is a wall. The place itself stands on the near side of what it guards, so it is a milestone you can walk up to and read. The Kaklon van stands on the Verge road at [4, 6] and is not there below level ten — the only shop in the game that is not a town, and the only place gated on what you are rather than on what you carry or what you have answered. It is past the crossing that opens the Verge at nine, so it is a walk you earned twice. **Bone Archer lives in the Slag Flats as well as the pit, since M11.2.** `draw_enemy` weights a pool so its hardest member is its rarest, and in the pit the Archer is the hardest of three — one draw in ninety-seven. That is right for fights and wrong for everything farmed off it: it is the Wallspider Weave's whole rate problem (`PLAN.md` §6b row 1) and it made Kettleworks' four-nock errand a four-hundred-fight errand the moment the town was placed. In the Flats it is the *easiest* of four and drawn about half the time, and the Flats' danger moves by five. **The lake drains when the Drambus Stack comes down.** `drains` is the rule and it reads `answered`, exactly the way a hidden place does \\u2014 the tiles are still not in the save, they are derived from it. And there is a way down in the middle of it, which is why the Toad set's rule widened from the rim to the whole body in M11.4: a set somebody ground three Bog Toads for should get better when the world gets bigger, and walking out to the grating before the tower falls is what it got better for.",
+  "id": "west-bambulon",
+  "drains": [
+    {
+      "when": "the-drambus-stack-1-boss",
+      "from": "water",
+      "to": "lakebed"
+    }
+  ]
 }

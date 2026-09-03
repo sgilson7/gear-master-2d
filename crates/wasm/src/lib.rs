@@ -48,14 +48,25 @@ thread_local! {
 /// recoverable answer where a panic is not — `World::repair` then finds them
 /// somewhere to stand.
 fn map_for<T>(g: &gm2d_core::game::Game, f: impl FnOnce(&World) -> T) -> T {
-    map_named(&g.world.map_id(), f)
+    map_in(&g.world.map_id(), &g.world.marks(), f)
 }
 
-/// A named map, whichever one the player is on.
-fn map_named<T>(id: &str, f: impl FnOnce(&World) -> T) -> T {
+/// A named map, as this game has left it.
+///
+/// **The state is here because a map can empty.** West Bambulon's lake drains
+/// when the Drambus Stack comes down, and the tiles under it are derived from
+/// `answered` rather than stored — so the cached `World` is the file and this
+/// is the file as the game has left it. Copied only when there is something to
+/// drain, which is one map of nine.
+fn map_in<T>(id: &str, marks: &[String], f: impl FnOnce(&World) -> T) -> T {
     WORLDS.with(|ws| {
         let w = ws.iter().find(|w| w.id == id).unwrap_or(&ws[0]);
-        f(w)
+        if w.drains.is_empty() {
+            return f(w);
+        }
+        let mut drained = w.clone();
+        drained.drain_by(marks);
+        f(&drained)
     })
 }
 
@@ -94,8 +105,9 @@ pub fn load_json(text: &str) -> Result<(), JsValue> {
             // that is.
             gm2d_core::world::leave_the_sitting(&mut g.world, DIFFICULTY);
             let here = g.world.map_id();
+            let marks = g.world.marks();
             let allowed = g.character.allowances();
-            map_named(&here, |w| w.repair(&mut g.world, &allowed));
+            map_in(&here, &marks, |w| w.repair(&mut g.world, &allowed));
             with_mut(|slot| *slot = g);
             Ok(())
         }
@@ -110,7 +122,7 @@ pub fn new_game(seed: f64) -> () {
         *g = Game::new(seed as u64, "td");
         // A new game starts where the map says, not at (0, 0) — which on this
         // map is rock, and on any map is an assumption.
-        g.world = map_named(&gm2d_core::world::overworld(), WorldState::at_start);
+        g.world = map_in(&gm2d_core::world::overworld(), &[], WorldState::at_start);
     });
 }
 
@@ -350,7 +362,8 @@ pub fn try_step(dir: &str) -> String {
     };
     with_mut(|g| {
         let here = g.world.map_id();
-        map_named(&here, |w| {
+        let marks = g.world.marks();
+        map_in(&here, &marks, |w| {
             // Repaired here as well as on load. A position that cannot be stood
             // on is a dead end rather than a glitch — there is no key that gets
             // you out of it — so the first keypress fixes it whatever put it
@@ -436,7 +449,7 @@ pub fn try_step(dir: &str) -> String {
                             // file rather than a branch here.
                             let landing = p
                                 .at_to
-                                .unwrap_or_else(|| map_named(&to, |d| d.arrival(&g.world)));
+                                .unwrap_or_else(|| map_in(&to, &marks, |d| d.arrival(&g.world)));
                             // Written down before the move, or the map you are
                             // leaving forgets where you were standing on it —
                             // and it is the tile you stepped *from*, not the
@@ -448,7 +461,7 @@ pub fn try_step(dir: &str) -> String {
                             // Repaired on the far side: a gate whose landing
                             // tile is not walkable would strand somebody on a
                             // map they cannot leave.
-                            map_named(&to, |dest| dest.repair(&mut g.world, &allowed));
+                            map_in(&to, &marks, |dest| dest.repair(&mut g.world, &allowed));
                             // A gate may carry a paragraph — the door in the
                             // western wall does, because crossing out of
                             // Bambulon is a thing that happens once. Shown the
@@ -687,7 +700,8 @@ pub fn answer(id: &str, n: usize) -> String {
 pub fn to_last_town() {
     with_mut(|g| {
         let here = g.world.map_id();
-        map_named(&here, |w| {
+        let marks = g.world.marks();
+        map_in(&here, &marks, |w| {
             let home = w
                 .places
                 .iter()
@@ -1600,6 +1614,7 @@ pub fn settle_fight() -> String {
             // The town is found across every map, and going home crosses maps
             // the same way a gate does.
             let want = g.world.last_town.clone();
+            let marks = g.world.marks();
             let mut moved = false;
             // Where you fell is where you were, and a defeat is a placement
             // rather than a step — so the map you are carried off remembers
@@ -1608,7 +1623,7 @@ pub fn settle_fight() -> String {
             // instead of into the fight they lost.
             g.world.remember();
             for (id, _) in gm2d_core::data::MAPS {
-                map_named(id, |w| {
+                map_in(id, &marks, |w| {
                     if !moved {
                         if let Some(p) = w.places.iter().find(|p| p.id == want) {
                             g.world.map = w.id.clone();
@@ -1630,7 +1645,7 @@ pub fn settle_fight() -> String {
                 // No town remembered anywhere. The first map's start is always
                 // somewhere you can stand.
                 let over = gm2d_core::world::overworld();
-                map_named(&over, |w| {
+                map_in(&over, &marks, |w| {
                     g.world.map = w.id.clone();
                     g.world.at = [w.start.0, w.start.1];
                 });

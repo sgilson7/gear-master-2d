@@ -84,7 +84,16 @@ fn every_place_is_on_walkable_ground() {
         let w = gm2d_core::data::map(id, D);
         for p in &w.places {
             let (x, y) = (p.at[0], p.at[1]);
-            assert!(w.passable(x, y), "{id}: {:?} stands on {}", p.id, w.terrain_name(x, y));
+            // **Ever**, not now. A place may stand on ground that opens later
+            // or opens for somebody: the grating in the middle of the lake is
+            // under water until the Drambus Stack comes down, and a Toad set
+            // walks out to it before that.
+            assert!(
+                w.ever_walkable(x, y),
+                "{id}: {:?} stands on {}",
+                p.id,
+                w.terrain_name(x, y)
+            );
         }
     }
 }

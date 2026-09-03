@@ -323,3 +323,61 @@ tower and puts you out; when they are all gone there is a stump.
   fights standing in a field. Going back is right and the game supports it; what
   it means is that most of a run is now spent walking between the pit and the
   tower, and the errand log keeps pointing east. **`TRIAGE-M11.md` gets this.**
+
+---
+
+## M11.4 — the lake drains
+
+### Terrain that is derived, a rule that widened, and a place standing in water
+
+**The change.** West Bambulon's lake empties when the Drambus Stack's bottom
+floor is answered. There is a grating in the middle of it with two hundred and
+six steps under it, one boss at the bottom, and a door behind the boss that says
+the writing stops there. `Rule::Wade` widened from the rim to the whole body.
+
+**Follows from.**
+
+- **`data::map` and `data::map_now` are now two questions.** The first is the
+  file — is the map well formed, where is the town, what does a lint see. The
+  second is the file as the game has left it. Every question a *game* asks moved
+  to the second, and a lint that could only see the drained lake could not see
+  the undrained one, which is what everybody plays for two blocks.
+- **The shim's `map_named` became `map_in` and takes the marks.** Not the state:
+  nearly every call site is a closure that then *mutates* the state, so holding
+  a borrow across the call is a borrow error at eight sites. `WorldState::marks`
+  is the smallest thing that answers *has this happened*, and it also names the
+  fact that `answered` and `flags` have always been read together.
+- **`ever_walkable` is a third answer beside `passable` and `walkable`**, and it
+  exists because a place may stand on ground that opens later or opens for
+  somebody. The load check and two lints use it. What it still catches is the
+  thing they were for: a place in rock, or in a sea nothing opens.
+- **`Rule::Wade`'s line lost its number**, because the number *was* the limit.
+  `the_new_rules_describe_themselves` grew a named exemption rather than a
+  fabricated quantity — a spec that invents a number to satisfy a lint is the
+  failure the two-register split exists to stop.
+- **Three tests about the rim were rewritten and one measurement was kept.**
+  `the_rim_is_shallow_and_the_middle_is_not` still measures fourteen and
+  fourteen and now decides nothing; it is kept because it is the argument M9
+  made, and the shape of the lake has not changed.
+
+**Watch.**
+
+- **Everywhere water gates anything** — notebook entry 3, and this is where it
+  came due. `World::repair` still reads the allowance going in and ignores it
+  coming out, which is now load-bearing in a new way: a wading player standing
+  in the *middle* of the lake who unpacks the set is repaired to land, and the
+  land they are repaired to is further away than it was.
+- **The walker routing through the lake.** It could not before and can now, if
+  it ever earns the Toad set. `make play` pathing straight across a lake it used
+  to walk round is the symptom to look for, and it is not a bug — it is entry 3
+  arriving.
+- **A drain is a whole-map rewrite waiting to happen.** `drain_by` swaps every
+  tile of one terrain for another across the map. It is right for a lake, which
+  is the only water on the map it is on; it would be catastrophic on a map where
+  `from` is the ground everybody walks on. `every_drain_names_terrain_that_exists`
+  refuses a drain whose `from` is the terrain in the corner of the map, which is
+  the cheapest available proxy for *this is not the whole map*.
+- **The under-lake is one map read twice, and the difference is the walk** —
+  twenty-one tiles of slag against eleven of road. That is the only currency a
+  dungeon here has, and it is worth saying because `PLAN-M11.md` proposed
+  positioning, and combat has no board.

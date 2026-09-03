@@ -1,7 +1,7 @@
 {
   "format": "gm2d-terrain",
   "version": 1,
-  "_note": "Shared by every map. The first nine are West Bambulon's, at the scale of a walk; the next four are the Treyway's, at the scale of a country \u2014 a plain is a day of it and a range is a week you do not have. **`sea` is not `water`**, and the difference is load-bearing: `Rule::Wade` opens the *rim* of anything drawn `~`, so an ocean drawn with it would be an ocean a toad set walks the edge of. The Treyway's sea is its own terrain and no rule opens it. `curd` is the Drambus Stack, and it is not `rock` for the same kind of reason: two hundred and ten feet of cheese drawn as rock is a hill.",
+  "_note": "Shared by every map. The first nine are West Bambulon's, at the scale of a walk; the next four are the Treyway's, at the scale of a country \u2014 a plain is a day of it and a range is a week you do not have. **`sea` is not `water`**, and the difference is load-bearing: `Rule::Wade` opens the *rim* of anything drawn `~`, so an ocean drawn with it would be an ocean a toad set walks the edge of. The Treyway's sea is its own terrain and no rule opens it. `curd` is the Drambus Stack, and it is not `rock` for the same kind of reason: two hundred and ten feet of cheese drawn as rock is a hill. `lakebed` is drawn in no file at all \u2014 it is what `water` becomes when a map's `drains` fire, and the only thing that has ever walked on it is somebody who dropped a tower.",
   "terrain": {
     "road":   { "glyph": "=", "passable": true,  "cost": 1, "encounter_per_mille": 30 },
     "grass":  { "glyph": ".", "passable": true,  "cost": 1, "encounter_per_mille": 90 },
@@ -18,6 +18,8 @@
     "range":  { "glyph": "A", "passable": false, "cost": 0, "encounter_per_mille": 0 },
     "sea":    { "glyph": "S", "passable": false, "cost": 0, "encounter_per_mille": 0 },
 
-    "curd":   { "glyph": "C", "passable": false, "cost": 0, "encounter_per_mille": 0 }
+    "curd":   { "glyph": "C", "passable": false, "cost": 0, "encounter_per_mille": 0 },
+
+    "lakebed": { "glyph": "_", "passable": true, "cost": 2, "encounter_per_mille": 220 }
   }
 }

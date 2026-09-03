@@ -83,7 +83,7 @@ fn every_gate_leads_somewhere_you_can_stand() {
             let dest = data::map(to, D);
             let at = p.at_to.unwrap_or([dest.start.0, dest.start.1]);
             assert!(
-                dest.passable(at[0], at[1]),
+                dest.ever_walkable(at[0], at[1]),
                 "{}: lands you on {:?} of {to}, which is not walkable",
                 p.id,
                 at

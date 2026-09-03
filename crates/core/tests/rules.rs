@@ -60,10 +60,23 @@ fn a_named_set_needs_every_piece_to_agree() {
 #[test]
 fn the_new_rules_describe_themselves() {
     const THEMED: &[&str] = &["fnorp", "the funny", "cork", "fury", "devotion", "harvest"];
+    // **A number where the effect has one.** Every rule the tree grants is an
+    // amount and says so; `Rule::Wade` was too, while it had a depth — "within
+    // 1 tile of dry land". M11.4 widened it to the whole body of water and the
+    // number went with the limit, because the limit *was* the number. A line
+    // that invented one to satisfy this list would be a spec that disagrees
+    // with its effect, which is the failure the whole two-register split exists
+    // to stop. So the rule is: quantities are named, and a rule with no
+    // quantity says so by name.
+    const NO_QUANTITY: &[&str] = &["Wade"];
     for r in [Rule::Rout { creature: "Cave Rat".into() }, Rule::Wade] {
         let line = r.line();
         assert!(!line.is_empty(), "{r:?} says nothing");
-        assert!(line.chars().any(|c| c.is_ascii_digit()), "{r:?}: {line:?} names no number");
+        let counted = NO_QUANTITY.iter().any(|n| format!("{r:?}").starts_with(n));
+        assert!(
+            counted || line.chars().any(|c| c.is_ascii_digit()),
+            "{r:?}: {line:?} names no number"
+        );
         let low = line.to_lowercase();
         for w in THEMED {
             assert!(!low.contains(w), "{r:?}: {line:?} speaks the theme");
@@ -137,9 +150,15 @@ fn wading_is_an_allowance_and_not_a_character() {
 ///
 /// A water tile is shallow when something you could already stand on is one
 /// orthogonal step away. On the first map that is fourteen of the lake's
-/// twenty-eight tiles — the rim — and the middle fourteen stay shut. A corner
+/// twenty-eight tiles — the rim — and the middle fourteen are not. A corner
 /// does not count: a diagonal touch is not somewhere to put a foot down on the
 /// way in.
+///
+/// **`shallow` no longer decides anything**, since M11.4 widened `Rule::Wade`
+/// to the whole body of water — there is a way down in the middle of the lake
+/// now and the set is how you reach it early. The measurement is kept because
+/// it is the argument M9 made and the shape of the lake has not changed; what
+/// changed is the world it is in.
 #[test]
 fn the_rim_is_shallow_and_the_middle_is_not() {
     let w = data::world(D);
@@ -184,14 +203,27 @@ fn a_step_into_water_is_refused_until_it_is_allowed() {
     assert_eq!(dry.at, [7, 8], "and a refused step does not move you");
     assert!(s.blocked.as_deref().unwrap().contains("frame"), "{:?}", s.blocked);
 
-    let s = world::step(&w, &mut state, &mut rng, D, Dir::South, &Allowances { wade: true, ..Allowances::default() });
+    let wading = Allowances { wade: true, ..Allowances::default() };
+    let s = world::step(&w, &mut state, &mut rng, D, Dir::South, &wading);
     assert!(s.moved, "and ground to somebody who is allowed to wade");
     assert_eq!(state.at, [7, 9]);
-    // The middle is still shut, allowance or not: depth is a property of the
-    // ground, and this is the half of the rule the map answers.
-    let s = world::step(&w, &mut state, &mut rng, D, Dir::South, &Allowances { wade: true, ..Allowances::default() });
-    assert!(!s.moved, "the middle of the lake is still the middle of the lake");
-    assert_eq!(state.at, [7, 9]);
+    // **And the middle too, since M11.4.** It was shut until there was
+    // something under it: `Rule::Wade` opened the rim, and widening it to the
+    // whole body is `PLAN-M11.md` §8 row 1 — a set somebody ground three Bog
+    // Toads for gets better when the world gets bigger, rather than a second
+    // deeper rule standing beside the first.
+    let s = world::step(&w, &mut state, &mut rng, D, Dir::South, &wading);
+    assert!(s.moved, "the middle of the lake is shut to a whole Toad set");
+    assert_eq!(state.at, [7, 10]);
+    // Which is what makes the way down reachable at all before the tower falls.
+    let grating = w
+        .places
+        .iter()
+        .find(|p| p.id == "the-way-under-the-lake")
+        .expect("the grating in the middle of the lake");
+    assert_eq!(w.terrain_name(grating.at[0], grating.at[1]), "water");
+    assert!(w.walkable(grating.at[0], grating.at[1], &wading));
+    assert!(!w.walkable(grating.at[0], grating.at[1], &Allowances::default()));
 }
 
 /// A repair must not walk a wading player home, and must not leave a

@@ -34,6 +34,8 @@ pub const STACK_4_JSON: &str = include_str!("../../../data/maps/the-drambus-stac
 pub const STACK_3_JSON: &str = include_str!("../../../data/maps/the-drambus-stack-3.tiles.json");
 pub const STACK_2_JSON: &str = include_str!("../../../data/maps/the-drambus-stack-2.tiles.json");
 pub const STACK_1_JSON: &str = include_str!("../../../data/maps/the-drambus-stack-1.tiles.json");
+/// What is under the lake, and the same map twice — see its own note.
+pub const UNDER_LAKE_JSON: &str = include_str!("../../../data/maps/under-the-lake.tiles.json");
 pub const EVENTS_JSON: &str = include_str!("../../../data/events.json");
 pub const THEME_TD_JSON: &str = include_str!("../../../data/theme.td.json");
 pub const SKILLS_JSON: &str = include_str!("../../../data/skills.json");
@@ -61,6 +63,7 @@ pub const FILES: &[(&str, &str)] = &[
     ("maps/the-drambus-stack-3.tiles.json", STACK_3_JSON),
     ("maps/the-drambus-stack-2.tiles.json", STACK_2_JSON),
     ("maps/the-drambus-stack-1.tiles.json", STACK_1_JSON),
+    ("maps/under-the-lake.tiles.json", UNDER_LAKE_JSON),
     ("events.json", EVENTS_JSON),
     ("theme.td.json", THEME_TD_JSON),
     ("skills.json", SKILLS_JSON),
@@ -91,6 +94,7 @@ pub const MAPS: &[(&str, &str)] = &[
     ("the-drambus-stack-3", STACK_3_JSON),
     ("the-drambus-stack-2", STACK_2_JSON),
     ("the-drambus-stack-1", STACK_1_JSON),
+    ("under-the-lake", UNDER_LAKE_JSON),
 ];
 
 /// One map by id, falling back to the overworld.
@@ -107,6 +111,22 @@ pub fn map(id: &str, difficulty: crate::combat::Difficulty) -> crate::world::Wor
         .map(|(_, t)| *t)
         .expect("at least one map ships");
     crate::world::World::load(TERRAIN_JSON, text, difficulty).expect("a shipped map is broken")
+}
+
+/// One map, as the game has left it.
+///
+/// The same map `map` returns with everything the state says has drained,
+/// drained. **Every question a *game* asks goes through this**; `map` is for
+/// questions about the file, and a lint that only ever saw the drained lake
+/// could not see the undrained one.
+pub fn map_now(
+    id: &str,
+    difficulty: crate::combat::Difficulty,
+    state: &crate::world::WorldState,
+) -> crate::world::World {
+    let mut w = map(id, difficulty);
+    w.drain(state);
+    w
 }
 
 /// Every map this build ships, loaded.

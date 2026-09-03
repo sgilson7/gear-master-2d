@@ -165,10 +165,7 @@ impl Rule {
                 "every {creature} you meet gives up: paid like a win, and {}% tiring",
                 0,
             ),
-            Rule::Wade => format!(
-                "walk onto water within {} tile of dry land",
-                crate::world::WADE_DEPTH,
-            ),
+            Rule::Wade => "walk onto water".to_string(),
         }
     }
 
@@ -218,12 +215,9 @@ impl Rule {
                     .into(),
             ],
             Rule::Wade => vec![
-                format!(
-                    "Water is impassable to everybody else. This opens the tiles within \
-                     {} tile of somewhere you could already stand — the rim, and not the \
-                     middle.",
-                    crate::world::WADE_DEPTH,
-                ),
+                "Water is impassable to everybody else. This opens all of it, edge to \
+                 middle, on every map that has any."
+                    .into(),
                 "Nothing lives in water, so a waded tile never starts a fight.".into(),
             ],
         }

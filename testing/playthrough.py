@@ -419,6 +419,7 @@ def main():
             seen_field = False
             seen_kettleworks = False
             on_floor = None
+            seen_under = False
             came_back = False
             floors_down = 0
             answered = set()
@@ -577,14 +578,15 @@ def main():
                 # again, because the first time is usually a defeat carrying it
                 # home after one fight, and a run that ends on being beaten
                 # once has measured nothing about the map it was beaten on.
+                lake_done = "the-bottom-of-the-lake" in answered
                 read_the_lot = (TREYWAY_PROMISES <= answered and seen_kettleworks
-                                and floors_down >= 5)
+                                and floors_down >= 5 and lake_done)
                 if seen_treyway and world["id"] == "west-bambulon" and read_the_lot:
                     came_back = True
                     head("back through the door")
                     say(f"  {panel(page)}")
                     say("")
-                    say(f"CROSSED, READ BOTH ROADS, DROPPED THE STACK AND CAME BACK "
+                    say(f"DROPPED THE STACK, DRAINED THE LAKE AND CAME BACK "
                         f"at step {step}. {panel(page)}")
                     break
                 keys = page.evaluate(
@@ -594,7 +596,25 @@ def main():
                 have_witch = "The Witch's Key" in keys
 
                 want = None
-                if world["id"].startswith("the-drambus-stack-"):
+                grate = place_by_id("the-way-under-the-lake")
+                if world["id"] == "under-the-lake":
+                    if not seen_under:
+                        seen_under = True
+                        head("under the lake")
+                        say(f"  {panel(page)}")
+                        phase = "under the lake"
+                    down = next((p for p in world["places"] if p["kind"] == "door"), None)
+                    boss_here = next((p for p in world["places"] if p["kind"] == "boss"), None)
+                    up = place_by_id("the-way-back-up-the-steps")
+                    if c["fatigue"] >= 40 and up:
+                        want, why = up["at"], "back up the steps"
+                    elif down:
+                        want, why = down["at"], "under the lake"
+                    elif boss_here:
+                        want, why = boss_here["at"], "under the lake"
+                    else:
+                        want, why = None, "under the lake"
+                elif world["id"].startswith("the-drambus-stack-"):
                     # Inside a floor. One thing to do and one way out of it.
                     if world["id"] != on_floor:
                         on_floor = world["id"]
@@ -712,6 +732,10 @@ def main():
                         want, why = gate["at"], "out"
                     elif boss or gate:
                         want, why = (boss or gate)["at"], "boss"
+                elif grate and floors_down >= 5 and not lake_done:
+                    # The Stack is down, the lake is a bed, and the last thing
+                    # written is at the bottom of it.
+                    want, why = grate["at"], "the lake"
                 elif wall_door and have_deep and not read_the_lot:
                     # **Bank and mend before a border.** The first run through
                     # crossed carrying nine hundred and thirty-two experience
@@ -909,6 +933,8 @@ def main():
                 say(f"  read on the Treyway: "
                     f"{sorted(TREYWAY_PROMISES & answered) or 'nothing'}")
                 say(f"  floors of the Drambus Stack down: {floors_down} of 5")
+                say(f"  the thing under the lake: "
+                    f"{'beaten' if 'the-bottom-of-the-lake' in answered else 'still down there'}")
             say(f"  ({moved} of {STEPS} presses actually moved)")
 
             head("what happened")

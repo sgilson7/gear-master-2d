@@ -114,3 +114,13 @@ under-geared cannot catch up there — the run forbidden from walking back lost
 two thousand four hundred fights standing in a field. A thousand losses against
 twelve hundred wins is what the road past the door costs at the level the door
 opens at.
+
+**M11.4's run is `m11.4.txt`.** 20,000 presses, 1,141 wins, 904 losses, level 12,
+three of the Stack's five floors down — and the lake still full, because the run
+ran out of presses before the fifth floor.
+
+That is the finding, and it is a measurement rather than a fault: **the block is
+longer than a walk.** Twenty thousand presses was enough to reach the door and
+drop most of a tower and is not enough to drain a lake behind it, at a win rate
+of about eleven to nine. `TRIAGE-M11.md` gets both halves — the length, and the
+rate that makes the length what it is.

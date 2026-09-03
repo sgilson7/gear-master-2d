@@ -94,7 +94,10 @@ pub fn run(game: &Game, difficulty: Difficulty) -> Option<CombatLog> {
 /// Reads the map the player is on. A `World` is cheap to build here — this
 /// runs once per settled fight, not per frame.
 fn boss_at(game: &Game, at: [u8; 2]) -> Option<(String, Option<String>, Vec<String>)> {
-    let w = crate::data::map(&game.world.map_id(), Difficulty::Easy);
+    // **As the game has left it**, not as the file has it: a boss can stand
+    // under a lake that has drained, and the map that answers questions about
+    // the file does not know about that.
+    let w = crate::data::map_now(&game.world.map_id(), Difficulty::Easy, &game.world);
     let p = w.place_at(at[0], at[1])?;
     if p.kind != crate::world::PlaceKind::Boss {
         return None;

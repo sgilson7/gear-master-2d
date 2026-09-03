@@ -308,9 +308,17 @@ fn a_boss_is_never_routed() {
 
 // ------------------------------------------------------------------ the wade
 
-/// The toad set opens the rim and not the middle.
+/// **The toad set opens the lake, all of it, since M11.4.**
+///
+/// It opened the rim and not the middle for two blocks, and the measurement
+/// behind that is still in `tests/rules.rs` — fourteen of twenty-eight, row
+/// nine crossable end to end. What changed is that there is a grating in the
+/// middle of the lake now with two hundred and six steps under it, and the set
+/// somebody ground three Bog Toads for is how you reach it before the Drambus
+/// Stack comes down and empties the whole thing. `PLAN-M11.md` §8 row 1: widen
+/// the rule rather than stand a second, deeper one beside it.
 #[test]
-fn the_toad_set_opens_the_rim_and_not_the_middle() {
+fn the_toad_set_opens_the_whole_lake() {
     let g = wearing(TOAD_ON_THE_BOARD);
     assert_eq!(
         g.character.report(SlotKind::Chest).assembled_count(),
@@ -326,29 +334,35 @@ fn the_toad_set_opens_the_rim_and_not_the_middle() {
         .filter(|&(x, y)| !w.passable(x, y) && w.walkable(x, y, &allowed))
         .map(|(x, y)| [x, y])
         .collect();
-    assert_eq!(opened.len(), 14, "the rim is fourteen tiles: {opened:?}");
-    // Row nine end to end, which is what makes the lake crossable at all.
+    assert_eq!(opened.len(), 28, "the lake is twenty-eight tiles: {opened:?}");
+    // Row nine end to end, which is what made it crossable at all.
     for x in 7..=10 {
         assert!(opened.contains(&[x, 9]), "({x}, 9) did not open");
     }
-    // And the fourteen the plan names stay shut — four, six, four.
-    let shut: Vec<(u8, u8)> = (7..=10)
+    // And the fourteen that used to be shut — four, six, four.
+    let was_shut: Vec<(u8, u8)> = (7..=10)
         .map(|x| (x, 10))
         .chain((6..=11).map(|x| (x, 11)))
         .chain((7..=10).map(|x| (x, 12)))
         .collect();
-    assert_eq!(shut.len(), 14);
-    for (x, y) in shut {
+    assert_eq!(was_shut.len(), 14);
+    for (x, y) in was_shut {
         assert_eq!(w.terrain_name(x, y), "water", "({x}, {y}) is not even lake");
-        assert!(!w.walkable(x, y, &allowed), "({x}, {y}) is the middle and it opened");
+        assert!(w.walkable(x, y, &allowed), "({x}, {y}) is the middle and it is still shut");
     }
-    // The two the rim reaches furthest in, which is what makes the shape a rim
-    // rather than a row.
-    assert!(opened.contains(&[5, 11]) && opened.contains(&[12, 11]));
+    // And what it opens is still water and nothing else: an allowance adds and
+    // never converts.
     assert!(
         !opened.iter().any(|c| w.terrain_name(c[0], c[1]) != "water"),
         "something that is not water opened"
     );
+    // The whole reason: the grating is in the middle of it.
+    let grating = w
+        .places
+        .iter()
+        .find(|p| p.id == "the-way-under-the-lake")
+        .expect("the way under the lake");
+    assert!(opened.contains(&grating.at), "the set does not reach the way down");
 }
 
 /// Take the chest apart and the lake is a wall again.
@@ -382,7 +396,16 @@ fn wading_does_not_move_a_place_or_a_region() {
     let allowed = Allowances { wade: true, ..Allowances::default() };
     for (id, _) in data::MAPS {
         let w = data::map(id, D);
+        // **One place stands on ground only a set reaches, and it is the
+        // point of that set.** Everything else has to be ordinary ground: a
+        // town or a card behind a rule is content three players in four never
+        // find, and this is the check that stops the next one being an
+        // accident rather than a decision.
         for p in &w.places {
+            if p.id == "the-way-under-the-lake" {
+                assert_eq!(w.terrain_name(p.at[0], p.at[1]), "water");
+                continue;
+            }
             assert!(
                 w.passable(p.at[0], p.at[1]),
                 "{}: {} stands on ground that only a waded set could reach",

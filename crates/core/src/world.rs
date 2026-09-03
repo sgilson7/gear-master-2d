@@ -58,11 +58,17 @@ pub const MAX_ENCOUNTER_PER_MILLE: i32 = 450;
 
 /// How far off dry land a waded tile may be.
 ///
-/// One, and the plan measured what one means before it was written: a water
-/// tile that touches somewhere you could already stand. On the first map that
-/// opens fourteen of the lake's twenty-eight tiles — the rim — and leaves the
-/// middle fourteen shut, so the lake stops being a wall at its edge while
-/// staying one through its middle. No new terrain and no repaint.
+/// **Nothing reads this any more, and it is kept because the number is the
+/// argument.** M9 measured it before it was written: at one, the Toad set
+/// opened fourteen of the lake's twenty-eight tiles — the rim — and left the
+/// middle fourteen shut, so the lake stopped being a wall at its edge while
+/// staying one through its middle.
+///
+/// M11.4 widened the rule to the whole body of water (`PLAN-M11.md` §8 row 1),
+/// because there is something under the middle of the lake now and the set that
+/// was ground for is how you reach it early. A ground set should get better
+/// when the world gets bigger; the alternative was a second, deeper wading rule
+/// standing beside the first, which is two answers to one question.
 pub const WADE_DEPTH: u8 = 1;
 
 /// What the character stepping is allowed to do that nobody else is.
@@ -77,7 +83,7 @@ pub const WADE_DEPTH: u8 = 1;
 /// no existing caller has to say it holds nothing.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct Allowances {
-    /// Water within [`WADE_DEPTH`] of land is ground.
+    /// Water is ground. **All of it**, since M11.4 — see [`WADE_DEPTH`].
     pub wade: bool,
     /// How far up the map the walker may go, as a level.
     ///
@@ -309,6 +315,18 @@ pub struct PlaceDef {
     pub floors: Vec<Floor>,
 }
 
+/// Terrain that becomes other terrain once a mark is in `answered`.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Drain {
+    /// What has to have happened. An id in `answered` or in `flags`.
+    pub when: String,
+    /// The terrain that goes, by name.
+    pub from: String,
+    /// What it becomes.
+    pub to: String,
+}
+
 /// One storey of a stack of maps, and the mark that says it is done.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -381,6 +399,20 @@ pub struct TilesData {
     pub rows: Vec<String>,
     pub regions: Vec<RegionDef>,
     pub places: Vec<PlaceDef>,
+    /// Terrain that turns into other terrain once something has happened.
+    ///
+    /// **The first thing on a map that is not fixed.** The grid is content and
+    /// content is not state, and this does not break that: the *rule* is in the
+    /// file and what it reads is `answered`, exactly the way a hidden place
+    /// does. The tiles are still not in the save; they are derived from it.
+    ///
+    /// One user: the lake in the middle of West Bambulon, which empties when
+    /// the Drambus Stack comes down. There is no `tower_dropped` flag because
+    /// there does not need to be one — the Stack's bottom floor is reachable
+    /// only once the four above it are gone, so its boss being answered *is*
+    /// the tower being down.
+    #[serde(default)]
+    pub drains: Vec<Drain>,
     /// The map a sitting on this one ends on.
     ///
     /// **A floor of the Drambus Stack is one sitting**, which is `PLAN-M11.md`
@@ -425,6 +457,8 @@ pub struct World {
     pub places: Vec<PlaceDef>,
     /// Where a sitting on this map ends. See [`TilesData::outside`].
     pub outside: Option<String>,
+    /// What empties, and when. See [`TilesData::drains`].
+    pub drains: Vec<Drain>,
 }
 
 /// Why a map would not load. Every one is a sentence naming the tile.
@@ -561,6 +595,7 @@ impl World {
             regions,
             places: tl.places,
             outside: tl.outside.clone(),
+            drains: tl.drains.clone(),
         };
 
         for y in 0..world.height {
@@ -575,7 +610,7 @@ impl World {
             if !world.in_bounds(x as i32, y as i32) {
                 return Err(format!("{:?} is placed at ({x}, {y}), off the map", p.id));
             }
-            if !world.passable(x, y) {
+            if !world.ever_walkable(x, y) {
                 return Err(format!("{:?} is placed on impassable ground at ({x}, {y})", p.id));
             }
         }
@@ -661,8 +696,12 @@ impl World {
     /// a step, and nothing else yet, because `repair` deliberately does not:
     /// see the note on it.
     pub fn walkable(&self, x: u8, y: u8, allowed: &Allowances) -> bool {
-        self.passable(x, y)
-            || (allowed.wade && self.terrain_name(x, y) == "water" && self.shallow(x, y))
+        // **The whole body, not the rim.** `&& self.shallow(x, y)` was here
+        // until M11.4 and the measurement behind it is in `WADE_DEPTH`. What
+        // changed is the world rather than the reasoning: there is a way down
+        // under the middle of the lake now, and the set somebody ground three
+        // Bog Toads for is how you get to it before the tower comes down.
+        self.passable(x, y) || (allowed.wade && self.terrain_name(x, y) == "water")
     }
 
     fn region_index(&self, x: u8, y: u8) -> Option<usize> {
@@ -849,6 +888,90 @@ impl World {
         Some(was)
     }
 
+    /// Could anybody, ever, stand here?
+    ///
+    /// **The load check's question, and it is not `passable`.** A place may
+    /// stand on ground that opens later or opens for somebody: the grating in
+    /// the middle of the lake is on water, which a Toad set walks on and which
+    /// becomes bed when the Drambus Stack comes down. Refusing it at load would
+    /// refuse the whole point of it.
+    ///
+    /// What this still catches is the thing the check is for — a place put in
+    /// rock, or in a sea nothing opens.
+    pub fn ever_walkable(&self, x: u8, y: u8) -> bool {
+        if self.passable(x, y) {
+            return true;
+        }
+        let here = self.terrain_name(x, y);
+        // A rule opens it.
+        if here == "water" {
+            return true;
+        }
+        // Or something drains it into ground.
+        self.drains.iter().any(|d| {
+            d.from == here
+                && self
+                    .terrain
+                    .iter()
+                    .any(|(n, t)| *n == d.to && t.passable)
+        })
+    }
+
+    /// This map's terrain table, by name.
+    ///
+    /// Public so a lint can ask what a drain names on both sides — a drain into
+    /// something impassable is a lake that empties into a wall.
+    pub fn terrain_named(&self, name: &str) -> Option<&TerrainDef> {
+        self.terrain.iter().find(|(n, _)| n == name).map(|(_, t)| t)
+    }
+
+    /// Empty whatever this state says has emptied.
+    ///
+    /// **Applied to the `World` rather than consulted at every read.** The
+    /// alternative was `terrain_at(x, y, state)`, which is forty call sites and
+    /// a state argument threaded through every question anybody asks the
+    /// ground. A `World` is built fresh on every lookup already — it is parsed,
+    /// not cached — so draining it once at that point costs nothing and leaves
+    /// `passable`, `walkable`, `encounter_per_mille` and the rest exactly as
+    /// they were.
+    ///
+    /// **`data::map` does not do this and must not.** That one answers
+    /// questions about the *file* — is the map well formed, where is the town —
+    /// and a lint that saw a drained lake would be a lint that could not see
+    /// the undrained one. `data::map_now` is the one a game asks.
+    pub fn drain(&mut self, state: &WorldState) {
+        let marks = state.marks();
+        self.drain_by(&marks);
+    }
+
+    /// The same, against a list of what has happened rather than a whole state.
+    ///
+    /// **The shim needs this and the borrow checker is why.** Draining takes
+    /// the state and nearly every call site is inside a closure that then
+    /// *mutates* the state — repairs a position, crosses a gate — so holding a
+    /// borrow of it across the call is a borrow error at eight sites. A short
+    /// owned list of marks is the smallest thing that answers the question.
+    pub fn drain_by(&mut self, marks: &[String]) {
+        for d in self.drains.clone() {
+            if !marks.iter().any(|m| *m == d.when) {
+                continue;
+            }
+            let (Some(from), Some(to)) = (self.terrain_index(&d.from), self.terrain_index(&d.to))
+            else {
+                continue;
+            };
+            for t in self.tiles.iter_mut() {
+                if *t == from {
+                    *t = to;
+                }
+            }
+        }
+    }
+
+    fn terrain_index(&self, name: &str) -> Option<usize> {
+        self.terrain.iter().position(|(n, _)| n == name)
+    }
+
     /// Where you arrive on this map, coming through a gate that named no tile.
     ///
     /// Where you left off — **unless the map is one sitting**, in which case a
@@ -1026,6 +1149,17 @@ impl WorldState {
     pub fn count(&self, what: &str) -> u32 {
         self.counters.iter().find(|(k, _)| k == what).map(|(_, n)| *n).unwrap_or(0)
     }
+
+    /// Everything that has happened, as one list.
+    ///
+    /// `answered` and `flags` are two lists for two reasons — one is written by
+    /// places and events, the other by an event's outcome — and every reader
+    /// that asks *has this happened* has always checked both. This is that
+    /// question with the two halves already joined, for a caller that cannot
+    /// hold a borrow of the state while it asks.
+    pub fn marks(&self) -> Vec<String> {
+        self.answered.iter().chain(self.flags.iter()).cloned().collect()
+    }
 }
 
 /// Put the walker outside, if the map they are standing on is one sitting.
@@ -1038,13 +1172,13 @@ impl WorldState {
 ///
 /// Returns the map they were moved to, or `None` if they were not on a sitting.
 pub fn leave_the_sitting(state: &mut WorldState, difficulty: Difficulty) -> Option<String> {
-    let here = crate::data::map(&state.map_id(), difficulty);
+    let here = crate::data::map_now(&state.map_id(), difficulty, state);
     let out = here.outside.clone()?;
     // Written down before the move, the same as a gate: without it the floor
     // forgets where you were on it, which does not matter for a floor and does
     // matter for the habit.
     state.remember();
-    let dest = crate::data::map(&out, difficulty);
+    let dest = crate::data::map_now(&out, difficulty, state);
     state.at = dest.arrival(state);
     state.map = out.clone();
     Some(out)

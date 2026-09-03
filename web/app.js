@@ -70,6 +70,9 @@ const LIGHT = {
   // The Drambus Stack. Two hundred and ten feet of it, drawn as itself rather
   // than as rock, which is the whole reason it is its own terrain.
   curd:  ['#e8cf7a', '#e3c96f'],
+  // What is under the lake once the Stack comes down. Drawn in no map file:
+  // it is what `water` becomes.
+  lakebed: ['#8f8567', '#89805f'],
 };
 const DARK = {
   road:  ['#4a4132', '#514837'],
@@ -86,6 +89,7 @@ const DARK = {
   range: ['#2a2723', '#302d28'],
   sea:   ['#1a2c33', '#1e323a'],
   curd:  ['#6a5c26', '#71622b'],
+  lakebed: ['#3b3524', '#423b29'],
 };
 
 function dark() {

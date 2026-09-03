@@ -1,0 +1,96 @@
+{
+  "format": "gm2d-tiles",
+  "version": 1,
+  "id": "under-the-lake",
+  "_note": "What is under the lake, and the same map twice. Entered before the Drambus Stack comes down it is flooded: the two middle rows are water, the west stair is shut, and the only way to the bottom is the long way round the slag — twenty-one tiles at two hundred and sixty per mille instead of eleven at thirty. Entered after, `drains` turns the water to bed and the straight run down the middle opens. Same boss, same loadout, same drop; what the early way costs is the walk, which is the only currency a dungeon here has. Not a second boss and not a second map — one of each, read twice.",
+  "width": 13,
+  "height": 9,
+  "start": [
+    1,
+    1
+  ],
+  "drains": [
+    {
+      "when": "the-drambus-stack-1-boss",
+      "from": "water",
+      "to": "lakebed"
+    }
+  ],
+  "rows": [
+    "^^^^^^^^^^^^^",
+    "^=%%%%%%%%%=^",
+    "^=^^^^^^^^^=^",
+    "^~~~~~~~~~~=^",
+    "^~~~~~~~~~~=^",
+    "^=^^^^^^^^^=^",
+    "^=%%%%%%%%%=^",
+    "^===========^",
+    "^^^^^^^^^^^^^"
+  ],
+  "regions": [
+    {
+      "id": "under-the-lake",
+      "name": "Under the Lake",
+      "bounds": [
+        [
+          0,
+          0,
+          12,
+          8
+        ]
+      ],
+      "enemies": [
+        "The Tallow Saint",
+        "The Last Gearwright",
+        "The Iron Choir"
+      ]
+    }
+  ],
+  "places": [
+    {
+      "at": [
+        1,
+        1
+      ],
+      "kind": "gate",
+      "id": "the-way-back-up-the-steps",
+      "name": "the two hundred and six steps",
+      "to": "west-bambulon",
+      "at_to": [
+        8,
+        11
+      ]
+    },
+    {
+      "at": [
+        6,
+        7
+      ],
+      "kind": "boss",
+      "id": "the-bottom-of-the-lake",
+      "name": "the bottom of the lake",
+      "creature": "Sootmother",
+      "drops": "The Cracked Lens",
+      "prose": [
+        "It stops, and the noise it was making stops with it, and what is left is water moving somewhere you cannot see.",
+        "Behind it the wall is not a wall. It is a door, and it has been a door the whole time, and there are eleven inches of silt banked against the bottom of it that nobody has swept."
+      ]
+    },
+    {
+      "at": [
+        7,
+        7
+      ],
+      "kind": "door",
+      "id": "the-door-under-the-lake",
+      "name": "the door under the lake",
+      "hidden_until": "the-bottom-of-the-lake",
+      "prose": [
+        "The silt comes away in one piece, the way a thing does when it has been there long enough to have set, and the door opens inwards on four hinges of which two are original.",
+        "Behind it is a landing and a stair going down, cut for people carrying something, and the stair does not stop where the light does.",
+        "This is where the writing stops. Not the game — the writing. What is at the bottom of that stair is not hidden and not locked and not saved for later: nobody has decided it yet.",
+        "You dropped a tower, drained a lake and walked two hundred and six steps into the dark, and the last fact this game has for you is that somebody cut them."
+      ]
+    }
+  ]
+}

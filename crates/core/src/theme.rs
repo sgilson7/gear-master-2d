@@ -934,6 +934,38 @@ pub static TURTLE_DICK: Theme = Theme {
         ("Cosmic Orb", "The Octarine Ball"),
         ("Cosmic Alignment", "The Eighth Ray, Set"),
         ("Living Earth", "Ground That Is Not Finished"),
+        // **M11.9's six sets**, and the naming rule M9 set: the name is the
+        // human's where there is one and the *creature's* where there is not,
+        // so a player who finds the third piece knows what they have without
+        // opening a screen. Five of the six are named for what dropped them.
+        //
+        // Off Frosty Kev in the Slag Flats.
+        ("Rimeglove Material", "Kev's Frost-Grip"),
+        ("Rimeglove Mold", "Kev's Frost-Mold"),
+        ("Rime Signet", "Kev's Own Ring"),
+        // Off a Velothi High Guard in the Shallows.
+        ("Sentinel Material", "Velothi Legwrap"),
+        ("Sentinel Mold", "Velothi Legmold"),
+        ("Sentinel Plating", "Velothi Standing Plate"),
+        // Off the Idol of Marbulon on the Verge. Hers already, so hers.
+        ("Idol's Frame", "Marbulon's Idol-Frame"),
+        ("Idol's Plating", "Marbulon's Idol-Plate"),
+        ("Idol's Crest", "Marbulon's Idol-Crest"),
+        // Off The Rice Criers in west Bambulon.
+        ("Chorister's Base", "Rice Crier's Coat"),
+        ("Chorister's Layer", "Rice Crier's Lining"),
+        ("Chorister's Weave", "Rice Crier's Count"),
+        // Off the three floors of the Drambus Stack, which is cheese all the
+        // way down and does not need to be told so twice.
+        ("Curd Haft", "The Drambus Haft"),
+        ("Curd Edge", "The Drambus Edge"),
+        ("Curd Weight", "Two Hundred and Ten Feet"),
+        // Off Spike Kaklon on the Treyway, and the one set here named for what
+        // it does rather than for what dropped it — because what it does is the
+        // whole of why anybody wears it.
+        ("Drover's Material", "Drove Way Wrap"),
+        ("Drover's Mold", "Drove Way Mold"),
+        ("Drover's Sole", "The Long Way Back"),
         // The toad census. Three pieces the starter town's errand turns on,
         // named in the change that writes them — the gear skill's own rule.
         // The toad is already the Bengulon Jungle Toad, so its eyes are, and
@@ -1082,6 +1114,19 @@ pub static TURTLE_DICK: Theme = Theme {
         ("The Last Light", "The Last Wimpler Oxen"),
         ("Gilt", "The Money Coat"),
         ("Francis", "Francis the Gambler"),
+        // **M11.9's eight.** Named for what they are rather than for where they
+        // stand — the field's two are the works' leavings, the shadow's two are
+        // what the Stack does at dusk, the reach's two are the nine surveys
+        // that never agreed, and the tower's two are what was left on the fifth
+        // floor and what the whole of it was standing on.
+        ("Kettle Wight", "The Thing In The Fortieth Kettle"),
+        ("Hoop Hound", "The Hooper's Dog"),
+        ("Curd Wraith", "What Comes Off At Dusk"),
+        ("The Good Wall", "The Wall Somebody Built"),
+        ("Trig Sentinel", "The Tenth Surveyor"),
+        ("Cairn Chorus", "The Nine Who Stopped"),
+        ("Curd Sentinel", "What Was Left On Five"),
+        ("The Ground Floor", "What The Stack Was Standing On"),
         // ---- THE SWITCHYARD ---------------------------------------------
         //
         // The Cork Train ran on the Holy Cork Empire's own line, and the line

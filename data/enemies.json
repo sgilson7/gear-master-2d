@@ -7151,6 +7151,1380 @@
       "rank": "ordinary",
       "rating": 2958,
       "items": 15
+    },
+    {
+      "name": "Kettle Wight",
+      "health": 1020,
+      "strength": 30,
+      "regen": 2,
+      "mind_resist": 26,
+      "curse_resist": 26,
+      "physical_resist": 23,
+      "magic_resist": 20,
+      "gear": [
+        [
+          "Reliquary Orb",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Stonewall Frame",
+          "helmet",
+          0,
+          0,
+          0
+        ],
+        [
+          "Scarred Plating",
+          "helmet",
+          3,
+          0,
+          0
+        ],
+        [
+          "Four Hundred and Second Step",
+          "helmet",
+          3,
+          1,
+          0
+        ],
+        [
+          "Countingstair Plating",
+          "helmet",
+          5,
+          0,
+          0
+        ],
+        [
+          "Foreman's Harness",
+          "chest",
+          0,
+          0,
+          0
+        ],
+        [
+          "Wickstub",
+          "chest",
+          2,
+          0,
+          0
+        ],
+        [
+          "Oathplate",
+          "chest",
+          3,
+          0,
+          0
+        ],
+        [
+          "Adamant Carapace",
+          "chest",
+          2,
+          2,
+          0
+        ],
+        [
+          "Wrathbreaker",
+          "chest",
+          0,
+          3,
+          0
+        ],
+        [
+          "Lightweave",
+          "chest",
+          0,
+          5,
+          0
+        ]
+      ],
+      "bounty": 43,
+      "rank": "ordinary",
+      "rating": 521,
+      "items": 3
+    },
+    {
+      "name": "Hoop Hound",
+      "health": 1520,
+      "strength": 38,
+      "regen": 2,
+      "mind_resist": 33,
+      "curse_resist": 33,
+      "physical_resist": 30,
+      "magic_resist": 27,
+      "gear": [
+        [
+          "Godsteel Haft",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Sunderer",
+          "weapon",
+          1,
+          0,
+          0
+        ],
+        [
+          "Worldsplitter",
+          "weapon",
+          3,
+          0,
+          0
+        ],
+        [
+          "Corded Grip",
+          "weapon",
+          3,
+          1,
+          0
+        ],
+        [
+          "Blade of Helms",
+          "weapon",
+          4,
+          2,
+          0
+        ],
+        [
+          "Windup Key",
+          "weapon",
+          1,
+          3,
+          0
+        ],
+        [
+          "Bulwark Bead",
+          "weapon",
+          5,
+          1,
+          0
+        ],
+        [
+          "Fury Sigil",
+          "weapon",
+          1,
+          4,
+          0
+        ],
+        [
+          "Iron Fang",
+          "weapon",
+          2,
+          4,
+          0
+        ],
+        [
+          "Cursed Handle",
+          "weapon",
+          4,
+          4,
+          0
+        ],
+        [
+          "Aegis Crown",
+          "helmet",
+          0,
+          0,
+          0
+        ],
+        [
+          "Scarred Plating",
+          "helmet",
+          3,
+          0,
+          0
+        ],
+        [
+          "Four Hundred and Second Step",
+          "helmet",
+          3,
+          1,
+          0
+        ],
+        [
+          "Countingstair Plating",
+          "helmet",
+          5,
+          0,
+          0
+        ],
+        [
+          "Listening Frame",
+          "helmet",
+          3,
+          2,
+          0
+        ],
+        [
+          "Braced Plating",
+          "helmet",
+          0,
+          3,
+          0
+        ],
+        [
+          "Tithe Collector",
+          "helmet",
+          4,
+          4,
+          0
+        ],
+        [
+          "Antechamber Crown",
+          "helmet",
+          0,
+          5,
+          0
+        ],
+        [
+          "Layered Plating",
+          "helmet",
+          3,
+          5,
+          0
+        ],
+        [
+          "Mage's Circlet",
+          "helmet",
+          2,
+          6,
+          0
+        ],
+        [
+          "Anchor Material",
+          "gloves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Throttling Mold",
+          "gloves",
+          2,
+          0,
+          0
+        ],
+        [
+          "Storm Signet",
+          "gloves",
+          4,
+          0,
+          0
+        ],
+        [
+          "Ring of Embers",
+          "gloves",
+          4,
+          1,
+          0
+        ]
+      ],
+      "bounty": 53,
+      "rank": "ordinary",
+      "rating": 643,
+      "items": 8
+    },
+    {
+      "name": "Curd Wraith",
+      "health": 1700,
+      "strength": 43,
+      "regen": 2,
+      "mind_resist": 37,
+      "curse_resist": 37,
+      "physical_resist": 33,
+      "magic_resist": 29,
+      "gear": [
+        [
+          "Reliquary Orb",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Adamant Carapace",
+          "chest",
+          0,
+          0,
+          0
+        ],
+        [
+          "Wrathbreaker",
+          "chest",
+          4,
+          0,
+          0
+        ],
+        [
+          "Lightweave",
+          "chest",
+          0,
+          3,
+          0
+        ],
+        [
+          "Wrathbreaker",
+          "chest",
+          4,
+          2,
+          0
+        ],
+        [
+          "Heartwood Base",
+          "chest",
+          0,
+          4,
+          0
+        ],
+        [
+          "Rimeguard Base",
+          "chest",
+          3,
+          4,
+          0
+        ],
+        [
+          "Aegis Weave",
+          "chest",
+          0,
+          6,
+          0
+        ],
+        [
+          "Warlord's Pauldron",
+          "chest",
+          3,
+          6,
+          0
+        ],
+        [
+          "Sevenleague Boots",
+          "greaves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Stormstep Mold",
+          "greaves",
+          2,
+          0,
+          0
+        ],
+        [
+          "Overflow Plate",
+          "greaves",
+          2,
+          1,
+          0
+        ]
+      ],
+      "bounty": 60,
+      "rank": "ordinary",
+      "rating": 731,
+      "items": 4
+    },
+    {
+      "name": "The Good Wall",
+      "health": 2020,
+      "strength": 51,
+      "regen": 3,
+      "mind_resist": 44,
+      "curse_resist": 44,
+      "physical_resist": 40,
+      "magic_resist": 36,
+      "gear": [
+        [
+          "Archmage's Primer",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Kingsbane",
+          "weapon",
+          2,
+          0,
+          0
+        ],
+        [
+          "Kingsblood Ink",
+          "weapon",
+          0,
+          2,
+          0
+        ],
+        [
+          "Windup Key",
+          "weapon",
+          4,
+          1,
+          0
+        ],
+        [
+          "Void Alignment",
+          "weapon",
+          3,
+          2,
+          0
+        ],
+        [
+          "Voidwritten Ink",
+          "weapon",
+          0,
+          4,
+          0
+        ],
+        [
+          "Aegis Crown",
+          "helmet",
+          0,
+          0,
+          0
+        ],
+        [
+          "Mirrored Visor",
+          "helmet",
+          3,
+          0,
+          0
+        ],
+        [
+          "Warded Plating",
+          "helmet",
+          3,
+          2,
+          0
+        ],
+        [
+          "Crown of the Deep",
+          "helmet",
+          0,
+          3,
+          0
+        ],
+        [
+          "Anvil Frame",
+          "helmet",
+          2,
+          4,
+          0
+        ],
+        [
+          "The Eyeless Stare",
+          "helmet",
+          0,
+          5,
+          0
+        ],
+        [
+          "Ribbed Base",
+          "chest",
+          0,
+          0,
+          0
+        ],
+        [
+          "Warlord's Pauldron",
+          "chest",
+          3,
+          0,
+          0
+        ],
+        [
+          "Seedbed Layer",
+          "chest",
+          0,
+          2,
+          0
+        ],
+        [
+          "Mending Layer",
+          "chest",
+          3,
+          1,
+          0
+        ],
+        [
+          "Deep Roots Base",
+          "chest",
+          0,
+          3,
+          0
+        ],
+        [
+          "Hide Base",
+          "chest",
+          3,
+          3,
+          0
+        ],
+        [
+          "Boiled Leather",
+          "greaves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Cadence Mold",
+          "greaves",
+          3,
+          0,
+          0
+        ]
+      ],
+      "bounty": 71,
+      "rank": "ordinary",
+      "rating": 856,
+      "items": 7
+    },
+    {
+      "name": "Trig Sentinel",
+      "health": 2440,
+      "strength": 62,
+      "regen": 4,
+      "mind_resist": 53,
+      "curse_resist": 53,
+      "physical_resist": 48,
+      "magic_resist": 43,
+      "gear": [
+        [
+          "Reliquary Orb",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Lamplighter's Cage",
+          "helmet",
+          0,
+          0,
+          0
+        ],
+        [
+          "Scarred Plating",
+          "helmet",
+          3,
+          0,
+          0
+        ],
+        [
+          "Four Hundred and Second Step",
+          "helmet",
+          3,
+          1,
+          0
+        ],
+        [
+          "Countingstair Plating",
+          "helmet",
+          5,
+          0,
+          0
+        ],
+        [
+          "Listening Frame",
+          "helmet",
+          3,
+          2,
+          0
+        ],
+        [
+          "Braced Plating",
+          "helmet",
+          0,
+          3,
+          0
+        ],
+        [
+          "Tithe Collector",
+          "helmet",
+          4,
+          4,
+          0
+        ],
+        [
+          "Antechamber Crown",
+          "helmet",
+          0,
+          5,
+          0
+        ],
+        [
+          "Layered Plating",
+          "helmet",
+          3,
+          5,
+          0
+        ],
+        [
+          "Mage's Circlet",
+          "helmet",
+          2,
+          6,
+          0
+        ],
+        [
+          "Deadweight Plating",
+          "helmet",
+          5,
+          5,
+          0
+        ],
+        [
+          "Archon's Crest",
+          "helmet",
+          0,
+          6,
+          0
+        ],
+        [
+          "Bulwark Material",
+          "gloves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Twinning Mold",
+          "gloves",
+          3,
+          0,
+          0
+        ],
+        [
+          "Siphon Ring",
+          "gloves",
+          5,
+          0,
+          0
+        ],
+        [
+          "Storm Signet",
+          "gloves",
+          4,
+          1,
+          0
+        ],
+        [
+          "Sevenleague Boots",
+          "greaves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Sapling Mold",
+          "greaves",
+          2,
+          0,
+          0
+        ],
+        [
+          "Overflow Plate",
+          "greaves",
+          3,
+          0,
+          0
+        ]
+      ],
+      "bounty": 80,
+      "rank": "ordinary",
+      "rating": 970,
+      "items": 6
+    },
+    {
+      "name": "Cairn Chorus",
+      "health": 2670,
+      "strength": 68,
+      "regen": 4,
+      "mind_resist": 58,
+      "curse_resist": 58,
+      "physical_resist": 52,
+      "magic_resist": 46,
+      "gear": [
+        [
+          "Godsteel Haft",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Sunderer",
+          "weapon",
+          1,
+          0,
+          0
+        ],
+        [
+          "Worldsplitter",
+          "weapon",
+          3,
+          0,
+          0
+        ],
+        [
+          "Corded Grip",
+          "weapon",
+          3,
+          1,
+          0
+        ],
+        [
+          "Blade of Helms",
+          "weapon",
+          4,
+          2,
+          0
+        ],
+        [
+          "Windup Key",
+          "weapon",
+          1,
+          3,
+          0
+        ],
+        [
+          "Bulwark Bead",
+          "weapon",
+          5,
+          1,
+          0
+        ],
+        [
+          "Fury Sigil",
+          "weapon",
+          1,
+          4,
+          0
+        ],
+        [
+          "Iron Fang",
+          "weapon",
+          2,
+          4,
+          0
+        ],
+        [
+          "Cursed Handle",
+          "weapon",
+          4,
+          4,
+          0
+        ],
+        [
+          "Bulwark Bead",
+          "weapon",
+          3,
+          4,
+          0
+        ],
+        [
+          "Warden's Haft",
+          "weapon",
+          5,
+          4,
+          0
+        ],
+        [
+          "Twinned Grip",
+          "weapon",
+          1,
+          5,
+          0
+        ],
+        [
+          "Bileglass Vial",
+          "weapon",
+          0,
+          7,
+          0
+        ],
+        [
+          "Bloodstone Bead",
+          "weapon",
+          2,
+          7,
+          0
+        ],
+        [
+          "Heartwood Base",
+          "chest",
+          0,
+          0,
+          0
+        ],
+        [
+          "Lightweave",
+          "chest",
+          3,
+          0,
+          0
+        ],
+        [
+          "Wrathbreaker",
+          "chest",
+          3,
+          1,
+          0
+        ],
+        [
+          "Rimeguard Base",
+          "chest",
+          0,
+          2,
+          0
+        ],
+        [
+          "Aegis Weave",
+          "chest",
+          3,
+          3,
+          0
+        ],
+        [
+          "Warlord's Pauldron",
+          "chest",
+          0,
+          4,
+          0
+        ],
+        [
+          "Ribbed Base",
+          "chest",
+          2,
+          5,
+          0
+        ],
+        [
+          "Seedbed Layer",
+          "chest",
+          0,
+          7,
+          0
+        ],
+        [
+          "Mending Layer",
+          "chest",
+          0,
+          5,
+          0
+        ],
+        [
+          "Thornmail Layer",
+          "chest",
+          3,
+          7,
+          0
+        ],
+        [
+          "Felt Layer",
+          "chest",
+          4,
+          2,
+          0
+        ],
+        [
+          "Anchor Material",
+          "gloves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Twinning Mold",
+          "gloves",
+          2,
+          0,
+          0
+        ],
+        [
+          "Siphon Ring",
+          "gloves",
+          4,
+          0,
+          0
+        ],
+        [
+          "Storm Signet",
+          "gloves",
+          3,
+          1,
+          0
+        ],
+        [
+          "Sevenleague Boots",
+          "greaves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Sump Sole",
+          "greaves",
+          2,
+          0,
+          0
+        ],
+        [
+          "Overflow Plate",
+          "greaves",
+          4,
+          0,
+          0
+        ]
+      ],
+      "bounty": 95,
+      "rank": "mini",
+      "rating": 1141,
+      "items": 9
+    },
+    {
+      "name": "Curd Sentinel",
+      "health": 2320,
+      "strength": 59,
+      "regen": 4,
+      "mind_resist": 50,
+      "curse_resist": 50,
+      "physical_resist": 45,
+      "magic_resist": 40,
+      "gear": [
+        [
+          "Corded Grip",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Blade of Helms",
+          "weapon",
+          1,
+          0,
+          0
+        ],
+        [
+          "Windup Key",
+          "weapon",
+          3,
+          0,
+          0
+        ],
+        [
+          "Bulwark Bead",
+          "weapon",
+          5,
+          0,
+          0
+        ],
+        [
+          "Witchglass Shard",
+          "weapon",
+          3,
+          1,
+          0
+        ],
+        [
+          "Anvil Frame",
+          "helmet",
+          0,
+          0,
+          0
+        ],
+        [
+          "Mirrored Visor",
+          "helmet",
+          3,
+          0,
+          0
+        ],
+        [
+          "Warded Plating",
+          "helmet",
+          0,
+          2,
+          0
+        ],
+        [
+          "Crown of the Deep",
+          "helmet",
+          2,
+          2,
+          0
+        ],
+        [
+          "Sightless Crown",
+          "helmet",
+          0,
+          4,
+          0
+        ],
+        [
+          "Braced Plating",
+          "helmet",
+          4,
+          3,
+          0
+        ],
+        [
+          "Tithe Collector",
+          "helmet",
+          3,
+          5,
+          0
+        ],
+        [
+          "Bastion Base",
+          "chest",
+          0,
+          0,
+          0
+        ],
+        [
+          "Seedbed Layer",
+          "chest",
+          3,
+          0,
+          0
+        ],
+        [
+          "Mending Layer",
+          "chest",
+          3,
+          1,
+          0
+        ],
+        [
+          "Deep Roots Base",
+          "chest",
+          0,
+          2,
+          0
+        ],
+        [
+          "Thornmail Layer",
+          "chest",
+          3,
+          3,
+          0
+        ],
+        [
+          "Ironbark Layer",
+          "chest",
+          0,
+          4,
+          0
+        ],
+        [
+          "Quilted Base",
+          "chest",
+          2,
+          4,
+          0
+        ],
+        [
+          "Aether Layer",
+          "chest",
+          4,
+          4,
+          0
+        ],
+        [
+          "Bulwark Layer",
+          "chest",
+          0,
+          6,
+          0
+        ],
+        [
+          "Starlit Mantle",
+          "chest",
+          2,
+          6,
+          0
+        ],
+        [
+          "Felt Layer",
+          "chest",
+          4,
+          1,
+          0
+        ],
+        [
+          "Rag Layer",
+          "chest",
+          4,
+          7,
+          0
+        ],
+        [
+          "Leather Material",
+          "gloves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Coven Mold",
+          "gloves",
+          2,
+          0,
+          0
+        ],
+        [
+          "Seal of the Deep",
+          "gloves",
+          4,
+          0,
+          0
+        ],
+        [
+          "Blightfinger",
+          "gloves",
+          3,
+          1,
+          0
+        ]
+      ],
+      "bounty": 74,
+      "rank": "ordinary",
+      "rating": 892,
+      "items": 7
+    },
+    {
+      "name": "The Ground Floor",
+      "health": 3590,
+      "strength": 91,
+      "regen": 6,
+      "mind_resist": 75,
+      "curse_resist": 75,
+      "physical_resist": 70,
+      "magic_resist": 63,
+      "gear": [
+        [
+          "Reliquary Orb",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Lamplighter's Cage",
+          "helmet",
+          0,
+          0,
+          0
+        ],
+        [
+          "Scarred Plating",
+          "helmet",
+          3,
+          0,
+          0
+        ],
+        [
+          "Four Hundred and Second Step",
+          "helmet",
+          3,
+          1,
+          0
+        ],
+        [
+          "Countingstair Plating",
+          "helmet",
+          5,
+          0,
+          0
+        ],
+        [
+          "Listening Frame",
+          "helmet",
+          3,
+          2,
+          0
+        ],
+        [
+          "Braced Plating",
+          "helmet",
+          0,
+          3,
+          0
+        ],
+        [
+          "Tithe Collector",
+          "helmet",
+          4,
+          4,
+          0
+        ],
+        [
+          "Antechamber Crown",
+          "helmet",
+          0,
+          5,
+          0
+        ],
+        [
+          "Layered Plating",
+          "helmet",
+          3,
+          5,
+          0
+        ],
+        [
+          "Mage's Circlet",
+          "helmet",
+          2,
+          6,
+          0
+        ],
+        [
+          "Deadweight Plating",
+          "helmet",
+          5,
+          5,
+          0
+        ],
+        [
+          "Archon's Crest",
+          "helmet",
+          0,
+          6,
+          0
+        ],
+        [
+          "Adamant Carapace",
+          "chest",
+          0,
+          0,
+          0
+        ],
+        [
+          "Wickstub",
+          "chest",
+          4,
+          0,
+          0
+        ],
+        [
+          "Oathplate",
+          "chest",
+          4,
+          1,
+          0
+        ],
+        [
+          "Wrathbreaker",
+          "chest",
+          1,
+          2,
+          0
+        ],
+        [
+          "Heartwood Base",
+          "chest",
+          2,
+          3,
+          0
+        ],
+        [
+          "Aegis Weave",
+          "chest",
+          0,
+          5,
+          0
+        ],
+        [
+          "Warlord's Pauldron",
+          "chest",
+          3,
+          5,
+          0
+        ],
+        [
+          "Seedbed Layer",
+          "chest",
+          0,
+          7,
+          0
+        ],
+        [
+          "Wellspring Base",
+          "chest",
+          3,
+          7,
+          0
+        ],
+        [
+          "Felt Layer",
+          "chest",
+          0,
+          4,
+          0
+        ],
+        [
+          "Bulwark Material",
+          "gloves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Twinning Mold",
+          "gloves",
+          3,
+          0,
+          0
+        ],
+        [
+          "Siphon Ring",
+          "gloves",
+          5,
+          0,
+          0
+        ],
+        [
+          "Storm Signet",
+          "gloves",
+          4,
+          1,
+          0
+        ],
+        [
+          "Sevenleague Boots",
+          "greaves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Ridge Runner",
+          "greaves",
+          2,
+          0,
+          0
+        ],
+        [
+          "Overflow Plate",
+          "greaves",
+          2,
+          1,
+          0
+        ]
+      ],
+      "bounty": 125,
+      "rank": "boss",
+      "rating": 1507,
+      "items": 9
     }
   ]
 }

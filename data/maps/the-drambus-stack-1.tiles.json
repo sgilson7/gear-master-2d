@@ -37,7 +37,8 @@
       "enemies": [
         "Rimefather",
         "The Last Gearwright",
-        "Hollowmarch"
+        "The Ground Floor",
+        "Verdigris"
       ]
     }
   ],
@@ -53,7 +54,8 @@
       "creature": "Gallowglass",
       "drops": [
         "Bearhide",
-        "Map Shard"
+        "Map Shard",
+        "Curd Weight"
       ],
       "prose": [
         "The last of it does not come down. It goes, which is a different thing, and what is left is a ring of rind eleven inches high and a great deal of daylight where two hundred and ten feet of the Drambus Stack was.",

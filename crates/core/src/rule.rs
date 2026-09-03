@@ -100,6 +100,24 @@ pub enum Rule {
     /// compass-atlas-golem would be two lists to keep in step. [`Rule::check`]
     /// refuses one the recipes have not got.
     Survey { kind: Name },
+    /// Assembled and whole, it takes you back to your last town.
+    ///
+    /// **The block's one piece of new travel, and it is priced in a tin.** The
+    /// walk home is what makes a restorative worth drinking and a town worth
+    /// reaching, so a teleport that cost nothing would re-price both — the fare
+    /// is one restorative, consumed on departure, and with nothing in the bag
+    /// the set refuses and says so.
+    ///
+    /// **Not a combat rule and not a step rule.** It is the first rule in the
+    /// game that is a *gesture*: the player asks for it, on the standing panel,
+    /// and `character::go_home` answers. That is why it carries no number —
+    /// there is nothing to tune but the fare, and the fare is a tin.
+    ///
+    /// It may fire from inside the Drambus Stack (`PLAN-M11.md` §8 row 9: the
+    /// tower is five entries by design and the kick already moves you) and not
+    /// from under the lake — a dungeon you can post yourself out of is not
+    /// under a lake.
+    Homeward,
 }
 
 /// The three instruments, by name, in the order their recipes are written.
@@ -148,6 +166,7 @@ impl Rule {
                 .contains(&kind.as_ref())
                 .then_some(())
                 .ok_or_else(|| format!("there is no instrument called {kind:?}")),
+            Rule::Homeward => Ok(()),
             // A creature nothing in the game is called is a set bonus that can
             // never fire, which is the granted-nothing failure wearing a
             // creature's name.
@@ -198,6 +217,9 @@ impl Rule {
             ),
             Rule::Wade => "walk onto water".to_string(),
             Rule::Survey { kind } => format!("survey a map with 1 {kind}"),
+            Rule::Homeward => {
+                "go back to your last town from anywhere, for 1 restorative".to_string()
+            }
         }
     }
 
@@ -258,6 +280,14 @@ impl Rule {
                      differently through it — see what the reach says when you get there."
                 ),
                 "The weapon grid holds gear or an instrument and never both.".into(),
+            ],
+            Rule::Homeward => vec![
+                "Asked for on the standing panel, and answered wherever you are \
+                 standing except under the lake."
+                    .into(),
+                "One restorative, spent on departure. With nothing in the bag it \
+                 refuses, because the fare is the whole of what makes it a decision."
+                    .into(),
             ],
         }
     }

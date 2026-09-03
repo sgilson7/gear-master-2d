@@ -813,6 +813,15 @@ def main():
                     # every second fight and it never gets four streets from
                     # the pit — which is how a walk never reaches the far
                     # corner an errand is pointing at.
+                    # **Ask the gear first.** M11.9's one piece of travel is
+                    # a button on the standing panel, and a walk that never
+                    # pressed it would be a transcript that never exercised it.
+                    # It refuses in voice when it cannot, which costs one press.
+                    if page.is_visible("#homeward") and (c["supplies"] or []):
+                        page.click("#homeward")
+                        page.wait_for_timeout(120)
+                        say(f"  the long way back: {last_said(page)}")
+                        continue
                     here_town = next((p for p in world["places"]
                                       if p["kind"] == "town"), None)
                     want, why = (here_town or town)["at"], "home"

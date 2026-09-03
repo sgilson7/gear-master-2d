@@ -557,3 +557,65 @@ goes underground.
   replace. The reach is content the walk cannot reach, which means the browser
   gate is the only thing standing between it and rotting. Same shape as M10.3's
   ench finding, and the same answer: the button is not an optimiser.
+
+---
+
+## M11.9 — the bestiary *(the second seam)*
+
+### A bench that had to be taught that rating is not difficulty
+
+**The change.** `crates/lab` and `make dress` / `make read`. Eight new creatures
+on the new maps' pools. Six sets of three — eighteen components, the block's
+second and last fingerprint move. `Rule::Homeward`, which is the one piece of
+new travel and is priced in a tin.
+
+**Follows from.**
+
+- **`is_core` had a third reader.** `recipe_parts` names a recipe off it, the
+  item splitter splits on it, and now the bench seeds a grid with it. All three
+  wanted the same thing and one of them (the splitter) wanted something
+  narrower, which is why `Shard` is not one — M11.5's entry has the rest.
+- **`PieceDef::drops` being a list paid off twice.** The Curd Mantle is three
+  certainties off three tower floors, on top of what those floors already paid.
+- **`SETS` went from three to nine and `every_set_is_one_creatures_and_one_grids`
+  had to widen.** Its rule was *one creature owns the whole of a set, or it is a
+  shopping list*; the Curd Mantle comes off three bosses. **One stack of floors
+  counts as one owner**, because a floor is one sitting, so a set off a floor's
+  *pool* would be unfarmable and a set off its bosses is the tower paying at the
+  top, the middle and the bottom.
+- **Five of six rules are old ones tuned to a new instance**, which is the
+  block's standing rule and the reason six sets cost no combat code.
+- **Two fixtures had to be rebaselined**: `gear_at.txt` (a ladder that grew) and
+  `enemies.json`. Both are ratchets and both said what they would write.
+
+**Watch.**
+
+- **The bench will spend health to hit a number, and health is not difficulty.**
+  Its first eight creatures were dressed at flat strength and resists, so every
+  point of rating past the gear came out of the body — and it produced a
+  thousand-rated creature that **lost to an Oak Handle and an Iron Blade.**
+  `the_floors_cost_more_than_the_things_at_the_end_of_them` caught it. The bench
+  scales the whole body with the target now, off the ladder's own ratios
+  (a seventeenth, a twenty-second, a twentieth), and caps what it will spend on
+  meat at 2.3 health a point — past which it says *give it more grids, not more
+  meat* rather than quietly inflating.
+- **And the second attempt made a wall.** Re-dressed at 1,507, The Ground Floor
+  beat the best board the game hands out, and
+  `every_region_has_a_fight_you_can_win_and_every_boss_can_be_beaten` refused it
+  as a boss within one run. It stands in floor one's *pool* instead, where being
+  a fight you sometimes lose is exactly what a rarest member is for.
+- **So the tower keeps its borrowed bosses, and that is a divergence.**
+  `PLAN-M11.md` §M11.9 asks for distinct bosses on floors that shipped on
+  borrowed frames. M11.7 measured every one of those frames against the board
+  the game hands out and retuned the whole block around the result; re-dressing
+  them threw that measurement away and produced a wall on the first try. A new
+  face on a *pool* costs nothing that has to be re-measured against
+  reachability. **Six sets, not seven**, for the same shape of reason: three
+  sets on tower floors would have to come off floor *pools*, and a floor is one
+  sitting.
+- **`Rule::Homeward` is the first rule that is a gesture.** Not a fight input,
+  not a step, not a lens: the player asks and `Game::go_home` answers. Watch what
+  entry 6 said to watch — whether tins get hoarded as fare rather than drunk as
+  medicine, and whether the walk home stops happening. **The knob is the tin
+  count, not the rule**, and it pays the *cheapest* tin it is carrying so that
+  the fare comes out of small change.

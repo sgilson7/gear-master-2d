@@ -66,5 +66,16 @@
 
   "Rimefather":          { "family": "rime",      "main": "A9C6D6", "dark": "5D8095", "accent": "FFFFFF" },
 
-  "Francis":             { "family": "francis",   "main": "2B2436", "dark": "171223", "accent": "E8D24A" }
+  "Francis":             { "family": "francis",   "main": "2B2436", "dark": "171223", "accent": "E8D24A" },
+
+  "_m11_9": "M11.9's eight, and the new maps stop borrowing. Two for the Kettleworks field, two for the Stack's shadow, two for the Wextreen Reach and two standing on tower floors. Families are reused on purpose \u2014 thirteen silhouettes and a palette each is what stops fifty creatures being fifty drawings \u2014 and no two of the eight share a colourway.",
+
+  "Kettle Wight":        { "family": "wisp",      "main": "8FB8C4", "dark": "48707C", "accent": "E8F0EE" },
+  "Curd Wraith":         { "family": "wisp",      "main": "E8D98A", "dark": "9A8B3C", "accent": "FFF6D0" },
+  "Hoop Hound":          { "family": "hound",     "main": "9A7A4E", "dark": "5E4A2C", "accent": "D8C088" },
+  "The Good Wall":       { "family": "sentinel",  "main": "7C7168", "dark": "4A423C", "accent": "C4B49A" },
+  "Trig Sentinel":       { "family": "sentinel",  "main": "5D6E7C", "dark": "36424C", "accent": "C0AE72" },
+  "Curd Sentinel":       { "family": "sentinel",  "main": "C8B45E", "dark": "7E7032", "accent": "F4E9B0" },
+  "Cairn Chorus":        { "family": "bone",      "main": "CFCABA", "dark": "888372", "accent": "7EA6C8" },
+  "The Ground Floor":    { "family": "idol",      "main": "6A5F52", "dark": "3C352C", "accent": "D0B85A" }
 }

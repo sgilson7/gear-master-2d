@@ -408,6 +408,10 @@ pub fn position() -> String {
                 "danger": scouting.then(|| w.region_at(x, y).map(|r| r.danger)).flatten(),
                 "chance": scouting.then(|| w.encounter_per_mille(x, y)),
                 "town": g.world.last_town,
+                // **Whether the gear knows the way home**, so the page can put
+                // the button up. Core's answer: the page never asks what rules
+                // a character has, it asks what it may offer.
+                "homeward": g.character.rules().contains(&gm2d_core::rule::Rule::Homeward),
                 "walked": g.world.count("tiles-walked"),
                 "fights": g.world.count("encounters"),
             })
@@ -784,6 +788,25 @@ pub fn answer(id: &str, n: usize) -> String {
         apply(g, &c.outcome, &mut receipt);
         g.world.answered.push(id.to_string());
         serde_json::json!({ "receipt": receipt }).to_string()
+    })
+}
+
+/// Ask the gear to take you home.
+///
+/// **The whole answer is core's.** Whether you may, what it costs, where you
+/// land and what it says when it refuses are all rules, and a shim that decided
+/// any of them would be a second rulebook. This moves a string across the
+/// boundary and nothing else.
+#[wasm_bindgen]
+pub fn go_home() -> String {
+    with_mut(|g| match g.go_home(DIFFICULTY) {
+        Ok(h) => serde_json::json!({
+            "town": h.town,
+            "fare": h.fare,
+            "mended": h.mended,
+        })
+        .to_string(),
+        Err(why) => serde_json::json!({ "error": why }).to_string(),
     })
 }
 

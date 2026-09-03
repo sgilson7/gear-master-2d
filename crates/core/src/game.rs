@@ -114,6 +114,93 @@ impl Game {
         self.character.fatigue = 0;
         took
     }
+
+    /// Ask the gear to take you home, and pay it a tin.
+    ///
+    /// **The block's one piece of new travel, and it is a rule.** Here rather
+    /// than in the shim because every clause of it is a rule: whether you may,
+    /// what it costs, where you land, and what it says when it refuses. A shim
+    /// that decided any of those would be a second rulebook.
+    ///
+    /// Four refusals, and each names the thing that is in the way (`TONE.md`
+    /// rule 12):
+    ///
+    /// - you are not wearing it;
+    /// - you have not been to a town yet, so there is nowhere to go back to;
+    /// - you are under the lake, which `PLAN-M11.md` §8 row 9 says no (*a
+    ///   dungeon you can post yourself out of is not under a lake*), while the
+    ///   Drambus Stack says yes — it is five entries by design and the kick
+    ///   already moves you;
+    /// - you have no tin, and the fare is the whole of what makes it a
+    ///   decision.
+    ///
+    /// The tin goes **on departure**, which is the same bargain the Chonga
+    /// Swing makes: the thing that is spent is spent whether or not you like
+    /// where you end up.
+    pub fn go_home(&mut self, difficulty: crate::combat::Difficulty) -> Result<Homeward, String> {
+        if !self.character.rules().contains(&crate::rule::Rule::Homeward) {
+            return Err("nothing you are wearing knows the way home".into());
+        }
+        let town = self.world.last_town.clone();
+        if town.is_empty() {
+            return Err("you have not been to a town yet, so there is nowhere to go back to"
+                .into());
+        }
+        let here = crate::data::map_now(&self.world.map_id(), difficulty, &self.world);
+        if here.no_homeward {
+            return Err(
+                "not from down here. Whatever it is doing, it is doing it upwards, and                  there are two hundred and six steps of rock in the way"
+                    .into(),
+            );
+        }
+        // The cheapest tin you are carrying, because a player who is spending a
+        // fare pays it out of small change — and because choosing which tin to
+        // burn is a decision nobody wants to make twice a session.
+        let supplies = crate::data::supplies();
+        let mut carried: Vec<(String, i32)> = self
+            .character
+            .supplies
+            .iter()
+            .filter(|(_, n)| *n > 0)
+            .filter_map(|(id, _)| supplies.get(id).map(|d| (id.clone(), d.price)))
+            .collect();
+        carried.sort_by(|a, b| a.1.cmp(&b.1).then(a.0.cmp(&b.0)));
+        let Some((fare, _)) = carried.first().cloned() else {
+            return Err("the gear knows the way home and it does not know it sober.                         One restorative, and you have not got one."
+                .into());
+        };
+        let name = supplies.get(&fare).map(|d| d.name.clone()).unwrap_or(fare.clone());
+        self.character.take_supply(&fare, 1);
+
+        // Where the town is, across every map — the same walk a defeat takes.
+        let mut moved = None;
+        for (id, _) in crate::data::MAPS {
+            let w = crate::data::map_now(id, difficulty, &self.world);
+            if let Some(p) = w.places.iter().find(|p| p.id == town) {
+                self.world.remember();
+                self.world.map = w.id.clone();
+                self.world.at = p.at;
+                moved = Some(w.id.clone());
+                break;
+            }
+        }
+        if moved.is_none() {
+            return Err("the town you came from is not on any map this build has".into());
+        }
+        let mended = self.arrive_in_town(&town);
+        Ok(Homeward { town, fare: name, mended })
+    }
+}
+
+/// What the way home cost and what it gave back.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Homeward {
+    /// Where you are now, by place id.
+    pub town: String,
+    /// The restorative it drank, by its themed name.
+    pub fare: String,
+    /// How much tiredness arriving took off, as a percentage.
+    pub mended: i32,
 }
 
 impl Default for Game {

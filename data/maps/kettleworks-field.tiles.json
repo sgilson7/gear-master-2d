@@ -51,7 +51,9 @@
       ],
       "enemies": [
         "The Curator",
+        "Kettle Wight",
         "Pale Twin",
+        "Hoop Hound",
         "Ruin Hound"
       ]
     },
@@ -69,7 +71,9 @@
       "enemies": [
         "Ember Wisp",
         "Slag Warden",
+        "Curd Wraith",
         "Bone Cantor",
+        "The Good Wall",
         "Crowned Hollow"
       ]
     }

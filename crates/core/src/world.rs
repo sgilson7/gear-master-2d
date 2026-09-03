@@ -119,7 +119,9 @@ impl Allowances {
                 // A map rule, and this is a step rule. What an instrument does
                 // is decided when a surveyable map is *loaded*, not when a foot
                 // goes down on it.
-                | Rule::Survey { .. } => {}
+                | Rule::Survey { .. }
+                // A gesture, not a step. Nothing about walking reads it.
+                | Rule::Homeward => {}
             }
         }
         out
@@ -418,6 +420,18 @@ pub struct TilesData {
     pub rows: Vec<String>,
     pub regions: Vec<RegionDef>,
     pub places: Vec<PlaceDef>,
+    /// The gear cannot take you home from here.
+    ///
+    /// **One map says so and it is the one under a lake** (`PLAN-M11.md` §8 row
+    /// 9): a dungeon you can post yourself out of is not under a lake. The
+    /// Drambus Stack's floors deliberately do *not* say it — the tower is five
+    /// entries by design and the kick already moves you.
+    ///
+    /// A field on the map rather than a list in `game.rs`, for the reason every
+    /// other refusal is content: which places you may leave is a thing about
+    /// the places.
+    #[serde(default)]
+    pub no_homeward: bool,
     /// Terrain that turns into other terrain once something has happened.
     ///
     /// **The first thing on a map that is not fixed.** The grid is content and
@@ -478,6 +492,8 @@ pub struct World {
     pub outside: Option<String>,
     /// What empties, and when. See [`TilesData::drains`].
     pub drains: Vec<Drain>,
+    /// The gear cannot take you home from here. See [`TilesData::no_homeward`].
+    pub no_homeward: bool,
     /// The instrument this map was read through, if it was read through one.
     ///
     /// **Never in a map file**, which is the architectural half of M11.6: a
@@ -622,6 +638,7 @@ impl World {
             places: tl.places,
             outside: tl.outside.clone(),
             drains: tl.drains.clone(),
+            no_homeward: tl.no_homeward,
             survey: crate::survey::SurveyMod::none(),
         };
 

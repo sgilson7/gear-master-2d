@@ -7246,6 +7246,1430 @@ LADDER[49] Francis INSANE Weapon 0,0 r1
     Zealot's Haft
 LADDER[49] Francis INSANE Weapon 3,0 r0
     Bonesaw
+LADDER[50] Kettle Wight EASY Weapon 0,0 r0
+    Reliquary Orb
+LADDER[50] Kettle Wight EASY Helmet 0,0 r0
+    Stonewall Frame
+LADDER[50] Kettle Wight EASY Helmet 3,0 r0
+    Scarred Plating
+LADDER[50] Kettle Wight EASY Helmet 3,1 r0
+    Four Hundred and Second Step
+LADDER[50] Kettle Wight EASY Helmet 5,0 r0
+    Countingstair Plating
+LADDER[50] Kettle Wight EASY Chest 0,0 r0
+    Foreman's Harness
+LADDER[50] Kettle Wight EASY Chest 2,0 r0
+    Wickstub
+LADDER[50] Kettle Wight EASY Chest 3,0 r0
+    Oathplate
+LADDER[50] Kettle Wight EASY Chest 2,2 r0
+    Adamant Carapace
+LADDER[50] Kettle Wight EASY Chest 0,3 r0
+    Wrathbreaker
+LADDER[50] Kettle Wight EASY Chest 0,5 r0
+    Lightweave
+LADDER[50] Kettle Wight MEDIUM Weapon 0,0 r0
+    Worldeye Orb
+LADDER[50] Kettle Wight MEDIUM Helmet 0,0 r0
+    Overseer's Circlet
+LADDER[50] Kettle Wight MEDIUM Helmet 3,0 r0
+    Lonely Plating
+LADDER[50] Kettle Wight MEDIUM Helmet 3,1 r0
+    Four Hundred and Second Step
+LADDER[50] Kettle Wight MEDIUM Helmet 5,0 r0
+    Countingstair Plating
+LADDER[50] Kettle Wight MEDIUM Chest 0,0 r0
+    Foreman's Harness
+LADDER[50] Kettle Wight MEDIUM Chest 2,0 r0
+    Wickstub
+LADDER[50] Kettle Wight MEDIUM Chest 3,0 r0
+    The Growing Weight
+LADDER[50] Kettle Wight MEDIUM Chest 2,2 r0
+    Adamant Carapace
+LADDER[50] Kettle Wight MEDIUM Chest 0,3 r0
+    Ungloved Layer
+LADDER[50] Kettle Wight MEDIUM Chest 0,5 r0
+    Split Weave
+LADDER[50] Kettle Wight HARD Weapon 0,0 r0
+    Grovemind Orb
+LADDER[50] Kettle Wight HARD Helmet 0,0 r0
+    Overseer's Circlet
+LADDER[50] Kettle Wight HARD Helmet 3,0 r0
+    Lonely Plating
+LADDER[50] Kettle Wight HARD Helmet 3,1 r0
+    Four Hundred and Second Step
+LADDER[50] Kettle Wight HARD Helmet 5,0 r0
+    Countingstair Plating
+LADDER[50] Kettle Wight HARD Chest 0,0 r0
+    Foreman's Harness
+LADDER[50] Kettle Wight HARD Chest 2,0 r0
+    Wickstub
+LADDER[50] Kettle Wight HARD Chest 3,0 r0
+    The Growing Weight
+LADDER[50] Kettle Wight HARD Chest 2,2 r0
+    Adamant Carapace
+LADDER[50] Kettle Wight HARD Chest 0,3 r0
+    Ungloved Layer
+LADDER[50] Kettle Wight HARD Chest 0,5 r0
+    Thornmail Layer
+LADDER[50] Kettle Wight INSANE Weapon 0,0 r0
+    Grovemind Orb
+LADDER[50] Kettle Wight INSANE Helmet 0,0 r0
+    Overseer's Circlet
+LADDER[50] Kettle Wight INSANE Helmet 3,0 r0
+    Lonely Plating
+LADDER[50] Kettle Wight INSANE Helmet 3,1 r0
+    Four Hundred and Second Step
+LADDER[50] Kettle Wight INSANE Helmet 5,0 r0
+    Countingstair Plating
+LADDER[50] Kettle Wight INSANE Chest 0,0 r0
+    Foreman's Harness
+LADDER[50] Kettle Wight INSANE Chest 2,0 r0
+    Wickstub
+LADDER[50] Kettle Wight INSANE Chest 3,0 r0
+    The Growing Weight
+LADDER[50] Kettle Wight INSANE Chest 2,2 r0
+    Adamant Carapace
+LADDER[50] Kettle Wight INSANE Chest 0,3 r0
+    Ungloved Layer
+LADDER[50] Kettle Wight INSANE Chest 0,5 r0
+    Wildfire Layer
+LADDER[51] Hoop Hound EASY Weapon 0,0 r0
+    Godsteel Haft
+LADDER[51] Hoop Hound EASY Weapon 1,0 r0
+    Sunderer
+LADDER[51] Hoop Hound EASY Weapon 3,0 r0
+    Worldsplitter
+LADDER[51] Hoop Hound EASY Weapon 3,1 r0
+    Corded Grip
+LADDER[51] Hoop Hound EASY Weapon 4,2 r0
+    Blade of Helms
+LADDER[51] Hoop Hound EASY Weapon 1,3 r0
+    Windup Key
+LADDER[51] Hoop Hound EASY Weapon 5,1 r0
+    Bulwark Bead
+LADDER[51] Hoop Hound EASY Weapon 1,4 r0
+    Fury Sigil
+LADDER[51] Hoop Hound EASY Weapon 2,4 r0
+    Iron Fang
+LADDER[51] Hoop Hound EASY Weapon 4,4 r0
+    Cursed Handle
+LADDER[51] Hoop Hound EASY Helmet 0,0 r0
+    Aegis Crown
+LADDER[51] Hoop Hound EASY Helmet 3,0 r0
+    Scarred Plating
+LADDER[51] Hoop Hound EASY Helmet 3,1 r0
+    Four Hundred and Second Step
+LADDER[51] Hoop Hound EASY Helmet 5,0 r0
+    Countingstair Plating
+LADDER[51] Hoop Hound EASY Helmet 3,2 r0
+    Listening Frame
+LADDER[51] Hoop Hound EASY Helmet 0,3 r0
+    Braced Plating
+LADDER[51] Hoop Hound EASY Helmet 4,4 r0
+    Tithe Collector
+LADDER[51] Hoop Hound EASY Helmet 0,5 r0
+    Antechamber Crown
+LADDER[51] Hoop Hound EASY Helmet 3,5 r0
+    Layered Plating
+LADDER[51] Hoop Hound EASY Helmet 2,6 r0
+    Mage's Circlet
+LADDER[51] Hoop Hound EASY Gloves 0,0 r0
+    Anchor Material
+LADDER[51] Hoop Hound EASY Gloves 2,0 r0
+    Throttling Mold
+LADDER[51] Hoop Hound EASY Gloves 4,0 r0
+    Storm Signet
+LADDER[51] Hoop Hound EASY Gloves 4,1 r0
+    Ring of Embers
+LADDER[51] Hoop Hound MEDIUM Weapon 0,0 r0
+    Godsteel Haft
+LADDER[51] Hoop Hound MEDIUM Weapon 1,0 r0
+    Sunderer
+LADDER[51] Hoop Hound MEDIUM Weapon 3,0 r0
+    Worldsplitter
+LADDER[51] Hoop Hound MEDIUM Weapon 3,1 r0
+    Ambusher's Grip
+LADDER[51] Hoop Hound MEDIUM Weapon 4,2 r0
+    Blade of Helms
+LADDER[51] Hoop Hound MEDIUM Weapon 1,3 r0
+    Manaflay
+LADDER[51] Hoop Hound MEDIUM Weapon 5,1 r0
+    Bulwark Bead
+LADDER[51] Hoop Hound MEDIUM Weapon 1,4 r0
+    Grudge Bead
+LADDER[51] Hoop Hound MEDIUM Weapon 2,4 r0
+    Adamant Fang
+LADDER[51] Hoop Hound MEDIUM Weapon 4,4 r0
+    Zealot's Haft
+LADDER[51] Hoop Hound MEDIUM Helmet 0,0 r0
+    Aegis Crown
+LADDER[51] Hoop Hound MEDIUM Helmet 3,0 r0
+    Lonely Plating
+LADDER[51] Hoop Hound MEDIUM Helmet 3,1 r0
+    Four Hundred and Second Step
+LADDER[51] Hoop Hound MEDIUM Helmet 5,0 r0
+    Countingstair Plating
+LADDER[51] Hoop Hound MEDIUM Helmet 3,2 r0
+    Listening Frame
+LADDER[51] Hoop Hound MEDIUM Helmet 0,3 r0
+    Bulwark Plating
+LADDER[51] Hoop Hound MEDIUM Helmet 4,4 r0
+    Doubter's Crest
+LADDER[51] Hoop Hound MEDIUM Helmet 0,5 r0
+    Antechamber Crown
+LADDER[51] Hoop Hound MEDIUM Helmet 3,5 r0
+    Scarred Plating
+LADDER[51] Hoop Hound MEDIUM Helmet 2,6 r0
+    Chapel Frame
+LADDER[51] Hoop Hound MEDIUM Gloves 0,0 r0
+    Warmed Material
+LADDER[51] Hoop Hound MEDIUM Gloves 2,0 r0
+    Throttling Mold
+LADDER[51] Hoop Hound MEDIUM Gloves 4,0 r0
+    Seal of the Deep
+LADDER[51] Hoop Hound MEDIUM Gloves 4,1 r0
+    Opening Grudge
+LADDER[51] Hoop Hound HARD Weapon 0,0 r0
+    Godsteel Haft
+LADDER[51] Hoop Hound HARD Weapon 1,0 r0
+    Sunderer
+LADDER[51] Hoop Hound HARD Weapon 3,0 r0
+    Worldsplitter
+LADDER[51] Hoop Hound HARD Weapon 3,1 r0
+    Ironbound Haft
+LADDER[51] Hoop Hound HARD Weapon 4,2 r0
+    Blade of Helms
+LADDER[51] Hoop Hound HARD Weapon 1,3 r0
+    Balance Weight
+LADDER[51] Hoop Hound HARD Weapon 5,1 r0
+    Leech Bead
+LADDER[51] Hoop Hound HARD Weapon 1,4 r0
+    Grudge Bead
+LADDER[51] Hoop Hound HARD Weapon 2,4 r0
+    Gluttonous Fang
+LADDER[51] Hoop Hound HARD Weapon 4,4 r0
+    Zealot's Haft
+LADDER[51] Hoop Hound HARD Helmet 0,0 r0
+    Aegis Crown
+LADDER[51] Hoop Hound HARD Helmet 3,0 r0
+    Lonely Plating
+LADDER[51] Hoop Hound HARD Helmet 3,1 r0
+    Four Hundred and Second Step
+LADDER[51] Hoop Hound HARD Helmet 5,0 r0
+    Countingstair Plating
+LADDER[51] Hoop Hound HARD Helmet 3,2 r0
+    Listening Frame
+LADDER[51] Hoop Hound HARD Helmet 0,3 r0
+    Consecrated Plating
+LADDER[51] Hoop Hound HARD Helmet 4,4 r0
+    Heartwood Crest
+LADDER[51] Hoop Hound HARD Helmet 0,5 r0
+    Antechamber Crown
+LADDER[51] Hoop Hound HARD Helmet 3,5 r0
+    Lonely Plating
+LADDER[51] Hoop Hound HARD Helmet 2,6 r0
+    Chapel Frame
+LADDER[51] Hoop Hound HARD Gloves 0,0 r0
+    Hide Material
+LADDER[51] Hoop Hound HARD Gloves 2,0 r0
+    Warding Mold
+LADDER[51] Hoop Hound HARD Gloves 4,0 r0
+    Seal of Power
+LADDER[51] Hoop Hound HARD Gloves 4,1 r0
+    Hermit's Band
+LADDER[51] Hoop Hound INSANE Weapon 0,0 r0
+    Godsteel Haft
+LADDER[51] Hoop Hound INSANE Weapon 1,0 r0
+    Sunderer
+LADDER[51] Hoop Hound INSANE Weapon 3,0 r0
+    Worldsplitter
+LADDER[51] Hoop Hound INSANE Weapon 3,1 r0
+    Cursed Handle
+LADDER[51] Hoop Hound INSANE Weapon 4,2 r0
+    Blade of Helms
+LADDER[51] Hoop Hound INSANE Weapon 1,3 r0
+    Clockwork Key
+LADDER[51] Hoop Hound INSANE Weapon 5,1 r0
+    Quickening Charm
+LADDER[51] Hoop Hound INSANE Weapon 1,4 r0
+    Grudge Bead
+LADDER[51] Hoop Hound INSANE Weapon 2,4 r0
+    Gluttonous Fang
+LADDER[51] Hoop Hound INSANE Weapon 4,4 r0
+    Zealot's Haft
+LADDER[51] Hoop Hound INSANE Helmet 0,0 r0
+    Aegis Crown
+LADDER[51] Hoop Hound INSANE Helmet 3,0 r0
+    Lonely Plating
+LADDER[51] Hoop Hound INSANE Helmet 3,1 r0
+    Four Hundred and Second Step
+LADDER[51] Hoop Hound INSANE Helmet 5,0 r0
+    Countingstair Plating
+LADDER[51] Hoop Hound INSANE Helmet 3,2 r0
+    Listening Frame
+LADDER[51] Hoop Hound INSANE Helmet 0,3 r0
+    Consecrated Plating
+LADDER[51] Hoop Hound INSANE Helmet 4,4 r0
+    Reckoning Crest
+LADDER[51] Hoop Hound INSANE Helmet 0,5 r0
+    Antechamber Crown
+LADDER[51] Hoop Hound INSANE Helmet 3,5 r0
+    Lonely Plating
+LADDER[51] Hoop Hound INSANE Helmet 2,6 r0
+    Chapel Frame
+LADDER[51] Hoop Hound INSANE Gloves 0,0 r0
+    Ironhide Wrap
+LADDER[51] Hoop Hound INSANE Gloves 2,0 r0
+    Rending Mold
+LADDER[51] Hoop Hound INSANE Gloves 4,0 r0
+    Mirrorplate Ring
+LADDER[51] Hoop Hound INSANE Gloves 4,1 r0
+    Unshod Signet
+LADDER[52] Curd Wraith EASY Weapon 0,0 r0
+    Reliquary Orb
+LADDER[52] Curd Wraith EASY Chest 0,0 r0
+    Adamant Carapace
+LADDER[52] Curd Wraith EASY Chest 4,0 r0
+    Wrathbreaker
+LADDER[52] Curd Wraith EASY Chest 0,3 r0
+    Lightweave
+LADDER[52] Curd Wraith EASY Chest 4,2 r0
+    Wrathbreaker
+LADDER[52] Curd Wraith EASY Chest 0,4 r0
+    Heartwood Base
+LADDER[52] Curd Wraith EASY Chest 3,4 r0
+    Rimeguard Base
+LADDER[52] Curd Wraith EASY Chest 0,6 r0
+    Aegis Weave
+LADDER[52] Curd Wraith EASY Chest 3,6 r0
+    Warlord's Pauldron
+LADDER[52] Curd Wraith EASY Greaves 0,0 r0
+    Sevenleague Boots
+LADDER[52] Curd Wraith EASY Greaves 2,0 r0
+    Stormstep Mold
+LADDER[52] Curd Wraith EASY Greaves 2,1 r0
+    Overflow Plate
+LADDER[52] Curd Wraith MEDIUM Weapon 0,0 r0
+    Worldeye Orb
+LADDER[52] Curd Wraith MEDIUM Chest 0,0 r0
+    Adamant Carapace
+LADDER[52] Curd Wraith MEDIUM Chest 4,0 r0
+    Ungloved Layer
+LADDER[52] Curd Wraith MEDIUM Chest 0,3 r0
+    Split Weave
+LADDER[52] Curd Wraith MEDIUM Chest 4,2 r0
+    Wrathbreaker
+LADDER[52] Curd Wraith MEDIUM Chest 0,4 r0
+    Adamant Base
+LADDER[52] Curd Wraith MEDIUM Chest 3,4 r0
+    Deep Roots Base
+LADDER[52] Curd Wraith MEDIUM Chest 0,6 r0
+    Godsheet Layer
+LADDER[52] Curd Wraith MEDIUM Chest 3,6 r0
+    Warlord's Pauldron
+LADDER[52] Curd Wraith MEDIUM Greaves 0,0 r0
+    Sevenleague Boots
+LADDER[52] Curd Wraith MEDIUM Greaves 2,0 r0
+    Deeprooted Sole
+LADDER[52] Curd Wraith MEDIUM Greaves 2,1 r0
+    Overflow Plate
+LADDER[52] Curd Wraith HARD Weapon 0,0 r0
+    Grovemind Orb
+LADDER[52] Curd Wraith HARD Chest 0,0 r0
+    Adamant Carapace
+LADDER[52] Curd Wraith HARD Chest 4,0 r0
+    Ungloved Layer
+LADDER[52] Curd Wraith HARD Chest 0,3 r0
+    Thornmail Layer
+LADDER[52] Curd Wraith HARD Chest 4,2 r0
+    Ungloved Layer
+LADDER[52] Curd Wraith HARD Chest 0,4 r0
+    Adamant Base
+LADDER[52] Curd Wraith HARD Chest 3,4 r0
+    Heartwood Base
+LADDER[52] Curd Wraith HARD Chest 0,6 r0
+    Godsheet Layer
+LADDER[52] Curd Wraith HARD Chest 3,6 r0
+    Warlord's Pauldron
+LADDER[52] Curd Wraith HARD Greaves 0,0 r0
+    Sevenleague Boots
+LADDER[52] Curd Wraith HARD Greaves 2,0 r0
+    Gravewalker Mold
+LADDER[52] Curd Wraith HARD Greaves 2,1 r0
+    Overflow Plate
+LADDER[52] Curd Wraith INSANE Weapon 0,0 r0
+    Grovemind Orb
+LADDER[52] Curd Wraith INSANE Chest 0,0 r0
+    Adamant Carapace
+LADDER[52] Curd Wraith INSANE Chest 4,0 r0
+    Ungloved Layer
+LADDER[52] Curd Wraith INSANE Chest 0,3 r0
+    Wildfire Layer
+LADDER[52] Curd Wraith INSANE Chest 4,2 r0
+    Ungloved Layer
+LADDER[52] Curd Wraith INSANE Chest 0,4 r0
+    Adamant Base
+LADDER[52] Curd Wraith INSANE Chest 3,4 r0
+    Adamant Base
+LADDER[52] Curd Wraith INSANE Chest 0,6 r0
+    Godsheet Layer
+LADDER[52] Curd Wraith INSANE Chest 3,6 r0
+    Warlord's Pauldron
+LADDER[52] Curd Wraith INSANE Greaves 0,0 r0
+    Sevenleague Boots
+LADDER[52] Curd Wraith INSANE Greaves 2,0 r0
+    Echo Sole
+LADDER[52] Curd Wraith INSANE Greaves 2,1 r0
+    Overflow Plate
+LADDER[53] The Good Wall EASY Weapon 0,0 r0
+    Archmage's Primer
+LADDER[53] The Good Wall EASY Weapon 2,0 r0
+    Kingsbane
+LADDER[53] The Good Wall EASY Weapon 0,2 r0
+    Kingsblood Ink
+LADDER[53] The Good Wall EASY Weapon 4,1 r0
+    Windup Key
+LADDER[53] The Good Wall EASY Weapon 3,2 r0
+    Void Alignment
+LADDER[53] The Good Wall EASY Weapon 0,4 r0
+    Voidwritten Ink
+LADDER[53] The Good Wall EASY Helmet 0,0 r0
+    Aegis Crown
+LADDER[53] The Good Wall EASY Helmet 3,0 r0
+    Mirrored Visor
+LADDER[53] The Good Wall EASY Helmet 3,2 r0
+    Warded Plating
+LADDER[53] The Good Wall EASY Helmet 0,3 r0
+    Crown of the Deep
+LADDER[53] The Good Wall EASY Helmet 2,4 r0
+    Anvil Frame
+LADDER[53] The Good Wall EASY Helmet 0,5 r0
+    The Eyeless Stare
+LADDER[53] The Good Wall EASY Chest 0,0 r0
+    Ribbed Base
+LADDER[53] The Good Wall EASY Chest 3,0 r0
+    Warlord's Pauldron
+LADDER[53] The Good Wall EASY Chest 0,2 r0
+    Seedbed Layer
+LADDER[53] The Good Wall EASY Chest 3,1 r0
+    Mending Layer
+LADDER[53] The Good Wall EASY Chest 0,3 r0
+    Deep Roots Base
+LADDER[53] The Good Wall EASY Chest 3,3 r0
+    Hide Base
+LADDER[53] The Good Wall EASY Greaves 0,0 r0
+    Boiled Leather
+LADDER[53] The Good Wall EASY Greaves 3,0 r0
+    Cadence Mold
+LADDER[53] The Good Wall MEDIUM Weapon 0,0 r0
+    Archmage's Primer
+LADDER[53] The Good Wall MEDIUM Weapon 2,0 r0
+    Kingsbane
+LADDER[53] The Good Wall MEDIUM Weapon 0,2 r0
+    Kingsblood Ink
+LADDER[53] The Good Wall MEDIUM Weapon 4,1 r0
+    Manaflay
+LADDER[53] The Good Wall MEDIUM Weapon 3,2 r0
+    Void Alignment
+LADDER[53] The Good Wall MEDIUM Weapon 0,4 r0
+    Voidwritten Ink
+LADDER[53] The Good Wall MEDIUM Helmet 0,0 r0
+    Aegis Crown
+LADDER[53] The Good Wall MEDIUM Helmet 3,0 r0
+    Godsteel Plating
+LADDER[53] The Good Wall MEDIUM Helmet 3,2 r0
+    Braced Plating
+LADDER[53] The Good Wall MEDIUM Helmet 0,3 r0
+    Crown of the Deep
+LADDER[53] The Good Wall MEDIUM Helmet 2,4 r0
+    Stonewall Frame
+LADDER[53] The Good Wall MEDIUM Helmet 0,5 r0
+    The Eyeless Stare
+LADDER[53] The Good Wall MEDIUM Chest 0,0 r0
+    Bastion Base
+LADDER[53] The Good Wall MEDIUM Chest 3,0 r0
+    Warlord's Pauldron
+LADDER[53] The Good Wall MEDIUM Chest 0,2 r0
+    Seedbed Layer
+LADDER[53] The Good Wall MEDIUM Chest 3,1 r0
+    Becalming Layer
+LADDER[53] The Good Wall MEDIUM Chest 0,3 r0
+    Heartwood Base
+LADDER[53] The Good Wall MEDIUM Chest 3,3 r0
+    Leyline Cuirass
+LADDER[53] The Good Wall MEDIUM Greaves 0,0 r0
+    Worldweave Material
+LADDER[53] The Good Wall MEDIUM Greaves 3,0 r0
+    Cadence Mold
+LADDER[53] The Good Wall HARD Weapon 0,0 r0
+    Archmage's Primer
+LADDER[53] The Good Wall HARD Weapon 2,0 r0
+    Cometfall
+LADDER[53] The Good Wall HARD Weapon 0,2 r0
+    Kingsblood Ink
+LADDER[53] The Good Wall HARD Weapon 4,1 r0
+    Balance Weight
+LADDER[53] The Good Wall HARD Weapon 3,2 r0
+    Void Alignment
+LADDER[53] The Good Wall HARD Weapon 0,4 r0
+    Voidwritten Ink
+LADDER[53] The Good Wall HARD Helmet 0,0 r0
+    Aegis Crown
+LADDER[53] The Good Wall HARD Helmet 3,0 r0
+    Godsteel Plating
+LADDER[53] The Good Wall HARD Helmet 3,2 r0
+    Bulwark Plating
+LADDER[53] The Good Wall HARD Helmet 0,3 r0
+    Crown of the Deep
+LADDER[53] The Good Wall HARD Helmet 2,4 r0
+    Overseer's Circlet
+LADDER[53] The Good Wall HARD Helmet 0,5 r0
+    The Eyeless Stare
+LADDER[53] The Good Wall HARD Chest 0,0 r0
+    Rimeguard Base
+LADDER[53] The Good Wall HARD Chest 3,0 r0
+    Warlord's Pauldron
+LADDER[53] The Good Wall HARD Chest 0,2 r0
+    Blight Layer
+LADDER[53] The Good Wall HARD Chest 3,1 r0
+    Becalming Layer
+LADDER[53] The Good Wall HARD Chest 0,3 r0
+    Adamant Base
+LADDER[53] The Good Wall HARD Chest 3,3 r0
+    Ribbed Base
+LADDER[53] The Good Wall HARD Greaves 0,0 r0
+    Worldweave Material
+LADDER[53] The Good Wall HARD Greaves 3,0 r0
+    Tarpit Sole
+LADDER[53] The Good Wall INSANE Weapon 0,0 r0
+    Archmage's Primer
+LADDER[53] The Good Wall INSANE Weapon 2,0 r0
+    Starfall
+LADDER[53] The Good Wall INSANE Weapon 0,2 r0
+    Kingsblood Ink
+LADDER[53] The Good Wall INSANE Weapon 4,1 r0
+    Clockwork Key
+LADDER[53] The Good Wall INSANE Weapon 3,2 r0
+    Void Alignment
+LADDER[53] The Good Wall INSANE Weapon 0,4 r0
+    Voidwritten Ink
+LADDER[53] The Good Wall INSANE Helmet 0,0 r0
+    Aegis Crown
+LADDER[53] The Good Wall INSANE Helmet 3,0 r0
+    Godsteel Plating
+LADDER[53] The Good Wall INSANE Helmet 3,2 r0
+    Consecrated Plating
+LADDER[53] The Good Wall INSANE Helmet 0,3 r0
+    Crown of the Deep
+LADDER[53] The Good Wall INSANE Helmet 2,4 r0
+    Overseer's Circlet
+LADDER[53] The Good Wall INSANE Helmet 0,5 r0
+    The Eyeless Stare
+LADDER[53] The Good Wall INSANE Chest 0,0 r0
+    Deep Roots Base
+LADDER[53] The Good Wall INSANE Chest 3,0 r0
+    Warlord's Pauldron
+LADDER[53] The Good Wall INSANE Chest 0,2 r0
+    Lightweave
+LADDER[53] The Good Wall INSANE Chest 3,1 r0
+    Becalming Layer
+LADDER[53] The Good Wall INSANE Chest 0,3 r0
+    Adamant Base
+LADDER[53] The Good Wall INSANE Chest 3,3 r0
+    Bastion Base
+LADDER[53] The Good Wall INSANE Greaves 0,0 r0
+    Worldweave Material
+LADDER[53] The Good Wall INSANE Greaves 3,0 r0
+    Hoarfrost Mold
+LADDER[54] Trig Sentinel EASY Weapon 0,0 r0
+    Reliquary Orb
+LADDER[54] Trig Sentinel EASY Helmet 0,0 r0
+    Lamplighter's Cage
+LADDER[54] Trig Sentinel EASY Helmet 3,0 r0
+    Scarred Plating
+LADDER[54] Trig Sentinel EASY Helmet 3,1 r0
+    Four Hundred and Second Step
+LADDER[54] Trig Sentinel EASY Helmet 5,0 r0
+    Countingstair Plating
+LADDER[54] Trig Sentinel EASY Helmet 3,2 r0
+    Listening Frame
+LADDER[54] Trig Sentinel EASY Helmet 0,3 r0
+    Braced Plating
+LADDER[54] Trig Sentinel EASY Helmet 4,4 r0
+    Tithe Collector
+LADDER[54] Trig Sentinel EASY Helmet 0,5 r0
+    Antechamber Crown
+LADDER[54] Trig Sentinel EASY Helmet 3,5 r0
+    Layered Plating
+LADDER[54] Trig Sentinel EASY Helmet 2,6 r0
+    Mage's Circlet
+LADDER[54] Trig Sentinel EASY Helmet 5,5 r0
+    Deadweight Plating
+LADDER[54] Trig Sentinel EASY Helmet 0,6 r0
+    Archon's Crest
+LADDER[54] Trig Sentinel EASY Gloves 0,0 r0
+    Bulwark Material
+LADDER[54] Trig Sentinel EASY Gloves 3,0 r0
+    Twinning Mold
+LADDER[54] Trig Sentinel EASY Gloves 5,0 r0
+    Siphon Ring
+LADDER[54] Trig Sentinel EASY Gloves 4,1 r0
+    Storm Signet
+LADDER[54] Trig Sentinel EASY Greaves 0,0 r0
+    Sevenleague Boots
+LADDER[54] Trig Sentinel EASY Greaves 2,0 r0
+    Sapling Mold
+LADDER[54] Trig Sentinel EASY Greaves 3,0 r0
+    Overflow Plate
+LADDER[54] Trig Sentinel MEDIUM Weapon 0,0 r0
+    Worldeye Orb
+LADDER[54] Trig Sentinel MEDIUM Helmet 0,0 r0
+    Lamplighter's Cage
+LADDER[54] Trig Sentinel MEDIUM Helmet 3,0 r0
+    Lonely Plating
+LADDER[54] Trig Sentinel MEDIUM Helmet 3,1 r0
+    Four Hundred and Second Step
+LADDER[54] Trig Sentinel MEDIUM Helmet 5,0 r0
+    Countingstair Plating
+LADDER[54] Trig Sentinel MEDIUM Helmet 3,2 r0
+    Listening Frame
+LADDER[54] Trig Sentinel MEDIUM Helmet 0,3 r0
+    Bulwark Plating
+LADDER[54] Trig Sentinel MEDIUM Helmet 4,4 r0
+    Doubter's Crest
+LADDER[54] Trig Sentinel MEDIUM Helmet 0,5 r0
+    Antechamber Crown
+LADDER[54] Trig Sentinel MEDIUM Helmet 3,5 r0
+    Scarred Plating
+LADDER[54] Trig Sentinel MEDIUM Helmet 2,6 r0
+    Chapel Frame
+LADDER[54] Trig Sentinel MEDIUM Helmet 5,5 r0
+    Deadweight Plating
+LADDER[54] Trig Sentinel MEDIUM Helmet 0,6 r0
+    Warlord's Crest
+LADDER[54] Trig Sentinel MEDIUM Gloves 0,0 r0
+    Titan's Grip
+LADDER[54] Trig Sentinel MEDIUM Gloves 3,0 r0
+    Twinning Mold
+LADDER[54] Trig Sentinel MEDIUM Gloves 5,0 r0
+    Grasping Ring
+LADDER[54] Trig Sentinel MEDIUM Gloves 4,1 r0
+    Seal of the Deep
+LADDER[54] Trig Sentinel MEDIUM Greaves 0,0 r0
+    Sevenleague Boots
+LADDER[54] Trig Sentinel MEDIUM Greaves 2,0 r0
+    Widow's Sole
+LADDER[54] Trig Sentinel MEDIUM Greaves 3,0 r0
+    Overflow Plate
+LADDER[54] Trig Sentinel HARD Weapon 0,0 r0
+    Grovemind Orb
+LADDER[54] Trig Sentinel HARD Helmet 0,0 r0
+    Lamplighter's Cage
+LADDER[54] Trig Sentinel HARD Helmet 3,0 r0
+    Lonely Plating
+LADDER[54] Trig Sentinel HARD Helmet 3,1 r0
+    Four Hundred and Second Step
+LADDER[54] Trig Sentinel HARD Helmet 5,0 r0
+    Countingstair Plating
+LADDER[54] Trig Sentinel HARD Helmet 3,2 r0
+    Listening Frame
+LADDER[54] Trig Sentinel HARD Helmet 0,3 r0
+    Consecrated Plating
+LADDER[54] Trig Sentinel HARD Helmet 4,4 r0
+    Heartwood Crest
+LADDER[54] Trig Sentinel HARD Helmet 0,5 r0
+    Antechamber Crown
+LADDER[54] Trig Sentinel HARD Helmet 3,5 r0
+    Lonely Plating
+LADDER[54] Trig Sentinel HARD Helmet 2,6 r0
+    Chapel Frame
+LADDER[54] Trig Sentinel HARD Helmet 5,5 r0
+    Mirrorbright Plating
+LADDER[54] Trig Sentinel HARD Helmet 0,6 r0
+    Warlord's Crest
+LADDER[54] Trig Sentinel HARD Gloves 0,0 r0
+    Titan's Grip
+LADDER[54] Trig Sentinel HARD Gloves 3,0 r0
+    Hexer's Tally
+LADDER[54] Trig Sentinel HARD Gloves 5,0 r0
+    Ring of Tides
+LADDER[54] Trig Sentinel HARD Gloves 4,1 r0
+    Seal of Power
+LADDER[54] Trig Sentinel HARD Greaves 0,0 r0
+    Sevenleague Boots
+LADDER[54] Trig Sentinel HARD Greaves 2,0 r0
+    Widow's Sole
+LADDER[54] Trig Sentinel HARD Greaves 3,0 r0
+    Overflow Plate
+LADDER[54] Trig Sentinel INSANE Weapon 0,0 r0
+    Grovemind Orb
+LADDER[54] Trig Sentinel INSANE Helmet 0,0 r0
+    Lamplighter's Cage
+LADDER[54] Trig Sentinel INSANE Helmet 3,0 r0
+    Lonely Plating
+LADDER[54] Trig Sentinel INSANE Helmet 3,1 r0
+    Four Hundred and Second Step
+LADDER[54] Trig Sentinel INSANE Helmet 5,0 r0
+    Countingstair Plating
+LADDER[54] Trig Sentinel INSANE Helmet 3,2 r0
+    Listening Frame
+LADDER[54] Trig Sentinel INSANE Helmet 0,3 r0
+    Consecrated Plating
+LADDER[54] Trig Sentinel INSANE Helmet 4,4 r0
+    Reckoning Crest
+LADDER[54] Trig Sentinel INSANE Helmet 0,5 r0
+    Antechamber Crown
+LADDER[54] Trig Sentinel INSANE Helmet 3,5 r0
+    Lonely Plating
+LADDER[54] Trig Sentinel INSANE Helmet 2,6 r0
+    Chapel Frame
+LADDER[54] Trig Sentinel INSANE Helmet 5,5 r0
+    Mirrorbright Plating
+LADDER[54] Trig Sentinel INSANE Helmet 0,6 r0
+    Warlord's Crest
+LADDER[54] Trig Sentinel INSANE Gloves 0,0 r0
+    Titan's Grip
+LADDER[54] Trig Sentinel INSANE Gloves 3,0 r0
+    Channeling Mold
+LADDER[54] Trig Sentinel INSANE Gloves 5,0 r0
+    Tin Band
+LADDER[54] Trig Sentinel INSANE Gloves 4,1 r0
+    Mirrorplate Ring
+LADDER[54] Trig Sentinel INSANE Greaves 0,0 r0
+    Sevenleague Boots
+LADDER[54] Trig Sentinel INSANE Greaves 2,0 r0
+    Widow's Sole
+LADDER[54] Trig Sentinel INSANE Greaves 3,0 r0
+    Overflow Plate
+LADDER[55] Cairn Chorus EASY Weapon 0,0 r0
+    Godsteel Haft
+LADDER[55] Cairn Chorus EASY Weapon 1,0 r0
+    Sunderer
+LADDER[55] Cairn Chorus EASY Weapon 3,0 r0
+    Worldsplitter
+LADDER[55] Cairn Chorus EASY Weapon 3,1 r0
+    Corded Grip
+LADDER[55] Cairn Chorus EASY Weapon 4,2 r0
+    Blade of Helms
+LADDER[55] Cairn Chorus EASY Weapon 1,3 r0
+    Windup Key
+LADDER[55] Cairn Chorus EASY Weapon 5,1 r0
+    Bulwark Bead
+LADDER[55] Cairn Chorus EASY Weapon 1,4 r0
+    Fury Sigil
+LADDER[55] Cairn Chorus EASY Weapon 2,4 r0
+    Iron Fang
+LADDER[55] Cairn Chorus EASY Weapon 4,4 r0
+    Cursed Handle
+LADDER[55] Cairn Chorus EASY Weapon 3,4 r0
+    Bulwark Bead
+LADDER[55] Cairn Chorus EASY Weapon 5,4 r0
+    Warden's Haft
+LADDER[55] Cairn Chorus EASY Weapon 1,5 r0
+    Twinned Grip
+LADDER[55] Cairn Chorus EASY Weapon 0,7 r0
+    Bileglass Vial
+LADDER[55] Cairn Chorus EASY Weapon 2,7 r0
+    Bloodstone Bead
+LADDER[55] Cairn Chorus EASY Chest 0,0 r0
+    Heartwood Base
+LADDER[55] Cairn Chorus EASY Chest 3,0 r0
+    Lightweave
+LADDER[55] Cairn Chorus EASY Chest 3,1 r0
+    Wrathbreaker
+LADDER[55] Cairn Chorus EASY Chest 0,2 r0
+    Rimeguard Base
+LADDER[55] Cairn Chorus EASY Chest 3,3 r0
+    Aegis Weave
+LADDER[55] Cairn Chorus EASY Chest 0,4 r0
+    Warlord's Pauldron
+LADDER[55] Cairn Chorus EASY Chest 2,5 r0
+    Ribbed Base
+LADDER[55] Cairn Chorus EASY Chest 0,7 r0
+    Seedbed Layer
+LADDER[55] Cairn Chorus EASY Chest 0,5 r0
+    Mending Layer
+LADDER[55] Cairn Chorus EASY Chest 3,7 r0
+    Thornmail Layer
+LADDER[55] Cairn Chorus EASY Chest 4,2 r0
+    Felt Layer
+LADDER[55] Cairn Chorus EASY Gloves 0,0 r0
+    Anchor Material
+LADDER[55] Cairn Chorus EASY Gloves 2,0 r0
+    Twinning Mold
+LADDER[55] Cairn Chorus EASY Gloves 4,0 r0
+    Siphon Ring
+LADDER[55] Cairn Chorus EASY Gloves 3,1 r0
+    Storm Signet
+LADDER[55] Cairn Chorus EASY Greaves 0,0 r0
+    Sevenleague Boots
+LADDER[55] Cairn Chorus EASY Greaves 2,0 r0
+    Sump Sole
+LADDER[55] Cairn Chorus EASY Greaves 4,0 r0
+    Overflow Plate
+LADDER[55] Cairn Chorus MEDIUM Weapon 0,0 r0
+    Godsteel Haft
+LADDER[55] Cairn Chorus MEDIUM Weapon 1,0 r0
+    Sunderer
+LADDER[55] Cairn Chorus MEDIUM Weapon 3,0 r0
+    Worldsplitter
+LADDER[55] Cairn Chorus MEDIUM Weapon 3,1 r0
+    Ambusher's Grip
+LADDER[55] Cairn Chorus MEDIUM Weapon 4,2 r0
+    Blade of Helms
+LADDER[55] Cairn Chorus MEDIUM Weapon 1,3 r0
+    Manaflay
+LADDER[55] Cairn Chorus MEDIUM Weapon 5,1 r0
+    Bulwark Bead
+LADDER[55] Cairn Chorus MEDIUM Weapon 1,4 r0
+    Grudge Bead
+LADDER[55] Cairn Chorus MEDIUM Weapon 2,4 r0
+    Adamant Fang
+LADDER[55] Cairn Chorus MEDIUM Weapon 4,4 r0
+    Zealot's Haft
+LADDER[55] Cairn Chorus MEDIUM Weapon 3,4 r0
+    Leech Bead
+LADDER[55] Cairn Chorus MEDIUM Weapon 5,4 r0
+    Sunder Haft
+LADDER[55] Cairn Chorus MEDIUM Weapon 1,5 r0
+    Gravebound Haft
+LADDER[55] Cairn Chorus MEDIUM Weapon 0,7 r0
+    Bloodstone Bead
+LADDER[55] Cairn Chorus MEDIUM Weapon 2,7 r0
+    Oathstone Bead
+LADDER[55] Cairn Chorus MEDIUM Chest 0,0 r0
+    Adamant Base
+LADDER[55] Cairn Chorus MEDIUM Chest 3,0 r0
+    Split Weave
+LADDER[55] Cairn Chorus MEDIUM Chest 3,1 r0
+    Wrathbreaker
+LADDER[55] Cairn Chorus MEDIUM Chest 0,2 r0
+    Deep Roots Base
+LADDER[55] Cairn Chorus MEDIUM Chest 3,3 r0
+    Godsheet Layer
+LADDER[55] Cairn Chorus MEDIUM Chest 0,4 r0
+    Warlord's Pauldron
+LADDER[55] Cairn Chorus MEDIUM Chest 2,5 r0
+    Bastion Base
+LADDER[55] Cairn Chorus MEDIUM Chest 0,7 r0
+    Seedbed Layer
+LADDER[55] Cairn Chorus MEDIUM Chest 0,5 r0
+    Becalming Layer
+LADDER[55] Cairn Chorus MEDIUM Chest 3,7 r0
+    Wildfire Layer
+LADDER[55] Cairn Chorus MEDIUM Chest 4,2 r0
+    Mail Layer
+LADDER[55] Cairn Chorus MEDIUM Gloves 0,0 r0
+    Warmed Material
+LADDER[55] Cairn Chorus MEDIUM Gloves 2,0 r0
+    Twinning Mold
+LADDER[55] Cairn Chorus MEDIUM Gloves 4,0 r0
+    Grasping Ring
+LADDER[55] Cairn Chorus MEDIUM Gloves 3,1 r0
+    Seal of the Deep
+LADDER[55] Cairn Chorus MEDIUM Greaves 0,0 r0
+    Sevenleague Boots
+LADDER[55] Cairn Chorus MEDIUM Greaves 2,0 r0
+    Witherroot
+LADDER[55] Cairn Chorus MEDIUM Greaves 4,0 r0
+    Overflow Plate
+LADDER[55] Cairn Chorus HARD Weapon 0,0 r0
+    Godsteel Haft
+LADDER[55] Cairn Chorus HARD Weapon 1,0 r0
+    Sunderer
+LADDER[55] Cairn Chorus HARD Weapon 3,0 r0
+    Worldsplitter
+LADDER[55] Cairn Chorus HARD Weapon 3,1 r0
+    Ironbound Haft
+LADDER[55] Cairn Chorus HARD Weapon 4,2 r0
+    Blade of Helms
+LADDER[55] Cairn Chorus HARD Weapon 1,3 r0
+    Balance Weight
+LADDER[55] Cairn Chorus HARD Weapon 5,1 r0
+    Leech Bead
+LADDER[55] Cairn Chorus HARD Weapon 1,4 r0
+    Grudge Bead
+LADDER[55] Cairn Chorus HARD Weapon 2,4 r0
+    Gluttonous Fang
+LADDER[55] Cairn Chorus HARD Weapon 4,4 r0
+    Zealot's Haft
+LADDER[55] Cairn Chorus HARD Weapon 3,4 r0
+    Quickening Charm
+LADDER[55] Cairn Chorus HARD Weapon 5,4 r0
+    Bloodrage Grip
+LADDER[55] Cairn Chorus HARD Weapon 1,5 r0
+    Gravebound Haft
+LADDER[55] Cairn Chorus HARD Weapon 0,7 r0
+    Oathstone Bead
+LADDER[55] Cairn Chorus HARD Weapon 2,7 r0
+    Oathstone Bead
+LADDER[55] Cairn Chorus HARD Chest 0,0 r0
+    Adamant Base
+LADDER[55] Cairn Chorus HARD Chest 3,0 r0
+    Thornmail Layer
+LADDER[55] Cairn Chorus HARD Chest 3,1 r0
+    Ungloved Layer
+LADDER[55] Cairn Chorus HARD Chest 0,2 r0
+    Heartwood Base
+LADDER[55] Cairn Chorus HARD Chest 3,3 r0
+    Godsheet Layer
+LADDER[55] Cairn Chorus HARD Chest 0,4 r0
+    Warlord's Pauldron
+LADDER[55] Cairn Chorus HARD Chest 2,5 r0
+    Rimeguard Base
+LADDER[55] Cairn Chorus HARD Chest 0,7 r0
+    Blight Layer
+LADDER[55] Cairn Chorus HARD Chest 0,5 r0
+    Becalming Layer
+LADDER[55] Cairn Chorus HARD Chest 3,7 r0
+    Sigil Layer
+LADDER[55] Cairn Chorus HARD Chest 4,2 r0
+    Mail Layer
+LADDER[55] Cairn Chorus HARD Gloves 0,0 r0
+    Hide Material
+LADDER[55] Cairn Chorus HARD Gloves 2,0 r0
+    Hexer's Tally
+LADDER[55] Cairn Chorus HARD Gloves 4,0 r0
+    Ring of Tides
+LADDER[55] Cairn Chorus HARD Gloves 3,1 r0
+    Seal of Power
+LADDER[55] Cairn Chorus HARD Greaves 0,0 r0
+    Sevenleague Boots
+LADDER[55] Cairn Chorus HARD Greaves 2,0 r0
+    Witherroot
+LADDER[55] Cairn Chorus HARD Greaves 4,0 r0
+    Overflow Plate
+LADDER[55] Cairn Chorus INSANE Weapon 0,0 r0
+    Godsteel Haft
+LADDER[55] Cairn Chorus INSANE Weapon 1,0 r0
+    Sunderer
+LADDER[55] Cairn Chorus INSANE Weapon 3,0 r0
+    Worldsplitter
+LADDER[55] Cairn Chorus INSANE Weapon 3,1 r0
+    Cursed Handle
+LADDER[55] Cairn Chorus INSANE Weapon 4,2 r0
+    Blade of Helms
+LADDER[55] Cairn Chorus INSANE Weapon 1,3 r0
+    Clockwork Key
+LADDER[55] Cairn Chorus INSANE Weapon 5,1 r0
+    Quickening Charm
+LADDER[55] Cairn Chorus INSANE Weapon 1,4 r0
+    Grudge Bead
+LADDER[55] Cairn Chorus INSANE Weapon 2,4 r0
+    Gluttonous Fang
+LADDER[55] Cairn Chorus INSANE Weapon 4,4 r0
+    Zealot's Haft
+LADDER[55] Cairn Chorus INSANE Weapon 3,4 r0
+    Loaded Fob
+LADDER[55] Cairn Chorus INSANE Weapon 5,4 r0
+    Bloodrage Grip
+LADDER[55] Cairn Chorus INSANE Weapon 1,5 r0
+    Gravebound Haft
+LADDER[55] Cairn Chorus INSANE Weapon 0,7 r0
+    Oathstone Bead
+LADDER[55] Cairn Chorus INSANE Weapon 2,7 r0
+    Oathstone Bead
+LADDER[55] Cairn Chorus INSANE Chest 0,0 r0
+    Adamant Base
+LADDER[55] Cairn Chorus INSANE Chest 3,0 r0
+    Wildfire Layer
+LADDER[55] Cairn Chorus INSANE Chest 3,1 r0
+    Ungloved Layer
+LADDER[55] Cairn Chorus INSANE Chest 0,2 r0
+    Adamant Base
+LADDER[55] Cairn Chorus INSANE Chest 3,3 r0
+    Godsheet Layer
+LADDER[55] Cairn Chorus INSANE Chest 0,4 r0
+    Warlord's Pauldron
+LADDER[55] Cairn Chorus INSANE Chest 2,5 r0
+    Deep Roots Base
+LADDER[55] Cairn Chorus INSANE Chest 0,7 r0
+    Lightweave
+LADDER[55] Cairn Chorus INSANE Chest 0,5 r0
+    Becalming Layer
+LADDER[55] Cairn Chorus INSANE Chest 3,7 r0
+    Scale Layer
+LADDER[55] Cairn Chorus INSANE Chest 4,2 r0
+    Mail Layer
+LADDER[55] Cairn Chorus INSANE Gloves 0,0 r0
+    Ironhide Wrap
+LADDER[55] Cairn Chorus INSANE Gloves 2,0 r0
+    Channeling Mold
+LADDER[55] Cairn Chorus INSANE Gloves 4,0 r0
+    Tin Band
+LADDER[55] Cairn Chorus INSANE Gloves 3,1 r0
+    Mirrorplate Ring
+LADDER[55] Cairn Chorus INSANE Greaves 0,0 r0
+    Sevenleague Boots
+LADDER[55] Cairn Chorus INSANE Greaves 2,0 r0
+    Witherroot
+LADDER[55] Cairn Chorus INSANE Greaves 4,0 r0
+    Overflow Plate
+LADDER[56] Curd Sentinel EASY Weapon 0,0 r0
+    Corded Grip
+LADDER[56] Curd Sentinel EASY Weapon 1,0 r0
+    Blade of Helms
+LADDER[56] Curd Sentinel EASY Weapon 3,0 r0
+    Windup Key
+LADDER[56] Curd Sentinel EASY Weapon 5,0 r0
+    Bulwark Bead
+LADDER[56] Curd Sentinel EASY Weapon 3,1 r0
+    Witchglass Shard
+LADDER[56] Curd Sentinel EASY Helmet 0,0 r0
+    Anvil Frame
+LADDER[56] Curd Sentinel EASY Helmet 3,0 r0
+    Mirrored Visor
+LADDER[56] Curd Sentinel EASY Helmet 0,2 r0
+    Warded Plating
+LADDER[56] Curd Sentinel EASY Helmet 2,2 r0
+    Crown of the Deep
+LADDER[56] Curd Sentinel EASY Helmet 0,4 r0
+    Sightless Crown
+LADDER[56] Curd Sentinel EASY Helmet 4,3 r0
+    Braced Plating
+LADDER[56] Curd Sentinel EASY Helmet 3,5 r0
+    Tithe Collector
+LADDER[56] Curd Sentinel EASY Chest 0,0 r0
+    Bastion Base
+LADDER[56] Curd Sentinel EASY Chest 3,0 r0
+    Seedbed Layer
+LADDER[56] Curd Sentinel EASY Chest 3,1 r0
+    Mending Layer
+LADDER[56] Curd Sentinel EASY Chest 0,2 r0
+    Deep Roots Base
+LADDER[56] Curd Sentinel EASY Chest 3,3 r0
+    Thornmail Layer
+LADDER[56] Curd Sentinel EASY Chest 0,4 r0
+    Ironbark Layer
+LADDER[56] Curd Sentinel EASY Chest 2,4 r0
+    Quilted Base
+LADDER[56] Curd Sentinel EASY Chest 4,4 r0
+    Aether Layer
+LADDER[56] Curd Sentinel EASY Chest 0,6 r0
+    Bulwark Layer
+LADDER[56] Curd Sentinel EASY Chest 2,6 r0
+    Starlit Mantle
+LADDER[56] Curd Sentinel EASY Chest 4,1 r0
+    Felt Layer
+LADDER[56] Curd Sentinel EASY Chest 4,7 r0
+    Rag Layer
+LADDER[56] Curd Sentinel EASY Gloves 0,0 r0
+    Leather Material
+LADDER[56] Curd Sentinel EASY Gloves 2,0 r0
+    Coven Mold
+LADDER[56] Curd Sentinel EASY Gloves 4,0 r0
+    Seal of the Deep
+LADDER[56] Curd Sentinel EASY Gloves 3,1 r0
+    Blightfinger
+LADDER[56] Curd Sentinel MEDIUM Weapon 0,0 r0
+    Ambusher's Grip
+LADDER[56] Curd Sentinel MEDIUM Weapon 1,0 r0
+    Blade of Helms
+LADDER[56] Curd Sentinel MEDIUM Weapon 3,0 r0
+    Manaflay
+LADDER[56] Curd Sentinel MEDIUM Weapon 5,0 r0
+    Bulwark Bead
+LADDER[56] Curd Sentinel MEDIUM Weapon 3,1 r0
+    Voidglass Shard
+LADDER[56] Curd Sentinel MEDIUM Helmet 0,0 r0
+    Stonewall Frame
+LADDER[56] Curd Sentinel MEDIUM Helmet 3,0 r0
+    Godsteel Plating
+LADDER[56] Curd Sentinel MEDIUM Helmet 0,2 r0
+    Braced Plating
+LADDER[56] Curd Sentinel MEDIUM Helmet 2,2 r0
+    Crown of the Deep
+LADDER[56] Curd Sentinel MEDIUM Helmet 0,4 r0
+    Sightless Crown
+LADDER[56] Curd Sentinel MEDIUM Helmet 4,3 r0
+    Bulwark Plating
+LADDER[56] Curd Sentinel MEDIUM Helmet 3,5 r0
+    Doubter's Crest
+LADDER[56] Curd Sentinel MEDIUM Chest 0,0 r0
+    Rimeguard Base
+LADDER[56] Curd Sentinel MEDIUM Chest 3,0 r0
+    Seedbed Layer
+LADDER[56] Curd Sentinel MEDIUM Chest 3,1 r0
+    Becalming Layer
+LADDER[56] Curd Sentinel MEDIUM Chest 0,2 r0
+    Heartwood Base
+LADDER[56] Curd Sentinel MEDIUM Chest 3,3 r0
+    Wildfire Layer
+LADDER[56] Curd Sentinel MEDIUM Chest 0,4 r0
+    Aether Layer
+LADDER[56] Curd Sentinel MEDIUM Chest 2,4 r0
+    Layered Core
+LADDER[56] Curd Sentinel MEDIUM Chest 4,4 r0
+    Bulwark Layer
+LADDER[56] Curd Sentinel MEDIUM Chest 0,6 r0
+    Oathplate
+LADDER[56] Curd Sentinel MEDIUM Chest 2,6 r0
+    Starlit Mantle
+LADDER[56] Curd Sentinel MEDIUM Chest 4,1 r0
+    Mail Layer
+LADDER[56] Curd Sentinel MEDIUM Chest 4,7 r0
+    Felt Layer
+LADDER[56] Curd Sentinel MEDIUM Gloves 0,0 r0
+    Anchor Material
+LADDER[56] Curd Sentinel MEDIUM Gloves 2,0 r0
+    Bramble Mold
+LADDER[56] Curd Sentinel MEDIUM Gloves 4,0 r0
+    Seal of Power
+LADDER[56] Curd Sentinel MEDIUM Gloves 3,1 r0
+    Deepdraught Ring
+LADDER[56] Curd Sentinel HARD Weapon 0,0 r0
+    Ironbound Haft
+LADDER[56] Curd Sentinel HARD Weapon 1,0 r0
+    Blade of Helms
+LADDER[56] Curd Sentinel HARD Weapon 3,0 r0
+    Balance Weight
+LADDER[56] Curd Sentinel HARD Weapon 5,0 r0
+    Leech Bead
+LADDER[56] Curd Sentinel HARD Weapon 3,1 r0
+    Voidglass Shard
+LADDER[56] Curd Sentinel HARD Helmet 0,0 r0
+    Overseer's Circlet
+LADDER[56] Curd Sentinel HARD Helmet 3,0 r0
+    Godsteel Plating
+LADDER[56] Curd Sentinel HARD Helmet 0,2 r0
+    Bulwark Plating
+LADDER[56] Curd Sentinel HARD Helmet 2,2 r0
+    Crown of the Deep
+LADDER[56] Curd Sentinel HARD Helmet 0,4 r0
+    Sightless Crown
+LADDER[56] Curd Sentinel HARD Helmet 4,3 r0
+    Consecrated Plating
+LADDER[56] Curd Sentinel HARD Helmet 3,5 r0
+    Heartwood Crest
+LADDER[56] Curd Sentinel HARD Chest 0,0 r0
+    Deep Roots Base
+LADDER[56] Curd Sentinel HARD Chest 3,0 r0
+    Blight Layer
+LADDER[56] Curd Sentinel HARD Chest 3,1 r0
+    Becalming Layer
+LADDER[56] Curd Sentinel HARD Chest 0,2 r0
+    Adamant Base
+LADDER[56] Curd Sentinel HARD Chest 3,3 r0
+    Sigil Layer
+LADDER[56] Curd Sentinel HARD Chest 0,4 r0
+    Bulwark Layer
+LADDER[56] Curd Sentinel HARD Chest 2,4 r0
+    Brigandine Base
+LADDER[56] Curd Sentinel HARD Chest 4,4 r0
+    Oathplate
+LADDER[56] Curd Sentinel HARD Chest 0,6 r0
+    The Growing Weight
+LADDER[56] Curd Sentinel HARD Chest 2,6 r0
+    Starlit Mantle
+LADDER[56] Curd Sentinel HARD Chest 4,1 r0
+    Mail Layer
+LADDER[56] Curd Sentinel HARD Chest 4,7 r0
+    Mail Layer
+LADDER[56] Curd Sentinel HARD Gloves 0,0 r0
+    Warmed Material
+LADDER[56] Curd Sentinel HARD Gloves 2,0 r0
+    Gripping Mold
+LADDER[56] Curd Sentinel HARD Gloves 4,0 r0
+    Mirrorplate Ring
+LADDER[56] Curd Sentinel HARD Gloves 3,1 r0
+    Siphon Ring
+LADDER[56] Curd Sentinel INSANE Weapon 0,0 r0
+    Cursed Handle
+LADDER[56] Curd Sentinel INSANE Weapon 1,0 r0
+    Blade of Helms
+LADDER[56] Curd Sentinel INSANE Weapon 3,0 r0
+    Clockwork Key
+LADDER[56] Curd Sentinel INSANE Weapon 5,0 r0
+    Quickening Charm
+LADDER[56] Curd Sentinel INSANE Weapon 3,1 r0
+    Voidglass Shard
+LADDER[56] Curd Sentinel INSANE Helmet 0,0 r0
+    Overseer's Circlet
+LADDER[56] Curd Sentinel INSANE Helmet 3,0 r0
+    Godsteel Plating
+LADDER[56] Curd Sentinel INSANE Helmet 0,2 r0
+    Consecrated Plating
+LADDER[56] Curd Sentinel INSANE Helmet 2,2 r0
+    Crown of the Deep
+LADDER[56] Curd Sentinel INSANE Helmet 0,4 r0
+    Sightless Crown
+LADDER[56] Curd Sentinel INSANE Helmet 4,3 r0
+    Consecrated Plating
+LADDER[56] Curd Sentinel INSANE Helmet 3,5 r0
+    Reckoning Crest
+LADDER[56] Curd Sentinel INSANE Chest 0,0 r0
+    Heartwood Base
+LADDER[56] Curd Sentinel INSANE Chest 3,0 r0
+    Lightweave
+LADDER[56] Curd Sentinel INSANE Chest 3,1 r0
+    Becalming Layer
+LADDER[56] Curd Sentinel INSANE Chest 0,2 r0
+    Adamant Base
+LADDER[56] Curd Sentinel INSANE Chest 3,3 r0
+    Scale Layer
+LADDER[56] Curd Sentinel INSANE Chest 0,4 r0
+    Oathplate
+LADDER[56] Curd Sentinel INSANE Chest 2,4 r0
+    Brigandine Base
+LADDER[56] Curd Sentinel INSANE Chest 4,4 r0
+    The Growing Weight
+LADDER[56] Curd Sentinel INSANE Chest 0,6 r0
+    The Growing Weight
+LADDER[56] Curd Sentinel INSANE Chest 2,6 r0
+    Starlit Mantle
+LADDER[56] Curd Sentinel INSANE Chest 4,1 r0
+    Mail Layer
+LADDER[56] Curd Sentinel INSANE Chest 4,7 r0
+    Mail Layer
+LADDER[56] Curd Sentinel INSANE Gloves 0,0 r0
+    Hide Material
+LADDER[56] Curd Sentinel INSANE Gloves 2,0 r0
+    Ravener's Mold
+LADDER[56] Curd Sentinel INSANE Gloves 4,0 r0
+    Mirrorplate Ring
+LADDER[56] Curd Sentinel INSANE Gloves 3,1 r0
+    Grasping Ring
+LADDER[57] The Ground Floor EASY Weapon 0,0 r0
+    Reliquary Orb
+LADDER[57] The Ground Floor EASY Helmet 0,0 r0
+    Lamplighter's Cage
+LADDER[57] The Ground Floor EASY Helmet 3,0 r0
+    Scarred Plating
+LADDER[57] The Ground Floor EASY Helmet 3,1 r0
+    Four Hundred and Second Step
+LADDER[57] The Ground Floor EASY Helmet 5,0 r0
+    Countingstair Plating
+LADDER[57] The Ground Floor EASY Helmet 3,2 r0
+    Listening Frame
+LADDER[57] The Ground Floor EASY Helmet 0,3 r0
+    Braced Plating
+LADDER[57] The Ground Floor EASY Helmet 4,4 r0
+    Tithe Collector
+LADDER[57] The Ground Floor EASY Helmet 0,5 r0
+    Antechamber Crown
+LADDER[57] The Ground Floor EASY Helmet 3,5 r0
+    Layered Plating
+LADDER[57] The Ground Floor EASY Helmet 2,6 r0
+    Mage's Circlet
+LADDER[57] The Ground Floor EASY Helmet 5,5 r0
+    Deadweight Plating
+LADDER[57] The Ground Floor EASY Helmet 0,6 r0
+    Archon's Crest
+LADDER[57] The Ground Floor EASY Chest 0,0 r0
+    Adamant Carapace
+LADDER[57] The Ground Floor EASY Chest 4,0 r0
+    Wickstub
+LADDER[57] The Ground Floor EASY Chest 4,1 r0
+    Oathplate
+LADDER[57] The Ground Floor EASY Chest 1,2 r0
+    Wrathbreaker
+LADDER[57] The Ground Floor EASY Chest 2,3 r0
+    Heartwood Base
+LADDER[57] The Ground Floor EASY Chest 0,5 r0
+    Aegis Weave
+LADDER[57] The Ground Floor EASY Chest 3,5 r0
+    Warlord's Pauldron
+LADDER[57] The Ground Floor EASY Chest 0,7 r0
+    Seedbed Layer
+LADDER[57] The Ground Floor EASY Chest 3,7 r0
+    Wellspring Base
+LADDER[57] The Ground Floor EASY Chest 0,4 r0
+    Felt Layer
+LADDER[57] The Ground Floor EASY Gloves 0,0 r0
+    Bulwark Material
+LADDER[57] The Ground Floor EASY Gloves 3,0 r0
+    Twinning Mold
+LADDER[57] The Ground Floor EASY Gloves 5,0 r0
+    Siphon Ring
+LADDER[57] The Ground Floor EASY Gloves 4,1 r0
+    Storm Signet
+LADDER[57] The Ground Floor EASY Greaves 0,0 r0
+    Sevenleague Boots
+LADDER[57] The Ground Floor EASY Greaves 2,0 r0
+    Ridge Runner
+LADDER[57] The Ground Floor EASY Greaves 2,1 r0
+    Overflow Plate
+LADDER[57] The Ground Floor MEDIUM Weapon 0,0 r0
+    Worldeye Orb
+LADDER[57] The Ground Floor MEDIUM Helmet 0,0 r0
+    Lamplighter's Cage
+LADDER[57] The Ground Floor MEDIUM Helmet 3,0 r0
+    Lonely Plating
+LADDER[57] The Ground Floor MEDIUM Helmet 3,1 r0
+    Four Hundred and Second Step
+LADDER[57] The Ground Floor MEDIUM Helmet 5,0 r0
+    Countingstair Plating
+LADDER[57] The Ground Floor MEDIUM Helmet 3,2 r0
+    Listening Frame
+LADDER[57] The Ground Floor MEDIUM Helmet 0,3 r0
+    Bulwark Plating
+LADDER[57] The Ground Floor MEDIUM Helmet 4,4 r0
+    Doubter's Crest
+LADDER[57] The Ground Floor MEDIUM Helmet 0,5 r0
+    Antechamber Crown
+LADDER[57] The Ground Floor MEDIUM Helmet 3,5 r0
+    Scarred Plating
+LADDER[57] The Ground Floor MEDIUM Helmet 2,6 r0
+    Chapel Frame
+LADDER[57] The Ground Floor MEDIUM Helmet 5,5 r0
+    Deadweight Plating
+LADDER[57] The Ground Floor MEDIUM Helmet 0,6 r0
+    Warlord's Crest
+LADDER[57] The Ground Floor MEDIUM Chest 0,0 r0
+    Adamant Carapace
+LADDER[57] The Ground Floor MEDIUM Chest 4,0 r0
+    Wickstub
+LADDER[57] The Ground Floor MEDIUM Chest 4,1 r0
+    The Growing Weight
+LADDER[57] The Ground Floor MEDIUM Chest 1,2 r0
+    Ungloved Layer
+LADDER[57] The Ground Floor MEDIUM Chest 2,3 r0
+    Adamant Base
+LADDER[57] The Ground Floor MEDIUM Chest 0,5 r0
+    Godsheet Layer
+LADDER[57] The Ground Floor MEDIUM Chest 3,5 r0
+    Warlord's Pauldron
+LADDER[57] The Ground Floor MEDIUM Chest 0,7 r0
+    Seedbed Layer
+LADDER[57] The Ground Floor MEDIUM Chest 3,7 r0
+    Wellspring Base
+LADDER[57] The Ground Floor MEDIUM Chest 0,4 r0
+    Mail Layer
+LADDER[57] The Ground Floor MEDIUM Gloves 0,0 r0
+    Titan's Grip
+LADDER[57] The Ground Floor MEDIUM Gloves 3,0 r0
+    Twinning Mold
+LADDER[57] The Ground Floor MEDIUM Gloves 5,0 r0
+    Grasping Ring
+LADDER[57] The Ground Floor MEDIUM Gloves 4,1 r0
+    Seal of the Deep
+LADDER[57] The Ground Floor MEDIUM Greaves 0,0 r0
+    Sevenleague Boots
+LADDER[57] The Ground Floor MEDIUM Greaves 2,0 r0
+    Ridge Runner
+LADDER[57] The Ground Floor MEDIUM Greaves 2,1 r0
+    Overflow Plate
+LADDER[57] The Ground Floor HARD Weapon 0,0 r0
+    Grovemind Orb
+LADDER[57] The Ground Floor HARD Helmet 0,0 r0
+    Lamplighter's Cage
+LADDER[57] The Ground Floor HARD Helmet 3,0 r0
+    Lonely Plating
+LADDER[57] The Ground Floor HARD Helmet 3,1 r0
+    Four Hundred and Second Step
+LADDER[57] The Ground Floor HARD Helmet 5,0 r0
+    Countingstair Plating
+LADDER[57] The Ground Floor HARD Helmet 3,2 r0
+    Listening Frame
+LADDER[57] The Ground Floor HARD Helmet 0,3 r0
+    Consecrated Plating
+LADDER[57] The Ground Floor HARD Helmet 4,4 r0
+    Heartwood Crest
+LADDER[57] The Ground Floor HARD Helmet 0,5 r0
+    Antechamber Crown
+LADDER[57] The Ground Floor HARD Helmet 3,5 r0
+    Lonely Plating
+LADDER[57] The Ground Floor HARD Helmet 2,6 r0
+    Chapel Frame
+LADDER[57] The Ground Floor HARD Helmet 5,5 r0
+    Mirrorbright Plating
+LADDER[57] The Ground Floor HARD Helmet 0,6 r0
+    Warlord's Crest
+LADDER[57] The Ground Floor HARD Chest 0,0 r0
+    Adamant Carapace
+LADDER[57] The Ground Floor HARD Chest 4,0 r0
+    Wickstub
+LADDER[57] The Ground Floor HARD Chest 4,1 r0
+    The Growing Weight
+LADDER[57] The Ground Floor HARD Chest 1,2 r0
+    Ungloved Layer
+LADDER[57] The Ground Floor HARD Chest 2,3 r0
+    Adamant Base
+LADDER[57] The Ground Floor HARD Chest 0,5 r0
+    Godsheet Layer
+LADDER[57] The Ground Floor HARD Chest 3,5 r0
+    Warlord's Pauldron
+LADDER[57] The Ground Floor HARD Chest 0,7 r0
+    Blight Layer
+LADDER[57] The Ground Floor HARD Chest 3,7 r0
+    Chapel Base
+LADDER[57] The Ground Floor HARD Chest 0,4 r0
+    Mail Layer
+LADDER[57] The Ground Floor HARD Gloves 0,0 r0
+    Titan's Grip
+LADDER[57] The Ground Floor HARD Gloves 3,0 r0
+    Hexer's Tally
+LADDER[57] The Ground Floor HARD Gloves 5,0 r0
+    Ring of Tides
+LADDER[57] The Ground Floor HARD Gloves 4,1 r0
+    Seal of Power
+LADDER[57] The Ground Floor HARD Greaves 0,0 r0
+    Sevenleague Boots
+LADDER[57] The Ground Floor HARD Greaves 2,0 r0
+    Ridge Runner
+LADDER[57] The Ground Floor HARD Greaves 2,1 r0
+    Overflow Plate
+LADDER[57] The Ground Floor INSANE Weapon 0,0 r0
+    Grovemind Orb
+LADDER[57] The Ground Floor INSANE Helmet 0,0 r0
+    Lamplighter's Cage
+LADDER[57] The Ground Floor INSANE Helmet 3,0 r0
+    Lonely Plating
+LADDER[57] The Ground Floor INSANE Helmet 3,1 r0
+    Four Hundred and Second Step
+LADDER[57] The Ground Floor INSANE Helmet 5,0 r0
+    Countingstair Plating
+LADDER[57] The Ground Floor INSANE Helmet 3,2 r0
+    Listening Frame
+LADDER[57] The Ground Floor INSANE Helmet 0,3 r0
+    Consecrated Plating
+LADDER[57] The Ground Floor INSANE Helmet 4,4 r0
+    Reckoning Crest
+LADDER[57] The Ground Floor INSANE Helmet 0,5 r0
+    Antechamber Crown
+LADDER[57] The Ground Floor INSANE Helmet 3,5 r0
+    Lonely Plating
+LADDER[57] The Ground Floor INSANE Helmet 2,6 r0
+    Chapel Frame
+LADDER[57] The Ground Floor INSANE Helmet 5,5 r0
+    Mirrorbright Plating
+LADDER[57] The Ground Floor INSANE Helmet 0,6 r0
+    Warlord's Crest
+LADDER[57] The Ground Floor INSANE Chest 0,0 r0
+    Adamant Carapace
+LADDER[57] The Ground Floor INSANE Chest 4,0 r0
+    Wickstub
+LADDER[57] The Ground Floor INSANE Chest 4,1 r0
+    The Growing Weight
+LADDER[57] The Ground Floor INSANE Chest 1,2 r0
+    Ungloved Layer
+LADDER[57] The Ground Floor INSANE Chest 2,3 r0
+    Adamant Base
+LADDER[57] The Ground Floor INSANE Chest 0,5 r0
+    Godsheet Layer
+LADDER[57] The Ground Floor INSANE Chest 3,5 r0
+    Warlord's Pauldron
+LADDER[57] The Ground Floor INSANE Chest 0,7 r0
+    Lightweave
+LADDER[57] The Ground Floor INSANE Chest 3,7 r0
+    Chapel Base
+LADDER[57] The Ground Floor INSANE Chest 0,4 r0
+    Mail Layer
+LADDER[57] The Ground Floor INSANE Gloves 0,0 r0
+    Titan's Grip
+LADDER[57] The Ground Floor INSANE Gloves 3,0 r0
+    Channeling Mold
+LADDER[57] The Ground Floor INSANE Gloves 5,0 r0
+    Tin Band
+LADDER[57] The Ground Floor INSANE Gloves 4,1 r0
+    Mirrorplate Ring
+LADDER[57] The Ground Floor INSANE Greaves 0,0 r0
+    Sevenleague Boots
+LADDER[57] The Ground Floor INSANE Greaves 2,0 r0
+    Ridge Runner
+LADDER[57] The Ground Floor INSANE Greaves 2,1 r0
+    Overflow Plate
 ALTERNATES[0] The Dreaming Idiot EASY Helmet 0,0 r0
     Reliquary Frame of Nine
 ALTERNATES[0] The Dreaming Idiot EASY Helmet 3,0 r0

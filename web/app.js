@@ -14,7 +14,7 @@ import init, {
   board_json, legal_anchors, place, pick_up, rotate, toggle_lock, undo, clear_board,
   look_json, look_over,
   encounter_json, fight_json, settle_fight, flee,
-  errand_marks_json,
+  errand_marks_json, go_home,
   ench_rack_json, attach_ench, detach_ench, toggle_ench,
 } from './pkg/gm2d_wasm.js';
 import { Board } from './board.js';
@@ -393,6 +393,9 @@ function paintPanel() {
   }
   // The button is the skill's, so it is not there without it.
   $('scout').hidden = !p.scouting;
+  // And the way home is the set's. Offering a click that will be refused is a
+  // worse screen than not offering it — the rack's lesson, and the same answer.
+  $('homeward').hidden = !p.homeward;
   if (!p.scouting && debug) toggleScout();
   $('walked').textContent = p.walked;
   $('fights').textContent = p.fights;
@@ -1843,6 +1846,18 @@ async function main() {
   });
 
   $('scout').onclick = toggleScout;
+  $('homeward').onclick = () => {
+    const r = JSON.parse(go_home());
+    if (r.error) { log(r.error, true); return; }
+    // The map changed, the purse did not, and a tin is gone. Core said all
+    // three; the page prints them.
+    world = JSON.parse(world_json());
+    paintPanel(); draw(); autosave();
+    log(`The gear takes you back. It drinks the ${r.fare} on the way.`);
+    if (r.mended > 0) {
+      log(`Somebody puts a chair out. ${r.mended}% of you comes back.`);
+    }
+  };
   $('history-open').onclick = openHistory;
   $('history-close').onclick = closeHistory;
   paintTape();

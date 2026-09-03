@@ -72,7 +72,29 @@ fn wearing(rows: &[(&str, SlotKind, u8, u8, u8)]) -> Game {
 #[test]
 fn every_set_is_one_creatures_and_one_grids() {
     let drops = data::drops();
-    assert_eq!(SETS.len(), 3, "the block ships three");
+    assert_eq!(SETS.len(), 9, "three from M9 and six from M11.9");
+    // **One stack of floors counts as one owner**, and that is M11.9's
+    // widening. The Curd Mantle's three pieces are certainties off the Drambus
+    // Stack's fifth, third and first floors, so *climbing the tower* is the
+    // grind — which is the same shape as one creature's drop table and not a
+    // shopping list. A floor is one sitting, so a set off a floor's *pool*
+    // would be unfarmable; a set off its bosses is the tower paying at the
+    // start, the middle and the top, which is what `PLAN-M11.md` §8 row 8 asks
+    // for by a different route.
+    let stacks: Vec<Vec<String>> = data::MAPS
+        .iter()
+        .flat_map(|(id, _)| data::map(id, D).places.clone())
+        .filter(|p| !p.floors.is_empty())
+        .map(|p| p.floors.iter().map(|f| f.map.clone()).collect())
+        .collect();
+    let stack_of = |piece: &str| -> Option<usize> {
+        stacks.iter().position(|maps| {
+            maps.iter().any(|m| {
+                data::map(m, D).places.iter().any(|p| p.drops.iter().any(|d| d == piece))
+            })
+        })
+    };
+
     for &set in SETS {
         let pieces = set_pieces(set);
         assert!(pieces.len() >= 2, "{set} is one component, which is not a set");
@@ -84,6 +106,17 @@ fn every_set_is_one_creatures_and_one_grids() {
             .collect();
         owners.sort_unstable();
         owners.dedup();
+        if owners.is_empty() {
+            let mut from: Vec<Option<usize>> = pieces.iter().map(|p| stack_of(p)).collect();
+            from.dedup();
+            assert_eq!(
+                from.len(),
+                1,
+                "{set} comes off no one creature and no one stack of floors"
+            );
+            assert!(from[0].is_some(), "{set} is dropped by nothing at all");
+            continue;
+        }
         assert_eq!(owners.len(), 1, "{set} is dropped by {owners:?}, which is a shopping list");
         // And one grid, because an item lives in one.
         let slots: Vec<SlotKind> = pieces
@@ -434,22 +467,23 @@ fn a_save_from_before_this_block_is_refused_by_name() {
     let g = Game::new(1, "td");
     let text = gm2d_core::save::save(&g);
     let now = gm2d_core::piece::CATALOG.len();
-    // **550 since M11.5**, which added the three instruments' six parts. It was
-    // 544 from M9.1 to M11.4 and 536 before that, and this line is where the
-    // move is said out loud — the deploy note says it too, in the sentence a
-    // seam always gets.
-    assert_eq!(now, 550, "the catalogue moved again and this line owns saying so");
+    // **568 since M11.9**, which added six sets of three. It was 550 from
+    // M11.5, which added the three instruments' six parts; 544 from M9.1; and
+    // 536 before that. This line is where a move is said out loud — the deploy
+    // note says it too, in the sentence a seam always gets. The block has two
+    // seams and no more: M11.5 and M11.9.
+    assert_eq!(now, 568, "the catalogue moved again and this line owns saying so");
     // A file written against the M9 catalogue: 544 components, and whatever
     // fingerprint that had. Either half is enough to refuse it.
     let older = text
-        .replace(&format!("\"pieces\": {now}"), "\"pieces\": 544")
+        .replace(&format!("\"pieces\": {now}"), "\"pieces\": 550")
         .replace(
             &format!("\"fingerprint\": \"{}\"", gm2d_core::save::catalog_fingerprint()),
             "\"fingerprint\": \"0000000000000000\"",
         );
     assert_ne!(older, text, "the save no longer states its catalogue size");
-    let why = gm2d_core::save::load(&older).expect_err("a pre-M11.5 save loaded");
-    assert!(why.contains("544"), "{why}");
+    let why = gm2d_core::save::load(&older).expect_err("a pre-M11.9 save loaded");
+    assert!(why.contains("550"), "{why}");
     assert!(why.contains(&gm2d_core::piece::CATALOG.len().to_string()), "{why}");
 }
 

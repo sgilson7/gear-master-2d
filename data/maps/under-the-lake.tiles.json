@@ -2,7 +2,7 @@
   "format": "gm2d-tiles",
   "version": 1,
   "id": "under-the-lake",
-  "_note": "What is under the lake, and the same map twice. Entered before the Drambus Stack comes down it is flooded: the two middle rows are water, the west stair is shut, and the only way to the bottom is the long way round the slag — twenty-one tiles at two hundred and sixty per mille instead of eleven at thirty. Entered after, `drains` turns the water to bed and the straight run down the middle opens. Same boss, same loadout, same drop; what the early way costs is the walk, which is the only currency a dungeon here has. Not a second boss and not a second map — one of each, read twice.",
+  "_note": "What is under the lake, and the same map twice. Entered before the Drambus Stack comes down it is flooded: the two middle rows are water, the west stair is shut, and the only way to the bottom is the long way round the slag — twenty-one tiles at two hundred and sixty per mille instead of eleven at thirty. Entered after, `drains` turns the water to bed and the straight run down the middle opens. Same boss, same loadout, same drop; what the early way costs is the walk, which is the only currency a dungeon here has. Not a second boss and not a second map — one of each, read twice. **And the gear cannot take you home from it.** `PLAN-M11.md` §8 row 9: the homeward set fires from inside the Drambus Stack, which is five entries by design and where the kick already moves you, and not from here \\u2014 a dungeon you can post yourself out of is not under a lake.",
   "width": 13,
   "height": 9,
   "start": [
@@ -96,5 +96,6 @@
         "You dropped a tower, drained a lake and walked two hundred and six steps into the dark, and the last fact this game has for you is that somebody cut them."
       ]
     }
-  ]
+  ],
+  "no_homeward": true
 }

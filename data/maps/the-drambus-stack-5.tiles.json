@@ -35,6 +35,7 @@
         ]
       ],
       "enemies": [
+        "Curd Sentinel",
         "Null Sentinel",
         "Crowned Hollow",
         "Silence"
@@ -53,7 +54,8 @@
       "creature": "Cog Priest",
       "drops": [
         "Ballast Bed",
-        "Map Shard"
+        "Map Shard",
+        "Curd Haft"
       ],
       "prose": [
         "The floor gives under the last of it and keeps giving, and the whole storey comes down about four feet and stops, and the noise it makes is not a crash. It is a settle.",

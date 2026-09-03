@@ -1257,6 +1257,23 @@ impl Character {
         }
     }
 
+    /// Spend some without drinking them.
+    ///
+    /// **`use_supply` is drinking and this is paying.** The two are not the
+    /// same gesture and cannot share a function: drinking refuses when you are
+    /// not tired, which is right for medicine and absurd for a fare. Returns
+    /// how many were actually taken.
+    pub fn take_supply(&mut self, id: &str, n: u32) -> u32 {
+        let have = self.supply_count(id).min(n);
+        for (s, count) in self.supplies.iter_mut() {
+            if s == id {
+                *count -= have;
+            }
+        }
+        self.supplies.retain(|(_, n)| *n > 0);
+        have
+    }
+
     /// Drink one. Returns how much tiredness actually came off, or why not.
     ///
     /// Reports what was *used* rather than what the tin claims, because

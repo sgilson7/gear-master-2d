@@ -50,6 +50,7 @@
         ]
       ],
       "enemies": [
+        "Trig Sentinel",
         "Cog Priest",
         "Silence",
         "The Long Mirror"
@@ -69,7 +70,8 @@
       "enemies": [
         "Iron Abbot",
         "Obsidian Colossus",
-        "Rimefather"
+        "Rimefather",
+        "Cairn Chorus"
       ]
     }
   ],

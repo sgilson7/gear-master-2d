@@ -56,9 +56,9 @@ publish:
 ## monsters wear the catalogue, and a spec whose gear does not assemble is a
 ## typo rather than a difficulty.
 ##
-##     make dress RATING=1200 SLOTS=3
+##     make dress RATING=1200 ONLY=helmet,chest SKIP=8
 dress:
-	@RATING=$(RATING) SLOTS=$(SLOTS) cargo run -q -p gm2d-lab --bin dress -- dress
+	@RATING=$(RATING) SLOTS=$(SLOTS) ONLY=$(ONLY) SKIP=$(SKIP) PER=$(PER) cargo run -q -p gm2d-lab --bin dress -- dress
 
 ## read: print an existing creature's board, its items and its rating
 ##

@@ -673,8 +673,10 @@ fn every_assembly_bonus_carries_a_stat() {
 fn the_catalogue_carries_the_assembly_bonuses_it_says_it_does() {
     let n = assembly_bonuses().len();
     assert_eq!(
-        n, 45,
-        "forty-five. It was thirty-seven until M9.1, which added eight \
+        n, 63,
+        "sixty-three. It was forty-five from M9.1 to M11.8 and thirty-seven before that, \
+         and M11.9 adds eighteen: six sets of three, and an assembly bonus is what makes a \
+         set a set. It was thirty-seven until M9.1, which added eight \
          components the pit's three creatures drop and gave every one of them \
          a bonus - because an assembly bonus is what makes a set a set, and \
          M9.2 hangs the names and the granted rules off exactly these eight. \

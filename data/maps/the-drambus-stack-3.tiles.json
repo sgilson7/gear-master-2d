@@ -36,8 +36,8 @@
       ],
       "enemies": [
         "Cog Priest",
-        "Iron Abbot",
-        "Obsidian Colossus"
+        "The Long Mirror",
+        "The Tallow Saint"
       ]
     }
   ],
@@ -53,7 +53,8 @@
       "creature": "Mire Behemoth",
       "drops": [
         "Drove Way",
-        "Map Shard"
+        "Map Shard",
+        "Curd Edge"
       ],
       "prose": [
         "The middle of it goes first and the rest follows it down, and for about a second there is a shape in the air where the storey was.",

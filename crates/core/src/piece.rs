@@ -1574,9 +1574,15 @@ impl PieceRegistry {
 pub const MANDATE: &str = "The Rat King's Mandate";
 pub const TOAD_FRAME: &str = "The Toad's Own Frame";
 pub const WEAVE: &str = "The Wallspider Weave";
+pub const RIME_COAT: &str = "The Rime Coat";
+pub const SENTINELS_TREAD: &str = "The Sentinel's Tread";
+pub const IDOLS_WARD: &str = "The Idol's Ward";
+pub const CHORUS_ROBE: &str = "The Chorus Robe";
+pub const CURD_MANTLE: &str = "The Curd Mantle";
+pub const DROVERS_STRIDE: &str = "The Drover's Stride";
 
 /// Every set this build ships. `tests/sets.rs` walks it.
-pub const SETS: &[&str] = &[MANDATE, TOAD_FRAME, WEAVE];
+pub const SETS: &[&str] = &[MANDATE, TOAD_FRAME, WEAVE, RIME_COAT, SENTINELS_TREAD, IDOLS_WARD, CHORUS_ROBE, CURD_MANTLE, DROVERS_STRIDE];
 
 pub static CATALOG: &[PieceDef] = &[
     // ---- Gear that is going somewhere ----
@@ -11690,6 +11696,413 @@ pub static CATALOG: &[PieceDef] = &[
         power_bonus: 0,
         price: 11,
     },
+    // ---- M11.9's six sets ------------------------------------------------
+    //
+    // Eighteen components, one grid's whole recipe each, and the block's
+    // second and last fingerprint move. Same convention as M9's three: three
+    // drops make one finished item, so nothing has to be bought to complete
+    // one, and the rule rides **one** component and pays off the whole set —
+    // `loadout::set_of` is what makes that true.
+    //
+    // Five of the six rules are ones the engine already had, tuned to a new
+    // instance. That is deliberate and it is the block's standing rule:
+    // nothing new is invented in combat for a set. The sixth is
+    // `Rule::Homeward`, which is not a combat rule at all — it is the one
+    // piece of new travel, and it is priced in a tin.
+
+    // **The Rime Coat** — off Frost Wisp, in the gloves grid.
+    PieceDef {
+        name: "Rimeglove Material",
+        slot: SlotKind::Gloves,
+        kind: PieceKind::Material,
+        cells: &[(0, 0), (1, 0), (0, 1), (1, 1)],
+        base: Stats { armor: 6, curse_resist: 8, ..Stats::ZERO },
+        assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: Some(RIME_COAT),
+            label: "Rimed",
+            stats: Stats::health(45),
+            triggers: &[],
+        }),
+        effect: None,
+        cooldown_ms: 0,
+        speed_bonus: 0,
+        triggers: &[],
+        quest: None,
+        power_bonus: 0,
+        price: 10,
+    },
+    PieceDef {
+        name: "Rimeglove Mold",
+        slot: SlotKind::Gloves,
+        kind: PieceKind::Mold,
+        cells: &[(0, 0), (1, 0), (0, 1)],
+        base: Stats { armor: 5, magic_resist: 6, ..Stats::ZERO },
+        assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: Some(RIME_COAT),
+            label: "Frostbound",
+            stats: Stats::armor(9),
+            triggers: &[],
+        }),
+        effect: None,
+        cooldown_ms: 0,
+        speed_bonus: 0,
+        triggers: &[],
+        quest: None,
+        power_bonus: 0,
+        price: 9,
+    },
+    PieceDef {
+        name: "Rime Signet",
+        slot: SlotKind::Gloves,
+        kind: PieceKind::Ring,
+        cells: &[(0, 0)],
+        base: Stats { curse_resist: 7, ..Stats::ZERO },
+        assembly_bonus: Some(AssemblyBonus {
+            grants: &[Rule::CurseOnActivate { slot: Cow::Borrowed("gloves"), curse: Cow::Borrowed("frost") }],
+            names: Some(RIME_COAT),
+            label: "Nut Freeze",
+            stats: Stats { curse_resist: 6, ..Stats::ZERO },
+            triggers: &[],
+        }),
+        effect: None,
+        cooldown_ms: 0,
+        speed_bonus: 0,
+        triggers: &[],
+        quest: None,
+        power_bonus: 0,
+        price: 8,
+    },
+    // **The Sentinel's Tread** — off Iron Sentinel, in the greaves grid.
+    PieceDef {
+        // **Fourteen health and not twenty.** A Material floats — it fits
+        // gloves and greaves alike — so a floating kind may carry no identity
+        // mechanic, and `identity_carriers` measures that as health above
+        // fifteen. The Mandate's Ratskin Material sits at fourteen for the same
+        // reason and this follows it. The curse resist is the greaves' own
+        // axis, which is tempo: footwork is a cadence tool.
+        name: "Sentinel Material",
+        slot: SlotKind::Greaves,
+        kind: PieceKind::Material,
+        cells: &[(0, 0), (1, 0), (0, 1), (1, 1)],
+        base: Stats { armor: 8, health: 14, curse_resist: 5, ..Stats::ZERO },
+        assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: Some(SENTINELS_TREAD),
+            label: "Sentinel-Made",
+            stats: Stats::health(60),
+            triggers: &[],
+        }),
+        effect: None,
+        cooldown_ms: 0,
+        speed_bonus: 0,
+        triggers: &[],
+        quest: None,
+        power_bonus: 0,
+        price: 12,
+    },
+    PieceDef {
+        name: "Sentinel Mold",
+        slot: SlotKind::Greaves,
+        kind: PieceKind::Mold,
+        cells: &[(0, 0), (1, 0), (0, 1)],
+        base: Stats { curse_resist: 9, physical_resist: 5, ..Stats::ZERO },
+        assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: Some(SENTINELS_TREAD),
+            label: "Standing Watch",
+            stats: Stats::armor(12),
+            triggers: &[],
+        }),
+        effect: None,
+        cooldown_ms: 0,
+        speed_bonus: 0,
+        triggers: &[],
+        quest: None,
+        power_bonus: 0,
+        price: 11,
+    },
+    PieceDef {
+        name: "Sentinel Plating",
+        slot: SlotKind::Greaves,
+        kind: PieceKind::Plating,
+        cells: &[(0, 0), (0, 1)],
+        base: Stats { physical_resist: 8, ..Stats::ZERO },
+        assembly_bonus: Some(AssemblyBonus {
+            grants: &[Rule::SpinExtra { per_turn: 2 }],
+            names: Some(SENTINELS_TREAD),
+            label: "Turned Round",
+            stats: Stats { physical_resist: 5, ..Stats::ZERO },
+            triggers: &[],
+        }),
+        effect: None,
+        cooldown_ms: 0,
+        speed_bonus: 0,
+        triggers: &[],
+        quest: None,
+        power_bonus: 0,
+        price: 10,
+    },
+    // **The Idol's Ward** — off Warded Idol, in the helmet grid.
+    PieceDef {
+        name: "Idol's Frame",
+        slot: SlotKind::Helmet,
+        kind: PieceKind::Frame,
+        cells: &[(0, 0), (1, 0), (2, 0), (0, 1), (1, 1), (2, 1)],
+        base: Stats { health: 70, mind_resist: 10, ..Stats::ZERO },
+        assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: Some(IDOLS_WARD),
+            label: "Warded",
+            stats: Stats::health(80),
+            triggers: &[],
+        }),
+        effect: None,
+        cooldown_ms: 0,
+        speed_bonus: 0,
+        triggers: &[],
+        quest: None,
+        power_bonus: 0,
+        price: 16,
+    },
+    PieceDef {
+        name: "Idol's Plating",
+        slot: SlotKind::Helmet,
+        kind: PieceKind::Plating,
+        cells: &[(0, 0), (1, 0), (0, 1)],
+        base: Stats { armor: 9, magic_resist: 8, ..Stats::ZERO },
+        assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: Some(IDOLS_WARD),
+            label: "Sealed",
+            stats: Stats::armor(14),
+            triggers: &[],
+        }),
+        effect: None,
+        cooldown_ms: 0,
+        speed_bonus: 0,
+        triggers: &[],
+        quest: None,
+        power_bonus: 0,
+        price: 13,
+    },
+    PieceDef {
+        name: "Idol's Crest",
+        slot: SlotKind::Helmet,
+        kind: PieceKind::Crest,
+        cells: &[(0, 0), (0, 1)],
+        base: Stats { mind_resist: 9, curse_resist: 6, ..Stats::ZERO },
+        assembly_bonus: Some(AssemblyBonus {
+            grants: &[Rule::SpinKeep { stacks: 1 }],
+            names: Some(IDOLS_WARD),
+            label: "Held Over",
+            stats: Stats { mind_resist: 8, ..Stats::ZERO },
+            triggers: &[],
+        }),
+        effect: None,
+        cooldown_ms: 0,
+        speed_bonus: 0,
+        triggers: &[],
+        quest: None,
+        power_bonus: 0,
+        price: 14,
+    },
+    // **The Chorus Robe** — off Grave Chorus, in the chest grid.
+    PieceDef {
+        name: "Chorister's Base",
+        slot: SlotKind::Chest,
+        kind: PieceKind::Base,
+        cells: &[(0, 0), (1, 0), (2, 0), (0, 1), (1, 1), (2, 1)],
+        base: Stats { health: 110, regen: 3, ..Stats::ZERO },
+        assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: Some(CHORUS_ROBE),
+            label: "Choral",
+            stats: Stats::health(120),
+            triggers: &[],
+        }),
+        effect: None,
+        cooldown_ms: 0,
+        speed_bonus: 0,
+        triggers: &[],
+        quest: None,
+        power_bonus: 0,
+        price: 20,
+    },
+    PieceDef {
+        name: "Chorister's Layer",
+        slot: SlotKind::Chest,
+        kind: PieceKind::Layer,
+        cells: &[(0, 0), (1, 0), (0, 1), (1, 1)],
+        base: Stats { health: 70, magic_resist: 9, ..Stats::ZERO },
+        assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: Some(CHORUS_ROBE),
+            label: "In Parts",
+            stats: Stats::health(70),
+            triggers: &[],
+        }),
+        effect: None,
+        cooldown_ms: 0,
+        speed_bonus: 0,
+        triggers: &[],
+        quest: None,
+        power_bonus: 0,
+        price: 17,
+    },
+    PieceDef {
+        // **Magic resist and not mind resist.** Mind is the helmet's axis and
+        // this is a chest; `the_catalog_stays_within_its_budgets` holds that at
+        // zero pieces out of place and caught the first draft.
+        name: "Chorister's Weave",
+        slot: SlotKind::Chest,
+        kind: PieceKind::Layer,
+        cells: &[(0, 0), (1, 0), (2, 0)],
+        base: Stats { magic_resist: 11, ..Stats::ZERO },
+        assembly_bonus: Some(AssemblyBonus {
+            grants: &[Rule::Scout],
+            names: Some(CHORUS_ROBE),
+            label: "Counted Out",
+            stats: Stats { magic_resist: 7, ..Stats::ZERO },
+            triggers: &[],
+        }),
+        effect: None,
+        cooldown_ms: 0,
+        speed_bonus: 0,
+        triggers: &[],
+        quest: None,
+        power_bonus: 0,
+        price: 18,
+    },
+    // **The Curd Mantle** — off the tower's floor bosses, in the weapon grid.
+    PieceDef {
+        name: "Curd Haft",
+        slot: SlotKind::Weapon,
+        kind: PieceKind::Handle,
+        cells: &[(0, 0), (0, 1), (0, 2), (0, 3)],
+        base: Stats { power: 40, ..Stats::ZERO },
+        assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: Some(CURD_MANTLE),
+            label: "Curdbound",
+            stats: Stats { power: 60, ..Stats::ZERO },
+            triggers: &[],
+        }),
+        effect: None,
+        cooldown_ms: 0,
+        speed_bonus: 0,
+        triggers: &[],
+        quest: None,
+        power_bonus: 0,
+        price: 26,
+    },
+    PieceDef {
+        name: "Curd Edge",
+        slot: SlotKind::Weapon,
+        kind: PieceKind::Damaging,
+        cells: &[(0, 0), (1, 0), (0, 1), (1, 1)],
+        base: Stats { physical_damage: 44, ..Stats::ZERO },
+        assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: Some(CURD_MANTLE),
+            label: "Two Hundred and Ten Feet",
+            stats: Stats { physical_damage: 30, ..Stats::ZERO },
+            triggers: &[],
+        }),
+        effect: None,
+        cooldown_ms: 0,
+        speed_bonus: 0,
+        triggers: &[],
+        quest: None,
+        power_bonus: 0,
+        price: 30,
+    },
+    PieceDef {
+        name: "Curd Weight",
+        slot: SlotKind::Weapon,
+        kind: PieceKind::Accessory,
+        cells: &[(0, 0)],
+        base: Stats { strength: 9, ..Stats::ZERO },
+        assembly_bonus: Some(AssemblyBonus {
+            grants: &[Rule::Rout { creature: Cow::Borrowed("The Curator") }],
+            names: Some(CURD_MANTLE),
+            label: "The Settle",
+            stats: Stats { strength: 7, ..Stats::ZERO },
+            triggers: &[],
+        }),
+        effect: None,
+        cooldown_ms: 0,
+        speed_bonus: 0,
+        triggers: &[],
+        quest: None,
+        power_bonus: 0,
+        price: 24,
+    },
+    // **The Drover's Stride** — off The Gearwright, in the greaves grid.
+    PieceDef {
+        name: "Drover's Material",
+        slot: SlotKind::Greaves,
+        kind: PieceKind::Material,
+        cells: &[(0, 0), (1, 0), (0, 1), (1, 1)],
+        base: Stats { health: 14, curse_resist: 7, ..Stats::ZERO },
+        assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: Some(DROVERS_STRIDE),
+            label: "Drover-Made",
+            stats: Stats::health(50),
+            triggers: &[],
+        }),
+        effect: None,
+        cooldown_ms: 0,
+        speed_bonus: 0,
+        triggers: &[],
+        quest: None,
+        power_bonus: 0,
+        price: 15,
+    },
+    PieceDef {
+        name: "Drover's Mold",
+        slot: SlotKind::Greaves,
+        kind: PieceKind::Mold,
+        cells: &[(0, 0), (1, 0), (0, 1)],
+        base: Stats { curse_resist: 11, ..Stats::ZERO },
+        assembly_bonus: Some(AssemblyBonus {
+            grants: &[],
+            names: Some(DROVERS_STRIDE),
+            label: "Eleven Days Each Way",
+            stats: Stats { curse_resist: 8, ..Stats::ZERO },
+            triggers: &[],
+        }),
+        effect: None,
+        cooldown_ms: 0,
+        speed_bonus: 0,
+        triggers: &[],
+        quest: None,
+        power_bonus: 0,
+        price: 14,
+    },
+    PieceDef {
+        name: "Drover's Sole",
+        slot: SlotKind::Greaves,
+        kind: PieceKind::Plating,
+        cells: &[(0, 0), (1, 0)],
+        base: Stats { curse_resist: 8, ..Stats::ZERO },
+        assembly_bonus: Some(AssemblyBonus {
+            grants: &[Rule::Homeward],
+            names: Some(DROVERS_STRIDE),
+            label: "The Way Back",
+            stats: Stats { curse_resist: 6, ..Stats::ZERO },
+            triggers: &[],
+        }),
+        effect: None,
+        cooldown_ms: 0,
+        speed_bonus: 0,
+        triggers: &[],
+        quest: None,
+        power_bonus: 0,
+        price: 19,
+    },
     // ---- the survey instruments, M11.5 ---------------------------------
     //
     // Six components and a save seam. Nothing here is for sale: the shards
@@ -11951,6 +12364,26 @@ pub const EVENT_ONLY: &[&str] = &[
     // The three instruments' parts. Off the Stack, out of its shadow, and one
     // off an errand — never off a shelf, because what an instrument is worth is
     // the walk that assembled it.
+    // M11.9's six sets. Off a creature, in one grid, and on no shelf: a set
+    // you could buy is a set nobody goes and gets.
+    "Rimeglove Material",
+    "Rimeglove Mold",
+    "Rime Signet",
+    "Sentinel Material",
+    "Sentinel Mold",
+    "Sentinel Plating",
+    "Idol's Frame",
+    "Idol's Plating",
+    "Idol's Crest",
+    "Chorister's Base",
+    "Chorister's Layer",
+    "Chorister's Weave",
+    "Curd Haft",
+    "Curd Edge",
+    "Curd Weight",
+    "Drover's Material",
+    "Drover's Mold",
+    "Drover's Sole",
     "Map Shard",
     "Glass Lens",
     "Magnet",

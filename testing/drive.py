@@ -1488,6 +1488,69 @@ def check_the_reach_reads_through_what_you_carry(page, name, fails):
     plant(page, base, lambda body: None, stem="reach-restore")
 
 
+def check_the_long_way_back(page, name, fails):
+    """A whole set takes you home, drinks a tin doing it, and refuses without one.
+
+    **M11.9**, and the block's one piece of new travel. The engine's half is
+    `tests/bestiary.rs`; what a browser has to prove is that the button is
+    *there when it should be and not when it should not*. Offering a click that
+    is going to be refused is a worse screen than not offering it, which is the
+    ench rack's lesson and the same answer.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+
+    # --- wearing nothing: no button ------------------------------------------
+    def bare(body):
+        strip_the_boards(body)
+        body["world"]["at"] = [5, 16]
+
+    plant(page, base, bare, stem="home-bare")
+    if page.is_visible("#homeward"):
+        fails.append(f"{name}: the way home is offered to somebody wearing nothing")
+
+    # --- the whole set, and a tin --------------------------------------------
+    def striding(body, tins=1):
+        seat_a_set(body, STRIDE, "greaves")
+        w = body.setdefault("world", {})
+        w["at"] = [5, 16]
+        w["last_town"] = "the-end-of-all-gears"
+        body["character"]["supplies"] = [["cork-tea", tins]] if tins else []
+
+    plant(page, base, lambda b: striding(b, 0), stem="home-skint")
+    if page.is_hidden("#homeward"):
+        fails.append(f"{name}: a whole Drover's Stride is on the board and there is no button")
+        plant(page, base, lambda body: None, stem="home-restore")
+        return
+    page.click("#homeward")
+    page.wait_for_timeout(300)
+    said = last_said(page)
+    if "restorative" not in said.lower():
+        fails.append(f"{name}: refused with no tin and said {said!r}")
+    if page.text_content("#coords").strip() != "5, 16":
+        fails.append(f"{name}: a refusal moved the player anyway")
+
+    plant(page, base, lambda b: striding(b, 1), stem="home-fare")
+    page.click("#homeward")
+    page.wait_for_timeout(400)
+    dismiss_card(page)
+    town = page.evaluate("""() => (window.__world().places ?? [])
+        .find(p => p.kind === 'town')""")
+    at = (page.text_content("#coords") or "").strip()
+    if not town or at != f"{town['at'][0]}, {town['at'][1]}":
+        fails.append(f"{name}: the gear took you to {at!r} and the town is at {town}")
+    tins = page.evaluate(
+        "() => JSON.parse(window.__save()).state.character.supplies ?? []")
+    if any(n > 0 for _, n in tins):
+        fails.append(f"{name}: it went home and did not drink the fare: {tins}")
+    said = last_said(page)
+    if "chair" not in said.lower() and "drinks" not in said.lower():
+        fails.append(f"{name}: it went home and said {said!r}")
+
+    plant(page, base, lambda body: None, stem="home-restore")
+
+
 def check_the_rack(page, name, fails):
     """A licensee buys an ench, bolts it on, switches it off, and takes it back.
 
@@ -1816,6 +1879,9 @@ COMPASS = [("Map Shard", 0, 0), ("Glass Lens", 2, 0), ("Magnet", 0, 1)]
 # Three shards and two handfuls of ground, laid out so all five touch.
 GOLEM = [("Map Shard", 0, 0), ("Map Shard", 0, 1), ("Map Shard", 0, 2),
          ("Living Earth", 2, 0), ("Living Earth", 2, 2)]
+# The Drover's Stride: a material, a mold and a plating is the greaves recipe
+# entire, laid out so all three touch.
+STRIDE = [("Drover's Material", 0, 0), ("Drover's Mold", 2, 0), ("Drover's Sole", 2, 2)]
 
 
 def check_a_set_reads(page, name, fails):
@@ -3347,6 +3413,7 @@ def walk_the_gate(browser, name, fails=None):
     # --- what a creature leaves behind ---------------------------------------
     check_a_set_reads(page, name, fails)
     check_an_instrument_takes_the_grid(page, name, fails)
+    check_the_long_way_back(page, name, fails)
     check_the_reach_reads_through_what_you_carry(page, name, fails)
     check_the_toad_walks_on_water(page, name, fails)
 
@@ -3450,6 +3517,7 @@ def main():
     print("ok: the Stack comes down, the lake empties, and there is a door at the bottom")
     print("ok: a compass in the weapon grid grants a rule, and the sheet says so")
     print("ok: the reach refuses without an instrument, and reads differently through each")
+    print("ok: a whole set takes you home, drinks a tin doing it, and refuses without one")
     print("ok: a whole set names its own item and says what it does; two thirds of one does not")
     print("ok: the lake is ground to a toad, edge to middle, and the middle has a way down in it")
     print("ok: the north is shut to a level-one character, and says what the road wants")

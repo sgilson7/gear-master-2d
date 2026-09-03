@@ -42,9 +42,33 @@ fn main() {
         Some("dress") | None => {
             let target: i32 =
                 env::var("RATING").ok().and_then(|v| v.parse().ok()).unwrap_or(1000);
-            let slots: usize =
-                env::var("SLOTS").ok().and_then(|v| v.parse().ok()).unwrap_or(5);
-            dress(target, slots.clamp(1, 5));
+            // **Which grids, by name.** `SLOTS=3` took the first three of
+            // `SlotKind::ALL`, which meant every creature dressed at every
+            // rating came out wearing the same helmet — the search is
+            // deterministic and a deterministic search asked the same question
+            // gives the same answer. Naming the grids is the difference between
+            // a bench and a stamp.
+            let only: Vec<SlotKind> = match env::var("ONLY").ok().filter(|v| !v.is_empty()) {
+                Some(v) => v.split(',').filter_map(|n| slot_named(n.trim())).collect(),
+                None => {
+                    let n: usize =
+                        env::var("SLOTS").ok().and_then(|v| v.parse().ok()).unwrap_or(5);
+                    SlotKind::ALL.iter().copied().take(n.clamp(1, 5)).collect()
+                }
+            };
+            // And **where in the catalogue to start looking**. Candidates are
+            // sorted dearest first, so skipping the first few dresses a
+            // creature out of a different part of the shelf — which is how two
+            // creatures at one rating stop being the same creature.
+            let skip: usize = env::var("SKIP").ok().and_then(|v| v.parse().ok()).unwrap_or(0);
+            // **And how many pieces a grid may hold.** Left uncapped, the
+            // greedy fill packs all forty-eight cells, and a creature wearing
+            // twenty-two components is a creature whose panel nobody can read
+            // and whose fight takes four times as long to simulate. The
+            // shipped ladder hand-dresses two to twelve; six a grid is that
+            // shape.
+            let per: usize = env::var("PER").ok().and_then(|v| v.parse().ok()).unwrap_or(6);
+            dress(target, &only, skip, per.max(1));
         }
         Some(other) => {
             eprintln!("no such command: {other}\n\n{}", USAGE);
@@ -136,27 +160,38 @@ fn read(name: &str) {
 /// components and nobody needs the optimum — they need a starting point they
 /// can then move by hand. Deterministic because two people asking for the same
 /// rating should get the same creature to argue about.
-fn dress(target: i32, slots: usize) {
-    let want: Vec<SlotKind> = SlotKind::ALL.iter().copied().take(slots).collect();
+fn slot_named(n: &str) -> Option<SlotKind> {
+    Some(match n.to_lowercase().as_str() {
+        "weapon" => SlotKind::Weapon,
+        "helmet" => SlotKind::Helmet,
+        "chest" => SlotKind::Chest,
+        "gloves" => SlotKind::Gloves,
+        "greaves" => SlotKind::Greaves,
+        _ => return None,
+    })
+}
+
+fn dress(target: i32, want: &[SlotKind], skip: usize, per: usize) {
 
     // The gear first, packed as well as a greedy walk manages; then the body,
     // which is the other half of a rating and the dial that closes the gap.
     let mut gear: Vec<GearPlacement> = Vec::new();
-    for &kind in &want {
-        gear.extend(fill(kind, &gear));
+    for &kind in want {
+        gear.extend(fill(kind, &gear, skip, per));
     }
     let health = body_for(&gear, target);
-    let got = rating::creature_rating(dressed(health, &gear), D);
+    let got = rating::creature_rating(dressed(health, &gear, target), D);
     println!("// rates {got} against a target of {target}");
     println!("MonsterSpec {{");
     println!("    name: \"CHANGE ME\",");
+    let b = body_of(target);
     println!("    health: {health},");
-    println!("    strength: 12,");
-    println!("    regen: 2,");
-    println!("    mind_resist: 6,");
-    println!("    curse_resist: 6,");
-    println!("    physical_resist: 8,");
-    println!("    magic_resist: 8,");
+    println!("    strength: {},", b.strength);
+    println!("    regen: {},", b.regen);
+    println!("    mind_resist: {},", b.mind);
+    println!("    curse_resist: {},", b.mind);
+    println!("    physical_resist: {},", b.resist);
+    println!("    magic_resist: {},", b.resist * 9 / 10);
     println!("    attacks: &[],");
     println!("    gear: &[");
     for (name, kind, x, y, rot) in &gear {
@@ -184,9 +219,7 @@ fn dress(target: i32, slots: usize) {
 /// the formula, and the formula is the one thing here that must have one home.
 /// So this asks: two bodies, two ratings, and the line between them.
 fn body_for(gear: &[GearPlacement], target: i32) -> i32 {
-    let rate = |health: i32| {
-        rating::creature_rating(dressed(health, gear), D)
-    };
+    let rate = |health: i32| rating::creature_rating(dressed(health, gear, target), D);
     let (lo_h, hi_h) = (200, 9600);
     let (lo_r, hi_r) = (rate(lo_h), rate(hi_h));
     if hi_r <= lo_r {
@@ -194,20 +227,73 @@ fn body_for(gear: &[GearPlacement], target: i32) -> i32 {
     }
     let per = (hi_r - lo_r) as f32 / (hi_h - lo_h) as f32;
     let out = lo_h as f32 + (target - lo_r) as f32 / per;
-    ((out.clamp(60.0, 60_000.0) / 10.0).round() * 10.0) as i32
+    // **A ceiling, and it is the bench's most useful line.** Health is the
+    // cheapest dial and the interpolation will happily spend ten thousand of it
+    // to hit a number — which produces a creature that rates a thousand and is
+    // a punching bag, because rating is not difficulty and a body with no
+    // weapons behind it just takes longer to knock over. The shipped ladder
+    // runs about two-and-a-bit health to a point of rating; past that the
+    // answer is *more gear*, not more meat, and the bench says so.
+    let ceiling = (target as f32 * HEALTH_TO_RATING).max(200.0);
+    if out > ceiling {
+        eprintln!(
+            "// the gear only rates {}: {} health would be needed and the ceiling is {}.\n\
+             // Give it more grids (ONLY=) or more pieces (PER=) rather than more meat.",
+            rate(60),
+            out as i32,
+            ceiling as i32
+        );
+    }
+    ((out.min(ceiling).clamp(60.0, 60_000.0) / 10.0).round() * 10.0) as i32
+}
+
+/// How much health a point of rating is worth on the shipped ladder.
+///
+/// Measured rather than chosen: Cog Priest is 2,100 health at 999, the Iron
+/// Warden 900 at 212, Francis 9,000 at 2,958. Two and a bit, everywhere.
+const HEALTH_TO_RATING: f32 = 2.3;
+
+/// The body a creature of this weight has, apart from its health.
+///
+/// **Measured off the ladder rather than chosen.** A rung-forty creature is not
+/// simply fatter than a rung-ten one: the High Cork Priest rates 999 with 58
+/// strength and 45/40 resists, the Iron Warden 212 with 20 and 18/15, Francis
+/// 2,958 with 150 and 70/70. Roughly a seventeenth, a twenty-second and a
+/// twentieth of the rating, everywhere.
+///
+/// It matters because the first draft held these flat at twelve and eight, so
+/// every point of rating past the gear had to come out of health — which is how
+/// the bench produced a creature that rated a thousand and lost to an Oak Handle
+/// and an Iron Blade. Rating is not difficulty; a body with no weapons behind it
+/// just takes longer to knock over.
+struct Body {
+    strength: i32,
+    regen: i32,
+    resist: i32,
+    mind: i32,
+}
+
+fn body_of(target: i32) -> Body {
+    Body {
+        strength: (target / 17).clamp(4, 200),
+        regen: (target / 250).clamp(0, 20),
+        resist: (target / 22).clamp(2, 75),
+        mind: (target / 20).clamp(2, 75),
+    }
 }
 
 /// One dressed creature, for the bench to weigh.
-fn dressed(health: i32, gear: &[GearPlacement]) -> &'static MonsterSpec {
+fn dressed(health: i32, gear: &[GearPlacement], target: i32) -> &'static MonsterSpec {
+    let b = body_of(target);
     leak(MonsterSpec {
         name: "The Dressed",
         health,
-        strength: 12,
-        regen: 2,
-        mind_resist: 6,
-        curse_resist: 6,
-        physical_resist: 8,
-        magic_resist: 8,
+        strength: b.strength,
+        regen: b.regen,
+        mind_resist: b.mind,
+        curse_resist: b.mind,
+        physical_resist: b.resist,
+        magic_resist: b.resist * 9 / 10,
         attacks: &[],
         gear: leak_gear(gear),
         gear_offset: 0,
@@ -220,7 +306,7 @@ fn dressed(health: i32, gear: &[GearPlacement]) -> &'static MonsterSpec {
 }
 
 /// Seat as much of one grid as improves it, biggest first.
-fn fill(kind: SlotKind, already: &[GearPlacement]) -> Vec<GearPlacement> {
+fn fill(kind: SlotKind, already: &[GearPlacement], skip: usize, per: usize) -> Vec<GearPlacement> {
     let taken: BTreeSet<&str> = already.iter().map(|(n, ..)| *n).collect();
     let mut reg = PieceRegistry::new();
     let mut lo = Loadout::new();
@@ -238,6 +324,9 @@ fn fill(kind: SlotKind, already: &[GearPlacement]) -> Vec<GearPlacement> {
     // Dearest first, and ties by name: deterministic, and price is the
     // catalogue's own opinion of worth.
     candidates.sort_by(|a, b| b.price.cmp(&a.price).then(a.name.cmp(b.name)));
+    if skip < candidates.len() {
+        candidates.drain(..skip);
+    }
 
     // **Seed on a core, unconditionally.** An item rates nothing until it
     // assembles, so a walk that only keeps what improves the rating keeps
@@ -259,6 +348,9 @@ fn fill(kind: SlotKind, already: &[GearPlacement]) -> Vec<GearPlacement> {
         }
     }
     for def in candidates {
+        if out.len() >= per {
+            break;
+        }
         let Some(index) = CATALOG.iter().position(|c| c.name == def.name) else { continue };
         let id = reg.alloc(index);
         let mut placed = None;

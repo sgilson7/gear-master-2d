@@ -821,6 +821,60 @@
         "It is kept oiled. Four people have the job between them and none of them will say whose idea the wall was."
       ],
       "choices": []
+    },
+    {
+      "id": "the-trig-stone",
+      "title": "THE TRIG STONE",
+      "prose": [
+        "A pillar of cut stone four feet high in the middle of a ring of slag, with a brass plate on the top of it and a hole in the plate. Everything anybody has ever measured here was measured from this.",
+        "The plate has nine sets of initials cut into it and a tenth that has been started and left at one letter. Nobody at the reach will tell you whose."
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-nine-surveys",
+      "title": "THE NINE SURVEYS",
+      "prose": [
+        "Nine cairns, one for each survey, each one a different height and each one built on the spot the surveyor was standing when they gave up.",
+        "The tallest is the third. It is eleven feet and it took the third surveyor most of a year, and the note wedged under the capstone says only that the reach was wider on the way back."
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-drove-way",
+      "title": "THE DROVE WAY",
+      "prose": [
+        "A green lane forty feet wide running north to south with a hedge either side and nothing at either end. It was made for moving something in numbers and the reach has never had anything in numbers.",
+        "It is worn eleven inches down the middle, which is a great deal of feet. The hedges are laid, and laying a hedge is a thing somebody has to come back and do."
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-common-ground",
+      "title": "THE COMMON GROUND",
+      "prose": [
+        "The one part of the reach every survey agrees about: four acres in the south, flat, bounded by nothing, and the same shape on all nine maps.",
+        "There is a post in the middle of it with nothing written on it. Somebody keeps it painted."
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-tenth-clipboard",
+      "title": "THE TENTH CLIPBOARD",
+      "prose": [
+        "A post with a clipboard chained to it, and the clipboard is the tenth. The first nine are on the post at the edge of the Treyway and this is where the tenth got to.",
+        "It is filled in as far as the fourth column. The fourth column is headed WIDTH and the entry under it has been written and rubbed out six times, and the paper has gone through."
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-far-hedge",
+      "title": "THE FAR HEDGE",
+      "prose": [
+        "A hedge running east with a gate in it, and the gate is hung and latched and swings properly. What it is hung on is two posts and a hedge, and what is on the other side is the same field.",
+        "Four people have counted the gate's palings and got four numbers. It has nine."
+      ],
+      "choices": []
     }
   ]
 }

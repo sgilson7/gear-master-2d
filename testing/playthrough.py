@@ -579,6 +579,7 @@ def main():
                 # home after one fight, and a run that ends on being beaten
                 # once has measured nothing about the map it was beaten on.
                 lake_done = "the-bottom-of-the-lake" in answered
+                surveyed = "the-trig-stone" in answered
                 read_the_lot = (TREYWAY_PROMISES <= answered and seen_kettleworks
                                 and floors_down >= 5 and lake_done)
                 if seen_treyway and world["id"] == "west-bambulon" and read_the_lot:
@@ -597,6 +598,7 @@ def main():
 
                 want = None
                 grate = place_by_id("the-way-under-the-lake")
+                reach_edge = place_by_id("the-reach-edge")
                 if world["id"] == "under-the-lake":
                     if not seen_under:
                         seen_under = True
@@ -708,6 +710,14 @@ def main():
                     elif promises:
                         promises.sort(key=lambda a: abs(a[0] - here[0]) + abs(a[1] - here[1]))
                         want, why = list(promises[0]), "the treyway"
+                    elif reach_edge and floors_down >= 5 and lake_done and not surveyed:
+                        # **Last of all.** The edge refuses without an
+                        # instrument and says so, which is a road being shut —
+                        # the walk gives up on it after three refusals like any
+                        # other and goes and does something else, which is what
+                        # a player does when a door wants a thing they have not
+                        # built.
+                        want, why = reach_edge["at"], "the reach"
                     elif (road_west and floors_down < 5
                           and (len(recent) < 6 or sum(recent) * 2 >= len(recent))):
                         # **West until the Stack is down.** Not "west until you

@@ -1402,6 +1402,92 @@ def check_an_instrument_takes_the_grid(page, name, fails):
     plant(page, base, lambda body: None, stem="compass-restore")
 
 
+def check_the_reach_reads_through_what_you_carry(page, name, fails):
+    """The edge refuses without an instrument, and each of the three changes it.
+
+    **M11.6.** The engine's half is `tests/reach.rs`; what a browser has to
+    prove is the half no engine test can — that the survey *reaches the screen*.
+    A survey moves the encounter rate, what falls off a win and what a win pays,
+    and a player sees none of those directly, so the panel has to say what it is
+    reading the map through or the whole feature is indistinguishable from
+    nothing happening.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+
+    edge = [6, 1]
+
+    def at_the_edge(body, instrument=None):
+        # **The board first, the world after.** `strip_the_boards` resets
+        # `world.map` to the first map — it always has, and it is right to,
+        # because most plants want the overworld. A plant that wants a
+        # different map has to set it *after* every stripper has run, and
+        # `seat_a_set` strips too.
+        strip_the_boards(body)
+        if instrument:
+            seat_a_set(body, instrument, "weapon")
+        w = body.setdefault("world", {})
+        w["map"] = "the-treyway"
+        # **From the east, not the south.** The tile below the edge is a
+        # mountain range: the Treyway's terrain has walls in it that West
+        # Bambulon's does not, and a plant that stands in one is repaired away
+        # before the first keypress.
+        w["at"] = [edge[0] + 1, edge[1]]
+        w["answered"] = list(w.get("answered", [])) + ["the-bottom-of-the-cave"]
+
+    # --- with nothing ---------------------------------------------------------
+    plant(page, base, lambda b: at_the_edge(b), stem="reach-shut")
+    page.keyboard.press("ArrowLeft")
+    page.wait_for_timeout(350)
+    dismiss_card(page)
+    close_fight(page)
+    if page.evaluate("() => window.__world().id") != "the-treyway":
+        fails.append(f"{name}: the reach opened with nothing to read it with")
+    else:
+        said = last_said(page)
+        if not said:
+            fails.append(f"{name}: the reach refused in silence")
+
+    # --- with a compass -------------------------------------------------------
+    plant(page, base, lambda b: at_the_edge(b, COMPASS), stem="reach-compass")
+    page.keyboard.press("ArrowLeft")
+    page.wait_for_timeout(400)
+    dismiss_card(page)
+    close_fight(page)
+    if page.evaluate("() => window.__world().id") != "the-reach":
+        fails.append(f"{name}: a compass did not open the reach")
+        plant(page, base, lambda body: None, stem="reach-restore")
+        return
+
+    lens = page.evaluate("() => window.__world().survey")
+    if not lens or lens.get("kind") != "compass":
+        fails.append(f"{name}: standing on the reach and the lens is {lens}")
+    elif lens["encounter_pct"] >= 0:
+        fails.append(f"{name}: a compass reads the ground at {lens['encounter_pct']}%")
+    # And the panel says so, because a number with nowhere it is shown cannot
+    # be told from a bug.
+    shown = (page.text_content("#survey") or "").lower()
+    if "compass" not in shown:
+        fails.append(f"{name}: the panel says {shown!r} about the survey")
+    if page.is_hidden("#survey-row"):
+        fails.append(f"{name}: the survey row is hidden while a survey is on")
+
+    # --- and a different instrument is a different map ------------------------
+    plant(page, base, lambda b: at_the_edge(b, GOLEM), stem="reach-golem")
+    page.keyboard.press("ArrowLeft")
+    page.wait_for_timeout(400)
+    dismiss_card(page)
+    close_fight(page)
+    second = page.evaluate("() => window.__world().survey")
+    if not second or second.get("kind") != "golem":
+        fails.append(f"{name}: walked in with a golem and read it as {second}")
+    elif second["encounter_pct"] == lens["encounter_pct"] and not second["golem"]:
+        fails.append(f"{name}: two instruments read the reach identically")
+
+    plant(page, base, lambda body: None, stem="reach-restore")
+
+
 def check_the_rack(page, name, fails):
     """A licensee buys an ench, bolts it on, switches it off, and takes it back.
 
@@ -1727,6 +1813,9 @@ TOAD_SET = [("Toad Frame", 0, 0), ("Toad Hide", 3, 0)]
 # The smallest of the three instruments, laid out so all three parts touch. A
 # shard is two cells wide, a magnet two tall, a lens one.
 COMPASS = [("Map Shard", 0, 0), ("Glass Lens", 2, 0), ("Magnet", 0, 1)]
+# Three shards and two handfuls of ground, laid out so all five touch.
+GOLEM = [("Map Shard", 0, 0), ("Map Shard", 0, 1), ("Map Shard", 0, 2),
+         ("Living Earth", 2, 0), ("Living Earth", 2, 2)]
 
 
 def check_a_set_reads(page, name, fails):
@@ -3258,6 +3347,7 @@ def walk_the_gate(browser, name, fails=None):
     # --- what a creature leaves behind ---------------------------------------
     check_a_set_reads(page, name, fails)
     check_an_instrument_takes_the_grid(page, name, fails)
+    check_the_reach_reads_through_what_you_carry(page, name, fails)
     check_the_toad_walks_on_water(page, name, fails)
 
     # --- the north ------------------------------------------------------------
@@ -3359,6 +3449,7 @@ def main():
     print("ok: the Drambus Stack opens onto a different floor every time, then a stump")
     print("ok: the Stack comes down, the lake empties, and there is a door at the bottom")
     print("ok: a compass in the weapon grid grants a rule, and the sheet says so")
+    print("ok: the reach refuses without an instrument, and reads differently through each")
     print("ok: a whole set names its own item and says what it does; two thirds of one does not")
     print("ok: the lake is ground to a toad, edge to middle, and the middle has a way down in it")
     print("ok: the north is shut to a level-one character, and says what the road wants")

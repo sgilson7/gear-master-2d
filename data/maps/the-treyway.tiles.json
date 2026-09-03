@@ -122,6 +122,22 @@
         6,
         1
       ],
+      "kind": "gate",
+      "id": "the-reach-edge",
+      "name": "the edge of the Wextreen Reach",
+      "to": "the-reach",
+      "needs_survey": true,
+      "shut": "The plain stops being the sort of ground that has a next tile, and what is past it will not hold a footprint. Nine people have surveyed it and none of them agreed; you have nothing to read it with and it has nothing to say.",
+      "prose": [
+        "Whatever you are carrying settles, and the edge stops being an edge — not by moving, but by acquiring a far side.",
+        "It is a field. It has hedges in it and a lane and a stone pillar in the middle with a brass plate on top, and nine cairns where nine people stopped."
+      ]
+    },
+    {
+      "at": [
+        5,
+        1
+      ],
       "kind": "event",
       "id": "the-wextreen-reach"
     }

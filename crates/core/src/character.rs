@@ -1377,6 +1377,19 @@ impl Character {
         out
     }
 
+    /// How many finished items are on the board, across every grid.
+    ///
+    /// The number a compass reads. **A count and not a rating**, because a
+    /// count is a thing a player can see on the packing screen without opening
+    /// anything — and *augmented by gear* should be legible from the gear.
+    pub fn assembled_items(&self) -> usize {
+        self.loadout
+            .reports(&self.registry)
+            .iter()
+            .map(|r| r.items.iter().filter(|i| i.assembled).count())
+            .sum()
+    }
+
     /// What a step is allowed to do that it would otherwise refuse.
     ///
     /// The caller's half of *a map does not know about bags*: `world::step`

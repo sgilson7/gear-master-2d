@@ -39,6 +39,7 @@ pub mod shop;
 pub mod skills;
 pub mod shape;
 pub mod slot;
+pub mod survey;
 pub mod stats;
 pub mod theme;
 pub mod theme_data;

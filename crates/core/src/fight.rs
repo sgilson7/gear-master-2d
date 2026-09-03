@@ -89,6 +89,29 @@ pub fn run(game: &Game, difficulty: Difficulty) -> Option<CombatLog> {
     ))
 }
 
+/// The mark that says this visit's golem has had its fight.
+///
+/// **In `answered` rather than in a counter**, and cleared when a survey opens
+/// rather than when one closes: what it records is *this entry*, and an entry
+/// begins at the gate. A counter would have been a second answer to a question
+/// one boolean answers.
+pub const GOLEM_SPENT: &str = "the-golem-has-been";
+
+/// What the map you are standing on is being read through.
+///
+/// `SurveyMod::none()` everywhere but a surveyed map, so every caller can add
+/// its fields without asking whether there is a survey on.
+fn lens(game: &Game) -> crate::survey::SurveyMod {
+    match &game.world.active_survey {
+        Some((map, kind)) if *map == game.world.map_id() => crate::survey::mods_for(
+            map,
+            kind,
+            game.character.assembled_items(),
+        ),
+        _ => crate::survey::SurveyMod::none(),
+    }
+}
+
 /// The boss standing on a tile, if one is, and what beating it leaves.
 ///
 /// Reads the map the player is on. A `World` is cheap to build here — this
@@ -142,10 +165,24 @@ pub fn rout(game: &mut Game) -> Option<Rout> {
     if boss_at(game, e.at).is_some() {
         return None;
     }
-    if !crate::rule::routs(&game.character.rules(), &e.enemy) {
+    // **Two ways an encounter is settled without a fight**, and they are one
+    // mechanism because they are one thing: something happened that meant the
+    // fight did not. The Rat King's Mandate is a creature that gives up; the
+    // survey golem is a creature that met the golem instead of you.
+    let mandate = crate::rule::routs(&game.character.rules(), &e.enemy);
+    let golem = lens(game).golem && !game.world.answered.iter().any(|a| a == GOLEM_SPENT);
+    if !mandate && !golem {
         return None;
     }
     let e = game.encounter.take()?;
+    if golem && !mandate {
+        // **One a visit**, which is the fallback `PLAN-M11.md` §8 row 6 named
+        // in advance so that taking it would be a decision rather than a
+        // retreat: the golem *handles one*. Written into `answered` and taken
+        // out again when the survey opens, so it is a fact about this entry
+        // rather than a counter.
+        game.world.answered.push(GOLEM_SPENT.to_string());
+    }
     let difficulty = Difficulty::Easy;
     // **The plain bounty, and no speed bonus.** `Showstopper` pays for winning
     // a fight quickly and there was no fight to be quick about — the same
@@ -156,8 +193,14 @@ pub fn rout(game: &mut Game) -> Option<Rout> {
     let rating = crate::rating::creature_rating(spec, difficulty);
     let xp = reward::xp_for(Outcome::Victory, crate::progression::xp_for_rating(rating));
 
-    let mut receipt =
-        vec![format!("The {} will not come near you. Nothing was fought.", game.theme_name(spec.name))];
+    let mut receipt = vec![if mandate {
+        format!("The {} will not come near you. Nothing was fought.", game.theme_name(spec.name))
+    } else {
+        format!(
+            "The golem gets to the {} first. You watch. Nothing was fought, by you.",
+            game.theme_name(spec.name)
+        )
+    }];
     game.character.gold += gold;
     receipt.push(format!("+{gold} Fnorp"));
     if xp > 0 {
@@ -208,7 +251,13 @@ fn pay_a_win(game: &mut Game, creature: &'static str, receipt: &mut Vec<String>)
     for name in crate::quest::on_victory(game, creature) {
         receipt.push(format!("Took a {}.", game.theme_piece(&name)));
     }
-    for name in crate::drops::roll(&crate::data::drops(), &mut game.rng, creature) {
+    // **What an atlas is for**, and the only place the number lands. The draw
+    // is taken either way; the survey moves the threshold, so the stream is a
+    // function of the fights you had rather than of what you walked in with.
+    let generous = lens(game).drops_per_mille;
+    for name in
+        crate::drops::roll_with(&crate::data::drops(), &mut game.rng, creature, generous)
+    {
         if game.character.holds(&name) {
             continue;
         }
@@ -237,7 +286,13 @@ pub fn settle(game: &mut Game, log: &CombatLog, difficulty: Difficulty) -> Optio
     let plain = reward::bounty_for(log.outcome, spec.bounty);
     let gold = reward::bounty_with_class(log.outcome, spec.bounty, &worn, log.duration_ms);
     let rating = crate::rating::creature_rating(spec, difficulty);
-    let xp = reward::xp_for(log.outcome, crate::progression::xp_for_rating(rating));
+    // **And what an atlas pays.** On the experience only: the purse is the
+    // class's argument and a survey has no business in it.
+    let read = lens(game);
+    let xp = crate::survey::shift(
+        reward::xp_for(log.outcome, crate::progression::xp_for_rating(rating)),
+        read.xp_pct,
+    );
 
     let mut receipt = Vec::new();
     let mut sent_home = None;

@@ -48,7 +48,7 @@ thread_local! {
 /// recoverable answer where a panic is not — `World::repair` then finds them
 /// somewhere to stand.
 fn map_for<T>(g: &gm2d_core::game::Game, f: impl FnOnce(&World) -> T) -> T {
-    map_in(&g.world.map_id(), &g.world.marks(), f)
+    map_in(&g.world.map_id(), &seen_by(g), f)
 }
 
 /// A named map, as this game has left it.
@@ -58,15 +58,72 @@ fn map_for<T>(g: &gm2d_core::game::Game, f: impl FnOnce(&World) -> T) -> T {
 /// `answered` rather than stored — so the cached `World` is the file and this
 /// is the file as the game has left it. Copied only when there is something to
 /// drain, which is one map of nine.
-fn map_in<T>(id: &str, marks: &[String], f: impl FnOnce(&World) -> T) -> T {
+/// Which instrument is assembled on this character's board, if one is.
+///
+/// One answer, read off `Character::rules` — which is derived from the board
+/// every time it is asked, so an instrument taken apart between one entry and
+/// the next is an instrument that is not there.
+fn survey_kind(g: &Game) -> Option<String> {
+    g.character.rules().into_iter().find_map(|r| match r {
+        gm2d_core::rule::Rule::Survey { kind } => Some(kind.into_owned()),
+        _ => None,
+    })
+}
+
+/// Is this map one an instrument reads?
+///
+/// **Derived from the map rather than listed here**, which is what makes a
+/// second surveyable map a data drop: a map is surveyable when something opens
+/// onto it through a gate that wants an instrument.
+fn surveyable(id: &str) -> bool {
+    WORLDS.with(|ws| {
+        ws.iter().any(|w| {
+            w.places
+                .iter()
+                .any(|p| p.needs_survey && p.to.as_deref() == Some(id))
+        })
+    })
+}
+
+/// Everything a map needs to know about the game, owned.
+///
+/// **Owned, and that is the point.** Nearly every call site is a closure that
+/// then *mutates* the game — repairs a position, crosses a gate — so a borrow
+/// held across the call is a borrow error at eight sites. This is the smallest
+/// snapshot that answers the two questions a map has: what has happened, and
+/// what are you reading it through.
+struct Seen {
+    /// `answered` and `flags`, joined. What a drain waits for.
+    marks: Vec<String>,
+    /// The map being surveyed and the instrument it is being surveyed with.
+    survey: Option<(String, String)>,
+    /// Assembled items on the board. A compass reads better off a packed one.
+    items: usize,
+}
+
+fn seen_by(g: &Game) -> Seen {
+    Seen {
+        marks: g.world.marks(),
+        survey: g.world.active_survey.clone(),
+        items: g.character.assembled_items(),
+    }
+}
+
+fn map_in<T>(id: &str, seen: &Seen, f: impl FnOnce(&World) -> T) -> T {
     WORLDS.with(|ws| {
         let w = ws.iter().find(|w| w.id == id).unwrap_or(&ws[0]);
-        if w.drains.is_empty() {
+        let surveyed = seen.survey.as_ref().is_some_and(|(m, _)| m == &w.id);
+        if w.drains.is_empty() && !surveyed {
             return f(w);
         }
-        let mut drained = w.clone();
-        drained.drain_by(marks);
-        f(&drained)
+        let mut read = w.clone();
+        read.drain_by(&seen.marks);
+        if let Some((_, kind)) = &seen.survey {
+            if surveyed {
+                read.survey = gm2d_core::survey::mods_for(&read.id, kind, seen.items);
+            }
+        }
+        f(&read)
     })
 }
 
@@ -105,7 +162,7 @@ pub fn load_json(text: &str) -> Result<(), JsValue> {
             // that is.
             gm2d_core::world::leave_the_sitting(&mut g.world, DIFFICULTY);
             let here = g.world.map_id();
-            let marks = g.world.marks();
+            let marks = seen_by(&g);
             let allowed = g.character.allowances();
             map_in(&here, &marks, |w| w.repair(&mut g.world, &allowed));
             with_mut(|slot| *slot = g);
@@ -122,7 +179,7 @@ pub fn new_game(seed: f64) -> () {
         *g = Game::new(seed as u64, "td");
         // A new game starts where the map says, not at (0, 0) — which on this
         // map is rock, and on any map is an assumption.
-        g.world = map_in(&gm2d_core::world::overworld(), &[], WorldState::at_start);
+        g.world = map_in(&gm2d_core::world::overworld(), &seen_by(g), WorldState::at_start);
     });
 }
 
@@ -305,6 +362,19 @@ pub fn world_json() -> String {
             // The id, so the page can tell one map from another — a gate that
             // led somewhere identical would look like a gate that did nothing.
             "id": w.id,
+            // **What this map is being read through.** Sent so the panel can
+            // say so — a survey moves numbers the player never sees directly,
+            // and a derived number with nowhere it is shown cannot be told from
+            // a bug. Null on every map that is not being surveyed.
+            "survey": g.world.active_survey.as_ref()
+                .filter(|(m, _)| *m == w.id)
+                .map(|(_, kind)| serde_json::json!({
+                    "kind": kind,
+                    "encounter_pct": w.survey.encounter_pct,
+                    "drops_per_mille": w.survey.drops_per_mille,
+                    "xp_pct": w.survey.xp_pct,
+                    "golem": w.survey.golem,
+                })),
             "width": w.width, "height": w.height, "rows": rows, "walk": walk,
             "scouting": scouting,
             "chances": chances, "places": places, "regions": regions,
@@ -362,7 +432,7 @@ pub fn try_step(dir: &str) -> String {
     };
     with_mut(|g| {
         let here = g.world.map_id();
-        let marks = g.world.marks();
+        let marks = seen_by(g);
         map_in(&here, &marks, |w| {
             // Repaired here as well as on load. A position that cannot be stood
             // on is a dead end rather than a glitch — there is no key that gets
@@ -428,7 +498,13 @@ pub fn try_step(dir: &str) -> String {
                         .needs
                         .as_deref()
                         .map(|n| gm2d_core::quest::holding(g, n) > 0)
-                        .unwrap_or(true);
+                        .unwrap_or(true)
+                        // **And a gate may want an instrument instead.** Not a
+                        // thing in the bag: an assembled item on the board,
+                        // which the character reports as a `Rule::Survey`.
+                        // Answered here for the reason a key is — a map does
+                        // not know about bags and does not know about rules.
+                        && (!p.needs_survey || survey_kind(g).is_some());
                     if has {
                         // **Which map a gate opens onto is core's**, and for a
                         // stack of floors it is a question about what has been
@@ -472,6 +548,22 @@ pub fn try_step(dir: &str) -> String {
                             if first {
                                 g.world.answered.push(p.id.clone());
                             }
+                            // **A survey opens on the way in and closes on
+                            // the way out.** Re-read every entry, so walking
+                            // out and back with a different instrument is a
+                            // different map — which is the whole feature. The
+                            // instrument is not consumed (`PLAN-M11.md` §8
+                            // row 5): shards are the grind and the instrument
+                            // is the achievement.
+                            g.world.active_survey = surveyable(&to)
+                                .then(|| survey_kind(g).map(|k| (to.clone(), k)))
+                                .flatten();
+                            // A golem that walked in with you has not had its
+                            // fight yet. Cleared at the gate, because what the
+                            // mark records is *this entry*.
+                            g.world
+                                .answered
+                                .retain(|a| a != gm2d_core::fight::GOLEM_SPENT);
                             went = Some((
                                 to,
                                 p.name.clone(),
@@ -700,7 +792,7 @@ pub fn answer(id: &str, n: usize) -> String {
 pub fn to_last_town() {
     with_mut(|g| {
         let here = g.world.map_id();
-        let marks = g.world.marks();
+        let marks = seen_by(g);
         map_in(&here, &marks, |w| {
             let home = w
                 .places
@@ -1614,7 +1706,7 @@ pub fn settle_fight() -> String {
             // The town is found across every map, and going home crosses maps
             // the same way a gate does.
             let want = g.world.last_town.clone();
-            let marks = g.world.marks();
+            let marks = seen_by(g);
             let mut moved = false;
             // Where you fell is where you were, and a defeat is a placement
             // rather than a step — so the map you are carried off remembers

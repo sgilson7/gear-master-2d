@@ -319,6 +319,47 @@
         "Map Shard"
       ],
       "gold": 90
+    },
+    {
+      "id": "the-tenth-survey",
+      "giver": "kettleworks",
+      "requires": [
+        "the-nine-and-the-eleven"
+      ],
+      "name": "THE TENTH SURVEY",
+      "brief": "Nine people have surveyed the Wextreen Reach and none of them agreed, and the clerk has all nine on her shelf and no room for a tenth. What she wants is the one thing none of the nine has: somebody who stood at the trig stone in the middle of it. You will need something to read the reach with; she is aware that this is the difficulty and says so before you ask.",
+      "thanks": "She takes it down word for word, reads it back, and puts it on the shelf beside the other nine without saying which of the ten she believes. Then she gives you a way of measuring things that came off the same cart as the ledger and has the same nine years of dust on it.",
+      "goal": {
+        "word": {
+          "place": "the-trig-stone"
+        }
+      },
+      "reward": [
+        "Crownwright's Measure"
+      ],
+      "gold": 80
+    },
+    {
+      "id": "what-the-drove-way-was-for",
+      "giver": "kettleworks",
+      "requires": [
+        "the-tenth-survey"
+      ],
+      "name": "WHAT THE DROVE WAY WAS FOR",
+      "brief": "There is a green lane on the reach forty feet wide and worn eleven inches down the middle, with a laid hedge either side and nothing at either end. Somebody moved something along it in numbers, and the reach has never had anything in numbers. Four of the four things that live out there would like to stop being counted; the clerk would like four of them counted anyway.",
+      "thanks": "Four, in the book, under a heading she rules for the purpose and does not fill in. \"That is not what the lane is for,\" she says, which is the first time anybody at the works has said what it is not. Then she gives you the ground itself, in a box.",
+      "goal": {
+        "slay": {
+          "creature": "Vermin Sovereign",
+          "count": 4,
+          "token": "The Ledger"
+        }
+      },
+      "reward": [
+        "Living Earth",
+        "Living Earth"
+      ],
+      "gold": 110
     }
   ]
 }

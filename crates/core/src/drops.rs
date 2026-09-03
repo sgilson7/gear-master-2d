@@ -117,9 +117,25 @@ impl DropsData {
 /// Whether the player can *keep* it is the caller's question, because that is
 /// about the bag and this is about the corpse.
 pub fn roll(data: &DropsData, rng: &mut Rng, creature: &str) -> Vec<String> {
+    roll_with(data, rng, creature, 0)
+}
+
+/// The same, with a survey's thumb on the scale.
+///
+/// **The draw is taken either way and the bonus moves the threshold**, which is
+/// the same discipline as *every entry is rolled whether or not the piece is
+/// already in the bag*: a survey that skipped or added draws would make the
+/// stream a function of what you were carrying rather than of the fights you
+/// had, and a seeded walk would stop replaying.
+pub fn roll_with(
+    data: &DropsData,
+    rng: &mut Rng,
+    creature: &str,
+    extra_per_mille: i32,
+) -> Vec<String> {
     data.of(creature)
         .into_iter()
-        .filter(|d| (rng.below(1000) as i32) < d.per_mille)
+        .filter(|d| (rng.below(1000) as i32) < d.per_mille + extra_per_mille)
         .map(|d| d.piece.clone())
         .collect()
 }

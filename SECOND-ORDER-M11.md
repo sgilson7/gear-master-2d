@@ -446,3 +446,63 @@ cosmic and no living earth. So all six are new, which is the whole seam.
   shipped twice and written a lint about (`every_offered_class_reaches_something`).
   It is stated here so that it is a schedule and not a silence, and M11.6's
   acceptance is the thing that closes it.
+
+---
+
+## M11.6 — the surveyable map
+
+### A map that is read rather than rolled, and a golem that fights once
+
+**The change.** `the-reach`: twenty by twenty, authored, static. The edge of it
+on the Treyway opens only for somebody carrying an assembled instrument, and
+what the map *is* while you are on it depends on which one — a compass makes the
+ground quieter and reads better off a packed board, an atlas pays more and stops
+you more often, and a golem takes the first fight.
+
+**Follows from.**
+
+- **`World` grew a `survey` field and it is never in a map file.**
+  `nothing_in_a_map_file_knows_about_a_survey` is the architecture note as a
+  test, and the payoff is the whole reason it is written that way: a second
+  surveyable map is a data drop plus an arm in `survey::mods_for`.
+- **`data::map` now has two siblings.** `map_now` is the file as the game has
+  left it and `map_read_through` is that, through an instrument. The board's
+  count is the *caller's* — `world.rs` may not go and read a character, which is
+  the division `Allowances` already makes.
+- **The shim's `marks` became a `Seen`.** It was a list of strings; a map now
+  needs three things about the game and all three have to be owned, because
+  nearly every call site mutates the game inside the closure.
+- **`drops::roll` grew `roll_with`**, and the atlas moves the *threshold* rather
+  than the number of draws. A survey that skipped or added draws would make the
+  stream a function of what you walked in with, and a seeded walk would stop
+  replaying.
+- **`needs_survey` is a fourth thing a gate can want**, beside a component, a
+  level and an id in `answered`. It is answered in the shim for the reason a key
+  is: a map does not know about bags, and it does not know about rules either.
+- **Two events had to move one tile.** The post at the reach and the woman at
+  the Kettleworks turn were both *on* the tiles that became gates, and an errand
+  that says "go and read the post" must not want an instrument. That is now
+  twice this block; a place that an errand names should not also be a door.
+
+**Watch.**
+
+- **The golem's fallback was taken, and it was a decision.** `PLAN-M11.md` §8
+  row 6 named it in advance so that taking it would not be a retreat, and the
+  reason it was taken is not the replay's layout: it is rule 5. A third board is
+  a third set of numbers the page must not invent, and the honest version is a
+  third combatant in `combat.rs` — new combat code in a block that has added
+  none. **The ally row is M12's**, and this is the entry that says so.
+- **Entry 5's watch does not apply and that is worth writing down.** There is no
+  ally row, so there is no absorbed damage on a golem to check. What replaces it
+  is `GOLEM_SPENT`: a mark in `answered` cleared at the *gate* rather than on the
+  way out, because what it records is this entry. Watch for a golem that fights
+  twice, which would mean the clear is happening in the wrong place.
+- **A survey is in the save and has to be.** The map is what it is while you are
+  standing on it, so a save taken inside one reopens inside the same one —
+  `save_is_whole` carries it now. What to watch is the opposite: a survey that
+  outlives the walk off the reach, which would be an atlas quietly paying forty
+  percent in the pit.
+- **The lens is on the panel**, because a survey moves the encounter rate, what
+  falls off a win and what a win pays, and a player sees none of those directly.
+  A derived number with nowhere it is shown cannot be told from a bug, and this
+  block has now written that sentence four times.

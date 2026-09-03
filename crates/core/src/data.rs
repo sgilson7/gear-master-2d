@@ -36,6 +36,8 @@ pub const STACK_2_JSON: &str = include_str!("../../../data/maps/the-drambus-stac
 pub const STACK_1_JSON: &str = include_str!("../../../data/maps/the-drambus-stack-1.tiles.json");
 /// What is under the lake, and the same map twice — see its own note.
 pub const UNDER_LAKE_JSON: &str = include_str!("../../../data/maps/under-the-lake.tiles.json");
+/// The surveyable map. Static, authored, and read through whatever you carried.
+pub const REACH_JSON: &str = include_str!("../../../data/maps/the-reach.tiles.json");
 pub const EVENTS_JSON: &str = include_str!("../../../data/events.json");
 pub const THEME_TD_JSON: &str = include_str!("../../../data/theme.td.json");
 pub const SKILLS_JSON: &str = include_str!("../../../data/skills.json");
@@ -64,6 +66,7 @@ pub const FILES: &[(&str, &str)] = &[
     ("maps/the-drambus-stack-2.tiles.json", STACK_2_JSON),
     ("maps/the-drambus-stack-1.tiles.json", STACK_1_JSON),
     ("maps/under-the-lake.tiles.json", UNDER_LAKE_JSON),
+    ("maps/the-reach.tiles.json", REACH_JSON),
     ("events.json", EVENTS_JSON),
     ("theme.td.json", THEME_TD_JSON),
     ("skills.json", SKILLS_JSON),
@@ -95,6 +98,7 @@ pub const MAPS: &[(&str, &str)] = &[
     ("the-drambus-stack-2", STACK_2_JSON),
     ("the-drambus-stack-1", STACK_1_JSON),
     ("under-the-lake", UNDER_LAKE_JSON),
+    ("the-reach", REACH_JSON),
 ];
 
 /// One map by id, falling back to the overworld.
@@ -124,8 +128,28 @@ pub fn map_now(
     difficulty: crate::combat::Difficulty,
     state: &crate::world::WorldState,
 ) -> crate::world::World {
+    map_read_through(id, difficulty, state, 0)
+}
+
+/// The same, through whatever instrument is on the board.
+///
+/// **The board's count is the caller's** — `world.rs` may not go and read a
+/// character, which is the same division `Allowances` makes and for the same
+/// reason. A caller with no character passes zero, which is a compass with no
+/// gear behind it and is what `map_now` does.
+pub fn map_read_through(
+    id: &str,
+    difficulty: crate::combat::Difficulty,
+    state: &crate::world::WorldState,
+    items_assembled: usize,
+) -> crate::world::World {
     let mut w = map(id, difficulty);
     w.drain(state);
+    if let Some((surveyed, kind)) = &state.active_survey {
+        if surveyed == &w.id {
+            w.survey = crate::survey::mods_for(&w.id, kind, items_assembled);
+        }
+    }
     w
 }
 

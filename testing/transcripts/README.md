@@ -124,3 +124,13 @@ longer than a walk.** Twenty thousand presses was enough to reach the door and
 drop most of a tower and is not enough to drain a lake behind it, at a win rate
 of about eleven to nine. `TRIAGE-M11.md` gets both halves — the length, and the
 rate that makes the length what it is.
+
+**M11.6's run is `m11.6.txt`.** 20,000 presses, 1,383 wins, 1,040 losses, level
+14, three floors of five. It says the same thing `m11.4.txt` says and says it
+twice, which is what makes it a measurement rather than a bad seed: **the block
+is longer than a walk, at a win rate of about four to three.** The reach is
+behind the lake, the lake is behind the tower, and twenty thousand presses gets
+most of a tower.
+
+Both halves go to `TRIAGE-M11.md` — the length, and the rate that makes the
+length what it is.

@@ -240,6 +240,16 @@ pub struct PlaceDef {
     /// `Gate`: what to say when you are not.
     #[serde(default)]
     pub shut: String,
+    /// `Gate`: it opens only for somebody carrying a survey instrument.
+    ///
+    /// **Not `needs`**, and the difference is the one this project keeps
+    /// making: `needs` names a component and is answered against the bag, and
+    /// an instrument is not a thing in the bag — it is an assembled item on the
+    /// board, which the character reports as a `Rule::Survey`. A map does not
+    /// know about bags and it does not know about rules either; both are
+    /// answered in the shim, where the character is.
+    #[serde(default)]
+    pub needs_survey: bool,
     /// `Boss`: the creature standing here, by canonical name.
     #[serde(default)]
     pub creature: Option<String>,
@@ -468,6 +478,13 @@ pub struct World {
     pub outside: Option<String>,
     /// What empties, and when. See [`TilesData::drains`].
     pub drains: Vec<Drain>,
+    /// The instrument this map was read through, if it was read through one.
+    ///
+    /// **Never in a map file**, which is the architectural half of M11.6: a
+    /// surveyable map is authored and static, and what varies is the lens.
+    /// `data::map_now` sets it from `WorldState::active_survey`, so a second
+    /// surveyable map is a data drop and an arm in `survey::mods_for`.
+    pub survey: crate::survey::SurveyMod,
 }
 
 /// Why a map would not load. Every one is a sentence naming the tile.
@@ -605,6 +622,7 @@ impl World {
             places: tl.places,
             outside: tl.outside.clone(),
             drains: tl.drains.clone(),
+            survey: crate::survey::SurveyMod::none(),
         };
 
         for y in 0..world.height {
@@ -854,7 +872,14 @@ impl World {
         }
         let danger = self.region_at(x, y).map(|r| r.danger).unwrap_or(0);
         let scaled = base as i64 * (100 + (danger as i64 * 100 / DANGER_REF as i64)) / 100;
-        scaled.clamp(0, MAX_ENCOUNTER_PER_MILLE as i64) as i32
+        let scaled = scaled.clamp(0, MAX_ENCOUNTER_PER_MILLE as i64) as i32;
+        // **The lens, last, and on the capped number.** A compass makes the
+        // ground quieter and an atlas makes it louder, and both of them are a
+        // percentage of what the map already was — applied after the cap so
+        // that a survey cannot be used to climb past `MAX_ENCOUNTER_PER_MILLE`
+        // and cannot be swallowed by it either.
+        crate::survey::shift(scaled, self.survey.encounter_pct)
+            .min(MAX_ENCOUNTER_PER_MILLE)
     }
 
     /// Put a player back somewhere they can stand.
@@ -1096,6 +1121,19 @@ pub struct WorldState {
     /// order is the only thing distinguishing two identical saves.
     #[serde(default)]
     pub positions: Vec<(String, [u8; 2])>,
+    /// The map currently being surveyed, and the instrument it is being
+    /// surveyed with.
+    ///
+    /// **State, and it has to be**: the survey is what the map *is* while you
+    /// are on it, so a save taken inside one has to reopen inside the same one.
+    /// Set on the way in and cleared on the way out, and re-read on every entry
+    /// — walk out and back with a different instrument and it is a different
+    /// map, which is the whole feature.
+    ///
+    /// The instrument is **not consumed** (`PLAN-M11.md` §8 row 5): shards are
+    /// the grind and the instrument is the achievement.
+    #[serde(default)]
+    pub active_survey: Option<(String, String)>,
 }
 
 impl WorldState {

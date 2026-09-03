@@ -74,6 +74,9 @@ fn a_used_game() -> Game {
     // names no landing tile reads this, so a save that dropped it would put
     // everybody who ever crossed a border back at that map's start.
     g.world.positions.push(("west-bambulon".into(), [5, 16]));
+    // And a survey open, because the survey is what a map *is* while you are
+    // on it: a save taken inside one has to reopen inside the same one.
+    g.world.active_survey = Some(("the-reach".into(), "atlas".into()));
     g.encounter = Some(fight::Encounter { enemy: "Iron Sentinel".into(), at: g.world.at });
     g
 }
@@ -98,6 +101,7 @@ fn a_used_game_survives_a_round_trip() {
     assert_eq!(after.world.quests_done, before.world.quests_done, "errands finished");
     assert_eq!(after.world.pinned, before.world.pinned, "the pinned errand");
     assert_eq!(after.world.positions, before.world.positions, "where you were on each map");
+    assert_eq!(after.world.active_survey, before.world.active_survey, "the open survey");
 
     // --- the character -----------------------------------------------------
     let (a, b) = (&after.character, &before.character);
@@ -140,6 +144,7 @@ fn the_used_game_is_actually_used() {
     assert!(!g.world.quests_done.is_empty(), "no errand finished");
     assert!(g.world.pinned.is_some(), "nothing pinned, so the map points nowhere");
     assert!(!g.world.positions.is_empty(), "never left a map, so the border is untested");
+    assert!(g.world.active_survey.is_some(), "no survey open, so the lens is untested");
     assert!(g.character.fatigue > 0, "not tired");
     assert!(!g.character.supplies.is_empty(), "carrying no tins");
     assert!(g.character.carried > 0, "carrying no experience");

@@ -378,6 +378,19 @@ function paintPanel() {
   // and would be a lie, and a screen cannot tell a lie from a bug.
   $('chance').textContent = p.scouting ? `${p.chance} / 1000` : 'you could not say';
   $('danger').textContent = p.scouting ? (p.danger ?? '—') : 'you could not say';
+  // **The lens, and what it is doing.** Numbers core computed; the page prints
+  // them. Hidden on every map that is not being surveyed, which is all of them
+  // but one.
+  const lens = world?.survey ?? null;
+  $('survey-row').hidden = !lens;
+  if (lens) {
+    const bits = [];
+    if (lens.encounter_pct) bits.push(`${lens.encounter_pct > 0 ? '+' : ''}${lens.encounter_pct}% encounters`);
+    if (lens.drops_per_mille) bits.push(`+${lens.drops_per_mille}/1000 drops`);
+    if (lens.xp_pct) bits.push(`+${lens.xp_pct}% experience`);
+    if (lens.golem) bits.push('a golem takes the first fight');
+    $('survey').textContent = `${lens.kind}${bits.length ? ` — ${bits.join(', ')}` : ''}`;
+  }
   // The button is the skill's, so it is not there without it.
   $('scout').hidden = !p.scouting;
   if (!p.scouting && debug) toggleScout();

@@ -551,34 +551,12 @@ pub fn hand_in(game: &mut Game, id: &str) -> Result<Vec<String>, String> {
     // a component in two places.
     if let Some(token) = q.goal.token() {
         for _ in 0..q.goal.count() {
-            let seated = game
-                .character
-                .owned
-                .iter()
-                .copied()
-                .find(|&p| game.character.registry.def(p).name == token);
-            match seated {
-                Some(id) => {
-                    // Off the board first. A component handed over the counter
-                    // and still occupying a cell is a component in two places.
-                    game.character.loadout.remove_anywhere(id);
-                    game.character.owned.retain(|&p| p != id);
-                    // Anything bolted to it comes back to the rack rather
-                    // than going over the counter with it.
-                    game.character.tidy_enchs();
-                }
-                None => {
-                    // A restorative, then. Spent the same way it would be if it
-                    // were drunk, minus the drinking.
-                    for (s, n) in game.character.supplies.iter_mut() {
-                        if s == token && *n > 0 {
-                            *n -= 1;
-                            break;
-                        }
-                    }
-                    game.character.supplies.retain(|(_, n)| *n > 0);
-                }
-            }
+            // Off the board first, then out of the bag, and anything bolted to
+            // it comes back to the rack rather than going over the counter with
+            // it — or, if the tally was a restorative, spent the way it would
+            // be if it were drunk, minus the drinking. `spend_one` is all of
+            // that, and it is shared with the key that turns in a lock.
+            game.character.spend_one(token);
         }
     }
 

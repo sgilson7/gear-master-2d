@@ -1263,6 +1263,46 @@ impl Character {
     /// same gesture and cannot share a function: drinking refuses when you are
     /// not tired, which is right for medicine and absurd for a fare. Returns
     /// how many were actually taken.
+    /// **Take one of these off the character, wherever it is.**
+    ///
+    /// Gear comes off the board first — a component that is spent and still
+    /// occupying a cell is a component in two places — and anything bolted to
+    /// it goes back to the rack rather than leaving with it. A restorative is
+    /// spent the way it would be if it were drunk, minus the drinking.
+    ///
+    /// **One function because there are two callers**, and what it means to
+    /// give something up must not have two answers: an errand handing in a
+    /// tally, and a key turning in a lock. `quest::hand_in` wrote this first
+    /// and it is the same eight lines.
+    ///
+    /// Returns whether there was one to take.
+    pub fn spend_one(&mut self, name: &str) -> bool {
+        let seated =
+            self.owned.iter().copied().find(|&p| self.registry.def(p).name == name);
+        match seated {
+            Some(id) => {
+                self.loadout.remove_anywhere(id);
+                self.owned.retain(|&p| p != id);
+                self.tidy_enchs();
+                true
+            }
+            None => {
+                let mut took = false;
+                for (s, n) in self.supplies.iter_mut() {
+                    if s == name && *n > 0 {
+                        *n -= 1;
+                        took = true;
+                        break;
+                    }
+                }
+                if took {
+                    self.supplies.retain(|(_, n)| *n > 0);
+                }
+                took
+            }
+        }
+    }
+
     pub fn take_supply(&mut self, id: &str, n: u32) -> u32 {
         let have = self.supply_count(id).min(n);
         for (s, count) in self.supplies.iter_mut() {

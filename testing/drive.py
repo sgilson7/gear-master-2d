@@ -1051,6 +1051,35 @@ def check_the_door_opens_on_the_treyway(page, name, fails):
         fails.append(f"{name}: the crossing still says the demo ends here")
     dismiss_card(page)
 
+    # --- the key turned, and it is gone --------------------------------------
+    #
+    # **Reported by the human**: a key you have used sits in the bag for ever,
+    # because the bag was only ever *asked* about it. `Game::unlock` spends it.
+    # Checked here rather than in a check of its own because this is the only
+    # place in the walk where a key actually turns.
+    # `canonical`, not `name` — `name` is the themed one, and matching against
+    # the catalogue's wording there is how this check first shipped vacuous.
+    # **Read off the save, which is the only screen-independent answer.**
+    # This check shipped vacuous twice before it worked: `character_json` has
+    # no `bag` field at all, and `window.__board.state.bag` is not populated
+    # until the packing screen has painted, which this check never opens. The
+    # save always knows what you own, and it names components canonically.
+    carrying = page.evaluate("""() => {
+        const s = JSON.parse(window.__save());
+        const c = s.character ?? s.state?.character ?? {};
+        const reg = c.registry ?? [];
+        return (c.owned ?? []).map(i => (reg[i] || {}).def || '?');
+    }""")
+    if "The Deep Gate Key" in carrying:
+        fails.append(f"{name}: the key opened the door and is still in the bag: {carrying}")
+    # Not `last_said`: "You go through." is logged after it, and the order is
+    # right — the key turns, then you walk.
+    said_key = " ".join(tape(page))
+    if "Key" not in said_key or "gone" not in said_key:
+        fails.append(
+            f"{name}: the key vanished out of the bag and nothing said so: {said_key!r}"
+        )
+
     # A different map: its own size, its own ground, its own regions.
     shape = page.evaluate("() => { const w = window.__world(); "
                           "return [w.width, w.height, (w.places||[]).length]; }")
@@ -1059,6 +1088,30 @@ def check_the_door_opens_on_the_treyway(page, name, fails):
     here = page.text_content("#region") or ""
     if "Bambulon" in here or not here.strip():
         fails.append(f"{name}: standing on the Treyway and the panel says {here!r}")
+
+    # --- and the lock stays open, which is what stops a soft-lock -------------
+    #
+    # The door in the wall is the only way to the back half of the game, and a
+    # defeat in the Treyway walks you home to West Bambulon. A key that were
+    # spent *and* re-locked would end the run there, and there is no second
+    # key anywhere. So: the boss down, the door remembered, and **nothing in
+    # the bag**.
+    def spent_and_open(body):
+        cleared(body)  # note: no key
+        body["world"]["answered"].append("the-door-in-the-wall")
+
+    plant(page, base, spent_and_open, stem="door-stays-open")
+    page.evaluate("(at) => window.__standAt(at)", [spot["at"][0] + 1, spot["at"][1]])
+    page.keyboard.press("ArrowLeft")
+    page.wait_for_timeout(400)
+    dismiss_card(page)
+    close_fight(page)
+    if page.evaluate("() => window.__world().id") != "the-treyway":
+        fails.append(
+            f"{name}: the door re-locked itself after the key was spent — "
+            "there is no second key and the run is over"
+        )
+        return
 
     # --- a border remembers ---------------------------------------------------
     #

@@ -192,6 +192,70 @@ impl Game {
     }
 }
 
+/// What happened when you walked onto something that wanted a key.
+///
+/// **A key is spent opening its lock, and the lock stays open.** Both halves
+/// are load-bearing and the second is the one that stops a soft-lock: the door
+/// in the wall is the only way to the back half of the game, and a defeat in
+/// the Treyway walks you home to West Bambulon. A key that were spent *and*
+/// re-locked would end the run there, and there is no second key.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Unlocked {
+    /// Nothing was ever locked here.
+    Open,
+    /// It was opened before now. The key is long gone and is not wanted again.
+    Already,
+    /// The key turned just now, and left the bag doing it.
+    Spent { key: String },
+    /// Still shut. What it wants is the place's own `shut` line.
+    Shut,
+}
+
+impl Game {
+    /// Turn the key, once.
+    ///
+    /// **The rule is core's and the bag question is core's with it.** Whether a
+    /// gate opens used to be decided in the shim, on the grounds that a `World`
+    /// does not know about bags — which is true, and is an argument for not
+    /// putting it in `World`. It was never an argument for putting it in a
+    /// shim: a `Game` is exactly the thing that holds both a bag and a world,
+    /// and *a key is spent* is a rule the fast suite has to be able to reach.
+    ///
+    /// **An instrument is asked for every time and is never spent.** It is not
+    /// in the bag, it is assembled on the board, and the Wextreen Reach's whole
+    /// design is that what you carry changes what you read — so a survey gate
+    /// is never written into `answered`. Only a key is.
+    pub fn unlock(&mut self, place: &crate::world::PlaceDef) -> Unlocked {
+        if place.needs_survey && self.survey_kind().is_none() {
+            return Unlocked::Shut;
+        }
+        let Some(key) = place.needs.clone() else {
+            return Unlocked::Open;
+        };
+        if self.world.answered.iter().any(|a| *a == place.id) {
+            return Unlocked::Already;
+        }
+        if crate::quest::holding(self, &key) == 0 {
+            return Unlocked::Shut;
+        }
+        // Off the character the same way an errand's tally goes over a counter.
+        self.character.spend_one(&key);
+        self.world.answered.push(place.id.clone());
+        Unlocked::Spent { key }
+    }
+
+    /// Which instrument is assembled, if any.
+    ///
+    /// Derived from the rules an assembled item grants, the same as everything
+    /// else about surveying — there is no field saying which one you carry.
+    pub fn survey_kind(&self) -> Option<String> {
+        self.character.rules().into_iter().find_map(|r| match r {
+            crate::rule::Rule::Survey { kind } => Some(kind.into_owned()),
+            _ => None,
+        })
+    }
+}
+
 /// What the way home cost and what it gave back.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Homeward {

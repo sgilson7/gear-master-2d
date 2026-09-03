@@ -127,7 +127,14 @@ something cost a day.
   shipped vacuous. A check that compares zero with zero is not a check.
 - **A derived number needs somewhere it is shown**, or it cannot be told from a
   bug. Four skills worked perfectly and were reported as broken because nothing
-  printed them.
+  printed them. **And a number that is shown needs somewhere it is read**:
+  `Outcome::Xp` wrote into a counter nothing consulted for four blocks, so nine
+  events printed a receipt for experience that never existed.
+- **Check the second visit.** Three faults found after M11 shipped were all one
+  fault — a key that stayed in the bag, an event that re-opened for ever, and a
+  door that had to keep being unlocked. Everything in this game is walked over
+  more than once, and every check that plants a state and steps once is asking
+  about the first time only.
 - **A promise on an irreversible screen must reach something.** Two shipped
   classes advertised a number and delivered nothing — `Showstopper` for two
   milestones and `Recycler` for one — and the fork does not come off, so a
@@ -437,6 +444,11 @@ the rename was cheaper before the nine than after.
   difference is entirely in the file, which is the point of content living in
   `data/` — a map whose texture is *reading things* rather than *walking* is a
   content decision and not an engine one.
+  **It did need one line of engine, and not having it made the map worse than
+  no map.** All 41 ask nothing, and an event that asks nothing could never be
+  marked answered, so every one of them re-opened on every step onto its tile.
+  See *An event that asks nothing is read once*. The density was the right
+  call; shipping it without checking the second visit was not.
 
 ## The Drambus Stack, and the counter that is not there
 
@@ -1679,6 +1691,82 @@ the panel draws `art.classes[canonical]` from then on. Repainted on every
 `paintPanel`, so a loaded save arrives wearing its own figure rather than
 waiting for the next fork.
 
+## A key that never left the bag, and an event that never shut up
+
+Three faults reported after M11 went live, and all three are the same fault:
+**nothing had ever checked what happens on the second visit.**
+
+### A key is spent opening its lock, and the lock stays open
+
+Both halves are load-bearing and the second is the one that matters. There are
+exactly two keys — the Witch's Key at the Cave mouth and the Deep Gate Key at
+the door in the wall — and the bag was only ever *asked* about them, so a key
+you had used sat there for ever.
+
+- **`Game::unlock` is the whole answer**, and it is core's. Whether a gate
+  opens used to be decided in the shim, on the grounds that a `World` does not
+  know about bags — which is true, and is an argument for not putting it in
+  `World`. It was never an argument for putting it in a shim: **a `Game` is
+  exactly the thing that holds both a bag and a world**, and *a key is spent*
+  is a rule the fast suite has to be able to reach.
+- **The lock stays open, and that is not a convenience.** The door in the wall
+  is the only way to the back half of the game, and a defeat in the Treyway
+  walks you home to West Bambulon. Spent *and* re-locked would end the run
+  there, and there is no second key anywhere in the game.
+- **An instrument is asked for every time and is never spent.** The Reach's
+  whole design is that what you carry changes what you read, so a survey gate
+  is never written into `answered`. Only a key is.
+- **Read `answered` before the key turns.** `unlock` writes the place down, and
+  the gate's paragraph uses that same set to mean *you have been through here*.
+  Asking afterwards opens the door and eats the speech in the same step.
+- `Character::spend_one` is one function because there are two callers, and
+  what it means to give something up must not have two answers: an errand
+  handing in a tally, and a key turning in a lock. `quest::hand_in` wrote those
+  eight lines first.
+- **A key is carried, never worn** — `PieceKind::Quest`, refused by `can_equip`
+  with *"that is a quest item - it is carried, not worn"*. So spending one
+  cannot strand a cell. An errand's tally *is* seatable, which is why
+  `spend_one` takes it off a board first anyway.
+
+### An event that asks nothing is read once
+
+`answer(id, n)` takes the index of the choice you picked, so **an event with no
+choices could never reach `answered`** — it re-opened its modal on every step
+onto the tile, for ever.
+
+That was invisible while every event in the game asked something. It is 7 of 7
+on West Bambulon and 2 of 2 on the Treyway. M11 then added **41 on the
+Kettleworks field and 6 on the Reach, and not one of them asks anything** — so
+one tile in ten became a toll booth, on the map whose whole texture was
+supposed to be reading things.
+
+- **Marked in `world::step`**, beside the line that already computes `spent`,
+  because *what counts as having read something* is a rule.
+- **Reported as nothing at all the second time**, rather than as a spent event,
+  because a page cannot decline to draw a card it was handed. An event that
+  *does* ask something still comes back, so you can re-read it and see it is
+  spent — that is the nine on the hand-built maps and it is deliberate.
+- The design note this file carried was wrong and is corrected above: a dense
+  map is a different kind of map, but 41 dismissals that pay nothing and ask
+  nothing are not texture.
+
+### The experience nine events promised and none of them paid
+
+`Outcome::Xp` wrote into `world.counters["xp"]`, **which is read by nothing.**
+Nine events promise up to 359 points between them and not one ever landed. The
+comment above the line dated itself — *"M4 is what turns this into a level"* —
+and M4 put experience on `Character` four blocks ago.
+
+It is `character.carry(n)` now, the same primitive a win pays into, and the
+receipt says *"+N experience, carried"* in the same words the fight uses. The
+playtester had noticed those two phrasings differed and that only one of them
+worked, which is the finding underneath the finding.
+
+**Found by somebody who was not allowed to read this file.** That is what
+M11.8's harness is for, and it earned its place on its first run: a fault three
+milestones old, in a line every reader of the source had skimmed past because
+the comment beside it explained why it was right.
+
 ## The game talks in one place
 
 Before M11.0 the game said things in five places and kept none of them. A
@@ -2080,7 +2168,8 @@ Every figure below was re-measured for M10.3 rather than carried forward.
 | M11.6: the surveyable map, read through what you carry | 608 passing |
 | M11.7: the block was unfinishable, and every test was green | 609 passing |
 | M11.8: hands, eyes, and a brief for somebody who is not the builder | 609 passing |
-| **M11.9: what the new maps leave behind, and the long way back** | **619 passing** |
+| M11.9: what the new maps leave behind, and the long way back | 619 passing |
+| **A key that never left the bag, and an event that never shut up** | **630 passing** |
 
 Note M11.0 and M11.8 add none, and both are honest. M11.0 moved every string
 the game says through one door and changed no behaviour the suite could see;

@@ -1425,8 +1425,35 @@ pub fn step(
                 return out;
             }
             PlaceKind::Event => {
+                let spent = state.answered.iter().any(|a| a == &p.id);
+                // **An event that asks nothing is read, not answered**, and a
+                // note you have read is scenery.
+                //
+                // `answer(id, n)` is what writes an event into `answered`, and
+                // it takes the index of the choice you picked — so an event
+                // with no choices could never reach it, was never spent, and
+                // opened its modal again on every single step onto the tile.
+                // That was invisible while the only events were seven on the
+                // overworld that all ask something; M11 put 41 on the
+                // Kettleworks field and 6 on the Reach, none of which do, and
+                // one tile in ten became a toll booth.
+                //
+                // Marked here rather than in the shim because *what counts as
+                // having read something* is a rule, and reported as nothing at
+                // all the second time because a page cannot decline to draw a
+                // card it was handed.
+                let asks = crate::data::events()
+                    .get(&p.id)
+                    .map(|e| !e.choices.is_empty())
+                    .unwrap_or(true);
+                if spent && !asks {
+                    return out;
+                }
+                if !asks {
+                    state.answered.push(p.id.clone());
+                }
                 out.event = Some(p.id.clone());
-                out.spent = state.answered.iter().any(|a| a == &p.id);
+                out.spent = spent;
                 return out;
             }
             PlaceKind::Gate => {

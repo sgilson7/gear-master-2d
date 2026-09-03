@@ -1706,6 +1706,11 @@ function walk(dir) {
   // **Through a gate is a different map.** The ground, the places and the
   // player's own position all changed, so the page reloads the map rather
   // than redrawing the one it had.
+  // **The key turned and it is gone.** Said before "you go through", because
+  // that is the order it happens in, and said at all because a thing that
+  // leaves your bag without a word reads as a bug. Core decides that a key is
+  // spent and which one; the page prints the sentence.
+  if (r.turned) log(`${r.turned} turns once and is gone. The way stays open.`);
   if (r.went) {
     world = JSON.parse(world_json());
     log(`You go through.`);

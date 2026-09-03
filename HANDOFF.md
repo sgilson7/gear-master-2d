@@ -111,7 +111,7 @@ fighting differently:
 REBASELINE_GOLDEN_COMBAT=1 cargo test -p gm2d-core
 ```
 
-## 5. Ten traps, each of which has already cost a day
+## 5. Eleven traps, each of which has already cost a day
 
 1. **`Loadout::locks` is state, not geometry.** Two components that touch are
    one item unless a lock says otherwise, and which locks exist depends on the
@@ -144,12 +144,18 @@ REBASELINE_GOLDEN_COMBAT=1 cargo test -p gm2d-core
    set, and every component that names it is in the item. Agreement alone lets
    two thirds of a three-piece set call itself whole, because most recipes have
    an optional slot; completeness alone lets a stranger in.
-9. **A CSS rule that sets `display` beats `[hidden]`, and it will do it again.**
+9. **Check the second visit.** Everything in this game is walked over more
+   than once, and a check that plants a state and steps once is asking about
+   the first time only. Three post-M11 faults were this: a key that opened a
+   door and stayed in the bag, an event with no choices that could never be
+   marked answered and so re-opened for ever, and the lock the key had already
+   turned. `Game::unlock` and `world::step`'s `Event` arm are the answers.
+10. **A CSS rule that sets `display` beats `[hidden]`, and it will do it again.**
    `.screen.framed` did it in M8 and `.panel dl > div { display: flex }` did it
    in M11, hiding nothing and printing "surveying with —" on every map for four
    attempts. **Anything that sets `display` on an element it also hides needs
    its own `[hidden] { display: none }`.**
-10. **A reachability check whose lower bound is "not everything works" cannot
+11. **A reachability check whose lower bound is "not everything works" cannot
     tell a cost from a wall.** `(2..5).contains(&taken)` passed on a tower
     nobody could climb, and the whole M11 block shipped unfinishable behind 597
     green tests. Measure against the board the player actually has —
@@ -230,7 +236,8 @@ REBASELINE_GOLDEN_COMBAT=1 cargo test -p gm2d-core
 | A fix deployed and did not arrive | the build stamp, and `app.js`'s self-heal — see *A deployed fix is not a delivered fix* in CLAUDE.md |
 | The board draws the wrong shape | something cached what core can be asked. The held component is looked up by id every frame |
 | A class or a node promises something and nothing happens | it is honoured in the fight, the purse or on the board, and possibly in none of them. `every_offered_class_reaches_something` |
-| A browser check passes but the thing is broken | it is probably vacuous. **Break the thing and watch it fail** before trusting it |
+| A browser check passes but the thing is broken | it is probably vacuous. **Break the thing and watch it fail** before trusting it. The key check shipped vacuous twice: `character_json` has no `bag`, and `board.state.bag` is empty until the packing screen paints. Read the save |
+| Something works the first time and misbehaves the second | nothing checked the second visit. A key that stays in the bag, an event that re-opens for ever, a door that re-locks — all one fault |
 | The map on screen is not the map you are on | `paintPanel` did not re-read. `position()` carries the map id — trap in *A stale map, shipped since M8* |
 | A row you hid is still laid out | a `display` rule beat `[hidden]` — trap 9 |
 | A whole region cannot be beaten and the suite is green | the reachability check is a range, not a measurement — trap 10 |

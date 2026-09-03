@@ -496,20 +496,26 @@ pub fn try_step(dir: &str) -> String {
             // lock wants.
             let mut went = None;
             let mut shut = None;
+            // The key that turned just now, if one did, in the player's words.
+            let mut turned = None;
             if let Some(id) = &s.gate {
                 if let Some(p) = w.places.iter().find(|p| p.id == *id).cloned() {
-                    let has = p
-                        .needs
-                        .as_deref()
-                        .map(|n| gm2d_core::quest::holding(g, n) > 0)
-                        .unwrap_or(true)
-                        // **And a gate may want an instrument instead.** Not a
-                        // thing in the bag: an assembled item on the board,
-                        // which the character reports as a `Rule::Survey`.
-                        // Answered here for the reason a key is — a map does
-                        // not know about bags and does not know about rules.
-                        && (!p.needs_survey || survey_kind(g).is_some());
-                    if has {
+                    // **Read before the key turns.** `Game::unlock` writes the
+                    // place into `answered` when it spends a key, and the
+                    // gate's own paragraph uses that same set to mean "you have
+                    // been through here before". Asking afterwards would open
+                    // the door and eat the speech in the same step.
+                    let unseen = !g.world.answered.iter().any(|a| *a == p.id);
+                    // **The whole answer is core's**, key and instrument both —
+                    // whether it opens, whether the key is spent, and whether
+                    // it was already open. A shim that decided any of that
+                    // would be a second rulebook, and *a key is spent* is a
+                    // rule the fast suite has to be able to reach.
+                    let opened = g.unlock(&p);
+                    if let gm2d_core::game::Unlocked::Spent { key } = &opened {
+                        turned = Some(g.theme_piece(key));
+                    }
+                    if opened != gm2d_core::game::Unlocked::Shut {
                         // **Which map a gate opens onto is core's**, and for a
                         // stack of floors it is a question about what has been
                         // answered. `None` here is not a locked door: it is a
@@ -547,9 +553,8 @@ pub fn try_step(dir: &str) -> String {
                             // Bambulon is a thing that happens once. Shown the
                             // first time and remembered, so a save taken after
                             // it comes back to a road rather than to the speech.
-                            let first = !p.prose.is_empty()
-                                && !g.world.answered.iter().any(|a| *a == p.id);
-                            if first {
+                            let first = !p.prose.is_empty() && unseen;
+                            if first && !g.world.answered.iter().any(|a| *a == p.id) {
                                 g.world.answered.push(p.id.clone());
                             }
                             // **A survey opens on the way in and closes on
@@ -597,17 +602,15 @@ pub fn try_step(dir: &str) -> String {
             let mut ending = None;
             if let Some(id) = &s.door {
                 if let Some(p) = w.places.iter().find(|p| p.id == *id).cloned() {
-                    let has = p
-                        .needs
-                        .as_deref()
-                        .map(|n| gm2d_core::quest::holding(g, n) > 0)
-                        .unwrap_or(true);
-                    if has {
-                        // Remembered, so a save taken after it opens comes back
-                        // to an open door rather than to a locked one.
-                        if !g.world.answered.iter().any(|a| *a == p.id) {
-                            g.world.answered.push(p.id.clone());
-                        }
+                    // The same one answer a gate gets. `unlock` is what
+                    // remembers the door, so a save taken after it opens comes
+                    // back to an open door rather than to a locked one — which
+                    // this branch used to do for itself.
+                    let opened = g.unlock(&p);
+                    if let gm2d_core::game::Unlocked::Spent { key } = &opened {
+                        turned = Some(g.theme_piece(key));
+                    }
+                    if opened != gm2d_core::game::Unlocked::Shut {
                         ending = Some(serde_json::json!({
                             "id": p.id,
                             "name": p.name,
@@ -660,6 +663,12 @@ pub fn try_step(dir: &str) -> String {
                     "prose": prose,
                 })),
                 "shut": shut,
+                // **The key that turned, and left the bag doing it.** A thing
+                // that disappears out of your inventory without a word reads
+                // as a bug, which is this project's oldest rule wearing a new
+                // coat: a derived number needs somewhere it is shown, and so
+                // does a spent one.
+                "turned": turned,
                 "ending": ending,
                 "boss": s.boss,
                 "bench": s.bench,
@@ -754,11 +763,18 @@ pub fn answer(id: &str, n: usize) -> String {
                 None => receipt.push(format!("{name} is not in the catalogue")),
             },
             Outcome::Xp(n) => {
-                // Banked, not spent. M4 is what turns this into a level; until
-                // then the number is kept honestly rather than discarded, so
-                // M4 inherits real figures instead of starting from zero.
-                g.world.add("xp", (*n).max(0) as u32);
-                receipt.push(format!("+{n} toward the next level"));
+                // **Carried, the same as a win pays.** This wrote into
+                // `world.counters["xp"]` from M1 until the M11 playtest, and
+                // that counter was read by nothing: the comment here said "M4
+                // is what turns this into a level", M4 put experience on
+                // `Character` four blocks ago, and this line never moved. Nine
+                // events promise up to 359 between them and not one point of
+                // it ever landed.
+                //
+                // `carry`, not `gain_xp`: nothing on the road spends, and a
+                // town is the only thing that turns carried into a level.
+                g.character.carry(*n);
+                receipt.push(format!("+{n} experience, carried"));
             }
             Outcome::Nothing => receipt.push("Nothing you could point to".into()),
         }

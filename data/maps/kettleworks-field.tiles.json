@@ -1,0 +1,429 @@
+{
+  "format": "gm2d-tiles",
+  "version": 1,
+  "id": "kettleworks-field",
+  "_note": "The dense map. Twenty by twenty like West Bambulon and nothing like it: forty of its four hundred tiles carry a place or something to read, which is the Look Outside register written down as a budget a test can check. Most of the readables sit off the roads on purpose — a card that opens every time you cross the field is a card a player learns to shut without reading. The Drambus Stack is four tiles of `curd` in the middle, which is its own terrain because a two-hundred-and-ten-foot cheese drawn as rock is a hill. Its door is written as an event and not a gate: the floors behind it are M11.3's, and a gate onto a map this build has not got is a hole where a promise should be. The two pools are ordered on purpose: `draw_enemy` weights a pool so its hardest member is its rarest, so the creature an errand asks for is the *easiest* thing in its region and never the hardest. Getting that backwards is `PLAN.md` §6b row 1 written into content — a set behind the rarest creature, one map further out.",
+  "width": 20,
+  "height": 20,
+  "start": [
+    10,
+    18
+  ],
+  "rows": [
+    "^^^^^^^^^^^^^^^^^^^^",
+    "^,,..==,,,,==..,,,,^",
+    "^,##..=,,,,=..##,,,^",
+    "^,#T..=....=..T#,,,^",
+    "^..T..======..T..,,^",
+    "^..T.,,,,,,,,.T..,,^",
+    "^==================^",
+    "^,,,,,=,,,,=,,,,,,,^",
+    "^,,,,=CCCC=,,,,,,,,^",
+    "^,,,,=CCCC=,,,,,,,,^",
+    "^,,,,=CCCC=,,,,,,,,^",
+    "^,,,,=CCCC=,,,,,,,,^",
+    "^,,,,======,,,,,,,,^",
+    "^..===========,,,,,^",
+    "^..=,,,,,,,,=..,,,,^",
+    "^.T=,,,,,,,,=.T.,,,^",
+    "^.#=,,,,,,,,=..#,,,^",
+    "^..===========..,,,^",
+    "^,,,,,,,,,=,,,,,,,,^",
+    "^^^^^^^^^^^^^^^^^^^^"
+  ],
+  "regions": [
+    {
+      "id": "kettleworks-field",
+      "name": "The Kettleworks Field",
+      "bounds": [
+        [
+          0,
+          0,
+          19,
+          5
+        ],
+        [
+          0,
+          13,
+          19,
+          19
+        ]
+      ],
+      "enemies": [
+        "The Curator",
+        "Pale Twin",
+        "Ruin Hound"
+      ]
+    },
+    {
+      "id": "the-stacks-shadow",
+      "name": "The Stack's Shadow",
+      "bounds": [
+        [
+          0,
+          6,
+          19,
+          12
+        ]
+      ],
+      "enemies": [
+        "Slag Warden",
+        "Bone Cantor",
+        "Crowned Hollow"
+      ]
+    }
+  ],
+  "places": [
+    {
+      "at": [
+        2,
+        16
+      ],
+      "kind": "town",
+      "id": "kettleworks",
+      "name": "Kettleworks"
+    },
+    {
+      "at": [
+        10,
+        18
+      ],
+      "kind": "gate",
+      "id": "the-field-road",
+      "name": "the road down to the Treyway",
+      "to": "the-treyway",
+      "at_to": [
+        3,
+        13
+      ]
+    },
+    {
+      "at": [
+        4,
+        1
+      ],
+      "kind": "event",
+      "id": "the-quench-pond"
+    },
+    {
+      "at": [
+        8,
+        1
+      ],
+      "kind": "event",
+      "id": "the-plate-stack"
+    },
+    {
+      "at": [
+        13,
+        1
+      ],
+      "kind": "event",
+      "id": "the-hooper"
+    },
+    {
+      "at": [
+        4,
+        2
+      ],
+      "kind": "event",
+      "id": "the-office-of-the-works"
+    },
+    {
+      "at": [
+        9,
+        2
+      ],
+      "kind": "event",
+      "id": "the-scrap-line"
+    },
+    {
+      "at": [
+        12,
+        2
+      ],
+      "kind": "event",
+      "id": "the-second-forge"
+    },
+    {
+      "at": [
+        3,
+        3
+      ],
+      "kind": "event",
+      "id": "the-cold-anvil"
+    },
+    {
+      "at": [
+        8,
+        3
+      ],
+      "kind": "event",
+      "id": "the-cast-that-failed"
+    },
+    {
+      "at": [
+        13,
+        3
+      ],
+      "kind": "event",
+      "id": "the-tap-house"
+    },
+    {
+      "at": [
+        2,
+        4
+      ],
+      "kind": "event",
+      "id": "the-fletchers-drawer"
+    },
+    {
+      "at": [
+        12,
+        4
+      ],
+      "kind": "event",
+      "id": "the-cooling-yard"
+    },
+    {
+      "at": [
+        3,
+        5
+      ],
+      "kind": "event",
+      "id": "the-wood-that-was-left"
+    },
+    {
+      "at": [
+        14,
+        5
+      ],
+      "kind": "event",
+      "id": "the-hoop-store"
+    },
+    {
+      "at": [
+        7,
+        12
+      ],
+      "kind": "event",
+      "id": "the-stack-door"
+    },
+    {
+      "at": [
+        4,
+        7
+      ],
+      "kind": "event",
+      "id": "the-smell-line"
+    },
+    {
+      "at": [
+        11,
+        7
+      ],
+      "kind": "event",
+      "id": "the-measuring-post"
+    },
+    {
+      "at": [
+        3,
+        8
+      ],
+      "kind": "event",
+      "id": "the-crumb-field"
+    },
+    {
+      "at": [
+        12,
+        8
+      ],
+      "kind": "event",
+      "id": "the-rind-wall"
+    },
+    {
+      "at": [
+        2,
+        9
+      ],
+      "kind": "event",
+      "id": "the-ladder"
+    },
+    {
+      "at": [
+        13,
+        9
+      ],
+      "kind": "event",
+      "id": "the-tally-shed"
+    },
+    {
+      "at": [
+        3,
+        10
+      ],
+      "kind": "event",
+      "id": "the-cut-face"
+    },
+    {
+      "at": [
+        12,
+        10
+      ],
+      "kind": "event",
+      "id": "the-flies"
+    },
+    {
+      "at": [
+        2,
+        11
+      ],
+      "kind": "event",
+      "id": "the-north-buttress"
+    },
+    {
+      "at": [
+        13,
+        11
+      ],
+      "kind": "event",
+      "id": "the-weighbridge"
+    },
+    {
+      "at": [
+        12,
+        12
+      ],
+      "kind": "event",
+      "id": "the-shortest-way"
+    },
+    {
+      "at": [
+        6,
+        14
+      ],
+      "kind": "event",
+      "id": "the-pens"
+    },
+    {
+      "at": [
+        10,
+        14
+      ],
+      "kind": "event",
+      "id": "the-lower-road"
+    },
+    {
+      "at": [
+        4,
+        15
+      ],
+      "kind": "event",
+      "id": "the-cistern"
+    },
+    {
+      "at": [
+        9,
+        15
+      ],
+      "kind": "event",
+      "id": "the-fitters-bench"
+    },
+    {
+      "at": [
+        13,
+        15
+      ],
+      "kind": "event",
+      "id": "the-long-shed"
+    },
+    {
+      "at": [
+        6,
+        16
+      ],
+      "kind": "event",
+      "id": "the-fence-off-the-fence"
+    },
+    {
+      "at": [
+        10,
+        16
+      ],
+      "kind": "event",
+      "id": "the-drover"
+    },
+    {
+      "at": [
+        3,
+        17
+      ],
+      "kind": "event",
+      "id": "the-boundary-stone"
+    },
+    {
+      "at": [
+        16,
+        17
+      ],
+      "kind": "event",
+      "id": "the-broken-kettle"
+    },
+    {
+      "at": [
+        5,
+        18
+      ],
+      "kind": "event",
+      "id": "the-milestone"
+    },
+    {
+      "at": [
+        14,
+        18
+      ],
+      "kind": "event",
+      "id": "the-empty-gibbet"
+    },
+    {
+      "at": [
+        17,
+        13
+      ],
+      "kind": "event",
+      "id": "the-notice-board"
+    },
+    {
+      "at": [
+        17,
+        10
+      ],
+      "kind": "event",
+      "id": "the-back-lane"
+    },
+    {
+      "at": [
+        17,
+        7
+      ],
+      "kind": "event",
+      "id": "the-east-marker"
+    },
+    {
+      "at": [
+        16,
+        4
+      ],
+      "kind": "event",
+      "id": "the-crossing-keeper"
+    },
+    {
+      "at": [
+        16,
+        2
+      ],
+      "kind": "event",
+      "id": "the-north-gate"
+    }
+  ]
+}

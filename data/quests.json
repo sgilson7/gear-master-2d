@@ -182,6 +182,119 @@
         }
       },
       "gold": 220
+    },
+    {
+      "id": "what-the-door-smells-of",
+      "giver": "kettleworks",
+      "name": "WHAT THE DOOR SMELLS OF",
+      "brief": "The works keeps a book on the Drambus Stack and the book has one gap in it, which is that nobody has written down what the door smells of. Four people have been sent and all four have come back and said it smells of cheese, and the clerk has refused all four on the grounds that the whole field smells of cheese. Go and stand at the door and come back with a better sentence.",
+      "thanks": "She writes what you said down without changing a word of it, reads it back, and says it is the fifth answer and the first one that is about the door. Then she gives you a layer off the shelf and says the works has nine of them and no shelf to put them on.",
+      "goal": {
+        "word": {
+          "place": "the-stack-door"
+        }
+      },
+      "reward": [
+        "Sprocketman's Gratitude"
+      ],
+      "gold": 24
+    },
+    {
+      "id": "what-comes-off-it",
+      "giver": "kettleworks",
+      "requires": [
+        "what-the-door-smells-of"
+      ],
+      "name": "WHAT COMES OFF IT",
+      "brief": "Things live in the Stack's shadow that do not live anywhere else in the field, and the works would like four of them counted properly rather than described. The clerk is specific: four of the ones that stand about in the crumb field with their hands together. Bring the count back and she will start the sixth book.",
+      "thanks": "Four counted, in a book that has been open at page one for two years. She writes the four in, rules the page off, and gives you a hall out of a crate that has KETTLEWORKS stencilled on it and a shipping label to somewhere else.",
+      "goal": {
+        "slay": {
+          "creature": "Bone Cantor",
+          "count": 4,
+          "token": "The Tally"
+        }
+      },
+      "reward": [
+        "Booking Hall"
+      ],
+      "gold": 40
+    },
+    {
+      "id": "the-frame-in-the-shallows",
+      "giver": "kettleworks",
+      "requires": [
+        "what-comes-off-it"
+      ],
+      "name": "THE FRAME IN THE SHALLOWS",
+      "brief": "There is a standing frame at the edge of this field and the works has been told there is a standing frame in the Bambulon shallows, and the works does not believe it. Eleven days each way. Go and stand at the one in the shallows and come back and say whether it is the same frame, and the clerk will accept either answer as long as you have been.",
+      "thanks": "\"Two,\" she says, and writes it, and looks at it for a while. \"Two is worse.\" Then she goes into the back and comes out with a head-measure in a sleeve, which she says came with the second book and has never fitted anybody at the works.",
+      "goal": {
+        "word": {
+          "place": "the-standing-frame"
+        }
+      },
+      "reward": [
+        "Crownwright's Measure"
+      ],
+      "gold": 55
+    },
+    {
+      "id": "the-count-at-the-pond",
+      "giver": "the-quench-pond",
+      "turn_in": "kettleworks",
+      "name": "THE COUNT AT THE POND",
+      "brief": "The man at the quench pond has 1,402 chalked on the rail and no idea what of. He has narrowed it to four possibilities and would like the fourth eliminated, which means four of the ones that come round the field counting things and writing none of it down. He will not tell you the other three possibilities. Take what you get to the clerk in town; he does not go in.",
+      "thanks": "The clerk reads the count, says the pond man has been at this for six years, and writes it in the book anyway. Then she gives you a wire off a reel that says MULTICITY on the flange and has nine feet left on it.",
+      "goal": {
+        "slay": {
+          "creature": "The Curator",
+          "count": 4,
+          "token": "The Odometer"
+        }
+      },
+      "reward": [
+        "Signal Wire"
+      ],
+      "gold": 30
+    },
+    {
+      "id": "the-drawer-of-eight-hundred",
+      "giver": "kettleworks",
+      "requires": [
+        "the-count-at-the-pond"
+      ],
+      "name": "THE DRAWER OF EIGHT HUNDRED",
+      "brief": "The fletcher counted eight hundred and one shafts on Tuesday and eight hundred and four today and has stopped having a theory. The clerk would like somebody who is not the fletcher to stand at the drawer and look at it. That is the whole errand. She is aware of how it sounds.",
+      "thanks": "\"And?\" she says, and then, before you answer, \"No, do not. He will ask and I would rather not be able to tell him.\" She writes NOT KNOWN in the book, which is the first time that has been written in it, and gives you a length of rodding off the wall.",
+      "goal": {
+        "word": {
+          "place": "the-fletchers-drawer"
+        }
+      },
+      "reward": [
+        "Points Rodding"
+      ],
+      "gold": 20
+    },
+    {
+      "id": "the-nine-and-the-eleven",
+      "giver": "kettleworks",
+      "requires": [
+        "the-drawer-of-eight-hundred"
+      ],
+      "name": "THE NINE AND THE ELEVEN",
+      "brief": "The milestone at the field gate says Kettleworks eleven and the milestone on the Treyway says nine, and the woman who sits against the second one says the nine is a lie people tell about the marsh. The clerk wants it settled by somebody who has stood at the far end. Walk the road, find the post at the edge of the reach, and come back.",
+      "thanks": "She hears it out, crosses out neither number, and cuts a third line under both of them in the book. Then she gives you a ledger that is not the works' ledger and says it came off a cart nine years ago and has been waiting for somebody who walks.",
+      "goal": {
+        "word": {
+          "place": "the-wextreen-reach"
+        }
+      },
+      "reward": [
+        "The Green Ledger"
+      ],
+      "gold": 60
     }
   ]
 }

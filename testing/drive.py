@@ -1085,6 +1085,106 @@ def check_the_door_opens_on_the_treyway(page, name, fails):
     plant(page, base, lambda body: None, stem="door-restore")
 
 
+def check_the_road_west_reaches_a_town(page, name, fails):
+    """Two maps out from Bambulon there is a town, and it trades.
+
+    **M11.2.** Kettleworks has had a shelf and two errands since M8 and no
+    ground under it. What a browser has to prove is the part the engine tests
+    cannot: that a player can walk the whole way — door, Treyway, road west —
+    and end up on a shelf. Planted onto the Treyway rather than walked from the
+    pit, because the walk from the pit is the whole game.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+
+    road = [3, 13]
+
+    def on_the_treyway(body):
+        w = body.setdefault("world", {})
+        w["map"] = "the-treyway"
+        w["at"] = [road[0], road[1] - 1]
+        w["answered"] = list(w.get("answered", [])) + ["the-bottom-of-the-cave"]
+
+    plant(page, base, on_the_treyway, stem="road-west")
+    if page.evaluate("() => window.__world().id") != "the-treyway":
+        fails.append(f"{name}: could not stand on the Treyway")
+        plant(page, base, lambda body: None, stem="road-west-restore")
+        return
+    page.keyboard.press("ArrowDown")
+    page.wait_for_timeout(400)
+    dismiss_card(page)
+    close_fight(page)
+    where = page.evaluate("() => window.__world().id")
+    if where != "kettleworks-field":
+        fails.append(f"{name}: the road west led to {where!r}")
+        plant(page, base, lambda body: None, stem="road-west-restore")
+        return
+
+    # The dense map: one tile in ten carries something.
+    dense = page.evaluate("""() => {
+      const w = window.__world();
+      return { places: w.places.length, tiles: w.width * w.height,
+               curd: w.rows.flat().filter(t => t === 'curd').length };
+    }""")
+    if dense["places"] < 40:
+        fails.append(f"{name}: {dense['places']} of {dense['tiles']} tiles answer")
+    if dense["curd"] != 16:
+        fails.append(f"{name}: the Drambus Stack is {dense['curd']} tiles")
+
+    # An examinable is a card with nothing to answer, and you walk on from it.
+    look = page.evaluate("""() => (window.__world().places ?? [])
+        .find(p => p.id === 'the-milestone')""")
+    if not look:
+        fails.append(f"{name}: the field has no milestone on it")
+    else:
+        # **Stand beside it and take one step.** Standing *on* it and stepping
+        # off and back is two steps, and the first of them can roll a fight —
+        # which swallows the second keypress and leaves the fight screen up for
+        # every check after this one. That is trap eight in a new coat and it
+        # cost a run: `close_fight` on every path out.
+        page.evaluate("(at) => window.__standHere(at)", [look["at"][0] + 1, look["at"][1]])
+        close_fight(page)
+        dismiss_card(page)
+        page.keyboard.press("ArrowLeft")
+        page.wait_for_timeout(350)
+        if page.is_visible("#card"):
+            n = page.locator("#card-choices button").count()
+            if n:
+                fails.append(f"{name}: an examinable offers {n} choices")
+            if page.is_hidden("#card-bar"):
+                fails.append(f"{name}: an examinable has no way out of it")
+            dismiss_card(page)
+        else:
+            fails.append(f"{name}: standing on the milestone opened nothing")
+        close_fight(page)
+
+    # And the town on it opens, sells, and wants something.
+    town = page.evaluate("""() => (window.__world().places ?? [])
+        .find(p => p.kind === 'town')""")
+    if not town or town["id"] != "kettleworks":
+        fails.append(f"{name}: the field's town is {town}")
+    else:
+        page.evaluate("(at) => window.__standHere(at)", [town["at"][0] + 1, town["at"][1]])
+        close_fight(page)
+        dismiss_card(page)
+        page.keyboard.press("ArrowLeft")
+        page.wait_for_timeout(400)
+        if not page.is_visible("#town"):
+            fails.append(f"{name}: walked onto Kettleworks and no town opened")
+        else:
+            wares = page.locator("#shelf .wares").count()
+            errands = page.locator("#quests .wares").count()
+            if wares < 10:
+                fails.append(f"{name}: Kettleworks' shelf has {wares} things on it")
+            if errands < 1:
+                fails.append(f"{name}: Kettleworks wants nothing")
+            page.click("#leave")
+            page.wait_for_selector("#town", state="hidden", timeout=5000)
+
+    plant(page, base, lambda body: None, stem="road-west-restore")
+
+
 def check_the_rack(page, name, fails):
     """A licensee buys an ench, bolts it on, switches it off, and takes it back.
 
@@ -2888,6 +2988,7 @@ def walk_the_gate(browser, name, fails=None):
     # after them would be checking a game this walk did not play.
     check_the_fork_is_on_top(page, name, fails)
     check_the_door_opens_on_the_treyway(page, name, fails)
+    check_the_road_west_reaches_a_town(page, name, fails)
     check_the_rack(page, name, fails)
     check_the_spin_animates(page, name, fails)
     check_a_town_takes_the_tiredness_off(page, name, fails)
@@ -2995,6 +3096,7 @@ def main():
     print("ok: a licensee buys an ench, bolts it on, switches it off and takes it back")
     print("ok: a spinning item turns, and turns to somewhere core said it could")
     print("ok: the wall grows a door, the key opens it, and behind it is a map")
+    print("ok: two maps out there is a town, and one field tile in ten answers")
     print("ok: a whole set names its own item and says what it does; two thirds of one does not")
     print("ok: the lake is ground at its rim to a toad, and a wall through its middle to everybody")
     print("ok: the north is shut to a level-one character, and says what the road wants")

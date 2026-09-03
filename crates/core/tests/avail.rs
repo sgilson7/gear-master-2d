@@ -47,34 +47,50 @@ fn every_town_stocks_something_and_stocks_it_from_the_catalogue() {
 /// test now: content waiting for a map is fine and content waiting for nothing
 /// is an orphan, and the only difference between them is somebody having
 /// written the name down. A third stray shelf fails here.
-const STAGED: &[&str] = &["kettleworks", "high-wick"];
+///
+/// **Kettleworks came off this list in M11.2**, which is the thing the list was
+/// for: it had a shelf and two errands for three blocks and no ground under it,
+/// and the field map is `PLAN.md` §6a row 1 finally paid. High Wick is still
+/// waiting, on purpose.
+const STAGED: &[&str] = &["high-wick"];
 
 #[test]
-fn towns_on_this_map_all_trade_and_all_want_something() {
+fn towns_anywhere_in_the_world_all_trade_and_all_want_something() {
     use gm2d_core::world::PlaceKind;
-    let w = data::world(gm2d_core::combat::Difficulty::Easy);
-    let towns: HashSet<&str> =
-        w.places.iter().filter(|p| p.kind == PlaceKind::Town).map(|p| p.id.as_str()).collect();
-    assert!(!towns.is_empty(), "the map has no town at all");
+    // **Every map**, since M11.2 puts a town on the second one. A check that
+    // walked only the first map would have gone on calling Kettleworks staged
+    // while a player was standing in it.
+    let mut towns: HashSet<String> = HashSet::new();
+    for (id, _) in data::MAPS {
+        let w = data::map(id, gm2d_core::combat::Difficulty::Easy);
+        towns.extend(
+            w.places.iter().filter(|p| p.kind == PlaceKind::Town).map(|p| p.id.clone()),
+        );
+    }
+    assert!(!towns.is_empty(), "the world has no town at all");
 
     let shops = data::shops();
     let quests = data::quests();
     for t in &towns {
-        assert!(shops.town(t).is_some(), "{t} is on the map and sells nothing");
-        assert!(!quests.at(t).is_empty(), "{t} is on the map and wants nothing");
+        assert!(shops.town(t).is_some(), "{t} is on a map and sells nothing");
+        assert!(!quests.at(t).is_empty(), "{t} is on a map and wants nothing");
     }
 
-    // Anything shelved for a place that is not on the map is staged, and has
-    // to be named as such.
+    // Anything shelved for a place that is on no map is staged, and has to be
+    // named as such.
     let shelves: HashSet<&str> = shops.towns.iter().map(|t| t.id.as_str()).collect();
-    let mut orphans: Vec<&str> =
-        shelves.iter().copied().filter(|id| !towns.contains(id) && !STAGED.contains(id)).collect();
+    let mut orphans: Vec<&str> = shelves
+        .iter()
+        .copied()
+        .filter(|id| !towns.contains(*id) && !STAGED.contains(id))
+        .collect();
     orphans.sort();
     assert!(
         orphans.is_empty(),
         "shelves for nowhere: {orphans:?} — put the town on a map or add it to STAGED"
     );
-    let mut waiting: Vec<&str> = STAGED.iter().copied().filter(|id| towns.contains(id)).collect();
+    let mut waiting: Vec<&str> =
+        STAGED.iter().copied().filter(|id| towns.contains(*id)).collect();
     waiting.sort();
     assert!(
         waiting.is_empty(),

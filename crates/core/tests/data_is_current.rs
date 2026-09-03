@@ -20,7 +20,7 @@ fn the_compiled_in_data_matches_the_files() {
     // a map file or `drops.json` would have shipped without a word. The list
     // lives in `data::FILES` now, beside the things it names — and a name in
     // it may have a directory in it, because the maps live in `data/maps/`.
-    assert!(data::FILES.len() >= 12, "content was added to data.rs and not to FILES");
+    assert!(data::FILES.len() >= 13, "content was added to data.rs and not to FILES");
     for (name, embedded) in data::FILES.iter().copied() {
         assert_eq!(
             on_disk(name),

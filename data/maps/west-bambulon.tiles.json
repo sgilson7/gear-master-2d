@@ -61,7 +61,8 @@
       "enemies": [
         "Rust Golem",
         "Frost Wisp",
-        "Plague Hound"
+        "Plague Hound",
+        "Bone Archer"
       ]
     },
     {
@@ -263,6 +264,6 @@
       ]
     }
   ],
-  "_map_note": "The first map: one town and a great deal of wilds. Kettleworks and High Wick are written and are not placed here — they belong on maps that do not exist yet, and their shelves and errands are kept in shops.json and quests.json waiting for them. `towns_on_this_map_all_trade_and_all_want_something` is what stops that becoming an excuse for unreachable content. Two crossings gate the north. A crossing guards a *region* rather than its own tile — rows four to fifteen are twelve tiles of open ground, so a crossing that refused only the square it stands on would need a dozen of them across a row, which is a wall. The place itself stands on the near side of what it guards, so it is a milestone you can walk up to and read. The Kaklon van stands on the Verge road at [4, 6] and is not there below level ten — the only shop in the game that is not a town, and the only place gated on what you are rather than on what you carry or what you have answered. It is past the crossing that opens the Verge at nine, so it is a walk you earned twice.",
+  "_map_note": "The first map: one town and a great deal of wilds. Kettleworks and High Wick are written and are not placed here — they belong on maps that do not exist yet, and their shelves and errands are kept in shops.json and quests.json waiting for them. `towns_on_this_map_all_trade_and_all_want_something` is what stops that becoming an excuse for unreachable content. Two crossings gate the north. A crossing guards a *region* rather than its own tile — rows four to fifteen are twelve tiles of open ground, so a crossing that refused only the square it stands on would need a dozen of them across a row, which is a wall. The place itself stands on the near side of what it guards, so it is a milestone you can walk up to and read. The Kaklon van stands on the Verge road at [4, 6] and is not there below level ten — the only shop in the game that is not a town, and the only place gated on what you are rather than on what you carry or what you have answered. It is past the crossing that opens the Verge at nine, so it is a walk you earned twice. **Bone Archer lives in the Slag Flats as well as the pit, since M11.2.** `draw_enemy` weights a pool so its hardest member is its rarest, and in the pit the Archer is the hardest of three — one draw in ninety-seven. That is right for fights and wrong for everything farmed off it: it is the Wallspider Weave's whole rate problem (`PLAN.md` §6b row 1) and it made Kettleworks' four-nock errand a four-hundred-fight errand the moment the town was placed. In the Flats it is the *easiest* of four and drawn about half the time, and the Flats' danger moves by five.",
   "id": "west-bambulon"
 }

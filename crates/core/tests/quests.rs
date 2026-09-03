@@ -29,13 +29,19 @@ fn the_shipped_errands_parse_and_name_things_that_exist() {
     // check that there is an errand at all and that it is somebody's.
     let q = data::quests();
     assert!(!q.quests.is_empty(), "no errands anywhere");
-    let w = data::world(D);
     let shops = data::shops();
-    let places: Vec<&str> = w.places.iter().map(|p| p.id.as_str()).collect();
+    // **Every map.** An errand's giver, its turn-in and the place it sends you
+    // to may each be on a different one since M11.2 — that is the point of the
+    // two lines the field map added, and a check that only walked the first map
+    // would have called all three of them nowhere.
+    let places: Vec<String> = data::MAPS
+        .iter()
+        .flat_map(|(id, _)| data::map(id, D).places.iter().map(|p| p.id.clone()).collect::<Vec<_>>())
+        .collect();
     for e in &q.quests {
         // A giver is a town or an event tile now, and either is fine — but it
         // has to be somewhere. A staged town counts: its map is coming.
-        let known = |id: &str| places.contains(&id) || shops.town(id).is_some();
+        let known = |id: &str| places.iter().any(|p| p == id) || shops.town(id).is_some();
         assert!(known(&e.giver), "{} is given out by {:?}, which is nowhere", e.id, e.giver);
         let back = e.turn_in.as_deref().unwrap_or(&e.giver);
         assert!(known(back), "{} is handed in at {:?}, which is nowhere", e.id, back);
@@ -81,13 +87,17 @@ fn every_errand_counts_something_of_its_own() {
 fn every_town_has_an_errand() {
     use gm2d_core::world::PlaceKind;
     let q = data::quests();
-    let w = data::world(D);
-    let mut bare: Vec<&str> = w
-        .places
+    let mut bare: Vec<String> = data::MAPS
         .iter()
-        .filter(|p| p.kind == PlaceKind::Town)
-        .map(|p| p.id.as_str())
-        .filter(|id| q.quests.iter().all(|e| e.giver != *id))
+        .flat_map(|(id, _)| {
+            data::map(id, D)
+                .places
+                .iter()
+                .filter(|p| p.kind == PlaceKind::Town)
+                .map(|p| p.id.clone())
+                .collect::<Vec<_>>()
+        })
+        .filter(|id| q.quests.iter().all(|e| &e.giver != id))
         .collect();
     bare.sort();
     assert!(bare.is_empty(), "towns that want nothing: {bare:?}");
@@ -100,16 +110,82 @@ fn every_town_has_an_errand() {
 #[test]
 fn every_errand_names_a_creature_that_is_actually_out_there() {
     let q = data::quests();
-    let w = data::world(D);
     for e in &q.quests {
         let Some(c) = e.goal.creature() else { continue };
-        let regions: Vec<&str> = w
-            .regions
+        // Any map's pools, not the first map's. An errand handed out on the
+        // field map is about what lives in the field.
+        let regions: Vec<String> = data::MAPS
             .iter()
-            .filter(|r| r.enemies.iter().any(|m| m.name == c))
-            .map(|r| r.id.as_str())
+            .flat_map(|(id, _)| {
+                data::map(id, D)
+                    .regions
+                    .iter()
+                    .filter(|r| r.enemies.iter().any(|m| m.name == c))
+                    .map(|r| r.id.clone())
+                    .collect::<Vec<_>>()
+            })
             .collect();
-        assert!(!regions.is_empty(), "{}: nothing anywhere on the map is a {c}", e.id);
+        assert!(!regions.is_empty(), "{}: nothing anywhere in the world is a {c}", e.id);
+    }
+}
+
+/// **An errand never asks for the rarest thing in the room.**
+///
+/// `draw_enemy` weights a pool by `(max + 1 − rating)`, so the hardest creature
+/// in a region is the rarest one in it — which is right for fights and is a
+/// *content* decision the moment something is farmed off it. `PLAN.md` §6b row
+/// 1 is this problem seen from the drops' end: measured per creature the three
+/// sets looked fine, and measured the way a player counts, one of them was
+/// three and a half thousand fights away.
+///
+/// So: somewhere in the world there is a region where the creature an errand
+/// names is drawn at least a fifth of the time. Not a statement about the pool
+/// being fair — a statement about the errand being finishable in an evening.
+#[test]
+fn every_slaying_errand_asks_for_something_you_actually_meet() {
+    let quests = data::quests();
+    for e in &quests.quests {
+        let Some(c) = e.goal.creature() else { continue };
+        let mut best = 0;
+        let mut where_ = String::new();
+        for (id, _) in data::MAPS {
+            for r in data::map(id, D).regions {
+                if !r.enemies.iter().any(|m| m.name == c) {
+                    continue;
+                }
+                let rated: Vec<i32> = r
+                    .enemies
+                    .iter()
+                    .map(|m| gm2d_core::rating::creature_rating(m, D))
+                    .collect();
+                let max = rated.iter().copied().max().unwrap_or(0);
+                let weights: Vec<i32> = rated.iter().map(|v| (max + 1 - v).max(1)).collect();
+                let total: i32 = weights.iter().sum();
+                let mine = r
+                    .enemies
+                    .iter()
+                    .zip(&weights)
+                    .find(|(m, _)| m.name == c)
+                    .map(|(_, w)| *w)
+                    .unwrap_or(0);
+                let pct = mine * 100 / total.max(1);
+                if pct > best {
+                    best = pct;
+                    where_ = format!("{id}/{}", r.id);
+                }
+            }
+        }
+        // An evening, not a lifetime. The number is the *expected wins* to
+        // finish, which is what a player counts — see `drops.rs`'s rate, which
+        // learned the same lesson from the other end.
+        let wins = e.goal.count() as i32 * 100 / best.max(1);
+        assert!(
+            best > 0 && wins <= 60,
+            "{}: {c} is drawn {best}% of the time at best ({where_}), so {} of them is \
+             about {wins} wins",
+            e.id,
+            e.goal.count()
+        );
     }
 }
 

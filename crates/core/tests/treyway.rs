@@ -102,20 +102,41 @@ fn the_treyway_carries_on_where_bambulon_stops() {
     );
 }
 
-/// Its three places are the door back and two promises, and the promises are
-/// events with something to read.
+/// **Every road off the Treyway says where it goes.**
+///
+/// Two are gates — back into Bambulon and west to Kettleworks — and the reach
+/// is still an event, because the map it promises is M11.6's and a gate onto a
+/// map this build has not got is a hole. What the test holds is the property
+/// both kinds have to have: a road on this map tells you what is at the end of
+/// it, and everything else on it has something to read.
 #[test]
-fn the_treyway_promises_two_maps_it_has_not_got() {
+fn every_road_off_the_treyway_says_where_it_goes() {
     let w = treyway();
     let events = data::events();
-    let promises: Vec<&world::PlaceDef> =
-        w.places.iter().filter(|p| p.kind == PlaceKind::Event).collect();
-    assert_eq!(promises.len(), 2, "the two roads that are not built yet");
-    for p in promises {
-        let e = events.get(&p.id).unwrap_or_else(|| panic!("{} has nothing to read", p.id));
-        assert!(!e.prose.is_empty(), "{}: a promise that says nothing", p.id);
+    assert!(
+        w.places.iter().filter(|p| p.kind == PlaceKind::Gate).count() >= 2,
+        "the Treyway has fewer than two roads off it"
+    );
+    for p in &w.places {
+        match p.kind {
+            PlaceKind::Gate => {
+                let to = p.to.as_deref().unwrap_or_else(|| panic!("{}: a gate to nowhere", p.id));
+                assert!(
+                    data::MAPS.iter().any(|(m, _)| *m == to),
+                    "{}: opens onto {to:?}, which is not a map",
+                    p.id
+                );
+                assert!(!p.name.is_empty(), "{}: a road with no name on it", p.id);
+            }
+            PlaceKind::Event => {
+                let e = events
+                    .get(&p.id)
+                    .unwrap_or_else(|| panic!("{} has nothing to read", p.id));
+                assert!(!e.prose.is_empty(), "{}: a promise that says nothing", p.id);
+            }
+            other => panic!("{}: the Treyway has a {other:?} on it and nothing expects one", p.id),
+        }
     }
-    assert_eq!(w.places.iter().filter(|p| p.kind == PlaceKind::Gate).count(), 1);
 }
 
 // ------------------------------------------------------- where you were

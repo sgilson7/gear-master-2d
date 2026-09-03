@@ -451,6 +451,376 @@
           "unmet": ""
         }
       ]
+    },
+    {
+      "id": "the-quench-pond",
+      "title": "THE QUENCH POND",
+      "prose": [
+        "A rectangle of black water forty feet on a side with a rail round three of them and a plank across the fourth. Steam comes off it in the morning and does not stop coming off it in the afternoon.",
+        "There is a tally chalked on the rail: 1,402. Under it, in a different hand, WE DO NOT KNOW WHAT OF."
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-plate-stack",
+      "title": "THE PLATE STACK",
+      "prose": [
+        "Plate, stacked. Two hundred and six sheets, each one the width of a door and the thickness of a thumbnail, leaning against a frame that was built for a hundred and eighty.",
+        "The frame is holding. A man walks past it four times an hour and looks at it and walks on, and that is his whole job and he is good at it."
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-hooper",
+      "title": "THE HOOPER",
+      "prose": [
+        "A woman is putting a hoop round a kettle. The kettle is eleven feet across and the hoop was made for a kettle ten feet across, and she is closing the gap by heating the hoop and waiting.",
+        "\"Sixth kettle this month,\" she says. \"They all come in a foot over. Nobody will say who is casting them.\""
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-office-of-the-works",
+      "title": "THE OFFICE OF THE WORKS",
+      "prose": [
+        "A shed with a window and a counter under the window and nobody behind the counter. On the counter is a ledger open at a page headed COMPLAINTS, and the page has three entries on it and all three are about the page.",
+        "The pencil is on a string and the string is nine inches long, which is not enough to reach the second column."
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-scrap-line",
+      "title": "THE SCRAP LINE",
+      "prose": [
+        "Bins, in a row, each one labelled with what goes in it. The labels read IRON, IRON, IRON, NOT IRON, IRON.",
+        "The fourth bin is empty and has always been empty, and a sign above it says KEEP IT THAT WAY, which somebody has taken to be an instruction about the bin."
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-second-forge",
+      "title": "THE SECOND FORGE",
+      "prose": [
+        "The first forge burned down in a year nobody writes on anything. This is the second one and it is built out of the first one, which is why the west wall is a different colour and eleven inches thicker than the other three.",
+        "Nothing is being forged. The fire is banked and two men are sitting beside it with a board between them playing a game with four counters."
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-cold-anvil",
+      "title": "THE COLD ANVIL",
+      "prose": [
+        "An anvil in the open with no forge near it and grass round the base. It has been struck a great many times and not recently; the face is dished by about a quarter of an inch, which is thirty years of somebody.",
+        "A card is wired to the horn. It says ANVIL, OWN FOOT, and then a date, and then the word AGAIN, and under that four more dates."
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-cast-that-failed",
+      "title": "THE CAST THAT FAILED",
+      "prose": [
+        "Something the size of a cart, iron, and the wrong shape for anything. It came out of a mould that opened early and set in the yard where it fell, and it has been there long enough that the works built the road around it.",
+        "Children have been drawing on it for nine years. The lowest drawing is at knee height and the highest is at the top, which tells you how long some of them have been coming back."
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-tap-house",
+      "title": "THE TAP HOUSE",
+      "prose": [
+        "Not a public house. It is where the taps are — sixteen of them on one wall, each with a hand-lettered card under it, and only four of the cards say the same thing as the tap above them.",
+        "The man who knows which four is off today. There is a note on the door that says so and does not say which four."
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-fletchers-drawer",
+      "title": "THE FLETCHER'S DRAWER",
+      "prose": [
+        "The fletcher of Kettleworks has a drawer of eight hundred shafts and no nocks to put on the end of any of them. He has the drawer open and is counting them again.",
+        "\"Eight hundred and four,\" he says. \"It was eight hundred and one on Tuesday. I have stopped having a theory.\""
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-cooling-yard",
+      "title": "THE COOLING YARD",
+      "prose": [
+        "Forty kettles on the ground in four rows of ten, all of them upside down, all of them still warm. Walking between the rows is warmer than walking round them by about the amount that makes you do it.",
+        "The fortieth is the only one the right way up. There is rainwater in it and something living in the rainwater."
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-wood-that-was-left",
+      "title": "THE WOOD THAT WAS LEFT",
+      "prose": [
+        "Twelve trees. The works took everything else on this side for charcoal in one winter and stopped at twelve, and nobody at the works can tell you why twelve and not eleven or none.",
+        "There is a bench under the third one. It is a good bench and it faces the stumps."
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-hoop-store",
+      "title": "THE HOOP STORE",
+      "prose": [
+        "Hoops on pegs, smallest to largest, from a bracelet to a thing you could stand in. The last four pegs are empty and the wall behind them is unfaded, so they have not been empty long.",
+        "The list on the door has ninety-one hoops on it. Counting the pegs gives eighty-seven."
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-stack-door",
+      "title": "THE DOOR IN THE STACK",
+      "prose": [
+        "The Drambus Stack goes up out of the field for two hundred and ten feet and is made of cheese, and everybody here has stopped finding that remarkable in the way you stop finding a hill remarkable.",
+        "There is a door in the south face at ground level. It is a proper door with a proper frame, set into the curd, and the curd has closed round the frame by about an inch on every side over some number of years.",
+        "It is shut. Not locked — shut, the way a door is shut when the thing behind it is not ready for you. Somebody has chalked five strokes on it and rubbed none of them out."
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-smell-line",
+      "title": "THE SMELL LINE",
+      "prose": [
+        "A line of whitewash on the ground, running east to west, forty yards out from the Stack. It marks where the smell starts, which was surveyed in one afternoon by nine people walking inwards with their eyes shut.",
+        "Six of the nine agreed to within a yard. The line is drawn through the six."
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-measuring-post",
+      "title": "THE MEASURING POST",
+      "prose": [
+        "A post with the Stack's height cut into it, once a year, for eleven years. The marks go down.",
+        "Not by much and not evenly: four of the eleven years it did not move at all, and one year it went down eleven feet in a fortnight and the mark for that year is cut twice because nobody believed the first one."
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-crumb-field",
+      "title": "THE CRUMB FIELD",
+      "prose": [
+        "Everything that comes off the Stack lands here, and what comes off the Stack is not crumbs so much as pieces, and nine of the pieces are the size of a chair.",
+        "There is a path through them that gets remade about once a month. You can tell how long it has been by how far you have to climb."
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-rind-wall",
+      "title": "THE RIND WALL",
+      "prose": [
+        "Somebody has built a wall out of the rind. It is four feet high, ninety feet long, and runs from nothing to nothing across open ground.",
+        "It is a very good wall. That is the part people come to see: whoever did it knew how to build a wall and had only this to build one out of."
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-ladder",
+      "title": "THE LADDER",
+      "prose": [
+        "A ladder, against the Stack, going up eleven rungs and stopping. It has been there long enough for the curd to have grown round the feet of it.",
+        "The eleventh rung is worn and the tenth is not, which means everybody who has ever climbed it has stood on the top one and looked, and nobody has ever gone further, because there is nothing to go further on."
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-tally-shed",
+      "title": "THE TALLY SHED",
+      "prose": [
+        "A shed with one door and one window and a man in it whose entire responsibility is to write down when the Stack drops. He has been in the shed for six years and has written five lines.",
+        "\"They come in clumps,\" he says. \"Or they do not. Six years is not enough to say and I have said so in the sixth line, which is not a drop and is why it is not a line.\""
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-cut-face",
+      "title": "THE CUT FACE",
+      "prose": [
+        "Somebody took a cheese-wire to the west side at head height and cut out a block a foot on a side, and then somebody else came and did the same nine inches to the left, and now there are forty of them in a row like a shelf of missing books.",
+        "The works had a meeting about it. The outcome of the meeting was a sign, and the sign is on the ground under the shelf where it fell."
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-flies",
+      "title": "THE FLIES",
+      "prose": [
+        "There are none. Two hundred and ten feet of cheese in an open field in warm weather and there is not one fly on it, and this is the fact about the Stack that people find hard rather than the height of it.",
+        "A woman with a net has been standing here for eleven days to catch the first one. She has caught nothing and does not seem discouraged, which is its own kind of information."
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-north-buttress",
+      "title": "THE NORTH BUTTRESS",
+      "prose": [
+        "The Stack leans north by about four degrees and has done for as long as anybody has measured it. Somebody has built a buttress against the north face out of proper stone, twenty feet of it, and left a gap of two inches at the top.",
+        "The gap is deliberate. There is a card on the stone that says IF THIS CLOSES, TELL SOMEBODY, and a name, and the name has been crossed out and not replaced."
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-weighbridge",
+      "title": "THE WEIGHBRIDGE",
+      "prose": [
+        "A weighbridge, for carts, at the edge of the crumb field. The plate reads to a quarter of a hundredweight and there is a book beside it with four thousand entries in it.",
+        "Every entry is a cart going out. There is no column for a cart coming in and there never has been, which the man on the bridge says is because nothing comes in."
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-shortest-way",
+      "title": "THE SHORTEST WAY",
+      "prose": [
+        "A path worn round the east side of the Stack, three feet wide and eleven inches deep in the middle. It goes from the road to the road and saves you about forty paces.",
+        "It has been worn into the field rather than into the curd, which is the thing to notice: the Stack is not the softer of the two."
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-pens",
+      "title": "THE PENS",
+      "prose": [
+        "Nine pens, empty, in good repair, with the gates all standing open and the straw changed. Somebody is keeping them ready.",
+        "A woman comes down twice a day and changes the straw in all nine and goes away. There has not been anything in them since the year the works stopped putting a year on things."
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-lower-road",
+      "title": "THE LOWER ROAD",
+      "prose": [
+        "The road out of the field runs south and then east and joins the Treyway at a milestone that says KETTLEWORKS 11, which is eleven if you take the road and nine if you do not.",
+        "Somebody has cut a third number under both of them and then filled it in again, and the filling has weathered differently, so you can read it. It is 4."
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-cistern",
+      "title": "THE CISTERN",
+      "prose": [
+        "Sunk stone, twelve feet across, with a lid on it in two halves and one half slid back. The water is nine feet down and clean.",
+        "There is a mark on the inside wall at the six-foot line, cut deep, with a date beside it. Whatever it records, it records it as having been higher."
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-fitters-bench",
+      "title": "THE FITTER'S BENCH",
+      "prose": [
+        "A bench under a lean-to with four vices on it, three of which work. The fourth has been left on the bench with its jaws open and a card in the jaws that says DO NOT, and nothing after that.",
+        "The other three are worn smooth where hands go. The fourth is not worn at all."
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-long-shed",
+      "title": "THE LONG SHED",
+      "prose": [
+        "Two hundred feet of shed with nothing in it, doors at both ends, and a floor swept end to end. It was built to hold the plate before the plate started being stacked outside, which is a decision nobody at the works will defend and nobody will name.",
+        "Standing at one end you can hear somebody walking at the other end, and there is nobody at the other end. It is the shed doing it."
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-fence-off-the-fence",
+      "title": "THE FENCE OFF THE FENCE",
+      "prose": [
+        "Cork fencing, four panels of it, plainly cut off the boundary in Bambulon and carted eleven days to get here. It has been put up round nothing — four panels in a square with a gap you walk through.",
+        "It is growing. Two of the four panels have closed the gap by an inch since somebody last measured, and somebody measures."
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-drover",
+      "title": "THE DROVER",
+      "prose": [
+        "A man with a stick and no animals, walking a line between the pens and the lower road and back. He does the circuit nine times and then sits down.",
+        "\"I am not waiting for them,\" he says, before you have asked. \"I am keeping the way open. It closes if you stop.\""
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-boundary-stone",
+      "title": "THE BOUNDARY STONE",
+      "prose": [
+        "A stone with two names on it and an arrow between them, and both names are Kettleworks. It marks the point where the field stops belonging to the works and starts belonging to the town, which are the same eleven people.",
+        "The arrow points at the ground."
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-broken-kettle",
+      "title": "THE BROKEN KETTLE",
+      "prose": [
+        "One kettle, on its side, split from rim to base. It is the only broken one in the field and it has been left where it split, which was six years ago according to the card, and the card is newer than that.",
+        "Somebody comes and puts a fresh card on it. The card says WE STILL DO NOT KNOW."
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-milestone",
+      "title": "THE MILESTONE",
+      "prose": [
+        "A milestone at the field gate, cut with the distance to four places. Three of them are legible: Kettleworks, one; the Stack, one; the Treyway, eleven.",
+        "The fourth has been chiselled out. What is left is the depth of the letters, and there were nine of them."
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-empty-gibbet",
+      "title": "THE STANDING FRAME",
+      "prose": [
+        "A frame, timber, twelve feet, standing on its own at the edge of the field with nothing hanging off it and nothing near it. It is the same frame that stands in the shallows in Bambulon and it is a different frame.",
+        "There are two of them. Nobody at the works knows about the other one and nobody in the shallows knows about this one, and both places will tell you theirs is the only one."
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-notice-board",
+      "title": "THE NOTICE BOARD",
+      "prose": [
+        "Six notices, four of them about the same thing. The thing is that the road east is not maintained past the eleventh milestone, which four separate offices have decided is a fact worth pinning up.",
+        "The fifth is a lost dog. The sixth is under the fifth and has been under it long enough that you would have to take the fifth down, and nobody has."
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-back-lane",
+      "title": "THE BACK LANE",
+      "prose": [
+        "A lane between the crumb field and the east scrub, walked flat, with a gutter down one side that runs the wrong way. Water in it goes uphill for about four feet and then thinks better of it and stops.",
+        "It has been like that since it was cut. Two separate surveys have said the ground is level and the gutter is level, and the water has read neither."
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-east-marker",
+      "title": "THE EAST MARKER",
+      "prose": [
+        "A post at the edge of the scrub with nine notches in it, and the notches are the number of times somebody has walked east from here and come back.",
+        "There is no notch for going and not coming back and there would be no one to cut it."
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-crossing-keeper",
+      "title": "THE CROSSING KEEPER",
+      "prose": [
+        "A hut at the junction of the two roads with a man in it whose job is to say which of the two is which. He has a board with four arrows on it and turns it as required.",
+        "It is required twice a day. He is here the rest of the time, and has been for nine years, and says it is the turning that matters and not how often."
+      ],
+      "choices": []
+    },
+    {
+      "id": "the-north-gate",
+      "title": "THE NORTH GATE",
+      "prose": [
+        "A gate in a wall that does not exist. The gate is good — hinges, latch, a stone post either side — and the wall it was made for was never built, so it stands in the open at the north end of the works.",
+        "It is kept oiled. Four people have the job between them and none of them will say whose idea the wall was."
+      ],
+      "choices": []
     }
   ]
 }

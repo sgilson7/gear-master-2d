@@ -69,7 +69,28 @@ pub struct TileEvent {
     pub id: String,
     pub title: String,
     pub prose: Vec<String>,
+    /// What you may do about it. **May be empty**, and an empty one is a
+    /// different kind of thing — see [`TileEvent::is_examinable`].
+    #[serde(default)]
     pub choices: Vec<Choice>,
+}
+
+impl TileEvent {
+    /// Something to read that does not ask you anything.
+    ///
+    /// **M11.2's, and it is a category rather than a degenerate case.** An
+    /// event with choices is a *card*: it is answered once, `answer` writes its
+    /// id into `answered`, and the choices are spent for good. An event with
+    /// none is a thing standing in a field — a post, a pond, a wall somebody
+    /// built out of rind — and there is nothing to spend, so it is never
+    /// answered and it reads the same on the ninth crossing as on the first.
+    ///
+    /// The engine refused one of these outright until M11.2, which was right
+    /// while every event was a card. The dense map is forty tiles that answer
+    /// and most of them have nothing to ask.
+    pub fn is_examinable(&self) -> bool {
+        self.choices.is_empty()
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -87,9 +108,9 @@ impl EventsData {
             return Err(format!("expected a gm2d-events file, got {:?}", d.format));
         }
         for e in &d.events {
-            if e.choices.is_empty() {
-                return Err(format!("{:?} offers no choices, so it cannot be answered", e.id));
-            }
+            // An event with no choices is an examinable and is allowed; one
+            // with no *prose* is nothing at all, and that is still refused —
+            // whichever kind it is, the whole of it is what it says.
             if e.prose.is_empty() {
                 return Err(format!("{:?} has no prose", e.id));
             }

@@ -21,6 +21,8 @@ pub const TILES_JSON: &str = include_str!("../../../data/maps/west-bambulon.tile
 pub const DUNGEON_JSON: &str = include_str!("../../../data/maps/the-great-gear-cave.tiles.json");
 /// The DQ-scale map behind the door in the western wall.
 pub const TREYWAY_JSON: &str = include_str!("../../../data/maps/the-treyway.tiles.json");
+/// The dense map: Kettleworks, the field, and the Drambus Stack in the middle.
+pub const FIELD_JSON: &str = include_str!("../../../data/maps/kettleworks-field.tiles.json");
 pub const EVENTS_JSON: &str = include_str!("../../../data/events.json");
 pub const THEME_TD_JSON: &str = include_str!("../../../data/theme.td.json");
 pub const SKILLS_JSON: &str = include_str!("../../../data/skills.json");
@@ -42,6 +44,7 @@ pub const FILES: &[(&str, &str)] = &[
     ("maps/west-bambulon.tiles.json", TILES_JSON),
     ("maps/the-great-gear-cave.tiles.json", DUNGEON_JSON),
     ("maps/the-treyway.tiles.json", TREYWAY_JSON),
+    ("maps/kettleworks-field.tiles.json", FIELD_JSON),
     ("events.json", EVENTS_JSON),
     ("theme.td.json", THEME_TD_JSON),
     ("skills.json", SKILLS_JSON),
@@ -66,6 +69,7 @@ pub const MAPS: &[(&str, &str)] = &[
     ("west-bambulon", TILES_JSON),
     ("the-great-gear-cave", DUNGEON_JSON),
     ("the-treyway", TREYWAY_JSON),
+    ("kettleworks-field", FIELD_JSON),
 ];
 
 /// One map by id, falling back to the overworld.

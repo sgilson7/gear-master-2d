@@ -67,6 +67,9 @@ const LIGHT = {
   coast: ['#e8e2c8', '#e4dec2'],
   range: ['#8c8478', '#867e72'],
   sea:   ['#5d8494', '#567d8e'],
+  // The Drambus Stack. Two hundred and ten feet of it, drawn as itself rather
+  // than as rock, which is the whole reason it is its own terrain.
+  curd:  ['#e8cf7a', '#e3c96f'],
 };
 const DARK = {
   road:  ['#4a4132', '#514837'],
@@ -82,6 +85,7 @@ const DARK = {
   coast: ['#4a4a36', '#50503b'],
   range: ['#2a2723', '#302d28'],
   sea:   ['#1a2c33', '#1e323a'],
+  curd:  ['#6a5c26', '#71622b'],
 };
 
 function dark() {
@@ -1891,14 +1895,24 @@ async function main() {
   window.__rack = () => ench_rack_json();
   // Stand somewhere, so a planted check can walk one step into a place rather
   // than a hundred steps to it. Not a cheat in shipped play: nothing calls it.
-  window.__standAt = (at) => {
+  //
+  // **Two of them, because there are four maps.** `__standAt` puts you on the
+  // *first* map — it always has, by writing an empty `map`, which was invisible
+  // while there was one — and every check written before M11 means that.
+  // `__standHere` keeps the map you are on, which is what a check about the
+  // Treyway or the field wants. Naming them apart rather than adding an
+  // argument, because the argument would have a default and the default is
+  // exactly the thing that was silent.
+  const standOn = (at, map) => {
     const save = JSON.parse(save_json());
     save.state.world.at = at;
-    save.state.world.map = '';
+    if (map !== null) save.state.world.map = map;
     load_json(JSON.stringify(save));
     world = JSON.parse(world_json());
     paintPanel(); draw();
   };
+  window.__standAt = (at) => standOn(at, '');
+  window.__standHere = (at) => standOn(at, null);
   // Layout is the one claim reading the source cannot settle, so the gate has
   // to be able to put the fight screen on each stage and measure it.
   window.__stage = (which) => stage(which);

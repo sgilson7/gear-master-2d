@@ -200,3 +200,60 @@ wall stops being an ending and becomes a gate.
   blaming the *road*: "not reachable yet" about a tile that is perfectly
   reachable. Any new screen wants a branch in `playthrough.py`'s loop in the
   same commit.
+
+---
+
+## M11.2 — the town map, dense
+
+### A category of event that answers nothing, and a town that stopped being staged
+
+**The change.** `kettleworks-field`, twenty by twenty, forty-three of its four
+hundred tiles carrying something. Kettleworks placed with its M8 shelf and
+errands. The Drambus Stack in the middle as its own terrain. Two questlines,
+three errands each, each crossing a map.
+
+**Follows from.**
+
+- **`TileEvent` may have no choices now, and that is a category.** The engine
+  refused one outright — *"offers no choices, so it cannot be answered"* — which
+  was right while every event was a card. An **examinable** is a post or a pond
+  or a wall somebody built out of rind: nothing to spend, never written into
+  `answered`, and it reads the same on the ninth crossing as on the first. The
+  consequence to watch is the one that cannot be tested for: a *card* written
+  with its choices left off by accident is now legal content.
+  `most_of_the_field_is_something_to_look_at_rather_than_something_to_answer`
+  counts both kinds, which at least makes the ratio visible.
+- **Kettleworks came off `STAGED`**, which is what that list was for — and the
+  test that reads it had to grow from *the overworld's towns* to *the world's
+  towns*, along with `every_town_has_an_errand`,
+  `the_shipped_errands_parse_and_name_things_that_exist` and
+  `every_errand_names_a_creature_that_is_actually_out_there`. Every one of those
+  said "the map" and meant "the first map".
+- **An errand may now cross a border**, and its giver, its turn-in and the place
+  it sends you to can be on three different maps. `quest::guide` already
+  answered across maps; nothing had ever asked it to.
+- **`__standAt` grew a sibling.** It has always written an empty `map`, meaning
+  *the first one*, which was invisible while there was one map and is a trap
+  with four. `__standHere` keeps the map you are on. Two names rather than an
+  argument with a default, because the default was the silent part.
+
+**Watch.**
+
+- **A slaying errand nobody can finish.** `draw_enemy` weights a pool so its
+  hardest member is its rarest, which is `PLAN.md` §6b row 1 — and placing
+  Kettleworks made its four-nock errand *live*, at one draw in ninety-seven,
+  which is four hundred wins. Found by
+  `every_slaying_errand_asks_for_something_you_actually_meet`, which is new and
+  which fails at sixty expected wins. Fixed as content, the way this project
+  tunes a map: **Bone Archer lives in the Slag Flats as well as the pit**, where
+  it is the easiest of four rather than the hardest of three. The Flats' danger
+  moved by five and the Wallspider Weave got cheaper along with the errand,
+  which is the same row of §6b paying off from the other end.
+- **A check that opens a screen and leaves it open.** The field check stood *on*
+  a tile and stepped off and back, and the first of those two steps can roll a
+  fight — which swallowed the second keypress and left the fight screen up for
+  every check after it. Stand beside, take one step, `close_fight` on every path
+  out. Trap eight, third coat.
+- **Forty cards is not forty good cards.** The budget is a floor on *count* and
+  says nothing about whether any of them is worth reading. That is a reader's
+  job and M11.7's tone pass is where it happens.

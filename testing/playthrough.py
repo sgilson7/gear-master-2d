@@ -31,9 +31,11 @@ ORIGIN = f"http://127.0.0.1:{PORT}"
 # steps is a demo nobody finishes.
 STEPS = 9000
 
-# The two roads on the Treyway that promise a map this build has not built.
-# Reading both is what makes a run *have been there* rather than having been
-# knocked over on the doorstep.
+# What the walk has to have done before it comes home for good: met the woman
+# at the turn, read the post at the reach, and been inside Kettleworks. The
+# first two are the Treyway's; the third is the map behind the road west, and
+# it is a town rather than a card because reaching a *town* on a third map is
+# the thing M11.2 ships.
 TREYWAY_PROMISES = {"the-kettleworks-road", "the-wextreen-reach"}
 
 
@@ -354,9 +356,16 @@ def main():
             # through the door — which is where the run now finishes, because
             # the door stopped being an ending and became a border.
             seen_treyway = False
+            seen_field = False
+            seen_kettleworks = False
             came_back = False
-            # Tiles on the Treyway that were walked to and turned out to hold
-            # nothing readable. `answered` is the real record; this is the
+            # Tiles that were walked to and turned out to hold nothing
+            # readable. **Keyed by map**, and it has to be: a bare `(x, y)` is
+            # four different tiles now, and the first version of this poisoned
+            # the woman at the turn on the Treyway with a tile the walk had
+            # stood on in Bambulon — so the run crossed the door back and
+            # forth for six thousand presses looking for something it had
+            # already crossed off. `answered` is the real record; this is the
             # walker's own give-up list, the same one `done_marks` is.
             read_over = set()
             # Targets that would not let us in, by how many presses were spent
@@ -407,6 +416,8 @@ def main():
                     phase = ""
                     continue
                 if page.is_visible("#town"):
+                    if page.evaluate("() => window.__world().id") == "kettleworks-field":
+                        seen_kettleworks = True
                     say(f"  in town: {panel(page)}")
                     in_town(page)
                     spend_points(page)
@@ -443,6 +454,7 @@ def main():
                 cave_mouth = place_by_id("the-cave-mouth")
                 wall_door = place_by_id("the-door-in-the-wall")
                 door_back = place_by_id("the-door-back")
+                road_west = place_by_id("the-road-west")
                 gate = next((p for p in world["places"] if p["kind"] == "gate"), None)
                 answered = set(page.evaluate(
                     "() => JSON.parse(window.__save()).state.world.answered || []"))
@@ -452,7 +464,7 @@ def main():
                 # again, because the first time is usually a defeat carrying it
                 # home after one fight, and a run that ends on being beaten
                 # once has measured nothing about the map it was beaten on.
-                read_the_lot = TREYWAY_PROMISES <= answered
+                read_the_lot = TREYWAY_PROMISES <= answered and seen_kettleworks
                 if seen_treyway and world["id"] == "west-bambulon" and read_the_lot:
                     came_back = True
                     head("back through the door")
@@ -468,7 +480,39 @@ def main():
                 have_witch = "The Witch's Key" in keys
 
                 want = None
-                if world["id"] == "the-treyway":
+                if world["id"] == "kettleworks-field":
+                    # **The dense map.** Forty of its four hundred tiles carry
+                    # something, so the walk is worth reading rather than worth
+                    # counting: head for the town first, then the door in the
+                    # Stack, then whatever else is unread, then home.
+                    if not seen_field:
+                        seen_field = True
+                        head("kettleworks field")
+                        say(f"  {panel(page)}")
+                        say(f"  {len(world['places'])} of "
+                            f"{world['width'] * world['height']} tiles answer")
+                        phase = "kettleworks field"
+                    kw = place_by_id("kettleworks")
+                    road = place_by_id("the-field-road")
+                    if c["fatigue"] >= 36 and kw:
+                        want, why = kw["at"], "kettleworks field"
+                    elif not seen_kettleworks and kw:
+                        want, why = kw["at"], "kettleworks field"
+                    else:
+                        unread = [tuple(p["at"]) for p in world["places"]
+                                  if p["kind"] == "event"
+                                  and p["id"] not in answered
+                                  and (world["id"], tuple(p["at"])) not in read_over]
+                        if len(unread) > 30 and road:
+                            # Reading forty cards is not what this run is for.
+                            # Six is enough to prove the map answers.
+                            unread = unread[:0]
+                        if unread:
+                            unread.sort(key=lambda a: abs(a[0] - here[0]) + abs(a[1] - here[1]))
+                            want, why = list(unread[0]), "kettleworks field"
+                        elif road:
+                            want, why = road["at"], "back"
+                elif world["id"] == "the-treyway":
                     # **Past the door.** Read what the two roads say and then
                     # go back, which is the whole of what M11.1 ships: a map at
                     # a different scale, and a border that remembers.
@@ -486,7 +530,7 @@ def main():
                     promises = [tuple(p["at"]) for p in world["places"]
                                 if p["kind"] == "event"
                                 and p["id"] not in answered
-                                and tuple(p["at"]) not in read_over]
+                                and (world["id"], tuple(p["at"])) not in read_over]
                     if c["fatigue"] >= 36 and door_back:
                         # Worn through on a map with no town on it. The way
                         # home is a target like any other — M9.4's lesson,
@@ -495,6 +539,8 @@ def main():
                     elif promises:
                         promises.sort(key=lambda a: abs(a[0] - here[0]) + abs(a[1] - here[1]))
                         want, why = list(promises[0]), "the treyway"
+                    elif road_west and not seen_kettleworks:
+                        want, why = road_west["at"], "the road west"
                     elif door_back:
                         want, why = door_back["at"], "back"
                 elif world["id"] != "west-bambulon":
@@ -588,7 +634,7 @@ def main():
                 if want is not None and tuple(want) == here:
                     # Standing on it and nothing opened, so there is nothing
                     # here for us. Do not walk back to it.
-                    read_over.add(here)
+                    read_over.add((world["id"], here))
                     #
                     # Cleared whenever an errand finishes, because what a place
                     # is worth changes when the log does — a tile with nothing
@@ -626,7 +672,7 @@ def main():
                         say(f"  shut: {tuple(want)} is not reachable yet"
                             f" — {last_said(page) or 'no reason given'}")
                         done_marks.add(tuple(want))
-                        read_over.add(tuple(want))
+                        read_over.add((world["id"], tuple(want)))
                         done_marks.add(here)
                         errand_turn += 1
                         stuck.clear()

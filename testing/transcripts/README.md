@@ -65,3 +65,22 @@ walker.
    hundred experience, lost the first fight on the other side and were carried
    home having read nothing. The walker banks and mends before it crosses now,
    which is what a person does, and the run after that read both roads.
+
+**M11.2's run is `m11.2.txt`.** 2,252 steps, 272 wins, 48 losses, level 16 —
+through the door, west along the Treyway, into Kettleworks, both its errands
+taken, and home. It is the first run that reaches a *third* map and the first
+that takes an errand in a town that is not the pit's.
+
+Two things it found.
+
+1. **The walker's give-up list was not keyed by map.** `read_over` held bare
+   `(x, y)` pairs, so a tile the walk had crossed off in Bambulon crossed off a
+   different tile on the Treyway — and the run spent six thousand presses
+   crossing the door back and forth looking for a woman it had already decided
+   was not there. Four maps make a bare coordinate four tiles.
+2. **The pools beat a seven-item board.** The first drafts of the Treyway's
+   arrival band and the field's outskirts were rated where the *next* thing
+   should be rather than where the last one left off, and the walk crossed and
+   was killed and carried home, repeatedly, having read nothing. Both were
+   retuned down against what the walk actually survives, which is the only
+   measurement either of them has.

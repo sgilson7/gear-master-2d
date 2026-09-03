@@ -1,6 +1,6 @@
 ROOT := $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 
-.PHONY: help test test-ui test-ui-setup check web serve publish art play clean
+.PHONY: help test test-ui test-ui-setup check web serve publish art play dress read clean
 
 ## test: run the engine suite (native, no browser needed)
 test:
@@ -48,6 +48,23 @@ publish:
 	@git push
 	@echo "Pushed. Actions builds and publishes; live in about two minutes."
 	@echo "Watch: gh run watch"
+
+## dress: search the catalogue for a creature that rates near RATING
+##
+## The authoring bench, `crates/lab`, and it is not shipped — the wasm crate
+## does not depend on it. Both of the original's guarantees come with it:
+## monsters wear the catalogue, and a spec whose gear does not assemble is a
+## typo rather than a difficulty.
+##
+##     make dress RATING=1200 SLOTS=3
+dress:
+	@RATING=$(RATING) SLOTS=$(SLOTS) cargo run -q -p gm2d-lab --bin dress -- dress
+
+## read: print an existing creature's board, its items and its rating
+##
+##     make read NAME="Cog Priest"
+read:
+	@cargo run -q -p gm2d-lab --bin dress -- read $(NAME)
 
 ## art: compile art/*.tex to web/assets/*.svg (needs pdflatex + pdftocairo)
 ##

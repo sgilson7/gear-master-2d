@@ -1,6 +1,8 @@
 [workspace]
 resolver = "2"
-members = ["crates/core", "crates/wasm"]
+# `crates/lab` is the authoring bench and is not shipped: `crates/wasm`
+# does not depend on it, so nothing it does can reach a player.
+members = ["crates/core", "crates/wasm", "crates/lab"]
 
 [workspace.package]
 edition = "2021"

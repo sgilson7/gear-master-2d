@@ -1,0 +1,16 @@
+[package]
+name = "gm2d-lab"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+
+# **Not shipped, and it must not be.** The lab is the authoring bench: it
+# searches the catalogue for a loadout that hits a rating, and it prints an
+# existing creature's board so somebody can read it. Neither is part of the
+# game, and `crates/wasm` does not depend on it.
+[[bin]]
+name = "dress"
+path = "src/dress.rs"
+
+[dependencies]
+gm2d-core = { path = "../core" }

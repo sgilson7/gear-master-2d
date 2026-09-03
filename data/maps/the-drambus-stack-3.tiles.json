@@ -1,0 +1,61 @@
+{
+  "format": "gm2d-tiles",
+  "version": 1,
+  "id": "the-drambus-stack-3",
+  "_note": "Floor 3 of the Drambus Stack, and one sitting. `outside` is what makes it one: beating the boss puts you back in the field and a save taken inside reopens there too, so a floor is a thing you go in and finish or do not. Ten by ten, one thing at the end of it, and the next entry is a different map because the tower is a floor shorter. Which floor the door opens onto is derived from what has been answered rather than from a counter — the boss tiles are the record, and the order they come down in is the whole of the condition.",
+  "width": 10,
+  "height": 10,
+  "start": [
+    4,
+    8
+  ],
+  "outside": "kettleworks-field",
+  "rows": [
+    "CCCCCCCCCC",
+    "C,,,==,,,C",
+    "C,CC==CC,C",
+    "C,C====C,C",
+    "C,C=CC=C,C",
+    "C,C=CC=C,C",
+    "C,C====C,C",
+    "C,CC==CC,C",
+    "C,,,==,,,C",
+    "CCCCCCCCCC"
+  ],
+  "regions": [
+    {
+      "id": "the-drambus-stack-3",
+      "name": "The Drambus Stack, floor 3",
+      "bounds": [
+        [
+          0,
+          0,
+          9,
+          9
+        ]
+      ],
+      "enemies": [
+        "Vermin Sovereign",
+        "Obsidian Colossus",
+        "Rimefather"
+      ]
+    }
+  ],
+  "places": [
+    {
+      "at": [
+        4,
+        1
+      ],
+      "kind": "boss",
+      "id": "the-drambus-stack-3-boss",
+      "name": "what is standing on floor 3",
+      "creature": "Mire Behemoth",
+      "drops": "Drove Way",
+      "prose": [
+        "The middle of it goes first and the rest follows it down, and for about a second there is a shape in the air where the storey was.",
+        "The buttress on the north face has closed its two-inch gap by half an inch. There is a card on the stone that says to tell somebody, and a name on it that was crossed out nine years ago. Two floors left."
+      ]
+    }
+  ]
+}

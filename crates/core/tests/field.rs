@@ -101,18 +101,46 @@ fn the_drambus_stack_stands_in_the_field() {
     );
     assert!((5..15).contains(&cx) && (5..15).contains(&cy), "the Stack is at ({cx}, {cy})");
 
-    // And a door at the foot of it, on ground, next to the curd.
-    let door = w.places.iter().find(|p| p.id == "the-stack-door").expect("the door in the Stack");
+    // And a way in at the foot of it, on ground, next to the curd.
+    let door = w
+        .places
+        .iter()
+        .find(|p| p.id == "the-way-into-the-stack")
+        .expect("the way into the Stack");
     let [dx, dy] = door.at;
-    assert!(w.passable(dx, dy), "the door is inside the Stack");
+    assert!(w.passable(dx, dy), "the way in is inside the Stack");
+    // And the board you read about it is beside it rather than on it: an
+    // errand that sends you to the door must not put you on floor five of a
+    // tower you have not agreed to enter.
+    let board = w.places.iter().find(|p| p.id == "the-stack-door").expect("the board outside it");
+    assert_eq!(board.kind, PlaceKind::Event);
+    assert_ne!(board.at, door.at, "the board and the doorway are one tile");
+    assert_eq!(
+        (board.at[0] as i32 - dx as i32).abs() + (board.at[1] as i32 - dy as i32).abs(),
+        1,
+        "the board about the door is not beside the door"
+    );
     let touching = [(1i32, 0i32), (-1, 0), (0, 1), (0, -1)].iter().any(|(ox, oy)| {
         let (nx, ny) = (dx as i32 + ox, dy as i32 + oy);
         w.in_bounds(nx, ny) && w.terrain_name(nx as u8, ny as u8) == "curd"
     });
     assert!(touching, "the door in the Stack does not touch the Stack");
-    // It is written as an event and not a gate, because the floors behind it
-    // are M11.3's and a gate onto a map this build has not got is a hole.
-    assert_eq!(door.kind, PlaceKind::Event);
+    // **Five floors behind it, top down.** M11.2 wrote it as an event, because
+    // the maps did not exist; M11.3 built them. What the order encodes is the
+    // whole condition — you always enter the current top, so a floor is
+    // reachable only while every floor above it is cleared and it is not, and
+    // that is the ordering rather than a rule stated anywhere.
+    assert_eq!(door.kind, PlaceKind::Gate);
+    assert_eq!(door.floors.len(), 5, "the Stack is {} floors", door.floors.len());
+    assert!(door.to.is_none(), "the door names a map as well as a stack");
+    let names: Vec<&str> = door.floors.iter().map(|f| f.map.as_str()).collect();
+    assert_eq!(
+        names,
+        ["the-drambus-stack-5", "the-drambus-stack-4", "the-drambus-stack-3",
+         "the-drambus-stack-2", "the-drambus-stack-1"],
+        "the floors are out of order, so the tower comes down the wrong way"
+    );
+    assert!(!door.shut.is_empty(), "a stack that comes down and says nothing");
 }
 
 /// **Kettleworks is on the ground now, and it trades and it wants things.**
@@ -211,6 +239,7 @@ fn nothing_the_field_pays_is_on_a_shelf() {
         "what-the-door-smells-of",
         "what-comes-off-it",
         "the-frame-in-the-shallows",
+        "the-stack-is-shorter",
         "the-count-at-the-pond",
         "the-drawer-of-eight-hundred",
         "the-nine-and-the-eleven",

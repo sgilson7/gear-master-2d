@@ -93,13 +93,13 @@ pub fn run(game: &Game, difficulty: Difficulty) -> Option<CombatLog> {
 ///
 /// Reads the map the player is on. A `World` is cheap to build here — this
 /// runs once per settled fight, not per frame.
-fn boss_at(game: &Game, at: [u8; 2]) -> Option<(String, Option<String>)> {
+fn boss_at(game: &Game, at: [u8; 2]) -> Option<(String, Option<String>, Vec<String>)> {
     let w = crate::data::map(&game.world.map_id(), Difficulty::Easy);
     let p = w.place_at(at[0], at[1])?;
     if p.kind != crate::world::PlaceKind::Boss {
         return None;
     }
-    Some((p.id.clone(), p.drops.clone()))
+    Some((p.id.clone(), p.drops.clone(), p.prose.clone()))
 }
 
 /// A creature that gave up, and what that paid.
@@ -282,15 +282,29 @@ pub fn settle(game: &mut Game, log: &CombatLog, difficulty: Difficulty) -> Optio
             // creature's name: the same creature stands in a region's pool as
             // an ordinary encounter, and beating one in a field must not hand
             // over the key to anywhere. The place is what makes it a boss.
-            if let Some((id, drop)) = boss_at(game, e.at) {
+            if let Some((id, drop, prose)) = boss_at(game, e.at) {
                 if !game.world.answered.iter().any(|a| *a == id) {
                     game.world.answered.push(id);
                     if let Some(name) = drop {
                         receipt.push(format!("It was carrying {}.", game.theme_piece(&name)));
                         game.character.give(&name);
                     }
+                    // **What the place says when it happens.** A boss on a
+                    // tower floor is the floor coming down, and the paragraph
+                    // about that is content — it is on the place, in the map
+                    // file, and it counts the floors that are left because the
+                    // order they come down in is fixed and written.
+                    receipt.extend(prose);
                 }
             }
+            // **A floor is one sitting, and beating it ends the sitting.**
+            //
+            // The kick is a position write and not a death: nothing is lost,
+            // the walk out is not part of the budget, and the next time you go
+            // in it is a different map. Here rather than in the shim because
+            // "clearing a floor puts you outside" is a rule, and a rule decided
+            // in the shim is a rule the fast suite cannot reach.
+            crate::world::leave_the_sitting(&mut game.world, difficulty);
         }
         Outcome::Defeat | Outcome::Stalemate => {
             game.world.bump("losses");

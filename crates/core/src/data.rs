@@ -23,6 +23,17 @@ pub const DUNGEON_JSON: &str = include_str!("../../../data/maps/the-great-gear-c
 pub const TREYWAY_JSON: &str = include_str!("../../../data/maps/the-treyway.tiles.json");
 /// The dense map: Kettleworks, the field, and the Drambus Stack in the middle.
 pub const FIELD_JSON: &str = include_str!("../../../data/maps/kettleworks-field.tiles.json");
+
+/// The Drambus Stack, top down. Five maps and one sitting each.
+///
+/// Listed in the order they are entered, which is also the order they come
+/// down in — floor five first, because you always enter the current top and the
+/// top is what comes off.
+pub const STACK_5_JSON: &str = include_str!("../../../data/maps/the-drambus-stack-5.tiles.json");
+pub const STACK_4_JSON: &str = include_str!("../../../data/maps/the-drambus-stack-4.tiles.json");
+pub const STACK_3_JSON: &str = include_str!("../../../data/maps/the-drambus-stack-3.tiles.json");
+pub const STACK_2_JSON: &str = include_str!("../../../data/maps/the-drambus-stack-2.tiles.json");
+pub const STACK_1_JSON: &str = include_str!("../../../data/maps/the-drambus-stack-1.tiles.json");
 pub const EVENTS_JSON: &str = include_str!("../../../data/events.json");
 pub const THEME_TD_JSON: &str = include_str!("../../../data/theme.td.json");
 pub const SKILLS_JSON: &str = include_str!("../../../data/skills.json");
@@ -45,6 +56,11 @@ pub const FILES: &[(&str, &str)] = &[
     ("maps/the-great-gear-cave.tiles.json", DUNGEON_JSON),
     ("maps/the-treyway.tiles.json", TREYWAY_JSON),
     ("maps/kettleworks-field.tiles.json", FIELD_JSON),
+    ("maps/the-drambus-stack-5.tiles.json", STACK_5_JSON),
+    ("maps/the-drambus-stack-4.tiles.json", STACK_4_JSON),
+    ("maps/the-drambus-stack-3.tiles.json", STACK_3_JSON),
+    ("maps/the-drambus-stack-2.tiles.json", STACK_2_JSON),
+    ("maps/the-drambus-stack-1.tiles.json", STACK_1_JSON),
     ("events.json", EVENTS_JSON),
     ("theme.td.json", THEME_TD_JSON),
     ("skills.json", SKILLS_JSON),
@@ -70,6 +86,11 @@ pub const MAPS: &[(&str, &str)] = &[
     ("the-great-gear-cave", DUNGEON_JSON),
     ("the-treyway", TREYWAY_JSON),
     ("kettleworks-field", FIELD_JSON),
+    ("the-drambus-stack-5", STACK_5_JSON),
+    ("the-drambus-stack-4", STACK_4_JSON),
+    ("the-drambus-stack-3", STACK_3_JSON),
+    ("the-drambus-stack-2", STACK_2_JSON),
+    ("the-drambus-stack-1", STACK_1_JSON),
 ];
 
 /// One map by id, falling back to the overworld.

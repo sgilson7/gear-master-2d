@@ -1687,7 +1687,7 @@ function walk(dir) {
     // is a crossing that happens once. Core says whether this was the once —
     // the page does not keep a list of which doors it has read.
     if ((r.went.prose ?? []).length) {
-      showCard('THE DOOR IN THE WALL', r.went.prose, [], null);
+      showCard((r.went.name || 'the way through').toUpperCase(), r.went.prose, [], null);
     }
   }
   if (r.shut) log(r.shut, true);

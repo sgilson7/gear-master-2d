@@ -199,3 +199,45 @@ pub fn build_full_loadout(ch: &mut Character) {
         }
     }
 }
+
+/// A character carrying what the game actually hands out by a given point.
+///
+/// **The fixture the tower needed and nothing had.** There were two boards to
+/// test against and neither is a player: `Character::starting()` owns two
+/// components, and `bench()` owns all five hundred and forty-four and packs to
+/// seven thousand health, which beats every creature in the ladder including
+/// Francis. A question like *is this floor beatable* has no answer against
+/// either of them.
+///
+/// This is the third: every shelf named, every errand reward in the game, every
+/// set piece any creature drops, on a board grown to its ceiling, arranged by
+/// the button a player is given. It is generous — it assumes you bought the
+/// whole of both shelves and finished everything — but it is generous about
+/// *reachable* content, which is the direction that makes a difficulty check
+/// mean something.
+///
+/// Measured when it was written: 55 components, 1,039 health, 300% weapon
+/// power, and it wins about half its fights between rating 450 and 1,550. The
+/// half it loses is what the packing screen is for.
+pub fn geared_from(towns: &[&str]) -> Character {
+    use gm2d_core::data;
+    let mut ch = Character::starting();
+    // The boards cap at level six; twenty is comfortably past it.
+    ch.grow_boards(20);
+    let shops = data::shops();
+    for town in towns {
+        for name in &shops.town(town).expect("a shelf that exists").stock {
+            ch.give(name);
+        }
+    }
+    for q in &data::quests().quests {
+        for r in &q.reward {
+            ch.give(r);
+        }
+    }
+    for d in &data::drops().drops {
+        ch.give(&d.piece);
+    }
+    ch.apply_preset();
+    ch
+}

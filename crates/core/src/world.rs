@@ -292,6 +292,59 @@ pub struct PlaceDef {
     /// because it is a pacing decision rather than a measurement.
     #[serde(default)]
     pub needs_level: Option<u32>,
+    /// `Gate`: a stack of maps entered from the top down.
+    ///
+    /// **The Drambus Stack, and the reason there is no counter.** Every time a
+    /// floor is cleared the tower drops a level and the next entry is a
+    /// different map — which wants a number saying how many are gone, and a
+    /// number in the save is a second answer to a question that already has
+    /// one. Beating a boss writes that boss's tile id into `answered`, so
+    /// *how many floors are gone* is how many of these have been answered:
+    /// **derived, never banked**, the same rule an ench and a level follow.
+    ///
+    /// Order is the contract, top down. You always enter the current top, so a
+    /// floor is reachable only while every floor above it is cleared and it is
+    /// not — which the ordering enforces rather than a condition stating it.
+    #[serde(default)]
+    pub floors: Vec<Floor>,
+}
+
+/// One storey of a stack of maps, and the mark that says it is done.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Floor {
+    /// The map id.
+    pub map: String,
+    /// What has to be in `answered` for this floor to be gone — the id of the
+    /// boss tile standing on it. Named here rather than looked up so the gate
+    /// can answer without loading five maps to ask them.
+    pub cleared: String,
+}
+
+impl PlaceDef {
+    /// Which map this gate opens onto right now, if any.
+    ///
+    /// A plain gate opens onto `to` for ever. A stack opens onto its topmost
+    /// floor that has not been cleared, and onto **nothing** once they all
+    /// have — which is not a locked door but an absent one, and `shut` is what
+    /// is said where the door used to be.
+    pub fn opens_onto(&self, state: &WorldState) -> Option<&str> {
+        if self.floors.is_empty() {
+            return self.to.as_deref();
+        }
+        self.floors
+            .iter()
+            .find(|f| !state.answered.iter().any(|a| *a == f.cleared))
+            .map(|f| f.map.as_str())
+    }
+
+    /// How many of this gate's floors are gone.
+    pub fn floors_cleared(&self, state: &WorldState) -> usize {
+        self.floors
+            .iter()
+            .filter(|f| state.answered.iter().any(|a| *a == f.cleared))
+            .count()
+    }
 }
 
 /// Is this place there yet?
@@ -328,6 +381,18 @@ pub struct TilesData {
     pub rows: Vec<String>,
     pub regions: Vec<RegionDef>,
     pub places: Vec<PlaceDef>,
+    /// The map a sitting on this one ends on.
+    ///
+    /// **A floor of the Drambus Stack is one sitting**, which is `PLAN-M11.md`
+    /// §8 row 3 answered: you go in, you clear it or you do not, and there is
+    /// no walking out and no coming back to it later. Set on the tower's five
+    /// floors and nowhere else — the Cave is a dungeon you walk out of, and it
+    /// says so by not having this.
+    ///
+    /// One field doing two jobs, and they are the same job: it is where beating
+    /// the floor's boss puts you, and it is where a save taken inside reopens.
+    #[serde(default)]
+    pub outside: Option<String>,
 }
 
 // ------------------------------------------------------------------ resolved
@@ -358,6 +423,8 @@ pub struct World {
     region_of: Vec<usize>,
     pub regions: Vec<Region>,
     pub places: Vec<PlaceDef>,
+    /// Where a sitting on this map ends. See [`TilesData::outside`].
+    pub outside: Option<String>,
 }
 
 /// Why a map would not load. Every one is a sentence naming the tile.
@@ -493,6 +560,7 @@ impl World {
             region_of,
             regions,
             places: tl.places,
+            outside: tl.outside.clone(),
         };
 
         for y in 0..world.height {
@@ -781,6 +849,20 @@ impl World {
         Some(was)
     }
 
+    /// Where you arrive on this map, coming through a gate that named no tile.
+    ///
+    /// Where you left off — **unless the map is one sitting**, in which case a
+    /// sitting begins at the beginning. Without that second half, leaving a
+    /// tower floor and going back in would put you on the tile you left, which
+    /// is a floor you have already walked and a boss you are standing next to.
+    pub fn arrival(&self, state: &WorldState) -> [u8; 2] {
+        let start = [self.start.0, self.start.1];
+        if self.outside.is_some() {
+            return start;
+        }
+        state.recall(&self.id).unwrap_or(start)
+    }
+
     /// Draw an opponent from this tile's region.
     ///
     /// Weighted by `(max + 1 − rating)`, so the hardest creature in a pool is
@@ -904,10 +986,23 @@ impl WorldState {
     /// position written every keypress would be a save that grew a row per map
     /// per session and told nobody anything more.
     pub fn remember(&mut self) {
+        let at = self.at;
+        self.remember_at(at);
+    }
+
+    /// Write down a *particular* tile as where you were on this map.
+    ///
+    /// **The tile you stepped from, not the doorway you stepped onto.** A gate
+    /// is walked onto, so by the time the crossing is handled `at` is the gate
+    /// itself — and coming back to the gate is fine for a border and wrong for
+    /// a sitting: clearing a floor of the Drambus Stack put the player back on
+    /// its doorstep, one keypress from walking into the next floor, and the
+    /// walker read that as *the tower is where I already am* and stopped.
+    pub fn remember_at(&mut self, at: [u8; 2]) {
         let here = self.map_id();
         match self.positions.iter_mut().find(|(k, _)| *k == here) {
-            Some((_, at)) => *at = self.at,
-            None => self.positions.push((here, self.at)),
+            Some((_, slot)) => *slot = at,
+            None => self.positions.push((here, at)),
         }
     }
 
@@ -931,6 +1026,28 @@ impl WorldState {
     pub fn count(&self, what: &str) -> u32 {
         self.counters.iter().find(|(k, _)| k == what).map(|(_, n)| *n).unwrap_or(0)
     }
+}
+
+/// Put the walker outside, if the map they are standing on is one sitting.
+///
+/// **Two callers and one rule.** A floor of the Drambus Stack ends when its
+/// boss goes down — the kick is a position write and not a death — and it also
+/// ends when the tab closes, because a floor is one sitting and a save taken
+/// inside one reopens outside it. Both are the same sentence and this is where
+/// it is written.
+///
+/// Returns the map they were moved to, or `None` if they were not on a sitting.
+pub fn leave_the_sitting(state: &mut WorldState, difficulty: Difficulty) -> Option<String> {
+    let here = crate::data::map(&state.map_id(), difficulty);
+    let out = here.outside.clone()?;
+    // Written down before the move, the same as a gate: without it the floor
+    // forgets where you were on it, which does not matter for a floor and does
+    // matter for the habit.
+    state.remember();
+    let dest = crate::data::map(&out, difficulty);
+    state.at = dest.arrival(state);
+    state.map = out.clone();
+    Some(out)
 }
 
 /// Which way a step went.

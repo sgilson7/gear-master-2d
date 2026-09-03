@@ -88,6 +88,11 @@ pub fn load_json(text: &str) -> Result<(), JsValue> {
             // trusted. A save from before M2 carries no position at all and
             // defaults to (0, 0), which on this map is rock — and a player who
             // arrived there could not move in any direction.
+            // **A floor of the Drambus Stack is one sitting**, so a save taken
+            // inside one reopens outside it. Before the repair, because the
+            // repair is about the map you are on and this decides which map
+            // that is.
+            gm2d_core::world::leave_the_sitting(&mut g.world, DIFFICULTY);
             let here = g.world.map_id();
             let allowed = g.character.allowances();
             map_named(&here, |w| w.repair(&mut g.world, &allowed));
@@ -357,6 +362,9 @@ pub fn try_step(dir: &str) -> String {
             // than reaching for it.
             let allowed = g.character.allowances();
             w.repair(&mut g.world, &allowed);
+            // Where the step started. A gate is walked *onto*, so this is the
+            // tile the far side should remember — see `remember_at`.
+            let stepped_from = g.world.at;
             let s = world::step(w, &mut g.world, &mut g.rng, DIFFICULTY, d, &allowed);
             // An encounter becomes state the moment it is rolled. Holding it
             // only in the page would mean a player who saved while a creature
@@ -409,7 +417,13 @@ pub fn try_step(dir: &str) -> String {
                         .map(|n| gm2d_core::quest::holding(g, n) > 0)
                         .unwrap_or(true);
                     if has {
-                        if let Some(to) = p.to.clone() {
+                        // **Which map a gate opens onto is core's**, and for a
+                        // stack of floors it is a question about what has been
+                        // answered. `None` here is not a locked door: it is a
+                        // stack that has come all the way down, and `shut` is
+                        // what is said where the door used to be.
+                        let opens = p.opens_onto(&g.world).map(|s| s.to_string());
+                        if let Some(to) = opens {
                             // **Where you left off, unless the gate says
                             // otherwise.** A dungeon's mouth names its landing
                             // tile on both sides, because a corridor has one
@@ -422,11 +436,13 @@ pub fn try_step(dir: &str) -> String {
                             // file rather than a branch here.
                             let landing = p
                                 .at_to
-                                .or_else(|| g.world.recall(&to))
-                                .unwrap_or_else(|| map_named(&to, |d| [d.start.0, d.start.1]));
+                                .unwrap_or_else(|| map_named(&to, |d| d.arrival(&g.world)));
                             // Written down before the move, or the map you are
-                            // leaving forgets where you were standing on it.
-                            g.world.remember();
+                            // leaving forgets where you were standing on it —
+                            // and it is the tile you stepped *from*, not the
+                            // doorway, so coming back does not put you one
+                            // keypress from going straight back through.
+                            g.world.remember_at(stepped_from);
                             g.world.map = to.clone();
                             g.world.at = landing;
                             // Repaired on the far side: a gate whose landing
@@ -443,7 +459,18 @@ pub fn try_step(dir: &str) -> String {
                             if first {
                                 g.world.answered.push(p.id.clone());
                             }
-                            went = Some((to, if first { p.prose.clone() } else { Vec::new() }));
+                            went = Some((
+                                to,
+                                p.name.clone(),
+                                if first { p.prose.clone() } else { Vec::new() },
+                            ));
+                        } else {
+                            // A stack with no floors left. Not locked: gone.
+                            shut = Some(if p.shut.is_empty() {
+                                "There is nothing there any more.".to_string()
+                            } else {
+                                p.shut.clone()
+                            });
                         }
                     } else {
                         shut = Some(if p.shut.is_empty() {
@@ -514,8 +541,13 @@ pub fn try_step(dir: &str) -> String {
                 // **A crossing, and what it said on the way through.** The
                 // map id so the page knows to redraw, and the paragraph the
                 // gate carries the first time — empty every time after.
-                "went": went.as_ref().map(|(to, prose)| serde_json::json!({
+                "went": went.as_ref().map(|(to, name, prose)| serde_json::json!({
                     "to": to,
+                    // The place's own name, so the card the page shows says
+                    // which door this was. It said THE DOOR IN THE WALL for
+                    // every gate in the game, including the one into a tower
+                    // of cheese two maps away from that wall.
+                    "name": name,
                     "prose": prose,
                 })),
                 "shut": shut,

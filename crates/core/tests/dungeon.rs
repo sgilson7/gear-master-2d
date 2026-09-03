@@ -44,7 +44,30 @@ fn every_gate_leads_somewhere_you_can_stand() {
     for (id, _) in data::MAPS {
         let w = data::map(id, D);
         for p in w.places.iter().filter(|p| p.kind == PlaceKind::Gate) {
-            let to = p.to.as_deref().unwrap_or_else(|| panic!("{}: a gate to nowhere", p.id));
+            // **A gate names one map or a stack of them.** The Drambus Stack's
+            // door opens onto whichever of its five floors is still standing,
+            // so every one of them has to be a map you can land on — the door
+            // is walked through five times and each time it is a different one.
+            let mut goes: Vec<&str> = p.floors.iter().map(|f| f.map.as_str()).collect();
+            if goes.is_empty() {
+                goes.push(p.to.as_deref().unwrap_or_else(|| panic!("{}: a gate to nowhere", p.id)));
+            } else {
+                assert!(p.to.is_none(), "{}: a stack that also names one map", p.id);
+                // Each floor's mark is the boss standing on it, or the door
+                // would open onto a floor that can never be cleared.
+                for f in &p.floors {
+                    let floor = data::map(&f.map, D);
+                    assert_eq!(floor.id, f.map, "{}: {:?} is not a map", p.id, f.map);
+                    assert!(
+                        floor.places.iter().any(|b| b.id == f.cleared),
+                        "{}: nothing on {} is called {:?}, so the floor never clears",
+                        p.id,
+                        f.map,
+                        f.cleared
+                    );
+                }
+            }
+            for to in goes {
             assert!(
                 data::MAPS.iter().any(|(m, _)| *m == to),
                 "{}: opens onto {to:?}, which is not a map",
@@ -65,6 +88,7 @@ fn every_gate_leads_somewhere_you_can_stand() {
                 p.id,
                 at
             );
+            }
             // And what it wants, if it wants anything, is a real component.
             if let Some(n) = &p.needs {
                 assert!(

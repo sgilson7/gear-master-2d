@@ -1,0 +1,61 @@
+{
+  "format": "gm2d-tiles",
+  "version": 1,
+  "id": "the-drambus-stack-4",
+  "_note": "Floor 4 of the Drambus Stack, and one sitting. `outside` is what makes it one: beating the boss puts you back in the field and a save taken inside reopens there too, so a floor is a thing you go in and finish or do not. Ten by ten, one thing at the end of it, and the next entry is a different map because the tower is a floor shorter. Which floor the door opens onto is derived from what has been answered rather than from a counter — the boss tiles are the record, and the order they come down in is the whole of the condition.",
+  "width": 10,
+  "height": 10,
+  "start": [
+    1,
+    8
+  ],
+  "outside": "kettleworks-field",
+  "rows": [
+    "CCCCCCCCCC",
+    "C=======,C",
+    "C,CCCCC=,C",
+    "C,,,,,C=,C",
+    "CCCCC,C=,C",
+    "C,,,,,C=,C",
+    "C,CCCCC=,C",
+    "C,,,,,,=,C",
+    "C,CCCCCC,C",
+    "CCCCCCCCCC"
+  ],
+  "regions": [
+    {
+      "id": "the-drambus-stack-4",
+      "name": "The Drambus Stack, floor 4",
+      "bounds": [
+        [
+          0,
+          0,
+          9,
+          9
+        ]
+      ],
+      "enemies": [
+        "Silence",
+        "The Long Mirror",
+        "Vermin Sovereign"
+      ]
+    }
+  ],
+  "places": [
+    {
+      "at": [
+        8,
+        1
+      ],
+      "kind": "boss",
+      "id": "the-drambus-stack-4-boss",
+      "name": "what is standing on floor 4",
+      "creature": "Iron Abbot",
+      "drops": "Trig Pillar",
+      "prose": [
+        "It settles again, and this time somebody at the tally shed is standing outside it with a pencil before the noise has finished.",
+        "\"Two,\" he says. \"Two in a week. Six years and then two in a week.\" He writes it down and looks at the page and does not look happy about it. Three floors left."
+      ]
+    }
+  ]
+}

@@ -2,7 +2,7 @@
   "format": "gm2d-tiles",
   "version": 1,
   "id": "kettleworks-field",
-  "_note": "The dense map. Twenty by twenty like West Bambulon and nothing like it: forty of its four hundred tiles carry a place or something to read, which is the Look Outside register written down as a budget a test can check. Most of the readables sit off the roads on purpose — a card that opens every time you cross the field is a card a player learns to shut without reading. The Drambus Stack is four tiles of `curd` in the middle, which is its own terrain because a two-hundred-and-ten-foot cheese drawn as rock is a hill. Its door is written as an event and not a gate: the floors behind it are M11.3's, and a gate onto a map this build has not got is a hole where a promise should be. The two pools are ordered on purpose: `draw_enemy` weights a pool so its hardest member is its rarest, so the creature an errand asks for is the *easiest* thing in its region and never the hardest. Getting that backwards is `PLAN.md` §6b row 1 written into content — a set behind the rarest creature, one map further out.",
+  "_note": "The dense map. Twenty by twenty like West Bambulon and nothing like it: forty of its four hundred tiles carry a place or something to read, which is the Look Outside register written down as a budget a test can check. Most of the readables sit off the roads on purpose — a card that opens every time you cross the field is a card a player learns to shut without reading. The Drambus Stack is four tiles of `curd` in the middle, which is its own terrain because a two-hundred-and-ten-foot cheese drawn as rock is a hill. Its door is written as an event and not a gate: the floors behind it are M11.3's, and a gate onto a map this build has not got is a hole where a promise should be. The two pools are ordered on purpose: `draw_enemy` weights a pool so its hardest member is its rarest, so the creature an errand asks for is the *easiest* thing in its region and never the hardest. Getting that backwards is `PLAN.md` §6b row 1 written into content — a set behind the rarest creature, one map further out. **The shadow was retuned down in M11.3.** At a mean of eight hundred it was a gauntlet you crossed to reach the tower and then crossed again after every floor, and a walk that had to cross it six times lost eighteen hundred fights doing it. The hard part of a tower should be the tower.",
   "width": 20,
   "height": 20,
   "start": [
@@ -67,9 +67,9 @@
         ]
       ],
       "enemies": [
+        "Ember Wisp",
         "Slag Warden",
-        "Bone Cantor",
-        "Crowned Hollow"
+        "Bone Cantor"
       ]
     }
   ],
@@ -208,6 +208,42 @@
       ],
       "kind": "event",
       "id": "the-stack-door"
+    },
+    {
+      "at": [
+        8,
+        12
+      ],
+      "kind": "gate",
+      "id": "the-way-into-the-stack",
+      "name": "the way into the Drambus Stack",
+      "floors": [
+        {
+          "map": "the-drambus-stack-5",
+          "cleared": "the-drambus-stack-5-boss"
+        },
+        {
+          "map": "the-drambus-stack-4",
+          "cleared": "the-drambus-stack-4-boss"
+        },
+        {
+          "map": "the-drambus-stack-3",
+          "cleared": "the-drambus-stack-3-boss"
+        },
+        {
+          "map": "the-drambus-stack-2",
+          "cleared": "the-drambus-stack-2-boss"
+        },
+        {
+          "map": "the-drambus-stack-1",
+          "cleared": "the-drambus-stack-1-boss"
+        }
+      ],
+      "shut": "There is a stump where the door was, eleven inches of rind and a frame lying flat in it with the hinges still on, and a board propped against it with five strokes chalked on and all five rubbed out.",
+      "prose": [
+        "The frame has closed round the door by an inch on every side and the door opens anyway, inwards, on hinges nobody has oiled since the works stopped putting a year on things.",
+        "Inside is a floor. Not a room and not a stair — a floor, two hundred feet across, with the ceiling four feet above your head and something at the far end of it that has been waiting long enough to have stopped pacing."
+      ]
     },
     {
       "at": [

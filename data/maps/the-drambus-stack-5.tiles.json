@@ -1,0 +1,61 @@
+{
+  "format": "gm2d-tiles",
+  "version": 1,
+  "id": "the-drambus-stack-5",
+  "_note": "Floor 5 of the Drambus Stack, and one sitting. `outside` is what makes it one: beating the boss puts you back in the field and a save taken inside reopens there too, so a floor is a thing you go in and finish or do not. Ten by ten, one thing at the end of it, and the next entry is a different map because the tower is a floor shorter. Which floor the door opens onto is derived from what has been answered rather than from a counter — the boss tiles are the record, and the order they come down in is the whole of the condition.",
+  "width": 10,
+  "height": 10,
+  "start": [
+    1,
+    8
+  ],
+  "outside": "kettleworks-field",
+  "rows": [
+    "CCCCCCCCCC",
+    "C==,,,,==C",
+    "C=CC,,CC=C",
+    "C=C,,,,C=C",
+    "C=,,CC,,=C",
+    "C=,,CC,,=C",
+    "C=C,,,,C=C",
+    "C=CC,,CC=C",
+    "C==,,,,==C",
+    "CCCCCCCCCC"
+  ],
+  "regions": [
+    {
+      "id": "the-drambus-stack-5",
+      "name": "The Drambus Stack, floor 5",
+      "bounds": [
+        [
+          0,
+          0,
+          9,
+          9
+        ]
+      ],
+      "enemies": [
+        "Null Sentinel",
+        "Crowned Hollow",
+        "Silence"
+      ]
+    }
+  ],
+  "places": [
+    {
+      "at": [
+        8,
+        1
+      ],
+      "kind": "boss",
+      "id": "the-drambus-stack-5-boss",
+      "name": "what is standing on floor 5",
+      "creature": "Cog Priest",
+      "drops": "Ballast Bed",
+      "prose": [
+        "The floor gives under the last of it and keeps giving, and the whole storey comes down about four feet and stops, and the noise it makes is not a crash. It is a settle.",
+        "You are outside. You did not walk out. There are four floors left and the door is where the door was, an inch lower."
+      ]
+    }
+  ]
+}

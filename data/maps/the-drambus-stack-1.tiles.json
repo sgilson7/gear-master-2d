@@ -1,0 +1,62 @@
+{
+  "format": "gm2d-tiles",
+  "version": 1,
+  "id": "the-drambus-stack-1",
+  "_note": "Floor 1 of the Drambus Stack, and one sitting. `outside` is what makes it one: beating the boss puts you back in the field and a save taken inside reopens there too, so a floor is a thing you go in and finish or do not. Ten by ten, one thing at the end of it, and the next entry is a different map because the tower is a floor shorter. Which floor the door opens onto is derived from what has been answered rather than from a counter — the boss tiles are the record, and the order they come down in is the whole of the condition.",
+  "width": 10,
+  "height": 10,
+  "start": [
+    1,
+    8
+  ],
+  "outside": "kettleworks-field",
+  "rows": [
+    "CCCCCCCCCC",
+    "C========C",
+    "C=CCCCCC=C",
+    "C=C,,,,C=C",
+    "C=C,,,,C=C",
+    "C=C,,,,C=C",
+    "C=C,,,,C=C",
+    "C=CCC,CC=C",
+    "C========C",
+    "CCCCCCCCCC"
+  ],
+  "regions": [
+    {
+      "id": "the-drambus-stack-1",
+      "name": "The Drambus Stack, floor 1",
+      "bounds": [
+        [
+          0,
+          0,
+          9,
+          9
+        ]
+      ],
+      "enemies": [
+        "The Tallow Saint",
+        "The Last Gearwright",
+        "Hollowmarch"
+      ]
+    }
+  ],
+  "places": [
+    {
+      "at": [
+        4,
+        4
+      ],
+      "kind": "boss",
+      "id": "the-drambus-stack-1-boss",
+      "name": "what is standing on floor 1",
+      "creature": "Gallowglass",
+      "drops": "Bearhide",
+      "prose": [
+        "The last of it does not come down. It goes, which is a different thing, and what is left is a ring of rind eleven inches high and a great deal of daylight where two hundred and ten feet of the Drambus Stack was.",
+        "The man from the tally shed writes the fifth line and then the sixth, and the sixth is the one that is not a drop. He has been waiting six years to have nothing to write.",
+        "There is a stump where the door was. Nothing is left standing."
+      ]
+    }
+  ]
+}

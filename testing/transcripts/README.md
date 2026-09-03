@@ -84,3 +84,33 @@ Two things it found.
    was killed and carried home, repeatedly, having read nothing. Both were
    retuned down against what the walk actually survives, which is the only
    measurement either of them has.
+
+**M11.3's run is `m11.3.txt`.** 20,000 presses, 1,247 wins, 1,039 losses, level
+11 — three of the Drambus Stack's five floors down, and it is the first run that
+enters a map it cannot walk out of.
+
+The walker was rewritten five times to get this far, and every one of the five
+was a thing a person does without thinking:
+
+1. **Walk on the road.** Shortest-path crossed the Stack's Shadow off the road
+   at twenty-eight percent a tile where the road is six.
+2. **Do not walk through the shop.** `town` was in the road set, so the cheapest
+   route to anywhere ran through the counter.
+3. **Do not clear the give-up list every time you bank.** It cleared the mark
+   saying *this errand's tile is where you already are*, and one run walked into
+   Kettleworks seven hundred and forty times buying a tin each visit.
+4. **A give-up that has somewhere to go is not a give-up.** The
+   back-off-when-losing check fell through to a branch that sent the walk to
+   the counter it was standing beside: two thousand six hundred visits.
+5. **How much you carry depends on whether you are winning.** Banking at
+   twenty-five meant banking after every win and never reaching the door;
+   carrying four hundred through a losing patch meant banking nothing at all
+   and finishing nine levels down. It reads its own last dozen fights now.
+
+And the finding that is about the *game* rather than the walker, which is what
+`TRIAGE-M11.md` will get: **the round trip is the block's real cost.** There is
+one town past the door, its shelf is Kettleworks', and a character who arrives
+under-geared cannot catch up there — the run forbidden from walking back lost
+two thousand four hundred fights standing in a field. A thousand losses against
+twelve hundred wins is what the road past the door costs at the level the door
+opens at.

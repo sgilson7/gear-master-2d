@@ -1,0 +1,61 @@
+{
+  "format": "gm2d-tiles",
+  "version": 1,
+  "id": "the-drambus-stack-2",
+  "_note": "Floor 2 of the Drambus Stack, and one sitting. `outside` is what makes it one: beating the boss puts you back in the field and a save taken inside reopens there too, so a floor is a thing you go in and finish or do not. Ten by ten, one thing at the end of it, and the next entry is a different map because the tower is a floor shorter. Which floor the door opens onto is derived from what has been answered rather than from a counter — the boss tiles are the record, and the order they come down in is the whole of the condition.",
+  "width": 10,
+  "height": 10,
+  "start": [
+    1,
+    8
+  ],
+  "outside": "kettleworks-field",
+  "rows": [
+    "CCCCCCCCCC",
+    "C,,,,,,,,C",
+    "C,CCCCCC,C",
+    "C,C,,,,C,C",
+    "C,C,,,,C,C",
+    "C,C,,,,C,C",
+    "C,C,,,,C,C",
+    "C,CCCC,C,C",
+    "C,,,,,,,,C",
+    "CCCCCCCCCC"
+  ],
+  "regions": [
+    {
+      "id": "the-drambus-stack-2",
+      "name": "The Drambus Stack, floor 2",
+      "bounds": [
+        [
+          0,
+          0,
+          9,
+          9
+        ]
+      ],
+      "enemies": [
+        "Rimefather",
+        "Obsidian Colossus",
+        "The Last Gearwright"
+      ]
+    }
+  ],
+  "places": [
+    {
+      "at": [
+        4,
+        4
+      ],
+      "kind": "boss",
+      "id": "the-drambus-stack-2-boss",
+      "name": "what is standing on floor 2",
+      "creature": "The Tallow Saint",
+      "drops": "The Common Ground",
+      "prose": [
+        "Forty feet of it comes down in one piece and lands on the crumb field, which is what the crumb field is for.",
+        "The woman with the net is still standing in it. She has not caught a fly and she has now been standing there for fourteen days. One floor left."
+      ]
+    }
+  ]
+}

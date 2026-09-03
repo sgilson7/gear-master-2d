@@ -1185,6 +1185,93 @@ def check_the_road_west_reaches_a_town(page, name, fails):
     plant(page, base, lambda body: None, stem="road-west-restore")
 
 
+def check_the_tower_drops(page, name, fails):
+    """The door opens onto a different floor every time, and then onto nothing.
+
+    **M11.3.** Which floor you get is derived from the boss tiles in
+    `answered`, so a browser can plant the answers and walk in — which is the
+    only way to see all six values without five end-game fights. What has to
+    hold from out here: the entrance opens somewhere different at each count,
+    the map behind it is a *different* map each time, clearing the last one
+    leaves a stump that says so, and a save taken inside a floor reopens
+    outside it.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+
+    floors = [f"the-drambus-stack-{n}" for n in (5, 4, 3, 2, 1)]
+    door = [8, 12]
+
+    def outside_the_stack(cleared):
+        def edit(body):
+            w = body.setdefault("world", {})
+            w["map"] = "kettleworks-field"
+            w["at"] = [door[0], door[1] + 1]
+            w["answered"] = list(w.get("answered", [])) + [f"{f}-boss" for f in cleared]
+        return edit
+
+    seen = []
+    for i in range(5):
+        plant(page, base, outside_the_stack(floors[:i]), stem=f"stack-{i}")
+        if page.evaluate("() => window.__world().id") != "kettleworks-field":
+            fails.append(f"{name}: could not stand outside the Stack with {i} floors down")
+            break
+        page.keyboard.press("ArrowUp")
+        page.wait_for_timeout(400)
+        dismiss_card(page)
+        where = page.evaluate("() => window.__world().id")
+        seen.append(where)
+        if where != floors[i]:
+            fails.append(f"{name}: with {i} floors down the door opened onto {where!r}, "
+                         f"not {floors[i]!r}")
+            break
+        # A floor is a floor: ten by ten, one thing standing on it, no way out.
+        shape = page.evaluate("""() => {
+          const w = window.__world();
+          return [w.width, w.height,
+                  w.places.filter(p => p.kind === 'boss').length,
+                  w.places.filter(p => p.kind === 'gate').length];
+        }""")
+        if shape != [10, 10, 1, 0]:
+            fails.append(f"{name}: {where} is {shape}, not a ten-by-ten with one boss on it")
+        close_fight(page)
+
+    if len(set(seen)) != len(seen):
+        fails.append(f"{name}: the door opened onto the same floor twice: {seen}")
+
+    # --- the stump ------------------------------------------------------------
+    plant(page, base, outside_the_stack(floors), stem="stack-done")
+    page.keyboard.press("ArrowUp")
+    page.wait_for_timeout(400)
+    dismiss_card(page)
+    close_fight(page)
+    if page.evaluate("() => window.__world().id") != "kettleworks-field":
+        fails.append(f"{name}: the Stack came all the way down and the door still opened")
+    else:
+        said = last_said(page)
+        if not said or "stump" not in said.lower():
+            fails.append(f"{name}: nothing is left of the Stack and it said {said!r}")
+
+    # --- a floor is one sitting ----------------------------------------------
+    #
+    # Planted *inside* a floor, which is a save a player cannot make on purpose
+    # and which the game has to open anyway: a tab closed mid-climb.
+    def inside_a_floor(body):
+        w = body.setdefault("world", {})
+        w["map"] = floors[0]
+        w["at"] = [1, 8]
+
+    plant(page, base, inside_a_floor, stem="stack-inside")
+    dismiss_card(page)
+    close_fight(page)
+    where = page.evaluate("() => window.__world().id")
+    if where != "kettleworks-field":
+        fails.append(f"{name}: a save taken inside a floor reopened on {where!r}")
+
+    plant(page, base, lambda body: None, stem="stack-restore")
+
+
 def check_the_rack(page, name, fails):
     """A licensee buys an ench, bolts it on, switches it off, and takes it back.
 
@@ -2989,6 +3076,7 @@ def walk_the_gate(browser, name, fails=None):
     check_the_fork_is_on_top(page, name, fails)
     check_the_door_opens_on_the_treyway(page, name, fails)
     check_the_road_west_reaches_a_town(page, name, fails)
+    check_the_tower_drops(page, name, fails)
     check_the_rack(page, name, fails)
     check_the_spin_animates(page, name, fails)
     check_a_town_takes_the_tiredness_off(page, name, fails)
@@ -3097,6 +3185,7 @@ def main():
     print("ok: a spinning item turns, and turns to somewhere core said it could")
     print("ok: the wall grows a door, the key opens it, and behind it is a map")
     print("ok: two maps out there is a town, and one field tile in ten answers")
+    print("ok: the Drambus Stack opens onto a different floor every time, then a stump")
     print("ok: a whole set names its own item and says what it does; two thirds of one does not")
     print("ok: the lake is ground at its rim to a toad, and a wall through its middle to everybody")
     print("ok: the north is shut to a level-one character, and says what the road wants")

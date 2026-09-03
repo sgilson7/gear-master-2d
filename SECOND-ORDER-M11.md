@@ -257,3 +257,69 @@ three errands each, each crossing a map.
 - **Forty cards is not forty good cards.** The budget is a floor on *count* and
   says nothing about whether any of them is worth reading. That is a reader's
   job and M11.7's tone pass is where it happens.
+
+---
+
+## M11.3 — the cheese tower
+
+### A counter that was not written, a sitting that is a map's own property,
+### and a walker that had to learn how a person plays
+
+**The change.** Five ten-by-ten floors of the Drambus Stack; the door in the
+field opens onto whichever is still standing; beating a floor's boss drops the
+tower and puts you out; when they are all gone there is a stump.
+
+**Follows from.**
+
+- **There is no `tower_floors_cleared`.** `PLAN-M11.md` §M11.3 asks for a
+  counter in `WorldState`; beating a boss already writes its tile id into
+  `answered`, so *how many floors are gone* is how many of those are there.
+  Derived, never banked — the rule an ench, a level and a skill's effect all
+  follow. It also means **there is no `tower_dropped` flag**: floor one is
+  reachable only once the four above it are down, so its boss being answered
+  *is* the tower being down, and M11.4's lake reads that id.
+- **`TilesData::outside` is one field doing two jobs**, and they are the same
+  job: where clearing the floor puts you, and where a save taken inside reopens.
+  `world::leave_the_sitting` is the one function both call, so the kick and the
+  reopen cannot disagree.
+- **`World::arrival` had to learn about sittings.** A gate with no landing tile
+  lands you where you left off, which is right for a border and wrong for a
+  floor: where you left off on a floor is the tile the boss is standing on.
+- **`remember_at`**, and this one was found by playing. A gate is walked *onto*,
+  so by the time the crossing is handled `at` is the doorway — and the kick put
+  the player back on the doorstep, one keypress from the next floor. It writes
+  the tile you stepped *from* now, which is also better for the border.
+- **`PlaceDef::prose` stopped being the door's.** A boss carries a paragraph
+  now — the floor coming down, counting what is left — and it counts correctly
+  because the order the floors come down in is fixed and written.
+- **The gate's card learned its own name.** `showCard('THE DOOR IN THE WALL', …)`
+  was hard-coded, so walking into a tower of cheese two maps from that wall
+  announced itself as the door in the wall.
+
+**Watch.**
+
+- **Five things the walker had to be taught, and every one of them is a thing a
+  person does without thinking.** They are listed here because each was a run
+  of twenty thousand presses that measured nothing, and because the next map
+  will find the sixth:
+  1. **Walk on the road.** Shortest-path crossed the Stack's Shadow off-road at
+     twenty-eight percent a tile where the road is six, and lost two thousand
+     two hundred fights doing it.
+  2. **Do not walk through the shop.** `town` was in the road set, so the
+     cheapest route to anywhere ran through the counter.
+  3. **Do not clear the give-up list every time you bank.** It cleared the mark
+     that says *this errand's tile is where you already are*, and the walk went
+     into Kettleworks seven hundred and forty times buying a tin each visit.
+  4. **A give-up that has somewhere to go is not a give-up.** The
+     back-off-when-losing check fell through to a branch that sent the walk to
+     the counter it was standing beside: two thousand six hundred visits.
+  5. **Setting out means not turning round at the first fight.** Banking at
+     twenty-five carried meant banking after every win, and a run got six
+     hundred and eighty-eight wins and not one floor of the tower.
+- **The round trip is the block's real cost, and it is a finding about the
+  game rather than the walker.** There is one town past the door, its shelf is
+  Kettleworks', and a character who arrives under-geared cannot catch up there
+  — the run that was forbidden from going back lost two thousand four hundred
+  fights standing in a field. Going back is right and the game supports it; what
+  it means is that most of a run is now spent walking between the pit and the
+  tower, and the errand log keeps pointing east. **`TRIAGE-M11.md` gets this.**

@@ -206,11 +206,11 @@
         "what-the-door-smells-of"
       ],
       "name": "WHAT COMES OFF IT",
-      "brief": "Things live in the Stack's shadow that do not live anywhere else in the field, and the works would like four of them counted properly rather than described. The clerk is specific: four of the ones that stand about in the crumb field with their hands together. Bring the count back and she will start the sixth book.",
+      "brief": "Things live in the Stack's shadow that do not live anywhere else in the field, and the works would like four of them counted properly rather than described. The clerk is specific: four of the ones that come off the Stack at dusk and do not land. Bring the count back and she will start the sixth book.",
       "thanks": "Four counted, in a book that has been open at page one for two years. She writes the four in, rules the page off, and gives you a hall out of a crate that has KETTLEWORKS stencilled on it and a shipping label to somewhere else.",
       "goal": {
         "slay": {
-          "creature": "Bone Cantor",
+          "creature": "Ember Wisp",
           "count": 4,
           "token": "The Tally"
         }
@@ -295,6 +295,28 @@
         "The Green Ledger"
       ],
       "gold": 60
+    },
+    {
+      "id": "the-stack-is-shorter",
+      "giver": "kettleworks",
+      "requires": [
+        "the-frame-in-the-shallows"
+      ],
+      "requires_answered": [
+        "the-drambus-stack-1-boss"
+      ],
+      "name": "THE STACK IS SHORTER",
+      "brief": "The man in the tally shed has been in it for six years and has written six lines, and the sixth is not a drop. The clerk would like the post outside read properly now there is nothing to measure against it — eleven years of marks and no twelfth. Go and read the post and come back, and she will close the sixth book.",
+      "thanks": "She rules off the page, writes the eleven years across the bottom of it in one line, and shuts the book with her hand flat on it for a while. Then she gives you a glass out of the drawer under the counter which the works has never had a use for and which she says was made for exactly this and nothing else.",
+      "goal": {
+        "word": {
+          "place": "the-measuring-post"
+        }
+      },
+      "reward": [
+        "Surveyor's Orb"
+      ],
+      "gold": 90
     }
   ]
 }

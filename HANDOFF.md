@@ -193,12 +193,12 @@ REBASELINE_GOLDEN_COMBAT=1 cargo test -p gm2d-core
 
 ## 9. What is being built next
 
-**Nothing is planned.** `PLAN-M9.md` and `PLAN-M10.md` are both done. M9 is
-deployed at `bff4f77` and verified against the live page; **M10 is committed and
-green and has not been pushed.** `git log origin/main..HEAD` is the check, and
-read *A deployed fix is not a delivered fix* in `CLAUDE.md` before you deploy —
-M8.0 through M8.8 sat local for a whole block once, and the first anybody knew
-was the human saying they could not see the quest log.
+**Nothing is planned.** `PLAN-M9.md` and `PLAN-M10.md` are both done and both
+deployed — M10 at `471afa8`, verified against the live page. Before you deploy
+the next one, read *A deployed fix is not a delivered fix* in `CLAUDE.md`: M8.0
+through M8.8 sat local for a whole block once, and the first anybody knew was
+the human saying they could not see the quest log. `git log origin/main..HEAD`
+is the check and it costs nothing.
 
 ### The three lists of what to do next, in order of how much they are worth
 

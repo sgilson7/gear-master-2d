@@ -28,10 +28,10 @@ stat could express, and two crossings that make the north a decision; M10 where
 an ench comes from, an item that fires once, and a fifth class.
 <https://sgilson7.github.io/gear-master-2d/>
 
-**M9 is the last block that was deployed**, at `bff4f77`, verified against the
-live page rather than the local build — see *A deployed fix is not a delivered
-fix*. **M10 is committed and green and has not been pushed.**
-`git log origin/main..HEAD` is the check and it costs nothing.
+**M10 is live**, deployed at `471afa8` on the human's word and verified against
+the live page rather than the local build — see *A deployed fix is not a
+delivered fix*, which is the section that says why those are two different
+things.
 
 **There is no plan for the next block.** `PLAN-M9.md` and `PLAN-M10.md` are
 done; `PLAN.md` §6c is what M10.3's playthrough left open, §6b is M9.4's and
@@ -1531,6 +1531,17 @@ live build 7808e551
   ok  Errands button    ok  ench rack      ok  ending screen
   ok  log screen        ok  scout button   ok  one action bar
   ok  #numbers gone     console errors: none
+```
+
+M10's was:
+
+```
+live build f5654c7e
+  town bench gone             yes     van below level 10       no
+  van at level 10             yes     walking on opens a bench yes
+  he has                      Plug Energy Tap, Grungo Elastic Band, Sneel Bearing
+  five classes offered        yes     all five fit 1280x720    yes
+  console errors: none
 ```
 
 M9's was:

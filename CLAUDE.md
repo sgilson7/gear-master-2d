@@ -19,21 +19,23 @@ from `sgilson7/gear-master`. `PLANNING-BRIEF.md` is the brief; `PLAN.md` is the
 plan and **wins where the two disagree**; `TONE.md` governs every string a
 player reads.
 
-**Every milestone is done, M0 through M9.** M0–M5 shipped the MVP, tagged
+**Every milestone is done, M0 through M10.** M0–M5 shipped the MVP, tagged
 `v0.1.0-mvp`; the board was rebuilt against the original's colourblind design;
 M6 added the art and the tone pass; M7 the shops, errands and the first
 dungeon; M8 curses made visible, a quest log, enchs, a fourth class, and a door
 at the end of it; M9 what a creature leaves behind — three sets, two rules no
-stat could express, and two crossings that make the north a decision.
+stat could express, and two crossings that make the north a decision; M10 where
+an ench comes from, an item that fires once, and a fifth class.
 <https://sgilson7.github.io/gear-master-2d/>
 
-**M9 is live**, deployed at `bff4f77` on the human's word and verified against
-the live page rather than the local build — see *A deployed fix is not a
-delivered fix*, which is the section that says why those are two different
-things.
+**M9 is the last block that was deployed**, at `bff4f77`, verified against the
+live page rather than the local build — see *A deployed fix is not a delivered
+fix*. **M10 is committed and green and has not been pushed.**
+`git log origin/main..HEAD` is the check and it costs nothing.
 
-**There is no plan for the next block.** `PLAN-M9.md` is done; `PLAN.md` §6b is
-the list of what M9.4's playthrough left open, and §6a is M8.8's.
+**There is no plan for the next block.** `PLAN-M9.md` and `PLAN-M10.md` are
+done; `PLAN.md` §6c is what M10.3's playthrough left open, §6b is M9.4's and
+§6a is M8.8's.
 
 **The demo ends at a door in the western wall**, which appears once the Cave's
 boss is down and opens to the key it drops. What is past it is not written —
@@ -846,6 +848,116 @@ of them owns, so `Rule` moved to `crates/core/src/rule.rs`; `skills.rs` keeps a
   prints no number of its own, so without somewhere it is shown there is no way
   to tell one that works from one that does not.
 
+## Where an ench comes from
+
+Every trading town kept a bench until M10 and sold every priced ench to any
+licensee. That was right when enching was one class's whole identity and the
+worry was stranding a licensee from their own class; it made an ench *a thing
+you bought* rather than a thing you went and got, which is the reason the
+shelves stopped rolling in M7.
+
+**Three sources now, and a lint per source.** A tree awards one, an errand pays
+one, and what neither does is sold by one man on the Verge road who is not there
+until level ten. `every_ench_comes_from_somewhere` refuses an orphan;
+`no_town_sells_an_ench` is the ask; `a_price_means_somebody_charges_it` refuses a
+price nobody charges.
+
+- **`Effect::GivesEnch` is derived, never banked**, like every other effect.
+  `Character::enchs()` is what was bought or paid over *plus* what the taken
+  nodes grant, read fresh — so retuning which ench a node hands over retunes
+  every save that took it.
+- **`enchs_owned` changed meaning, and the loader carries old saves across.** It
+  was *loose*, and `attach` moved an entry out of it — which cannot work once a
+  derived list can grant one, because there is nothing to take an entry out of.
+  It is *banked* now and `enchs_loose` subtracts what is on the board.
+  `repair_enchs` runs on load, and `detach` no longer pushes, which would have
+  handed out a second copy of every ench anybody ever unbolted.
+- **Closing the towns nearly made the Patent inert.** Three of its eight nodes
+  tune the spin, and the spin is not a stat — it is The Ponkey Turn, which was
+  ninety Fnorp off a bench. A class offered at level five would have had an
+  identity and three eighths of a tree that did nothing until ten. **Bench
+  Rights grants it**, which is the node at the root of the spin spine with no
+  prerequisite, already named for the thing it now hands over.
+- **`PlaceKind::Bench` is a place and not an event**, and the reason is
+  measured: `answer` refuses a second choice and writes the whole event id into
+  `answered`, so a card could sell one thing once. A bench sells each line once
+  and keeps the sold ones on the table, greyed — the town shelf's rule, and the
+  gap is the memory of what you took.
+- **A place can be hidden until a level**, and it reads the level the way a
+  crossing does — through `Allowances`. Writing `level-10` into `flags` when it
+  was reached would have worked and is refused: the level is derived from
+  experience and never stored.
+- **A level that opens a place says so.** The map redraws when you bank, which
+  M10.0 had to be told to do — and a redraw is not a sentence. The M10.3 walk
+  reached level twelve and never met the man on the road, so banking now names
+  what the level opened.
+
+## An item that fires once
+
+**The first new rule in the fight since the fork**, and the smallest one the
+game could be given. It is invented for an *ench* rather than for a class — the
+fifth class reuses a power that was already tuned — but the distinction is thin
+and is worth knowing.
+
+- **`broken` is its own field**, not `stun_ms = u32::MAX` and not `has_fired`. A
+  stun is a curse somebody put on you: aimed, resisted, counted, and it ends.
+  This is the gear. And `has_fired` asks *was this the first?* while this asks
+  *is it finished?* — one flag answering two questions is how the next person
+  gets it wrong.
+- **It breaks at the end of the activation**, after everything that activation
+  pays. That is the bargain: the swing that finishes the item lands in full and
+  nothing after it does. Before the payout it would be an ench that triples an
+  item's power and never lets it use any.
+- **For the fight, not for good.** `RunningItem` is rebuilt at every bell. A
+  component destroyed permanently would be the fight writing to the character,
+  and a mid-fight save carries a creature name and a tile because it does not.
+- **`Effect::Fragile { pct }` is one effect, not two.** The power and the cost
+  are one bargain, and two effects that could be attached separately would let
+  somebody take the good half.
+- **A stun does not aim at a broken item.** The rule was that stunning what is
+  already stopped is the one outcome an aimed stun must not have, as a
+  *tie-break* behind the rating. A stun on a stopped item is wasted for a
+  second and one on a broken item is wasted for the fight, so it sorts ahead of
+  the rating now.
+- **An ench does not move what an item is worth.** `item_rating` prices the
+  pieces and the cadence, and `ench::apply` runs over the profiles afterwards —
+  so a Chonga'd blade is not suddenly the best item in the game by the shop's
+  reckoning. Pinned in a test, because the day spent finding that out should not
+  be spent twice.
+
+## Two promises that reached nothing
+
+M10.2 was going to add a fifth class. Its first two commits were not that.
+
+**`ClassPower::Showstopper`** — *a fight won in under ten seconds pays fifty
+percent more* — existed, was tuned, was themed as Top of the Bill, and was read
+by nothing. `combat.rs` ignores it on purpose and correctly, because it is a
+settlement rule; and `fight::settle` never looked at the class. It lands in
+`reward::bounty_with_class` now, where the argument about what a fight pays
+already lives.
+
+**`ClassPower::Recycler`** — found by the lint written for the first one, on its
+first run. The Kaklon Patent had promised *"+N% assembly bonuses"* since M8.4 and
+delivered the tree's half and nothing else: `apply_skills` only ever read
+`Effect::AssemblyPct`, and `combat.rs` skips the class saying it is a board rule
+already in the profiles, which nothing put there.
+
+- **The lint calls rather than declares.** Its first version matched the variant
+  and said "the purse", which a stubbed payout passed cleanly — *a lint that
+  reads a list rather than the behaviour is the failure it exists to catch, one
+  level up.* `every_offered_class_reaches_something` now proves each of the three
+  places a power can be honoured: the purse moves, the fighter at the bell
+  differs, or the board differs.
+- **The roster is `class::OFFERED`, in core.** It was a `const` in the shim and
+  a second copy in `tests/classes.rs` whose own comment admitted it.
+- **The licence is a list.** Two classes may ench, and what separates them is
+  *which* enchs they can get — which is what taking the bench off every town
+  made possible.
+- **The window is a condition and not a formality**, measured: Top of the Bill is
+  paid on **66%** of the wins a full board takes off the ladder, and the M10.3
+  playthrough was paid on 65 of 99. The two agree, which is the point of taking
+  both.
+
 ## Enchs, and the spin
 
 **An ench is not an enchantment.** `PieceKind::Enchantment` is thirteen
@@ -1518,7 +1630,7 @@ and M5's trees may spend them again.
 
 ## Numbers, so a regression is visible
 
-Every figure below was re-measured for M9.4 rather than carried forward.
+Every figure below was re-measured for M10.3 rather than carried forward.
 
 | | |
 |---|---|
@@ -1551,37 +1663,45 @@ Every figure below was re-measured for M9.4 rather than carried forward.
 | M9.2: three sets | 518 passing |
 | M9.3: the north is a decision | 526 passing |
 | M9.4: played to the ending, triaged, written down | 526 passing |
-| **An ench you were paid and cannot use yet** | **527 passing** |
+| An ench you were paid and cannot use yet | 527 passing |
+| M10.0: where an ench comes from | 537 passing |
+| M10.1: an item that fires once | 545 passing |
+| M10.2: Top of the Bill, and two promises that reached nothing | 553 passing |
+| **M10.3: played as the new class, triaged, written down** | **556 passing** |
 
 | | |
 |---|---|
-| Catalogue | **544 components**, up 8 in M9.1 — **the save fingerprint moved and every pre-M9 file is refused** |
+| Catalogue | **544 components**, unchanged since M9.1 — M10 adds none, so the fingerprint has not moved |
 | Pieces that apply a curse | 59 of 544, 4 kinds, 2 on the starting shelf |
 | Sets | 3, of 3 / 2 / 3 components — every one `EVENT_ONLY`, off one creature, in one grid |
 | Ladder | 50 creatures, rated 16 to 2958 |
-| `crates/core` | ~39.8k lines, up from 38.6k at M8.8, down from ~50k at the fork |
-| wasm | 1159 KB, up from 1116 KB at M8.8 |
-| Save format | v1. Every M9 field defaults, so the *format* is unchanged — it is the catalogue stamp that refuses an old file |
-| Maps | 2 — overworld 20×20 (1 town, 7 events, 1 gate, 1 door, **2 crossings**) + the cave 9×5 (1 boss, 1 gate) |
-| `PlaceKind` | 6: town, event, gate, boss, door, **crossing** |
-| Effect kinds | 5: stat, start_with, grow_slot_rows, assembly_pct, grants |
+| `crates/core` | ~40.4k lines, up from 39.8k at M9.4, down from ~50k at the fork |
+| wasm | 1178 KB, up from 1159 KB at M9.4 |
+| Save format | v1. Every M10 field defaults; `enchs_owned` changed *meaning* and `repair_enchs` carries an older file across |
+| Maps | 2 — overworld 20×20 (1 town, 7 events, 1 gate, 1 door, 2 crossings, **1 bench**) + the cave 9×5 (1 boss, 1 gate) |
+| `PlaceKind` | 7: town, event, gate, boss, door, crossing, **bench** |
+| Effect kinds | 6: stat, start_with, grow_slot_rows, assembly_pct, grants, **gives_ench** |
+| Ench effect kinds | 4: power, haste, spin, **fragile** |
 | `Rule` kinds | 7: curse_on_activate, spin_extra, spin_keep, spin_every, scout, **rout**, **wade** |
-| Data files | 14 — `drops.json` is M9.1's, and `data::FILES` is what `data_is_current` walks |
+| Data files | 14 in `data/`, **11 compiled in** — `data::FILES` is the list `data_is_current` walks |
 | Starting kit | **2 components**, 28 Fnorp, 1 assembled weapon |
-| Towns | 1 placed, 2 staged; fixed shelves of 11 / 15 / 17, no reroll; every one keeps a bench |
+| Towns | 1 placed, 2 staged; fixed shelves of 11 / 15 / 17, no reroll; **none of them sells an ench** |
 | Errands | 10: 5 at the pit, 1 roadside, 2 of Marbulon's, 2 staged |
-| Enchs | 5 — 4 on every bench, 1 off an errand and on no shelf |
+| Enchs | 6 — 3 on the van's table, 2 awarded by a class tree, 1 off an errand |
+| Ench vendors | 1, at [4, 6] on the Verge road, not there below level 10 |
 | Restoratives | 3, at 4 / 11 / 28 Fnorp — retuned down when a town started mending |
 | Boards | 6×3 at level 1, one row a level, 6×8 ceiling |
 | Level 5 | ~27 fights, mean of nine seeded walks |
 | Regions reachable | 2 at level 1, 3 at 5, all 5 at 9 — flood-filled, not declared |
 | A whole set | 40 / 120 / 242 wins in the pit, at 50 / 80 / 500 per-mille |
-| A whole playthrough | 159 wins, 13 losses, level 14, 1,434 steps to the ending |
-| Skill trees | 13 base nodes + gorillathon 8, funnel-sergeant 8, worm-fact-keeper 10, kaklon-patent 8 |
-| Classes offered | 4 |
-| Figures | 26 `.tex` → 72 SVGs (13 family drawings, 4 drawn for themselves, 4 classes, 3 towns, you) |
-| Art coverage | 50 of 50 creatures, 3 of 3 towns, **4 of 4 classes**, and you. **The eight set pieces have no art and want none** — a component has never had a figure |
-| Browser gate | 40 checks, 3 engines |
+| A whole playthrough | 153 wins, 22 losses, level 13, 1,360 steps to the ending, as Top of the Bill |
+| Top of the Bill's window | open on **66%** of the wins a full board takes off the ladder; 65 of 99 in the M10.3 walk |
+| Skill trees | 13 base nodes + gorillathon 8, funnel-sergeant 8, worm-fact-keeper 10, kaklon-patent 8, **top-of-the-bill 8** |
+| Classes offered | **5**, and every one of their powers reaches something — a lint says so |
+| Classes that may ench | 2: the Kaklon Patent and Top of the Bill |
+| Figures | 27 `.tex` → 73 SVGs (13 family drawings, 4 drawn for themselves, **5 classes**, 3 towns, you) |
+| Art coverage | 50 of 50 creatures, 3 of 3 towns, **5 of 5 classes**, and you. The set pieces and the enchs have no art and want none — a component has never had a figure |
+| Browser gate | 43 checks, 3 engines |
 
 Note the catalogue is **544**, not the 374 the retheme document counts — it
 grew upstream after that document was written, and again here. Any content work

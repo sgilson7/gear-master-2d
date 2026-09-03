@@ -147,15 +147,21 @@ REBASELINE_GOLDEN_COMBAT=1 cargo test -p gm2d-core
 - **The north is gated.** Two crossings: the Burnwarp Shallows want level 5 and
   the Bengulon Verge wants 9, and West Bambulon — and therefore the Cave — is
   behind the Verge. A crossing guards a *region*, not its own tile.
+- **No town sells an ench.** A class tree awards two, an errand pays one, and
+  the other three are sold by one man in a van at [4, 6] on the Verge road, who
+  is not there below level ten. Banking the level that opens him says so.
 - **Every creature in the pit drops pieces of a set**, at 50 / 80 / 500
   per-mille. Three sets, each one grid's whole recipe; assembled, and made of
   nothing but themselves, they grant a rule no stat could express: an A. Rat
   gives up without a fight, the lake's rim becomes ground, or every helmet
   activation lands a curse.
-- **A class is one of four**, taken at level five and permanent. The Kaklon
-  Patent is the one that can bolt **enchs** onto components — a rack on the
-  packing screen, one ench a component, and one of them turns the item it is on
-  once a second for stacking power.
+- **A class is one of five**, taken at level five and permanent. **The Kaklon
+  Patent** and **Top of the Bill** are the two that can bolt **enchs** onto
+  components — a rack on the packing screen, one ench a component. The Patent's
+  tree awards the turn that stacks power; the Bill is paid half again for a win
+  under ten seconds and its tree awards **The Chonga Swing**, which triples an
+  item's power and breaks it after one activation, for the fight rather than for
+  good.
 
 ## 7. Where to look when something is wrong
 
@@ -166,6 +172,7 @@ REBASELINE_GOLDEN_COMBAT=1 cargo test -p gm2d-core
 | A player is stuck in scenery | `World::repair`, called on load *and* on the first keypress |
 | A fix deployed and did not arrive | the build stamp, and `app.js`'s self-heal — see *A deployed fix is not a delivered fix* in CLAUDE.md |
 | The board draws the wrong shape | something cached what core can be asked. The held component is looked up by id every frame |
+| A class or a node promises something and nothing happens | it is honoured in the fight, the purse or on the board, and possibly in none of them. `every_offered_class_reaches_something` |
 | A browser check passes but the thing is broken | it is probably vacuous. **Break the thing and watch it fail** before trusting it |
 
 ## 8. The habits, in one place
@@ -186,46 +193,49 @@ REBASELINE_GOLDEN_COMBAT=1 cargo test -p gm2d-core
 
 ## 9. What is being built next
 
-**Nothing is planned.** `PLAN-M9.md` is done — five milestones, deployed at
-`bff4f77` and verified against the live page. Before you deploy the next one,
-read *A deployed fix is not a delivered fix* in `CLAUDE.md`: M8.0 through M8.8
-sat local for a whole block once, and the first anybody knew was the human
-saying they could not see the quest log. `git log origin/main..HEAD` is the
-check and it costs nothing.
+**Nothing is planned.** `PLAN-M9.md` and `PLAN-M10.md` are both done. M9 is
+deployed at `bff4f77` and verified against the live page; **M10 is committed and
+green and has not been pushed.** `git log origin/main..HEAD` is the check, and
+read *A deployed fix is not a delivered fix* in `CLAUDE.md` before you deploy —
+M8.0 through M8.8 sat local for a whole block once, and the first anybody knew
+was the human saying they could not see the quest log.
 
-### The two lists of what to do next, in order of how much they are worth
+### The three lists of what to do next, in order of how much they are worth
 
-- **`PLAN.md` §6b** — what M9.4's playthrough left open. The one that matters is
-  row 1: `draw_enemy` weights a pool so its hardest member is its rarest, which
-  is right for fights and is now also a *content* decision, because a set off
-  the rarest creature is a set behind the rarest creature. M9.4 answered it with
-  the drop rate, which is the knob that exists; the pool is the proper fix and
-  it is a person's.
 - **`PLAN.md` §6a** — M8.8's, and still the best list of what this game gets
   wrong. Row 1 is a second town, and it answers three of the other rows for
   nothing.
+- **`PLAN.md` §6b** — M9.4's. Row 1 is the one that matters: `draw_enemy`
+  weights a pool so its hardest member is its rarest, which is right for fights
+  and is now also a *content* decision, because a set off the rarest creature is
+  a set behind the rarest creature.
+- **`PLAN.md` §6c** — M10.3's. Nothing in it is broken; the top row is a number
+  nobody has argued about.
 
-### Four things M9 established, so you do not re-derive them
+### Five things M9 and M10 established, so you do not re-derive them
 
 1. **`Rule` is `crates/core/src/rule.rs` and two systems grant one** — the skill
    tree and an assembled item. The enum, `deny_unknown_fields` and `Rule::check`
    are the whole guard, and every match on it is exhaustive on purpose.
 2. **A set is the set or it is gear.** `loadout::set_of` is the one answer, and
-   both the item's name and the rules it grants read it. Agreement *and*
-   completeness: every component names the same set, and every component that
-   names the set is present.
-3. **A map does not know about bags or about levels.** `world::step` and
-   `World::repair` take a `world::Allowances` the caller fills. `Allowances::of`
-   matches `Rule` exhaustively.
-4. **`make play` reaches the ending** — 1,434 steps. When it stops reaching it,
-   read the transcript before reading the code: twice now the walker was the
-   thing that was wrong and both times it was wrong the way a new player would
-   be.
+   both the item's name and the rules it grants read it: agreement *and*
+   completeness.
+3. **A map does not know about bags, about levels, or about who is looking.**
+   `world::step`, `World::repair` and `place_is_there` all take a
+   `world::Allowances` the caller fills. `Allowances::of` matches `Rule`
+   exhaustively.
+4. **A promise is not a wiring.** Two shipped classes advertised a number and
+   delivered nothing — `Showstopper` for two milestones and `Recycler` for one,
+   the second found by the lint written for the first.
+   `every_offered_class_reaches_something` proves the behaviour rather than
+   reading a list, and that distinction is the whole of why it works.
+5. **`make play` reaches the ending**, ~1,400 steps. When it stops, read the
+   transcript before the code: three times now the walker was the thing that was
+   wrong, and every time it was wrong the way a new player would be.
 
 ### What is not scheduled, and is still the human's
 
 - **What is past the door.** `PLAN-M8.md` §5.6. Nothing in the code assumes a
   second overworld, a chapter count, or an ending beyond the one M8.7 writes.
 - **A second town.** Kettleworks and High Wick are written, shelved, given
-  errands and on no map. The pit's eleven-line shelf is the whole economy and it
-  sells each line once. `PLAN.md` §6a, row 1.
+  errands and on no map. `PLAN.md` §6a, row 1.

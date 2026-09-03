@@ -97,6 +97,23 @@ fn every_ench_comes_from_somewhere() {
     }
 }
 
+/// **A price is what somebody charges, so an ench with one is on a table.**
+///
+/// `EnchDef::price` is documented as *what a bench charges, or `None` for one
+/// nobody sells* — and after M10 took the benches off the towns there were two
+/// enchs carrying a price that no table had. A number nobody charges is a
+/// number that means nothing, and the card prints it.
+#[test]
+fn a_price_means_somebody_charges_it() {
+    let sold: Vec<String> = benches().iter().flat_map(|p| p.sells.clone()).collect();
+    for e in &data::enchs().enchs {
+        match e.price {
+            Some(_) => assert!(sold.contains(&e.id), "{} has a price and no table", e.id),
+            None => assert!(!sold.contains(&e.id), "{} is on a table for nothing", e.id),
+        }
+    }
+}
+
 /// A bench is refused at load if it sells nothing, or something that is not an
 /// ench, or one nobody prices.
 #[test]
@@ -324,4 +341,41 @@ fn a_save_from_before_the_benches_closed_still_opens() {
     let mut after = back;
     after.character.detach_ench(piece);
     assert_eq!(after.character.enchs_loose(&id), 1, "taking it off would have lost it");
+}
+
+/// **A level that opens a place says so.**
+///
+/// Found by playing it: the M10.3 walk reached level twelve and never met the
+/// man on the Verge road, because a map that redraws is not a sentence. Core
+/// says which places a level opened; the town prints it with everything else
+/// banking pays for.
+#[test]
+fn banking_past_the_level_says_what_it_opened() {
+    let van = benches().into_iter().next().expect("one ships");
+    let need = van.hidden_until_level.expect("he waits for a level");
+
+    let mut g = Game::new(21, "td");
+    // Just under, then over, in one banking — which is the ordinary case:
+    // banking spends the whole pocket and can cross several levels at once.
+    g.character.gain_xp(gm2d_core::progression::xp_to_reach(need) - 1);
+    assert!(g.character.level() < need, "the fixture is already past it");
+    g.character.carry(100_000);
+    let r = gm2d_core::fight::bank(&mut g);
+    assert!(g.character.level() >= need);
+    let said = r.receipt.join(" ");
+    assert!(
+        said.contains(&van.name),
+        "banked past level {need} and nothing said the van was there: {:?}",
+        r.receipt
+    );
+
+    // And it is said once. Banking again must not re-announce a road you have
+    // been walking for six levels.
+    g.character.carry(100_000);
+    let again = gm2d_core::fight::bank(&mut g);
+    assert!(
+        !again.receipt.join(" ").contains(&van.name),
+        "it was announced twice: {:?}",
+        again.receipt
+    );
 }

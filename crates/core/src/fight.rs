@@ -355,7 +355,29 @@ pub struct Banking {
 /// the row — prints here instead, because here is where it occurs.
 ///
 /// Safe to call with nothing carried: it says so and changes nothing.
+/// The names of places this level made visible, in map order.
+///
+/// Reads every shipped map rather than the one underfoot: a level opens what it
+/// opens, and being told about it while standing somewhere else is better than
+/// not being told.
+fn opened_by(game: &Game, was: u32, now: u32) -> Vec<String> {
+    if now <= was {
+        return Vec::new();
+    }
+    let mut out = Vec::new();
+    for w in crate::data::all_maps(Difficulty::Easy) {
+        for p in &w.places {
+            let Some(need) = p.hidden_until_level else { continue };
+            if need > was && need <= now {
+                out.push(if p.name.is_empty() { p.id.clone() } else { p.name.clone() });
+            }
+        }
+    }
+    out
+}
+
 pub fn bank(game: &mut Game) -> Banking {
+    let was = game.character.level();
     let spent = game.character.carried;
     if spent <= 0 {
         return Banking {
@@ -382,6 +404,16 @@ pub fn bank(game: &mut Game) -> Banking {
     if levels.is_empty() {
         let (into, need) = crate::progression::progress(game.character.xp);
         receipt.push(format!("{into} of {need} towards the next level."));
+    }
+    // **What the level opened.** A place can be hidden until one since M10.0,
+    // and the map redraws — but a redraw is not a sentence, and a man who
+    // appears on a road thirty tiles away is a man nobody finds. The
+    // playthrough reached level twelve and never met him.
+    //
+    // Core's, because *which* places a level opens is a rule; the page prints
+    // what it is told.
+    for id in opened_by(game, was, game.character.level()) {
+        receipt.push(format!("Somebody is at {id} who was not there before."));
     }
     Banking { spent, levels, grew, receipt }
 }

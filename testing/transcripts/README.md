@@ -25,3 +25,13 @@ nine-by-five room for the rest of the run — which is what `m8.8.txt` ends on.
 Read the first of those as a finding about the *game* too: the quest log was
 pointing at an errand behind a shut road and saying nothing about it, which is
 what `Guide::shut` fixed.
+
+**M10.3's run is `m10.3.txt`, played as Top of the Bill.** 1,360 steps, 153 wins,
+22 losses, level 13, and the class paid on 65 of 99 fights — which is the same
+66% the engine reports over the ladder, from the other end.
+
+Two things it found. The walk banked level ten and **was told** the van was
+there, which is the fix: a place hidden until a level appears when you bank, the
+map redraws, and a redraw is not a sentence — the run before this one reached
+level twelve and never met him. And it never bolted the Swing on, because
+Auto-pack does not use enchs and never has; that is `PLAN.md` §6c row 3.

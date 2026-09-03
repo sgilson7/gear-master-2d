@@ -289,3 +289,44 @@ fn the_bill_brings_a_tree_somebody_can_spend_in() {
         );
     }
 }
+
+/// **How often the window is actually open**, measured rather than assumed.
+///
+/// `PLAN-M10.md` §M10.2 said the ten-second window was either a difficulty
+/// curve or a bug depending on the numbers, and that nothing measured it. This
+/// is the measurement, and it is printed rather than pinned: the M10.3
+/// playthrough was paid on **65 of 99 fights**, and the figure below says the
+/// same thing from the engine's side.
+///
+/// The assertion is deliberately loose — it refuses only the two readings that
+/// would make the class a lie in either direction: a window that is never open
+/// is a promise that never pays, and one that is always open is a flat income
+/// bonus wearing a condition. Where between those it should sit is a tuning,
+/// and `PLAN.md` §6c is where it is written down for a person.
+#[test]
+fn the_window_is_a_condition_and_not_a_formality() {
+    let ClassPower::Showstopper { under_ms, .. } = def("Showstopper").power else { panic!() };
+    // The full board rather than the preset: the preset beats nine of the
+    // ladder, which is too few to be a share of anything.
+    let mut ch = common::bench();
+    common::build_full_loadout(&mut ch);
+    let mut quick = 0;
+    let mut fought = 0;
+    for spec in gm2d_core::combat::LADDER {
+        let log = gm2d_core::combat::simulate_at(
+            ch.player_stats(), &ch.combat_items(), spec, D,
+        );
+        if log.outcome != Outcome::Victory {
+            continue;
+        }
+        fought += 1;
+        if log.duration_ms < under_ms {
+            quick += 1;
+        }
+    }
+    assert!(fought >= 8, "the fixture beats {fought} of the ladder, which measures nothing");
+    let pct = quick * 100 / fought;
+    println!("Top of the Bill: paid on {quick} of {fought} wins ({pct}%) at {}s", under_ms / 1000);
+    assert!(pct > 0, "the window never opens, so the class promises what it never pays");
+    assert!(pct < 100, "the window is always open, so the condition is decoration");
+}

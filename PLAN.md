@@ -1012,6 +1012,40 @@ fixed there. These are the **Later** rows.
    do (row 2). The first person to seat it by hand is the first person to watch
    an A. Rat give up.
 
+---
+
+### 6c. Left open by M10.3's playthrough
+
+The triage table is in the M10.3 commit. Blockers, Wrongs and cheap Roughs were
+fixed there. These are the **Later** rows.
+
+1. **Top of the Bill's window is open two thirds of the time.** Measured twice
+   and the two agree: 66% of the wins a full board takes off the ladder, and 65
+   of 99 in the playthrough. That is a real condition — a third of wins do not
+   pay — and it is also nearly always true at the levels the class is taken,
+   which makes it read as conditional and behave as an income. Whether ten
+   seconds is the right number is a tuning, `under_ms` is one field, and
+   `the_window_is_a_condition_and_not_a_formality` is the measurement to move it
+   against. Left alone because it is upstream's tuning and nothing about it is
+   broken.
+2. **Nothing points a player at the van.** He is announced when the level lands
+   — that was M10.3's fix, and it is why the walk found him — but the only other
+   thing that says where he is is a mark on the map. A player who banks level
+   ten in a town thirty tiles away has one sentence and no pin. The quest log's
+   pin is the mechanism that exists; whether a vendor deserves one is a design
+   question about what the log is *for*.
+3. **Auto-pack still bolts nothing on.** The Chonga Swing is awarded by a node,
+   sits in the rack, and the walker never uses it — the same shape as §6b row 2
+   about the sets. Bolting an ench has been a hand gesture since M8.4 and the
+   browser gate covers it, so this is the playthrough's gap rather than the
+   game's. It does mean **no automated run has ever fought with a fragile item
+   in a fight it walked into**, which is worth knowing when the number gets
+   judged.
+4. **`+200%` has not been judged by a person in play** for the same reason. The
+   engine's half is tested and the browser plants a fight to prove it, but
+   nobody has built a board around it and found out whether one enormous swing
+   is worth a slot.
+
 ## 7. What happens next
 
 On approval: M0, in the order — scaffold the workspace, capture the golden combat fixtures

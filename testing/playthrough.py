@@ -238,7 +238,10 @@ def fork(page):
     say(f"  fork: {len(boxes)} classes offered")
     for b in boxes:
         say(f"        [{b['i']}] {b['name']} at {b['box']} clickable={b['ok']} ({b['under']})")
-    want = next((b["i"] for b in boxes if "Kaklon" in b["name"]), 0)
+    # **Top of the Bill**, which is the class M10 added and therefore the one
+    # this block has to be played as. Falls back to the first card, so a run
+    # against a build that does not offer it still plays rather than stopping.
+    want = next((b["i"] for b in boxes if "Bill" in b["name"]), 0)
     card = page.locator("#fork-choices .wares").nth(want)
     card.scroll_into_view_if_needed()
     # On the name rather than in the middle: the card is four hundred pixels

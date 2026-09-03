@@ -4507,7 +4507,12 @@ pub fn simulate_party_holding(
             // `world::step`, where a wall is refused. Ignored here for the same
             // reason `Scout` is — this arm exists so that adding a rule is a
             // decision about combat rather than a silence.
-            crate::skills::Rule::Rout { .. } | crate::skills::Rule::Wade => {}
+            // And M11.5's is a *map* rule, which is a third kind again: it
+            // decides how a surveyable map reads, and a fight has never known
+            // which map it is on.
+            crate::skills::Rule::Rout { .. }
+            | crate::skills::Rule::Wade
+            | crate::skills::Rule::Survey { .. } => {}
         }
     }
     // Every class you hold applies at once. The fountains hand out different

@@ -139,8 +139,13 @@ fn the_bottom_of_the_cave_is_something_certain() {
         gm2d_core::combat::LADDER.iter().any(|s| s.name == who),
         "the boss is {who:?}, which is not a creature"
     );
-    let drop = b.drops.as_deref().expect("the boss leaves something");
-    assert!(gm2d_core::shop::def_named(drop).is_some(), "it leaves {drop:?}, which is nothing");
+    assert!(!b.drops.is_empty(), "the boss leaves nothing");
+    for drop in &b.drops {
+        assert!(
+            gm2d_core::shop::def_named(drop).is_some(),
+            "it leaves {drop:?}, which is nothing"
+        );
+    }
 
     // It is harder than what the cave throws at you on the way down, or the
     // corridor is the fight and the boss is a formality.
@@ -193,9 +198,7 @@ fn the_witchs_key_is_the_key_the_cave_wants() {
         data::quests().quests.iter().flat_map(|q| q.reward.iter().cloned()).collect();
     for (id, _) in data::MAPS {
         for p in data::map(id, D).places.iter() {
-            if let Some(d) = &p.drops {
-                paid.push(d.clone());
-            }
+            paid.extend(p.drops.iter().cloned());
         }
     }
     for w in &wants {
@@ -226,7 +229,7 @@ fn the_boss_drops_its_key_and_a_field_fight_does_not() {
     let cave = data::map("the-great-gear-cave", D);
     let boss = cave.places.iter().find(|p| p.kind == PlaceKind::Boss).expect("a boss");
     let who = boss.creature.clone().unwrap();
-    let key = boss.drops.clone().unwrap();
+    let key = boss.drops.first().cloned().expect("the boss leaves something");
 
     let mut g = Game::new(3, "td");
     // Strong enough to win: what is being tested is the drop, not the fight.

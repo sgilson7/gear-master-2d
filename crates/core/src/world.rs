@@ -115,7 +115,11 @@ impl Allowances {
                 | Rule::SpinKeep { .. }
                 | Rule::SpinEvery { .. }
                 | Rule::Scout
-                | Rule::Rout { .. } => {}
+                | Rule::Rout { .. }
+                // A map rule, and this is a step rule. What an instrument does
+                // is decided when a surveyable map is *loaded*, not when a foot
+                // goes down on it.
+                | Rule::Survey { .. } => {}
             }
         }
         out
@@ -239,9 +243,14 @@ pub struct PlaceDef {
     /// `Boss`: the creature standing here, by canonical name.
     #[serde(default)]
     pub creature: Option<String>,
-    /// `Boss`: the canonical component beating it leaves behind.
+    /// `Boss`: the canonical components beating it leaves behind.
+    ///
+    /// **A list since M11.5**, and it was always going to be one: the Drambus
+    /// Stack's five floors each pay their own piece *and* a map shard, which is
+    /// two certainties off one tile. It was `Option<String>` because there was
+    /// one boss in the game and it dropped one key.
     #[serde(default)]
-    pub drops: Option<String>,
+    pub drops: Vec<String>,
     /// Not here at all until this id is in `answered` or in `flags`.
     ///
     /// **The first conditional place.** A rock in the wall that is a door once

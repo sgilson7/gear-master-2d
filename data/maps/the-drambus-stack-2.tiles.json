@@ -51,7 +51,10 @@
       "id": "the-drambus-stack-2-boss",
       "name": "what is standing on floor 2",
       "creature": "The Tallow Saint",
-      "drops": "The Common Ground",
+      "drops": [
+        "The Common Ground",
+        "Map Shard"
+      ],
       "prose": [
         "Forty feet of it comes down in one piece and lands on the crumb field, which is what the crumb field is for.",
         "The woman with the net is still standing in it. She has not caught a fly and she has now been standing there for fourteen days. One floor left."

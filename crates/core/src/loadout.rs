@@ -1308,6 +1308,30 @@ fn repair_split(
     groups
 }
 
+/// Which instrument this group of components is, if it is one.
+///
+/// **Read off the shard count**, because that is the whole of what separates
+/// the three recipes — one shard is a compass, two an atlas, three a golem.
+/// Derived rather than named, so retuning a recipe retunes what it grants and
+/// the two cannot disagree; the same reasoning `set_of` uses from the other
+/// direction.
+///
+/// Says nothing about whether the group *assembled*. That is the caller's
+/// question and the callers ask it: `Character::item_rules` walks assembled
+/// items only, which is the shape of the loop rather than a condition in it.
+pub fn instrument_of(reg: &PieceRegistry, pieces: &[PieceId]) -> Option<&'static str> {
+    let shards = pieces
+        .iter()
+        .filter(|&&p| reg.def(p).kind == crate::piece::PieceKind::Shard)
+        .count();
+    match shards {
+        1 => Some("compass"),
+        2 => Some("atlas"),
+        3 => Some("golem"),
+        _ => None,
+    }
+}
+
 /// Does this group of components satisfy the slot's recipe? Returns the
 /// missing-requirement message on failure, phrased for the player. Counts are
 /// per item, not per slot — two complete weapons in one slot is legal.

@@ -51,7 +51,10 @@
       "id": "the-drambus-stack-1-boss",
       "name": "what is standing on floor 1",
       "creature": "Gallowglass",
-      "drops": "Bearhide",
+      "drops": [
+        "Bearhide",
+        "Map Shard"
+      ],
       "prose": [
         "The last of it does not come down. It goes, which is a different thing, and what is left is a ring of rind eleven inches high and a great deal of daylight where two hundred and ten feet of the Drambus Stack was.",
         "The man from the tally shed writes the fifth line and then the sixth, and the sixth is the one that is not a drop. He has been waiting six years to have nothing to write.",

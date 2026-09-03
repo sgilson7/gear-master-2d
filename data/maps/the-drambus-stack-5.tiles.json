@@ -51,7 +51,10 @@
       "id": "the-drambus-stack-5-boss",
       "name": "what is standing on floor 5",
       "creature": "Cog Priest",
-      "drops": "Ballast Bed",
+      "drops": [
+        "Ballast Bed",
+        "Map Shard"
+      ],
       "prose": [
         "The floor gives under the last of it and keeps giving, and the whole storey comes down about four feet and stops, and the noise it makes is not a crash. It is a settle.",
         "You are outside. You did not walk out. There are four floors left and the door is where the door was, an inch lower."

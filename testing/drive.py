@@ -1367,6 +1367,41 @@ def check_the_lake_drains_and_the_demo_ends_under_it(page, name, fails):
     plant(page, base, lambda body: None, stem="lake-restore")
 
 
+def check_an_instrument_takes_the_grid(page, name, fails):
+    """A compass in the weapon grid grants a rule, and the grid takes no blade.
+
+    **M11.5**, the block's first save seam. What a browser has to prove is the
+    half no engine test can: that the refusal reaches a player where they will
+    read it. "Does not fit there" belongs on the board and clears in two and a
+    half seconds; *the grid is doing something else* is a rule about what you
+    may be, it happens twice in a playthrough, and it goes in the log.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+
+    def with_a_compass(body):
+        seat_a_set(body, COMPASS, "weapon")
+        # And a handle in the bag, unworn, to try to seat beside it.
+        reg = body["character"]["registry"]
+        reg.append({"def": "Oak Handle", "rot": 0})
+        body["character"]["owned"].append(len(reg) - 1)
+
+    plant(page, base, with_a_compass, stem="compass-probe")
+    rules = page.evaluate("() => window.__character().rules ?? []")
+    if not any("survey" in str(r).lower() or "compass" in str(r).lower() for r in rules):
+        fails.append(f"{name}: a compass is on the board and grants {rules}")
+
+    # The sheet prints it, because a rule moves no bar and a screen that shows
+    # nothing is a rule that cannot be told from a bug.
+    sheet = page.evaluate("""() => [...document.querySelectorAll('#sheet li')]
+        .map(li => li.textContent).join(' | ')""")
+    if "compass" not in sheet.lower():
+        fails.append(f"{name}: the sheet says nothing about the compass: {sheet!r}")
+
+    plant(page, base, lambda body: None, stem="compass-restore")
+
+
 def check_the_rack(page, name, fails):
     """A licensee buys an ench, bolts it on, switches it off, and takes it back.
 
@@ -1689,6 +1724,9 @@ def seat_a_set(body, pieces, slot):
 
 MANDATE = [("Ratskin Material", 0, 0), ("Ratskin Mold", 2, 0), ("Rat Signet", 4, 0)]
 TOAD_SET = [("Toad Frame", 0, 0), ("Toad Hide", 3, 0)]
+# The smallest of the three instruments, laid out so all three parts touch. A
+# shard is two cells wide, a magnet two tall, a lens one.
+COMPASS = [("Map Shard", 0, 0), ("Glass Lens", 2, 0), ("Magnet", 0, 1)]
 
 
 def check_a_set_reads(page, name, fails):
@@ -3219,6 +3257,7 @@ def walk_the_gate(browser, name, fails=None):
 
     # --- what a creature leaves behind ---------------------------------------
     check_a_set_reads(page, name, fails)
+    check_an_instrument_takes_the_grid(page, name, fails)
     check_the_toad_walks_on_water(page, name, fails)
 
     # --- the north ------------------------------------------------------------
@@ -3319,6 +3358,7 @@ def main():
     print("ok: two maps out there is a town, and one field tile in ten answers")
     print("ok: the Drambus Stack opens onto a different floor every time, then a stump")
     print("ok: the Stack comes down, the lake empties, and there is a door at the bottom")
+    print("ok: a compass in the weapon grid grants a rule, and the sheet says so")
     print("ok: a whole set names its own item and says what it does; two thirds of one does not")
     print("ok: the lake is ground to a toad, edge to middle, and the middle has a way down in it")
     print("ok: the north is shut to a level-one character, and says what the road wants")

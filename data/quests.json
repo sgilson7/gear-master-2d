@@ -307,14 +307,16 @@
       ],
       "name": "THE STACK IS SHORTER",
       "brief": "The man in the tally shed has been in it for six years and has written six lines, and the sixth is not a drop. The clerk would like the post outside read properly now there is nothing to measure against it — eleven years of marks and no twelfth. Go and read the post and come back, and she will close the sixth book.",
-      "thanks": "She rules off the page, writes the eleven years across the bottom of it in one line, and shuts the book with her hand flat on it for a while. Then she gives you a glass out of the drawer under the counter which the works has never had a use for and which she says was made for exactly this and nothing else.",
+      "thanks": "She rules off the page, writes the eleven years across the bottom of it in one line, and shuts the book with her hand flat on it for a while. Then she goes into the drawer under the counter and comes out with three things the works has never had a use for: a glass, a setting, and a piece of somewhere that is not here. She says they came together and have never been apart and she would rather they went on not being.",
       "goal": {
         "word": {
           "place": "the-measuring-post"
         }
       },
       "reward": [
-        "Surveyor's Orb"
+        "Surveyor's Orb",
+        "Cosmic Alignment",
+        "Map Shard"
       ],
       "gold": 90
     }

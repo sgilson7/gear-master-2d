@@ -109,6 +109,29 @@ pub fn piece_lines(def: &PieceDef) -> Vec<(&'static str, String)> {
             out.push(("set", r.line()));
         }
     }
+    // **What an instrument's part is a part of.**
+    //
+    // The same lesson the set line learned, one block later: a player who is
+    // handed a Map Shard off a tower floor has a two-cell component with three
+    // mind damage on it and no way at all to find out that three of them and
+    // two handfuls of earth make a golem. A recipe is derived — `recipe_parts`
+    // reads the recipe table — so this cannot go stale when a recipe is
+    // retuned, which is the whole reason the line is here rather than typed
+    // into six blurbs.
+    if crate::piece::is_survey(def.kind) {
+        out.push((
+            "survey",
+            "a survey instrument's part. It goes in the weapon grid and the grid then \
+             holds no weapon"
+                .into(),
+        ));
+        for way in crate::piece::recipe_parts(crate::piece::SlotKind::Weapon)
+            .into_iter()
+            .filter(|w| w.required.iter().any(|r| r.contains(&def.kind.name())))
+        {
+            out.push(("survey", format!("{}: {}", way.title, way.required.join(" + "))));
+        }
+    }
     if let Some(e) = def.effect {
         out.push(("effect", e.label.to_string()));
     }

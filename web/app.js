@@ -1021,6 +1021,13 @@ function boardSays(text) {
   el.classList.add('bad');
   clearTimeout(boardSays.t);
   boardSays.t = setTimeout(() => { el.hidden = true; }, 2600);
+  // **A refusal about the *board* stays on the board; a refusal about the
+  // *game* goes in the log.** "Does not fit there" is the first kind and there
+  // are twenty of them a minute. The weapon grid refusing an instrument beside
+  // a blade is the second: it is a rule about what you may be, it happens
+  // twice in a playthrough, and a player who reads it two seconds later on a
+  // strip that has since cleared has learned nothing.
+  if (/instrument|grid/.test(text || '')) log(text, true);
 }
 
 // ---------------------------------------------------------------- the fork

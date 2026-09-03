@@ -126,13 +126,25 @@ pub fn recipe_parts(slot: SlotKind) -> Vec<RecipeParts> {
             }
             // Named for the piece it is built around, which is the thing that
             // decides which recipe you are following.
+            // **The shard first, then the item's core.** An atlas names an
+            // `Orb` as well, and an orb is what an item splits on — so asking
+            // for the core would call an atlas a crystal ball.
             let title = r
                 .iter()
-                .find(|(k, ..)| k.is_core())
+                .find(|(k, ..)| *k == PieceKind::Shard)
+                .or_else(|| r.iter().find(|(k, ..)| k.is_core()))
                 .map(|(k, ..)| match k {
                     PieceKind::Handle => "Martial weapon",
                     PieceKind::Book => "Book spell",
                     PieceKind::Orb => "Crystal ball",
+                    // Three recipes share this core, so the title has to say
+                    // which. Named off the count of shards, which is the whole
+                    // of what separates them.
+                    PieceKind::Shard => match r.iter().find(|(k, ..)| *k == PieceKind::Shard) {
+                        Some((_, 1, _)) => "Compass",
+                        Some((_, 2, _)) => "Atlas",
+                        _ => "Survey golem",
+                    },
                     _ => "",
                 })
                 .unwrap_or("");
@@ -172,6 +184,23 @@ pub enum PieceKind {
     /// than being cast itself - which is why an orb needs no ink: the
     /// alignment is where an orb's build decision lives.
     Alignment,
+    // ---- the survey instruments ------------------------------------------
+    //
+    // **A fourth thing the weapon grid can be.** It builds a martial weapon, a
+    // book spell or a crystal ball; the fourth is not a weapon at all, and that
+    // is the decision — surveying costs your sword arm, which is what
+    // `PLAN-M11.md` §8 row 4 chose over a sixth board.
+    //
+    // The recipes are in the weapon style because the ask says so: a core plus
+    // named supporters. `Shard` is the core, the way `Handle` is a blade's.
+    /// A piece of somewhere, and the core of every instrument.
+    Shard,
+    /// Ground glass. A compass wants one and an atlas wants one.
+    Lens,
+    /// It points at a thing. Nobody at the works agrees which thing.
+    Magnet,
+    /// Ground that has not finished being ground. Two make a golem.
+    Earth,
     /// **Enchantment.** Laid under the grid rather than packed into it: gear
     /// may sit on top of it, and what it is worth depends on what ends up
     /// covering it.
@@ -219,6 +248,24 @@ impl PieceKind {
         matches!(self, PieceKind::Enchantment)
     }
 
+    /// Is this the piece an *item* hangs off?
+    ///
+    /// **Exactly one to an item, and that is what this means.** When a blob of
+    /// touching components holds two of these, `items_with_locks` splits it and
+    /// hands every other piece to its nearest one — which is how a handle and a
+    /// book in the same grid come out as two weapons rather than one confused
+    /// one.
+    ///
+    /// **`Shard` is deliberately not here**, even though it is the piece the
+    /// three survey recipes are built around and reads at a core's brightness
+    /// in `look::kind_luminance`. An atlas wants two shards and a golem wants
+    /// three, so a shard that anchored an item would split every instrument
+    /// bigger than a compass into pieces — which is exactly what it did, and
+    /// the atlas came out as three items that each needed something.
+    ///
+    /// So there are two senses of *core* and they had to be told apart: the
+    /// piece a recipe is named for, and the piece an item is split on. This is
+    /// the second.
     pub fn is_core(self) -> bool {
         matches!(
             self,
@@ -250,6 +297,10 @@ impl PieceKind {
             PieceKind::Material => "material",
             PieceKind::Mold => "mold",
             PieceKind::Alignment => "alignment",
+            PieceKind::Shard => "map shard",
+            PieceKind::Lens => "lens",
+            PieceKind::Magnet => "magnet",
+            PieceKind::Earth => "living earth",
             PieceKind::Quest => "quest item",
         }
     }
@@ -1335,6 +1386,38 @@ pub fn recipes(kind: SlotKind) -> &'static [&'static [(PieceKind, usize, usize)]
                 (PieceKind::Spell, 2, 3),
                 (PieceKind::Alignment, 0, 1),
             ],
+            // ---- the three instruments -----------------------------------
+            //
+            // On the weapon board and not a weapon, which is the trade: an
+            // instrument in the grid is a grid with no blade in it, and
+            // `Character::can_equip` refuses the mixture outright rather than
+            // leaving it to a recipe that would happily allow two items.
+            //
+            // Every bound is exact. A compass is one of each and an atlas is
+            // two shards; there is no "up to", because the difference between
+            // the three *is* the count and a range would blur it.
+            //
+            // **The compass.** A shard, something to look through, and
+            // something that points.
+            &[
+                (PieceKind::Shard, 1, 1),
+                (PieceKind::Lens, 1, 1),
+                (PieceKind::Magnet, 1, 1),
+            ],
+            // **The atlas.** Two shards, the same glass, and the two cosmic
+            // pieces — which are an `Orb` and an `Alignment`, the kinds a
+            // crystal ball already uses. Reused rather than invented: a cosmic
+            // orb in a ball is a perfectly good crystal ball, and a kind that
+            // meant one thing in one recipe and another somewhere else would be
+            // the ambiguity `is_slot_specific` exists to catch.
+            &[
+                (PieceKind::Shard, 2, 2),
+                (PieceKind::Lens, 1, 1),
+                (PieceKind::Orb, 1, 1),
+                (PieceKind::Alignment, 1, 1),
+            ],
+            // **The golem.** Three shards and two of the ground itself.
+            &[(PieceKind::Shard, 3, 3), (PieceKind::Earth, 2, 2)],
         ],
         SlotKind::Helmet => &[&[
             (PieceKind::Frame, 1, 1),
@@ -11607,6 +11690,123 @@ pub static CATALOG: &[PieceDef] = &[
         power_bonus: 0,
         price: 11,
     },
+    // ---- the survey instruments, M11.5 ---------------------------------
+    //
+    // Six components and a save seam. Nothing here is for sale: the shards
+    // come off the Drambus Stack's five floors and the thing under the lake,
+    // and the four supporters are drops in the Stack's Shadow or the pay for
+    // an errand. `PLAN-M11.md` calls this the block's first fingerprint move
+    // and it is: every save written before it is refused, with the sentence
+    // naming both catalogues.
+    //
+    // **They carry stats, and small ones.** An instrument is worth building
+    // for the rule it grants and not for the numbers on it — a compass that
+    // out-damaged a blade would make the trade this whole recipe is about
+    // ("surveying costs your sword arm") not a trade at all.
+    PieceDef {
+        name: "Map Shard",
+        slot: SlotKind::Weapon,
+        kind: PieceKind::Shard,
+        // Two cells, and an awkward two: an instrument is three to five pieces
+        // in a grid that also wants to hold a weapon, and the whole decision is
+        // that it cannot hold both.
+        cells: &[(0, 0), (1, 0)],
+        base: Stats { mind: 3, ..Stats::ZERO },
+        assembly_bonus: None,
+        effect: None,
+        cooldown_ms: 0,
+        speed_bonus: 0,
+        triggers: &[],
+        quest: None,
+        power_bonus: 0,
+        price: 40,
+    },
+    PieceDef {
+        name: "Glass Lens",
+        slot: SlotKind::Weapon,
+        kind: PieceKind::Lens,
+        cells: &[(0, 0)],
+        base: Stats { mind: 4, magic_pierce: 4, ..Stats::ZERO },
+        assembly_bonus: None,
+        effect: None,
+        cooldown_ms: 0,
+        speed_bonus: 0,
+        triggers: &[],
+        quest: None,
+        power_bonus: 0,
+        price: 22,
+    },
+    PieceDef {
+        name: "Magnet",
+        slot: SlotKind::Weapon,
+        kind: PieceKind::Magnet,
+        cells: &[(0, 0), (0, 1)],
+        base: Stats { physical_pierce: 6, ..Stats::ZERO },
+        assembly_bonus: None,
+        effect: None,
+        cooldown_ms: 0,
+        speed_bonus: 0,
+        triggers: &[],
+        quest: None,
+        power_bonus: 0,
+        price: 22,
+    },
+    PieceDef {
+        name: "Cosmic Orb",
+        slot: SlotKind::Weapon,
+        // **An `Orb`, not a kind of its own.** A cosmic orb set into a crystal
+        // ball is a perfectly good crystal ball, and inventing a fifth kind
+        // that behaved identically would be a kind nobody could tell from this
+        // one. The atlas's recipe names `Orb` and so does the ball's; which one
+        // you are building is decided by what else is touching it.
+        kind: PieceKind::Orb,
+        cells: &[(0, 0), (1, 0), (0, 1), (1, 1)],
+        base: Stats { mana: 4, magic_damage: 8, ..Stats::ZERO },
+        assembly_bonus: None,
+        effect: None,
+        cooldown_ms: 2600,
+        speed_bonus: 0,
+        triggers: &[],
+        quest: None,
+        // **It really is a crystal ball, so it is priced as one.** The atlas
+        // names `Orb` because a cosmic orb set into a ball is a good ball, and
+        // `an_orb_out_damages_a_book_for_the_room_it_costs` says every orb
+        // scales what a ball casts — a zero here would have been an orb that
+        // could not be used as one, which is the ambiguity reusing the kind was
+        // meant to avoid.
+        power_bonus: 60,
+        price: 55,
+    },
+    PieceDef {
+        name: "Cosmic Alignment",
+        slot: SlotKind::Weapon,
+        kind: PieceKind::Alignment,
+        cells: &[(0, 0)],
+        base: Stats { magic_damage: 5, mind: 5, ..Stats::ZERO },
+        assembly_bonus: None,
+        effect: None,
+        cooldown_ms: 0,
+        speed_bonus: 0,
+        triggers: &[],
+        quest: None,
+        power_bonus: 85,
+        price: 34,
+    },
+    PieceDef {
+        name: "Living Earth",
+        slot: SlotKind::Weapon,
+        kind: PieceKind::Earth,
+        cells: &[(0, 0), (1, 0), (0, 1)],
+        base: Stats { health: 40, armor: 4, ..Stats::ZERO },
+        assembly_bonus: None,
+        effect: None,
+        cooldown_ms: 0,
+        speed_bonus: 0,
+        triggers: &[],
+        quest: None,
+        power_bonus: 0,
+        price: 30,
+    },
 ];
 
 /// Gear that exists only on a boss.
@@ -11618,6 +11818,37 @@ pub static CATALOG: &[PieceDef] = &[
 pub const BOSS_ONLY: &[&str] = &["The Money Jacket", "The Split Wisdom", "The Idiot's Gift", "Asker's Monocle", "Toolwright's Grip", "Kaklon's Patent", "Eighth Ray Crown", "Assassin's Hemline", "Handman's Peel", "Gilded Offcuts", "Henpeck's Cell Keys", "The Seeker's Tears", "Tetrahedron Shard"];
 
 /// Is this a piece a player can never own?
+/// Is this kind part of a survey instrument rather than a weapon?
+///
+/// **The line the weapon grid is split along.** `Orb` and `Alignment` are
+/// deliberately *not* here: a cosmic orb is a perfectly good crystal ball, and
+/// naming them survey kinds would have made every ball part refuse to sit
+/// beside a blade. What decides an atlas is the shards touching it, and the
+/// shards are what this list is really about.
+pub fn is_survey(kind: PieceKind) -> bool {
+    matches!(kind, PieceKind::Shard | PieceKind::Lens | PieceKind::Magnet | PieceKind::Earth)
+}
+
+/// Is this kind part of a *weapon* — something that hits or casts?
+///
+/// The other side of the line `is_survey` draws, and there is a gap between
+/// them on purpose. `Orb` and `Alignment` are in **neither**: a cosmic orb is a
+/// crystal ball's core and an atlas's, and the whole reason those two kinds are
+/// reused rather than invented is that one piece can honestly be either. So the
+/// grid refuses a *blade* beside a shard and lets a ball's parts through, and
+/// which of the two you have built is decided by what the shards are touching.
+pub fn is_weapon_gear(kind: PieceKind) -> bool {
+    matches!(
+        kind,
+        PieceKind::Handle
+            | PieceKind::Damaging
+            | PieceKind::Accessory
+            | PieceKind::Book
+            | PieceKind::Ink
+            | PieceKind::Spell
+    )
+}
+
 pub fn is_boss_only(name: &str) -> bool {
     BOSS_ONLY.contains(&name)
 }
@@ -11717,6 +11948,15 @@ pub const EVENT_ONLY: &[&str] = &[
     "Points Rodding",
     "Booking Hall",
     "Signal Wire",
+    // The three instruments' parts. Off the Stack, out of its shadow, and one
+    // off an errand — never off a shelf, because what an instrument is worth is
+    // the walk that assembled it.
+    "Map Shard",
+    "Glass Lens",
+    "Magnet",
+    "Cosmic Orb",
+    "Cosmic Alignment",
+    "Living Earth",
     "Shunter's Orb",
     "Signalman's Orb",
     "A Word About the Sidings",

@@ -381,3 +381,68 @@ the writing stops there. `Rule::Wade` widened from the rim to the whole body.
   twenty-one tiles of slag against eleven of road. That is the only currency a
   dungeon here has, and it is worth saying because `PLAN-M11.md` proposed
   positioning, and combat has no board.
+
+---
+
+## M11.5 — map shards and the instruments *(the first seam)*
+
+### Six components, two meanings of "core", and a grid that has to choose
+
+**The change.** `Map Shard`, `Glass Lens`, `Magnet`, `Cosmic Orb`,
+`Cosmic Alignment` and `Living Earth` join the catalogue. Three recipes on the
+weapon board build a compass, an atlas and a survey golem; an assembled one
+grants `Rule::Survey`. The catalogue is 550 and every save written before it is
+refused.
+
+**Recon, as the plan asks for it in the commit:** none of the five names the ask
+gives existed. `Scrying Lens`, `The Cracked Lens` and `Nine-Plane Lens` are all
+in the catalogue and none of them is a `Glass Lens`; there is no magnet, nothing
+cosmic and no living earth. So all six are new, which is the whole seam.
+
+**Follows from.**
+
+- **`is_core` had two meanings and they had to be told apart.** It reads as
+  *the piece a recipe is built around* and it means *the piece an item is split
+  on* — `items_with_locks` hands every other piece to its nearest one. A shard
+  that anchored an item split every instrument bigger than a compass: the atlas
+  came out as three items that each needed something. So `Shard` is not a core
+  in that sense, reads at a core's brightness in `look::kind_luminance`, and
+  `recipe_parts` looks for it *before* the core when naming a recipe — otherwise
+  an atlas is called a crystal ball.
+- **`Cosmic Orb` and `Cosmic Alignment` are the kinds a crystal ball uses.**
+  Reused rather than invented, because a cosmic orb set into a ball is a good
+  ball. That decides the shape of the exclusion below, and it means both had to
+  earn a `power_bonus` — `an_orb_out_damages_a_book_for_the_room_it_costs` says
+  every orb scales what a ball casts, and a zero would have been an orb that
+  could not be used as one.
+- **The exclusion has a gap in it, on purpose.** `is_survey` and
+  `is_weapon_gear` are two lists with `Orb`, `Alignment`, `Enchantment` and
+  `Quest` in neither. What is refused is a *blade* beside a shard, which is what
+  the plan asks for in as many words; what is allowed is a ball's parts, which is
+  what the atlas is made of.
+- **`PlaceDef::drops` became a list**, and was always going to be one: the
+  Stack's five floors each pay their own piece *and* a shard.
+- **`a_set_is_a_few_hours_and_not_a_lifetime` grew a second band.** A set is
+  three pieces and an afternoon, 25 to 400 wins; a single supporter is a *part*,
+  2 to 40. One band for both would have called a magnet a broken set.
+- **Two lints widened to every map** — the drop-hours test and the reward
+  sources — because the instruments' parts come off creatures two maps out.
+
+**Watch.**
+
+- **Every exhaustive match on `PieceKind`.** Four new kinds went in and the
+  compiler found `look::kind_luminance` and nothing else, which is the good
+  outcome and also the thing to be suspicious of: anything matching on kind with
+  a `_ =>` arm silently accepted them. `explain.rs` was widened by hand.
+- **A shard seating where only a weapon core should** — notebook entry 4's
+  watch, and the answer is that it can, in the sense that a shard and an orb
+  share a grid. That is the atlas and it is deliberate; what to look for is the
+  *other* direction, a blade sitting beside a shard, which `can_equip` refuses.
+- **The seam.** Deploy point D's note says old saves are done and why. The
+  number lives in `sets.rs::a_save_from_before_this_block_is_refused_by_name`
+  and nowhere else, which is where it has always lived.
+- **An instrument that grants nothing.** `Rule::Survey` is carried and named and
+  **does nothing at all** until M11.6 — which is the one shape this project has
+  shipped twice and written a lint about (`every_offered_class_reaches_something`).
+  It is stated here so that it is a schedule and not a silence, and M11.6's
+  acceptance is the thing that closes it.

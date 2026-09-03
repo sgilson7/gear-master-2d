@@ -434,18 +434,22 @@ fn a_save_from_before_this_block_is_refused_by_name() {
     let g = Game::new(1, "td");
     let text = gm2d_core::save::save(&g);
     let now = gm2d_core::piece::CATALOG.len();
-    assert_eq!(now, 544, "the catalogue moved again and this line owns saying so");
-    // A file written against the M8 catalogue: 536 components, and whatever
+    // **550 since M11.5**, which added the three instruments' six parts. It was
+    // 544 from M9.1 to M11.4 and 536 before that, and this line is where the
+    // move is said out loud — the deploy note says it too, in the sentence a
+    // seam always gets.
+    assert_eq!(now, 550, "the catalogue moved again and this line owns saying so");
+    // A file written against the M9 catalogue: 544 components, and whatever
     // fingerprint that had. Either half is enough to refuse it.
     let older = text
-        .replace(&format!("\"pieces\": {now}"), "\"pieces\": 536")
+        .replace(&format!("\"pieces\": {now}"), "\"pieces\": 544")
         .replace(
             &format!("\"fingerprint\": \"{}\"", gm2d_core::save::catalog_fingerprint()),
             "\"fingerprint\": \"0000000000000000\"",
         );
     assert_ne!(older, text, "the save no longer states its catalogue size");
-    let why = gm2d_core::save::load(&older).expect_err("a pre-M9 save loaded");
-    assert!(why.contains("536"), "{why}");
+    let why = gm2d_core::save::load(&older).expect_err("a pre-M11.5 save loaded");
+    assert!(why.contains("544"), "{why}");
     assert!(why.contains(&gm2d_core::piece::CATALOG.len().to_string()), "{why}");
 }
 

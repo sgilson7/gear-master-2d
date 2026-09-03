@@ -83,13 +83,23 @@ pub fn kind_luminance(kind: PieceKind) -> f32 {
         | PieceKind::Base
         | PieceKind::Material
         | PieceKind::Book
-        | PieceKind::Orb => 0.22,
+        | PieceKind::Orb
+        // And a map shard anchors an instrument. Same role, same brightness:
+        // the channel carries *what a piece is for in its recipe*, and a core
+        // is a core whichever of the four things the weapon grid is building.
+        | PieceKind::Shard => 0.22,
         // The body of the recipe.
         PieceKind::Damaging
         | PieceKind::Plating
         | PieceKind::Layer
         | PieceKind::Mold
-        | PieceKind::Ink => 0.45,
+        | PieceKind::Ink
+        // The instruments' supporters. Every one of them is required rather
+        // than optional — a compass with no magnet is not a worse compass, it
+        // is not a compass — so they read as the body of the recipe.
+        | PieceKind::Lens
+        | PieceKind::Magnet
+        | PieceKind::Earth => 0.45,
         // What you add once the item works.
         PieceKind::Accessory
         | PieceKind::Crest

@@ -83,8 +83,32 @@ pub enum Rule {
     /// Answered in `world::step`, because a step is where a wall is refused —
     /// and reaching it through [`crate::world::Allowances`] rather than through
     /// the character, because **a map does not know about bags.**
+    ///
+    /// **All of it, since M11.4.** See `world::WADE_DEPTH` for the measurement
+    /// that used to bound it and the reason the bound went.
     Wade,
+    /// An assembled instrument is on the board, and it is this one.
+    ///
+    /// **The third granter of rules is an item again**, and this is the first
+    /// rule that is *about* a map rather than about a fight or a step. What
+    /// each kind does to the map it opens is M11.6's; what this does is say
+    /// which instrument you built, once, in one place — so nothing downstream
+    /// has to re-derive it from what is sitting in the weapon grid.
+    ///
+    /// The kind is a `Name` for the reason every other name here is one: the
+    /// vocabulary lives in `piece.rs`'s recipes, and a second enum listing
+    /// compass-atlas-golem would be two lists to keep in step. [`Rule::check`]
+    /// refuses one the recipes have not got.
+    Survey { kind: Name },
 }
+
+/// The three instruments, by name, in the order their recipes are written.
+///
+/// **A list, and it is the only one.** `Rule::check` reads it, `Rule::line`
+/// reads it, and M11.6's modifiers read it — so an instrument that is not here
+/// is an instrument that does not exist, which is what stops a fourth being
+/// half-added.
+pub const INSTRUMENTS: &[&str] = &["compass", "atlas", "golem"];
 
 impl Rule {
     /// Refuse a rule that names something the engine has not got.
@@ -117,6 +141,13 @@ impl Rule {
                 .then_some(())
                 .ok_or_else(|| format!("{ms}ms is not faster than a second")),
             Rule::Scout => Ok(()),
+            // The same guard `CurseOnActivate` gets, for the same reason: an
+            // instrument nobody wrote a recipe for is a rule that can never
+            // fire, and nothing else in the game would say so.
+            Rule::Survey { kind } => INSTRUMENTS
+                .contains(&kind.as_ref())
+                .then_some(())
+                .ok_or_else(|| format!("there is no instrument called {kind:?}")),
             // A creature nothing in the game is called is a set bonus that can
             // never fire, which is the granted-nothing failure wearing a
             // creature's name.
@@ -166,6 +197,7 @@ impl Rule {
                 0,
             ),
             Rule::Wade => "walk onto water".to_string(),
+            Rule::Survey { kind } => format!("survey a map with 1 {kind}"),
         }
     }
 
@@ -219,6 +251,13 @@ impl Rule {
                  middle, on every map that has any."
                     .into(),
                 "Nothing lives in water, so a waded tile never starts a fight.".into(),
+            ],
+            Rule::Survey { kind } => vec![
+                format!(
+                    "An assembled {kind} in the weapon grid. A surveyable map reads \
+                     differently through it — see what the reach says when you get there."
+                ),
+                "The weapon grid holds gear or an instrument and never both.".into(),
             ],
         }
     }

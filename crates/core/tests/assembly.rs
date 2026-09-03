@@ -962,9 +962,27 @@ fn a_slot_with_several_recipes_describes_each_one() {
     use gm2d_core::piece::recipe_parts;
 
     let ways = recipe_parts(SlotKind::Weapon);
-    assert_eq!(ways.len(), 3, "weapon builds three ways");
+    assert_eq!(ways.len(), 6, "weapon builds six ways");
     let titles: Vec<&str> = ways.iter().map(|w| w.title).collect();
-    assert_eq!(titles, vec!["Martial weapon", "Book spell", "Crystal ball"]);
+    assert_eq!(
+        titles,
+        vec!["Martial weapon", "Book spell", "Crystal ball", "Compass", "Atlas", "Survey golem"],
+        "the weapon grid builds three weapons and three instruments"
+    );
+
+    // **The three instruments, and every bound exact.** What separates a
+    // compass from an atlas from a golem is the count of shards, so there is no
+    // optional half to any of them: a compass with no magnet is not a worse
+    // compass, it is not a compass.
+    assert_eq!(ways[3].required, vec!["1 map shard", "1 lens", "1 magnet"]);
+    assert_eq!(
+        ways[4].required,
+        vec!["2 map shards", "1 lens", "1 crystal ball", "1 alignment"]
+    );
+    assert_eq!(ways[5].required, vec!["3 map shards", "2 living earths"]);
+    for w in &ways[3..] {
+        assert!(w.optional.is_empty(), "{}: an instrument has an optional half", w.title);
+    }
 
     // The book, as `design/assembly-bonuses-and-books.md` §2.2 asks for it: a
     // core and something to cast, and everything else a choice. It read

@@ -51,7 +51,10 @@
       "id": "the-drambus-stack-3-boss",
       "name": "what is standing on floor 3",
       "creature": "Mire Behemoth",
-      "drops": "Drove Way",
+      "drops": [
+        "Drove Way",
+        "Map Shard"
+      ],
       "prose": [
         "The middle of it goes first and the rest follows it down, and for about a second there is a shape in the air where the storey was.",
         "The buttress on the north face has closed its two-inch gap by half an inch. There is a card on the stone that says to tell somebody, and a name on it that was crossed out nine years ago. Two floors left."

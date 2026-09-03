@@ -70,7 +70,11 @@
       "id": "the-bottom-of-the-lake",
       "name": "the bottom of the lake",
       "creature": "Sootmother",
-      "drops": "The Cracked Lens",
+      "drops": [
+        "The Cracked Lens",
+        "Map Shard",
+        "Cosmic Orb"
+      ],
       "prose": [
         "It stops, and the noise it was making stops with it, and what is left is water moving somewhere you cannot see.",
         "Behind it the wall is not a wall. It is a door, and it has been a door the whole time, and there are eleven inches of silt banked against the bottom of it that nobody has swept."

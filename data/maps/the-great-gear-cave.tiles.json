@@ -5,7 +5,10 @@
   "_note": "The first dungeon, and deliberately short: nine by five, one way in, one thing at the end of it. A dungeon here is a corridor with something certain at the bottom — the only fight in the game that is not a draw against a region's pool — and its length is the point. Fatigue is what makes it a decision: you walk in with a budget and the walk back out is part of it.",
   "width": 9,
   "height": 5,
-  "start": [2, 1],
+  "start": [
+    2,
+    1
+  ],
   "rows": [
     "^^^^^^^^^",
     "^==%%%==^",
@@ -17,26 +20,48 @@
     {
       "id": "the-great-gear-cave",
       "name": "The Great Gear Cave",
-      "bounds": [[1, 1, 7, 3]],
-      "enemies": ["Iron Sentinel", "The Iron Warden", "Warded Idol"]
+      "bounds": [
+        [
+          1,
+          1,
+          7,
+          3
+        ]
+      ],
+      "enemies": [
+        "Iron Sentinel",
+        "The Iron Warden",
+        "Warded Idol"
+      ]
     }
   ],
   "places": [
     {
-      "at": [1, 1],
+      "at": [
+        1,
+        1
+      ],
       "kind": "gate",
       "id": "the-way-back-up",
       "name": "the way back up",
       "to": "west-bambulon",
-      "at_to": [16, 2]
+      "at_to": [
+        16,
+        2
+      ]
     },
     {
-      "at": [7, 3],
+      "at": [
+        7,
+        3
+      ],
       "kind": "boss",
       "id": "the-bottom-of-the-cave",
       "name": "the bottom of the cave",
       "creature": "Rust Colossus",
-      "drops": "The Deep Gate Key"
+      "drops": [
+        "The Deep Gate Key"
+      ]
     }
   ]
 }

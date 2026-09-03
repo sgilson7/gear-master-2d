@@ -919,6 +919,21 @@ pub static TURTLE_DICK: Theme = Theme {
         ("Signal Wire", "The Signal Wire from Multicity"),
         ("Shunter's Orb", "The Shunting Ball"),
         ("Signalman's Orb", "The Signal Ball"),
+        // **The three instruments and what they are made of**, M11.5. The
+        // names are the world's for a thing the engine calls a shard, a lens
+        // and a magnet — which is exactly the split TONE 13a asks for: the
+        // recipe reads out of `recipe_text` in the engine's words and the
+        // component reads in the book's.
+        //
+        // A map shard is a piece of somewhere, so it is a piece of the one
+        // place anybody here has been surveying: the reach nobody has agreed
+        // the width of.
+        ("Map Shard", "A Piece of the Reach"),
+        ("Glass Lens", "Ground Wextreen Glass"),
+        ("Magnet", "The Pointing Stone"),
+        ("Cosmic Orb", "The Octarine Ball"),
+        ("Cosmic Alignment", "The Eighth Ray, Set"),
+        ("Living Earth", "Ground That Is Not Finished"),
         // The toad census. Three pieces the starter town's errand turns on,
         // named in the change that writes them — the gear skill's own rule.
         // The toad is already the Bengulon Jungle Toad, so its eyes are, and

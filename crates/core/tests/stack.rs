@@ -99,7 +99,11 @@ fn every_floor_is_one_sitting_with_one_thing_on_it() {
         let b = bosses[0];
         assert_eq!(b.id, format!("{id}-boss"));
         assert!(b.creature.is_some(), "{id}: a boss tile with nothing on it");
-        assert!(b.drops.is_some(), "{id}: a floor that pays nothing");
+        assert!(!b.drops.is_empty(), "{id}: a floor that pays nothing");
+        assert!(
+            b.drops.iter().any(|d| d == "Map Shard"),
+            "{id}: the tower is the shards' faucet and this floor pays none"
+        );
         assert!(!b.prose.is_empty(), "{id}: the floor comes down and says nothing");
         // No gate out. The way out is the boss, or the tab.
         assert!(

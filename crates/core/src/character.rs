@@ -87,6 +87,17 @@ pub enum RuleError {
     NotEquipped,
     /// Tried to wear a quest item. They are carried and never worn.
     NotWearable,
+    /// **The weapon grid holds gear or an instrument, and never both.**
+    ///
+    /// `PLAN-M11.md` §8 row 4: the three survey instruments are built on the
+    /// weapon board, and *surveying costs your sword arm* is the decision that
+    /// buys — a sixth board would have been UI and no decision at all.
+    ///
+    /// Refused here rather than in a recipe, because a recipe governs one
+    /// *item* and a grid holds several. A compass and a blade in the same
+    /// weapon grid satisfy two recipes perfectly well and are exactly the thing
+    /// this is meant to stop.
+    MixedGrid { instrument: bool },
 }
 
 impl std::fmt::Display for RuleError {
@@ -97,6 +108,17 @@ impl std::fmt::Display for RuleError {
             RuleError::NotWearable => {
                 write!(f, "that is a quest item - it is carried, not worn")
             }
+            // TONE rule 12: a refusal names the thing that is in the way.
+            RuleError::MixedGrid { instrument: true } => write!(
+                f,
+                "there is an instrument in that grid, and an instrument is what the grid is \
+                 doing - take it apart if you want a weapon back"
+            ),
+            RuleError::MixedGrid { instrument: false } => write!(
+                f,
+                "there is gear in that grid. An instrument wants the whole of it, which is \
+                 what surveying costs you"
+            ),
         }
     }
 }
@@ -339,6 +361,31 @@ impl Character {
         // which is a rule nothing states and everything has to remember.
         if self.registry.def(id).kind == crate::piece::PieceKind::Quest {
             return Err(RuleError::NotWearable);
+        }
+        // **Gear or an instrument, never both.** See `RuleError::MixedGrid`.
+        //
+        // The line has a gap in it and the gap is the point: an orb and an
+        // alignment are in neither list, because a cosmic orb is a crystal
+        // ball's core *and* an atlas's. What is refused is a blade beside a
+        // shard, which is what `PLAN-M11.md` asks for in as many words.
+        if kind == SlotKind::Weapon {
+            let here = self.registry.def(id).kind;
+            let others: Vec<_> = self
+                .loadout
+                .slot(kind)
+                .pieces()
+                .into_iter()
+                .filter(|&p| p != id)
+                .map(|p| self.registry.def(p).kind)
+                .collect();
+            if crate::piece::is_survey(here) && others.iter().copied().any(crate::piece::is_weapon_gear)
+            {
+                return Err(RuleError::MixedGrid { instrument: false });
+            }
+            if crate::piece::is_weapon_gear(here) && others.iter().copied().any(crate::piece::is_survey)
+            {
+                return Err(RuleError::MixedGrid { instrument: true });
+            }
         }
         // A piece being moved within its own slot must not collide with
         // itself; `Slot::can_place` already allows that.
@@ -1303,6 +1350,15 @@ impl Character {
         let mut out = Vec::new();
         for report in self.loadout.reports(&self.registry) {
             for item in report.items.iter().filter(|i| i.assembled) {
+                // **An instrument grants its own rule, and it is not a set.**
+                // A set is agreement and completeness across a recipe somebody
+                // wrote in `piece.rs`; an instrument is a *recipe*, so what it
+                // grants is decided by which recipe it satisfied. Read off the
+                // shard count, which is the whole of what separates the three.
+                if let Some(kind) = crate::loadout::instrument_of(&self.registry, &item.pieces) {
+                    out.push(crate::rule::Rule::Survey { kind: kind.into() });
+                    continue;
+                }
                 // **The set or nothing.** A rule off one component would be a
                 // rule off one component, and the whole ask was that a set
                 // bonus applies when the assembled item is recombined.

@@ -93,7 +93,7 @@ pub fn run(game: &Game, difficulty: Difficulty) -> Option<CombatLog> {
 ///
 /// Reads the map the player is on. A `World` is cheap to build here — this
 /// runs once per settled fight, not per frame.
-fn boss_at(game: &Game, at: [u8; 2]) -> Option<(String, Option<String>, Vec<String>)> {
+fn boss_at(game: &Game, at: [u8; 2]) -> Option<(String, Vec<String>, Vec<String>)> {
     // **As the game has left it**, not as the file has it: a boss can stand
     // under a lake that has drained, and the map that answers questions about
     // the file does not know about that.
@@ -285,10 +285,10 @@ pub fn settle(game: &mut Game, log: &CombatLog, difficulty: Difficulty) -> Optio
             // creature's name: the same creature stands in a region's pool as
             // an ordinary encounter, and beating one in a field must not hand
             // over the key to anywhere. The place is what makes it a boss.
-            if let Some((id, drop, prose)) = boss_at(game, e.at) {
+            if let Some((id, drops, prose)) = boss_at(game, e.at) {
                 if !game.world.answered.iter().any(|a| *a == id) {
                     game.world.answered.push(id);
-                    if let Some(name) = drop {
+                    for name in drops {
                         receipt.push(format!("It was carrying {}.", game.theme_piece(&name)));
                         game.character.give(&name);
                     }

@@ -51,7 +51,10 @@
       "id": "the-drambus-stack-4-boss",
       "name": "what is standing on floor 4",
       "creature": "Iron Abbot",
-      "drops": "Trig Pillar",
+      "drops": [
+        "Trig Pillar",
+        "Map Shard"
+      ],
       "prose": [
         "It settles again, and this time somebody at the tally shed is standing outside it with a pencil before the noise has finished.",
         "\"Two,\" he says. \"Two in a week. Six years and then two in a week.\" He writes it down and looks at the page and does not look happy about it. Three floors left."

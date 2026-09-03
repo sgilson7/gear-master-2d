@@ -72,6 +72,11 @@ export function pieceCardHtml(p) {
     // the set, so nothing on any screen said the three of them were three of a
     // thing.
     ['set', 'part of a set'],
+    // **And which instrument wants it.** The same lesson one block later: a
+    // Map Shard off a tower floor is a two-cell component with three mind
+    // damage on it, and without this there is nothing anywhere that says three
+    // of them and two handfuls of earth make a golem.
+    ['survey', 'part of a survey instrument'],
     ['effect', 'what it does to its neighbours'],
     ['trigger', ''],
   ];

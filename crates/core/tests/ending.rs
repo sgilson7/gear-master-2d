@@ -78,7 +78,7 @@ fn the_door_wants_the_key_the_boss_drops() {
     let dropped: Vec<String> = data::MAPS
         .iter()
         .flat_map(|(id, _)| {
-            data::map(id, D).places.iter().filter_map(|p| p.drops.clone()).collect::<Vec<_>>()
+            data::map(id, D).places.iter().flat_map(|p| p.drops.clone()).collect::<Vec<_>>()
         })
         .collect();
     assert!(
@@ -91,7 +91,7 @@ fn the_door_wants_the_key_the_boss_drops() {
     let dropper = data::MAPS
         .iter()
         .flat_map(|(id, _)| data::map(id, D).places.clone())
-        .find(|p| p.drops.as_deref() == Some(wants))
+        .find(|p| p.drops.iter().any(|d| d == wants))
         .expect("something drops it");
     assert_eq!(
         opens, dropper.id,

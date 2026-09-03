@@ -170,18 +170,26 @@ fn the_stream_is_a_function_of_the_fights_and_not_of_the_bag() {
 #[test]
 fn a_set_is_a_few_hours_and_not_a_lifetime() {
     let d = shipped();
-    let w = data::world(D);
     let mut creatures: Vec<&str> = d.drops.iter().map(|e| e.creature.as_str()).collect();
     creatures.dedup();
     for who in creatures {
         let want: Vec<&str> = d.of(who).iter().map(|e| e.piece.as_str()).collect();
-        // A tile in the region that holds it, so the draw is the map's own.
-        let region = w
-            .regions
+        // **A tile in a region that holds it, on any map.** This walked West
+        // Bambulon alone while the drops were the pit's three sets; M11.5's
+        // three instrument parts come off creatures in the Stack's Shadow, two
+        // maps away, and a check that could not find them would have been a
+        // check that panicked rather than one that measured.
+        let (w, region_id, region_name) = data::MAPS
             .iter()
-            .find(|r| r.enemies.iter().any(|m| m.name == who))
-            .unwrap_or_else(|| panic!("nothing on this map holds a {who}"));
-        let tile = w.tiles_of(&region.id)[0];
+            .find_map(|(id, _)| {
+                let w = data::map(id, D);
+                let r = w.regions.iter().find(|r| r.enemies.iter().any(|m| m.name == who))?;
+                let (rid, rname) = (r.id.clone(), r.name.clone());
+                Some((w, rid, rname))
+            })
+            .unwrap_or_else(|| panic!("nothing anywhere holds a {who}"));
+        let region = &region_name;
+        let tile = w.tiles_of(&region_id)[0];
 
         let trials = 40;
         let mut total = 0u32;
@@ -209,18 +217,29 @@ fn a_set_is_a_few_hours_and_not_a_lifetime() {
         }
         let mean = total / trials;
         println!(
-            "{who}: {} pieces at {} per mille -> {mean} wins in {}",
+            "{who}: {} pieces at {} per mille -> {mean} wins in {region}",
             want.len(),
             d.of(who)[0].per_mille,
-            region.name,
         );
+        // **Two bands, because there are two kinds of thing dropped here.**
+        //
+        // A *set* is three pieces that make one item and it is meant to be an
+        // afternoon: under twenty-five is a set you get by accident, over four
+        // hundred is one nobody finishes, and the M9.4 playthrough reached the
+        // ending in 169 wins.
+        //
+        // A single piece is one of an instrument's supporters — a lens, a
+        // magnet, a handful of living earth — and it is a *part*, not a
+        // trophy. The shards are the achievement and these are the errand you
+        // run to use them, so the band is much lower at both ends: free is not
+        // a decision and forty wins for a magnet is a magnet nobody bothers
+        // with.
+        let band = if want.len() > 1 { 25..=400 } else { 2..=40 };
         assert!(
-            (25..=400).contains(&mean),
-            "{who}: {} pieces take a mean of {mean} wins in {}. Under twenty-five is a set \
-             you get by accident; over four hundred is a set nobody finishes. The M9.4 \
-             playthrough reached the ending in 169 wins.",
+            band.contains(&mean),
+            "{who}: {} pieces take a mean of {mean} wins in {region}, and the band is \
+             {band:?}. A set is an afternoon and a part is an errand.",
             want.len(),
-            region.name,
         );
     }
 }

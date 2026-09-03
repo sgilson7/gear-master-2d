@@ -194,7 +194,7 @@ fn there_is_one_boss_under_the_lake_and_one_door_behind_it() {
     assert_eq!(bosses.len(), 1);
     let boss = bosses[0];
     assert_eq!(boss.id, "the-bottom-of-the-lake");
-    assert!(boss.drops.is_some(), "it carries nothing");
+    assert!(!boss.drops.is_empty(), "it carries nothing");
     // Harder than anything in the tower, which is what makes it the bottom.
     let rated = |name: &str| {
         gm2d_core::rating::creature_rating(

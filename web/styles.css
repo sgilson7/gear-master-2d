@@ -73,8 +73,30 @@ button.primary { background: var(--brass); border-color: var(--brass); color: va
 button.primary:hover { filter: brightness(1.1); color: var(--surface); }
 :focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
 .save .row { margin-top: 16px; }
+/* `.says` is still the in-screen slot for a town, a bench, the tree and the
+   board — a sentence about the screen you are on, printed on it. What left is
+   the one that hung below the save panel and belonged to nothing. */
 .says { margin: 16px 0 0; font-family: var(--mono); font-size: 13px; color: var(--ink-2); }
 .says.bad { color: var(--rust); }
+
+/* --- M11.0: the log ----------------------------------------------------- */
+/* The strip: the last few things the game said, always up. The overlay wears
+   the same class with `.whole` on it, so a line reads the same in both — one
+   look, because they are one transcript at two lengths. */
+.taperow { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.taperow h3 { margin: 0; }
+button.small { font-size: 12px; padding: 4px 10px; letter-spacing: .08em; }
+.tape { list-style: none; margin: 12px 0 0; padding: 0;
+  font-family: var(--mono); font-size: 13px; line-height: 1.5; }
+.tape li { color: var(--ink-2); padding: 3px 0 3px 12px; border-left: 2px solid var(--line);
+  overflow-wrap: anywhere; }
+.tape li.bad { color: var(--rust); border-left-color: var(--rust); }
+/* The newest line is the one being read; the ones above it are context. */
+.tape:not(.whole) li:last-child { color: var(--ink); border-left-color: var(--brass); }
+.tape:empty::after { content: 'Nothing yet.'; color: var(--ink-3); font-family: var(--mono);
+  font-size: 13px; }
+.tape.whole { max-height: none; margin-top: 20px; }
+.tape.whole li { padding: 5px 0 5px 14px; }
 code { font-family: var(--mono); font-size: .9em; }
 
 /* --- M2: the map ------------------------------------------------------- */
@@ -147,7 +169,7 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
    full-viewport overlay, `.screen.framed[hidden]` kept a hidden fight screen
    swallowing clicks, and this. All three were found by `elementFromPoint` and
    none of them by reading. `check_the_fork_is_on_top` is what stops a fourth. */
-#tree, #log, #ending { z-index: 30; }
+#tree, #log, #ending, #history { z-index: 30; }
 /* The van is *where you are*, like a town and the fight — tier 20. Putting it
    above the town would have been a screen you could open on top of one you
    cannot walk out of. See the stack in CLAUDE.md. */

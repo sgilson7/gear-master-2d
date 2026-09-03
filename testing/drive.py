@@ -768,6 +768,26 @@ def check_the_result_is_a_pocket_not_a_level(page, name, fails, lines, before):
         fails.append(f"{name}: a defeat left {after['carried']} in the pocket")
 
 
+def tape(page):
+    """Every line the game has said this sitting, newest last.
+
+    **M11.0 moved the slot.** Refusals, quest movement, pickups and the save
+    all used to print into a `<p id="says">` hanging off the bottom of the save
+    panel — a slot that existed because nothing owned it. They go through one
+    `log()` now, into a strip that keeps the last few and a HISTORY overlay
+    that keeps the sitting. The strip is what a player is looking at, so it is
+    what these checks read.
+    """
+    return [t.strip() for t in page.eval_on_selector_all(
+        "#tape li", "els => els.map(e => e.textContent)")]
+
+
+def last_said(page):
+    """The last thing the game said, which is what the old `#says` held."""
+    lines = tape(page)
+    return lines[-1] if lines else ""
+
+
 def plant(page, base_path, edit, stem="probe"):
     """Load a save built by editing a downloaded one. Returns nothing.
 
@@ -788,8 +808,8 @@ def plant(page, base_path, edit, stem="probe"):
     page.set_input_files("#file", str(out))
     try:
         page.wait_for_function(
-            "name => (document.getElementById('says').textContent || '')"
-            ".includes('Loaded ' + name)",
+            "name => Array.from(document.querySelectorAll('#tape li'))"
+            ".some(e => (e.textContent || '').includes('Loaded ' + name))",
             arg=out.name, timeout=8000)
     except Exception:
         # Older callers plant files whose load says something else; the sleep is
@@ -855,8 +875,8 @@ def check_an_errand_can_be_handed_in_where_it_was_taken(page, name, fails):
         return
     live.first.click()
     page.wait_for_timeout(200)
-    said = page.text_content("#says") or ""
-    if not said.strip():
+    said_it = last_said(page)
+    if not said_it:
         fails.append(f"{name}: handing in at the door said nothing")
     done = page.evaluate("""() => JSON.parse(window.__save()).state.world.quests_done""")
     if "marbulon-asks-first" not in (done or []):
@@ -986,8 +1006,8 @@ def check_the_door_ends_the_demo(page, name, fails):
     if page.is_visible("#ending"):
         fails.append(f"{name}: the door opened with no key in the bag")
         page.click("#ending-close")
-    said = (page.text_content("#says") or "").strip()
-    if not said:
+    said_it = last_said(page)
+    if not said_it:
         fails.append(f"{name}: a locked door said nothing")
 
     # --- and with the key ----------------------------------------------------
@@ -1733,6 +1753,66 @@ def check_an_ench_you_cannot_use_is_still_shown(page, name, fails):
         close_fight(page)
 
 
+def check_the_game_talks_in_one_place(page, name, fails):
+    """Everything the game says lands in the strip, and the history keeps it.
+
+    **M11.0.** The old slot was a `<p id="says">` under the save panel — a slot
+    that existed because nothing owned it, which is the shape of thing that
+    ships a feature invisible. This plants a refusal, finds it in the strip,
+    opens HISTORY and finds it there too, and then checks the old element is
+    *gone* rather than merely unused: a stray writer has to fail loudly.
+
+    Broken first and watched failing, per the standing habit: with `log()`
+    writing only the strip, the history half fails; with the old `<p>` back,
+    the last assertion fails.
+    """
+    if page.evaluate("() => !!document.getElementById('says')"):
+        fails.append(f"{name}: the old below-save slot is still in the page")
+
+    # Something that costs nothing to provoke and always talks. The strip
+    # keeps only the last few, so what is measured is the *newest line*, not
+    # how many there are — it is capped and a length check would read as a
+    # pass or a fail depending on how much had already happened.
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    dl.value.path()
+    page.wait_for_timeout(200)
+    strip = tape(page)
+    if not strip:
+        fails.append(f"{name}: the strip is empty after a whole walk")
+        return
+    latest = strip[-1]
+    if "Saved" not in latest:
+        fails.append(f"{name}: the save was written and the strip says {latest!r}")
+
+    # The strip is the last few; the history is the sitting.
+    page.click("#history-open")
+    page.wait_for_selector("#history", state="visible", timeout=5000)
+    whole = [t.strip() for t in page.eval_on_selector_all(
+        "#history-list li", "els => els.map(e => e.textContent)")]
+    if latest not in whole:
+        fails.append(f"{name}: the history does not hold {latest!r}")
+    # And it is not just the strip under another name: this runs at the end of
+    # a whole walk, which has said far more than the strip's four lines.
+    if len(whole) <= len(strip):
+        fails.append(f"{name}: the history ({len(whole)}) holds no more than the strip "
+                     f"({len(strip)}), so it is the strip in a bigger box")
+    # It is the top-most thing while it is up, like the tree and the quest log.
+    # Pointed at the *last* line, because a long sitting scrolls the top of
+    # the list out of the viewport and `elementFromPoint` outside it is
+    # nothing at all — which reads as a failure and is only a scroll.
+    box = page.evaluate("""() => {
+      const li = document.querySelector('#history-list li:last-child');
+      const r = li.getBoundingClientRect();
+      const el = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+      return el ? (el.closest('#history') ? 'history' : el.id || el.className) : 'nothing';
+    }""")
+    if box != 'history':
+        fails.append(f"{name}: something covers the history: {box!r}")
+    page.keyboard.press("Escape")
+    page.wait_for_selector("#history", state="hidden", timeout=5000)
+
+
 def check_the_north_is_shut(page, name, fails):
     """A level-one character cannot walk into a region of two-thousand-rated
     creatures, and is told what the road wants.
@@ -1774,11 +1854,11 @@ def check_the_north_is_shut(page, name, fails):
     if page.text_content("#coords").strip() != f"{cross['at'][0]}, {cross['at'][1]}":
         fails.append(f"{name}: a level-one character walked north past {cross['id']}")
         return
-    said = (page.text_content("#says") or "").strip()
-    if not said:
+    said_it = last_said(page)
+    if not said_it:
         fails.append(f"{name}: the crossing refused in silence")
-    elif str(cross["needs_level"]) not in said:
-        fails.append(f"{name}: the refusal does not name the level it wants: {said!r}")
+    elif str(cross["needs_level"]) not in said_it:
+        fails.append(f"{name}: the refusal does not name the level it wants: {said_it!r}")
 
     # And at the level it asks for, it is a road. 100,000 experience is
     # comfortably past whatever the number is.
@@ -2089,8 +2169,8 @@ def check_the_cave_is_shut_until_it_is_not(page, name, fails):
     stand_beside(base)
     page.keyboard.press("ArrowRight")
     page.wait_for_timeout(250)
-    said = (page.text_content("#says") or "").strip()
-    if not said:
+    said_it = last_said(page)
+    if not said_it:
         fails.append(f"{name}: a locked gate said nothing")
     if page.evaluate("() => window.__world().id") == 'the-great-gear-cave':
         fails.append(f"{name}: the locked gate let you through")
@@ -2530,8 +2610,8 @@ def walk_the_gate(browser, name, fails=None):
     junk = ROOT / "dist" / "not-a-save.json"
     junk.write_text('{"format":"gm2d-theme","version":1}')
     page.set_input_files("#file", str(junk))
-    page.wait_for_selector("#says.bad", timeout=10000)
-    msg = page.text_content("#says")
+    page.wait_for_selector("#tape li.bad", timeout=10000)
+    msg = last_said(page)
     if "gm2d-save" not in (msg or ""):
         fails.append(f"{name}: a wrong file was refused with {msg!r}, which names nothing")
     junk.unlink()
@@ -2777,6 +2857,9 @@ def walk_the_gate(browser, name, fails=None):
     # --- scouting ------------------------------------------------------------
     check_scouting_is_earned(page, name, fails)
 
+    # --- the log ---------------------------------------------------------------
+    check_the_game_talks_in_one_place(page, name, fails)
+
     ctx.close()
     if problems:
         fails.append(f"{name}: the page reported errors:\n  " + "\n  ".join(problems))
@@ -2866,6 +2949,7 @@ def main():
     print("ok: walk, download, reload, upload — position and stream both came back")
     print("ok: a wrong file was refused with a sentence and changed nothing")
     print("ok: a save from an older build does not wedge the player in the scenery")
+    print("ok: the game talks in one place, and the history holds the sitting")
     print("ok: no console errors, no off-origin requests")
 
 

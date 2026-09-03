@@ -75,9 +75,46 @@
             <label class="btn">Load<input type="file" id="file" accept="application/json,.json" hidden></label>
             <button id="reset" type="button">New game</button>
           </div>
-          <p id="says" class="says" hidden></p>
+        </div>
+
+        <!-- **The one place the game talks.** Refusals, quest movement, drops,
+             tins, bankings and the save all print here and nowhere else. It
+             used to be a `<p id="says">` hanging off the bottom of the save
+             panel — a slot that existed because nothing owned it, which is the
+             shape of bug that ships a feature invisible. The strip keeps the
+             last few lines; HISTORY holds the sitting.
+
+             New id and new class on purpose: `#log` is the quest log's screen
+             and `.says` was the old slot, and reusing either is trap 6. -->
+        <div class="panel" id="tape-panel">
+          <div class="taperow">
+            <h3>What has happened</h3>
+            <button id="history-open" type="button" class="small">History</button>
+          </div>
+          <ol id="tape" class="tape" aria-live="polite"></ol>
         </div>
       </aside>
+    </div>
+
+    <!-- The whole sitting, top to bottom, the way the fight replay reads.
+         **Session-only** — a save carries the world, not what the screen said
+         about it, and a transcript in every save file would be a seam and a
+         diary. -->
+    <div id="history" class="screen" hidden>
+      <div class="screenbox">
+        <header class="fighthead">
+          <div>
+            <p class="eyebrow">this sitting</p>
+            <h2>Everything that has happened</h2>
+            <p class="note">Top to bottom, in the order it happened. It is not saved: close the
+              tab and the world comes back, but the telling does not.</p>
+          </div>
+        </header>
+        <ol id="history-list" class="tape whole"></ol>
+        <div class="actionbar">
+          <button id="history-close" type="button" class="primary">Back</button>
+        </div>
+      </div>
     </div>
 
     <div id="card" class="card" hidden>

@@ -36,6 +36,16 @@ class Quiet(http.server.SimpleHTTPRequestHandler):
         pass
 
 
+
+def last_said(page):
+    """The last thing the game said, out of M11.0's log strip.
+
+    The transcript used to read `#says`, the slot below the save panel that
+    nothing owned. There is one place the game talks now, and this is it."""
+    lines = page.eval_on_selector_all("#tape li", "els => els.map(e => e.textContent)")
+    return (lines[-1].strip() if lines else "")
+
+
 def serve():
     handler = functools.partial(Quiet, directory=str(WEB))
     socketserver.TCPServer.allow_reuse_address = True
@@ -211,7 +221,7 @@ def card(page):
         seen.add(name)
         live.click()
         page.wait_for_timeout(60)
-        say(f"        errand: {name} — {page.text_content('#says')}")
+        say(f"        errand: {name} — {last_said(page)}")
     if page.is_visible("#card-choices button:not(:disabled)"):
         pick = page.locator("#card-choices button:not(:disabled)").first
         say(f"        chose: {pick.locator('b').text_content()}")
@@ -375,7 +385,7 @@ def main():
                 if c["fatigue"] >= 24 and (c["supplies"] or []):
                     page.locator("#kit .tin:not(:disabled)").first.click()
                     page.wait_for_timeout(60)
-                    say(f"  drank a tin: {page.text_content('#says')}")
+                    say(f"  drank a tin: {last_said(page)}")
                     continue
 
                 door = next((p for p in world["places"] if p["kind"] == "door"), None)
@@ -503,7 +513,7 @@ def main():
                     stuck[tuple(want)] = stuck.get(tuple(want), 0) + 1
                     if stuck[tuple(want)] >= 3:
                         say(f"  shut: {tuple(want)} is not reachable yet"
-                            f" — {page.text_content('#says') or 'no reason given'}")
+                            f" — {last_said(page) or 'no reason given'}")
                         done_marks.add(tuple(want))
                         done_marks.add(here)
                         errand_turn += 1

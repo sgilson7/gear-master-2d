@@ -395,7 +395,7 @@ function paintPack(c) {
     b.title = t.blurb;
     b.onclick = () => {
       const r = JSON.parse(use_supply(t.id));
-      says(r.error || `${t.name}. ${r.took}% of it comes off; ${r.fatigue}% left.`, !!r.error);
+      log(r.error || `${t.name}. ${r.took}% of it comes off; ${r.fatigue}% left.`, !!r.error);
       paintPanel(); draw(); autosave();
     };
     box.appendChild(b);
@@ -450,8 +450,8 @@ function refreshErrandMarks() {
 /// `guide_json` answers `null` for an errand whose target is on another map,
 /// which is the honest answer: the cave has no Whisperlings in it.
 function refreshPin() {
-  const log = JSON.parse(quest_log_json());
-  pinGuide = log.pinned ? JSON.parse(guide_json(log.pinned)) : null;
+  const errands = JSON.parse(quest_log_json());
+  pinGuide = errands.pinned ? JSON.parse(guide_json(errands.pinned)) : null;
   startPulse();
 }
 
@@ -468,11 +468,66 @@ function toggleScout() {
   draw();
 }
 
-function says(text, bad = false) {
-  const el = $('says');
-  el.textContent = text;
-  el.hidden = !text;
-  el.classList.toggle('bad', bad);
+// ------------------------------------------------------------------- the log
+
+/// Everything the game has said this sitting, in order.
+///
+/// **Session-only, and that is a decision** (`PLAN-M11.md` §8 row 10): a save
+/// carries the world, not what the screen said about it. A transcript in every
+/// save file would be a save seam and a diary.
+const history = [];
+
+/// How many lines the always-up strip keeps. The rest is behind HISTORY.
+const TAPE = 4;
+
+/// **The one place the game talks.**
+///
+/// Every message the world sends the player goes through here — a crossing
+/// refusing, an errand taken or handed in, a drop, a tin, a banking, a save.
+/// It used to be a `<p id="says">` below the save panel: a slot that existed
+/// because nothing owned it, which is exactly the shape that ships a feature
+/// invisible (M8's curses worked for three milestones and no screen said so).
+/// One function owns the slot now, so a message cannot miss it.
+///
+/// Presentation only. Core sends what it sent before; this decides where it
+/// lands and nothing about what it says.
+function log(text, bad = false) {
+  const line = String(text ?? '').trim();
+  if (!line) return;
+  history.push({ text: line, bad: !!bad });
+  paintTape();
+  if (!$('history').hidden) paintHistory();
+}
+
+function lines(list, into) {
+  into.replaceChildren(...list.map((e) => {
+    const li = document.createElement('li');
+    li.textContent = e.text;
+    li.classList.toggle('bad', e.bad);
+    return li;
+  }));
+}
+
+function paintTape() {
+  lines(history.slice(-TAPE), $('tape'));
+}
+
+function paintHistory() {
+  lines(history, $('history-list'));
+  // The end of it is what you opened it to read.
+  const box = $('history-list');
+  box.lastElementChild?.scrollIntoView({ block: 'nearest' });
+}
+
+function openHistory() {
+  paintHistory();
+  $('history').hidden = false;
+  $('history-close').focus();
+}
+
+function closeHistory() {
+  $('history').hidden = true;
+  $('map').focus();
 }
 
 function autosave() {
@@ -512,14 +567,14 @@ function closeCard() {
 
 function openEvent(id) {
   const e = JSON.parse(event_json(id));
-  if (e.error) { says(e.error, true); return; }
+  if (e.error) { log(e.error, true); return; }
   paintErrands($('card-errands'), null);
   // **Spent doors are not offered again.** The card reopens because the place
   // may still have an errand on it; the choices were answered once and that
   // was right.
   showCard(e.title, e.prose, e.spent ? [] : e.choices, (i) => {
     const r = JSON.parse(answer(id, i));
-    if (r.error) { says(r.error, true); return; }
+    if (r.error) { log(r.error, true); return; }
     $('card-choices').replaceChildren();
     const box = $('card-receipt');
     box.replaceChildren(...(r.receipt.length ? r.receipt : ['Nothing you could point to'])
@@ -642,10 +697,10 @@ function closeFight() {
 }
 
 function runFight() {
-  const log = JSON.parse(fight_json());
-  if (log.error) { boardSays(log.error); return; }
+  const fought = JSON.parse(fight_json());
+  if (fought.error) { boardSays(fought.error); return; }
   stage('replay');
-  replay.load(log);
+  replay.load(fought);
   replay.onend = () => {
     const s = JSON.parse(settle_fight());
     stage('result');
@@ -654,6 +709,10 @@ function runFight() {
     $('result-receipt').replaceChildren(...s.receipt.map((line) => {
       const p = document.createElement('p'); p.textContent = line; return p;
     }));
+    // The receipt is read on the result screen and then walked away from. It
+    // is also the only place a drop is ever named, so it goes in the log —
+    // where a player can go back and find out what that thing was called.
+    for (const line of s.receipt) log(line, s.outcome !== 'victory');
     // **Repaint behind the result.** A fight settles here — the purse, what is
     // carried and how worn out you are all move — and the standing panel used
     // to keep the pre-fight numbers until the result was dismissed.
@@ -1426,6 +1485,11 @@ function paintVendor() {
 }
 
 function vendorSays(text, bad) {
+  log(text, bad);
+  vendorSlot(text, bad);
+}
+
+function vendorSlot(text, bad) {
   const el = $('vendor-says');
   el.textContent = text;
   el.hidden = !text;
@@ -1434,7 +1498,7 @@ function vendorSays(text, bad) {
 
 function openVendor() {
   paintVendor();
-  vendorSays('');
+  vendorSlot('');
   $('vendor').hidden = false;
 }
 
@@ -1487,7 +1551,7 @@ function paintErrands(box, wrapper) {
       `<span class="meta">pays ${q.pays.join(', ')}</span>` +
       `<span class="cost">${foot}</span>`;
     b.onclick = () => {
-      const say = box.id === 'card-errands' ? says : townSays;
+      const say = box.id === 'card-errands' ? log : townSays;
       if (q.stage === 'offered') {
         const why = take_quest(q.id);
         say(why || `Taken. ${q.asks}.`, !!why);
@@ -1539,7 +1603,17 @@ function hidePiece() {
   $('piece-card').hidden = true;
 }
 
+/// The town's own slot, on the town's own screen — and the log as well.
+///
+/// A message printed on a screen you walk out of is a message you cannot go
+/// back and read. The screen keeps its sentence because that is where you are
+/// standing; the log keeps it because the log is the transcript.
 function townSays(text, bad = false) {
+  log(text, bad);
+  townSlot(text, bad);
+}
+
+function townSlot(text, bad = false) {
   const el = $('town-says');
   el.textContent = text; el.hidden = !text;
   el.classList.toggle('bad', bad);
@@ -1557,6 +1631,7 @@ function closeTown() {
 function walk(dir) {
   if (!$('card').hidden || !$('fight').hidden || !$('town').hidden ||
       !$('tree').hidden || !$('fork').hidden || !$('log').hidden ||
+      !$('history').hidden ||
       !$('ending').hidden || !$('vendor').hidden) return;
   const r = JSON.parse(try_step(dir));
   blocked = r.moved ? null : r.blocked;
@@ -1564,28 +1639,28 @@ function walk(dir) {
   // which this was; the page does not read the sentence to work it out. A
   // refusal that is a fact about where the game goes next is worth more than
   // one second of 13px text along the bottom of a canvas.
-  if (r.crossing) says(r.blocked, true);
+  if (r.crossing) log(r.blocked, true);
   paintPanel(); draw(); autosave();
   if (blocked) setTimeout(() => { blocked = null; draw(); }, 1100);
   // Arriving is the doing: an errand that says "go and talk to them" is
   // finished by standing there, and core says so on the step.
-  if ((r.spoke ?? []).length) says(`You have been. ${r.spoke.join(', ')}.`);
+  if ((r.spoke ?? []).length) log(`You have been. ${r.spoke.join(', ')}.`);
   // **Through a gate is a different map.** The ground, the places and the
   // player's own position all changed, so the page reloads the map rather
   // than redrawing the one it had.
   if (r.went) {
     world = JSON.parse(world_json());
-    says(`You go through.`);
+    log(`You go through.`);
     paintPanel(); draw(); autosave();
   }
-  if (r.shut) says(r.shut, true);
+  if (r.shut) log(r.shut, true);
   if (r.ending) openEnding(r.ending);
-  if (r.mended > 0) says(`Somebody puts a chair out. ${r.mended}% of you comes back.`);
+  if (r.mended > 0) log(`Somebody puts a chair out. ${r.mended}% of you comes back.`);
   // **A creature that gave up.** No fight screen and no replay, because there
   // was no fight — core settled the encounter where it stood and handed over
   // the receipt. Printed, never worked out: the page has no idea what a rout
   // pays and must not learn.
-  if (r.routed) says(r.routed.receipt.join(' '));
+  if (r.routed) log(r.routed.receipt.join(' '));
   if (r.town) openTown(r.town);
   else if (r.bench) openVendor();
   else if (r.event) openEvent(r.event);
@@ -1687,6 +1762,10 @@ async function main() {
       if (e.key === 'Escape') closeLog();
       return;
     }
+    if (!$('history').hidden) {
+      if (e.key === 'Escape') closeHistory();
+      return;
+    }
     if (!$('ending').hidden) {
       if (e.key === 'Escape') closeEnding();
       return;
@@ -1703,6 +1782,9 @@ async function main() {
   });
 
   $('scout').onclick = toggleScout;
+  $('history-open').onclick = openHistory;
+  $('history-close').onclick = closeHistory;
+  paintTape();
 
   board = new Board($('board'), {
     boardJson: board_json,
@@ -1863,13 +1945,13 @@ async function main() {
   $('download').onclick = () => {
     const name = stamp();
     download(name, save_json());
-    says(`Saved ${name}.`);
+    log(`Saved ${name}.`);
   };
   $('reset').onclick = () => {
     new_game(Date.now());
     closeCard();
     world = JSON.parse(world_json());
-    paintPanel(); draw(); autosave(); says('New game.');
+    paintPanel(); draw(); autosave(); log('New game.');
   };
   $('file').onchange = async (e) => {
     const f = e.target.files?.[0];
@@ -1884,11 +1966,11 @@ async function main() {
       // taken in the cave opened onto the overworld's ground until you moved.
       world = JSON.parse(world_json());
       paintPanel(); draw(); autosave();
-      says(`Loaded ${f.name}.`);
+      log(`Loaded ${f.name}.`);
       if (JSON.parse(encounter_json())) openFight();
       else offerClass();
     } catch (err) {
-      says(String(err?.message ?? err), true);
+      log(String(err?.message ?? err), true);
     }
     e.target.value = '';
   };

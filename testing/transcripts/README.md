@@ -244,3 +244,52 @@ game is luck, and the one this block is about to open pays nothing today.
 it has a cross-map goal — `PLAN.md` §6d row 3, still true — so thousands of
 steps and twenty-three drops sit between those two readings. Read rows 3 to 14
 as the game and row 15 as the endgame arriving all at once.
+
+---
+
+**M12.1's run is `m12.1.txt`, and it is the barrel's evidence.** 1,574 fights,
+level 19, and **stopped by hand rather than by its step budget** — it had gone
+four levels and nine hundred fights past the baseline, which is far enough to
+compare, and the last quarter of a 20,000-press walk was not going to change
+what it says. So there is no `--- the measure ---` table at the foot of it;
+read the `probe:` lines.
+
+Against `m12.0.txt` at the same levels:
+
+    level   baseline   barrel      greaves: before -> after
+        3       35%      38%             0%  ->   0%
+        4       39%      43%             0%  ->  44%
+        5       43%      41%             0%  ->  44%
+        8       37%      44%             0%  ->   0%
+        9       40%      47%             0%  ->  33%
+       11       51%      47%             0%  ->  26%
+       13       47%      70%             0%  ->  86%
+       15       73%      70%            66%  ->  86%
+
+Three things it says, and the third is the one that matters.
+
+1. **The greaves grid is no longer dead.** It was 0% for fourteen levels of the
+   baseline — a fifth of the canvas, untouched for a whole playthrough. It goes
+   non-zero at level four now and reaches 86%. That is the barrel doing exactly
+   the job M12.0 found for it.
+2. **Bench depth arrives earlier and stays.** 0 until level fifteen in the
+   baseline; non-zero from thirteen here and never back to zero. The moment
+   where seating something means unseating something now covers a stretch of
+   the game rather than one reading at the end.
+3. **326 barrel components bought by level nineteen, for about five points of
+   fill.** The barrel is by a distance the largest faucet by count and the
+   smallest by effect, and the reason is Auto-pack: every placement after the
+   seed must *strictly improve* `(items assembled, what they rate)` and is
+   taken straight back out otherwise, so a cheap piece that fits a hole but
+   does not raise the rating is refused. The barrel fills the bag and not the
+   board.
+
+That third one is not a barrel bug. It is a live tension with `PLAN.md`'s own
+rule for the button — *"what it has to do is leave nothing obvious in the
+bag"* — which is currently leaving three hundred obvious things in it. It is a
+question for the human rather than a fix taken quietly, and it is
+`PLAN-M12-EXEC.md` §8 row 13.
+
+**And the curve is still not met.** Fill is 38% at level three against a 70%
+target and does not pass 70% until thirteen. One faucet was never going to do
+it; that is why the block has three and a lever.

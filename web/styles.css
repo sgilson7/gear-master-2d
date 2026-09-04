@@ -313,6 +313,20 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
   line-height: 1.5; }
 .recipe li b { color: var(--ink); font-weight: 600; }
 
+/* --- M12.1: the barrel -------------------------------------------------- */
+/*
+ * **The shelf is the designed curve; the barrel is the floor under it.** Told
+ * apart by ground and by weight rather than by a colour, for the same reason
+ * assembled-versus-not is brightness and not gold-against-red: the two shelves
+ * sit one above the other and the difference has to survive being read by
+ * somebody who cannot tell the hues apart.
+ */
+.shelf.barrel { background: var(--surface-2); border-color: var(--surface-2); }
+.shelf.barrel .wares { background: var(--surface-2); }
+.shelf.barrel .wares:hover:not(:disabled) { background: var(--surface); }
+.shelf.barrel .wares b { font-weight: 500; }
+.shelf.barrel .wares .cost { color: var(--ink-3); }
+
 /* --- M6: the figures ---------------------------------------------------- */
 /* TikZ, compiled to SVG by `make art`. Flat fills and heavy outlines, so a
    figure reads at 64px on the map and again at 4x in a panel. */

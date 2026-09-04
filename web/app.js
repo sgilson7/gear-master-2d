@@ -6,7 +6,7 @@
 import init, {
   world_json, position, try_step, event_json, answer,
   save_json, load_json, new_game, apply_preset,
-  shop_json, bench_json, buy, buy_supply, buy_ench, use_supply, quests_json, take_quest, hand_in_quest, bank_xp,
+  shop_json, bench_json, buy, buy_barrel, buy_supply, buy_ench, use_supply, quests_json, take_quest, hand_in_quest, bank_xp,
   quest_log_json, guide_json, pin_quest,
   character_json, skills_json, take_skill, pressure_json,
   class_offer_json, choose_class, class_name, all_trees_json,
@@ -1447,6 +1447,7 @@ function openTown(id) {
   $('town-name').textContent = place?.name ?? id;
   portrait($('town-art'), figure('places', id), place?.name ?? id);
   paintShelf();
+  paintBarrel();
   paintQuests();
   paintTins();
   paintCarrying();
@@ -1488,7 +1489,43 @@ function paintShelf() {
     b.onclick = () => {
       const why = buy(w.slot);
       townSays(why || `Bought ${w.name}.`, !!why);
-      paintShelf(); paintPanel(); autosave();
+      // The barrel repaints too: what you can afford there just changed, and
+      // a button that greys out one screen late reads as a broken button.
+      paintShelf(); paintBarrel(); paintPanel(); autosave();
+    };
+    box.appendChild(b);
+  }
+}
+
+/// The barrel, which is the shop's floor.
+///
+/// **No sold state, because there is none to draw.** The shelf greys an entry
+/// out and leaves it where it was, because the index is the identity and the
+/// gap is the memory of what you took. Nothing is ever taken out of the
+/// barrel — you take a copy — so there is no gap, no grey, and no memory, and
+/// the payload has no `sold` field for this to read.
+function paintBarrel() {
+  const s = JSON.parse(shop_json());
+  const box = $('barrel');
+  box.replaceChildren();
+  for (const w of s.barrel ?? []) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'wares';
+    b.disabled = !w.afford;
+    b.innerHTML = `<span class="ware-top"></span><b>${w.name}</b>` +
+      `<span class="meta">${w.for} · ${w.kind} · rates ${w.rating}</span>` +
+      `<span class="cost">${w.price} Fnorp</span>`;
+    b.querySelector('.ware-top').appendChild(shapeCanvas(w));
+    const read = () => showPiece(b, w);
+    b.onpointerenter = read;
+    b.onfocus = read;
+    b.onpointerleave = hidePiece;
+    b.onblur = hidePiece;
+    b.onclick = () => {
+      const why = buy_barrel(w.slot);
+      townSays(why || `${w.name}, out of the barrel.`, !!why);
+      paintShelf(); paintBarrel(); paintPanel(); autosave();
     };
     box.appendChild(b);
   }
@@ -1518,7 +1555,7 @@ function paintTins() {
     b.onclick = () => {
       const why = buy_supply(t.id);
       townSays(why || `Bought ${t.name}.`, !!why);
-      paintTins(); paintShelf(); paintPanel(); autosave();
+      paintTins(); paintShelf(); paintBarrel(); paintPanel(); autosave();
     };
     box.appendChild(b);
   }
@@ -1654,7 +1691,7 @@ function paintErrands(box, wrapper) {
         else say(`${r.thanks} — ${r.given.join(' and ')}.`);
       }
       paintErrands(box, wrapper);
-      if (box.id === 'quests') paintShelf();
+      if (box.id === 'quests') { paintShelf(); paintBarrel(); }
       paintPanel(); autosave();
     };
     box.appendChild(b);

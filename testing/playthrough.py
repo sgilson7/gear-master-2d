@@ -371,6 +371,21 @@ def in_town(page, buy=True, probe=None):
         # whole point of counting by source is telling them apart.
         if probe is not None:
             probe.took("shelf")
+        # **The barrel, and a player empties it into their frames.** It never
+        # runs out, so the bound is the purse rather than the stock: one of
+        # each per visit, cheapest first, keeping enough back for a tin. A
+        # walker that bought until it was broke would be measuring a shopping
+        # spree rather than a player.
+        for _ in range(len(page.locator("#barrel .wares").all())):
+            live = page.locator("#barrel .wares:not(:disabled)")
+            if live.count() == 0 or int(page.text_content("#town-gold")) < 40:
+                break
+            name = live.first.locator("b").text_content()
+            live.first.click()
+            page.wait_for_timeout(40)
+            said.append(f"barrel: {name}")
+        if probe is not None:
+            probe.took("barrel")
     # By name, not by "the first enabled one": a taken errand stays clickable
     # on purpose — clicking it says how far along you are, which is
     # information rather than an error — so a loop that keeps pressing the

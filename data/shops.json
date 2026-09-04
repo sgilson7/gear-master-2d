@@ -3,6 +3,22 @@
   "version": 1,
   "_note": "What each town sells, for ever. A shelf is content: it does not roll, it does not reroll, and a save records only which entries have been bought. Order is part of the contract — a purchase is stored as a town and an index — so append to a list, never insert into the middle of one.",
   "_shape": "Each town is a place rather than a slot machine in a costume. The End of All Gears has the cheap basics and nothing else; Kettleworks is metalwork, and is where a real helmet and a second blade come from; High Wick is the arcane shelf and the only place a book, an ink and a spell can be bought together.",
+  "_barrel": "The barrel under the counter, and it is the same barrel in every town. It never runs out, so nothing here is an index a save records and buying from it writes nothing down - which is why this block has no seam. It is the shop's floor and not more of its ceiling: each entry is the lowest-rated of its kind in the catalogue at four cells and twelve Fnorp or under, and between them they assemble one complete item in each of the five grids and nothing better. Its mean piece rating sits under the pit shelf's, which a test holds.",
+  "barrel": [
+    "Oak Handle",
+    "Bronze Fang",
+    "Overflow Vial",
+    "Bronze Frame",
+    "Bronze Plating",
+    "Seer's Crest",
+    "Quilted Base",
+    "Felt Layer",
+    "Mage's Wrapping",
+    "Padded Mold",
+    "Tin Band",
+    "Mage's Sandals",
+    "Sprung Sole"
+  ],
   "towns": [
     {
       "id": "the-end-of-all-gears",

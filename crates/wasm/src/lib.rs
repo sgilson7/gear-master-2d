@@ -1994,8 +1994,26 @@ pub fn shop_json() -> String {
         // and got — the same reason the shelves stopped rolling in M7. What a
         // skill tree does not award is sold by one person, on one tile, who is
         // not there below level ten. See `PlaceKind::Bench`.
+        // **The barrel, and it is the same list in every town.** No `sold`,
+        // because there is nowhere for one to come from: `shop::BarrelOffer`
+        // has no such field and buying writes nothing to the save.
+        let barrel: Vec<_> = gm2d_core::shop::barrel(&shops)
+            .into_iter()
+            .map(|o| {
+                let mut v = piece_payload(o.def, theme, serde_json::Value::Null,
+                                          serde_json::json!(o.def.cells), None);
+                let m = v.as_object_mut().expect("an object");
+                m.insert("slot".into(), o.index.into());
+                m.insert("for".into(), slot_name(o.def.slot).into());
+                m.insert("price".into(), o.price.into());
+                m.insert("rating".into(), gm2d_core::rating::piece_rating(o.def).into());
+                m.insert("afford".into(), (g.character.gold >= o.price).into());
+                v
+            })
+            .collect();
         serde_json::json!({
             "gold": g.character.gold, "town": town, "shelf": shelf,
+            "barrel": barrel,
             "supplies": tins,
             "fatigue": g.character.fatigue,
         })
@@ -2053,6 +2071,34 @@ pub fn buy(index: usize) -> String {
         // Marked sold before anything else can change: the shelf is fixed, so
         // this is the only record that the entry is gone.
         g.world.bought.push((town, index as u16));
+        String::new()
+    })
+}
+
+/// Buy the entry at `index` out of the barrel. Empty string, or why not.
+///
+/// **The barrel never runs out, so this writes nothing to the save.** `buy`
+/// has to record `(town, index)` because a shelf entry is spent; there is no
+/// equivalent here and that is the design rather than an omission — it is the
+/// whole reason M12 has no save seam. The only state that moves is the purse
+/// and the bag, both of which the save already carries.
+#[wasm_bindgen]
+pub fn buy_barrel(index: usize) -> String {
+    with_mut(|g| {
+        if town_here(g).is_none() {
+            return "you are not in a town".into();
+        }
+        let shops = gm2d_core::data::shops();
+        let barrel = gm2d_core::shop::barrel(&shops);
+        let Some(o) = barrel.iter().find(|o| o.index == index) else {
+            return "there is nothing like that in the barrel".into();
+        };
+        if g.character.gold < o.price {
+            return format!("{} Fnorp, and you have {}.", o.price, g.character.gold);
+        }
+        let (price, name) = (o.price, o.def.name);
+        g.character.gold -= price;
+        g.character.give(name);
         String::new()
     })
 }

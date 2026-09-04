@@ -436,6 +436,7 @@ binding per §7. These are the new ones.
 | 9 | M12.5 | Does a warp's outcomes box **name where it sends you**? | **no** — "You are put somewhere else, and it is a long walk back" is honest about the cost, which is the part that matters, and keeps the surprise that makes it worth writing. Naming it turns a weird event into a fast-travel menu |
 | 10 | M12.5 | How many of the field's 41 notes become decisions? | **about twenty**, leaving the map roughly even. Enough that reading pays; not so many that a dense map becomes a dense quiz |
 | 11 | M12.5 | May an event's warp send you somewhere the level gates would refuse — the far side of a crossing, or under the lake before the tower falls? | **yes, and that is the point** — but only where the map itself charges for it, which today means under the lake and nowhere else. A warp past a crossing hands a level-five character a region rated for twelve, and that is a wall, not a surprise |
+| 13 | M12.3 | **Should Auto-pack seat filler into cells it has finished with?** M12.1 measured 326 barrel components bought for ~5 points of fill: the button refuses anything that does not strictly improve the rating, so the barrel fills the bag rather than the board. | **yes, as a final pass** — `PLAN.md` already says the button must "leave nothing obvious in the bag" and it is currently leaving three hundred. A pass that seats what fits *after* the optimising is done is that rule honoured, not the button becoming an optimiser. But it raises the floor of player power across the early game (§6 entry 1), which is the human's call and not mine, so it is asked rather than taken |
 | 12 | M12.5 | Do the nine existing events keep their current payouts on top of new ones, or are they re-cut? | **re-cut** — three of the nine pay a component instead of some of their Fnorp. They sit where the frame has the most holes in it, and adding on top inflates a curve this block is trying to measure |
 
 ## 9. What this block still does not do
@@ -493,6 +494,39 @@ close-out cannot disagree about what was aimed at: **fill ≥ 70% by level 3,
   unseating something.
 - **Events pay 0 pieces**, which is M12.5's premise confirmed rather than
   assumed.
+
+### M12.1's reading, taken after the barrel
+
+`testing/transcripts/m12.1.txt`. 1,574 fights, level 19, stopped by hand once
+it was four levels past the baseline.
+
+    level   baseline   barrel     greaves before -> after
+        3       35%      38%            0%  ->   0%
+        4       39%      43%            0%  ->  44%
+        9       40%      47%            0%  ->  33%
+       13       47%      70%            0%  ->  86%
+       15       73%      70%           66%  ->  86%
+
+    bench: 0 until level 15 -> non-zero from 13, and it stays
+    by source: shelf 26, barrel 326, drop 30, quest 9
+
+**The greaves grid is no longer dead** — 0% for fourteen levels became
+non-zero at four and 86% by thirteen, which is precisely the hole M12.0 found.
+**Bench depth arrives two levels earlier and does not go back to zero**, so the
+decision the block exists to create now covers a stretch of the game rather
+than one reading at the end.
+
+**And 326 barrel components bought for about five points of fill.** The barrel
+is the largest faucet by count and the smallest by effect. The reason is
+Auto-pack: every placement after the seed must *strictly improve* `(items
+assembled, what they rate)`, so a cheap piece that fits a hole and does not
+raise the rating is taken straight back out. **The barrel fills the bag and not
+the board**, and the curve is still missed — 38% at level three against 70%.
+
+That is a real tension with `PLAN.md`'s rule for the button — *"what it has to
+do is leave nothing obvious in the bag"* — and it is §8 row 13 rather than a
+fix taken quietly, because changing Auto-pack raises the floor of player power
+across the whole early game (§6 entry 1).
 
 ### One addition to §7, from the measurement
 

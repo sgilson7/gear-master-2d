@@ -406,6 +406,72 @@ def wait_for_images(page, selector, timeout=8000):
         pass
 
 
+def check_the_barrel_is_under_the_counter(page, name, fails):
+    """The barrel: same in every town, never sells out, and cheap.
+
+    **M12.1.** The shelf is the designed curve and this is the floor under it.
+    Three things a screen can be wrong about and core cannot: that it is drawn
+    at all, that buying from it does not consume the entry, and that it is told
+    apart from the shelf.
+    """
+    entries = page.evaluate("""() => [...document.querySelectorAll('#barrel .wares')].map(b => ({
+      name: b.querySelector('b')?.textContent,
+      cost: b.querySelector('.cost')?.textContent,
+      off: b.disabled,
+    }))""")
+    if len(entries) < 9:
+        fails.append(f"{name}: the barrel shows {len(entries)} entries")
+        return
+    for e in entries:
+        n = "".join(c for c in (e["cost"] or "") if c.isdigit())
+        if not n:
+            fails.append(f"{name}: a barrel entry costs {e['cost']!r}, which is not a price")
+        elif int(n) > 12:
+            fails.append(f"{name}: {e['name']} is in the barrel at {n} Fnorp")
+        if "Fnorp" not in (e["cost"] or ""):
+            fails.append(f"{name}: a barrel price does not say Fnorp: {e['cost']!r}")
+    # **Told apart from the shelf, and measured rather than read.** They are
+    # two lists of the same buttons one above the other; if they paint the
+    # same the section heading is the only difference and that is not enough.
+    same = page.evaluate("""() => {
+      const a = document.querySelector('#shelf .wares');
+      const b = document.querySelector('#barrel .wares');
+      if (!a || !b) return null;
+      const ga = getComputedStyle(a), gb = getComputedStyle(b);
+      return ga.backgroundColor === gb.backgroundColor;
+    }""")
+    if same is None:
+        fails.append(f"{name}: could not compare the shelf and the barrel")
+    elif same:
+        fails.append(f"{name}: the barrel paints the same as the shelf")
+
+    # **It never sells out.** The shelf greys an entry after you buy it and
+    # leaves it in place; the barrel must not, because you took a copy.
+    live = page.locator("#barrel .wares:not(:disabled)")
+    if live.count() == 0:
+        fails.append(f"{name}: nothing in the barrel is affordable")
+        return
+    bought = live.first.locator("b").text_content()
+    purse = int(page.text_content("#town-gold"))
+    live.first.click()
+    page.wait_for_timeout(120)
+    after = int(page.text_content("#town-gold"))
+    if after >= purse:
+        fails.append(f"{name}: buying from the barrel cost nothing ({purse} -> {after})")
+    still = page.evaluate("""(want) => {
+      const b = [...document.querySelectorAll('#barrel .wares')]
+        .find(e => e.querySelector('b')?.textContent === want);
+      return b ? !b.disabled || b.className.includes('sold') : null;
+    }""", bought)
+    if still is None:
+        fails.append(f"{name}: {bought} left the barrel after it was bought")
+    elif still is False:
+        fails.append(f"{name}: {bought} greyed out after one purchase; the barrel ran out")
+    said = last_said(page)
+    if bought and bought not in (said or ""):
+        fails.append(f"{name}: buying {bought} said {said!r}, which does not name it")
+
+
 def check_a_grid_says_what_it_takes(page, name, fails):
     """Every grid names its recipe, and an empty grid names it too.
 
@@ -3223,6 +3289,7 @@ def walk_the_gate(browser, name, fails=None):
         check_a_component_is_a_shape(page, name, fails)
         check_the_errand_board(page, name, fails)
         check_the_shelf_is_the_shelf(page, name, fails)
+        check_the_barrel_is_under_the_counter(page, name, fails)
         purse = int(page.text_content("#town-gold"))
         wares = page.locator("#shelf .wares:not(:disabled)")
         if wares.count() == 0:

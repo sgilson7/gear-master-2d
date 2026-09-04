@@ -188,6 +188,15 @@ pub struct Character {
     /// the same ench are two things you can bolt to two components.
     #[serde(default)]
     pub enchs_owned: Vec<String>,
+    /// A licence bought off the man in the van, rather than come by honestly.
+    ///
+    /// **On the character and not in the world**, because it is a fact about
+    /// who you are: the fork is permanent and this is the one way round it, so
+    /// it belongs beside the class rather than beside what you have bought.
+    /// Defaults false, so every save written before it opens unlicensed, which
+    /// is what those characters were.
+    #[serde(default)]
+    pub bought_licence: bool,
     /// Enchs bolted to a component, and whether each is switched on.
     ///
     /// The attachment names a `PieceId`, not a cell, so it survives a repack:
@@ -223,6 +232,7 @@ impl Character {
     /// item.
     pub fn new() -> Self {
         Character {
+            bought_licence: false,
             registry: PieceRegistry::new(),
             owned: Vec::new(),
             loadout: Loadout::new(),
@@ -1545,17 +1555,29 @@ impl Character {
 
     /// Is this character licensed to bolt anything to anything?
     ///
-    /// The Kaklon Patent's, and nobody else's. **The class is the gate**, not a
-    /// node inside it: enching is what the class *is*, and a class whose
+    /// **The class, or the paper.** Two of the five classes are licensed by
+    /// being what they are — enching is what the Patent *is*, and a class whose
     /// identity waited on a point spent would be a class you could take and not
-    /// notice you had taken.
+    /// notice you had taken. That has not changed.
+    ///
+    /// What has is that the man in the van will sell the same permission to
+    /// anybody else for [`ench::LICENCE_PRICE`]. The fork is permanent and does
+    /// not come off, so without this a player who took Gorillathon at level
+    /// five could be handed an ench by an errand for the rest of the game and
+    /// never once use one. The licence is the way out of that, and it costs
+    /// what a way out should.
     pub fn licensed(&self) -> bool {
-        crate::ench::licences(self.class.as_deref())
+        crate::ench::licences(self.class.as_deref()) || self.bought_licence
     }
 
     /// What is bolted to this component, if anything.
     pub fn ench_on(&self, piece: PieceId) -> Option<&crate::ench::Ench> {
         self.enchanted.iter().find(|e| e.on == piece)
+    }
+
+    /// Buy the paper. Idempotent: nobody sells you a second one.
+    pub fn buy_licence(&mut self) {
+        self.bought_licence = true;
     }
 
     pub fn give_ench(&mut self, id: &str) {

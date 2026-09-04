@@ -8,21 +8,21 @@
       "name": "Cork Tea",
       "blurb": "Boiled off the fence. It tastes of the fence and it works.",
       "restores": 10,
-      "price": 4
+      "price": 20
     },
     {
       "id": "long-shift-tin",
       "name": "Long Shift Tin",
       "blurb": "Issued to whoever was going down and not coming up before Tuesday.",
       "restores": 25,
-      "price": 11
+      "price": 55
     },
     {
       "id": "the-full-stop",
       "name": "The Full Stop",
       "blurb": "One tin, one sitting, and the next four hours are not yours.",
       "restores": 60,
-      "price": 28
+      "price": 140
     }
   ]
 }

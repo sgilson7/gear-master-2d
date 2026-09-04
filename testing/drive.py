@@ -415,11 +415,23 @@ def check_the_barrel_is_under_the_counter(page, name, fails):
     at all, that buying from it does not consume the entry, and that it is told
     apart from the shelf.
     """
-    entries = page.evaluate("""() => [...document.querySelectorAll('#barrel .wares')].map(b => ({
-      name: b.querySelector('b')?.textContent,
-      cost: b.querySelector('.cost')?.textContent,
-      off: b.disabled,
-    }))""")
+    got = page.evaluate("""() => {
+      const s = JSON.parse(window.__shopJson ? window.__shopJson() : '{}');
+      return {
+        ceiling: s.barrel_ceiling,
+        rows: [...document.querySelectorAll('#barrel .wares')].map(b => ({
+          name: b.querySelector('b')?.textContent,
+          cost: b.querySelector('.cost')?.textContent,
+          off: b.disabled,
+        })),
+      };
+    }""")
+    entries = got["rows"]
+    # **The ceiling comes off core.** This carried its own copy of the number
+    # and went stale in three engines at once the day every price in the game
+    # was multiplied by five. A second copy of a constant is the mistake this
+    # project keeps paying for.
+    ceiling = got.get("ceiling") or 60
     if len(entries) < 9:
         fails.append(f"{name}: the barrel shows {len(entries)} entries")
         return
@@ -427,8 +439,9 @@ def check_the_barrel_is_under_the_counter(page, name, fails):
         n = "".join(c for c in (e["cost"] or "") if c.isdigit())
         if not n:
             fails.append(f"{name}: a barrel entry costs {e['cost']!r}, which is not a price")
-        elif int(n) > 12:
-            fails.append(f"{name}: {e['name']} is in the barrel at {n} Fnorp")
+        elif int(n) > ceiling:
+            fails.append(f"{name}: {e['name']} is in the barrel at {n} Fnorp, "
+                         f"and the barrel stops at {ceiling}")
         if "Fnorp" not in (e["cost"] or ""):
             fails.append(f"{name}: a barrel price does not say Fnorp: {e['cost']!r}")
     # **Told apart from the shelf, and measured rather than read.** They are

@@ -6,7 +6,8 @@
 import init, {
   world_json, position, try_step, event_json, answer,
   save_json, load_json, new_game, apply_preset,
-  shop_json, bench_json, buy, buy_barrel, order, collect_order, buy_supply, buy_ench, use_supply, quests_json, take_quest, hand_in_quest, bank_xp,
+  shop_json, bench_json, buy, buy_barrel, order, collect_order, buy_supply, buy_ench,
+  reroll_barrel, reroll_ledger, buy_licence, use_supply, quests_json, take_quest, hand_in_quest, bank_xp,
   quest_log_json, guide_json, pin_quest,
   character_json, skills_json, take_skill, pressure_json,
   class_offer_json, choose_class, class_name, all_trees_json,
@@ -1529,6 +1530,32 @@ function paintShelf() {
   }
 }
 
+/// The button that turns one of the two rollable lists over.
+///
+/// **What it costs is core's and the page prints it.** The curve is `n * n`
+/// and the counters reset every tenth level, and neither of those is worked
+/// out here — a screen that computed its own price would be a second answer to
+/// what a reroll costs, and the one that charged you would be the other.
+function paintReroll(id, price, done, what, go) {
+  const el = $(id);
+  if (!el) return;
+  if (price === undefined || price === null) { el.hidden = true; return; }
+  el.hidden = false;
+  el.replaceChildren();
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'rollbtn';
+  b.innerHTML = `<b>Turn ${what} over</b><span class="cost">${price} Fnorp</span>`;
+  b.onclick = go;
+  el.appendChild(b);
+  const note = document.createElement('span');
+  note.className = 'rollnote';
+  note.textContent = done
+    ? `${done} so far. The next one after this costs ${(done + 2) * (done + 2)}.`
+    : 'The first one is a shrug. The eighth is sixty-four.';
+  el.appendChild(note);
+}
+
 /// The barrel, which is the shop's floor.
 ///
 /// **No sold state, because there is none to draw.** The shelf greys an entry
@@ -1540,6 +1567,11 @@ function paintBarrel() {
   const s = JSON.parse(shop_json());
   const box = $('barrel');
   box.replaceChildren();
+  paintReroll('barrel-roll', s.reroll?.barrel, s.reroll?.barrel_done, 'the barrel', () => {
+    const r = JSON.parse(reroll_barrel());
+    townSays(r.error || `He digs through it again. ${r.paid} Fnorp.`, !!r.error);
+    paintBarrel(); paintShelf(); paintOrders(); paintPanel(); autosave();
+  });
   for (const w of s.barrel ?? []) {
     const b = document.createElement('button');
     b.type = 'button';
@@ -1575,6 +1607,11 @@ function paintOrders() {
   const book = s.commissions ?? [];
   $('orders').hidden = book.length === 0;
   if (!book.length) return;
+  paintReroll('order-roll', s.reroll?.ledger, s.reroll?.ledger_done, 'the book', () => {
+    const r = JSON.parse(reroll_ledger());
+    townSays(r.error || `A different list. ${r.paid} Fnorp.`, !!r.error);
+    paintOrders(); paintShelf(); paintBarrel(); paintPanel(); autosave();
+  });
   const open = s.on_order;
   const line = $('on-order');
   if (open) {
@@ -1676,6 +1713,29 @@ function paintVendor() {
   }));
   const box = $('vendor-stock');
   box.replaceChildren();
+  // **The paper, before the things it lets you bolt on.** He sells the licence
+  // to anybody whose class did not come with one, once, and the fork does not
+  // come off — so without this a character who took Gorillathon at five can be
+  // paid an ench by an errand for the rest of the game and never use one.
+  if (v.licence && v.licence.needed) {
+    const l = document.createElement('button');
+    l.type = 'button';
+    l.className = 'wares ench licence';
+    l.id = 'buy-licence';
+    l.disabled = !v.licence.afford;
+    l.innerHTML = '<b>A licence of your own</b>' +
+      '<span class="spec">lets you bolt an ench to a component</span>' +
+      '<span class="flavour">He turns the paper round again. There is a second sheet under it ' +
+      'with a space on it, and he has a pen.</span>' +
+      `<span class="cost">${v.licence.price} Fnorp</span>`;
+    l.onclick = () => {
+      const r = JSON.parse(buy_licence());
+      vendorSays(r.error || 'Signed, dated next year, and yours. You may bolt things on now.',
+                 !!r.error);
+      paintVendor(); paintPanel(); autosave();
+    };
+    box.appendChild(l);
+  }
   for (const e of v.stock ?? []) {
     const b = document.createElement('button');
     b.type = 'button';
@@ -2096,6 +2156,7 @@ async function main() {
   // `core::pressure`, and the walker printing it is the same discipline as the
   // page drawing a number core sent it.
   window.__pressure = () => JSON.parse(pressure_json());
+  window.__shopJson = () => shop_json();
   window.__trees = () => JSON.parse(all_trees_json());
   window.__places = () => world.places;
   window.__world = () => world;

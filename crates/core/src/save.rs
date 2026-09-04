@@ -152,6 +152,10 @@ pub struct CharacterSave {
     /// Enchs in the rack, by id.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub enchs_owned: Vec<String>,
+    /// A licence bought off the van, for a character whose class does not carry
+    /// one. Defaults false, so every older file opens as what it was.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub bought_licence: bool,
     /// Enchs bolted to a component: which one, which component, switched on.
     ///
     /// The component is a **registry index**, exactly as `owned` and every
@@ -245,6 +249,7 @@ impl SaveFile {
             class,
             enchs_owned,
             enchanted,
+            bought_licence,
             undo_stack: _,
         } = character;
         let Loadout { slots, locks, name_seed, naming: _, assembly_pct } = loadout;
@@ -318,6 +323,7 @@ impl SaveFile {
                     skills_taken: skills_taken.clone(),
                     class: class.clone(),
                     enchs_owned: enchs_owned.clone(),
+                    bought_licence: *bought_licence,
                     enchanted: enchanted
                         .iter()
                         .map(|e| EnchSave { id: e.id.clone(), on: e.on.0, active: e.active })
@@ -418,6 +424,7 @@ impl SaveFile {
         let state = migrate(version, state)?;
         let SaveState { rng_state, theme, character, world, encounter } = state;
         let CharacterSave {
+            bought_licence,
             gold,
             grown_health,
             registry: instances,
@@ -508,6 +515,7 @@ impl SaveFile {
         character.skills_taken = skills_taken;
         character.class = class;
         character.enchs_owned = enchs_owned;
+        character.bought_licence = bought_licence;
         // Checked like every other index into the registry. An ench bolted to
         // component 400 of 12 is a damaged file, and saying so beats panicking
         // three screens later.

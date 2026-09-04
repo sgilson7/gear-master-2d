@@ -166,6 +166,17 @@ fn spell(n: i32) -> String {
                 format!("{} hundred and {}", ONES[h], spell(r as i32))
             }
         }
+        // **Thousands, since the economy grew a fourth figure.** Every cost in
+        // the game was multiplied by five, so a toll that was two hundred is a
+        // thousand — and this stopped at 999 and handed back "1000", which
+        // failed a refusal that read "A thousand Fnorp" and was perfectly
+        // clear. Rule 12's lint has been the wrong one before, for exactly
+        // this reason: it did not know how the house writes a number.
+        1_000..=999_999 => {
+            let (t, r) = (n / 1_000, n % 1_000);
+            let head = if t == 1 { "a thousand".to_string() } else { format!("{} thousand", spell(t as i32)) };
+            if r == 0 { head } else { format!("{head} and {}", spell(r as i32)) }
+        }
         _ => n.to_string(),
     }
 }

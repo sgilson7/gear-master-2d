@@ -26,3 +26,20 @@ strip = true
 # gets the full backtrace back for one run without editing anything.
 [profile.test]
 debug = "line-tables-only"
+# **And optimised, because the suite's cost is runtime and not build.**
+# `debug = "line-tables-only"` above fixed the *other* half of this in the
+# fork: full debuginfo across the suite grew `target/debug/deps` past six
+# gigabytes. What was left is that a test binary ran at `opt-level = 0`, and
+# this suite simulates a very great deal of combat — `drops.rs` alone draws
+# pools and counts wins for sixty-five seconds, which was more than the other
+# fifty-seven files put together.
+#
+# `debug_assertions` and overflow checks stay on, because this is the `test`
+# profile and not `--release`: what is bought is speed, and nothing is given
+# up. A cold build costs a little more and every run after it costs much less.
+opt-level = 2
+
+# Dependencies too, or the engine is optimised and the crates it leans on are
+# not. They change about once a year, so this is paid once.
+[profile.test.package."*"]
+opt-level = 2

@@ -2303,7 +2303,9 @@ Every figure below was re-measured for M10.3 rather than carried forward.
 | M12.1: the bargain barrel | 651 passing |
 | M12.1a + M12.2: three tiers, and an order on the world's clock | 662 passing |
 | M12.5: events that pay something, and say what they pay | 670 passing |
-| **M12.3: slower cells — a row is earned, not scheduled** | **671 passing** |
+| M12.3: slower cells — a row is earned, not scheduled | 671 passing |
+| M12.6: a chain you can see, a licence you can buy, and a list you can turn over | 687 passing |
+| **The economy, multiplied by five** | **687 passing** |
 
 Note M11.0 and M11.8 add none, and both are honest. M11.0 moved every string
 the game says through one door and changed no behaviour the suite could see;

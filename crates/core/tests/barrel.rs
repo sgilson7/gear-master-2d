@@ -32,7 +32,7 @@ fn the_barrel_charges_the_catalogue_price_and_nothing_else() {
             "{} is stocked at {} and offered at {}",
             o.def.name, o.def.price, o.price
         );
-        assert!(o.price <= 12, "{} is offered at {} Fnorp", o.def.name, o.price);
+        assert!(o.price <= shop::BARREL_CEILING, "{} is offered at {} Fnorp", o.def.name, o.price);
         assert!(o.price > 0, "{} is offered free", o.def.name);
     }
 }
@@ -45,7 +45,8 @@ fn the_barrel_is_stocked_and_small() {
         // Cheap enough to buy without thinking about it. A starting purse is
         // 28 Fnorp and the pit pays 6 a fight, so this is the ceiling that
         // makes the first weapon affordable on the first afternoon.
-        assert!(d.price <= 12, "{} costs {} Fnorp, which is not a bargain", d.name, d.price);
+        assert!(d.price <= shop::BARREL_CEILING,
+            "{} costs {} Fnorp, which is not a bargain", d.name, d.price);
         assert!(d.price > 0, "{} is free, and free filler is not a decision", d.name);
         // **Four cells, not two.** The frame's "1x1 and 1x2 commons" could not
         // assemble anything: every recipe needs a core and no core in the
@@ -289,6 +290,6 @@ fn a_mark_up_never_rounds_a_price_to_nothing() {
         assert!(shop::at_pct(1, pct) >= 1);
         assert!(shop::at_pct(0, pct) >= 1, "even a free component costs something to order");
     }
-    assert_eq!(shop::at_pct(3, shop::SHELF_PCT), 15, "the pit's cheapest line");
-    assert_eq!(shop::at_pct(3, shop::COMMISSION_PCT), 30);
+    assert_eq!(shop::at_pct(15, shop::SHELF_PCT), 75, "the pit's cheapest line");
+    assert_eq!(shop::at_pct(15, shop::COMMISSION_PCT), 150);
 }

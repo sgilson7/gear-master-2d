@@ -160,6 +160,20 @@ pub struct Quest {
     /// off `skills_taken`.
     #[serde(default)]
     pub rows: Option<RowReward>,
+    /// **Handed over, never offered.** An errand a *choice* starts.
+    ///
+    /// Ordinarily a `giver` is a counter you walk up to and are offered
+    /// something at. A chain's errand is not offered: it is what taking one
+    /// half of an event hands you, and the half you did not take must not put
+    /// its errand on the same tile a moment later. So this one is invisible
+    /// until it is in `quests_taken`, and `Outcome::Errand` is the only thing
+    /// that puts it there.
+    ///
+    /// `giver` still names the event it comes out of, because the log has to
+    /// say where a thing came from and "nowhere" is not an answer a player can
+    /// use.
+    #[serde(default)]
+    pub granted: bool,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -238,6 +252,10 @@ impl QuestsData {
     pub fn at(&self, place: &str) -> Vec<&Quest> {
         self.quests
             .iter()
+            // **A granted errand is never on a counter.** It is handed over by
+            // a choice, and the branch you did not take must not be sitting on
+            // the tile offering itself the moment you have chosen.
+            .filter(|q| !q.granted)
             .filter(|q| q.giver == place || Self::turn_in_of(q) == place)
             .collect()
     }
@@ -324,7 +342,9 @@ pub fn stage(game: &Game, q: &Quest) -> Stage {
         return Stage::Locked;
     }
     if !game.world.quests_taken.iter().any(|t| *t == q.id) {
-        return Stage::Offered;
+        // A granted errand that has not been granted is not offered, it simply
+        // is not yet: the only door into it is the choice that hands it over.
+        return if q.granted { Stage::Locked } else { Stage::Offered };
     }
     match &q.goal {
         Goal::Word { .. } => {

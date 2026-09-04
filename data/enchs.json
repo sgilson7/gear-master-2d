@@ -1,13 +1,14 @@
 {
   "format": "gm2d-enchs",
   "version": 1,
-  "_note": "Enchs. Not enchantments \u2014 `PieceKind::Enchantment` is thirteen catalogue pieces laid under the grid, and this is the other thing, which is the book's own word for it (the ench economy, p. 119). An ench has no shape and goes on no grid: it bolts to a component you already own, and it comes off. Everything one does is a number the engine already had, so nothing here retunes combat.",
+  "_note": "Enchs. Not enchantments — `PieceKind::Enchantment` is thirteen catalogue pieces laid under the grid, and this is the other thing, which is the book's own word for it (the ench economy, p. 119). An ench has no shape and goes on no grid: it bolts to a component you already own, and it comes off. Everything one does is a number the engine already had, so nothing here retunes combat.",
+  "_price": "What the van charges, and it is two thousand for any of them. An ench is the last thing a character buys rather than the next: the licence is a thousand and the bolting-on is where the money goes, which is what a licence is everywhere else.",
   "enchs": [
     {
       "id": "plug-energy-tap",
       "name": "Plug Energy Tap",
       "blurb": "Four hundred of these were made and three hundred and ninety-one were recalled. The recall notice is on the side of the tap, printed under the tap, where you have to take the tap off to read it.",
-      "price": 60,
+      "price": 2000,
       "effect": {
         "power": {
           "pct": 30
@@ -18,7 +19,7 @@
       "id": "grungo-elastic-band",
       "name": "Grungo Elastic Band",
       "blurb": "Cut off the tree in one piece and sold in eleven. Kaklon's own note says it goes back to the length it was, and does not say when.",
-      "price": 45,
+      "price": 2000,
       "effect": {
         "haste": {
           "pct": 25
@@ -35,7 +36,7 @@
       "id": "sneel-bearing",
       "name": "Sneel Bearing",
       "blurb": "Stainless. Eleven of them in a tin and the tin says twelve, which Kaklon has been asked about four times and has answered once.",
-      "price": 120,
+      "price": 2000,
       "effect": {
         "haste": {
           "pct": 45
@@ -59,6 +60,26 @@
       "effect": {
         "fragile": {
           "pct": 200
+        }
+      }
+    },
+    {
+      "id": "the-wextreen-correction",
+      "name": "The Wextreen Correction",
+      "blurb": "Nine surveys of the reach and no two agree. The tenth does not agree either, but it is the only one that says by how much, and a fitter who reads it can set a bearing off it. It has been right about four acres for eleven years.",
+      "effect": {
+        "haste": {
+          "pct": 35
+        }
+      }
+    },
+    {
+      "id": "the-hooper-s-allowance",
+      "name": "The Hooper's Allowance",
+      "blurb": "A hoop is cut long and then taken in. The allowance is how much longer, and the woman at Kettleworks has cut eleven thousand of them and never once measured one. She will tell you the number if you turn a kettle for her.",
+      "effect": {
+        "power": {
+          "pct": 40
         }
       }
     }

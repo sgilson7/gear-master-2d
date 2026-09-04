@@ -1880,6 +1880,15 @@ pub fn bench_json() -> String {
             // refusing — an ench you cannot bolt on yet is still an ench you
             // own, which is the rule the rack had to learn.
             "licensed": g.character.licensed(),
+            // **The way round the fork.** Two of the five classes are licensed
+            // by being what they are; everybody else can buy the same paper
+            // here, once, and the fork does not come off.
+            "licence": {
+                "price": gm2d_core::ench::LICENCE_PRICE,
+                "afford": g.character.gold >= gm2d_core::ench::LICENCE_PRICE,
+                "needed": !g.character.licensed(),
+                "bought": g.character.bought_licence,
+            },
             "stock": rows,
         })
         .to_string()
@@ -1940,7 +1949,7 @@ pub fn shop_json() -> String {
         // **The barrel, and it is the same list in every town.** No `sold`,
         // because there is nowhere for one to come from: `shop::BarrelOffer`
         // has no such field and buying writes nothing to the save.
-        let barrel: Vec<_> = gm2d_core::shop::barrel(&shops)
+        let barrel: Vec<_> = g.barrel_now()
             .into_iter()
             .map(|o| {
                 let mut v = piece_payload(o.def, theme, serde_json::Value::Null,
@@ -1957,7 +1966,7 @@ pub fn shop_json() -> String {
         // **The order book, and what is already on order here.** Both, because
         // a counter with an order outstanding has to say so — "one at a time"
         // is a refusal a player should be able to see coming.
-        let book: Vec<_> = gm2d_core::shop::commissions(&shops, &town)
+        let book: Vec<_> = g.ledger_at(&town)
             .into_iter()
             .map(|o| {
                 let mut v = piece_payload(o.def, theme, serde_json::Value::Null,
@@ -1983,6 +1992,19 @@ pub fn shop_json() -> String {
             "commissions": book,
             "on_order": on_order,
             "supplies": tins,
+            // What turning each of them over costs next, and how many have
+            // been paid for in this band of ten levels.
+            // **The barrel's ceiling, said by core.** The gate checks that
+            // nothing dear is in the barrel and used to carry its own copy of
+            // the number — which went stale the moment every price in the game
+            // was multiplied by five, in three engines at once. One answer.
+            "barrel_ceiling": gm2d_core::shop::BARREL_CEILING,
+            "reroll": {
+                "barrel": g.reroll_price(gm2d_core::shop::REROLL_BARREL),
+                "ledger": g.reroll_price(gm2d_core::shop::REROLL_LEDGER),
+                "barrel_done": g.rerolls_done(gm2d_core::shop::REROLL_BARREL),
+                "ledger_done": g.rerolls_done(gm2d_core::shop::REROLL_LEDGER),
+            },
             "fatigue": g.character.fatigue,
         })
         .to_string()
@@ -2094,6 +2116,46 @@ pub fn collect_order() -> String {
         let Some(town) = town_here(g) else { return "you are not in a town".into() };
         match g.collect(&town) {
             Ok(name) => serde_json::json!({ "piece": g.theme_piece(&name) }).to_string(),
+            Err(why) => serde_json::json!({ "error": why }).to_string(),
+        }
+    })
+}
+
+/// Turn the barrel over. Empty string, or why not.
+#[wasm_bindgen]
+pub fn reroll_barrel() -> String {
+    with_mut(|g| {
+        if town_here(g).is_none() {
+            return "you are not in a town".into();
+        }
+        match g.reroll_barrel() {
+            Ok(paid) => serde_json::json!({ "paid": paid }).to_string(),
+            Err(why) => serde_json::json!({ "error": why }).to_string(),
+        }
+    })
+}
+
+/// Turn this town's order book over, keeping anything already on order.
+#[wasm_bindgen]
+pub fn reroll_ledger() -> String {
+    with_mut(|g| {
+        let Some(town) = town_here(g) else { return "you are not in a town".into() };
+        match g.reroll_ledger(&town) {
+            Ok(paid) => serde_json::json!({ "paid": paid }).to_string(),
+            Err(why) => serde_json::json!({ "error": why }).to_string(),
+        }
+    })
+}
+
+/// Buy a licence off the man in the van.
+#[wasm_bindgen]
+pub fn buy_licence() -> String {
+    with_mut(|g| {
+        if bench_here(g).is_none() {
+            return serde_json::json!({ "error": "there is nobody selling here" }).to_string();
+        }
+        match g.buy_licence() {
+            Ok(paid) => serde_json::json!({ "paid": paid }).to_string(),
             Err(why) => serde_json::json!({ "error": why }).to_string(),
         }
     })

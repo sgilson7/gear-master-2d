@@ -55,6 +55,20 @@ pub enum Outcome {
     /// without a cost an event is a vending machine. A *negative* tire is a
     /// tin, and tins are bought.
     Tire(u32),
+    /// Starts an errand, by id, and puts it in the quest log.
+    ///
+    /// **This is what makes a chain visible, and without it a chain is not a
+    /// decision.** At The Shallows Marker the two halves paid 12 experience
+    /// and 20, and both opened a different chain — so from where the player
+    /// sits there was no choice at all, only a smaller number and a larger
+    /// one. Nobody takes the 12.
+    ///
+    /// An errand is the one thing this game already has that says *something
+    /// has been opened and it is somewhere else*: it lands in the log, the log
+    /// points at the map, and `quest::guide` walks a `Word` goal to the tile
+    /// it wants. So a chain root hands over a chain rather than a number, and
+    /// the outcomes box says so before the choice is taken.
+    Errand(String),
     /// Puts you somewhere else, on a named map.
     ///
     /// **One way, and never a shortcut home.** It moves you *out*;
@@ -98,6 +112,23 @@ impl Outcome {
             // honest about is the cost, which is the walk.
             Outcome::Warp { .. } => {
                 vec!["You are put somewhere else. It is a long walk back.".into()]
+            }
+            // **The line that tells a player they have started something.**
+            // It names the errand rather than the chain's length or its prize,
+            // because the log is where those belong and this is the box: what
+            // it must convey is *this is not the end of it*.
+            Outcome::Errand(id) => {
+                // **The errand's own name, which is the one exception in this
+                // function to TONE 13a.** Everything else here is the engine's
+                // words with a number in it, because somebody comparing two
+                // halves of an event is comparing numbers. An errand's name is
+                // a **proper noun**, and rule 13a's own carve-out is that a
+                // proper noun is not translated — the same reason a set's name
+                // is not themed. Printing the id with its hyphens taken out
+                // would be neither: not the engine's words and not the book's.
+                let all = crate::data::quests();
+                let name = all.get(id).map(|q| q.name.clone()).unwrap_or_else(|| id.clone());
+                vec![format!("Begins an errand: {name}")]
             }
             // A flag is bookkeeping. It is what makes a chain possible and it
             // is not a thing a player receives, so the box does not claim it

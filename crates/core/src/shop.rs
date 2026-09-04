@@ -43,17 +43,40 @@ use crate::piece::{PieceDef, CATALOG};
 /// You own a handle and a blade and nothing else, so this is the first upgrade
 /// rather than pocket change. It buys two or three cheap components at the
 /// starter town, which — with what the pit pays — is the opening.
-pub const STARTING_GOLD: i32 = 28;
+///
+/// **Twenty-eight until the fivefold pass, and it had to move with it.** Every
+/// cost in the game was multiplied by five and what a fight pays was not, so
+/// money is scarcer everywhere it is earned — which is the point. The one
+/// place that could not absorb it is the first afternoon: at 28 a beginner
+/// could afford three of thirteen barrel lines and no helmet at all, and
+/// `the_first_shop_can_finish_a_helmet` said so, which is the M4 soft-lock
+/// guard doing exactly what it is for. So the purse moved with the prices and
+/// the opening is the opening it always was; everything after it is dearer.
+pub const STARTING_GOLD: i32 = 140;
 
 /// What a shelf charges, as a percentage of the catalogue's price.
 ///
 /// **Set against the opening rather than by taste.** A starting purse is
-/// [`STARTING_GOLD`] and the pit's cheapest shelf line is 3 Fnorp. At ×5 that
-/// is 15, so a new character's first shop is *one considered piece and a
-/// weapon out of the barrel* — 15 + 11 = 26 of 28 — and **not** two shelf
-/// pieces, which is 30. That is the decision the tier exists to create, and
-/// `the_opening_is_one_good_piece_or_a_frame_of_junk` is what holds it.
+/// [`STARTING_GOLD`] and the pit's cheapest shelf line is the catalogue's 15.
+/// At ×5 that is 75, so a new character's first shop is *one considered piece
+/// and a weapon out of the barrel* — 75 + 55 = 130 of 140 — and **not** two
+/// shelf pieces, which is 150. That is the decision the tier exists to create,
+/// and `the_opening_is_one_good_piece_or_a_frame_of_junk` holds it. Both
+/// numbers moved fivefold in the same pass and their ratio did not, which is
+/// why that test needed no edit.
 pub const SHELF_PCT: i32 = 500;
+
+/// The dearest thing the barrel will hold, and the band an order comes from.
+///
+/// **One place, because these moved together and will again.** Every cost in
+/// the game was multiplied by five in one pass; these were written as bare
+/// numbers against the old scale and three separate checks failed on them.
+/// Named here so the next time the economy is redenominated it is four edits
+/// in one file rather than a hunt.
+pub const BARREL_CEILING: i32 = 60;
+/// What an order's book is drawn from: above the barrel, below the absurd.
+pub const LEDGER_FLOOR: i32 = 65;
+pub const LEDGER_CEILING: i32 = 200;
 
 /// What ordering a piece costs, as a percentage of the catalogue's price.
 ///
@@ -272,6 +295,177 @@ pub struct BarrelOffer {
     pub price: i32,
 }
 
+// ------------------------------------------------------------------ rerolls
+
+/// What a reroll costs, in Fnorp: `n * n` for the nth one.
+///
+/// **1, 4, 9, 16.** The first is loose change and the fourth is a decision,
+/// which is the shape a cost curve wants: turning the barrel over once because
+/// you did not like it is free enough to be a shrug, and doing it eight times
+/// costs sixty-four and is a thing you thought about.
+///
+/// `n` is how many have already been paid for, so the first reroll is `n = 1`.
+pub fn reroll_price(done: u32) -> i32 {
+    let n = done as i64 + 1;
+    (n * n).min(i32::MAX as i64) as i32
+}
+
+/// How many levels of grinding wipe the counters.
+///
+/// **Every tenth level, everywhere.** Without a reset the curve is a wall: by
+/// level fifteen a reroll costs what a boss pays and the feature is one nobody
+/// touches again. Ten levels is long enough that it is not a tap and short
+/// enough that it comes back.
+pub const REROLL_RESET_LEVELS: u32 = 10;
+
+/// Which band of ten levels a character is in. The counters reset when it moves.
+pub fn reroll_band(level: u32) -> u32 {
+    level / REROLL_RESET_LEVELS
+}
+
+/// The two things that can be turned over, and they count separately.
+///
+/// **Per type, which is the whole of the ask**: rerolling the barrel eight
+/// times must not make the ledger's first reroll cost eighty-one. They are
+/// different appetites — one is *give me different junk* and the other is
+/// *give me a different thing to want* — and a shared counter would price the
+/// second by how impatient you were about the first.
+pub const REROLL_BARREL: &str = "barrel";
+pub const REROLL_LEDGER: &str = "ledger";
+
+/// Everything the barrel is allowed to hold.
+///
+/// **The rules are the rules whoever rolled it.** A rerolled barrel has to pass
+/// what the authored one passes — nothing off a creature, nothing a town has on
+/// its shelf, nothing carried rather than worn, small and cheap — or a reroll
+/// is a way to shake a set piece out of the catalogue.
+pub fn barrel_pool() -> Vec<&'static PieceDef> {
+    let shops = crate::data::shops();
+    let on_a_shelf: Vec<&str> =
+        shops.towns.iter().flat_map(|t| t.stock.iter().map(|s| s.as_str())).collect();
+    CATALOG
+        .iter()
+        .filter(|d| {
+            d.price > 0
+                && d.price <= BARREL_CEILING
+                && d.cells.len() <= 4
+                && d.kind != crate::piece::PieceKind::Quest
+                && d.quest.is_none()
+                && !crate::piece::EVENT_ONLY.contains(&d.name)
+                && !on_a_shelf.contains(&d.name)
+        })
+        .collect()
+}
+
+/// Roll a barrel: one of each kind the five recipes need, plus the extras.
+///
+/// **Deterministic off the run's own stream**, like every other roll in this
+/// game, so a seeded walk still replays and two machines agree about what the
+/// barrel held.
+pub fn roll_barrel(rng: &mut crate::rng::Rng) -> Vec<String> {
+    use crate::piece::{PieceKind, SlotKind};
+    let pool = barrel_pool();
+    // The eight that make the five grids assemble, then three fillers. Same
+    // shape as the authored barrel, because that shape is what makes it a
+    // barrel rather than a bag.
+    let want: &[(PieceKind, Option<SlotKind>)] = &[
+        (PieceKind::Handle, None),
+        (PieceKind::Damaging, None),
+        (PieceKind::Frame, None),
+        (PieceKind::Plating, Some(SlotKind::Helmet)),
+        (PieceKind::Base, None),
+        (PieceKind::Layer, None),
+        (PieceKind::Material, Some(SlotKind::Gloves)),
+        (PieceKind::Mold, Some(SlotKind::Gloves)),
+        (PieceKind::Material, Some(SlotKind::Greaves)),
+        (PieceKind::Mold, Some(SlotKind::Greaves)),
+        (PieceKind::Ring, None),
+        (PieceKind::Accessory, None),
+        (PieceKind::Crest, None),
+    ];
+    let mut out: Vec<String> = Vec::new();
+    for (kind, slot) in want {
+        let mut fits: Vec<&&PieceDef> = pool
+            .iter()
+            .filter(|d| d.kind == *kind && slot.map(|s| d.slot == s).unwrap_or(true))
+            .filter(|d| !out.iter().any(|n| n == d.name))
+            .collect();
+        if fits.is_empty() {
+            continue;
+        }
+        fits.sort_by_key(|d| d.name);
+        let i = rng.below(fits.len());
+        out.push(fits[i].name.to_string());
+    }
+    out
+}
+
+/// Everything the order book is allowed to hold.
+///
+/// Dearer and larger than the barrel's pool — an order is the thing you *chose*
+/// and the tier above the shelf — and still nothing off a creature and nothing
+/// a town already stocks.
+pub fn ledger_pool() -> Vec<&'static PieceDef> {
+    let shops = crate::data::shops();
+    let on_a_shelf: Vec<&str> =
+        shops.towns.iter().flat_map(|t| t.stock.iter().map(|s| s.as_str())).collect();
+    let in_barrel: Vec<&str> = shops.barrel.iter().map(|s| s.as_str()).collect();
+    CATALOG
+        .iter()
+        .filter(|d| {
+            (LEDGER_FLOOR..=LEDGER_CEILING).contains(&d.price)
+                && d.cells.len() <= 6
+                && d.kind != crate::piece::PieceKind::Quest
+                && d.quest.is_none()
+                && !crate::piece::EVENT_ONLY.contains(&d.name)
+                && !on_a_shelf.contains(&d.name)
+                && !in_barrel.contains(&d.name)
+        })
+        .collect()
+}
+
+/// Roll a town's order book, keeping anything already on order.
+///
+/// **The one you are waiting for is not rerolled.** You paid for it and its
+/// clock is running; turning the book over must not turn over the thing that
+/// is already being made, or a reroll would be a way to lose an order you had
+/// bought. Everything else on the counter changes.
+pub fn roll_commissions(
+    rng: &mut crate::rng::Rng,
+    keep: Option<&str>,
+    how_many: usize,
+) -> Vec<CommissionDef> {
+    let pool = ledger_pool();
+    let mut out: Vec<CommissionDef> = Vec::new();
+    if let Some(name) = keep {
+        if let Some(i) = def_named(name) {
+            // Its fights are re-derived from its price the same way any other
+            // line's are, so the kept one is not a different kind of entry.
+            out.push(CommissionDef { piece: CATALOG[i].name.to_string(), fights: fights_for(&CATALOG[i]) });
+        }
+    }
+    while out.len() < how_many {
+        let mut fits: Vec<&&PieceDef> =
+            pool.iter().filter(|d| !out.iter().any(|c| c.piece == d.name)).collect();
+        if fits.is_empty() {
+            break;
+        }
+        fits.sort_by_key(|d| d.name);
+        let i = rng.below(fits.len());
+        out.push(CommissionDef { piece: fits[i].name.to_string(), fights: fights_for(fits[i]) });
+    }
+    out
+}
+
+/// How long a rolled order takes: dearer things take longer.
+///
+/// Authored lines say so in the file; a rolled one has nobody to say it, so it
+/// is derived from the one number the piece already carries. Three fights at
+/// the cheap end and ten at the dear.
+fn fights_for(def: &PieceDef) -> u16 {
+    (3 + (def.price as u16).saturating_sub(LEDGER_FLOOR as u16) / 20).clamp(3, 10)
+}
+
 /// What is in the barrel, in order.
 pub fn barrel(shops: &ShopsData) -> Vec<BarrelOffer> {
     shops
@@ -299,6 +493,30 @@ pub struct CommissionOffer {
 pub fn commissions(shops: &ShopsData, town: &str) -> Vec<CommissionOffer> {
     let Some(t) = shops.town(town) else { return Vec::new() };
     t.commissions
+        .iter()
+        .enumerate()
+        .filter_map(|(i, c)| {
+            let def = &CATALOG[def_named(&c.piece)?];
+            Some(CommissionOffer { index: i, def, price: commission_price(def), fights: c.fights })
+        })
+        .collect()
+}
+
+/// The same, over a list of names rather than the shipped barrel.
+pub fn barrel_of(names: &[String]) -> Vec<BarrelOffer> {
+    names
+        .iter()
+        .enumerate()
+        .filter_map(|(i, name)| {
+            let def = &CATALOG[def_named(name)?];
+            Some(BarrelOffer { index: i, def, price: def.price })
+        })
+        .collect()
+}
+
+/// The same, over a rolled book rather than a town's authored one.
+pub fn commissions_of(rolled: &[CommissionDef]) -> Vec<CommissionOffer> {
+    rolled
         .iter()
         .enumerate()
         .filter_map(|(i, c)| {

@@ -1609,7 +1609,7 @@ pub static CATALOG: &[PieceDef] = &[
             becomes: "Blade of Helms",
         }),
         power_bonus: 0,
-        price: 16,
+        price: 80,
     },
     PieceDef {
         name: "Blade of Helms",
@@ -1632,7 +1632,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainArmor(22))],
         quest: None,
         power_bonus: 0,
-        price: 30,
+        price: 150,
     },
     PieceDef {
         name: "Apprentice's Primer",
@@ -1660,7 +1660,7 @@ pub static CATALOG: &[PieceDef] = &[
             becomes: "Archmage's Primer",
         }),
         power_bonus: 40,
-        price: 9,
+        price: 45,
     },
     PieceDef {
         name: "Archmage's Primer",
@@ -1679,7 +1679,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 160,
-        price: 34,
+        price: 170,
     },
     PieceDef {
         name: "Cracked Pauldron",
@@ -1699,7 +1699,7 @@ pub static CATALOG: &[PieceDef] = &[
             becomes: "Warlord's Pauldron",
         }),
         power_bonus: 0,
-        price: 7,
+        price: 35,
     },
     PieceDef {
         name: "Warlord's Pauldron",
@@ -1720,7 +1720,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 32,
+        price: 160,
     },
     PieceDef {
         name: "Hexer's Tally",
@@ -1740,7 +1740,7 @@ pub static CATALOG: &[PieceDef] = &[
             becomes: "Hexer's Reckoning",
         }),
         power_bonus: 0,
-        price: 10,
+        price: 50,
     },
     PieceDef {
         name: "Hexer's Reckoning",
@@ -1768,7 +1768,7 @@ pub static CATALOG: &[PieceDef] = &[
         ],
         quest: None,
         power_bonus: 0,
-        price: 30,
+        price: 150,
     },
     PieceDef {
         name: "Wayfarer's Sole",
@@ -1788,7 +1788,7 @@ pub static CATALOG: &[PieceDef] = &[
             becomes: "Sevenleague Sole",
         }),
         power_bonus: 0,
-        price: 8,
+        price: 40,
     },
     PieceDef {
         name: "Sevenleague Sole",
@@ -1809,7 +1809,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 30,
+        price: 150,
     },
     // ---- Typed damage, banked resources, and more ways into a spell ----
     //
@@ -1829,7 +1829,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainArmor(3))],
         quest: None,
         power_bonus: 0,
-        price: 12,
+        price: 60,
     },
     PieceDef {
         name: "Runic Weave",
@@ -1844,7 +1844,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainArmor(3))],
         quest: None,
         power_bonus: 0,
-        price: 13,
+        price: 65,
     },
     PieceDef {
         name: "Voidsilk Base",
@@ -1859,7 +1859,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 22,
+        price: 110,
     },
     PieceDef {
         name: "Starlit Mantle",
@@ -1874,7 +1874,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainArmor(3))],
         quest: None,
         power_bonus: 0,
-        price: 18,
+        price: 90,
     },
     PieceDef {
         name: "Leyline Cuirass",
@@ -1889,7 +1889,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 24,
+        price: 120,
     },
     PieceDef {
         name: "Spiked Vambrace",
@@ -1904,7 +1904,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAdjacentActivate(Action::Damage { amount: 10, kind: DamageType::Physical, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 15,
+        price: 75,
     },
     PieceDef {
         name: "Ironhide Wrap",
@@ -1919,7 +1919,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 17,
+        price: 85,
     },
     PieceDef {
         name: "Breaker's Fist",
@@ -1956,7 +1956,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 26,
+        price: 130,
     },
     PieceDef {
         name: "Tempered Sole",
@@ -1971,7 +1971,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::ReduceCooldown(150))],
         quest: None,
         power_bonus: 0,
-        price: 14,
+        price: 70,
     },
     PieceDef {
         name: "Warplate Greave",
@@ -1986,7 +1986,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainArmor(14))],
         quest: None,
         power_bonus: 0,
-        price: 19,
+        price: 95,
     },
     PieceDef {
         name: "Bloodrage Grip",
@@ -2001,7 +2001,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 15,
+        price: 75,
     },
     PieceDef {
         name: "Fury Sigil",
@@ -2016,7 +2016,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 9,
+        price: 45,
     },
     PieceDef {
         name: "Berserker's Plate",
@@ -2034,7 +2034,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainArmor(4))],
         quest: None,
         power_bonus: 0,
-        price: 16,
+        price: 80,
     },
     PieceDef {
         name: "Wrathful Talons",
@@ -2054,7 +2054,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 20,
+        price: 100,
     },
     PieceDef {
         name: "Cull",
@@ -2069,7 +2069,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 22,
+        price: 110,
     },
     PieceDef {
         name: "Votive Crest",
@@ -2084,7 +2084,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 10,
+        price: 50,
     },
     PieceDef {
         name: "Reliquary Frame",
@@ -2099,7 +2099,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 19,
+        price: 95,
     },
     PieceDef {
         name: "Consecrated Plating",
@@ -2114,7 +2114,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 17,
+        price: 85,
     },
     PieceDef {
         name: "Absolution",
@@ -2134,7 +2134,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 21,
+        price: 105,
     },
     PieceDef {
         name: "Pilgrim's Sole",
@@ -2149,7 +2149,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::Curse { kind: CurseKind::Searing, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 12,
+        price: 60,
     },
     PieceDef {
         name: "Rootbound Material",
@@ -2164,7 +2164,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 18,
+        price: 90,
     },
     PieceDef {
         name: "Verdant Weave",
@@ -2179,7 +2179,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::Grow(3))],
         quest: None,
         power_bonus: 0,
-        price: 13,
+        price: 65,
     },
     PieceDef {
         name: "Bloomcap",
@@ -2194,7 +2194,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 11,
+        price: 55,
     },
     PieceDef {
         name: "Wildgrowth",
@@ -2214,7 +2214,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 18,
+        price: 90,
     },
     PieceDef {
         name: "Thornweald Grip",
@@ -2229,7 +2229,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 17,
+        price: 85,
     },
     PieceDef {
         name: "Astrolabe",
@@ -2245,7 +2245,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::ReduceCooldown(250))],
         quest: None,
         power_bonus: 45,
-        price: 16,
+        price: 80,
     },
     PieceDef {
         name: "Obsidian Orb",
@@ -2264,7 +2264,7 @@ pub static CATALOG: &[PieceDef] = &[
         })],
         quest: None,
         power_bonus: 70,
-        price: 15,
+        price: 75,
     },
     PieceDef {
         name: "Prismatic Ink",
@@ -2279,7 +2279,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 130,
-        price: 14,
+        price: 70,
     },
     PieceDef {
         name: "Shatterbolt",
@@ -2294,7 +2294,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 20,
+        price: 100,
     },
     PieceDef {
         name: "Hoarfrost",
@@ -2309,7 +2309,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 17,
+        price: 85,
     },
     PieceDef {
         name: "Timeworn Orb",
@@ -2325,7 +2325,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::ReduceCooldown(300))],
         quest: None,
         power_bonus: 65,
-        price: 21,
+        price: 105,
     },
     // ---- Gear that reads its neighbours ----
     //
@@ -2346,7 +2346,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 20,
+        price: 100,
     },
     PieceDef {
         name: "Reliquary Frame of Nine",
@@ -2361,7 +2361,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 21,
+        price: 105,
     },
     PieceDef {
         name: "Layered Core",
@@ -2376,7 +2376,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 22,
+        price: 110,
     },
     PieceDef {
         name: "Knuckleduster",
@@ -2391,7 +2391,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 17,
+        price: 85,
     },
     PieceDef {
         name: "Grimoire Rack",
@@ -2406,7 +2406,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 18,
+        price: 90,
     },
     PieceDef {
         name: "Studded Sole",
@@ -2421,7 +2421,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 16,
+        price: 80,
     },
     // ---- Rings ----
     //
@@ -2450,7 +2450,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAdjacentActivate(Action::Damage { amount: 5, kind: DamageType::Physical, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 9,
+        price: 45,
     },
     PieceDef {
         name: "Iron Band",
@@ -2465,7 +2465,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAdjacentActivate(Action::ReduceCooldown(150))],
         quest: None,
         power_bonus: 0,
-        price: 11,
+        price: 55,
     },
     PieceDef {
         name: "Ring of Tides",
@@ -2481,7 +2481,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAlignedActivate(Action::Drain { what: Resource::Mana, amount: 2, hurt: 0, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 12,
+        price: 60,
     },
     PieceDef {
         name: "Emberloop",
@@ -2496,7 +2496,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAdjacentActivate(Action::Damage { amount: 5, kind: DamageType::Magic, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 13,
+        price: 65,
     },
     PieceDef {
         name: "Bloodring",
@@ -2511,7 +2511,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAdjacentActivate(Action::Damage { amount: 10, kind: DamageType::Physical, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 12,
+        price: 60,
     },
     PieceDef {
         name: "Warding Ring",
@@ -2526,7 +2526,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAdjacentActivate(Action::GainArmor(2))],
         quest: None,
         power_bonus: 0,
-        price: 14,
+        price: 70,
     },
     PieceDef {
         name: "Ring of Hours",
@@ -2541,7 +2541,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAlignedActivate(Action::ReduceCooldown(400))],
         quest: None,
         power_bonus: 0,
-        price: 15,
+        price: 75,
     },
     PieceDef {
         name: "Seal of the Grove",
@@ -2556,7 +2556,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAlignedActivate(Action::GainMana(1))],
         quest: None,
         power_bonus: 0,
-        price: 13,
+        price: 65,
     },
     PieceDef {
         name: "Oathring",
@@ -2571,7 +2571,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAdjacentActivate(Action::ReduceCooldown(200))],
         quest: None,
         power_bonus: 0,
-        price: 12,
+        price: 60,
     },
     PieceDef {
         name: "Piercer's Band",
@@ -2586,7 +2586,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAdjacentActivate(Action::Damage { amount: 10, kind: DamageType::Physical, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 15,
+        price: 75,
     },
     // ---- Pace, and the answer to it ----
     //
@@ -2616,7 +2616,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 16,
+        price: 80,
     },
     PieceDef {
         name: "Lightweave",
@@ -2631,7 +2631,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainArmor(2))],
         quest: None,
         power_bonus: 0,
-        price: 15,
+        price: 75,
     },
     PieceDef {
         name: "Deft Mold",
@@ -2646,7 +2646,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAdjacentActivate(Action::Damage { amount: 5, kind: DamageType::Physical, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 17,
+        price: 85,
     },
     PieceDef {
         name: "Quickstep Mold",
@@ -2661,7 +2661,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::ReduceCooldown(200))],
         quest: None,
         power_bonus: 0,
-        price: 16,
+        price: 80,
     },
     PieceDef {
         name: "Watchful Crest",
@@ -2688,7 +2688,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 14,
+        price: 70,
     },
     PieceDef {
         name: "Rimeguard Base",
@@ -2703,7 +2703,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainArmor(30))],
         quest: None,
         power_bonus: 0,
-        price: 25,
+        price: 125,
     },
     PieceDef {
         name: "Tarpit Sole",
@@ -2718,7 +2718,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::Curse { kind: CurseKind::Frost, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 18,
+        price: 90,
     },
     PieceDef {
         name: "Stonewall Frame",
@@ -2733,7 +2733,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainArmor(26))],
         quest: None,
         power_bonus: 0,
-        price: 28,
+        price: 140,
     },
     PieceDef {
         name: "Anchor Material",
@@ -2752,7 +2752,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 24,
+        price: 120,
     },
     PieceDef {
         name: "Bulwark Vial",
@@ -2767,7 +2767,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 13,
+        price: 65,
     },
     // ---- Gear for the thin axes ----
     //
@@ -2788,7 +2788,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::Curse { kind: CurseKind::Searing, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 18,
+        price: 90,
     },
     PieceDef {
         name: "Coven Mold",
@@ -2803,7 +2803,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAdjacentActivate(Action::Damage { amount: 10, kind: DamageType::Magic, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 13,
+        price: 65,
     },
     PieceDef {
         name: "Blight Layer",
@@ -2818,7 +2818,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainDeflection(1))],
         quest: None,
         power_bonus: 0,
-        price: 15,
+        price: 75,
     },
     PieceDef {
         name: "Malefic Crest",
@@ -2833,7 +2833,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::MindDamage { amount: 22, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 12,
+        price: 60,
     },
     PieceDef {
         name: "Plaguewalkers",
@@ -2854,7 +2854,7 @@ pub static CATALOG: &[PieceDef] = &[
         })],
         quest: None,
         power_bonus: 0,
-        price: 19,
+        price: 95,
     },
     PieceDef {
         name: "Heartwood Base",
@@ -2891,7 +2891,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 24,
+        price: 120,
     },
     PieceDef {
         name: "Sapling Mold",
@@ -2906,7 +2906,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::Curse { kind: CurseKind::Frost, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 14,
+        price: 70,
     },
     PieceDef {
         name: "Bloomguard",
@@ -2921,7 +2921,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 20,
+        price: 100,
     },
     PieceDef {
         name: "Green Crown",
@@ -2936,7 +2936,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 19,
+        price: 95,
     },
     PieceDef {
         name: "Oathplate",
@@ -2951,7 +2951,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainDeflection(1))],
         quest: None,
         power_bonus: 0,
-        price: 18,
+        price: 90,
     },
     PieceDef {
         name: "Chapel Frame",
@@ -2966,7 +2966,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 20,
+        price: 100,
     },
     PieceDef {
         name: "Zealot's Sole",
@@ -2981,7 +2981,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnBattleStart(Action::Gain { what: Resource::Faith, amount: 12 })],
         quest: None,
         power_bonus: 0,
-        price: 15,
+        price: 75,
     },
     PieceDef {
         name: "Bulwark Base",
@@ -2996,7 +2996,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 26,
+        price: 130,
     },
     PieceDef {
         name: "Riveted Layer",
@@ -3011,7 +3011,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainArmor(3))],
         quest: None,
         power_bonus: 0,
-        price: 16,
+        price: 80,
     },
     PieceDef {
         name: "Warcry Crest",
@@ -3026,7 +3026,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 13,
+        price: 65,
     },
     PieceDef {
         name: "Ravener's Mold",
@@ -3041,7 +3041,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAdjacentActivate(Action::GainSpellblade(1))],
         quest: None,
         power_bonus: 0,
-        price: 18,
+        price: 90,
     },
     PieceDef {
         name: "Runebound Tome",
@@ -3057,7 +3057,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 110,
-        price: 22,
+        price: 110,
     },
     PieceDef {
         name: "Seer's Orb",
@@ -3073,7 +3073,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 70,
-        price: 17,
+        price: 85,
     },
     PieceDef {
         name: "Starfall",
@@ -3092,7 +3092,7 @@ pub static CATALOG: &[PieceDef] = &[
         })],
         quest: None,
         power_bonus: 0,
-        price: 23,
+        price: 115,
     },
     // ---- The deep end ----
     //
@@ -3117,7 +3117,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 40,
+        price: 200,
     },
     PieceDef {
         name: "Sunderer",
@@ -3135,7 +3135,7 @@ pub static CATALOG: &[PieceDef] = &[
         })],
         quest: None,
         power_bonus: 0,
-        price: 44,
+        price: 220,
     },
     PieceDef {
         name: "Aegis Crown",
@@ -3156,7 +3156,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainArmor(16))],
         quest: None,
         power_bonus: 0,
-        price: 38,
+        price: 190,
     },
     PieceDef {
         name: "Adamant Carapace",
@@ -3177,7 +3177,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainArmor(30))],
         quest: None,
         power_bonus: 0,
-        price: 46,
+        price: 230,
     },
     PieceDef {
         name: "Titan's Grip",
@@ -3198,7 +3198,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 42,
+        price: 210,
     },
     PieceDef {
         name: "Sevenleague Boots",
@@ -3219,7 +3219,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainArmor(12))],
         quest: None,
         power_bonus: 0,
-        price: 40,
+        price: 200,
     },
     // ---- Weapon, the arcane way: books, orbs, inks and spells ----
     //
@@ -3239,7 +3239,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 5,
+        price: 25,
     },
     PieceDef {
         name: "Leaden Tome",
@@ -3263,7 +3263,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 120,
-        price: 14,
+        price: 70,
     },
     PieceDef {
         name: "Chained Codex",
@@ -3280,7 +3280,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 12,
+        price: 60,
     },
     PieceDef {
         name: "Scrying Orb",
@@ -3295,7 +3295,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnOtherCast(Action::GainMana(1))],
         quest: None,
         power_bonus: 35,
-        price: 13,
+        price: 65,
     },
     PieceDef {
         name: "Hollow Sphere",
@@ -3315,7 +3315,7 @@ pub static CATALOG: &[PieceDef] = &[
         }))],
         quest: None,
         power_bonus: 55,
-        price: 9,
+        price: 45,
     },
     PieceDef {
         name: "Soot Ink",
@@ -3330,7 +3330,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::Curse { kind: CurseKind::Searing, target: Target::Enemy })],
         quest: None,
         power_bonus: 90,
-        price: 5,
+        price: 25,
     },
     PieceDef {
         name: "Quicksilver Ink",
@@ -3350,7 +3350,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 170,
-        price: 12,
+        price: 60,
     },
     PieceDef {
         name: "Bloodletter's Ink",
@@ -3375,7 +3375,7 @@ pub static CATALOG: &[PieceDef] = &[
         })],
         quest: None,
         power_bonus: 240,
-        price: 16,
+        price: 80,
     },
     PieceDef {
         name: "Emberburst",
@@ -3393,7 +3393,7 @@ pub static CATALOG: &[PieceDef] = &[
         })],
         quest: None,
         power_bonus: 0,
-        price: 11,
+        price: 55,
     },
     PieceDef {
         name: "Rime Nova",
@@ -3411,7 +3411,7 @@ pub static CATALOG: &[PieceDef] = &[
         })],
         quest: None,
         power_bonus: 0,
-        price: 9,
+        price: 45,
     },
     PieceDef {
         name: "Siphon",
@@ -3427,7 +3427,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 12,
+        price: 60,
     },
     PieceDef {
         name: "Warding Sigil",
@@ -3443,7 +3443,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnOtherCast(Action::GainArmor(7))],
         quest: None,
         power_bonus: 0,
-        price: 8,
+        price: 40,
     },
     PieceDef {
         name: "Arc Lightning",
@@ -3464,7 +3464,7 @@ pub static CATALOG: &[PieceDef] = &[
         })],
         quest: None,
         power_bonus: 0,
-        price: 14,
+        price: 70,
     },
     PieceDef {
         name: "Mirrorcast",
@@ -3487,7 +3487,7 @@ pub static CATALOG: &[PieceDef] = &[
         })],
         quest: None,
         power_bonus: 0,
-        price: 10,
+        price: 50,
     },
     // ---- Weapon: handles, damaging pieces, accessories ----
     PieceDef {
@@ -3503,7 +3503,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 3,
+        price: 15,
     },
     PieceDef {
         name: "Balanced Grip",
@@ -3525,7 +3525,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 6,
+        price: 30,
     },
     PieceDef {
         name: "Iron Blade",
@@ -3540,7 +3540,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 7,
+        price: 35,
     },
     PieceDef {
         name: "Serrated Edge",
@@ -3555,7 +3555,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 8,
+        price: 40,
     },
     PieceDef {
         name: "Ruby Inlay",
@@ -3572,7 +3572,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 5,
+        price: 25,
     },
     PieceDef {
         name: "Balance Weight",
@@ -3587,7 +3587,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 4,
+        price: 20,
     },
     // ---- Helmet: frame, plating, crest ----
     PieceDef {
@@ -3603,7 +3603,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 5,
+        price: 25,
     },
     PieceDef {
         name: "Iron Plating",
@@ -3618,7 +3618,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 5,
+        price: 25,
     },
     PieceDef {
         name: "Visor of Focus",
@@ -3640,7 +3640,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 7,
+        price: 35,
     },
     PieceDef {
         name: "Crest of Vigor",
@@ -3655,7 +3655,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 4,
+        price: 20,
     },
     // ---- Chest: one base, up to three layers ----
     PieceDef {
@@ -3675,7 +3675,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainArmor(3))],
         quest: None,
         power_bonus: 0,
-        price: 6,
+        price: 30,
     },
     PieceDef {
         name: "Chain Layer",
@@ -3690,7 +3690,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainArmor(3))],
         quest: None,
         power_bonus: 0,
-        price: 4,
+        price: 20,
     },
     PieceDef {
         name: "Plate Layer",
@@ -3705,7 +3705,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainArmor(4))],
         quest: None,
         power_bonus: 0,
-        price: 5,
+        price: 25,
     },
     PieceDef {
         name: "Woven Underlayer",
@@ -3727,7 +3727,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 6,
+        price: 30,
     },
     // ---- Gloves: material + mold ----
     PieceDef {
@@ -3743,7 +3743,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 3,
+        price: 15,
     },
     PieceDef {
         name: "Steel Material",
@@ -3758,7 +3758,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 6,
+        price: 30,
     },
     PieceDef {
         name: "Gauntlet Mold",
@@ -3780,7 +3780,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 6,
+        price: 30,
     },
     PieceDef {
         name: "Gripping Mold",
@@ -3795,7 +3795,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAdjacentActivate(Action::Damage { amount: 5, kind: DamageType::Physical, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 4,
+        price: 20,
     },
     // ---- Greaves: material + mold ----
     PieceDef {
@@ -3818,7 +3818,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 7,
+        price: 35,
     },
     PieceDef {
         name: "Boiled Leather",
@@ -3833,7 +3833,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 4,
+        price: 20,
     },
     PieceDef {
         name: "Greave Mold",
@@ -3851,7 +3851,7 @@ pub static CATALOG: &[PieceDef] = &[
         ],
         quest: None,
         power_bonus: 0,
-        price: 3,
+        price: 15,
     },
     PieceDef {
         name: "Runner's Mold",
@@ -3866,7 +3866,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::ReduceCooldown(150))],
         quest: None,
         power_bonus: 0,
-        price: 4,
+        price: 20,
     },
     // ---- Components with positional effects ----
     PieceDef {
@@ -3890,7 +3890,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 9,
+        price: 45,
     },
     PieceDef {
         name: "Hollow Weave",
@@ -3909,7 +3909,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 6,
+        price: 30,
     },
     PieceDef {
         name: "Unbound Core",
@@ -3931,7 +3931,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 6,
+        price: 30,
     },
     // ---- Cursed line: powerful, but they bite back ----
     PieceDef {
@@ -3963,7 +3963,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 10,
+        price: 50,
     },
     PieceDef {
         name: "Cursed Blade",
@@ -3984,7 +3984,7 @@ pub static CATALOG: &[PieceDef] = &[
         })],
         quest: None,
         power_bonus: 0,
-        price: 12,
+        price: 60,
     },
     // ---- Spares, so every slot can host more than one finished item ----
     PieceDef {
@@ -4000,7 +4000,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 4,
+        price: 20,
     },
     PieceDef {
         name: "Hide Base",
@@ -4015,7 +4015,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainArmor(3))],
         quest: None,
         power_bonus: 0,
-        price: 5,
+        price: 25,
     },
     // ================= MAGE LINE: makes and spends mana =================
     PieceDef {
@@ -4031,7 +4031,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 8,
+        price: 40,
     },
     PieceDef {
         name: "Arcane Splinter",
@@ -4051,7 +4051,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 9,
+        price: 45,
     },
     PieceDef {
         name: "Mana Loom",
@@ -4066,7 +4066,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 9,
+        price: 45,
     },
     PieceDef {
         name: "Mage's Circlet",
@@ -4089,7 +4089,7 @@ pub static CATALOG: &[PieceDef] = &[
             }],
         quest: None,
         power_bonus: 0,
-        price: 8,
+        price: 40,
     },
     PieceDef {
         name: "Runed Lining",
@@ -4108,7 +4108,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 6,
+        price: 30,
     },
     PieceDef {
         name: "Mage's Wrapping",
@@ -4123,7 +4123,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 7,
+        price: 35,
     },
     PieceDef {
         name: "Mage's Sandals",
@@ -4138,7 +4138,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 7,
+        price: 35,
     },
     PieceDef {
         name: "Scrying Lens",
@@ -4153,7 +4153,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 7,
+        price: 35,
     },
     PieceDef {
         name: "Overflow Vial",
@@ -4174,7 +4174,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 6,
+        price: 30,
     },
 
     // ================ WITCH LINE: pays in curses ================
@@ -4195,7 +4195,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 9,
+        price: 45,
     },
     PieceDef {
         name: "Hexbolt",
@@ -4210,7 +4210,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 9,
+        price: 45,
     },
     PieceDef {
         name: "Witch's Hat",
@@ -4225,7 +4225,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::MindDamage { amount: 12, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 10,
+        price: 50,
     },
     PieceDef {
         name: "Hexweave Shroud",
@@ -4244,7 +4244,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 10,
+        price: 50,
     },
     PieceDef {
         name: "Witch's Claw",
@@ -4266,7 +4266,7 @@ pub static CATALOG: &[PieceDef] = &[
         })],
         quest: None,
         power_bonus: 0,
-        price: 9,
+        price: 45,
     },
     PieceDef {
         name: "Hexer's Mold",
@@ -4285,7 +4285,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 8,
+        price: 40,
     },
     PieceDef {
         name: "Witch's Stilts",
@@ -4300,7 +4300,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 8,
+        price: 40,
     },
     PieceDef {
         name: "Bileglass Vial",
@@ -4321,7 +4321,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 8,
+        price: 40,
     },
     PieceDef {
         name: "Coven Crest",
@@ -4339,7 +4339,7 @@ pub static CATALOG: &[PieceDef] = &[
         })],
         quest: None,
         power_bonus: 0,
-        price: 11,
+        price: 55,
     },
 
     // ============ REACTIVE: gear that answers other gear ============
@@ -4357,7 +4357,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnOtherCast(Action::ReduceCooldown(1000))],
         quest: None,
         power_bonus: 0,
-        price: 9,
+        price: 45,
     },
     PieceDef {
         name: "Chain Coil",
@@ -4378,7 +4378,7 @@ pub static CATALOG: &[PieceDef] = &[
         })],
         quest: None,
         power_bonus: 0,
-        price: 9,
+        price: 45,
     },
     PieceDef {
         name: "Channeling Mold",
@@ -4395,7 +4395,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAlignedActivate(Action::GainMana(1))],
         quest: None,
         power_bonus: 0,
-        price: 8,
+        price: 40,
     },
     PieceDef {
         name: "Striding Mold",
@@ -4410,7 +4410,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAlignedActivate(Action::ReduceCooldown(500))],
         quest: None,
         power_bonus: 0,
-        price: 8,
+        price: 40,
     },
     PieceDef {
         name: "Thornmail Layer",
@@ -4429,7 +4429,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 8,
+        price: 40,
     },
     PieceDef {
         name: "Third Eye",
@@ -4447,7 +4447,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnDiagonalActivate(Action::GainMana(1))],
         quest: None,
         power_bonus: 0,
-        price: 8,
+        price: 40,
     },
     PieceDef {
         name: "Ember Crest",
@@ -4466,7 +4466,7 @@ pub static CATALOG: &[PieceDef] = &[
         })],
         quest: None,
         power_bonus: 0,
-        price: 8,
+        price: 40,
     },
     PieceDef {
         name: "Grave-Iron Mold",
@@ -4481,7 +4481,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::Curse { kind: CurseKind::Misfire, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 7,
+        price: 35,
     },
     PieceDef {
         name: "Featherweight Mold",
@@ -4496,7 +4496,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAlignedActivate(Action::ReduceCooldown(450))],
         quest: None,
         power_bonus: 0,
-        price: 8,
+        price: 40,
     },
     PieceDef {
         name: "Warding Plate",
@@ -4511,7 +4511,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 7,
+        price: 35,
     },
     PieceDef {
         name: "Mirrored Visor",
@@ -4526,7 +4526,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 8,
+        price: 40,
     },
     PieceDef {
         name: "Ironbark Layer",
@@ -4541,7 +4541,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainArmor(3))],
         quest: None,
         power_bonus: 0,
-        price: 7,
+        price: 35,
     },
     PieceDef {
         name: "Duelist's Grip",
@@ -4556,7 +4556,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 8,
+        price: 40,
     },
     PieceDef {
         name: "Executioner's Haft",
@@ -4571,7 +4571,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 11,
+        price: 55,
     },
     PieceDef {
         name: "Bonesaw",
@@ -4586,7 +4586,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 8,
+        price: 40,
     },
     PieceDef {
         name: "Whetstone",
@@ -4601,7 +4601,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 6,
+        price: 30,
     },
     PieceDef {
         name: "Pathfinder Material",
@@ -4616,7 +4616,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 7,
+        price: 35,
     },
     PieceDef {
         name: "Bulwark Material",
@@ -4631,7 +4631,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 9,
+        price: 45,
     },
 
     // ====== OVERSIZED: hopeless to build, formidable left in bits ======
@@ -4658,7 +4658,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 12,
+        price: 60,
     },
     PieceDef {
         name: "Colossus Ring",
@@ -4686,7 +4686,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 12,
+        price: 60,
     },
     PieceDef {
         name: "Sprawling Handwrap",
@@ -4712,7 +4712,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 11,
+        price: 55,
     },
     PieceDef {
         name: "Wandering Root",
@@ -4735,7 +4735,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 11,
+        price: 55,
     },
     PieceDef {
         name: "Broken Crown",
@@ -4761,7 +4761,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 11,
+        price: 55,
     },
     // ===== MANA BUFFS: pay mana for a stack that scales off the mana left =====
     PieceDef {
@@ -4781,7 +4781,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 12,
+        price: 60,
     },
     PieceDef {
         name: "Empowering Mold",
@@ -4805,7 +4805,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 11,
+        price: 55,
     },
     PieceDef {
         name: "Mana Ward",
@@ -4824,7 +4824,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 12,
+        price: 60,
     },
     PieceDef {
         name: "Aegis Weave",
@@ -4841,7 +4841,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainArmor(18))],
         quest: None,
         power_bonus: 0,
-        price: 13,
+        price: 65,
     },
     PieceDef {
         name: "Warded Sabatons",
@@ -4865,7 +4865,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 12,
+        price: 60,
     },
     PieceDef {
         name: "Ashfall Ink",
@@ -4883,7 +4883,7 @@ pub static CATALOG: &[PieceDef] = &[
         })],
         quest: None,
         power_bonus: 100,
-        price: 6,
+        price: 30,
     },
     PieceDef {
         name: "Tidewrack Ink",
@@ -4898,7 +4898,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 110,
-        price: 9,
+        price: 45,
     },
     PieceDef {
         name: "Wrathwrit Ink",
@@ -4913,7 +4913,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 115,
-        price: 10,
+        price: 50,
     },
     PieceDef {
         name: "Gravebloom Ink",
@@ -4928,7 +4928,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 120,
-        price: 12,
+        price: 60,
     },
     PieceDef {
         name: "Oathbound Ink",
@@ -4943,7 +4943,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 120,
-        price: 12,
+        price: 60,
     },
     PieceDef {
         name: "Mercurial Ink",
@@ -4958,7 +4958,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::ReduceCooldown(200))],
         quest: None,
         power_bonus: 95,
-        price: 8,
+        price: 40,
     },
     PieceDef {
         name: "Runewash Ink",
@@ -4974,7 +4974,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 135,
-        price: 14,
+        price: 70,
     },
     PieceDef {
         name: "Cinderscript Ink",
@@ -4989,7 +4989,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::Curse { kind: CurseKind::Searing, target: Target::Enemy })],
         quest: None,
         power_bonus: 125,
-        price: 15,
+        price: 75,
     },
     PieceDef {
         name: "Glacier Ink",
@@ -5004,7 +5004,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 118,
-        price: 15,
+        price: 75,
     },
     PieceDef {
         name: "Hollow Ink",
@@ -5020,7 +5020,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::PerAdjacentEmpty(&Trigger::OnActivate(Action::Damage { amount: 2, kind: DamageType::Magic, target: Target::Enemy }))],
         quest: None,
         power_bonus: 150,
-        price: 18,
+        price: 90,
     },
     PieceDef {
         name: "Deepwater Ink",
@@ -5035,7 +5035,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 145,
-        price: 17,
+        price: 85,
     },
     PieceDef {
         name: "Starlit Ink",
@@ -5055,7 +5055,7 @@ pub static CATALOG: &[PieceDef] = &[
         })],
         quest: None,
         power_bonus: 160,
-        price: 20,
+        price: 100,
     },
     PieceDef {
         name: "Emberdust Ink",
@@ -5079,7 +5079,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 130,
-        price: 16,
+        price: 80,
     },
     PieceDef {
         name: "Voidwritten Ink",
@@ -5094,7 +5094,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::Damage { amount: 4, kind: DamageType::Magic, target: Target::Enemy })],
         quest: None,
         power_bonus: 185,
-        price: 26,
+        price: 130,
     },
     PieceDef {
         name: "Kingsblood Ink",
@@ -5118,7 +5118,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 205,
-        price: 34,
+        price: 170,
     },
     PieceDef {
         name: "Echo Sigil",
@@ -5133,7 +5133,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnOtherCast(Action::GainMana(3))],
         quest: None,
         power_bonus: 0,
-        price: 13,
+        price: 65,
     },
     PieceDef {
         name: "Resonant Chord",
@@ -5148,7 +5148,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnOtherCast(Action::Damage { amount: 6, kind: DamageType::Magic, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 17,
+        price: 85,
     },
     PieceDef {
         name: "Attendant Flame",
@@ -5163,7 +5163,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnOtherCast(Action::Curse { kind: CurseKind::Searing, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 19,
+        price: 95,
     },
     PieceDef {
         name: "Mirror Ward",
@@ -5178,7 +5178,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnOtherCast(Action::GainArmor(9))],
         quest: None,
         power_bonus: 0,
-        price: 16,
+        price: 80,
     },
     PieceDef {
         name: "Sympathetic Bloom",
@@ -5193,7 +5193,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnOtherCast(Action::Gain { what: Resource::Nature, amount: 2 })],
         quest: None,
         power_bonus: 0,
-        price: 14,
+        price: 70,
     },
     PieceDef {
         name: "Choir of Ash",
@@ -5208,7 +5208,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnOtherCast(Action::Damage { amount: 2, kind: DamageType::Magic, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 21,
+        price: 105,
     },
     PieceDef {
         name: "Rite of Answer",
@@ -5223,7 +5223,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnOtherCast(Action::Gain { what: Resource::Faith, amount: 3 })],
         quest: None,
         power_bonus: 0,
-        price: 18,
+        price: 90,
     },
     PieceDef {
         name: "Sunder",
@@ -5238,7 +5238,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 22,
+        price: 110,
     },
     PieceDef {
         name: "Frostbind",
@@ -5253,7 +5253,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 18,
+        price: 90,
     },
     PieceDef {
         name: "Hollow Lance",
@@ -5272,7 +5272,7 @@ pub static CATALOG: &[PieceDef] = &[
         }))],
         quest: None,
         power_bonus: 0,
-        price: 26,
+        price: 130,
     },
     PieceDef {
         name: "Verdant Surge",
@@ -5287,7 +5287,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::Spend { what: Resource::Nature, cost: 4, on_success: Action::GainMana(8), on_failure: Action::Gain { what: Resource::Nature, amount: 3 } }],
         quest: None,
         power_bonus: 0,
-        price: 16,
+        price: 80,
     },
     PieceDef {
         name: "Blood Rite",
@@ -5302,7 +5302,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::Spend { what: Resource::Rage, cost: 5, on_success: Action::Damage { amount: 22, kind: DamageType::Magic, target: Target::Enemy }, on_failure: Action::Gain { what: Resource::Rage, amount: 3 } }],
         quest: None,
         power_bonus: 0,
-        price: 23,
+        price: 115,
     },
     PieceDef {
         name: "Sanctuary",
@@ -5317,7 +5317,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::Spend { what: Resource::Faith, cost: 4, on_success: Action::GainArmor(20), on_failure: Action::GainArmor(12) }],
         quest: None,
         power_bonus: 0,
-        price: 20,
+        price: 100,
     },
     PieceDef {
         name: "Cometfall",
@@ -5337,7 +5337,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 30,
+        price: 150,
     },
     PieceDef {
         name: "Unmaking",
@@ -5352,7 +5352,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnOtherCast(Action::Damage { amount: 3, kind: DamageType::Magic, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 25,
+        price: 125,
     },
     PieceDef {
         name: "Azure Alignment",
@@ -5368,7 +5368,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::PerAdjacentEmpty(&Trigger::OnActivate(Action::GainMana(1)))],
         quest: None,
         power_bonus: 70,
-        price: 12,
+        price: 60,
     },
     PieceDef {
         name: "Crimson Alignment",
@@ -5384,7 +5384,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnOtherCast(Action::Gain { what: Resource::Rage, amount: 3 })],
         quest: None,
         power_bonus: 70,
-        price: 12,
+        price: 60,
     },
     PieceDef {
         name: "Golden Alignment",
@@ -5411,7 +5411,7 @@ pub static CATALOG: &[PieceDef] = &[
         })],
         quest: None,
         power_bonus: 70,
-        price: 12,
+        price: 60,
     },
     PieceDef {
         name: "Verdant Alignment",
@@ -5426,7 +5426,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnOtherCast(Action::Gain { what: Resource::Nature, amount: 3 })],
         quest: None,
         power_bonus: 70,
-        price: 12,
+        price: 60,
     },
     PieceDef {
         name: "Tidal Alignment",
@@ -5441,7 +5441,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::SpendMana { cost: 4, on_success: Action::GainForking(1), on_failure: Action::GainMana(2) }],
         quest: None,
         power_bonus: 90,
-        price: 20,
+        price: 100,
     },
     PieceDef {
         name: "Ember Alignment",
@@ -5461,7 +5461,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 85,
-        price: 19,
+        price: 95,
     },
     PieceDef {
         name: "Pilgrim Alignment",
@@ -5481,7 +5481,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 80,
-        price: 18,
+        price: 90,
     },
     PieceDef {
         name: "Rootwork Alignment",
@@ -5501,7 +5501,7 @@ pub static CATALOG: &[PieceDef] = &[
         })],
         quest: None,
         power_bonus: 80,
-        price: 19,
+        price: 95,
     },
     PieceDef {
         name: "Prism Alignment",
@@ -5520,7 +5520,7 @@ pub static CATALOG: &[PieceDef] = &[
         }))],
         quest: None,
         power_bonus: 95,
-        price: 24,
+        price: 120,
     },
     PieceDef {
         name: "Void Alignment",
@@ -5536,7 +5536,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::Damage { amount: 3, kind: DamageType::Magic, target: Target::Enemy })],
         quest: None,
         power_bonus: 100,
-        price: 27,
+        price: 135,
     },
     PieceDef {
         name: "Ash Haft",
@@ -5551,7 +5551,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 4,
+        price: 20,
     },
     PieceDef {
         name: "Corded Grip",
@@ -5566,7 +5566,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 7,
+        price: 35,
     },
     PieceDef {
         name: "Ironbound Haft",
@@ -5581,7 +5581,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 11,
+        price: 55,
     },
     PieceDef {
         name: "Duelist's Hilt",
@@ -5596,7 +5596,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 9,
+        price: 45,
     },
     PieceDef {
         name: "Whipcord Hilt",
@@ -5611,7 +5611,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 14,
+        price: 70,
     },
     PieceDef {
         name: "Warden's Haft",
@@ -5626,7 +5626,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 16,
+        price: 80,
     },
     PieceDef {
         name: "Sunder Haft",
@@ -5641,7 +5641,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 21,
+        price: 105,
     },
     PieceDef {
         name: "Twinned Grip",
@@ -5656,7 +5656,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 15,
+        price: 75,
     },
     PieceDef {
         name: "Gravebound Haft",
@@ -5671,7 +5671,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 20,
+        price: 100,
     },
     PieceDef {
         name: "Kingmaker Hilt",
@@ -5686,7 +5686,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 32,
+        price: 160,
     },
     PieceDef {
         name: "Chipped Edge",
@@ -5701,7 +5701,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 5,
+        price: 25,
     },
     PieceDef {
         name: "Hooked Edge",
@@ -5716,7 +5716,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 9,
+        price: 45,
     },
     PieceDef {
         name: "Sawtooth Edge",
@@ -5731,7 +5731,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 14,
+        price: 70,
     },
     PieceDef {
         name: "Bronze Fang",
@@ -5746,7 +5746,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 8,
+        price: 40,
     },
     PieceDef {
         name: "Iron Fang",
@@ -5761,7 +5761,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 13,
+        price: 65,
     },
     PieceDef {
         name: "Adamant Fang",
@@ -5776,7 +5776,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 22,
+        price: 110,
     },
     PieceDef {
         name: "Witchglass Shard",
@@ -5791,7 +5791,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 12,
+        price: 60,
     },
     PieceDef {
         name: "Voidglass Shard",
@@ -5806,7 +5806,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 24,
+        price: 120,
     },
     PieceDef {
         name: "Reaver's Bill",
@@ -5821,7 +5821,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 20,
+        price: 100,
     },
     PieceDef {
         name: "Worldsplitter",
@@ -5836,7 +5836,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 38,
+        price: 190,
     },
     PieceDef {
         name: "Bone Charm",
@@ -5851,7 +5851,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::Watch { what: Watched::AnyActivation, count: 10, then: Action::GainSpellblade(1), repeats: true }],
         quest: None,
         power_bonus: 0,
-        price: 4,
+        price: 20,
     },
     PieceDef {
         name: "Silver Charm",
@@ -5866,7 +5866,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 8,
+        price: 40,
     },
     PieceDef {
         name: "Loaded Fob",
@@ -5881,7 +5881,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 10,
+        price: 50,
     },
     PieceDef {
         name: "Duelist's Fob",
@@ -5896,7 +5896,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 16,
+        price: 80,
     },
     PieceDef {
         name: "Windup Key",
@@ -5911,7 +5911,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 13,
+        price: 65,
     },
     PieceDef {
         name: "Clockwork Key",
@@ -5926,7 +5926,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 20,
+        price: 100,
     },
     PieceDef {
         name: "Ratchet Cog",
@@ -5941,7 +5941,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::Watch { what: Watched::AnyActivation, count: 8, then: Action::GainSpellblade(1), repeats: true }],
         quest: None,
         power_bonus: 0,
-        price: 15,
+        price: 75,
     },
     PieceDef {
         name: "Flywheel Cog",
@@ -5956,7 +5956,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 24,
+        price: 120,
     },
     PieceDef {
         name: "Bloodstone Bead",
@@ -5971,7 +5971,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 14,
+        price: 70,
     },
     PieceDef {
         name: "Oathstone Bead",
@@ -5986,7 +5986,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 14,
+        price: 70,
     },
     PieceDef {
         name: "Tin Frame",
@@ -6001,7 +6001,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 3,
+        price: 15,
     },
     PieceDef {
         name: "Bronze Frame",
@@ -6016,7 +6016,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 6,
+        price: 30,
     },
     PieceDef {
         name: "Warded Frame",
@@ -6031,7 +6031,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainShield(1))],
         quest: None,
         power_bonus: 0,
-        price: 13,
+        price: 65,
     },
     PieceDef {
         name: "Ridged Frame",
@@ -6046,7 +6046,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 9,
+        price: 45,
     },
     PieceDef {
         name: "Buttressed Frame",
@@ -6061,7 +6061,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainShield(1))],
         quest: None,
         power_bonus: 0,
-        price: 18,
+        price: 90,
     },
     PieceDef {
         name: "Hollowbone Frame",
@@ -6076,7 +6076,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::Watch { what: Watched::AnyActivation, count: 8, then: Action::GainMana(4), repeats: true }],
         quest: None,
         power_bonus: 0,
-        price: 8,
+        price: 40,
     },
     PieceDef {
         name: "Ossuary Frame",
@@ -6091,7 +6091,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::Watch { what: Watched::CurseApplied, count: 3, then: Action::Gain { what: Resource::Rage, amount: 3 }, repeats: true }],
         quest: None,
         power_bonus: 0,
-        price: 14,
+        price: 70,
     },
     PieceDef {
         name: "Stormcaught Frame",
@@ -6106,7 +6106,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::Watch { what: Watched::DiagonalActivation, count: 2, then: Action::GainMana(2), repeats: true }],
         quest: None,
         power_bonus: 0,
-        price: 26,
+        price: 130,
     },
     PieceDef {
         name: "Anvil Frame",
@@ -6121,7 +6121,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 32,
+        price: 160,
     },
     PieceDef {
         name: "Crown of Nails",
@@ -6136,7 +6136,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::Watch { what: Watched::AnyActivation, count: 10, then: Action::GainEmpowerment(1), repeats: true }],
         quest: None,
         power_bonus: 0,
-        price: 15,
+        price: 75,
     },
     PieceDef {
         name: "Tin Plating",
@@ -6151,7 +6151,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 3,
+        price: 15,
     },
     PieceDef {
         name: "Bronze Plating",
@@ -6166,7 +6166,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 6,
+        price: 30,
     },
     PieceDef {
         name: "Layered Plating",
@@ -6181,7 +6181,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 11,
+        price: 55,
     },
     PieceDef {
         name: "Scaled Plating",
@@ -6196,7 +6196,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 10,
+        price: 50,
     },
     PieceDef {
         name: "Runed Plating",
@@ -6211,7 +6211,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 10,
+        price: 50,
     },
     PieceDef {
         name: "Warded Plating",
@@ -6226,7 +6226,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 17,
+        price: 85,
     },
     PieceDef {
         name: "Bulwark Plating",
@@ -6241,7 +6241,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 23,
+        price: 115,
     },
     PieceDef {
         name: "Mirrorbright Plating",
@@ -6256,7 +6256,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 18,
+        price: 90,
     },
     PieceDef {
         name: "Deadweight Plating",
@@ -6271,7 +6271,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 19,
+        price: 95,
     },
     PieceDef {
         name: "Godsteel Plating",
@@ -6286,7 +6286,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 31,
+        price: 155,
     },
     PieceDef {
         name: "Feather Crest",
@@ -6301,7 +6301,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::MindDamage { amount: 2, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 4,
+        price: 20,
     },
     PieceDef {
         name: "Gilded Crest",
@@ -6316,7 +6316,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 8,
+        price: 40,
     },
     PieceDef {
         name: "Seer's Crest",
@@ -6336,7 +6336,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 9,
+        price: 45,
     },
     PieceDef {
         name: "Zealot's Crest",
@@ -6351,7 +6351,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 12,
+        price: 60,
     },
     PieceDef {
         name: "Berserker's Crest",
@@ -6366,7 +6366,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 12,
+        price: 60,
     },
     PieceDef {
         name: "Bloomed Crest",
@@ -6381,7 +6381,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 12,
+        price: 60,
     },
     PieceDef {
         name: "Warlord's Crest",
@@ -6396,7 +6396,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::MindDamage { amount: 3, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 18,
+        price: 90,
     },
     PieceDef {
         name: "Archon's Crest",
@@ -6411,7 +6411,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::Watch { what: Watched::AnyActivation, count: 6, then: Action::MindDamage { amount: 4, target: Target::Enemy }, repeats: true }],
         quest: None,
         power_bonus: 0,
-        price: 22,
+        price: 110,
     },
     PieceDef {
         name: "Martyr's Crest",
@@ -6426,7 +6426,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainShield(1))],
         quest: None,
         power_bonus: 0,
-        price: 20,
+        price: 100,
     },
     PieceDef {
         name: "Crown of the Deep",
@@ -6445,7 +6445,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 30,
+        price: 150,
     },
     PieceDef {
         name: "Sackcloth Base",
@@ -6460,7 +6460,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainArmor(2))],
         quest: None,
         power_bonus: 0,
-        price: 3,
+        price: 15,
     },
     PieceDef {
         name: "Quilted Base",
@@ -6475,7 +6475,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainArmor(4))],
         quest: None,
         power_bonus: 0,
-        price: 6,
+        price: 30,
     },
     PieceDef {
         name: "Brigandine Base",
@@ -6490,7 +6490,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainDeflection(1))],
         quest: None,
         power_bonus: 0,
-        price: 12,
+        price: 60,
     },
     PieceDef {
         name: "Ribbed Base",
@@ -6505,7 +6505,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainDeflection(1))],
         quest: None,
         power_bonus: 0,
-        price: 17,
+        price: 85,
     },
     PieceDef {
         name: "Bastion Base",
@@ -6520,7 +6520,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainArmor(6))],
         quest: None,
         power_bonus: 0,
-        price: 27,
+        price: 135,
     },
     PieceDef {
         name: "Cinder Base",
@@ -6535,7 +6535,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainArmor(4))],
         quest: None,
         power_bonus: 0,
-        price: 13,
+        price: 65,
     },
     PieceDef {
         name: "Grove Base",
@@ -6550,7 +6550,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::Grow(4))],
         quest: None,
         power_bonus: 0,
-        price: 15,
+        price: 75,
     },
     PieceDef {
         name: "Chapel Base",
@@ -6565,7 +6565,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainArmor(5))],
         quest: None,
         power_bonus: 0,
-        price: 13,
+        price: 65,
     },
     PieceDef {
         name: "Wellspring Base",
@@ -6580,7 +6580,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 15,
+        price: 75,
     },
     PieceDef {
         name: "Adamant Base",
@@ -6595,7 +6595,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainArmor(7))],
         quest: None,
         power_bonus: 0,
-        price: 34,
+        price: 170,
     },
     PieceDef {
         name: "Rag Layer",
@@ -6610,7 +6610,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainArmor(1))],
         quest: None,
         power_bonus: 0,
-        price: 3,
+        price: 15,
     },
     PieceDef {
         name: "Felt Layer",
@@ -6625,7 +6625,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainDeflection(1))],
         quest: None,
         power_bonus: 0,
-        price: 6,
+        price: 30,
     },
     PieceDef {
         name: "Mail Layer",
@@ -6640,7 +6640,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainArmor(3))],
         quest: None,
         power_bonus: 0,
-        price: 11,
+        price: 55,
     },
     PieceDef {
         name: "Scale Layer",
@@ -6655,7 +6655,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainArmor(3))],
         quest: None,
         power_bonus: 0,
-        price: 12,
+        price: 60,
     },
     PieceDef {
         name: "Sigil Layer",
@@ -6670,7 +6670,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainArmor(2))],
         quest: None,
         power_bonus: 0,
-        price: 12,
+        price: 60,
     },
     PieceDef {
         name: "Thorn Layer",
@@ -6685,7 +6685,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainArmor(2))],
         quest: None,
         power_bonus: 0,
-        price: 13,
+        price: 65,
     },
     PieceDef {
         name: "Mending Layer",
@@ -6700,7 +6700,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::Grow(2))],
         quest: None,
         power_bonus: 0,
-        price: 13,
+        price: 65,
     },
     PieceDef {
         name: "Bulwark Layer",
@@ -6715,7 +6715,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainArmor(5))],
         quest: None,
         power_bonus: 0,
-        price: 21,
+        price: 105,
     },
     PieceDef {
         name: "Aether Layer",
@@ -6734,7 +6734,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 22,
+        price: 110,
     },
     PieceDef {
         name: "Godsheet Layer",
@@ -6749,7 +6749,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainArmor(6))],
         quest: None,
         power_bonus: 0,
-        price: 33,
+        price: 165,
     },
     PieceDef {
         name: "Hide Material",
@@ -6764,7 +6764,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 3,
+        price: 15,
     },
     PieceDef {
         name: "Waxed Material",
@@ -6779,7 +6779,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 7,
+        price: 35,
     },
     PieceDef {
         name: "Scaled Material",
@@ -6794,7 +6794,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 14,
+        price: 70,
     },
     PieceDef {
         name: "Spun Material",
@@ -6809,7 +6809,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 11,
+        price: 55,
     },
     PieceDef {
         name: "Sanctified Material",
@@ -6824,7 +6824,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 13,
+        price: 65,
     },
     PieceDef {
         name: "Ashwoven Material",
@@ -6839,7 +6839,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 13,
+        price: 65,
     },
     PieceDef {
         name: "Rootwoven Material",
@@ -6854,7 +6854,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 13,
+        price: 65,
     },
     PieceDef {
         name: "Ironthread Material",
@@ -6869,7 +6869,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 17,
+        price: 85,
     },
     PieceDef {
         name: "Duskweave Material",
@@ -6891,7 +6891,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 19,
+        price: 95,
     },
     PieceDef {
         name: "Worldweave Material",
@@ -6906,7 +6906,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 30,
+        price: 150,
     },
     PieceDef {
         name: "Padded Mold",
@@ -6921,7 +6921,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAdjacentActivate(Action::GainArmor(2))],
         quest: None,
         power_bonus: 0,
-        price: 3,
+        price: 15,
     },
     PieceDef {
         name: "Braced Mold",
@@ -6936,7 +6936,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAdjacentActivate(Action::GainArmor(3))],
         quest: None,
         power_bonus: 0,
-        price: 7,
+        price: 35,
     },
     PieceDef {
         name: "Vicegrip Mold",
@@ -6951,7 +6951,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAdjacentActivate(Action::Damage { amount: 10, kind: DamageType::Physical, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 12,
+        price: 60,
     },
     PieceDef {
         name: "Nimble Mold",
@@ -6966,7 +6966,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAlignedActivate(Action::ReduceCooldown(300))],
         quest: None,
         power_bonus: 0,
-        price: 10,
+        price: 50,
     },
     PieceDef {
         name: "Quickfinger Mold",
@@ -6981,7 +6981,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAdjacentActivate(Action::ReduceCooldown(380))],
         quest: None,
         power_bonus: 0,
-        price: 17,
+        price: 85,
     },
     PieceDef {
         name: "Warding Mold",
@@ -6996,7 +6996,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAdjacentActivate(Action::GainSpellblade(1))],
         quest: None,
         power_bonus: 0,
-        price: 14,
+        price: 70,
     },
     PieceDef {
         name: "Rending Mold",
@@ -7011,7 +7011,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAdjacentActivate(Action::Damage { amount: 10, kind: DamageType::Physical, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 18,
+        price: 90,
     },
     PieceDef {
         name: "Oathkeeper Mold",
@@ -7026,7 +7026,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAlignedActivate(Action::Damage { amount: 4, kind: DamageType::Physical, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 15,
+        price: 75,
     },
     PieceDef {
         name: "Wrathful Mold",
@@ -7041,7 +7041,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAdjacentActivate(Action::Damage { amount: 10, kind: DamageType::Physical, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 16,
+        price: 80,
     },
     PieceDef {
         name: "Sovereign Mold",
@@ -7056,7 +7056,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::PerAdjacentItem { action: Action::Damage { amount: 4, kind: DamageType::Physical, target: Target::Enemy }, same_slot_only: false }],
         quest: None,
         power_bonus: 0,
-        price: 29,
+        price: 145,
     },
     PieceDef {
         name: "Plain Sole",
@@ -7071,7 +7071,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::Curse { kind: CurseKind::Frost, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 3,
+        price: 15,
     },
     PieceDef {
         name: "Sprung Sole",
@@ -7089,7 +7089,7 @@ pub static CATALOG: &[PieceDef] = &[
         ],
         quest: None,
         power_bonus: 0,
-        price: 7,
+        price: 35,
     },
     PieceDef {
         name: "Racing Sole",
@@ -7104,7 +7104,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::ReduceCooldown(250))],
         quest: None,
         power_bonus: 0,
-        price: 12,
+        price: 60,
     },
     PieceDef {
         name: "Anchored Sole",
@@ -7119,7 +7119,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::Watch { what: Watched::AnyActivation, count: 5, then: Action::Curse { kind: CurseKind::Searing, target: Target::Enemy }, repeats: true }],
         quest: None,
         power_bonus: 0,
-        price: 12,
+        price: 60,
     },
     PieceDef {
         name: "Trailworn Sole",
@@ -7134,7 +7134,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::Curse { kind: CurseKind::Misfire, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 14,
+        price: 70,
     },
     PieceDef {
         name: "Pilgrim Sole",
@@ -7173,7 +7173,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 16,
+        price: 80,
     },
     PieceDef {
         name: "Ironshod Sole",
@@ -7188,7 +7188,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::Watch { what: Watched::AlignedActivation, count: 3, then: Action::Curse { kind: CurseKind::Searing, target: Target::Enemy }, repeats: true }],
         quest: None,
         power_bonus: 0,
-        price: 19,
+        price: 95,
     },
     PieceDef {
         name: "Stormstep Mold",
@@ -7208,7 +7208,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 17,
+        price: 85,
     },
     PieceDef {
         name: "Gravewalker Mold",
@@ -7223,7 +7223,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::Curse { kind: CurseKind::Searing, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 18,
+        price: 90,
     },
     PieceDef {
         name: "Worldstrider Sole",
@@ -7247,7 +7247,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 31,
+        price: 155,
     },
     PieceDef {
         name: "Tin Band",
@@ -7262,7 +7262,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAdjacentActivate(Action::ReduceCooldown(150))],
         quest: None,
         power_bonus: 0,
-        price: 3,
+        price: 15,
     },
     PieceDef {
         name: "Silver Band",
@@ -7277,7 +7277,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAdjacentActivate(Action::Damage { amount: 5, kind: DamageType::Magic, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 7,
+        price: 35,
     },
     PieceDef {
         name: "Signet of Iron",
@@ -7292,7 +7292,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAdjacentActivate(Action::GainArmor(3))],
         quest: None,
         power_bonus: 0,
-        price: 9,
+        price: 45,
     },
     PieceDef {
         name: "Signet of Ash",
@@ -7307,7 +7307,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAdjacentActivate(Action::Damage { amount: 5, kind: DamageType::Magic, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 9,
+        price: 45,
     },
     PieceDef {
         name: "Ring of Wells",
@@ -7322,7 +7322,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAlignedActivate(Action::GainSpellblade(1))],
         quest: None,
         power_bonus: 0,
-        price: 10,
+        price: 50,
     },
     PieceDef {
         name: "Ring of Embers",
@@ -7337,7 +7337,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAdjacentActivate(Action::Damage { amount: 10, kind: DamageType::Magic, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 10,
+        price: 50,
     },
     PieceDef {
         name: "Ring of Vigils",
@@ -7352,7 +7352,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAlignedActivate(Action::Damage { amount: 4, kind: DamageType::Physical, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 10,
+        price: 50,
     },
     PieceDef {
         name: "Ring of Roots",
@@ -7367,7 +7367,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAdjacentActivate(Action::ReduceCooldown(200))],
         quest: None,
         power_bonus: 0,
-        price: 10,
+        price: 50,
     },
     PieceDef {
         name: "Seal of Power",
@@ -7382,7 +7382,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAdjacentActivate(Action::Damage { amount: 10, kind: DamageType::Physical, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 20,
+        price: 100,
     },
     PieceDef {
         name: "Seal of the Deep",
@@ -7397,7 +7397,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAdjacentActivate(Action::Drain { what: Resource::Mana, amount: 2, hurt: 0, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 27,
+        price: 135,
     },
     PieceDef {
         name: "Chapbook",
@@ -7413,7 +7413,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::ReduceCooldown(150))],
         quest: None,
         power_bonus: 0,
-        price: 5,
+        price: 25,
     },
     PieceDef {
         name: "Traveller's Codex",
@@ -7429,7 +7429,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAlignedActivate(Action::GainMana(1))],
         quest: None,
         power_bonus: 0,
-        price: 9,
+        price: 45,
     },
     PieceDef {
         name: "Scholar's Codex",
@@ -7444,7 +7444,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnOtherCast(Action::GainMana(2))],
         quest: None,
         power_bonus: 0,
-        price: 15,
+        price: 75,
     },
     PieceDef {
         name: "Hymnal",
@@ -7464,7 +7464,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 12,
+        price: 60,
     },
     PieceDef {
         name: "War Ledger",
@@ -7489,7 +7489,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 12,
+        price: 60,
     },
     PieceDef {
         name: "Herbal",
@@ -7511,7 +7511,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 12,
+        price: 60,
     },
     PieceDef {
         name: "Quickread Folio",
@@ -7526,7 +7526,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::ReduceCooldown(300))],
         quest: None,
         power_bonus: 0,
-        price: 18,
+        price: 90,
     },
     PieceDef {
         name: "Whisperbound Tome",
@@ -7541,7 +7541,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::Damage { amount: 3, kind: DamageType::Magic, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 20,
+        price: 100,
     },
     PieceDef {
         name: "Grand Grimoire",
@@ -7560,7 +7560,7 @@ pub static CATALOG: &[PieceDef] = &[
         })],
         quest: None,
         power_bonus: 0,
-        price: 28,
+        price: 140,
     },
     PieceDef {
         name: "Codex Interminable",
@@ -7580,7 +7580,7 @@ pub static CATALOG: &[PieceDef] = &[
         }))],
         quest: None,
         power_bonus: 0,
-        price: 38,
+        price: 190,
     },
     PieceDef {
         name: "Clouded Orb",
@@ -7595,7 +7595,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnOtherCast(Action::Damage { amount: 2, kind: DamageType::Magic, target: Target::Enemy })],
         quest: None,
         power_bonus: 40,
-        price: 7,
+        price: 35,
     },
     PieceDef {
         name: "Polished Orb",
@@ -7614,7 +7614,7 @@ pub static CATALOG: &[PieceDef] = &[
         })],
         quest: None,
         power_bonus: 55,
-        price: 12,
+        price: 60,
     },
     PieceDef {
         name: "Fateglass Orb",
@@ -7633,7 +7633,7 @@ pub static CATALOG: &[PieceDef] = &[
         })],
         quest: None,
         power_bonus: 75,
-        price: 19,
+        price: 95,
     },
     PieceDef {
         name: "Tidecaller Orb",
@@ -7649,7 +7649,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnOtherCast(Action::GainMana(2))],
         quest: None,
         power_bonus: 75,
-        price: 22,
+        price: 110,
     },
     PieceDef {
         name: "Emberheart Orb",
@@ -7673,7 +7673,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 65,
-        price: 22,
+        price: 110,
     },
     PieceDef {
         name: "Grovemind Orb",
@@ -7692,7 +7692,7 @@ pub static CATALOG: &[PieceDef] = &[
         })],
         quest: None,
         power_bonus: 65,
-        price: 22,
+        price: 110,
     },
     PieceDef {
         name: "Reliquary Orb",
@@ -7712,7 +7712,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 65,
-        price: 22,
+        price: 110,
     },
     PieceDef {
         name: "Spinning Orb",
@@ -7728,7 +7728,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnOtherCast(Action::ReduceCooldown(180))],
         quest: None,
         power_bonus: 60,
-        price: 26,
+        price: 130,
     },
     PieceDef {
         name: "Orb of the Nine",
@@ -7752,7 +7752,7 @@ pub static CATALOG: &[PieceDef] = &[
         })],
         quest: None,
         power_bonus: 95,
-        price: 33,
+        price: 165,
     },
     PieceDef {
         name: "Worldeye Orb",
@@ -7771,7 +7771,7 @@ pub static CATALOG: &[PieceDef] = &[
         })],
         quest: None,
         power_bonus: 120,
-        price: 45,
+        price: 225,
     },
     // Francis only. Never stocked, and deliberately outside the scale every
     // other chestpiece is measured against - see BOSS_ONLY.
@@ -7812,7 +7812,7 @@ pub static CATALOG: &[PieceDef] = &[
         ],
         quest: None,
         power_bonus: 0,
-        price: 999,
+        price: 4995,
     },
     PieceDef {
         name: "Heartwood Crest",
@@ -7827,7 +7827,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainShield(1))],
         quest: None,
         power_bonus: 0,
-        price: 46,
+        price: 230,
     },
     PieceDef {
         name: "The Growing Weight",
@@ -7842,7 +7842,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::Grow(60))],
         quest: None,
         power_bonus: 0,
-        price: 62,
+        price: 310,
     },
     PieceDef {
         name: "Grasping Ring",
@@ -7857,7 +7857,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAdjacentActivate(Action::Drain { what: Resource::Mana, amount: 3, hurt: 1, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 38,
+        price: 190,
     },
     PieceDef {
         name: "Deeprooted Sole",
@@ -7888,7 +7888,7 @@ pub static CATALOG: &[PieceDef] = &[
         })],
         quest: None,
         power_bonus: 0,
-        price: 52,
+        price: 260,
     },
     PieceDef {
         name: "Gluttonous Fang",
@@ -7909,7 +7909,7 @@ pub static CATALOG: &[PieceDef] = &[
         })],
         quest: None,
         power_bonus: 0,
-        price: 55,
+        price: 275,
     },
     PieceDef {
         name: "Hermit's Band",
@@ -7924,7 +7924,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAdjacentActivate(Action::GainSpellblade(1))],
         quest: None,
         power_bonus: 0,
-        price: 58,
+        price: 290,
     },
     PieceDef {
         name: "The Empty Crown",
@@ -7939,7 +7939,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 64,
+        price: 320,
     },
     PieceDef {
         name: "Lonely Plating",
@@ -7954,7 +7954,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 54,
+        price: 270,
     },
     PieceDef {
         name: "Widow's Sole",
@@ -7969,7 +7969,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 56,
+        price: 280,
     },
     PieceDef {
         name: "Bare-Headed Fang",
@@ -7984,7 +7984,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 44,
+        price: 220,
     },
     PieceDef {
         name: "Ungloved Layer",
@@ -7999,7 +7999,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 46,
+        price: 230,
     },
     PieceDef {
         name: "Unshod Signet",
@@ -8017,7 +8017,7 @@ pub static CATALOG: &[PieceDef] = &[
         })],
         quest: None,
         power_bonus: 0,
-        price: 88,
+        price: 440,
     },
 
     // ---- spending a pool, rather than only banking one ---------------------
@@ -8049,7 +8049,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 26,
+        price: 130,
     },
     PieceDef {
         name: "Zealot's Haft",
@@ -8073,7 +8073,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 22,
+        price: 110,
     },
     // Everything that grows has thorns on it somewhere.
     PieceDef {
@@ -8098,7 +8098,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 20,
+        price: 100,
     },
     PieceDef {
         name: "Wildfire Layer",
@@ -8117,7 +8117,7 @@ pub static CATALOG: &[PieceDef] = &[
         })],
         quest: None,
         power_bonus: 0,
-        price: 24,
+        price: 120,
     },
     // Fury spent on staying upright, which is not what fury is for.
     PieceDef {
@@ -8138,7 +8138,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 21,
+        price: 105,
     },
     PieceDef {
         name: "Bloodbank Base",
@@ -8155,7 +8155,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainArmor(18))],
         quest: None,
         power_bonus: 0,
-        price: 27,
+        price: 135,
     },
     PieceDef {
         name: "Wellspring Sole",
@@ -8175,7 +8175,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 23,
+        price: 115,
     },
     // Drink the whole reserve. You keep what it makes of you.
     PieceDef {
@@ -8199,7 +8199,7 @@ pub static CATALOG: &[PieceDef] = &[
         })],
         quest: None,
         power_bonus: 0,
-        price: 19,
+        price: 95,
     },
     // Conviction, cashed in for something less patient.
     PieceDef {
@@ -8220,7 +8220,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 17,
+        price: 85,
     },
     // What burns down feeds what grows back.
     PieceDef {
@@ -8241,7 +8241,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 18,
+        price: 90,
     },
     PieceDef {
         name: "Covenant Frame",
@@ -8261,7 +8261,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 20,
+        price: 100,
     },
     PieceDef {
         name: "Reliquary Sole",
@@ -8282,7 +8282,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 28,
+        price: 140,
     },
     // It has been keeping a list.
     PieceDef {
@@ -8307,7 +8307,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 25,
+        price: 125,
     },
     // Everything at once, and nothing left in the field.
     PieceDef {
@@ -8327,7 +8327,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 26,
+        price: 130,
     },
     // Conviction stops turning aside harm at forty percent. This is where the rest of it goes.
     PieceDef {
@@ -8349,7 +8349,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 29,
+        price: 145,
     },
     PieceDef {
         name: "Last Rite",
@@ -8368,7 +8368,7 @@ pub static CATALOG: &[PieceDef] = &[
         })],
         quest: None,
         power_bonus: 0,
-        price: 24,
+        price: 120,
     },
 
     // ---- trophies -----------------------------------------------------------
@@ -8390,7 +8390,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::MindDamage { amount: 18, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 999,
+        price: 4995,
     },
     PieceDef {
         name: "Toolwright's Grip",
@@ -8405,7 +8405,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::ReduceCooldown(400))],
         quest: None,
         power_bonus: 0,
-        price: 999,
+        price: 4995,
     },
     // Everything you build is, it turns out, a licensing matter.
     PieceDef {
@@ -8421,7 +8421,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnOtherCast(Action::GainForking(1))],
         quest: None,
         power_bonus: 0,
-        price: 999,
+        price: 4995,
     },
     PieceDef {
         name: "Eighth Ray Crown",
@@ -8445,7 +8445,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 999,
+        price: 4995,
     },
     // Summoned by a claim nobody checked.
     PieceDef {
@@ -8461,7 +8461,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::Curse { kind: CurseKind::Misfire, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 999,
+        price: 4995,
     },
     // The oldest goof there is, and it has never once failed.
     PieceDef {
@@ -8477,7 +8477,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 999,
+        price: 4995,
     },
     // Not the jacket. The offcuts, which are still worth more than you are.
     PieceDef {
@@ -8506,7 +8506,7 @@ pub static CATALOG: &[PieceDef] = &[
         ],
         quest: None,
         power_bonus: 0,
-        price: 999,
+        price: 4995,
     },
     // They do not fit anything. You keep them anyway.
     PieceDef {
@@ -8526,7 +8526,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 999,
+        price: 4995,
     },
     // He was looking for something. He is still looking.
     PieceDef {
@@ -8546,7 +8546,7 @@ pub static CATALOG: &[PieceDef] = &[
         })],
         quest: None,
         power_bonus: 0,
-        price: 999,
+        price: 4995,
     },
     // He is adrift on it between the planes, and cannot ascend while Francis lives.
     PieceDef {
@@ -8566,7 +8566,7 @@ pub static CATALOG: &[PieceDef] = &[
         }))],
         quest: None,
         power_bonus: 0,
-        price: 999,
+        price: 4995,
     },
 
     // ---- what you walk in holding -------------------------------------------
@@ -8591,7 +8591,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainArmor(20))],
         quest: None,
         power_bonus: 0,
-        price: 30,
+        price: 150,
     },
     PieceDef {
         name: "Standing Start",
@@ -8606,7 +8606,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnBattleStart(Action::GainMana(9))],
         quest: None,
         power_bonus: 0,
-        price: 26,
+        price: 130,
     },
     // It arrives having already decided.
     PieceDef {
@@ -8639,7 +8639,7 @@ pub static CATALOG: &[PieceDef] = &[
         ],
         quest: None,
         power_bonus: 0,
-        price: 24,
+        price: 120,
     },
     PieceDef {
         name: "Vigil Crest",
@@ -8669,7 +8669,7 @@ pub static CATALOG: &[PieceDef] = &[
         ],
         quest: None,
         power_bonus: 0,
-        price: 24,
+        price: 120,
     },
     PieceDef {
         name: "Seedbed Layer",
@@ -8692,7 +8692,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 25,
+        price: 125,
     },
     // Said before anyone is ready, which is most of why it lands.
     PieceDef {
@@ -8720,7 +8720,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 27,
+        price: 135,
     },
     // Two thousand miles an hour, and invisible with it.
     PieceDef {
@@ -8736,7 +8736,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 32,
+        price: 160,
     },
     PieceDef {
         name: "Bulwark Bead",
@@ -8754,7 +8754,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 18,
-        price: 28,
+        price: 140,
     },
     PieceDef {
         name: "Warmed Material",
@@ -8773,7 +8773,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 31,
+        price: 155,
     },
     // Already grown by the time anyone swings.
     PieceDef {
@@ -8789,7 +8789,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::Grow(20))],
         quest: None,
         power_bonus: 0,
-        price: 34,
+        price: 170,
     },
 
     // What the Dreaming Idiot leaves behind. Its whole trick, in a helmet.
@@ -8835,7 +8835,7 @@ pub static CATALOG: &[PieceDef] = &[
         ],
         quest: None,
         power_bonus: 0,
-        price: 999,
+        price: 4995,
     },
 
     // ---- spell forking ------------------------------------------------------
@@ -8862,7 +8862,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 40,
+        price: 200,
     },
     // Everything that grows, grows in two directions.
     PieceDef {
@@ -8881,7 +8881,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 40,
+        price: 200,
     },
     PieceDef {
         name: "Twinning Mold",
@@ -8907,7 +8907,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 42,
+        price: 210,
     },
     PieceDef {
         name: "Echo Sole",
@@ -8927,7 +8927,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 40,
+        price: 200,
     },
     // Empty the reserve and every spell in the build says itself again.
     PieceDef {
@@ -8948,7 +8948,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 44,
+        price: 220,
     },
 
     // What the old gods were holding, split into pieces on the way out.
@@ -8965,7 +8965,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnOtherCast(Action::GainForking(1))],
         quest: None,
         power_bonus: 0,
-        price: 999,
+        price: 4995,
     },
     // The aimed stun. Shares Cometfall's footprint and kind on purpose: the
     // two are the same spell with and without a choice of target, so the
@@ -8991,7 +8991,7 @@ pub static CATALOG: &[PieceDef] = &[
         })],
         quest: None,
         power_bonus: 0,
-        price: 34,
+        price: 170,
     },
     // ---- taking a pool off them, one per slot -------------------------
     //
@@ -9015,7 +9015,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 21,
+        price: 105,
     },
     PieceDef {
         name: "Doubter's Crest",
@@ -9032,7 +9032,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::MindDamage { amount: 3, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 23,
+        price: 115,
     },
     PieceDef {
         name: "Becalming Layer",
@@ -9050,7 +9050,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 24,
+        price: 120,
     },
     PieceDef {
         name: "Blightfinger",
@@ -9070,7 +9070,7 @@ pub static CATALOG: &[PieceDef] = &[
         })],
         quest: None,
         power_bonus: 0,
-        price: 22,
+        price: 110,
     },
     PieceDef {
         name: "Sump Sole",
@@ -9093,7 +9093,7 @@ pub static CATALOG: &[PieceDef] = &[
         })],
         quest: None,
         power_bonus: 0,
-        price: 30,
+        price: 150,
     },
     // ---- and the same trick turned on the player ----------------------
     //
@@ -9122,7 +9122,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 38,
+        price: 190,
     },
     PieceDef {
         name: "Wrathbreaker",
@@ -9140,7 +9140,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 40,
+        price: 200,
     },
     PieceDef {
         name: "Witherroot",
@@ -9160,7 +9160,7 @@ pub static CATALOG: &[PieceDef] = &[
         })],
         quest: None,
         power_bonus: 0,
-        price: 39,
+        price: 195,
     },
     PieceDef {
         name: "Manaflay",
@@ -9177,7 +9177,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 30,
+        price: 150,
     },
     // ---- the casino chips -------------------------------------------
     //
@@ -9210,7 +9210,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 1,
+        price: 5,
     },
     PieceDef {
         name: "Platinum Chip",
@@ -9231,7 +9231,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 1,
+        price: 5,
     },
     // ---- behind the velvet rope --------------------------------------
     //
@@ -9258,7 +9258,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainArmor(40))],
         quest: None,
         power_bonus: 0,
-        price: 480,
+        price: 2400,
     },
     PieceDef {
         name: "Foreman's Harness",
@@ -9273,7 +9273,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::Grow(18))],
         quest: None,
         power_bonus: 0,
-        price: 520,
+        price: 2600,
     },
     PieceDef {
         name: "Tallykeeper's Weave",
@@ -9297,7 +9297,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 500,
+        price: 2500,
     },
     PieceDef {
         name: "Treadmill Sole",
@@ -9313,7 +9313,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::ReduceCooldown(400))],
         quest: None,
         power_bonus: 0,
-        price: 470,
+        price: 2350,
     },
     PieceDef {
         name: "Quota Edge",
@@ -9328,7 +9328,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::Damage { amount: 6, kind: DamageType::Magic, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 560,
+        price: 2800,
     },
     // ---- town gear ----
     //
@@ -9352,7 +9352,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::Watch { what: Watched::AlignedActivation, count: 4, then: Action::GainMana(3), repeats: true }],
         quest: None,
         power_bonus: 0,
-        price: 90,
+        price: 450,
     },
     PieceDef {
         // One cell. There is nothing else in the game that fits in a gap this
@@ -9369,7 +9369,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 70,
+        price: 350,
     },
     PieceDef {
         // Pays out on being hit rather than on hitting, which is the half of
@@ -9386,7 +9386,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAdjacentActivate(Action::GainSpellblade(1))],
         quest: None,
         power_bonus: 0,
-        price: 110,
+        price: 550,
     },
     PieceDef {
         // A long thin sole. Greaves boards are wide and shallow once a couple
@@ -9418,7 +9418,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainDeflection(1))],
         quest: None,
         power_bonus: 0,
-        price: 130,
+        price: 650,
     },
     PieceDef {
         // Cheap, fast, and worth having only if the rest of the board is fast
@@ -9435,7 +9435,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 120,
+        price: 600,
     },
     // ---- what the two rumour doors hand over ----
     //
@@ -9454,7 +9454,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 200,
+        price: 1000,
     },
     PieceDef {
         name: "The Green Ledger",
@@ -9469,7 +9469,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 260,
+        price: 1300,
     },
     // ---- rumours ----
     //
@@ -9489,7 +9489,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 1,
+        price: 5,
     },
     PieceDef {
         name: "A Word About the Green Ledger",
@@ -9504,7 +9504,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 1,
+        price: 5,
     },
     // Not for sale, and not exempt from anything: what it is worth is the
     // thirty cells it hands you, and those are not on its card.
@@ -9521,7 +9521,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 1,
+        price: 5,
     },
     // ---- appended, and appended on purpose ----
     //
@@ -9557,7 +9557,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 26,
+        price: 130,
     },
     // Stands on the bar beside the rumours and is traded for the same way,
     // but what it hands over is a class rather than a condition. It never
@@ -9575,7 +9575,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 1,
+        price: 5,
     },
     // ---- The feet, keeping time ----
     //
@@ -9601,7 +9601,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::Curse { kind: CurseKind::Frost, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 13,
+        price: 65,
     },
     PieceDef {
         name: "Rimebound Mold",
@@ -9632,7 +9632,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::Curse { kind: CurseKind::Frost, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 16,
+        price: 80,
     },
     PieceDef {
         name: "Glacier Mold",
@@ -9647,7 +9647,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::Watch { what: Watched::AlignedActivation, count: 3, then: Action::Curse { kind: CurseKind::Frost, target: Target::Enemy }, repeats: true }],
         quest: None,
         power_bonus: 0,
-        price: 13,
+        price: 65,
     },
     PieceDef {
         name: "Frostbite Mold",
@@ -9662,7 +9662,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnBattleStart(Action::Curse { kind: CurseKind::Frost, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 15,
+        price: 75,
     },
     PieceDef {
         name: "Coldstep Mold",
@@ -9687,7 +9687,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::Watch { what: Watched::AnyActivation, count: 5, then: Action::Curse { kind: CurseKind::Frost, target: Target::Enemy }, repeats: true }],
         quest: None,
         power_bonus: 0,
-        price: 18,
+        price: 90,
     },
     PieceDef {
         name: "Deepwinter Mold",
@@ -9702,7 +9702,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::Watch { what: Watched::AlignedActivation, count: 3, then: Action::Curse { kind: CurseKind::Frost, target: Target::Enemy }, repeats: true }],
         quest: None,
         power_bonus: 0,
-        price: 22,
+        price: 110,
     },
     PieceDef {
         name: "Stumblefoot Mold",
@@ -9717,7 +9717,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::Curse { kind: CurseKind::Stun, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 17,
+        price: 85,
     },
     PieceDef {
         name: "Ambush Mold",
@@ -9745,7 +9745,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnBattleStart(Action::Curse { kind: CurseKind::Stun, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 20,
+        price: 100,
     },
     PieceDef {
         name: "Tripwire Mold",
@@ -9760,7 +9760,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::Watch { what: Watched::AlignedActivation, count: 5, then: Action::Curse { kind: CurseKind::Stun, target: Target::Enemy }, repeats: true }],
         quest: None,
         power_bonus: 0,
-        price: 19,
+        price: 95,
     },
     PieceDef {
         name: "Deadfall Mold",
@@ -9786,7 +9786,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnBattleStart(Action::Curse { kind: CurseKind::Stun, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 20,
+        price: 100,
     },
     PieceDef {
         name: "Hobbling Mold",
@@ -9801,7 +9801,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::Watch { what: Watched::AnyActivation, count: 6, then: Action::Curse { kind: CurseKind::Stun, target: Target::Enemy }, repeats: true }],
         quest: None,
         power_bonus: 0,
-        price: 24,
+        price: 120,
     },
     PieceDef {
         name: "Fumbler's Mold",
@@ -9816,7 +9816,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::Curse { kind: CurseKind::Misfire, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 15,
+        price: 75,
     },
     PieceDef {
         name: "Loose-Sole Mold",
@@ -9831,7 +9831,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::Watch { what: Watched::AnyActivation, count: 7, then: Action::Curse { kind: CurseKind::Misfire, target: Target::Enemy }, repeats: true }],
         quest: None,
         power_bonus: 0,
-        price: 15,
+        price: 75,
     },
     PieceDef {
         name: "Stutterstep Mold",
@@ -9846,7 +9846,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnBattleStart(Action::Curse { kind: CurseKind::Misfire, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 21,
+        price: 105,
     },
     PieceDef {
         name: "Cadence Mold",
@@ -9864,7 +9864,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::Watch { what: Watched::AlignedActivation, count: 4, then: Action::ReduceCooldown(800), repeats: true }],
         quest: None,
         power_bonus: 0,
-        price: 26,
+        price: 130,
     },
     // ---- The hands, answering ----
     //
@@ -9892,7 +9892,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAdjacentActivate(Action::Damage { amount: 15, kind: DamageType::Physical, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 11,
+        price: 55,
     },
     PieceDef {
         name: "Mirrorplate Ring",
@@ -9912,7 +9912,7 @@ pub static CATALOG: &[PieceDef] = &[
         })],
         quest: None,
         power_bonus: 0,
-        price: 14,
+        price: 70,
     },
     PieceDef {
         name: "Chainlink Mold",
@@ -9927,7 +9927,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAdjacentActivate(Action::Damage { amount: 25, kind: DamageType::Physical, target: Target::Enemy })],
         quest: None,
         power_bonus: 0,
-        price: 15,
+        price: 75,
     },
     PieceDef {
         name: "Storm Signet",
@@ -9947,7 +9947,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 18,
+        price: 90,
     },
     PieceDef {
         name: "Siphon Ring",
@@ -9967,7 +9967,7 @@ pub static CATALOG: &[PieceDef] = &[
         })],
         quest: None,
         power_bonus: 0,
-        price: 21,
+        price: 105,
     },
     PieceDef {
         name: "Flaying Mold",
@@ -9990,7 +9990,7 @@ pub static CATALOG: &[PieceDef] = &[
         })],
         quest: None,
         power_bonus: 0,
-        price: 30,
+        price: 150,
     },
     PieceDef {
         name: "Throttling Mold",
@@ -10018,7 +10018,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 34,
+        price: 170,
     },
     // ---- Terrain ----
     //
@@ -10050,7 +10050,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 30,
+        price: 150,
     },
 
     // The other four grids. One enchantment each, on that slot's own axis,
@@ -10086,7 +10086,7 @@ pub static CATALOG: &[PieceDef] = &[
         })],
         quest: None,
         power_bonus: 0,
-        price: 60,
+        price: 300,
     },
     PieceDef {
         name: "Open Palm",
@@ -10111,7 +10111,7 @@ pub static CATALOG: &[PieceDef] = &[
         })],
         quest: None,
         power_bonus: 0,
-        price: 52,
+        price: 260,
     },
     PieceDef {
         name: "Sprung Board",
@@ -10131,7 +10131,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::ReduceCooldown(260))],
         quest: None,
         power_bonus: 0,
-        price: 48,
+        price: 240,
     },
     PieceDef {
         name: "Quiet Room",
@@ -10152,7 +10152,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 55,
+        price: 275,
     },
 
     // ------------------------------------------------------- the Unwinding
@@ -10187,7 +10187,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::Watch { what: Watched::AnyActivation, count: 1, then: Action::GainMana(3), repeats: false }],
         quest: None,
         power_bonus: 20,
-        price: 20,
+        price: 100,
     },
     PieceDef {
         name: "Pilgrim's Orb",
@@ -10205,7 +10205,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 25,
-        price: 22,
+        price: 110,
     },
     PieceDef {
         name: "Ferry Orb",
@@ -10222,7 +10222,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnOtherCast(Action::ReduceCooldown(1000))],
         quest: None,
         power_bonus: 15,
-        price: 24,
+        price: 120,
     },
     PieceDef {
         name: "Stray Orb",
@@ -10240,7 +10240,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 15,
-        price: 26,
+        price: 130,
     },
 
     // ---- what the road hands over ---------------------------------------
@@ -10266,7 +10266,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 1,
+        price: 5,
     },
     PieceDef {
         name: "The Stranger's Parcel",
@@ -10309,7 +10309,7 @@ pub static CATALOG: &[PieceDef] = &[
             becomes: "Bone Charm",
         }),
         power_bonus: 0,
-        price: 1,
+        price: 5,
     },
     PieceDef {
         name: "An Unwound Mainspring",
@@ -10327,7 +10327,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 1,
+        price: 5,
     },
     // The three run-relics. Their stat lines are empty on purpose: what they
     // are worth is a function of the run, and it lives in `relic.rs`.
@@ -10344,7 +10344,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 1,
+        price: 5,
     },
     PieceDef {
         name: "The Odometer",
@@ -10359,7 +10359,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 1,
+        price: 5,
     },
     PieceDef {
         name: "The Ledger",
@@ -10374,7 +10374,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 1,
+        price: 5,
     },
     // And the three that are spent. `relic.rs` says what breaking one does.
     PieceDef {
@@ -10390,7 +10390,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 1,
+        price: 5,
     },
     PieceDef {
         name: "the Appeal",
@@ -10405,7 +10405,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 1,
+        price: 5,
     },
     PieceDef {
         name: "the Skip Stone",
@@ -10420,7 +10420,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 1,
+        price: 5,
     },
     PieceDef {
         name: "Bearhide",
@@ -10443,7 +10443,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainArmor(6))],
         quest: None,
         power_bonus: 0,
-        price: 1,
+        price: 5,
     },
     // The enchantment curses would rather land on. Bought where somebody has a
     // floor to sell, like every other one - `is_town_stock` keeps every
@@ -10461,7 +10461,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 34,
+        price: 170,
     },
 
     // ---- the mind lane's gear -------------------------------------------
@@ -10487,7 +10487,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::Gain { what: Resource::Insight, amount: 2 })],
         quest: None,
         power_bonus: 0,
-        price: 18,
+        price: 90,
     },
     PieceDef {
         name: "Doorward Frame",
@@ -10502,7 +10502,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::Gain { what: Resource::Insight, amount: 1 })],
         quest: None,
         power_bonus: 0,
-        price: 20,
+        price: 100,
     },
     PieceDef {
         name: "Sightless Crown",
@@ -10523,7 +10523,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 26,
+        price: 130,
     },
     PieceDef {
         name: "Listening Frame",
@@ -10540,7 +10540,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::Watch { what: Watched::AnyActivation, count: 6, then: Action::GainDread(1), repeats: true }],
         quest: None,
         power_bonus: 0,
-        price: 24,
+        price: 120,
     },
     PieceDef {
         name: "Antechamber Crown",
@@ -10555,7 +10555,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::Gain { what: Resource::Insight, amount: 2 })],
         quest: None,
         power_bonus: 0,
-        price: 22,
+        price: 110,
     },
     PieceDef {
         name: "Foreboding Crest",
@@ -10570,7 +10570,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainDread(1))],
         quest: None,
         power_bonus: 0,
-        price: 21,
+        price: 105,
     },
     PieceDef {
         name: "Second Sight",
@@ -10589,7 +10589,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 25,
+        price: 125,
     },
     PieceDef {
         name: "The Quiet Ear",
@@ -10604,7 +10604,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::Watch { what: Watched::AlignedActivation, count: 3, then: Action::Gain { what: Resource::Insight, amount: 2 }, repeats: true }],
         quest: None,
         power_bonus: 0,
-        price: 23,
+        price: 115,
     },
     PieceDef {
         name: "The Eyeless Stare",
@@ -10622,7 +10622,7 @@ pub static CATALOG: &[PieceDef] = &[
         ],
         quest: None,
         power_bonus: 0,
-        price: 28,
+        price: 140,
     },
     PieceDef {
         name: "Doorway Primer",
@@ -10643,7 +10643,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 19,
+        price: 95,
     },
 
     // ---- six more words -------------------------------------------------
@@ -10665,7 +10665,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 1,
+        price: 5,
     },
     PieceDef {
         name: "A Word About the Cellar",
@@ -10680,7 +10680,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 1,
+        price: 5,
     },
     PieceDef {
         name: "A Word About the Glow",
@@ -10695,7 +10695,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 1,
+        price: 5,
     },
     PieceDef {
         name: "A Word About the Thirsty Wizard",
@@ -10710,7 +10710,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 1,
+        price: 5,
     },
     PieceDef {
         name: "A Word About the Picket",
@@ -10725,7 +10725,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 1,
+        price: 5,
     },
     PieceDef {
         name: "A Word About the Exhibition",
@@ -10740,7 +10740,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 1,
+        price: 5,
     },
 
     // ---- THE SWITCHYARD -------------------------------------------------
@@ -10789,7 +10789,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::Ballast(30))],
         quest: None,
         power_bonus: 0,
-        price: 58,
+        price: 290,
     },
     PieceDef {
         name: "Points Rodding",
@@ -10810,7 +10810,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::Shunt { ms: 400 })],
         quest: None,
         power_bonus: 0,
-        price: 54,
+        price: 270,
     },
     PieceDef {
         name: "Booking Hall",
@@ -10831,7 +10831,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::Accrue { what: Resource::Mana, pct: 10 })],
         quest: None,
         power_bonus: 0,
-        price: 60,
+        price: 300,
     },
     PieceDef {
         name: "Signal Wire",
@@ -10860,7 +10860,7 @@ pub static CATALOG: &[PieceDef] = &[
         // 60, which is Chalked Circle's and the dearest any ground in this
         // game has been. It was 62 and that is two gold outside a band the
         // shipped six have held since the Unwinding.
-        price: 60,
+        price: 300,
     },
 
     // The two orbs. Event-only, unlike the four shipped, which are shop finds
@@ -10897,7 +10897,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnOtherCast(Action::Shunt { ms: 500 })],
         quest: None,
         power_bonus: 18,
-        price: 24,
+        price: 120,
     },
     PieceDef {
         name: "Signalman's Orb",
@@ -10916,7 +10916,7 @@ pub static CATALOG: &[PieceDef] = &[
         })],
         quest: None,
         power_bonus: 20,
-        price: 22,
+        price: 110,
     },
 
     // The chain's two words. Neither is on the bar: `SHELVES` is exactly six
@@ -10937,7 +10937,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 1,
+        price: 5,
     },
     PieceDef {
         name: "A Word About the Points",
@@ -10952,7 +10952,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 1,
+        price: 5,
     },
 
     // ------------------------------------------------- THE HUNDRED, at F6
@@ -10992,7 +10992,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 40,
+        price: 200,
     },
     PieceDef {
         // THE DROVE ROADS. What comes through first goes through twice.
@@ -11020,7 +11020,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAdjacentActivate(Action::GainArmor(3))],
         quest: None,
         power_bonus: 0,
-        price: 38,
+        price: 190,
     },
     PieceDef {
         // THE ENCLOSURE. A common is land nothing is fenced off from, which is
@@ -11041,7 +11041,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 42,
+        price: 210,
     },
 
     // The two orbs. Weapon cores first and tickets second, the way every Orb
@@ -11076,7 +11076,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 16,
-        price: 26,
+        price: 130,
     },
     PieceDef {
         // Held, not spent: the first move of every trip is free. Up to six
@@ -11095,7 +11095,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnOtherCast(Action::Shunt { ms: 450 })],
         quest: None,
         power_bonus: 14,
-        price: 25,
+        price: 125,
     },
 
     // The county's one word, appended at F7 rather than with the five above.
@@ -11120,7 +11120,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 1,
+        price: 5,
     },
 
     // ---- THE THRESHOLD's shelf --------------------------------------------
@@ -11146,7 +11146,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::Gain { what: Resource::Insight, amount: 2 })],
         quest: None,
         power_bonus: 0,
-        price: 62,
+        price: 310,
     },
     // A plating so the recipe can be finished, and a plain one on purpose:
     // `Plating` floats between the helmet and the greaves, and a floating kind
@@ -11165,7 +11165,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 46,
+        price: 230,
     },
     PieceDef {
         name: "Four Hundred and Second Step",
@@ -11180,7 +11180,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::Gain { what: Resource::Insight, amount: 3 })],
         quest: None,
         power_bonus: 0,
-        price: 48,
+        price: 240,
     },
     PieceDef {
         name: "Watcher's Crest",
@@ -11195,7 +11195,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainDread(2))],
         quest: None,
         power_bonus: 0,
-        price: 74,
+        price: 370,
     },
     PieceDef {
         name: "The Wrong Sense",
@@ -11223,7 +11223,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::Gain { what: Resource::Insight, amount: 3 })],
         quest: None,
         power_bonus: 0,
-        price: 240,
+        price: 1200,
     },
     // ---- the toad census ---------------------------------------------
     //
@@ -11247,7 +11247,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 1,
+        price: 5,
     },
     // ---- what the first map's errands pay ----------------------------
     //
@@ -11282,7 +11282,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 18,
+        price: 90,
     },
     PieceDef {
         name: "Counting Frame",
@@ -11303,7 +11303,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::Gain { what: Resource::Insight, amount: 2 })],
         quest: None,
         power_bonus: 0,
-        price: 22,
+        price: 110,
     },
     PieceDef {
         name: "Boundary Cork",
@@ -11319,7 +11319,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::GainArmor(9))],
         quest: None,
         power_bonus: 0,
-        price: 20,
+        price: 100,
     },
     PieceDef {
         name: "Witch's Thimble",
@@ -11334,7 +11334,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::Gain { what: Resource::Faith, amount: 2 })],
         quest: None,
         power_bonus: 0,
-        price: 24,
+        price: 120,
     },
     PieceDef {
         name: "Nine-Plane Lens",
@@ -11349,7 +11349,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 30,
+        price: 150,
     },
     // ---- the two keys ------------------------------------------------
     //
@@ -11369,7 +11369,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 1,
+        price: 5,
     },
     PieceDef {
         name: "The Deep Gate Key",
@@ -11384,7 +11384,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 1,
+        price: 5,
     },
     PieceDef {
         name: "Whisper Jar",
@@ -11399,7 +11399,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 1,
+        price: 5,
     },
     PieceDef {
         name: "Bone Nock",
@@ -11414,7 +11414,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 1,
+        price: 5,
     },
     PieceDef {
         name: "Mirror Shard",
@@ -11429,7 +11429,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 1,
+        price: 5,
     },
     PieceDef {
         name: "The Bog Census",
@@ -11449,7 +11449,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnActivate(Action::Gain { what: Resource::Nature, amount: 4 })],
         quest: None,
         power_bonus: 0,
-        price: 34,
+        price: 170,
     },
     PieceDef {
         name: "Census Bolt",
@@ -11476,7 +11476,7 @@ pub static CATALOG: &[PieceDef] = &[
         }],
         quest: None,
         power_bonus: 0,
-        price: 30,
+        price: 150,
     },
     // ---- what a creature leaves behind -------------------------------
     //
@@ -11523,7 +11523,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 9,
+        price: 45,
     },
     PieceDef {
         name: "Ratskin Mold",
@@ -11547,7 +11547,7 @@ pub static CATALOG: &[PieceDef] = &[
         })],
         quest: None,
         power_bonus: 0,
-        price: 8,
+        price: 40,
     },
     PieceDef {
         name: "Rat Signet",
@@ -11572,7 +11572,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[Trigger::OnAdjacentActivate(Action::GainArmor(3))],
         quest: None,
         power_bonus: 0,
-        price: 7,
+        price: 35,
     },
     // ---- the toad's two, off a Bog Toad. Chest: a base and a layer, which is
     // that recipe entire.
@@ -11595,7 +11595,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 22,
+        price: 110,
     },
     PieceDef {
         name: "Toad Hide",
@@ -11616,7 +11616,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 18,
+        price: 90,
     },
     // ---- the swarm's three, off a Bone Archer. Helmet: a frame, a plating
     // and a crest, which is that recipe entire. The head's axis is economy,
@@ -11640,7 +11640,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 21,
+        price: 105,
     },
     PieceDef {
         name: "Bone Scale",
@@ -11664,7 +11664,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 12,
+        price: 60,
     },
     PieceDef {
         name: "Bone Fletch",
@@ -11694,7 +11694,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 11,
+        price: 55,
     },
     // ---- M11.9's six sets ------------------------------------------------
     //
@@ -11730,7 +11730,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 10,
+        price: 50,
     },
     PieceDef {
         name: "Rimeglove Mold",
@@ -11751,7 +11751,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 9,
+        price: 45,
     },
     PieceDef {
         name: "Rime Signet",
@@ -11772,7 +11772,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 8,
+        price: 40,
     },
     // **The Sentinel's Tread** — off Iron Sentinel, in the greaves grid.
     PieceDef {
@@ -11800,7 +11800,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 12,
+        price: 60,
     },
     PieceDef {
         name: "Sentinel Mold",
@@ -11821,7 +11821,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 11,
+        price: 55,
     },
     PieceDef {
         name: "Sentinel Plating",
@@ -11842,7 +11842,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 10,
+        price: 50,
     },
     // **The Idol's Ward** — off Warded Idol, in the helmet grid.
     PieceDef {
@@ -11864,7 +11864,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 16,
+        price: 80,
     },
     PieceDef {
         name: "Idol's Plating",
@@ -11885,7 +11885,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 13,
+        price: 65,
     },
     PieceDef {
         name: "Idol's Crest",
@@ -11906,7 +11906,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 14,
+        price: 70,
     },
     // **The Chorus Robe** — off Grave Chorus, in the chest grid.
     PieceDef {
@@ -11928,7 +11928,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 20,
+        price: 100,
     },
     PieceDef {
         name: "Chorister's Layer",
@@ -11949,7 +11949,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 17,
+        price: 85,
     },
     PieceDef {
         // **Magic resist and not mind resist.** Mind is the helmet's axis and
@@ -11973,7 +11973,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 18,
+        price: 90,
     },
     // **The Curd Mantle** — off the tower's floor bosses, in the weapon grid.
     PieceDef {
@@ -11995,7 +11995,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 26,
+        price: 130,
     },
     PieceDef {
         name: "Curd Edge",
@@ -12016,7 +12016,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 30,
+        price: 150,
     },
     PieceDef {
         name: "Curd Weight",
@@ -12037,7 +12037,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 24,
+        price: 120,
     },
     // **The Drover's Stride** — off The Gearwright, in the greaves grid.
     PieceDef {
@@ -12059,7 +12059,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 15,
+        price: 75,
     },
     PieceDef {
         name: "Drover's Mold",
@@ -12080,7 +12080,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 14,
+        price: 70,
     },
     PieceDef {
         name: "Drover's Sole",
@@ -12101,7 +12101,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 19,
+        price: 95,
     },
     // ---- the survey instruments, M11.5 ---------------------------------
     //
@@ -12132,7 +12132,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 40,
+        price: 200,
     },
     PieceDef {
         name: "Glass Lens",
@@ -12147,7 +12147,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 22,
+        price: 110,
     },
     PieceDef {
         name: "Magnet",
@@ -12162,7 +12162,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 22,
+        price: 110,
     },
     PieceDef {
         name: "Cosmic Orb",
@@ -12188,7 +12188,7 @@ pub static CATALOG: &[PieceDef] = &[
         // could not be used as one, which is the ambiguity reusing the kind was
         // meant to avoid.
         power_bonus: 60,
-        price: 55,
+        price: 275,
     },
     PieceDef {
         name: "Cosmic Alignment",
@@ -12203,7 +12203,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 85,
-        price: 34,
+        price: 170,
     },
     PieceDef {
         name: "Living Earth",
@@ -12218,7 +12218,7 @@ pub static CATALOG: &[PieceDef] = &[
         triggers: &[],
         quest: None,
         power_bonus: 0,
-        price: 30,
+        price: 150,
     },
 ];
 

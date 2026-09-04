@@ -368,6 +368,363 @@
         "slot": "greaves",
         "rows": 1
       }
+    },
+    {
+      "id": "the-cork-you-took",
+      "giver": "the-cork-boundary",
+      "granted": true,
+      "name": "THE CORK YOU TOOK",
+      "brief": "You have a strip of boundary cork and the man who cut it says there are ninety feet more where it came from. Somebody at Kettleworks has built a wall out of the same stuff and left a gap in it. Take the strip and see where it goes.",
+      "thanks": "It fits, which is what cork does. What comes off the Stack lands in the crumb field and the wall holds it for about a week, and a week is what they wanted.",
+      "goal": {
+        "word": {
+          "place": "the-crumb-field"
+        }
+      },
+      "reward": [
+        "Runed Lining"
+      ],
+      "gold": 60
+    },
+    {
+      "id": "the-tenth-cut",
+      "giver": "the-cork-boundary",
+      "granted": true,
+      "name": "THE TENTH CUT",
+      "brief": "You cut the tenth panel off the boundary with him and neither of you wrote it down. Four panels of that fencing are standing in a field ninety miles away and nobody there knows where it was cut.",
+      "thanks": "They stop stacking. The gutter down the back lane runs to the same place the cork did, which is the sort of thing that is obvious once somebody has said it.",
+      "goal": {
+        "word": {
+          "place": "the-back-lane"
+        }
+      },
+      "reward": [
+        "Thornmail Layer"
+      ],
+      "gold": 45
+    },
+    {
+      "id": "what-the-knife-is-for",
+      "giver": "the-cork-boundary",
+      "granted": true,
+      "name": "WHAT THE KNIFE IS FOR",
+      "brief": "Forty Fnorp for a serrated edge and he has nine more. Somebody took a cheese-wire to the west face of the Drambus Stack at head height and cut out a block a foot on a side, and the cut is clean.",
+      "thanks": "It is the same cut. The scrap line has a bin labelled for it and the bin is empty, which everybody has been careful not to mention.",
+      "goal": {
+        "word": {
+          "place": "the-scrap-line"
+        }
+      },
+      "reward": [
+        "Sawtooth Edge"
+      ],
+      "gold": 80
+    },
+    {
+      "id": "the-heap-you-took-from",
+      "giver": "the-counted-heap",
+      "granted": true,
+      "name": "THE HEAP YOU TOOK FROM",
+      "brief": "Eleven thousand two hundred gear-teeth in a cone on the slag, sorted by pitch, and you took four. There is a man in a shed at Kettleworks whose entire responsibility is to write down numbers, and he has not heard about the heap.",
+      "thanks": "He writes it in a different book from the one he was writing in, and does not say what the second book is.",
+      "goal": {
+        "word": {
+          "place": "the-tally-shed"
+        }
+      },
+      "reward": [
+        "Mail Layer"
+      ],
+      "gold": 55
+    },
+    {
+      "id": "the-corrected-board",
+      "giver": "the-counted-heap",
+      "granted": true,
+      "name": "THE CORRECTED BOARD",
+      "brief": "You corrected somebody's arithmetic on a board on the slag. The office of the works at Kettleworks has a counter, a window and nobody behind either, and a spike of paper that has not been read since the first forge burned down.",
+      "thanks": "The paper stays where you put it. Something is left on the counter in exchange, which means somebody is behind it some of the time.",
+      "goal": {
+        "word": {
+          "place": "the-office-of-the-works"
+        }
+      },
+      "reward": [
+        "Riveted Layer"
+      ],
+      "gold": 40
+    },
+    {
+      "id": "the-six-notices",
+      "giver": "the-gate-that-was-yours",
+      "granted": true,
+      "name": "THE SIX NOTICES",
+      "brief": "You read all six notices at your own gate and four of them were about the same thing. There is a board at Kettleworks with six more on it, and four of those are about the road east.",
+      "thanks": "Yours makes seven. The road east is not maintained, which the notices agree about and the road does not.",
+      "goal": {
+        "word": {
+          "place": "the-lower-road"
+        }
+      },
+      "reward": [
+        "Trailworn Sole"
+      ],
+      "gold": 70
+    },
+    {
+      "id": "the-hinges-you-took",
+      "giver": "the-gate-that-was-yours",
+      "granted": true,
+      "name": "THE HINGES YOU TOOK",
+      "brief": "You took the hinges off your own gate. There is a gate at the north edge of the Kettleworks field standing in a wall that does not exist, and it is a good gate apart from the one thing.",
+      "thanks": "It shuts. There is no wall, and it shuts, and the hoop store has one on a peg that was never a hoop.",
+      "goal": {
+        "word": {
+          "place": "the-hoop-store"
+        }
+      },
+      "reward": [
+        "Reckoning Plate"
+      ],
+      "gold": 65
+    },
+    {
+      "id": "paid-at-your-own-gate",
+      "giver": "the-gate-that-was-yours",
+      "granted": true,
+      "name": "PAID AT YOUR OWN GATE",
+      "brief": "Two hundred Fnorp to walk through a gate with your name on it. The weighbridge at the edge of the crumb field reads to a quarter of a hundredweight and somebody there will want to know what the toll was.",
+      "thanks": "A quarter of a hundredweight. He says it is not the same kind of number and writes it down anyway.",
+      "goal": {
+        "word": {
+          "place": "the-weighbridge"
+        }
+      },
+      "enchs": [
+        "the-hooper-s-allowance"
+      ],
+      "gold": 120
+    },
+    {
+      "id": "what-would-count",
+      "giver": "marbulons-door",
+      "granted": true,
+      "name": "WHAT WOULD COUNT",
+      "brief": "You asked Marbulon what would count and she told you. There is a boundary stone on the Kettleworks field with two names on it and an arrow between them, and both names are Kettleworks.",
+      "thanks": "She has been waiting eleven years for somebody to say the other name. The second forge is built out of what is left of the first, and both of those have two names as well.",
+      "goal": {
+        "word": {
+          "place": "the-second-forge"
+        }
+      },
+      "reward": [
+        "Grove Base"
+      ],
+      "gold": 75
+    },
+    {
+      "id": "what-is-behind-the-door",
+      "giver": "marbulons-door",
+      "granted": true,
+      "name": "WHAT IS BEHIND THE DOOR",
+      "brief": "You asked what was behind a door and got an answer from somebody who had not been through it. The Drambus Stack has a door in its south face and the same question fits it.",
+      "thanks": "The same answer, about a different door. There is a ladder against the Stack going up eleven rungs and stopping, and now you know why.",
+      "goal": {
+        "word": {
+          "place": "the-ladder"
+        }
+      },
+      "reward": [
+        "Map Shard"
+      ],
+      "gold": 50
+    },
+    {
+      "id": "the-road-they-asked-about",
+      "giver": "the-kettleworks-road",
+      "granted": true,
+      "name": "THE ROAD THEY ASKED ABOUT",
+      "brief": "Somebody on the road west told you what Kettleworks wants. There is a milestone at the field gate cut with the distance to four places, and three of them are legible.",
+      "thanks": "The fourth is the one you were told about. It is nearer than the three that can be read, which is why nobody has recut it.",
+      "goal": {
+        "word": {
+          "place": "the-milestone"
+        }
+      },
+      "reward": [
+        "Warding Ring"
+      ],
+      "gold": 35
+    },
+    {
+      "id": "the-kettle-you-turned",
+      "giver": "the-kettleworks-road",
+      "granted": true,
+      "name": "THE KETTLE YOU TURNED",
+      "brief": "You turned a kettle for a woman on the road and she did not say why it wanted turning. The hooper at Kettleworks is putting a hoop round one eleven feet across and the hoop is nine.",
+      "thanks": "She cuts it long and takes it in, and the allowance is the number she has never once measured. She gives it to you rather than telling you, which is quicker.",
+      "goal": {
+        "word": {
+          "place": "the-hooper"
+        }
+      },
+      "enchs": [
+        "the-wextreen-correction"
+      ],
+      "gold": 90
+    },
+    {
+      "id": "your-name-at-the-sixth",
+      "giver": "the-shallows-marker",
+      "granted": true,
+      "name": "YOUR NAME AT THE SIXTH",
+      "brief": "You cut your name at the sixth mark on a post at the shallows. There is a measuring post at Kettleworks with the Stack's height cut into it once a year for eleven years, and the marks go down.",
+      "thanks": "Twelve marks now, and the twelfth is not a height. The east marker has nine notches and each one is a number of something.",
+      "goal": {
+        "word": {
+          "place": "the-east-marker"
+        }
+      },
+      "reward": [
+        "Frostbite Mold"
+      ],
+      "gold": 55
+    },
+    {
+      "id": "the-five-you-read",
+      "giver": "the-shallows-marker",
+      "granted": true,
+      "name": "THE FIVE YOU READ",
+      "brief": "You read the five names on the shallows post and walked on without adding a sixth. There is a clipboard chained to a post out on the reach, and it is the tenth. The first nine are in the mud under it.",
+      "thanks": "Yours goes on the top of the tenth. It is chained on so it will not join the others, which is the only lesson anybody out here has learned.",
+      "goal": {
+        "word": {
+          "place": "the-tenth-clipboard"
+        }
+      },
+      "reward": [
+        "Glass Lens"
+      ],
+      "gold": 45
+    },
+    {
+      "id": "the-frame-you-took",
+      "giver": "the-standing-frame",
+      "granted": true,
+      "name": "THE FRAME YOU TOOK",
+      "brief": "You took the timber and left the place it was standing in empty. There is a bench under a lean-to at Kettleworks with four vices on it, three of which work.",
+      "thanks": "It takes the afternoon. Three that work becomes four that work, which is the whole of it.",
+      "goal": {
+        "word": {
+          "place": "the-fitters-bench"
+        }
+      },
+      "reward": [
+        "Spiked Vambrace"
+      ],
+      "gold": 60
+    },
+    {
+      "id": "the-frame-you-left",
+      "giver": "the-standing-frame",
+      "granted": true,
+      "name": "THE FRAME YOU LEFT",
+      "brief": "You left twelve feet of timber standing on its own at the edge of a field because it was doing no harm. There is one exactly like it at the edge of the Kettleworks field, with nothing on it either.",
+      "thanks": "They walk out to look at it and are gone the rest of the day. Nobody asks what the first one was for.",
+      "goal": {
+        "word": {
+          "place": "the-empty-gibbet"
+        }
+      },
+      "reward": [
+        "Ossuary Frame"
+      ],
+      "gold": 50
+    },
+    {
+      "id": "what-the-count-is-for",
+      "giver": "the-tally-shed",
+      "granted": true,
+      "name": "WHAT THE COUNT IS FOR",
+      "brief": "You asked the tallyman what he was counting and he does not know either, at length. There are forty kettles in the cooling yard in four rows of ten, all of them upside down.",
+      "thanks": "Thirty-nine are upside down and stacked. You leave the fortieth the other way up, and he writes that down too.",
+      "goal": {
+        "word": {
+          "place": "the-cooling-yard"
+        }
+      },
+      "reward": [
+        "Felt Layer"
+      ],
+      "gold": 40
+    },
+    {
+      "id": "the-count-she-wanted",
+      "giver": "the-toad-census",
+      "granted": true,
+      "name": "THE COUNT SHE WANTED",
+      "brief": "You counted the west side for the clerk in the pit. There is a man at the quench pond with 1,402 chalked on the rail and no idea what of, and he has narrowed it to four possibilities.",
+      "thanks": "Two counts, eleven years apart, filed under the same heading by a man who does not know what either of them is of.",
+      "goal": {
+        "word": {
+          "place": "the-tally-shed"
+        }
+      },
+      "reward": [
+        "Lightweave"
+      ],
+      "gold": 65
+    },
+    {
+      "id": "who-brought-forty",
+      "giver": "the-toad-census",
+      "granted": true,
+      "name": "WHO BROUGHT FORTY",
+      "brief": "Somebody brought forty jungle toads nine planes over and did not stay. There are nine pens at Kettleworks, empty, in good repair, with the gates standing open and the straw changed.",
+      "thanks": "Nine pens and he knows all nine names before you finish the first. The drover walks the line between them and the road and does not stop while you talk.",
+      "goal": {
+        "word": {
+          "place": "the-drover"
+        }
+      },
+      "reward": [
+        "Sapling Mold"
+      ],
+      "gold": 85
+    },
+    {
+      "id": "the-five-on-the-reach",
+      "giver": "the-wextreen-reach",
+      "granted": true,
+      "name": "THE FIVE ON THE REACH",
+      "brief": "You read what the reach says about itself: five lines on a post, and nine surveys that do not agree. The trig stone in the middle has a brass plate with room under the ninth.",
+      "thanks": "Ten cairns now, and the tenth is the shortest. The four acres every survey agrees about turn out to fit in a pocket.",
+      "goal": {
+        "word": {
+          "place": "the-common-ground"
+        }
+      },
+      "reward": [
+        "Cosmic Alignment"
+      ],
+      "gold": 100
+    },
+    {
+      "id": "the-edge-you-stepped-off",
+      "giver": "the-wextreen-reach",
+      "granted": true,
+      "name": "THE EDGE YOU STEPPED OFF",
+      "brief": "You stepped off the edge of the reach to see what was there, which is what everybody does once. There is a hedge running east with a gate in it, and the gate is hung and latched and swings properly.",
+      "thanks": "It swings. There is nothing either side of it and it has been maintained for eleven years by somebody who has never said why.",
+      "goal": {
+        "word": {
+          "place": "the-far-hedge"
+        }
+      },
+      "reward": [
+        "Living Earth"
+      ],
+      "gold": 70
     }
   ],
   "_rows": "At most one row per questline and only on its last errand - a row from the world stays an event that way, and one per errand would be the level schedule M12.3 retired wearing a different hat. Rows are never in a drop table: a row is a decision or an achievement, never a lottery ticket."

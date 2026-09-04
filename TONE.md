@@ -148,7 +148,7 @@ know from the label?
 
 ### 12. A refusal says why, in one sentence, in the world's words
 
-> "Forty Fnorp, and you have not got it."
+> "Two hundred Fnorp, and you have not got it."
 
 Not "requirement not met". Not an apology. The `unmet` field on a choice and
 every error string the player can reach are prose and are checked here.

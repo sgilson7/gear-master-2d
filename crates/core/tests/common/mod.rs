@@ -230,7 +230,24 @@ pub fn geared_from(towns: &[&str]) -> Character {
             ch.give(name);
         }
     }
-    for q in &data::quests().quests {
+    // **At most one chain reward per root, because the chains are exclusive.**
+    // An event is answered once, so taking one half of The Gate That Was Yours
+    // closes its other two chains for good. Handing this fixture all twenty-one
+    // chain rewards would build a character no playthrough can produce — and
+    // it did: it made floor five of the Stack trivially winnable and
+    // `the_floors_cost_more_than_the_things_at_the_end_of_them` said so.
+    //
+    // A `granted` errand is one a *choice* hands over, and its `giver` is the
+    // event it comes out of, so one per giver is exactly one branch per root.
+    let quests = data::quests();
+    let mut roots_taken: Vec<&str> = Vec::new();
+    for q in &quests.quests {
+        if q.granted {
+            if roots_taken.contains(&q.giver.as_str()) {
+                continue;
+            }
+            roots_taken.push(&q.giver);
+        }
         for r in &q.reward {
             ch.give(r);
         }

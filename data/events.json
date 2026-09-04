@@ -21,7 +21,10 @@
                 "flag": "has-cork"
               },
               {
-                "xp": 6
+                "errand": "the-cork-you-took"
+              },
+              {
+                "xp": 8
               }
             ]
           },
@@ -31,19 +34,28 @@
           "label": "Buy the knife",
           "blurb": "Forty Fnorp. He says he has nine more and you believe him.",
           "requires": {
-            "gold": 40
+            "gold": 200
           },
           "outcome": {
             "all": [
               {
-                "gold": -40
+                "flag": "bought-the-knife"
+              },
+              {
+                "errand": "what-the-knife-is-for"
+              },
+              {
+                "gold": -200
               },
               {
                 "give": "Serrated Edge"
+              },
+              {
+                "xp": 8
               }
             ]
           },
-          "unmet": "Forty Fnorp, and you have not got it."
+          "unmet": "Two hundred Fnorp, and you have not got it."
         },
         {
           "label": "Cut the tenth with him",
@@ -55,7 +67,10 @@
                 "flag": "cut-the-tenth"
               },
               {
-                "xp": 14
+                "errand": "the-tenth-cut"
+              },
+              {
+                "xp": 8
               }
             ]
           },
@@ -79,10 +94,13 @@
           "outcome": {
             "all": [
               {
-                "gold": 25
+                "flag": "took-from-the-heap"
               },
               {
-                "flag": "took-from-the-heap"
+                "errand": "the-heap-you-took-from"
+              },
+              {
+                "gold": 25
               },
               {
                 "xp": 8
@@ -101,7 +119,10 @@
                 "flag": "corrected-the-heap"
               },
               {
-                "xp": 18
+                "errand": "the-corrected-board"
+              },
+              {
+                "xp": 8
               }
             ]
           },
@@ -128,7 +149,10 @@
                 "flag": "named-on-the-post"
               },
               {
-                "xp": 12
+                "errand": "your-name-at-the-sixth"
+              },
+              {
+                "xp": 8
               }
             ]
           },
@@ -144,7 +168,10 @@
                 "flag": "read-the-post"
               },
               {
-                "xp": 20
+                "errand": "the-five-you-read"
+              },
+              {
+                "xp": 8
               }
             ]
           },
@@ -168,16 +195,19 @@
           "outcome": {
             "all": [
               {
+                "flag": "took-the-frame"
+              },
+              {
+                "errand": "the-frame-you-took"
+              },
+              {
                 "gold": 20
               },
               {
                 "give": "Whipcord Hilt"
               },
               {
-                "flag": "took-the-frame"
-              },
-              {
-                "xp": 10
+                "xp": 8
               }
             ]
           },
@@ -193,7 +223,10 @@
                 "flag": "left-it-standing"
               },
               {
-                "xp": 26
+                "errand": "the-frame-you-left"
+              },
+              {
+                "xp": 8
               }
             ]
           },
@@ -235,13 +268,16 @@
           "outcome": {
             "all": [
               {
-                "give": "Sapling Mold"
-              },
-              {
                 "flag": "counted-toads"
               },
               {
-                "xp": 22
+                "errand": "the-count-she-wanted"
+              },
+              {
+                "give": "Sapling Mold"
+              },
+              {
+                "xp": 8
               }
             ]
           },
@@ -257,7 +293,10 @@
                 "flag": "knows-who-brought-them"
               },
               {
-                "xp": 16
+                "errand": "who-brought-forty"
+              },
+              {
+                "xp": 8
               }
             ]
           },
@@ -284,7 +323,10 @@
                 "flag": "read-the-notices"
               },
               {
-                "xp": 40
+                "errand": "the-six-notices"
+              },
+              {
+                "xp": 8
               }
             ]
           },
@@ -297,13 +339,16 @@
           "outcome": {
             "all": [
               {
-                "give": "Steel Frame"
-              },
-              {
                 "flag": "took-the-hinges"
               },
               {
-                "xp": 24
+                "errand": "the-hinges-you-took"
+              },
+              {
+                "give": "Steel Frame"
+              },
+              {
+                "xp": 8
               }
             ]
           },
@@ -313,22 +358,25 @@
           "label": "Pay the toll and walk in",
           "blurb": "Two hundred Fnorp, at a gate onto ground that was yours.",
           "requires": {
-            "gold": 200
+            "gold": 1000
           },
           "outcome": {
             "all": [
               {
-                "gold": -200
-              },
-              {
                 "flag": "paid-at-your-own-gate"
               },
               {
-                "xp": 60
+                "errand": "paid-at-your-own-gate"
+              },
+              {
+                "gold": -1000
+              },
+              {
+                "xp": 8
               }
             ]
           },
-          "unmet": "Two hundred Fnorp. You have stood here before with less."
+          "unmet": "A thousand Fnorp. You have stood here before with less."
         }
       ]
     },
@@ -351,7 +399,10 @@
                 "flag": "met-marbulon"
               },
               {
-                "xp": 14
+                "errand": "what-would-count"
+              },
+              {
+                "xp": 8
               }
             ]
           },
@@ -367,7 +418,10 @@
                 "flag": "asked-about-the-door"
               },
               {
-                "xp": 9
+                "errand": "what-is-behind-the-door"
+              },
+              {
+                "xp": 8
               }
             ]
           },
@@ -394,6 +448,9 @@
                 "flag": "heard-about-kettleworks"
               },
               {
+                "errand": "the-road-they-asked-about"
+              },
+              {
                 "xp": 8
               }
             ]
@@ -407,10 +464,16 @@
           "outcome": {
             "all": [
               {
+                "flag": "turned-the-kettle"
+              },
+              {
+                "errand": "the-kettle-you-turned"
+              },
+              {
                 "give": "Watchful Crest"
               },
               {
-                "xp": 10
+                "xp": 8
               }
             ]
           },
@@ -437,7 +500,10 @@
                 "flag": "read-the-reach"
               },
               {
-                "xp": 10
+                "errand": "the-five-on-the-reach"
+              },
+              {
+                "xp": 8
               }
             ]
           },
@@ -450,7 +516,13 @@
           "outcome": {
             "all": [
               {
-                "xp": 4
+                "flag": "stepped-off"
+              },
+              {
+                "errand": "the-edge-you-stepped-off"
+              },
+              {
+                "xp": 8
               }
             ]
           },
@@ -505,7 +577,23 @@
         "A woman is putting a hoop round a kettle. The kettle is eleven feet across and the hoop was made for a kettle ten feet across, and she is closing the gap by heating the hoop and waiting.",
         "\"Sixth kettle this month,\" she says. \"They all come in a foot over. Nobody will say who is casting them.\""
       ],
-      "choices": []
+      "choices": [
+        {
+          "label": "Tell her what the kettle was doing",
+          "blurb": "Eleven feet across and the hoop is nine. She cuts long and takes it in.",
+          "requires": {
+            "flag": "turned-the-kettle"
+          },
+          "unmet": "You have not turned a kettle for anybody, so you have nothing to tell her.",
+          "outcome": {
+            "all": [
+              {
+                "xp": 28
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "the-office-of-the-works",
@@ -542,7 +630,26 @@
         "Bins, in a row, each one labelled with what goes in it. The labels read IRON, IRON, IRON, NOT IRON, IRON.",
         "The fourth bin is empty and has always been empty, and a sign above it says KEEP IT THAT WAY, which somebody has taken to be an instruction about the bin."
       ],
-      "choices": []
+      "choices": [
+        {
+          "label": "Fill the bin nobody fills",
+          "blurb": "IRON, IRON, IRON and one that is not iron. It has been empty for eleven years.",
+          "requires": {
+            "flag": "cut-the-stack"
+          },
+          "unmet": "You have not matched an edge to the cut face, so you do not know what goes in it.",
+          "outcome": {
+            "all": [
+              {
+                "gold": 40
+              },
+              {
+                "xp": 30
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "the-second-forge",
@@ -910,7 +1017,10 @@
                 "flag": "asked-the-tally"
               },
               {
-                "xp": 12
+                "errand": "what-the-count-is-for"
+              },
+              {
+                "xp": 8
               }
             ]
           }
@@ -942,7 +1052,26 @@
         "Somebody took a cheese-wire to the west side at head height and cut out a block a foot on a side, and then somebody else came and did the same nine inches to the left, and now there are forty of them in a row like a shelf of missing books.",
         "The works had a meeting about it. The outcome of the meeting was a sign, and the sign is on the ground under the shelf where it fell."
       ],
-      "choices": []
+      "choices": [
+        {
+          "label": "Match your edge to the cut",
+          "blurb": "Head height, a foot on a side, and the same teeth. Whoever did it had one of these.",
+          "requires": {
+            "flag": "bought-the-knife"
+          },
+          "unmet": "You have not bought the knife, so you cannot say what cut this.",
+          "outcome": {
+            "all": [
+              {
+                "flag": "cut-the-stack"
+              },
+              {
+                "xp": 24
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "the-flies",
@@ -1662,7 +1791,23 @@
         "A hedge running east with a gate in it, and the gate is hung and latched and swings properly. What it is hung on is two posts and a hedge, and what is on the other side is the same field.",
         "Four people have counted the gate's palings and got four numbers. It has nine."
       ],
-      "choices": []
+      "choices": [
+        {
+          "label": "Latch it behind you",
+          "blurb": "Hung, latched and swinging properly, in a hedge with nothing either side of it.",
+          "requires": {
+            "flag": "stepped-off"
+          },
+          "unmet": "You have not stepped off the edge of the reach, so you have not come this way.",
+          "outcome": {
+            "all": [
+              {
+                "xp": 26
+              }
+            ]
+          }
+        }
+      ]
     }
   ]
 }

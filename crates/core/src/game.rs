@@ -46,6 +46,14 @@ pub struct Game {
 // it is drawn; what a save carries is `WorldState::bought`, which is the short
 // list of things already taken off a shelf. Same discipline as the map.
 
+/// Add one to a counter kept as a list of pairs.
+fn bump(list: &mut Vec<(String, u32)>, key: &str) {
+    match list.iter_mut().find(|(k, _)| k == key) {
+        Some((_, n)) => *n += 1,
+        None => list.push((key.to_string(), 1)),
+    }
+}
+
 impl Game {
     /// A new session from a seed.
     ///
@@ -273,6 +281,22 @@ impl Game {
                 let by = self.character.fatigue - before;
                 receipt.push(format!("{by}% more tired"));
             }
+            Outcome::Errand(id) => {
+                let all = crate::data::quests();
+                match all.get(id) {
+                    Some(q) => {
+                        if self.world.quests_taken.iter().any(|t| t == id)
+                            || self.world.quests_done.iter().any(|t| t == id)
+                        {
+                            receipt.push(format!("{} is already in hand.", q.name));
+                        } else {
+                            self.world.quests_taken.push(id.clone());
+                            receipt.push(format!("{}. It is in your errands now.", q.name));
+                        }
+                    }
+                    None => receipt.push(format!("{id} is not an errand")),
+                }
+            }
             Outcome::Warp { map, at } => {
                 self.warp_to(map, *at, difficulty);
                 receipt.push("You are somewhere else. It is a long walk back.".into());
@@ -299,6 +323,110 @@ impl Game {
         w.repair(&mut self.world, &allowed);
     }
 
+    /// Buy a licence off the man in the van.
+    ///
+    /// **Refuses in three named ways**, TONE 12, and each is a different rule:
+    /// you are not at his table, you already have one, or you have not got the
+    /// money. A button that greys out with no sentence reads as broken.
+    pub fn buy_licence(&mut self) -> Result<i32, String> {
+        if self.character.licensed() {
+            return Err(if self.character.bought_licence {
+                "You have one. He does not sell a second.".into()
+            } else {
+                "You are already licensed, and he can tell.".into()
+            });
+        }
+        let price = crate::ench::LICENCE_PRICE;
+        if self.character.gold < price {
+            return Err(format!("{price} Fnorp, and you have {}.", self.character.gold));
+        }
+        self.character.gold -= price;
+        self.character.buy_licence();
+        Ok(price)
+    }
+
+    // ----------------------------------------------------------- rerolls
+
+    /// Wipe the reroll counters if the character has crossed a ten-level band.
+    ///
+    /// Called wherever a price is asked for or paid, so the reset happens the
+    /// moment it is true rather than at some later moment somebody has to
+    /// remember to call.
+    fn settle_reroll_band(&mut self) {
+        let band = crate::shop::reroll_band(self.character.level());
+        if band != self.world.reroll_band {
+            self.world.reroll_band = band;
+            self.world.rerolls.clear();
+        }
+    }
+
+    /// How many rerolls of this kind have been paid for in this band.
+    pub fn rerolls_done(&self, kind: &str) -> u32 {
+        if crate::shop::reroll_band(self.character.level()) != self.world.reroll_band {
+            return 0;
+        }
+        self.world.rerolls.iter().find(|(k, _)| k == kind).map(|(_, n)| *n).unwrap_or(0)
+    }
+
+    /// What the next reroll of this kind costs.
+    pub fn reroll_price(&self, kind: &str) -> i32 {
+        crate::shop::reroll_price(self.rerolls_done(kind))
+    }
+
+    /// Turn the barrel over. Returns what it costs, or why not.
+    pub fn reroll_barrel(&mut self) -> Result<i32, String> {
+        self.settle_reroll_band();
+        let price = self.reroll_price(crate::shop::REROLL_BARREL);
+        if self.character.gold < price {
+            return Err(format!("{price} Fnorp, and you have {}.", self.character.gold));
+        }
+        self.character.gold -= price;
+        let rolled = crate::shop::roll_barrel(&mut self.rng);
+        self.world.rolled_barrel = rolled;
+        bump(&mut self.world.rerolls, crate::shop::REROLL_BARREL);
+        Ok(price)
+    }
+
+    /// Turn a town's order book over, keeping anything already on order.
+    pub fn reroll_ledger(&mut self, town: &str) -> Result<i32, String> {
+        self.settle_reroll_band();
+        let shops = crate::data::shops();
+        let how_many = self.ledger_at(town).len().max(3);
+        if how_many == 0 {
+            return Err("They do not make anything to order here.".into());
+        }
+        let price = self.reroll_price(crate::shop::REROLL_LEDGER);
+        if self.character.gold < price {
+            return Err(format!("{price} Fnorp, and you have {}.", self.character.gold));
+        }
+        // **The one being made is not turned over.** It is paid for and its
+        // clock is running, so a reroll must not be a way to lose it.
+        let keep = self.order_at(town).map(|c| c.piece.clone());
+        self.character.gold -= price;
+        let rolled = crate::shop::roll_commissions(&mut self.rng, keep.as_deref(), how_many);
+        self.world.rolled_ledgers.retain(|(t, _)| t != town);
+        self.world.rolled_ledgers.push((town.to_string(), rolled));
+        bump(&mut self.world.rerolls, crate::shop::REROLL_LEDGER);
+        let _ = shops;
+        Ok(price)
+    }
+
+    /// The barrel as this run has it: rolled if it has been, authored if not.
+    pub fn barrel_now(&self) -> Vec<crate::shop::BarrelOffer> {
+        if self.world.rolled_barrel.is_empty() {
+            return crate::shop::barrel(&crate::data::shops());
+        }
+        crate::shop::barrel_of(&self.world.rolled_barrel)
+    }
+
+    /// A town's order book as this run has it.
+    pub fn ledger_at(&self, town: &str) -> Vec<crate::shop::CommissionOffer> {
+        if let Some((_, rolled)) = self.world.rolled_ledgers.iter().find(|(t, _)| t == town) {
+            return crate::shop::commissions_of(rolled);
+        }
+        crate::shop::commissions(&crate::data::shops(), town)
+    }
+
     // ------------------------------------------------------------ orders
 
     /// Place an order at this town's counter.
@@ -312,8 +440,8 @@ impl Game {
     /// than globally, so each town's ledger is its own small promise and the
     /// walk back is the economy working.
     pub fn order(&mut self, town: &str, index: usize) -> Result<crate::world::Commission, String> {
-        let shops = crate::data::shops();
-        let book = crate::shop::commissions(&shops, town);
+        // **The book as this run has it**, rolled or authored.
+        let book = self.ledger_at(town);
         let Some(o) = book.iter().find(|o| o.index == index) else {
             return Err("They do not make that here.".into());
         };

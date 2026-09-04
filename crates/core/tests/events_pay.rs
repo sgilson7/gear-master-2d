@@ -187,6 +187,14 @@ fn every_choice_says_what_it_pays_and_does_not_speak_the_theme() {
             );
             boxes += lines.len();
             for l in &lines {
+                // **An errand's name is a proper noun and is exempt.** TONE
+                // 13a's carve-out: a name somebody wrote is not translated,
+                // which is why a set's name is not themed either. "THE CORK
+                // YOU TOOK" is about boundary cork, the material, and not
+                // about the theme's word for armour.
+                if l.starts_with("Begins an errand:") {
+                    continue;
+                }
                 let low = l.to_lowercase();
                 for t in themed {
                     // "Fnorp" is the theme's word for gold and is the one
@@ -307,4 +315,158 @@ fn a_choice_is_taken_once() {
     g.answer_event(id, 0, D).expect("the first time");
     let again = g.answer_event(id, 1, D).expect_err("the second time");
     assert!(again.contains("already"), "{again:?}");
+}
+
+fn errands_in(o: &Outcome, out: &mut Vec<String>) {
+    match o {
+        Outcome::All(l) => l.iter().for_each(|i| errands_in(i, out)),
+        Outcome::Errand(id) => out.push(id.clone()),
+        _ => {}
+    }
+}
+
+/// **A choice at a chain root is never just a smaller number.**
+///
+/// The complaint this exists for, in the words it arrived in: at The Shallows
+/// Marker one half paid 12 experience and the other 20, and both opened a
+/// different chain — *so they'd always take the 20, cause why would you take
+/// the smaller number*. From where the player sits there was no decision,
+/// because the thing that made it one was invisible.
+///
+/// So: **every choice at an event that roots a chain hands over an errand, and
+/// no two of them hand over the same one.** The errand is what makes the
+/// branch legible — it lands in the log, the log points at the map, and the
+/// outcomes box says so before the choice is taken.
+#[test]
+fn every_choice_at_a_chain_root_starts_its_own_errand() {
+    let events = data::events();
+    let quests = data::quests();
+
+    // A root is an event where at least one choice starts an errand.
+    let roots: Vec<&gm2d_core::tile_event::TileEvent> = events
+        .events
+        .iter()
+        .filter(|e| {
+            e.choices.iter().any(|c| {
+                let mut v = Vec::new();
+                errands_in(&c.outcome, &mut v);
+                !v.is_empty()
+            })
+        })
+        .collect();
+    assert!(roots.len() >= 8, "only {} events root a chain", roots.len());
+
+    for e in &roots {
+        let mut seen: Vec<String> = Vec::new();
+        for c in &e.choices {
+            let mut mine = Vec::new();
+            errands_in(&c.outcome, &mut mine);
+            // **Starts one, or continues one.** An event can be a root and a
+            // step at once — The Standing Frame begins two chains and is the
+            // second rung of a third, and its cork choice is gated on the cork
+            // you took at the boundary. What must never happen is the third
+            // kind: a choice at a root that goes nowhere, which is the
+            // "smaller number" this test exists to refuse.
+            if mine.is_empty() {
+                assert!(
+                    !matches!(c.requires, Requirement::None),
+                    "{}: the choice {:?} starts no chain and continues none, so it is only a \
+                     smaller number than the one beside it",
+                    e.id,
+                    c.label
+                );
+                continue;
+            }
+            assert_eq!(
+                mine.len(), 1,
+                "{}: {:?} starts {} errands at once", e.id, c.label, mine.len()
+            );
+            let id = mine.remove(0);
+            assert!(
+                quests.get(&id).is_some(),
+                "{}: {:?} starts {id:?}, which is not an errand",
+                e.id,
+                c.label
+            );
+            assert!(
+                !seen.contains(&id),
+                "{}: two choices both start {id:?}, so one of them is the smaller number",
+                e.id
+            );
+            seen.push(id);
+        }
+    }
+}
+
+/// Every errand a choice hands over is granted, never offered.
+///
+/// The branch you did not take must not be sitting on the same tile a moment
+/// later, offering itself at a counter.
+#[test]
+fn a_chain_errand_is_handed_over_and_never_sits_on_a_counter() {
+    let events = data::events();
+    let quests = data::quests();
+    let mut started = Vec::new();
+    for e in &events.events {
+        for c in &e.choices {
+            errands_in(&c.outcome, &mut started);
+        }
+    }
+    assert!(started.len() >= 20, "only {} chain errands", started.len());
+    for id in &started {
+        let q = quests.get(id).expect("it exists");
+        assert!(q.granted, "{id} is started by a choice and also offered at {}", q.giver);
+        assert!(
+            matches!(q.goal, gm2d_core::quest::Goal::Word { .. }),
+            "{id} is a chain errand and does not send you anywhere"
+        );
+        assert!(
+            !q.reward.is_empty() || !q.enchs.is_empty() || q.gold > 0,
+            "{id} pays nothing at the end of it"
+        );
+    }
+    // And none of them can be picked up by walking to the tile that gave it.
+    let mut g = Game::new(2, "td");
+    for id in &started {
+        let q = quests.get(id).expect("it exists");
+        assert_eq!(
+            gm2d_core::quest::stage(&g, q),
+            gm2d_core::quest::Stage::Locked,
+            "{id} is offered before anybody chose it"
+        );
+    }
+    // Taking one puts it in the log.
+    let first = &started[0];
+    let mut r = Vec::new();
+    g.apply_outcome_for_test(&Outcome::Errand(first.clone()), &mut r, D);
+    assert!(g.world.quests_taken.contains(first), "starting an errand did not log it");
+    assert!(r.iter().any(|l| !l.is_empty()), "and said nothing about it");
+}
+
+/// A chain's payout is not only experience.
+///
+/// The whole complaint: rewards that are all experience are rewards a player
+/// reads as one number against another. Across the chains there has to be a
+/// spread — gear, an ench, an instrument's part, Fnorp.
+#[test]
+fn the_chains_pay_more_than_experience() {
+    let quests = data::quests();
+    let chain: Vec<_> = quests.quests.iter().filter(|q| q.granted).collect();
+    assert!(chain.len() >= 20, "only {} chain errands", chain.len());
+    let gear = chain.iter().filter(|q| !q.reward.is_empty()).count();
+    let enchs = chain.iter().filter(|q| !q.enchs.is_empty()).count();
+    let instrument = chain
+        .iter()
+        .filter(|q| {
+            q.reward.iter().any(|r| {
+                ["Map Shard", "Glass Lens", "Magnet", "Cosmic Orb", "Cosmic Alignment",
+                 "Living Earth"]
+                    .contains(&r.as_str())
+            })
+        })
+        .count();
+    assert!(gear >= 15, "only {gear} chains pay a component");
+    assert!(enchs >= 2, "only {enchs} chains pay an ench");
+    assert!(instrument >= 3, "only {instrument} chains pay an instrument's part");
+    assert!(chain.iter().all(|q| q.gold > 0), "a chain that pays no Fnorp at all");
 }

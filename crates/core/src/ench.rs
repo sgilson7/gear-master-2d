@@ -50,7 +50,26 @@ pub const LICENSED_CLASSES: &[&str] = &["Recycler", "Showstopper"];
 /// the class enching is *about*.
 pub const LICENSED_CLASS: &str = "Recycler";
 
+/// What the man in the van charges for a licence of your own.
+///
+/// **A class is still the free way in.** Two of the five are licensed by being
+/// what they are, and for them this never comes up. What it buys is the same
+/// permission for everybody else — one price, once, and it does not come off,
+/// which is the same shape as the fork it works around.
+///
+/// Five thousand against an ench's two. **The one price in the game that
+/// went up and did not stay ahead**: everything else was multiplied by five in
+/// the same pass and the enchs were held where they were, so a licence is now
+/// dearer than the thing it lets you bolt on. That is deliberate — the paper is
+/// the permission and the permission is the scarce thing.
+pub const LICENCE_PRICE: i32 = 5_000;
+
 /// May a character of this class bolt an ench onto a component?
+///
+/// **The class or the paper**, since the van started selling one. `licences`
+/// answers the class half and is what `LICENSED_CLASSES` is for;
+/// `Character::licensed` asks both, because a bought licence is a fact about
+/// the character rather than about the class.
 pub fn licences(class: Option<&str>) -> bool {
     class.is_some_and(|c| LICENSED_CLASSES.contains(&c))
 }

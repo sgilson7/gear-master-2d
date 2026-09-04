@@ -1225,6 +1225,37 @@ pub struct WorldState {
     /// orders outstanding, which is the truth about it.
     #[serde(default)]
     pub commissions: Vec<Commission>,
+    /// The barrel as this run has turned it over, and the order books likewise.
+    ///
+    /// **This is content becoming state, and it is a deliberate reversal.** M7
+    /// took the roll out of the shop on the grounds that *a town that sells
+    /// something different every visit is not a place*, and that still holds —
+    /// **for the shelf**, which is the designed curve and is untouched. What is
+    /// rerollable is the floor under it and the menu above it: the barrel is
+    /// junk furniture and the ledger is a list of things you might want, and
+    /// neither is a place's character.
+    ///
+    /// Empty means *nobody has rerolled*, and the authored lists in
+    /// `data/shops.json` stand. So every save written before this opens on the
+    /// barrel it always had.
+    #[serde(default)]
+    pub rolled_barrel: Vec<String>,
+    /// Rolled order books, by town id.
+    #[serde(default)]
+    pub rolled_ledgers: Vec<(String, Vec<crate::shop::CommissionDef>)>,
+    /// How many rerolls have been paid for, by type, and the level band they
+    /// were counted in.
+    ///
+    /// **Per type**, so turning the barrel over eight times does not price the
+    /// ledger's first reroll at eighty-one — they are different appetites and a
+    /// shared counter would charge one for the other's impatience. The band is
+    /// `level / 10`: when it moves, everything resets, because a curve with no
+    /// floor under it is a feature nobody touches twice.
+    #[serde(default)]
+    pub rerolls: Vec<(String, u32)>,
+    /// The band the counters above were last valid in.
+    #[serde(default)]
+    pub reroll_band: u32,
     /// The map currently being surveyed, and the instrument it is being
     /// surveyed with.
     ///

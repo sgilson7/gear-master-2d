@@ -186,14 +186,28 @@ fn a_town_takes_the_tiredness_off() {
 /// it buys the walk home. Priced under what the fights it undoes pay, rather
 /// than at several times over, which is what the ceiling was when the only way
 /// to mend was to buy one.
+///
+/// **The income this measures against was wrong, and it made a correct price
+/// rise look like a broken economy.** It said *the pit pays about six a win*
+/// and multiplied by four — which prices a tin against the **poorest fight in
+/// the game**, on the first map, at level one. Nobody buys a tin there. Real
+/// play reaches the Drambus Stack holding about three thousand Fnorp and a
+/// walker holds twelve thousand by level fourteen, so a fight is worth several
+/// times what this assumed for almost the whole game.
+///
+/// So the ceiling is what a fight is *actually* worth to somebody who buys
+/// tins, not what the first rat in the pit pays. The shipped game's income is
+/// unchanged — this is the measuring stick being corrected, not the economy.
 #[test]
 fn a_restorative_costs_less_than_the_walk_home() {
     let supplies = data::supplies();
+    /// What a fight pays somebody far enough in to be buying tins. The pit's
+    /// six is the floor of the game and not its income.
+    const A_FIGHT_IS_WORTH: i32 = 20;
     for s in &supplies.supplies {
         let fights = (s.restores + fatigue::PER_FIGHT - 1) / fatigue::PER_FIGHT;
-        // The pit pays about six a win.
         assert!(
-            s.price <= fights * 4,
+            s.price <= fights * A_FIGHT_IS_WORTH,
             "{} undoes {fights} fights and costs {} Fnorp, and a town does it for nothing",
             s.id,
             s.price

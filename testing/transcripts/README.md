@@ -293,3 +293,30 @@ question for the human rather than a fix taken quietly, and it is
 **And the curve is still not met.** Fill is 38% at level three against a 70%
 target and does not pass 70% until thirteen. One faucet was never going to do
 it; that is why the block has three and a lever.
+
+---
+
+**M12.4's run is `m12.4.txt`, and it is the block's closing measurement.** 831
+wins, 607 losses, level 11, no console errors, stopped at a 12,000-press budget
+because the curve is decided in the early and middle levels and the last third
+of a walk does not move it.
+
+Against `m12.0.txt` at matched levels:
+
+    level   baseline   closing
+        3       35%       30%
+        5       43%       47%
+        6       41%       48%
+        8       37%       54%
+       10       48%       54%
+
+**Read the slope, not the level.** The baseline *fell* as it levelled — 43% at
+five down to 37% at eight — because rows arrived on a clock and components did
+not. It rises now. That is the whole of M12.3's argument and it is the one
+thing in this block that can be pointed at rather than argued about.
+
+Two numbers in it are not good news and are in `TRIAGE-M12.md` as rows 8 and 9.
+**The final reading has a bench of 203** — two hundred owned components that
+fit nowhere, because the barrel is bought and then declined by Auto-pack. And
+**the loss rate is up from 34.5% to 42.2%**, which is the likeliest consequence
+of the shelf costing five times what it did.

@@ -36,7 +36,11 @@ walks all forty-two gate checks against the deployed page, three engines. See
 *A deployed fix is not a delivered fix* for why that is a separate step from
 the deploy going green.
 
-**M12 is in flight. M12.0 is done and it deployed nothing** — its whole job
+**M12 is built and not deployed.** M12.B, M12.0, M12.1, M12.1a, M12.2, M12.5
+and M12.3 are all in, `TRIAGE-M12.md` is written, and **eight commits sit
+unpushed**. Two things the block needs are not the builder's and are named as
+outstanding in that triage: an agent spot-run against a deployed build, and the
+friend whose one sentence started the block. **M12.0 deployed nothing** — its whole job
 was to make board pressure a number before anything tried to move it, and the
 number is in `testing/transcripts/m12.0.txt`. `PLAN-M12.md` is the frame,
 written while M11 was in flight; **`PLAN-M12-EXEC.md` is the execution plan and

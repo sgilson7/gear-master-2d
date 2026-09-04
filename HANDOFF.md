@@ -261,6 +261,28 @@ REBASELINE_GOLDEN_COMBAT=1 cargo test -p gm2d-core
 
 ## 9. What is being built next
 
+**M12 is built and unpushed.** Seven milestones — M12.B (a player's save that
+could not be played), M12.0 (the measure), M12.1 and M12.1a (the barrel and the
+price tiers), M12.2 (commissions), M12.5 (events that pay) and M12.3 (a row is
+earned, not scheduled). 630 tests became **671**, the browser gate grew four
+checks, and **no save seam anywhere**: the catalogue is still 568, so every file
+that opened on M11 opens on M12.
+
+`TRIAGE-M12.md` is the sweep. Two of its thirteen rows are not the builder's
+and are named as outstanding: **an agent spot-run** against a deployed build
+(`testing/AGENT-BRIEF-M12.md` is written and its fifth errand is the one only a
+stranger can do), and **the friend**, whose one sentence started the block. The
+block is not closed until both are in.
+
+The row that matters most is **§8 row 13**, which is a decision rather than a
+bug: the barrel fills the bag and not the board, because Auto-pack declines any
+placement that does not improve the board's rating. Nothing else in the block
+can reach the fill target without answering it.
+
+### Before this
+
+
+
 **Nothing is planned.** `PLAN-M9.md`, `PLAN-M10.md` and `PLAN-M11.md` are all
 done and all deployed — M11 at `43804e49`, verified by pointing the gate itself
 at the live page. Before you deploy the next one, read *A deployed fix is not a

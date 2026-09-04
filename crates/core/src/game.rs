@@ -137,6 +137,29 @@ impl Game {
     /// The tin goes **on departure**, which is the same bargain the Chonga
     /// Swing makes: the thing that is spent is spent whether or not you like
     /// where you end up.
+    /// Every row this character has earned, by slot.
+    ///
+    /// **Two sources and one answer.** A skill point spent on a row node, and
+    /// a questline finished — the tree's half off `skills_taken`, the world's
+    /// half off `quests_done`, both read fresh. A `Character` cannot answer
+    /// this alone because the errands are the world's, and a `Game` is exactly
+    /// the thing that holds both.
+    pub fn granted_rows(&self) -> [u8; 5] {
+        let from_tree = crate::data::skills().granted_rows(&self.character.skills_taken);
+        let from_errands = crate::quest::granted_rows(&self.world.quests_done);
+        let mut out = [0u8; 5];
+        for i in 0..5 {
+            out[i] = from_tree[i] + from_errands[i];
+        }
+        out
+    }
+
+    /// Grow the boards to what has been earned. Returns what grew.
+    pub fn regrow_boards(&mut self) -> Vec<(crate::piece::SlotKind, u8)> {
+        let granted = self.granted_rows();
+        self.character.resize_boards(granted)
+    }
+
     // ------------------------------------------------------------ events
 
     /// Whether this choice can be taken.

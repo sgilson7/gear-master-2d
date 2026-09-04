@@ -2625,7 +2625,15 @@ pub fn character_json() -> String {
             "taken": c.skills_taken,
             "gold": c.gold,
             "rows": rows,
-            "next_grows": gm2d_core::progression::grows_at(level + 1).map(slot_name),
+            // **No frame grows at the next level, since M12.3.** A row is
+            // earned — a point spent at the tree, or a questline finished —
+            // so the panel points at where one comes from instead of naming
+            // a frame the level was going to hand over.
+            "rows_earned": SlotKind::ALL.iter().enumerate()
+                .map(|(i, &k)| serde_json::json!({
+                    "slot": slot_name(k), "earned": g.granted_rows()[i],
+                }))
+                .collect::<Vec<_>>(),
             // What the character actually is. Nothing read this before, which
             // is why a player who took +6 strength had no way to tell whether
             // they had got it.

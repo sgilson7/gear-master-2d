@@ -1144,11 +1144,24 @@ function offerClass() {
 
 // ---------------------------------------------------------------- the tree
 
+/// How many rows this character has earned, and where from.
+///
+/// A row is a point spent here or a questline finished. Nothing else hands one
+/// over, and a level does not.
+function rowsEarned(c) {
+  const got = (c.rows_earned ?? []).filter((r) => r.earned > 0);
+  if (!got.length) return 'none yet';
+  return got.map((r) => `${r.earned} ${r.slot}`).join(', ');
+}
+
 function openTree() {
   const c = JSON.parse(character_json());
   $('tree-level').textContent = c.level;
   $('tree-points').textContent = c.points;
-  $('tree-next').textContent = c.next_grows ?? '—';
+  // **No frame grows at the next level any more.** M12.3 retired the
+  // schedule, so what this says is how many rows have been *earned* — which
+  // is the number the screen it sits on is now for.
+  $('tree-next').textContent = rowsEarned(c);
   paintTree();
   $('tree').hidden = false;
 }
@@ -1261,7 +1274,10 @@ function nodeButton(n, tree) {
     paintTree(); paintPanel(); draw(); autosave();
     const c = JSON.parse(character_json());
     $('tree-level').textContent = c.level;
-    $('tree-next').textContent = c.next_grows ?? '—';
+    // **No frame grows at the next level any more.** M12.3 retired the
+  // schedule, so what this says is how many rows have been *earned* — which
+  // is the number the screen it sits on is now for.
+  $('tree-next').textContent = rowsEarned(c);
   };
   return b;
 }

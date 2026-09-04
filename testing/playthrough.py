@@ -386,6 +386,23 @@ def in_town(page, buy=True, probe=None):
             said.append(f"barrel: {name}")
         if probe is not None:
             probe.took("barrel")
+        # **Order the thing you want, and take delivery of the last one.**
+        # A player with money and an empty order slot places one; a player
+        # standing where they ordered picks it up. Collect first, so the slot
+        # is free to order into on the same visit.
+        take = page.locator("#take-order")
+        if take.count():
+            take.first.click()
+            page.wait_for_timeout(60)
+            said.append(f"collected: {last_said(page)}")
+            if probe is not None:
+                probe.took("commission")
+        live = page.locator("#order-book .wares:not(:disabled)")
+        if live.count() and int(page.text_content("#town-gold")) > 120:
+            name = live.first.locator("b").text_content()
+            live.first.click()
+            page.wait_for_timeout(60)
+            said.append(f"ordered: {name}")
     # By name, not by "the first enabled one": a taken errand stays clickable
     # on purpose — clicking it says how far along you are, which is
     # information rather than an error — so a loop that keeps pressing the

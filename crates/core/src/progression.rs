@@ -94,24 +94,37 @@ pub fn progress(total_xp: i32) -> (i32, i32) {
     (total_xp - xp_to_reach(level), xp_to_next(level))
 }
 
-/// Which grid the level-up *to* `level` grows. `None` for level 1, which is
-/// where you start rather than something you reach.
-pub fn grows_at(level: u32) -> Option<SlotKind> {
-    (level >= 2).then(|| ROTATION[((level - 2) % 5) as usize])
-}
-
-/// Rows this grid has by rotation alone at this level.
+/// **A level grows no board. M12.3 retired that, and it was an MVP pillar.**
 ///
-/// A pure function, which is the whole point: board size is implied by level,
-/// so it can be checked rather than trusted.
-pub fn rows_for(slot: SlotKind, level: u32) -> u8 {
-    let earned = (2..=level).filter(|&l| grows_at(l) == Some(slot)).count() as u8;
-    (STARTING_ROWS + earned).min(MAX_ROWS)
+/// `PLAN.md` M4 made board size a pure function of level and the rotation in
+/// `ROTATION` decided which grid grew when. That was right while pieces were
+/// scarce by accident: a row was the only thing that ever changed about a
+/// board, so handing one out on a schedule was the whole of progression.
+///
+/// M12.0 measured what it costs once pieces are not scarce. **Fill goes
+/// *down* as you level** — 43% at five, 37% at eight — because rows arrive on
+/// a clock and components do not, so levelling dilutes you. A scheduled row is
+/// dilution on a timer.
+///
+/// So a row is a thing you **earn** now: a skill point spent on it, or a quest
+/// line finished. Every level poses the game's central question with the
+/// player's own hands — power on the board you have, or a bigger board — and
+/// pressure regulates itself instead of leaking away every fifth level.
+///
+/// **Nothing is banked to make this work**, which is a divergence from
+/// `PLAN-M12.md` and the reason is that the save already carries it:
+/// `BoardSave::rows` is written and restored verbatim and `resize_boards` only
+/// ever grows, so an old file keeps every row it had without a ledger and
+/// without a migration. What a row came *from* is derived — from
+/// `skills_taken` and from `quests_done` — the same way a node's effect and a
+/// tower's fallen floors are.
+pub fn base_rows() -> u8 {
+    STARTING_ROWS
 }
 
-/// Rows this grid has, rotation plus anything a skill granted out of turn.
-pub fn board_rows(slot: SlotKind, level: u32, granted: u8) -> u8 {
-    (rows_for(slot, level) + granted).min(MAX_ROWS)
+/// Rows this grid has: the base, plus everything earned for it.
+pub fn board_rows(granted: u8) -> u8 {
+    (STARTING_ROWS + granted).min(MAX_ROWS)
 }
 
 /// How much experience beating this creature is worth.

@@ -3605,8 +3605,14 @@ def walk_the_gate(browser, name, fails=None):
                      f"({len(BANKINGS)} bankings)")
     else:
         # Read off every banking the walk has done, wherever it happened.
-        if not any("row on the" in r for r in BANKINGS):
-            fails.append(f"{name}: no banking ever said which frame grew: {BANKINGS[-3:]}")
+        # **A level no longer grows a frame, and this asks the new question.**
+        # M12.3 retired `PLAN.md` M4's row-per-level, so a banking that named
+        # a frame was the *old* receipt. What the screen must still do is
+        # never leave a level silent about rows: either something was earned
+        # and it says which frame, or nothing was and it says where one comes
+        # from. A banking that says neither is the level banner going quiet.
+        if not any(("row on the" in r) or ("row is bought" in r) for r in BANKINGS):
+            fails.append(f"{name}: no banking said where a row comes from: {BANKINGS[-3:]}")
         if not any("Level " in r for r in BANKINGS):
             fails.append(f"{name}: no banking ever announced a level: {BANKINGS[-3:]}")
         if int(page.text_content("#points")) < 1:
@@ -3615,8 +3621,10 @@ def walk_the_gate(browser, name, fails=None):
         page.click("#skills")
         page.wait_for_selector("#tree", state="visible", timeout=8000)
         nodes = page.locator("#nodes .wares").count()
-        if not (10 <= nodes <= 15):
-            fails.append(f"{name}: the tree shows {nodes} nodes and the plan asks for 10 to 15")
+        # 14 to 19 since M12.3: a row is bought at the tree now, so the tree
+        # grew the nodes to buy one with. Same widening as the core test.
+        if not (14 <= nodes <= 19):
+            fails.append(f"{name}: the tree shows {nodes} nodes and the plan asks for 14 to 19")
         buyable = page.locator("#nodes .wares:not(:disabled)")
         if buyable.count() == 0:
             fails.append(f"{name}: a point to spend and nothing to spend it on")

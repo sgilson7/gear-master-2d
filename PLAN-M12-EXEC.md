@@ -614,6 +614,40 @@ barrel: the barrel is the same in every town, so it holds at whichever one a
 player reaches first. The shelf keeps a weaker guard of its own — one line
 affordable on arrival, two not — where the number that set it lives.
 
+### Gate zero, with all three faucets open — and M12.3 ships
+
+`PLAN-M12.md` §8 row 5 asks: if the probe hits the target curve, does M12.3
+ship anyway? The recommendation on record is **no, skip it and say so**. It
+does not hit. It is not close.
+
+    level   fill   want    bench  want
+        3    20%    70%        0     —
+        5    32%    70%        0     2
+        6    40%    80%        0     2
+       10    42%    80%        0     2
+       13  62-76%   80%     2-10     2
+
+    by source at level 10:
+      shelf 26   barrel 121   commission 3   event 1   drop 17   quest 7
+
+**So the schedule change ships**, and the measure is what decided it rather
+than an opinion about it. Three things in that table are worth carrying into
+M12.3.
+
+- **Fill is *lower* early than it was at M12.1.** 20% at level three against
+  38% before. That is M12.1a working as asked: the shelf costs five times what
+  it did, so a walker with a beginner's purse buys six things instead of
+  eleven, and the barrel's own purchases start later because the money is
+  tighter. The price tier bought a decision and it cost early fill, which is
+  the trade and is worth having said out loud.
+- **The barrel is still the biggest faucet by a distance and still barely
+  moves the board** — 121 components at level ten. That is `§8 row 13` again:
+  Auto-pack refuses what does not improve the rating, so throughput lands in
+  the bag. **M12.3 cannot fix that**, and if row 13 is answered *no*, the
+  fill half of this curve is not reachable by any lever in this block.
+- **Bench is 0 until thirteen even now.** A bench only fills when a board is
+  full, so bench depth is downstream of fill and will move when fill does.
+
 ### One addition to §7, from the measurement
 
 | # | the frame said | this plan says | why |

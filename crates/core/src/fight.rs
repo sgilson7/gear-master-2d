@@ -484,11 +484,26 @@ pub fn bank(game: &mut Game) -> Banking {
     }
     let mut grew = Vec::new();
     if !levels.is_empty() {
-        let granted = crate::data::skills().granted_rows(&game.character.skills_taken);
+        // **Both sources, since M12.3.** The tree's rows and the errands'.
+        // A board can still grow here — a questline finished on the road pays
+        // a row and this is the next time anything resizes — but a *level*
+        // grows nothing, so this line has stopped being the level's receipt
+        // and become the receipt of whatever was earned.
+        let granted = {
+            let g: &Game = game;
+            g.granted_rows()
+        };
         for (slot, rows) in game.character.resize_boards(granted) {
             let name = format!("{slot:?}").to_lowercase();
             receipt.push(format!("+{rows} row on the {name} frame"));
             grew.push((name, rows));
+        }
+        // **And where the next one comes from.** The level banner used to
+        // promise a row and now it points at the place one is bought, which
+        // is `PLAN-M12.md` §3 M12.3's "the screens" in one sentence: a system
+        // nobody is told about is a bug report.
+        if grew.is_empty() {
+            receipt.push("A row is bought at the tree, or finished off an errand.".into());
         }
     }
     if levels.is_empty() {

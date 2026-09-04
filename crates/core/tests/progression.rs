@@ -9,7 +9,7 @@ use gm2d_core::combat::Difficulty;
 use gm2d_core::data;
 use gm2d_core::game::Game;
 use gm2d_core::piece::SlotKind;
-use gm2d_core::progression::{self, MAX_LEVEL, STARTING_ROWS, XP_TO_NEXT};
+use gm2d_core::progression::{self, MAX_LEVEL, MAX_ROWS, STARTING_ROWS, XP_TO_NEXT};
 use gm2d_core::save;
 use gm2d_core::skills::Refusal;
 
@@ -58,47 +58,132 @@ fn a_level_is_derived_from_experience() {
 
 // ------------------------------------------------------------------ the rows
 
-/// **Board dimensions are a pure function of level plus granted rows.**
+/// **A level grows no board, and that retires an MVP pillar on purpose.**
 ///
-/// The acceptance criterion in the plan's own words. Checked across every level
-/// the table covers, because the failure it guards is a board that agrees with
-/// the formula at level 5 and disagrees at level 11.
+/// This file used to hold `board_size_is_a_function_of_level` and
+/// `a_levelled_character_has_the_boards_its_level_implies`, and both were
+/// exactly right for `PLAN.md` M4: board size *was* a pure function of level,
+/// which is what made it checkable rather than trusted. M12.3 takes that down
+/// deliberately, and the reason is a measurement rather than a preference —
+/// M12.0 found **fill going down as you level**, 43% at five and 37% at eight,
+/// because rows arrive on a clock and components do not. A scheduled row is
+/// dilution on a timer.
+///
+/// What replaces the pure function is this: a board is the base plus what was
+/// *earned* for it, and levelling earns nothing.
 #[test]
-fn board_size_is_a_function_of_level() {
-    for level in 1..=MAX_LEVEL as u32 {
-        let total: u8 = SlotKind::ALL.iter().map(|&k| progression::rows_for(k, level)).sum();
-        let expected = (5 * STARTING_ROWS as u32 + (level - 1)).min(5 * 8) as u8;
-        assert_eq!(
-            total, expected,
-            "at level {level} the five grids total {total} rows and should total {expected}"
-        );
-    }
-    // The rotation, in the plan's order.
-    assert_eq!(progression::grows_at(1), None, "level 1 is where you start");
-    assert_eq!(progression::grows_at(2), Some(SlotKind::Weapon));
-    assert_eq!(progression::grows_at(3), Some(SlotKind::Chest));
-    assert_eq!(progression::grows_at(4), Some(SlotKind::Helmet));
-    assert_eq!(progression::grows_at(5), Some(SlotKind::Gloves));
-    assert_eq!(progression::grows_at(6), Some(SlotKind::Greaves));
-    assert_eq!(progression::grows_at(7), Some(SlotKind::Weapon), "and round again");
-}
-
-/// A character's real boards match what the level implies.
-#[test]
-fn a_levelled_character_has_the_boards_its_level_implies() {
+fn levelling_alone_never_grows_a_board() {
     let mut c = Character::starting();
     for k in SlotKind::ALL {
         assert_eq!(c.loadout.slot(k).rows(), STARTING_ROWS, "{k:?} did not start at three");
     }
-    c.gain_xp(progression::xp_to_reach(6));
-    assert_eq!(c.level(), 6);
+    c.gain_xp(progression::xp_to_reach(MAX_LEVEL as u32));
+    assert!(c.level() >= 6, "the character actually levelled, or this proves nothing");
     c.resize_boards([0; 5]);
     for k in SlotKind::ALL {
         assert_eq!(
             c.loadout.slot(k).rows(),
-            progression::rows_for(k, 6),
-            "{k:?} is the wrong height at level 6"
+            STARTING_ROWS,
+            "{k:?} grew for nothing but a level"
         );
+    }
+}
+
+/// A board is the base plus what was earned, and it stops at the ceiling.
+///
+/// **The ledger test the pure-function test is succeeded by** — sums match,
+/// growth is monotonic (below), and every slot caps at the original's 6x8 so
+/// the late game converges instead of sprawling.
+#[test]
+fn a_board_is_the_base_plus_what_was_earned_and_caps() {
+    for granted in 0..=12u8 {
+        let want = (STARTING_ROWS + granted).min(MAX_ROWS);
+        assert_eq!(progression::board_rows(granted), want, "{granted} granted");
+        assert!(progression::board_rows(granted) <= MAX_ROWS, "past the ceiling");
+    }
+    assert_eq!(progression::base_rows(), STARTING_ROWS);
+
+    // And a character's real boards follow it. **Indexed by `SlotKind::index`
+    // rather than by writing the array out**, which is how the first version
+    // of this failed: `ALL` is helmet-first and the literal assumed weapon-
+    // first, so it asserted about a different frame than it meant.
+    let mut c = Character::starting();
+    let mut granted = [0u8; 5];
+    granted[SlotKind::Weapon.index()] = 1;
+    granted[SlotKind::Chest.index()] = 2;
+    c.resize_boards(granted);
+    assert_eq!(c.loadout.slot(SlotKind::Weapon).rows(), STARTING_ROWS + 1);
+    assert_eq!(c.loadout.slot(SlotKind::Chest).rows(), STARTING_ROWS + 2);
+    assert_eq!(c.loadout.slot(SlotKind::Helmet).rows(), STARTING_ROWS);
+    let mut lots = [0u8; 5];
+    lots[SlotKind::Weapon.index()] = 99;
+    c.resize_boards(lots);
+    assert_eq!(c.loadout.slot(SlotKind::Weapon).rows(), MAX_ROWS, "the ceiling did not hold");
+}
+
+/// **A row comes from a point spent or a questline finished, and nothing
+/// else.** Both derived, neither banked.
+#[test]
+fn a_row_is_earned_from_the_tree_or_from_the_world() {
+    let tree = data::skills();
+    let rows: Vec<&str> = tree
+        .trees
+        .iter()
+        .flat_map(|t| t.nodes.iter())
+        .filter(|n| {
+            n.effects.iter().any(|e| {
+                matches!(e, gm2d_core::skills::Effect::GrowSlotRows { .. })
+            })
+        })
+        .map(|n| n.id.as_str())
+        .collect();
+    assert!(rows.len() >= 10, "only {} nodes anywhere grant a row", rows.len());
+    let base = tree.trees.iter().find(|t| t.id == "base").expect("a base tree");
+    let in_base = base
+        .nodes
+        .iter()
+        .filter(|n| {
+            n.effects.iter().any(|e| {
+                matches!(e, gm2d_core::skills::Effect::GrowSlotRows { .. })
+            })
+        })
+        .count();
+    assert!(
+        (6..=8).contains(&in_base),
+        "the base tree has {in_base} row nodes; the plan asks for six to eight"
+    );
+
+    // Every slot can be grown from the base tree, or one frame is unreachable
+    // for anybody who does not take a particular class.
+    let mut slots: Vec<String> = Vec::new();
+    for n in &base.nodes {
+        for e in &n.effects {
+            if let gm2d_core::skills::Effect::GrowSlotRows { slot, .. } = e {
+                slots.push(slot.clone());
+            }
+        }
+    }
+    for want in ["weapon", "helmet", "chest", "gloves", "greaves"] {
+        assert!(slots.iter().any(|s| s == want), "no base node grows the {want} frame");
+    }
+
+    // And the world's half: at most one row per questline, on its last errand.
+    let quests = gm2d_core::data::quests();
+    let paying: Vec<&str> =
+        quests.quests.iter().filter(|q| q.rows.is_some()).map(|q| q.id.as_str()).collect();
+    assert!(!paying.is_empty(), "no questline pays a row");
+    for id in &paying {
+        let q = quests.get(id).expect("it exists");
+        assert!(
+            !q.requires.is_empty(),
+            "{id} pays a row and is the *start* of a line; a row is the end of one"
+        );
+        let followed_by = quests.quests.iter().any(|o| o.requires.iter().any(|r| r == id));
+        assert!(!followed_by, "{id} pays a row and something follows it");
+    }
+    // A row is never in a drop table.
+    for d in &gm2d_core::data::drops().drops {
+        assert!(!d.piece.is_empty());
     }
 }
 
@@ -186,9 +271,13 @@ fn a_bought_node_does_something_immediately() {
 fn the_shipped_tree_is_coherent() {
     let tree = data::skills();
     let base = tree.base().expect("a base tree");
+    // **14 to 19 since M12.3**, and the widening is the milestone rather than
+    // a bound being loosened to fit: `PLAN-M12.md` §8 row 6 asks for six to
+    // eight row nodes in the base tree, and the base tree had three. A row is
+    // bought here now, so this is where the nodes to buy it are.
     assert!(
-        (10..=15).contains(&base.nodes.len()),
-        "the base tree has {} nodes and the plan asks for 10 to 15",
+        (14..=19).contains(&base.nodes.len()),
+        "the base tree has {} nodes and the plan asks for 14 to 19",
         base.nodes.len()
     );
 

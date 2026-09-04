@@ -94,6 +94,14 @@ impl Goal {
     }
 }
 
+/// A row on a named frame.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct RowReward {
+    /// Canonical slot name: `weapon`, `helmet`, `chest`, `gloves`, `greaves`.
+    pub slot: String,
+    pub rows: u8,
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Quest {
     pub id: String,
@@ -137,6 +145,21 @@ pub struct Quest {
     pub enchs: Vec<String>,
     #[serde(default)]
     pub gold: i32,
+    /// A row on one frame, for finishing this errand.
+    ///
+    /// **At most one per questline, and it is the end of one.** A row from the
+    /// world stays an event that way; one per errand would be the schedule
+    /// M12.3 just retired, wearing a different hat and paid out faster.
+    ///
+    /// **Never in a drop table**, and that is the whole thesis: a row is a
+    /// decision or an achievement, never a lottery ticket. `Effect::
+    /// GrowSlotRows` is the other source and it costs a skill point.
+    ///
+    /// Derived, never banked — `Character::granted_rows` reads this off
+    /// `quests_done` every time it is asked, the same way it reads the tree
+    /// off `skills_taken`.
+    #[serde(default)]
+    pub rows: Option<RowReward>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -452,6 +475,25 @@ pub fn guide(game: &Game, q: &Quest, worlds: &[crate::world::World]) -> Guide {
                 c.needs_level.unwrap_or(0)
             ));
             break;
+        }
+    }
+    out
+}
+
+/// Rows earned by finished errands, indexed by `SlotKind::index`.
+///
+/// **Derived off `quests_done` every time it is asked**, which is why nothing
+/// about a row is written into the save beyond the fact the errand is done.
+/// The same rule the skill tree follows: retune what a questline pays and
+/// every character who finished it is retuned with it.
+pub fn granted_rows(done: &[String]) -> [u8; 5] {
+    let mut out = [0u8; 5];
+    let all = crate::data::quests();
+    for id in done {
+        let Some(q) = all.get(id) else { continue };
+        let Some(r) = &q.rows else { continue };
+        if let Some(k) = crate::skills::slot_of(&r.slot) {
+            out[k.index()] += r.rows;
         }
     }
     out

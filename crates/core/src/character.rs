@@ -822,10 +822,13 @@ impl Character {
     /// whatever was seated in the rows it lost, silently, and the player would
     /// find out in a fight.
     pub fn resize_boards(&mut self, granted: [u8; 5]) -> Vec<(SlotKind, u8)> {
-        let level = self.level();
         let mut grew = Vec::new();
         for k in SlotKind::ALL {
-            let want = crate::progression::board_rows(k, level, granted[k.index()]);
+            // **No level in this line since M12.3.** A row is earned, not
+            // scheduled, so what a board should be is the base plus what was
+            // earned for it — and `grow_one` below still only ever grows, so
+            // an older save that arrives with bigger boards keeps them.
+            let want = crate::progression::board_rows(granted[k.index()]);
             let have = self.loadout.slot(k).rows();
             if want > have {
                 self.loadout.grow_one(k, want - have);

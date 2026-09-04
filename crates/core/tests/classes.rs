@@ -293,19 +293,27 @@ fn the_mvp_checklist() {
     use gm2d_core::piece::SlotKind;
     let tree = data::skills();
 
-    // 1. A levelling system exists, and levelling adds a row to a gear-slot
-    //    board.
+    // 1. A levelling system exists, and levelling pays a **point**.
+    //
+    // **It used to say levelling adds a row, and M12.3 retired that.** The
+    // MVP's rotation handed a frame a row every level; M12.0 measured what
+    // that cost once components were not scarce — fill falling as you level —
+    // so a row is earned now, with the point this level just paid. What a
+    // level still does, and what this checks, is hand you the point.
     let mut c = Character::starting();
     let before = c.slot_rows();
+    let points_before = c.skill_points;
     c.gain_xp(progression::xp_to_reach(2));
     c.resize_boards([0; 5]);
     assert_eq!(c.level(), 2);
-    assert_ne!(c.slot_rows(), before, "levelling grew no board");
-    assert_eq!(
-        progression::grows_at(2),
-        Some(SlotKind::Weapon),
-        "and it is the rotation's turn that grew"
-    );
+    assert_eq!(c.slot_rows(), before, "a level grew a board, which M12.3 retired");
+    assert!(c.skill_points > points_before, "a level paid no point");
+    let tree_grows = tree
+        .trees
+        .iter()
+        .flat_map(|t| t.nodes.iter())
+        .any(|n| n.effects.iter().any(|e| matches!(e, gm2d_core::skills::Effect::GrowSlotRows { .. })));
+    assert!(tree_grows, "and there is nowhere to spend it on a row");
 
     // 2. A base skill tree exists and the player gets one point per level.
     let base = tree.base().expect("a base tree");

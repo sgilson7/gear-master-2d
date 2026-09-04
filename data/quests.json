@@ -318,7 +318,11 @@
         "Cosmic Alignment",
         "Map Shard"
       ],
-      "gold": 90
+      "gold": 90,
+      "rows": {
+        "slot": "helmet",
+        "rows": 1
+      }
     },
     {
       "id": "the-tenth-survey",
@@ -359,7 +363,12 @@
         "Living Earth",
         "Living Earth"
       ],
-      "gold": 110
+      "gold": 110,
+      "rows": {
+        "slot": "greaves",
+        "rows": 1
+      }
     }
-  ]
+  ],
+  "_rows": "At most one row per questline and only on its last errand - a row from the world stays an event that way, and one per errand would be the level schedule M12.3 retired wearing a different hat. Rows are never in a drop table: a row is a decision or an achievement, never a lottery ticket."
 }

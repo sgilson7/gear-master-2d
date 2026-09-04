@@ -10,7 +10,7 @@
         {
           "id": "frame-sense",
           "name": "Frame Sense",
-          "blurb": "One more row on the weapon frame, out of turn.",
+          "blurb": "One more row on the weapon frame. Nothing else hands you one.",
           "cost": 1,
           "requires": [],
           "effect": {
@@ -177,6 +177,66 @@
           "effect": {
             "grow_slot_rows": {
               "slot": "greaves",
+              "rows": 1
+            }
+          }
+        },
+        {
+          "id": "the-hat-band",
+          "name": "The Hat Band",
+          "blurb": "A row on the helmet. The band is what a hat is; the rest of it is weather.",
+          "cost": 1,
+          "requires": [
+            "frame-sense"
+          ],
+          "effect": {
+            "grow_slot_rows": {
+              "slot": "helmet",
+              "rows": 1
+            }
+          }
+        },
+        {
+          "id": "the-glovers-word",
+          "name": "The Glover's Word",
+          "blurb": "A row on the gloves. She measures both hands and cuts for the larger one.",
+          "cost": 1,
+          "requires": [
+            "frame-sense"
+          ],
+          "effect": {
+            "grow_slot_rows": {
+              "slot": "gloves",
+              "rows": 1
+            }
+          }
+        },
+        {
+          "id": "room-for-the-second",
+          "name": "Room For The Second",
+          "blurb": "Another row on the weapon frame. Two blades is a different argument from one.",
+          "cost": 2,
+          "requires": [
+            "the-fifth-frame"
+          ],
+          "effect": {
+            "grow_slot_rows": {
+              "slot": "weapon",
+              "rows": 1
+            }
+          }
+        },
+        {
+          "id": "let-the-seams-out",
+          "name": "Let The Seams Out",
+          "blurb": "One more row on the chest. Somebody let them out and did not write down who.",
+          "cost": 2,
+          "requires": [
+            "the-fifth-frame"
+          ],
+          "effect": {
+            "grow_slot_rows": {
+              "slot": "chest",
               "rows": 1
             }
           }
@@ -575,7 +635,7 @@
         {
           "id": "w-roast",
           "name": "Filed Under The Roast",
-          "blurb": "Two hundred and nine helmets are in the Keeper\u2019s book, filed by what was still coming off them when they were handed back. Yours goes down as two hundred and ten, under the Roast.",
+          "blurb": "Two hundred and nine helmets are in the Keeper’s book, filed by what was still coming off them when they were handed back. Yours goes down as two hundred and ten, under the Roast.",
           "requires": [
             "w-ledger"
           ],
@@ -611,7 +671,7 @@
         {
           "id": "k-licence",
           "name": "The Licence",
-          "blurb": "Nine pages, and eight of them are the list of what the licence does not cover. Page one is a drawing of a hand holding a thing, and under it, in Kaklon\u2019s own writing, the words BOLT IT ON.",
+          "blurb": "Nine pages, and eight of them are the list of what the licence does not cover. Page one is a drawing of a hand holding a thing, and under it, in Kaklon’s own writing, the words BOLT IT ON.",
           "requires": [],
           "effect": {
             "assembly_pct": {

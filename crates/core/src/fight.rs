@@ -305,6 +305,24 @@ pub fn settle(game: &mut Game, log: &CombatLog, difficulty: Difficulty) -> Optio
     game.character.tire(crate::fatigue::PER_FIGHT);
     let tired = game.character.fatigue - before;
 
+    // **An order ticks exactly when the character gets tired.** M12.2, and the
+    // placement is the whole argument: `PLAN-M12.md` §6 entry 3 warns about "a
+    // fight that resolves without ticking, which would make some fights count
+    // and some not, invisibly", and the answer is not to go and find every
+    // place a fight can end. It is to put the clock beside the one line that
+    // already means *a fight happened, won or lost* — the line directly above
+    // — so the two cannot drift apart.
+    //
+    // **A rout deliberately does not reach here**, and must not. `fight::rout`
+    // settles an encounter with no fight in it and costs no tiredness, because
+    // nothing was fought; a clock that counted routs would let the Rat King's
+    // Mandate and the survey golem pace an order out on creatures that decline
+    // to fight, which is the walking-in-circles loophole the frame chose
+    // fights over steps to avoid, arriving through a different door.
+    for c in &mut game.world.commissions {
+        c.fights_left = c.fights_left.saturating_sub(1);
+    }
+
     match log.outcome {
         Outcome::Victory => {
             game.character.gold += gold;

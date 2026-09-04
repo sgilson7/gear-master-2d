@@ -1120,6 +1120,22 @@ impl World {
 
 // ------------------------------------------------------------------ state
 
+/// An order placed at a town's counter.
+///
+/// A struct rather than a tuple because there are three fields and two of them
+/// are strings: `("kettleworks", "Bronze Fang", 4)` is a thing you have to
+/// count commas in.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Commission {
+    /// The place id that took the order, and the only place it can be
+    /// collected.
+    pub town: String,
+    /// Canonical catalogue name of what was ordered.
+    pub piece: String,
+    /// Fights still to be had. Zero means it is waiting on the counter.
+    pub fights_left: u16,
+}
+
 /// The part of the world that goes in the save.
 ///
 /// Position, what has been answered, and flags. **Not the map.**
@@ -1192,6 +1208,23 @@ pub struct WorldState {
     /// order is the only thing distinguishing two identical saves.
     #[serde(default)]
     pub positions: Vec<(String, [u8; 2])>,
+    /// Orders placed and not yet collected.
+    ///
+    /// **Paid for on placing and waiting on a number of fights.** One open
+    /// order per town, so the ledger is a choice and not a subscription, and
+    /// the piece waits at the shop rather than arriving in the bag — walking
+    /// back for it is the travel economy doing its job.
+    ///
+    /// The piece is a **canonical catalogue name**, not a `PieceId`: a
+    /// `PieceId` is an index into this character's registry and the piece does
+    /// not exist yet. `PLAN-M12.md` wrote `Vec<(PieceId, u16)>`; that is the
+    /// one thing in this milestone the frame got wrong, and it is wrong in the
+    /// way `PieceId` is always wrong across a boundary.
+    ///
+    /// Empty by default, so every save written before M12.2 opens with no
+    /// orders outstanding, which is the truth about it.
+    #[serde(default)]
+    pub commissions: Vec<Commission>,
     /// The map currently being surveyed, and the instrument it is being
     /// surveyed with.
     ///

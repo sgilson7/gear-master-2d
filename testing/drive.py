@@ -452,12 +452,18 @@ def check_the_barrel_is_under_the_counter(page, name, fails):
         fails.append(f"{name}: nothing in the barrel is affordable")
         return
     bought = live.first.locator("b").text_content()
+    shown = "".join(c for c in (live.first.locator(".cost").text_content() or "")
+                    if c.isdigit())
     purse = int(page.text_content("#town-gold"))
     live.first.click()
     page.wait_for_timeout(120)
     after = int(page.text_content("#town-gold"))
     if after >= purse:
         fails.append(f"{name}: buying from the barrel cost nothing ({purse} -> {after})")
+    elif shown and purse - after != int(shown):
+        # §C.3 again. The barrel is the one tier that is *not* marked up, so
+        # this is also how a mark-up leaking onto it would be caught.
+        fails.append(f"{name}: the barrel said {shown} Fnorp and took {purse - after}")
     still = page.evaluate("""(want) => {
       const b = [...document.querySelectorAll('#barrel .wares')]
         .find(e => e.querySelector('b')?.textContent === want);
@@ -3293,12 +3299,34 @@ def walk_the_gate(browser, name, fails=None):
         purse = int(page.text_content("#town-gold"))
         wares = page.locator("#shelf .wares:not(:disabled)")
         if wares.count() == 0:
-            fails.append(f"{name}: nothing on the shelf is affordable with {purse} Fnorp")
+            # **Not a failure since M12.1a, and this is the retargeting.** The
+            # shelf charges five times the catalogue now precisely so that it
+            # stops being where a beginner shops; with ten Fnorp there is
+            # nothing on it, and that is the tier working. What must never be
+            # empty is the *counter* — which is the barrel, and
+            # `check_the_barrel_is_under_the_counter` is where that is asked.
+            # The same move the two M4 soft-lock guards in `avail.rs` made.
+            if page.locator("#barrel .wares:not(:disabled)").count() == 0:
+                fails.append(f"{name}: nothing in the whole shop is affordable "
+                             f"with {purse} Fnorp, shelf or barrel")
         else:
+            # **§C.3, and it is not trivially true any more.** The shelf
+            # charges a mark-up over the catalogue since M12.1a, so "the screen
+            # shows the price actually charged" is a rule with a way to be
+            # wrong: the figure on the button and the figure taken out of the
+            # purse have to be the same number.
+            shown = "".join(c for c in (wares.first.locator(".cost").text_content() or "")
+                            if c.isdigit())
             wares.first.click()
+            page.wait_for_timeout(80)
             after = int(page.text_content("#town-gold"))
             if after >= purse:
                 fails.append(f"{name}: buying cost nothing ({purse} -> {after})")
+            elif not shown:
+                fails.append(f"{name}: a shelf line shows no price")
+            elif purse - after != int(shown):
+                fails.append(f"{name}: the shelf said {shown} Fnorp and took "
+                             f"{purse - after} ({purse} -> {after})")
         page.click("#pack")
         page.wait_for_selector("#fight", state="visible", timeout=8000)
         page.click("#preset")

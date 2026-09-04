@@ -128,62 +128,76 @@ fn no_two_towns_are_the_same_shop() {
 /// A starting character can afford to leave the first town better than they
 /// arrived.
 ///
-/// The kit is two components now, so the shelf is not decoration — it is where
-/// the second and third come from. A starter shelf a new character cannot
-/// reach is the M4 soft-lock wearing a different hat.
+/// **The guard is the same and the thing guarded moved.** The kit is two
+/// components, so somewhere in the first town has to sell the third — a first
+/// shop a new character cannot reach is the M4 soft-lock wearing a different
+/// hat, and that has not changed.
+///
+/// What changed is *which counter*. This asked it of the shelf, because until
+/// M12.1 the shelf was the only counter there was and its prices had to be
+/// small enough to be reachable. There is a floor under it now, and M12.1a
+/// charges the shelf five times the catalogue precisely so that it can stop
+/// being the place a beginner shops. So the question is asked of the barrel,
+/// which is what the beginner's counter is now.
+///
+/// The shelf keeps a weaker guard of its own — one line of it is affordable on
+/// arrival and two are not — in `barrel.rs`, which is where the tier that set
+/// the number lives.
 #[test]
-fn the_starting_purse_buys_something_at_the_starting_town() {
+fn the_first_shop_buys_something_at_the_starting_town() {
     let shops = data::shops();
     let c = Character::starting();
     assert_eq!(c.gold, STARTING_GOLD);
-    let shelf = shelf(&shops, "the-end-of-all-gears", &[]);
-    let affordable: Vec<_> = shelf.iter().filter(|o| o.price <= c.gold).collect();
+    let barrel = gm2d_core::shop::barrel(&shops);
+    assert!(!barrel.is_empty(), "there is no barrel, so there is no floor");
+    let affordable: Vec<_> = barrel.iter().filter(|o| o.price <= c.gold).collect();
     assert!(
         affordable.len() >= 4,
-        "{} of {} entries are within {} Fnorp; the first shelf has to be reachable",
+        "{} of {} barrel entries are within {} Fnorp; the first counter has to be reachable",
         affordable.len(),
-        shelf.len(),
+        barrel.len(),
         c.gold
     );
     // And enough of it to finish a second item, not just to own more scrap.
-    // A helmet wants a frame; gloves and greaves want a material and a mold.
     let cheapest_total: i32 = {
-        let mut prices: Vec<i32> = shelf.iter().map(|o| o.price).collect();
+        let mut prices: Vec<i32> = barrel.iter().map(|o| o.price).collect();
         prices.sort();
         prices.iter().take(4).sum()
     };
     assert!(
         cheapest_total <= c.gold,
-        "the four cheapest things in the pit cost {cheapest_total} and you arrive with {}",
+        "the four cheapest things in the barrel cost {cheapest_total} and you arrive with {}",
         c.gold
     );
 }
 
-/// The starter shelf can actually finish a piece of gear.
+/// The first shop can actually finish a piece of gear.
 ///
 /// Affording four components means nothing if no four of them assemble. The
 /// helmet recipe is the one a new character can reach, so it is the one
-/// checked: a frame and a plating, both on the shelf, both inside the purse.
+/// checked: a frame and a plating, both for sale, both inside the purse.
+///
+/// Asked of the barrel for the reason above — and it is a stronger question
+/// there than it ever was of the shelf, because the barrel is the same in
+/// every town, so this holds at whichever one a player reaches first.
 #[test]
-fn the_first_shelf_can_finish_a_helmet() {
+fn the_first_shop_can_finish_a_helmet() {
     let shops = data::shops();
-    let shelf = shelf(&shops, "the-end-of-all-gears", &[]);
-    let has = |k: PieceKind| {
-        shelf.iter().any(|o| o.def.kind == k && o.def.slot == SlotKind::Helmet)
+    let barrel = gm2d_core::shop::barrel(&shops);
+    let cheapest = |k: PieceKind| {
+        barrel
+            .iter()
+            .filter(|o| o.def.kind == k && o.def.slot == SlotKind::Helmet)
+            .map(|o| o.price)
+            .min()
     };
-    assert!(has(PieceKind::Frame), "no helmet frame in the pit, so no helmet");
-    assert!(has(PieceKind::Plating), "a frame with nothing to plate it");
-    let cost: i32 = [PieceKind::Frame, PieceKind::Plating]
-        .iter()
-        .filter_map(|&k| {
-            shelf
-                .iter()
-                .filter(|o| o.def.kind == k && o.def.slot == SlotKind::Helmet)
-                .map(|o| o.price)
-                .min()
-        })
-        .sum();
-    assert!(cost <= STARTING_GOLD, "the cheapest helmet in the pit costs {cost}");
+    let frame = cheapest(PieceKind::Frame).expect("no helmet frame in the barrel, so no helmet");
+    let plating = cheapest(PieceKind::Plating).expect("a frame with nothing to plate it");
+    assert!(
+        frame + plating <= STARTING_GOLD,
+        "the cheapest helmet a beginner can buy costs {}",
+        frame + plating
+    );
 }
 
 /// Buying takes an entry off the shelf and leaves the rest where they were.

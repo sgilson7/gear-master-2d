@@ -194,6 +194,30 @@ tick the clock, collect, and assert the piece is in the bag. A lint that reads
 the ledger and says "yes, that piece exists" is the failure it exists to
 catch, one level up.
 
+### M12.2's recon, taken before the code
+
+**The clock counts what fatigue counts, and that is not "every encounter".**
+The frame says an order completes after N *fights*, and the block's own
+second-order note (§6 entry 3) warns about "a fight that resolves without
+ticking, which would make some fights count and some not, invisibly". The
+recon answers it, and the answer is not the obvious one:
+
+- **`fight::settle` is every resolved fight, won or lost**, and it already
+  carries the line that means *a fight happened*: `character.tire(PER_FIGHT)`,
+  commented "Every battle, won or lost. Fatigue is what a fight costs whatever
+  happens in it". The tick goes beside it, one line apart, so the two things
+  that mean the same thing cannot drift.
+- **`fight::rout` resolves an encounter without a fight, and must not tick.**
+  It pays what a win pays and deliberately **costs no tiredness** — "nothing
+  was fought". A clock that counted routs would let the Rat King's Mandate and
+  the survey golem pace out an order by meeting creatures that decline to
+  fight, which is the walking-in-circles loophole the frame rejected steps to
+  avoid, arriving through a different door.
+
+So: **an order ticks exactly when the character gets tired.** That is one rule,
+already written, already tested, and it settles §6 entry 3 by reusing the
+answer rather than inventing a second one.
+
 ### M12.5 — events that pay something, and say what they pay *(new)*
 
 **Goal.** An event stops being a paragraph with a dismiss button and becomes a
@@ -528,10 +552,73 @@ do is leave nothing obvious in the bag"* — and it is §8 row 13 rather than a
 fix taken quietly, because changing Auto-pack raises the floor of player power
 across the whole early game (§6 entry 1).
 
+### M12.1a — the shelf gets dearer, on the human's ask
+
+> *"make the actual items in the shop that are not part of the bargain bin a
+> lot more expensive now that the bargain bin exists; consignments should be
+> most expensive."*
+
+**Three tiers, and the barrel is what makes them possible.** Before it, the
+shelf was the only place to buy anything, so its prices had to be affordable
+or a player had no gear at all. With a floor under it, the shelf can go back
+to being what `data/shops.json` says it is — *the curated designed curve* —
+and cost what a considered purchase should.
+
+| tier | what it is | price |
+|---|---|---|
+| the barrel | the floor: junk, infinite, the same everywhere | the catalogue's, unmarked |
+| the shelf | the designed curve: a place's character, once each | **×5** |
+| a commission | the thing you *chose*, ordered and waited for | **×10** |
+
+- **A mark-up in `shop.rs`, not a rewrite of `piece.rs`.** The catalogue's
+  price stays the thing's worth; what a shop charges is the shop's. Editing
+  568 entries to move one relationship would put the tier in five hundred
+  places instead of one, and the barrel would move with the shelf, which is
+  the whole thing being avoided. Seam-free either way — `catalog_fingerprint`
+  hashes **names only**, which was checked rather than assumed.
+- **§C.3 stops being trivially true and becomes a rule with a test on it.**
+  `shop.rs`'s note said *"there is no discount and no mark-up, which is what
+  makes §C.3 — the screen shows the price actually charged — trivially true
+  here rather than something to keep checking"*. There is a mark-up now, so
+  it is something to keep checking: one function answers *what does this
+  cost*, the screen and `buy` both read it, and a test proves they agree.
+  M12.1 already found this hole from the other end — adding fifty Fnorp to
+  every barrel offer passed seven checks because none of them read the price
+  actually charged.
+- **The number is set against the opening, not by taste.** A starting purse is
+  28 Fnorp and the pit's cheapest shelf line is 3. At ×5 that is 15, so the
+  opening is *one considered piece and a barrel weapon* (15 + 11 = 26) or a
+  frame full of junk — and not two shelf pieces, which is 30. That is the
+  decision the tier exists to create, and it is what the test pins.
+- **Commissions at ×10** is `PLAN-M12.md`'s own "priced above shelf — ordering
+  certainty costs more than finding luck", made a number. It lands with M12.2.
+- **Late game it is not a constraint and that is fine.** The M12.1 run held
+  12,000 Fnorp at level 14; no shelf price is a decision by then. The tier is
+  aimed at the first hours, which is where the block's thesis lives.
+
+**This is a divergence from `PLAN-M12.md` §7** — *"no change to what the shelf
+itself stocks; the designed curve is untouched"*. The stock is untouched; the
+prices are not, and the ask is the reason. Recorded as §7 row 8 rather than
+slipped in under "building around it".
+
+**It retargeted two MVP guards rather than weakening them.**
+`the_starting_purse_buys_something_at_the_starting_town` and
+`the_first_shelf_can_finish_a_helmet` both failed on the mark-up, and both were
+right to. They are the M4 soft-lock guards: *a first shop a new character
+cannot reach is that soft-lock in a different hat*. What they asked of the
+shelf they now ask of the **barrel**, because the shelf was only ever the
+subject of that question by being the only counter in the game. They are
+`the_first_shop_buys_something_at_the_starting_town` and
+`the_first_shop_can_finish_a_helmet`, and the question is stronger asked of the
+barrel: the barrel is the same in every town, so it holds at whichever one a
+player reaches first. The shelf keeps a weaker guard of its own — one line
+affordable on arrival, two not — where the number that set it lives.
+
 ### One addition to §7, from the measurement
 
 | # | the frame said | this plan says | why |
 |---|---|---|---|
+| 8 | the shelf's prices are the catalogue's, and the designed curve is untouched | **the shelf charges ×5 and a commission ×10; the barrel charges the catalogue's** | the human's ask, and the barrel is what makes it safe: before there was a floor, the shelf had to be cheap or a player had no gear. The stock is still untouched — this is what it costs, not what it is |
 | 7 | barrel stock is 1×1 and 1×2 commons at single-digit Fnorp | **≤2 cells and ≤12 Fnorp for weapon, helmet and gloves; ≤3 cells and ≤20 Fnorp for chest and greaves** | after removing quest tokens, `EVENT_ONLY` and everything already on a shelf, the tight bounds leave **3 chest and 4 greaves** candidates against 26 weapon, 14 helmet and 20 gloves. The loose bounds give 17 and 30. A barrel that fills three grids and leaves the two emptiest ones bare is a barrel aimed away from the finding — and M12.0 measured greaves at 0% for fourteen levels. Still zero new components: §7 row 1 is untouched |
 
 ---

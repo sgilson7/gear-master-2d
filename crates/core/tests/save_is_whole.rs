@@ -39,6 +39,17 @@ fn a_used_game() -> Game {
     g.world.bump("wins");
     g.world.last_town = "the-end-of-all-gears".into();
 
+    // **An order in the book.** `WorldState` is serialised whole rather than
+    // destructured, so a new field on it is *not* the compile error a field on
+    // `Character` or `Game` is — which is what this file opens by saying. That
+    // makes this the only thing between M12.2's ledger and a save that drops
+    // it in silence.
+    g.world.commissions.push(gm2d_core::world::Commission {
+        town: "the-end-of-all-gears".into(),
+        piece: "Corded Grip".into(),
+        fights_left: 2,
+    });
+
     // An event answered, and a flag off it.
     g.world.answered.push("the-cork-boundary".into());
     g.world.flags.push("has-cork".into());

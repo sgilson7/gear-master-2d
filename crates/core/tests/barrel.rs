@@ -229,3 +229,66 @@ fn the_barrel_holds_no_quest_item_and_nothing_off_a_creature() {
         );
     }
 }
+
+// ---------------------------------------------------------------- the tiers
+
+#[test]
+fn the_barrel_is_cheaper_than_the_shelf_for_the_same_thing() {
+    // **The tier, stated over the whole catalogue rather than over the stock.**
+    // Comparing the barrel's actual entries with the shelf's actual entries
+    // compares two different sets of components and would pass on a shelf that
+    // happened to stock dear things. This asks the question that is really
+    // being asked: for one and the same component, what does each tier want?
+    for d in CATALOG.iter().filter(|d| d.price > 0) {
+        let barrel = d.price;
+        let shelf = shop::shelf_price(d);
+        let order = shop::commission_price(d);
+        assert!(shelf > barrel, "{}: the shelf wants {shelf} and the barrel {barrel}", d.name);
+        assert!(order > shelf, "{}: an order wants {order} and the shelf {shelf}", d.name);
+    }
+}
+
+#[test]
+fn the_opening_is_one_good_piece_or_a_frame_of_junk() {
+    // **What the mark-up is set against.** A starting purse has to buy a
+    // decision rather than a shopping list: one considered piece off the
+    // shelf and a weapon out of the barrel, or a frame full of junk — and
+    // *not* two shelf pieces, which is what made the shelf the only place
+    // worth looking before there was a floor under it.
+    let shops = gm2d_core::data::shops();
+    let purse = shop::STARTING_GOLD;
+    let mut pit: Vec<i32> = shops
+        .town("the-end-of-all-gears")
+        .expect("the pit sells things")
+        .stock
+        .iter()
+        .map(|n| shop::shelf_price(CATALOG.iter().find(|c| c.name == *n).expect("catalogued")))
+        .collect();
+    pit.sort_unstable();
+    let cheapest = pit[0];
+    let two = pit[0] + pit[1];
+    assert!(cheapest <= purse, "a new character cannot afford one shelf line ({cheapest})");
+    assert!(two > purse, "a new character can afford two shelf lines ({two} of {purse})");
+
+    // And the barrel still assembles a weapon out of what is left over.
+    let b = barrel();
+    let handle = b.iter().filter(|d| d.kind == PieceKind::Handle).map(|d| d.price).min();
+    let edge = b.iter().filter(|d| d.kind == PieceKind::Damaging).map(|d| d.price).min();
+    let (handle, edge) = (handle.expect("a handle"), edge.expect("an edge"));
+    assert!(
+        cheapest + handle + edge <= purse,
+        "one shelf piece ({cheapest}) and a barrel weapon ({handle}+{edge}) is {} of {purse}",
+        cheapest + handle + edge
+    );
+}
+
+#[test]
+fn a_mark_up_never_rounds_a_price_to_nothing() {
+    // The dearest tier must not become the cheapest on a rounding error.
+    for pct in [shop::SHELF_PCT, shop::COMMISSION_PCT] {
+        assert!(shop::at_pct(1, pct) >= 1);
+        assert!(shop::at_pct(0, pct) >= 1, "even a free component costs something to order");
+    }
+    assert_eq!(shop::at_pct(3, shop::SHELF_PCT), 15, "the pit's cheapest line");
+    assert_eq!(shop::at_pct(3, shop::COMMISSION_PCT), 30);
+}

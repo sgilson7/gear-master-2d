@@ -137,6 +137,71 @@ impl Game {
     /// The tin goes **on departure**, which is the same bargain the Chonga
     /// Swing makes: the thing that is spent is spent whether or not you like
     /// where you end up.
+    // ------------------------------------------------------------ orders
+
+    /// Place an order at this town's counter.
+    ///
+    /// **Every refusal names the thing in the way**, TONE 12, and each is a
+    /// different rule: you are not here, they do not make that, you already
+    /// have one on order, or you have not got the money. A button that greys
+    /// out with no sentence is a button that reads as broken.
+    ///
+    /// **One open order per town** (`PLAN-M12.md` §8 row 4) — per town rather
+    /// than globally, so each town's ledger is its own small promise and the
+    /// walk back is the economy working.
+    pub fn order(&mut self, town: &str, index: usize) -> Result<crate::world::Commission, String> {
+        let shops = crate::data::shops();
+        let book = crate::shop::commissions(&shops, town);
+        let Some(o) = book.iter().find(|o| o.index == index) else {
+            return Err("They do not make that here.".into());
+        };
+        if let Some(open) = self.world.commissions.iter().find(|c| c.town == town) {
+            let def = crate::shop::def_named(&open.piece).map(|i| crate::piece::CATALOG[i].name);
+            return Err(format!(
+                "They are already making you {}. One at a time.",
+                def.map(|n| self.theme_piece(n)).unwrap_or_else(|| open.piece.clone())
+            ));
+        }
+        if self.character.gold < o.price {
+            return Err(format!("{} Fnorp, and you have {}.", o.price, self.character.gold));
+        }
+        self.character.gold -= o.price;
+        let c = crate::world::Commission {
+            town: town.to_string(),
+            piece: o.def.name.to_string(),
+            fights_left: o.fights,
+        };
+        self.world.commissions.push(c.clone());
+        Ok(c)
+    }
+
+    /// Take delivery, if it is ready and you are standing where you ordered it.
+    ///
+    /// **Collected in person.** The piece does not arrive in the bag when the
+    /// last fight ends, because then the order would be a timer rather than an
+    /// errand — walking back for it is what makes the ledger part of the
+    /// travel economy rather than a second inventory.
+    pub fn collect(&mut self, town: &str) -> Result<String, String> {
+        let Some(i) = self.world.commissions.iter().position(|c| c.town == town) else {
+            return Err("You have nothing on order here.".into());
+        };
+        if self.world.commissions[i].fights_left > 0 {
+            let left = self.world.commissions[i].fights_left;
+            return Err(format!(
+                "Not yet. {left} more {}.",
+                if left == 1 { "fight" } else { "fights" }
+            ));
+        }
+        let c = self.world.commissions.remove(i);
+        self.character.give(&c.piece);
+        Ok(c.piece)
+    }
+
+    /// What is on order here, if anything.
+    pub fn order_at(&self, town: &str) -> Option<&crate::world::Commission> {
+        self.world.commissions.iter().find(|c| c.town == town)
+    }
+
     pub fn go_home(&mut self, difficulty: crate::combat::Difficulty) -> Result<Homeward, String> {
         if !self.character.rules().contains(&crate::rule::Rule::Homeward) {
             return Err("nothing you are wearing knows the way home".into());

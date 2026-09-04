@@ -19,6 +19,7 @@
     "Mage's Sandals",
     "Sprung Sole"
   ],
+  "_commissions": "What each town will make to order. Paid up front, arrives after that many fights, and collected in person at the counter that took it - one open order per town. Priced at COMMISSION_PCT of the catalogue, which is twice the shelf: ordering certainty costs more than finding luck. Nothing here is on a shelf or in the barrel, so an order is a third source and not a slower way to shop.",
   "towns": [
     {
       "id": "the-end-of-all-gears",
@@ -35,6 +36,20 @@
         "Rag Layer",
         "Balance Weight",
         "Ruby Inlay"
+      ],
+      "commissions": [
+        {
+          "piece": "Corded Grip",
+          "fights": 3
+        },
+        {
+          "piece": "Arcane Splinter",
+          "fights": 5
+        },
+        {
+          "piece": "Mail Layer",
+          "fights": 6
+        }
       ]
     },
     {
@@ -56,6 +71,20 @@
         "Chain Coil",
         "Plate Layer",
         "Hide Base"
+      ],
+      "commissions": [
+        {
+          "piece": "Hollowbone Frame",
+          "fights": 5
+        },
+        {
+          "piece": "Brigandine Base",
+          "fights": 8
+        },
+        {
+          "piece": "Warded Sabatons",
+          "fights": 10
+        }
       ]
     },
     {
@@ -79,6 +108,16 @@
         "Serrated Edge",
         "Bonesaw",
         "Duelist's Grip"
+      ],
+      "commissions": [
+        {
+          "piece": "Witchglass Shard",
+          "fights": 6
+        },
+        {
+          "piece": "Coven Crest",
+          "fights": 9
+        }
       ]
     }
   ]

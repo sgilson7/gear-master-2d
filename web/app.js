@@ -6,7 +6,7 @@
 import init, {
   world_json, position, try_step, event_json, answer,
   save_json, load_json, new_game, apply_preset,
-  shop_json, bench_json, buy, buy_barrel, buy_supply, buy_ench, use_supply, quests_json, take_quest, hand_in_quest, bank_xp,
+  shop_json, bench_json, buy, buy_barrel, order, collect_order, buy_supply, buy_ench, use_supply, quests_json, take_quest, hand_in_quest, bank_xp,
   quest_log_json, guide_json, pin_quest,
   character_json, skills_json, take_skill, pressure_json,
   class_offer_json, choose_class, class_name, all_trees_json,
@@ -1448,6 +1448,7 @@ function openTown(id) {
   portrait($('town-art'), figure('places', id), place?.name ?? id);
   paintShelf();
   paintBarrel();
+  paintOrders();
   paintQuests();
   paintTins();
   paintCarrying();
@@ -1491,7 +1492,7 @@ function paintShelf() {
       townSays(why || `Bought ${w.name}.`, !!why);
       // The barrel repaints too: what you can afford there just changed, and
       // a button that greys out one screen late reads as a broken button.
-      paintShelf(); paintBarrel(); paintPanel(); autosave();
+      paintShelf(); paintBarrel(); paintOrders(); paintPanel(); autosave();
     };
     box.appendChild(b);
   }
@@ -1525,7 +1526,69 @@ function paintBarrel() {
     b.onclick = () => {
       const why = buy_barrel(w.slot);
       townSays(why || `${w.name}, out of the barrel.`, !!why);
-      paintShelf(); paintBarrel(); paintPanel(); autosave();
+      paintShelf(); paintBarrel(); paintOrders(); paintPanel(); autosave();
+    };
+    box.appendChild(b);
+  }
+}
+
+/// The order book: the deterministic answer to "I want the thing".
+///
+/// **One at a time, and it waits at the counter.** What is already on order is
+/// printed above the book rather than instead of it, because a player who
+/// cannot see what they ordered has to remember it, and a ledger you have to
+/// remember is a ledger you stop using.
+function paintOrders() {
+  const s = JSON.parse(shop_json());
+  const box = $('order-book');
+  const book = s.commissions ?? [];
+  $('orders').hidden = book.length === 0;
+  if (!book.length) return;
+  const open = s.on_order;
+  const line = $('on-order');
+  if (open) {
+    line.textContent = open.ready
+      ? `${open.piece} is finished and on the counter.`
+      : `${open.piece}, after ${open.fights_left} more ${open.fights_left === 1 ? 'fight' : 'fights'}.`;
+    line.hidden = false;
+  } else {
+    line.hidden = true;
+  }
+  box.replaceChildren();
+  if (open && open.ready) {
+    const take = document.createElement('button');
+    take.type = 'button';
+    take.className = 'wares';
+    take.id = 'take-order';
+    take.innerHTML = `<b>Take it</b><span class="meta">${open.piece}</span>` +
+      `<span class="cost">paid for</span>`;
+    take.onclick = () => {
+      const r = JSON.parse(collect_order());
+      townSays(r.error || `${r.piece}. They had it under the counter.`, !!r.error);
+      paintOrders(); paintPanel(); autosave();
+    };
+    box.appendChild(take);
+  }
+  for (const w of book) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'wares';
+    // A counter with an order outstanding takes no more, and says so by
+    // greying rather than by refusing after the click.
+    b.disabled = !w.afford || !!open;
+    b.innerHTML = `<span class="ware-top"></span><b>${w.name}</b>` +
+      `<span class="meta">${w.for} · ${w.kind} · after ${w.fights} fights</span>` +
+      `<span class="cost">${w.price} Fnorp</span>`;
+    b.querySelector('.ware-top').appendChild(shapeCanvas(w));
+    const read = () => showPiece(b, w);
+    b.onpointerenter = read;
+    b.onfocus = read;
+    b.onpointerleave = hidePiece;
+    b.onblur = hidePiece;
+    b.onclick = () => {
+      const why = order(w.slot);
+      townSays(why || `Ordered. ${w.name}, after ${w.fights} fights.`, !!why);
+      paintOrders(); paintShelf(); paintBarrel(); paintPanel(); autosave();
     };
     box.appendChild(b);
   }
@@ -1555,7 +1618,7 @@ function paintTins() {
     b.onclick = () => {
       const why = buy_supply(t.id);
       townSays(why || `Bought ${t.name}.`, !!why);
-      paintTins(); paintShelf(); paintBarrel(); paintPanel(); autosave();
+      paintTins(); paintShelf(); paintBarrel(); paintOrders(); paintPanel(); autosave();
     };
     box.appendChild(b);
   }

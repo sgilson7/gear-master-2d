@@ -2011,9 +2011,34 @@ pub fn shop_json() -> String {
                 v
             })
             .collect();
+        // **The order book, and what is already on order here.** Both, because
+        // a counter with an order outstanding has to say so — "one at a time"
+        // is a refusal a player should be able to see coming.
+        let book: Vec<_> = gm2d_core::shop::commissions(&shops, &town)
+            .into_iter()
+            .map(|o| {
+                let mut v = piece_payload(o.def, theme, serde_json::Value::Null,
+                                          serde_json::json!(o.def.cells), None);
+                let m = v.as_object_mut().expect("an object");
+                m.insert("slot".into(), o.index.into());
+                m.insert("for".into(), slot_name(o.def.slot).into());
+                m.insert("price".into(), o.price.into());
+                m.insert("fights".into(), o.fights.into());
+                m.insert("rating".into(), gm2d_core::rating::piece_rating(o.def).into());
+                m.insert("afford".into(), (g.character.gold >= o.price).into());
+                v
+            })
+            .collect();
+        let on_order = g.order_at(&town).map(|c| serde_json::json!({
+            "piece": g.theme_piece(&c.piece),
+            "fights_left": c.fights_left,
+            "ready": c.fights_left == 0,
+        }));
         serde_json::json!({
             "gold": g.character.gold, "town": town, "shelf": shelf,
             "barrel": barrel,
+            "commissions": book,
+            "on_order": on_order,
             "supplies": tins,
             "fatigue": g.character.fatigue,
         })
@@ -2100,6 +2125,34 @@ pub fn buy_barrel(index: usize) -> String {
         g.character.gold -= price;
         g.character.give(name);
         String::new()
+    })
+}
+
+/// Order the entry at `index` from this town's book. Empty string, or why not.
+///
+/// **The whole answer is core's.** Whether you may, what it costs, how long it
+/// takes and what it says when it refuses are all rules, and a shim that
+/// decided any of them would be a second rulebook.
+#[wasm_bindgen]
+pub fn order(index: usize) -> String {
+    with_mut(|g| {
+        let Some(town) = town_here(g) else { return "you are not in a town".into() };
+        match g.order(&town, index) {
+            Ok(_) => String::new(),
+            Err(why) => why,
+        }
+    })
+}
+
+/// Take delivery of what this town is holding for you.
+#[wasm_bindgen]
+pub fn collect_order() -> String {
+    with_mut(|g| {
+        let Some(town) = town_here(g) else { return "you are not in a town".into() };
+        match g.collect(&town) {
+            Ok(name) => serde_json::json!({ "piece": g.theme_piece(&name) }).to_string(),
+            Err(why) => serde_json::json!({ "error": why }).to_string(),
+        }
     })
 }
 

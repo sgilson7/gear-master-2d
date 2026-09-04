@@ -29,6 +29,7 @@ import socketserver
 import sys
 import threading
 import json
+import re
 import traceback
 from pathlib import Path
 
@@ -478,6 +479,76 @@ def check_the_barrel_is_under_the_counter(page, name, fails):
         fails.append(f"{name}: buying {bought} said {said!r}, which does not name it")
 
 
+def check_a_choice_says_what_it_pays(page, name, fails):
+    """The outcomes box, and that it agrees with the receipt.
+
+    **M12.5, and the highest-risk thing in the block.** A box is a promise
+    printed on a screen, and this project has shipped four promises that
+    reached nothing — `Showstopper`, `Recycler`, the ench rack, event
+    experience. `PLAN-M12-EXEC.md` §6 entry 7 says to treat any disagreement
+    between the box, the receipt and the character's actual state as a **fifth
+    instance rather than a rendering bug**, and that is what this asks: read
+    the box, take the choice, read the receipt, and compare.
+    """
+    card = page.evaluate("""() => {
+      const box = document.getElementById('card');
+      if (!box || box.hidden) return null;
+      return [...document.querySelectorAll('#card-choices .choice')].map(b => ({
+        label: b.querySelector('b')?.textContent,
+        off: b.disabled,
+        spec: [...b.querySelectorAll('.outcome li')].map(li => (li.textContent || '').trim()),
+        wants: [...b.querySelectorAll('.outcome li.wants')].map(li => (li.textContent || '').trim()),
+      }));
+    }""")
+    if card is None:
+        return
+    if not card:
+        # A card whose choices are spent reopens with none, which is the
+        # design: the place may still have an errand on it. Nothing to read
+        # here, and that is not a fault.
+        return
+    for c in card:
+        if not c["spec"]:
+            fails.append(f"{name}: the choice {c['label']!r} says nothing about what it pays")
+        # A locked choice says what it wants as well as what it would pay.
+        if c["off"] and not c["wants"]:
+            fails.append(f"{name}: {c['label']!r} is refused and never says what would open it")
+    themed = ("cork", "nut freeze", "the funny", "semuta")
+    for c in card:
+        for line in c["spec"]:
+            if any(t in line.lower() for t in themed):
+                fails.append(f"{name}: an outcomes box says {line!r}, which is the theme's word")
+
+    # **The box against the receipt.** Take a choice that can be taken and
+    # compare what it promised with what the game says it did.
+    live = [i for i, c in enumerate(card) if not c["off"]]
+    if not live:
+        return
+    i = live[0]
+    promised = card[i]["spec"]
+    gold_before = int(page.text_content("#gold"))
+    page.locator("#card-choices .choice").nth(i).click()
+    page.wait_for_timeout(200)
+    receipt = page.locator("#card-receipt p").all_text_contents()
+    if not receipt:
+        fails.append(f"{name}: taking {card[i]['label']!r} produced no receipt at all")
+        return
+    for line in promised:
+        m = re.search(r"([+-]?\d+) Fnorp", line)
+        if not m:
+            continue
+        want = int(m.group(1))
+        got = int(page.text_content("#gold")) - gold_before
+        if got != want:
+            fails.append(f"{name}: the box promised {want} Fnorp and the purse moved {got}")
+    # Experience is carried, so the receipt is where it shows.
+    for line in promised:
+        if "experience" in line and not any("experience" in r for r in receipt):
+            fails.append(f"{name}: the box promised {line!r} and the receipt never mentions it")
+        if line.startswith("Gained:") and not any("Gained" in r or "Took" in r for r in receipt):
+            fails.append(f"{name}: the box promised {line!r} and the receipt does not")
+
+
 def check_a_grid_says_what_it_takes(page, name, fails):
     """Every grid names its recipe, and an empty grid names it too.
 
@@ -571,10 +642,20 @@ def check_the_frozen_save_is_playable(page, name, fails):
         fails.append(f"{name}: reading the quest log threw {str(e).splitlines()[0][:60]}")
     walked = []
     for key in ("ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"):
+        # **Close a card without answering it.** The field is thick with events
+        # since M12.5 and one of them is a warp: `dismiss_card` takes the first
+        # choice, which on the cistern is *go down*, and this check would end
+        # up under the lake proving nothing. Close only.
+        if page.is_visible("#card"):
+            page.click("#card-close")
+            page.wait_for_selector("#card", state="hidden", timeout=5000)
         page.click("#map")
         page.keyboard.press(key)
         page.wait_for_timeout(180)
         walked.append(page.text_content("#coords"))
+    if page.is_visible("#card"):
+        page.click("#card-close")
+        page.wait_for_selector("#card", state="hidden", timeout=5000)
     if len(set(walked)) < 2:
         fails.append(f"{name}: four presses and the character stood still: {walked}")
     if errors:
@@ -1372,10 +1453,14 @@ def check_the_road_west_reaches_a_town(page, name, fails):
         fails.append(f"{name}: the Drambus Stack is {dense['curd']} tiles")
 
     # An examinable is a card with nothing to answer, and you walk on from it.
+    # **`the-flies` rather than `the-milestone` since M12.5**: the milestone
+    # asks something now, and an examinable check needs an event that is still
+    # furniture. What is being checked is unchanged — a card with nothing to
+    # answer that you walk on from.
     look = page.evaluate("""() => (window.__world().places ?? [])
-        .find(p => p.id === 'the-milestone')""")
+        .find(p => p.id === 'the-flies')""")
     if not look:
-        fails.append(f"{name}: the field has no milestone on it")
+        fails.append(f"{name}: the field has no flies on it")
     else:
         # **Stand beside it and take one step.** Standing *on* it and stepping
         # off and back is two steps, and the first of them can roll a fight —
@@ -1395,7 +1480,7 @@ def check_the_road_west_reaches_a_town(page, name, fails):
                 fails.append(f"{name}: an examinable has no way out of it")
             dismiss_card(page)
         else:
-            fails.append(f"{name}: standing on the milestone opened nothing")
+            fails.append(f"{name}: standing on the flies opened nothing")
         close_fight(page)
 
     # And the town on it opens, sells, and wants something.
@@ -3341,6 +3426,30 @@ def walk_the_gate(browser, name, fails=None):
         check_a_grid_says_what_it_takes(page, name, fails)
         page.click("#run")
         page.wait_for_selector("#fight", state="hidden", timeout=8000)
+
+    # --- an event that says what it pays ------------------------------------
+    # Stood on rather than walked into: the box is the milestone's whole
+    # deliverable and a check that waits for the ground to roll one is a check
+    # that runs on some seeds and not others.
+    # **Stood beside and stepped onto.** `__standAt` plants a position; a card
+    # opens on a *step*, which is the same reason every other planted check in
+    # this file stands one tile east and presses west.
+    page.evaluate("(at) => window.__standAt(at)", [17, 14])
+    page.wait_for_timeout(150)
+    page.click("#map")
+    page.keyboard.press("ArrowLeft")
+    page.wait_for_timeout(300)
+    if not page.is_visible("#card"):
+        fails.append(f"{name}: stepping onto the counted heap opened no card")
+    else:
+        try:
+            check_a_choice_says_what_it_pays(page, name, fails)
+        finally:
+            # **A check that opens a screen closes it on every path out.** One
+            # that returned early once left the screen up, the next check died
+            # on a click it could not land, and the whole failure list went
+            # unprinted.
+            dismiss_card(page)
 
     # The tree lives on the map, behind nothing — checked here rather than up
     # in the packing block, where the fight screen is over the top of it.

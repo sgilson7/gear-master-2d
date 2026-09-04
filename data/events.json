@@ -168,7 +168,10 @@
           "outcome": {
             "all": [
               {
-                "gold": 60
+                "gold": 20
+              },
+              {
+                "give": "Whipcord Hilt"
               },
               {
                 "flag": "took-the-frame"
@@ -232,7 +235,7 @@
           "outcome": {
             "all": [
               {
-                "gold": 30
+                "give": "Sapling Mold"
               },
               {
                 "flag": "counted-toads"
@@ -404,7 +407,10 @@
           "outcome": {
             "all": [
               {
-                "xp": 4
+                "give": "Watchful Crest"
+              },
+              {
+                "xp": 10
               }
             ]
           },
@@ -459,7 +465,29 @@
         "A rectangle of black water forty feet on a side with a rail round three of them and a plank across the fourth. Steam comes off it in the morning and does not stop coming off it in the afternoon.",
         "There is a tally chalked on the rail: 1,402. Under it, in a different hand, WE DO NOT KNOW WHAT OF."
       ],
-      "choices": []
+      "choices": [
+        {
+          "label": "Give him the west side's number",
+          "blurb": "He chalks it up beside 1,402 and looks at the two of them for a while.",
+          "requires": {
+            "flag": "counted-toads"
+          },
+          "unmet": "He wants a count, and you have not counted toads for anybody.",
+          "outcome": {
+            "all": [
+              {
+                "flag": "counted-for-the-pond"
+              },
+              {
+                "gold": 20
+              },
+              {
+                "xp": 20
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "the-plate-stack",
@@ -486,7 +514,26 @@
         "A shed with a window and a counter under the window and nobody behind the counter. On the counter is a ledger open at a page headed COMPLAINTS, and the page has three entries on it and all three are about the page.",
         "The pencil is on a string and the string is nine inches long, which is not enough to reach the second column."
       ],
-      "choices": []
+      "choices": [
+        {
+          "label": "Leave the correction",
+          "blurb": "Nobody is behind it. The paper stays where you put it.",
+          "requires": {
+            "flag": "corrected-the-heap"
+          },
+          "unmet": "You have not corrected anybody's arithmetic yet.",
+          "outcome": {
+            "all": [
+              {
+                "give": "Riveted Layer"
+              },
+              {
+                "xp": 26
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "the-scrap-line",
@@ -504,7 +551,37 @@
         "The first forge burned down in a year nobody writes on anything. This is the second one and it is built out of the first one, which is why the west wall is a different colour and eleven inches thicker than the other three.",
         "Nothing is being forged. The fire is banked and two men are sitting beside it with a board between them playing a game with four counters."
       ],
-      "choices": []
+      "choices": [
+        {
+          "label": "Say both names",
+          "blurb": "The first forge burned down in a year nobody writes on anything. This one has two names too.",
+          "requires": {
+            "flag": "said-the-other-name"
+          },
+          "unmet": "You would have to have said the other name somewhere first.",
+          "outcome": {
+            "all": [
+              {
+                "give": "Grove Base"
+              },
+              {
+                "xp": 32
+              }
+            ]
+          }
+        },
+        {
+          "label": "Watch them work",
+          "blurb": "It is the second one and it is built out of what is left of the first.",
+          "outcome": {
+            "all": [
+              {
+                "xp": 8
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "the-cold-anvil",
@@ -549,7 +626,26 @@
         "Forty kettles on the ground in four rows of ten, all of them upside down, all of them still warm. Walking between the rows is warmer than walking round them by about the amount that makes you do it.",
         "The fortieth is the only one the right way up. There is rainwater in it and something living in the rainwater."
       ],
-      "choices": []
+      "choices": [
+        {
+          "label": "Turn the fortieth over",
+          "blurb": "Thirty-nine are upside down and stacked. You leave the fortieth the other way up.",
+          "requires": {
+            "flag": "asked-the-tally"
+          },
+          "unmet": "You have not asked anybody here what they are counting.",
+          "outcome": {
+            "all": [
+              {
+                "gold": 30
+              },
+              {
+                "xp": 18
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "the-wood-that-was-left",
@@ -567,7 +663,26 @@
         "Hoops on pegs, smallest to largest, from a bracelet to a thing you could stand in. The last four pegs are empty and the wall behind them is unfaded, so they have not been empty long.",
         "The list on the door has ninety-one hoops on it. Counting the pegs gives eighty-seven."
       ],
-      "choices": []
+      "choices": [
+        {
+          "label": "Take the hoop that fits the gate",
+          "blurb": "Smallest to largest, and one of them is a gate's width. It was never a hoop.",
+          "requires": {
+            "flag": "hung-the-north-gate"
+          },
+          "unmet": "There is no gate here that wants a hoop.",
+          "outcome": {
+            "all": [
+              {
+                "give": "Reckoning Plate"
+              },
+              {
+                "xp": 34
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "the-stack-door",
@@ -577,7 +692,26 @@
         "There is a door in the south face at ground level. It is a proper door with a proper frame, set into the curd, and the curd has closed round the frame by about an inch on every side over some number of years.",
         "It is shut. Not locked — shut, the way a door is shut when the thing behind it is not ready for you. Somebody has chalked five strokes on it and rubbed none of them out."
       ],
-      "choices": []
+      "choices": [
+        {
+          "label": "Ask what is behind this one",
+          "blurb": "The same answer, about a different door, from somebody who has not been in.",
+          "requires": {
+            "flag": "asked-about-the-door"
+          },
+          "unmet": "You have not got into the habit of asking about doors.",
+          "outcome": {
+            "all": [
+              {
+                "flag": "asked-again"
+              },
+              {
+                "xp": 20
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "the-smell-line",
@@ -595,7 +729,37 @@
         "A post with the Stack's height cut into it, once a year, for eleven years. The marks go down.",
         "Not by much and not evenly: four of the eleven years it did not move at all, and one year it went down eleven feet in a fortnight and the mark for that year is cut twice because nobody believed the first one."
       ],
-      "choices": []
+      "choices": [
+        {
+          "label": "Cut your name under the eleventh",
+          "blurb": "It is the twelfth mark and it is not a height.",
+          "requires": {
+            "flag": "named-on-the-post"
+          },
+          "unmet": "You have not cut your name into a post before.",
+          "outcome": {
+            "all": [
+              {
+                "flag": "named-twice"
+              },
+              {
+                "xp": 24
+              }
+            ]
+          }
+        },
+        {
+          "label": "Read the eleven and go",
+          "blurb": "The Stack has lost four feet in eleven years. Somebody has been keeping this up.",
+          "outcome": {
+            "all": [
+              {
+                "xp": 10
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "the-crumb-field",
@@ -604,7 +768,37 @@
         "Everything that comes off the Stack lands here, and what comes off the Stack is not crumbs so much as pieces, and nine of the pieces are the size of a chair.",
         "There is a path through them that gets remade about once a month. You can tell how long it has been by how far you have to climb."
       ],
-      "choices": []
+      "choices": [
+        {
+          "label": "Wall the crumb in",
+          "blurb": "It is not crumb and it does not stay where it lands. The wall helps for a week.",
+          "requires": {
+            "flag": "corked-the-wall"
+          },
+          "unmet": "You have not corked a wall yet, so you do not know how it sits.",
+          "outcome": {
+            "all": [
+              {
+                "give": "Tempered Sole"
+              },
+              {
+                "xp": 30
+              }
+            ]
+          }
+        },
+        {
+          "label": "Take a handful",
+          "blurb": "It is not crumb. You put it down again.",
+          "outcome": {
+            "all": [
+              {
+                "xp": 6
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "the-rind-wall",
@@ -613,7 +807,37 @@
         "Somebody has built a wall out of the rind. It is four feet high, ninety feet long, and runs from nothing to nothing across open ground.",
         "It is a very good wall. That is the part people come to see: whoever did it knew how to build a wall and had only this to build one out of."
       ],
-      "choices": []
+      "choices": [
+        {
+          "label": "Fit cork to the gap",
+          "blurb": "It is the wrong colour and the right size, which is what a wall wants.",
+          "requires": {
+            "flag": "corked-the-frame"
+          },
+          "unmet": "You have not corked a frame yet, and this is bigger than a frame.",
+          "outcome": {
+            "all": [
+              {
+                "flag": "corked-the-wall"
+              },
+              {
+                "xp": 20
+              }
+            ]
+          }
+        },
+        {
+          "label": "Walk the ninety feet",
+          "blurb": "Ninety feet of wall and it stops. It was never going anywhere.",
+          "outcome": {
+            "all": [
+              {
+                "xp": 6
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "the-ladder",
@@ -622,7 +846,34 @@
         "A ladder, against the Stack, going up eleven rungs and stopping. It has been there long enough for the curd to have grown round the feet of it.",
         "The eleventh rung is worn and the tenth is not, which means everybody who has ever climbed it has stood on the top one and looked, and nobody has ever gone further, because there is nothing to go further on."
       ],
-      "choices": []
+      "choices": [
+        {
+          "label": "Ask why it stops at eleven",
+          "blurb": "Eleven rungs and then nothing. Somebody stopped and did not come back for the rest.",
+          "requires": {
+            "flag": "asked-again"
+          },
+          "unmet": "You have not asked about one door, so asking again about a ladder is early.",
+          "outcome": {
+            "all": [
+              {
+                "xp": 24
+              }
+            ]
+          }
+        },
+        {
+          "label": "Climb the eleven",
+          "blurb": "Eleven rungs of ladder against two hundred and ten feet of cheese.",
+          "outcome": {
+            "all": [
+              {
+                "xp": 10
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "the-tally-shed",
@@ -631,7 +882,58 @@
         "A shed with one door and one window and a man in it whose entire responsibility is to write down when the Stack drops. He has been in the shed for six years and has written five lines.",
         "\"They come in clumps,\" he says. \"Or they do not. Six years is not enough to say and I have said so in the sixth line, which is not a drop and is why it is not a line.\""
       ],
-      "choices": []
+      "choices": [
+        {
+          "label": "Tell him about the heap",
+          "blurb": "He writes it in a different book from the one he was writing in.",
+          "requires": {
+            "flag": "took-from-the-heap"
+          },
+          "unmet": "He wants a number off the slag and you have not been.",
+          "outcome": {
+            "all": [
+              {
+                "gold": 35
+              },
+              {
+                "xp": 18
+              }
+            ]
+          }
+        },
+        {
+          "label": "Ask what the count is for",
+          "blurb": "Eleven years of it. He does not know either, and says so at length.",
+          "outcome": {
+            "all": [
+              {
+                "flag": "asked-the-tally"
+              },
+              {
+                "xp": 12
+              }
+            ]
+          }
+        },
+        {
+          "label": "Bring him the pond's number",
+          "blurb": "Two counts, eleven years apart, and he files them under the same heading.",
+          "requires": {
+            "flag": "counted-for-the-pond"
+          },
+          "unmet": "The man at the pond is still waiting for his four.",
+          "outcome": {
+            "all": [
+              {
+                "give": "Lightweave"
+              },
+              {
+                "xp": 36
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "the-cut-face",
@@ -667,7 +969,26 @@
         "A weighbridge, for carts, at the edge of the crumb field. The plate reads to a quarter of a hundredweight and there is a book beside it with four thousand entries in it.",
         "Every entry is a cart going out. There is no column for a cart coming in and there never has been, which the man on the bridge says is because nothing comes in."
       ],
-      "choices": []
+      "choices": [
+        {
+          "label": "Weigh yourself against the toll",
+          "blurb": "A quarter of a hundredweight. It is not the same kind of number.",
+          "requires": {
+            "flag": "paid-at-your-own-gate"
+          },
+          "unmet": "You have not paid to walk through anything of yours.",
+          "outcome": {
+            "all": [
+              {
+                "gold": 50
+              },
+              {
+                "xp": 16
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "the-shortest-way",
@@ -685,7 +1006,26 @@
         "Nine pens, empty, in good repair, with the gates all standing open and the straw changed. Somebody is keeping them ready.",
         "A woman comes down twice a day and changes the straw in all nine and goes away. There has not been anything in them since the year the works stopped putting a year on things."
       ],
-      "choices": []
+      "choices": [
+        {
+          "label": "Say who brought them",
+          "blurb": "Nine pens, and he knows all nine names before you finish the first.",
+          "requires": {
+            "flag": "knows-who-brought-them"
+          },
+          "unmet": "You never asked who brought forty of anything.",
+          "outcome": {
+            "all": [
+              {
+                "flag": "named-the-drover"
+              },
+              {
+                "xp": 26
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "the-lower-road",
@@ -694,7 +1034,40 @@
         "The road out of the field runs south and then east and joins the Treyway at a milestone that says KETTLEWORKS 11, which is eleven if you take the road and nine if you do not.",
         "Somebody has cut a third number under both of them and then filled it in again, and the filling has weathered differently, so you can read it. It is 4."
       ],
-      "choices": []
+      "choices": [
+        {
+          "label": "Walk east against the notices",
+          "blurb": "Four notices say the road east is not maintained. The road east is not maintained.",
+          "requires": {
+            "flag": "posted-the-seventh"
+          },
+          "unmet": "You have not had your say on the board yet.",
+          "outcome": {
+            "all": [
+              {
+                "gold": 35
+              },
+              {
+                "tire": 5
+              },
+              {
+                "xp": 24
+              }
+            ]
+          }
+        },
+        {
+          "label": "Take the road south",
+          "blurb": "South, then east, and it joins the Treyway at a milestone.",
+          "outcome": {
+            "all": [
+              {
+                "xp": 8
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "the-cistern",
@@ -703,7 +1076,42 @@
         "Sunk stone, twelve feet across, with a lid on it in two halves and one half slid back. The water is nine feet down and clean.",
         "There is a mark on the inside wall at the six-foot line, cut deep, with a date beside it. Whatever it records, it records it as having been higher."
       ],
-      "choices": []
+      "choices": [
+        {
+          "label": "Go down the half that is slid back",
+          "blurb": "Twelve feet of sunk stone and then it is not stone. You are a long way under.",
+          "outcome": {
+            "all": [
+              {
+                "warp": {
+                  "map": "under-the-lake",
+                  "at": [
+                    11,
+                    7
+                  ]
+                }
+              },
+              {
+                "tire": 6
+              },
+              {
+                "xp": 30
+              }
+            ]
+          }
+        },
+        {
+          "label": "Slide the lid back over",
+          "blurb": "It takes both hands and it is the right thing to do.",
+          "outcome": {
+            "all": [
+              {
+                "xp": 8
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "the-fitters-bench",
@@ -712,7 +1120,37 @@
         "A bench under a lean-to with four vices on it, three of which work. The fourth has been left on the bench with its jaws open and a card in the jaws that says DO NOT, and nothing after that.",
         "The other three are worn smooth where hands go. The fourth is not worn at all."
       ],
-      "choices": []
+      "choices": [
+        {
+          "label": "Fit the fourth vice",
+          "blurb": "It takes the afternoon. Three that work becomes four that work.",
+          "requires": {
+            "flag": "took-the-frame"
+          },
+          "unmet": "You would need the timber, and you left it standing.",
+          "outcome": {
+            "all": [
+              {
+                "give": "Spiked Vambrace"
+              },
+              {
+                "xp": 28
+              }
+            ]
+          }
+        },
+        {
+          "label": "Use the three that work",
+          "blurb": "You straighten what you are carrying. It is quicker after.",
+          "outcome": {
+            "all": [
+              {
+                "xp": 9
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "the-long-shed",
@@ -730,7 +1168,37 @@
         "Cork fencing, four panels of it, plainly cut off the boundary in Bambulon and carted eleven days to get here. It has been put up round nothing — four panels in a square with a gap you walk through.",
         "It is growing. Two of the four panels have closed the gap by an inch since somebody last measured, and somebody measures."
       ],
-      "choices": []
+      "choices": [
+        {
+          "label": "Say where it was cut",
+          "blurb": "They stop stacking. Nobody thanks you and the work does not start again.",
+          "requires": {
+            "flag": "cut-the-tenth"
+          },
+          "unmet": "You have not cut cork off that boundary, so you are guessing.",
+          "outcome": {
+            "all": [
+              {
+                "flag": "named-the-fence"
+              },
+              {
+                "xp": 30
+              }
+            ]
+          }
+        },
+        {
+          "label": "Count the panels and go",
+          "blurb": "Four. It takes a moment and it is the only number anybody here has.",
+          "outcome": {
+            "all": [
+              {
+                "xp": 8
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "the-drover",
@@ -739,7 +1207,37 @@
         "A man with a stick and no animals, walking a line between the pens and the lower road and back. He does the circuit nine times and then sits down.",
         "\"I am not waiting for them,\" he says, before you have asked. \"I am keeping the way open. It closes if you stop.\""
       ],
-      "choices": []
+      "choices": [
+        {
+          "label": "Name the nine",
+          "blurb": "He walks the line between the pens and the road and back, and does not stop while you talk.",
+          "requires": {
+            "flag": "named-the-drover"
+          },
+          "unmet": "You do not know who brought them, so you have nothing to tell him.",
+          "outcome": {
+            "all": [
+              {
+                "gold": 40
+              },
+              {
+                "xp": 26
+              }
+            ]
+          }
+        },
+        {
+          "label": "Walk the line with him",
+          "blurb": "Pens to road, road to pens. He has no animals and he keeps the time anyway.",
+          "outcome": {
+            "all": [
+              {
+                "xp": 8
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "the-boundary-stone",
@@ -748,7 +1246,37 @@
         "A stone with two names on it and an arrow between them, and both names are Kettleworks. It marks the point where the field stops belonging to the works and starts belonging to the town, which are the same eleven people.",
         "The arrow points at the ground."
       ],
-      "choices": []
+      "choices": [
+        {
+          "label": "Say the other name",
+          "blurb": "Both names are Kettleworks. She has been waiting eleven years for somebody to say why.",
+          "requires": {
+            "flag": "met-marbulon"
+          },
+          "unmet": "You have not met anybody who would know.",
+          "outcome": {
+            "all": [
+              {
+                "flag": "said-the-other-name"
+              },
+              {
+                "xp": 24
+              }
+            ]
+          }
+        },
+        {
+          "label": "Follow the arrow",
+          "blurb": "It points at Kettleworks. So does the other end.",
+          "outcome": {
+            "all": [
+              {
+                "xp": 6
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "the-broken-kettle",
@@ -766,7 +1294,37 @@
         "A milestone at the field gate, cut with the distance to four places. Three of them are legible: Kettleworks, one; the Stack, one; the Treyway, eleven.",
         "The fourth has been chiselled out. What is left is the depth of the letters, and there were nine of them."
       ],
-      "choices": []
+      "choices": [
+        {
+          "label": "Read the fourth distance",
+          "blurb": "Three are legible. The fourth is the one you were told about.",
+          "requires": {
+            "flag": "heard-about-kettleworks"
+          },
+          "unmet": "Nobody has told you about Kettleworks, so you have heard nothing worth reading for.",
+          "outcome": {
+            "all": [
+              {
+                "give": "Warding Ring"
+              },
+              {
+                "xp": 22
+              }
+            ]
+          }
+        },
+        {
+          "label": "Read the three that are legible",
+          "blurb": "Four places, three distances, and one of them is behind you.",
+          "outcome": {
+            "all": [
+              {
+                "xp": 8
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "the-empty-gibbet",
@@ -775,7 +1333,26 @@
         "A frame, timber, twelve feet, standing on its own at the edge of the field with nothing hanging off it and nothing near it. It is the same frame that stands in the shallows in Bambulon and it is a different frame.",
         "There are two of them. Nobody at the works knows about the other one and nobody in the shallows knows about this one, and both places will tell you theirs is the only one."
       ],
-      "choices": []
+      "choices": [
+        {
+          "label": "Say there is one at home",
+          "blurb": "They walk out to look at it and are gone the rest of the day.",
+          "requires": {
+            "flag": "left-it-standing"
+          },
+          "unmet": "You would have to have left one standing to know.",
+          "outcome": {
+            "all": [
+              {
+                "gold": 45
+              },
+              {
+                "xp": 22
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "the-notice-board",
@@ -784,7 +1361,37 @@
         "Six notices, four of them about the same thing. The thing is that the road east is not maintained past the eleventh milestone, which four separate offices have decided is a fact worth pinning up.",
         "The fifth is a lost dog. The sixth is under the fifth and has been under it long enough that you would have to take the fifth down, and nobody has."
       ],
-      "choices": []
+      "choices": [
+        {
+          "label": "Add a seventh",
+          "blurb": "Four of them are about the road east. Yours is about the other three.",
+          "requires": {
+            "flag": "read-the-notices"
+          },
+          "unmet": "You have not read six notices anywhere.",
+          "outcome": {
+            "all": [
+              {
+                "flag": "posted-the-seventh"
+              },
+              {
+                "xp": 18
+              }
+            ]
+          }
+        },
+        {
+          "label": "Read all six",
+          "blurb": "Four say the same thing. The other two are older and worse.",
+          "outcome": {
+            "all": [
+              {
+                "xp": 8
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "the-back-lane",
@@ -793,7 +1400,34 @@
         "A lane between the crumb field and the east scrub, walked flat, with a gutter down one side that runs the wrong way. Water in it goes uphill for about four feet and then thinks better of it and stops.",
         "It has been like that since it was cut. Two separate surveys have said the ground is level and the gutter is level, and the water has read neither."
       ],
-      "choices": []
+      "choices": [
+        {
+          "label": "Follow the gutter to the cut",
+          "blurb": "The gutter runs the length of it and comes out where the cork was taken.",
+          "requires": {
+            "flag": "named-the-fence"
+          },
+          "unmet": "You have not named the fence to anybody, so the gutter leads nowhere you know.",
+          "outcome": {
+            "all": [
+              {
+                "xp": 20
+              }
+            ]
+          }
+        },
+        {
+          "label": "Walk it flat",
+          "blurb": "It is already flat. You add nothing to it and it is a lane.",
+          "outcome": {
+            "all": [
+              {
+                "xp": 6
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "the-east-marker",
@@ -802,7 +1436,26 @@
         "A post at the edge of the scrub with nine notches in it, and the notches are the number of times somebody has walked east from here and come back.",
         "There is no notch for going and not coming back and there would be no one to cut it."
       ],
-      "choices": []
+      "choices": [
+        {
+          "label": "Cut the tenth notch",
+          "blurb": "Nine notches and each one is a number of something. The tenth is yours.",
+          "requires": {
+            "flag": "named-twice"
+          },
+          "unmet": "You have not put your name on a post twice, so a third is presumptuous.",
+          "outcome": {
+            "all": [
+              {
+                "give": "Frostbite Mold"
+              },
+              {
+                "xp": 28
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "the-crossing-keeper",
@@ -811,7 +1464,25 @@
         "A hut at the junction of the two roads with a man in it whose job is to say which of the two is which. He has a board with four arrows on it and turns it as required.",
         "It is required twice a day. He is here the rest of the time, and has been for nine years, and says it is the turning that matters and not how often."
       ],
-      "choices": []
+      "choices": [
+        {
+          "label": "Ask which road is open",
+          "blurb": "He says which of the two roads is open and he is right about one of them.",
+          "outcome": {
+            "all": [
+              {
+                "supply": {
+                  "id": "tea",
+                  "n": 1
+                }
+              },
+              {
+                "xp": 14
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "the-north-gate",
@@ -820,7 +1491,37 @@
         "A gate in a wall that does not exist. The gate is good — hinges, latch, a stone post either side — and the wall it was made for was never built, so it stands in the open at the north end of the works.",
         "It is kept oiled. Four people have the job between them and none of them will say whose idea the wall was."
       ],
-      "choices": []
+      "choices": [
+        {
+          "label": "Hang your hinges on it",
+          "blurb": "A gate in a wall that does not exist, and now it shuts.",
+          "requires": {
+            "flag": "took-the-hinges"
+          },
+          "unmet": "It wants hinges and you are not carrying any.",
+          "outcome": {
+            "all": [
+              {
+                "flag": "hung-the-north-gate"
+              },
+              {
+                "xp": 32
+              }
+            ]
+          }
+        },
+        {
+          "label": "Open it and walk through",
+          "blurb": "There is no wall. You do it anyway and so has everybody.",
+          "outcome": {
+            "all": [
+              {
+                "xp": 6
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "the-trig-stone",
@@ -829,7 +1530,26 @@
         "A pillar of cut stone four feet high in the middle of a ring of slag, with a brass plate on the top of it and a hole in the plate. Everything anybody has ever measured here was measured from this.",
         "The plate has nine sets of initials cut into it and a tenth that has been started and left at one letter. Nobody at the reach will tell you whose."
       ],
-      "choices": []
+      "choices": [
+        {
+          "label": "Sign the plate",
+          "blurb": "There is room under the ninth. It is brass and it does not take a name easily.",
+          "requires": {
+            "flag": "read-the-reach"
+          },
+          "unmet": "You have not read what the reach says about itself.",
+          "outcome": {
+            "all": [
+              {
+                "flag": "signed-the-trig"
+              },
+              {
+                "xp": 20
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "the-nine-surveys",
@@ -838,7 +1558,26 @@
         "Nine cairns, one for each survey, each one a different height and each one built on the spot the surveyor was standing when they gave up.",
         "The tallest is the third. It is eleven feet and it took the third surveyor most of a year, and the note wedged under the capstone has one sentence on it: the reach was wider on the way back."
       ],
-      "choices": []
+      "choices": [
+        {
+          "label": "Build the tenth cairn",
+          "blurb": "It takes an hour and it is the shortest one. Nine surveys disagree; ten is not better.",
+          "requires": {
+            "flag": "signed-the-trig"
+          },
+          "unmet": "The plate has no name on it yet, including yours.",
+          "outcome": {
+            "all": [
+              {
+                "flag": "built-the-tenth"
+              },
+              {
+                "xp": 28
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "the-drove-way",
@@ -856,7 +1595,26 @@
         "The one part of the reach every survey agrees about: four acres in the south, flat, bounded by nothing, and the same shape on all nine maps.",
         "There is a post in the middle of it with nothing written on it. Somebody keeps it painted."
       ],
-      "choices": []
+      "choices": [
+        {
+          "label": "Take the four acres' measure",
+          "blurb": "The one part every survey agrees about, and it fits in a pocket.",
+          "requires": {
+            "flag": "built-the-tenth"
+          },
+          "unmet": "There are nine cairns. Come back when there are ten.",
+          "outcome": {
+            "all": [
+              {
+                "give": "Wellspring Base"
+              },
+              {
+                "xp": 40
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "the-tenth-clipboard",
@@ -865,7 +1623,37 @@
         "A post with a clipboard chained to it, and the clipboard is the tenth. The first nine are on the post at the edge of the Treyway and this is where the tenth got to.",
         "It is filled in as far as the fourth column. The fourth column is headed WIDTH and the entry under it has been written and rubbed out six times, and the paper has gone through."
       ],
-      "choices": []
+      "choices": [
+        {
+          "label": "Sign the tenth",
+          "blurb": "The first nine are on the ground under it. Yours goes on the top.",
+          "requires": {
+            "flag": "read-the-post"
+          },
+          "unmet": "You have not read a post through, and this is nine of them.",
+          "outcome": {
+            "all": [
+              {
+                "give": "Whipcord Hilt"
+              },
+              {
+                "xp": 30
+              }
+            ]
+          }
+        },
+        {
+          "label": "Read the nine underneath",
+          "blurb": "Nine clipboards, in the mud, in order. The tenth is chained on so it will not join them.",
+          "outcome": {
+            "all": [
+              {
+                "xp": 12
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "the-far-hedge",

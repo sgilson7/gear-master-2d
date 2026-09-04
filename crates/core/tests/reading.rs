@@ -37,17 +37,26 @@ fn events() -> Vec<(String, String, bool)> {
     out
 }
 
-/// The premise, and it is the shape of the bug: most events ask nothing.
+/// The premise: there are events that ask nothing, and this suite is theirs.
+///
+/// **It used to say *most* events ask nothing, and M12.5 retires that clause
+/// on purpose.** Its own message said "if this drops, re-read what the suite
+/// is for" — so: the suite is about what an examinable *does*, which is to be
+/// read once and then go quiet, and that has not changed and is still checked
+/// below. What changed is the balance. M12.0 measured what the old one cost —
+/// 0 decisions against 41 notes on the Kettleworks field, and events paying no
+/// gear anywhere in the game — and `events_pay.rs::a_map_is_not_mostly_
+/// wallpaper` now wants the other answer.
+///
+/// The half that matters is kept: **there are still examinables**, because a
+/// map with none is a map with no furniture, and a suite about furniture with
+/// nothing to test would pass by being empty.
 #[test]
-fn most_events_in_the_game_ask_nothing() {
+fn there_are_events_that_ask_nothing() {
     let all = events();
     let quiet = all.iter().filter(|(_, _, asks)| !asks).count();
     assert!(quiet > 0, "every event asks something; this suite is about the ones that do not");
-    assert!(
-        quiet > all.len() / 2,
-        "{quiet} of {} ask nothing — if this drops, re-read what the suite is for",
-        all.len()
-    );
+    assert!(quiet >= 10, "only {quiet} of {} are furniture", all.len());
 }
 
 /// **Read once, then quiet.**

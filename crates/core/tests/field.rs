@@ -56,10 +56,24 @@ fn the_field_is_dense() {
     }
 }
 
-/// Every readable on it has something to read, and the examinables outnumber
-/// the cards — which is what makes it a place rather than a row of dialogues.
+/// Every readable on it has something to read, and there is a great deal of it.
+///
+/// **M11.2 asserted the examinables *outnumbered* the cards**, and M12.5
+/// retires that clause on purpose rather than by deleting a line. The reason
+/// it was written still stands — a dense map is a different kind of map, and
+/// forty tiles that answer would be a quiz — but M12.0 measured what the other
+/// extreme costs: 0 decisions against 41 notes, and events paying no gear at
+/// all, on the map whose whole texture was supposed to be *reading things*.
+/// Texture only survives contact with a player if something rewards having
+/// read it.
+///
+/// So the clause that reversed is gone and the clause that did not is kept:
+/// every readable here has a title and prose, and the map is still thick with
+/// them. Which side outnumbers which is now
+/// `events_pay.rs::a_map_is_not_mostly_wallpaper`, and it wants the other
+/// answer.
 #[test]
-fn most_of_the_field_is_something_to_look_at_rather_than_something_to_answer() {
+fn the_field_is_thick_with_things_to_read() {
     let w = field();
     let events = data::events();
     let (mut cards, mut examinables) = (0, 0);
@@ -75,8 +89,13 @@ fn most_of_the_field_is_something_to_look_at_rather_than_something_to_answer() {
             cards += 1;
         }
     }
-    assert!(examinables > cards, "{examinables} examinables against {cards} cards");
-    assert!(examinables >= 30, "only {examinables} things to look at");
+    assert!(
+        examinables + cards >= 40,
+        "{} readables on the field, and its density is the point",
+        examinables + cards
+    );
+    assert!(examinables >= 10, "only {examinables} are furniture; a map wants some");
+    assert!(cards >= 10, "only {cards} ask anything, which is what M12.5 was for");
 }
 
 /// **The Stack is in the middle, it is not rock, and it has a door.**

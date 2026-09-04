@@ -2296,7 +2296,9 @@ Every figure below was re-measured for M10.3 rather than carried forward.
 | A key that never left the bag, and an event that never shut up | 630 passing |
 | M12.0: board pressure, measured before anything tries to move it | 638 passing |
 | M12.B: a coordinate is only meaningful with the map it came from | 643 passing |
-| **M12.1: the bargain barrel** | **651 passing** |
+| M12.1: the bargain barrel | 651 passing |
+| M12.1a + M12.2: three tiers, and an order on the world's clock | 662 passing |
+| **M12.5: events that pay something, and say what they pay** | **670 passing** |
 
 Note M11.0 and M11.8 add none, and both are honest. M11.0 moved every string
 the game says through one door and changed no behaviour the suite could see;

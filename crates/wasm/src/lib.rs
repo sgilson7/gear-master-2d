@@ -703,7 +703,6 @@ pub fn try_step(dir: &str) -> String {
 /// available is a page with a second copy of the rules in it.
 #[wasm_bindgen]
 pub fn event_json(id: &str) -> String {
-    use gm2d_core::tile_event::Requirement;
     with(|g| {
         let events = gm2d_core::data::events();
         let Some(e) = events.get(id) else {
@@ -713,16 +712,21 @@ pub fn event_json(id: &str) -> String {
             .choices
             .iter()
             .map(|c| {
-                let ok = match &c.requires {
-                    Requirement::None => true,
-                    Requirement::Gold(n) => g.character.gold >= *n,
-                    Requirement::Flag(f) => g.world.flags.iter().any(|x| x == f),
-                    Requirement::Holding(name) => g.character.holds(name),
-                };
+                // **One answer to "can this be taken", and it is core's.**
+                // This match was here and again in `answer`, which is two
+                // copies of a rule in the layer that decides nothing.
+                let ok = g.can_take(c);
                 serde_json::json!({
                     "label": c.label, "blurb": c.blurb,
                     "takeable": ok,
                     "unmet": if ok { String::new() } else { c.unmet.clone() },
+                    // **What it wants and what it pays, derived, both halves
+                    // shown whether or not it can be taken.** A locked choice
+                    // that says only *what it says when you try* is a dead
+                    // end; one that also says what it wants is a target to
+                    // come back to.
+                    "wants": c.requires.describe(),
+                    "outcome": c.outcome.describe(),
                 })
             })
             .collect();
@@ -740,70 +744,9 @@ pub fn event_json(id: &str) -> String {
 /// Take choice `n` of the event on this tile. Returns the receipt.
 #[wasm_bindgen]
 pub fn answer(id: &str, n: usize) -> String {
-    use gm2d_core::tile_event::{Outcome, Requirement};
-
-    fn apply(g: &mut Game, o: &Outcome, receipt: &mut Vec<String>) {
-        match o {
-            Outcome::All(list) => list.iter().for_each(|i| apply(g, i, receipt)),
-            Outcome::Gold(n) => {
-                g.character.gold = (g.character.gold + n).max(0);
-                receipt.push(if *n >= 0 {
-                    format!("+{n} Fnorp")
-                } else {
-                    format!("{n} Fnorp")
-                });
-            }
-            Outcome::Flag(f) => {
-                if !g.world.flags.iter().any(|x| x == f) {
-                    g.world.flags.push(f.clone());
-                }
-            }
-            Outcome::Give(name) => match g.character.give(name) {
-                Some(_) => receipt.push(format!("Gained: {name}")),
-                None => receipt.push(format!("{name} is not in the catalogue")),
-            },
-            Outcome::Xp(n) => {
-                // **Carried, the same as a win pays.** This wrote into
-                // `world.counters["xp"]` from M1 until the M11 playtest, and
-                // that counter was read by nothing: the comment here said "M4
-                // is what turns this into a level", M4 put experience on
-                // `Character` four blocks ago, and this line never moved. Nine
-                // events promise up to 359 between them and not one point of
-                // it ever landed.
-                //
-                // `carry`, not `gain_xp`: nothing on the road spends, and a
-                // town is the only thing that turns carried into a level.
-                g.character.carry(*n);
-                receipt.push(format!("+{n} experience, carried"));
-            }
-            Outcome::Nothing => receipt.push("Nothing you could point to".into()),
-        }
-    }
-
-    with_mut(|g| {
-        let events = gm2d_core::data::events();
-        let Some(e) = events.get(id) else {
-            return serde_json::json!({ "error": "no such event" }).to_string();
-        };
-        if g.world.answered.iter().any(|a| a == id) {
-            return serde_json::json!({ "error": "already answered" }).to_string();
-        }
-        let Some(c) = e.choices.get(n) else {
-            return serde_json::json!({ "error": "no such choice" }).to_string();
-        };
-        let ok = match &c.requires {
-            Requirement::None => true,
-            Requirement::Gold(n) => g.character.gold >= *n,
-            Requirement::Flag(f) => g.world.flags.iter().any(|x| x == f),
-            Requirement::Holding(name) => g.character.holds(name),
-        };
-        if !ok {
-            return serde_json::json!({ "error": c.unmet }).to_string();
-        }
-        let mut receipt = Vec::new();
-        apply(g, &c.outcome, &mut receipt);
-        g.world.answered.push(id.to_string());
-        serde_json::json!({ "receipt": receipt }).to_string()
+    with_mut(|g| match g.answer_event(id, n, DIFFICULTY) {
+        Ok(receipt) => serde_json::json!({ "receipt": receipt }).to_string(),
+        Err(why) => serde_json::json!({ "error": why }).to_string(),
     })
 }
 

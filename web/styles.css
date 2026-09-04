@@ -299,6 +299,18 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
 .wares:disabled { opacity: .5; cursor: not-allowed; }
 .wares:disabled .cost { color: var(--rust); }
 .wares.pinned { outline: 2px solid var(--brass); outline-offset: -2px; }
+/* --- M12.5: what a choice pays ------------------------------------------ */
+/*
+ * The engine talking, on a choice. Same register as the skill node's line and
+ * the recipe box: mono, quiet, and set apart from the blurb above it, which is
+ * the author's.
+ */
+.choice .outcome { margin: 5px 0 0; padding: 0 0 0 2px; list-style: none;
+  border-top: 1px solid var(--line); padding-top: 5px; }
+.choice .outcome li { font-family: var(--mono); font-size: 11.5px; color: var(--ink-2);
+  line-height: 1.55; }
+.choice .outcome li.wants { color: var(--rust); }
+
 /* --- M12.B: what a grid takes ------------------------------------------- */
 /*
  * A spec, not prose, so it reads like the skill tree's line rather than like

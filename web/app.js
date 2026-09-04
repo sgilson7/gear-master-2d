@@ -601,7 +601,22 @@ function showCard(title, prose, choices, onPick) {
     b.type = 'button';
     b.className = 'choice';
     b.disabled = c.takeable === false;
-    b.innerHTML = `<b>${c.label}</b><span>${c.takeable === false ? c.unmet : c.blurb}</span>`;
+    // **Three registers, and they do different jobs.** The label is what you
+    // do; the blurb is the author's, in voice, and says what it costs or what
+    // you are in for; the box is the engine's, derived and unthemed, and says
+    // the numbers. TONE 13a — somebody choosing between two halves of an event
+    // is comparing numbers, and a number wearing a joke has to be translated
+    // before it can be compared.
+    //
+    // **A locked choice shows both halves.** `unmet` is flavour written for
+    // the moment after you have tried; `wants` is the plain statement before
+    // one. With only the first a refusal reads as a wall; with both it is a
+    // target to come back to.
+    const spec = [];
+    if (c.takeable === false && c.wants) spec.push(`<li class="wants">${c.wants}</li>`);
+    for (const line of c.outcome ?? []) spec.push(`<li>${line}</li>`);
+    b.innerHTML = `<b>${c.label}</b><span>${c.takeable === false ? c.unmet : c.blurb}</span>` +
+      (spec.length ? `<ul class="outcome">${spec.join('')}</ul>` : '');
     b.onclick = () => onPick(i);
     box.appendChild(b);
   });

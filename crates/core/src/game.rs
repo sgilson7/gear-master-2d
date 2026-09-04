@@ -137,6 +137,145 @@ impl Game {
     /// The tin goes **on departure**, which is the same bargain the Chonga
     /// Swing makes: the thing that is spent is spent whether or not you like
     /// where you end up.
+    // ------------------------------------------------------------ events
+
+    /// Whether this choice can be taken.
+    ///
+    /// **One answer, and it used to be two.** The shim asked this question in
+    /// `event_json`, to grey a button, and again in `answer`, to refuse a
+    /// click — two copies of the same match in the layer that decides nothing.
+    /// A `Game` is exactly the thing that holds a purse, a bag and a world, so
+    /// it is the thing that can answer.
+    pub fn can_take(&self, c: &crate::tile_event::Choice) -> bool {
+        use crate::tile_event::Requirement;
+        match &c.requires {
+            Requirement::None => true,
+            Requirement::Gold(n) => self.character.gold >= *n,
+            Requirement::Flag(f) => self.world.flags.iter().any(|x| x == f),
+            Requirement::Holding(name) => self.character.holds(name),
+        }
+    }
+
+    /// Take choice `n` of an event, and say what it paid.
+    ///
+    /// **Core's, and M12.5 is why.** Applying an outcome was the shim's while
+    /// every outcome was a number; `Warp` is a rule about where a player may
+    /// stand, and a rule the fast suite cannot reach in seconds is a rule with
+    /// two rulebooks.
+    pub fn answer_event(
+        &mut self,
+        id: &str,
+        n: usize,
+        difficulty: crate::combat::Difficulty,
+    ) -> Result<Vec<String>, String> {
+        let events = crate::data::events();
+        let Some(e) = events.get(id) else { return Err("no such event".into()) };
+        if self.world.answered.iter().any(|a| a == id) {
+            return Err("already answered".into());
+        }
+        let Some(c) = e.choices.get(n) else { return Err("no such choice".into()) };
+        if !self.can_take(c) {
+            return Err(c.unmet.clone());
+        }
+        let outcome = c.outcome.clone();
+        let mut receipt = Vec::new();
+        self.apply_outcome(&outcome, &mut receipt, difficulty);
+        self.world.answered.push(id.to_string());
+        Ok(receipt)
+    }
+
+    /// [`apply_outcome`](Self::apply_outcome), reachable from a test.
+    ///
+    /// The private one is private because taking a choice goes through
+    /// `answer_event`, which is where the *rules* about taking one live —
+    /// spent-ness, requirements, writing the id down. A test that wants to
+    /// prove one outcome kind pays should not have to author an event to do
+    /// it, so this exists and says why rather than the field being loosened.
+    #[doc(hidden)]
+    pub fn apply_outcome_for_test(
+        &mut self,
+        o: &crate::tile_event::Outcome,
+        receipt: &mut Vec<String>,
+        difficulty: crate::combat::Difficulty,
+    ) {
+        self.apply_outcome(o, receipt, difficulty)
+    }
+
+    fn apply_outcome(
+        &mut self,
+        o: &crate::tile_event::Outcome,
+        receipt: &mut Vec<String>,
+        difficulty: crate::combat::Difficulty,
+    ) {
+        use crate::tile_event::Outcome;
+        match o {
+            Outcome::All(list) => {
+                for i in list {
+                    self.apply_outcome(i, receipt, difficulty);
+                }
+            }
+            Outcome::Gold(n) => {
+                self.character.gold = (self.character.gold + n).max(0);
+                receipt.push(if *n >= 0 { format!("+{n} Fnorp") } else { format!("{n} Fnorp") });
+            }
+            Outcome::Flag(f) => {
+                if !self.world.flags.iter().any(|x| x == f) {
+                    self.world.flags.push(f.clone());
+                }
+            }
+            Outcome::Give(name) => match self.character.give(name) {
+                Some(_) => receipt.push(format!("Gained: {}", self.theme_piece(name))),
+                None => receipt.push(format!("{name} is not in the catalogue")),
+            },
+            Outcome::Xp(n) => {
+                // **Carried, the same as a win pays.** Nothing on the road
+                // spends; a town is the only thing that turns carried into a
+                // level.
+                self.character.carry(*n);
+                receipt.push(format!("+{n} experience, carried"));
+            }
+            Outcome::Supply { id, n } => {
+                let all = crate::data::supplies();
+                match all.get(id) {
+                    Some(def) => {
+                        self.character.give_supply(id, *n);
+                        receipt.push(format!("{n} × {}", def.name));
+                    }
+                    None => receipt.push(format!("{id} is not a supply")),
+                }
+            }
+            Outcome::Tire(pct) => {
+                let before = self.character.fatigue;
+                self.character.tire(*pct as i32);
+                let by = self.character.fatigue - before;
+                receipt.push(format!("{by}% more tired"));
+            }
+            Outcome::Warp { map, at } => {
+                self.warp_to(map, *at, difficulty);
+                receipt.push("You are somewhere else. It is a long walk back.".into());
+            }
+            Outcome::Nothing => receipt.push("Nothing you could point to".into()),
+        }
+    }
+
+    /// Put the player on another map, at a tile they can stand on.
+    ///
+    /// **The same three steps a gate takes, in the same order**, because a
+    /// warp is a crossing that did not ask: remember where you were standing
+    /// so the map you are leaving knows, move, then `repair` — which is what
+    /// stops a warp ever landing somebody in scenery. `every_warp_lands_
+    /// somewhere_you_can_stand` checks the data over every map; this is what
+    /// makes a warp safe even where the data is wrong.
+    pub fn warp_to(&mut self, map: &str, at: [u8; 2], difficulty: crate::combat::Difficulty) {
+        self.world.remember_at(self.world.at);
+        self.world.map = map.to_string();
+        self.world.at = at;
+        let allowed = self.character.allowances();
+        let id = self.world.map_id();
+        let w = crate::data::map_now(&id, difficulty, &self.world);
+        w.repair(&mut self.world, &allowed);
+    }
+
     // ------------------------------------------------------------ orders
 
     /// Place an order at this town's counter.

@@ -19,7 +19,7 @@ from `sgilson7/gear-master`. `PLANNING-BRIEF.md` is the brief; `PLAN.md` is the
 plan and **wins where the two disagree**; `TONE.md` governs every string a
 player reads.
 
-**Every milestone is done, M0 through M11.** M0–M5 shipped the MVP, tagged
+**Every milestone is done, M0 through M12.** M0–M5 shipped the MVP, tagged
 `v0.1.0-mvp`; the board was rebuilt against the original's colourblind design;
 M6 added the art and the tone pass; M7 the shops, errands and the first
 dungeon; M8 curses made visible, a quest log, enchs, a fourth class, and a door
@@ -27,7 +27,10 @@ at the end of it; M9 what a creature leaves behind — three sets, two rules no
 stat could express, and two crossings that make the north a decision; M10 where
 an ench comes from, an item that fires once, and a fifth class; **M11 what is
 through the door** — nine new maps, a tower that comes down, a lake that
-empties, and three instruments that read a map you cannot otherwise enter.
+empties, and three instruments that read a map you cannot otherwise enter;
+**M12 board pressure** — a save that could not be played, three counters where
+there was one, events that pay something and say what they pay, and a row you
+earn instead of one a level hands you.
 <https://sgilson7.github.io/gear-master-2d/>
 
 **M11 is live**, deployed at `43804e49` on the human's word. Its live check is
@@ -36,11 +39,16 @@ walks all forty-two gate checks against the deployed page, three engines. See
 *A deployed fix is not a delivered fix* for why that is a separate step from
 the deploy going green.
 
-**M12 is built and not deployed.** M12.B, M12.0, M12.1, M12.1a, M12.2, M12.5
-and M12.3 are all in, `TRIAGE-M12.md` is written, and **eight commits sit
-unpushed**. Two things the block needs are not the builder's and are named as
-outstanding in that triage: an agent spot-run against a deployed build, and the
-friend whose one sentence started the block. **M12.0 deployed nothing** — its whole job
+**M12 is done and live at `ccfeb16d`**, verified the way this file has demanded
+since M8: `GM2D_ORIGIN=… drive.py` walked all forty-six checks in three engines
+against the deployed page, and the player's own frozen save was loaded on it and
+walked. Eight milestones — M12.B (a save that could not be played), M12.0 (the
+measure), M12.1 and M12.1a (the barrel and the price tiers), M12.2
+(commissions), M12.5 (events that pay), M12.3 (a row is earned) and M12.6 (the
+chain you can see). `TRIAGE-M12.md` is the sweep, and **two of its rows are not
+the builder's**: an agent spot-run — `testing/AGENT-BRIEF-M12.md` is written and
+there is now a deployed build to run it against — and the friend whose one
+sentence started the block. **M12.0 deployed nothing** — its whole job
 was to make board pressure a number before anything tried to move it, and the
 number is in `testing/transcripts/m12.0.txt`. `PLAN-M12.md` is the frame,
 written while M11 was in flight; **`PLAN-M12-EXEC.md` is the execution plan and
@@ -54,8 +62,26 @@ M11 left open, §6c is M10.3's, §6b is M9.4's and §6a is M8.8's.
 as inventory space rather than a puzzle, and there is no moment where putting
 one thing down means taking another up. Everything in the block is a lever on
 that: a bargain barrel and commissions raise throughput, earned rows slow
-cells, and events that pay gear are a third faucet. **No reroll** — the ask
-that started the block is declined by name, and `PLAN-M12.md` §0 says why.
+cells, and events that pay gear are a third faucet.
+
+**"No reroll" was the block's founding decision and M12.6 reversed it, narrowly
+and on the human's ask.** `PLAN-M12.md` §0 declined the friend's reroll by name
+and its reasons still hold **for the shelf**, which is untouched: a town that
+sells something different every visit is not a place. What turns over is the
+floor under the shelf and the menu above it — the barrel and the order book —
+and neither is a place's character. `n * n` a roll, counted per type so the bin
+never prices the book, reset every tenth level, and **the order being made is
+never rerolled**, because you paid for it and its clock is running.
+
+**And the whole economy was multiplied by five**, on the human's word, with the
+enchs held at 2,000 and **income deliberately unchanged**. The first attempt
+scaled the bounties to match and was wrong: real play reaches the Drambus Stack
+holding about three thousand Fnorp, so the rise is a *correction* for income the
+tests had been undervaluing. The thing undervaluing it was
+`a_restorative_costs_less_than_the_walk_home`, which priced tins against "the
+pit pays about six a win" — the poorest fight in the game, on the first map, at
+level one, where nobody buys a tin. **When a test disagrees with a cost, suspect
+the test's idea of income first.**
 
 **The demo ends under the lake now**, at a door behind the thing at the bottom
 of it, and getting there means dropping a five-floor tower or walking on water.
@@ -64,10 +90,13 @@ later — and the ending screen says so in as many words. The game's overall
 structure past that point is still the human's to decide; `PLAN-M8.md` §5.6 is
 where the question was first written down and it is still the live one.
 
-**The block is two seams and no more.** M11.5 moved the catalogue 544 → 550 and
-M11.9 moved it 550 → 568, so any save written before this block is refused by
-name. That is the design, it is said out loud in both commits, and
-`a_save_from_before_this_block_is_refused_by_name` is where the number lives.
+**M11 was two seams and M12 is none.** M11.5 moved the catalogue 544 → 550 and
+M11.9 moved it 550 → 568, so a save written before *that* block is refused by
+name — the design, said out loud in both commits, with the number living in
+`a_save_from_before_this_block_is_refused_by_name`. **Nothing M12 added moved
+it.** Every field the block introduced defaults, and the fivefold price rise is
+seam-free because `catalog_fingerprint` hashes names and not prices. A save that
+opened on M11 opens on M12.
 
 **No rest point, and there still should not be one.** Combat health resets
 every fight, so a rest would restore something that was never spent. What a
@@ -103,6 +132,32 @@ something cost a day.
   refused with a sentence naming both catalogues. That is the design; say so in
   the commit when it happens.
 - Never write a game string without `TONE.md` open.
+- **A choice at a chain root hands over an errand, and no two of them the same
+  one.** Reported as *"its either 12 experience or 20 experience, so they'd
+  always take the 20"* — both halves opened a different chain and neither was
+  visible, so it was not a decision, it was a smaller number beside a larger.
+  An errand is the one thing this game has that says *something has opened and
+  it is somewhere else*: it lands in the log and the log points at the map.
+  `every_choice_at_a_chain_root_starts_its_own_errand` refuses the next one that
+  is only a number, and `Quest::granted` keeps the branch you did **not** take
+  from sitting on the same tile a moment later offering itself.
+- **When a test disagrees with a cost, suspect the test's idea of income
+  first.** The fivefold price rise looked like it broke the economy and had not:
+  `a_restorative_costs_less_than_the_walk_home` priced tins against *the pit
+  pays about six a win*, which is the poorest fight in the game, on the first
+  map, at level one, where nobody buys a tin. Real play reaches the Stack
+  holding about three thousand Fnorp. **The shipped game's income is not scaled
+  to make a test happy** — the measuring stick is.
+- **A second copy of a constant goes stale in three engines at once.** The gate
+  carried its own `12` for the barrel's price ceiling, and every price in the
+  game was multiplied by five. It reads `shop::BARREL_CEILING` off the payload
+  now. Same shape as the `EVENT_ONLY` list read with a regex — twice — which put
+  a set piece in the barrel and was caught by a test rather than by rereading.
+- **The suite's cost was runtime, not debuginfo.** The fork's
+  `[profile.test] debug = "line-tables-only"` was already carried across; what
+  it did not cover was `opt-level`, and this suite simulates a great deal of
+  combat. At `opt-level = 2` a warm run is fourteen seconds instead of minutes,
+  with debug assertions and overflow checks still on.
 - **Save round-trip tests run on every commit. A red round-trip blocks
   everything.** `tests/save.rs` is that suite; `testing/drive.py` walks the same
   property through three real browsers.
@@ -187,7 +242,7 @@ something cost a day.
 
 ## Commands
 
-    make test          # the engine suite, native, seconds
+    make test          # the engine suite, native, 687 tests, ~14s warm
     make check         # fast type-check
     make web           # build dist/web/
     make test-ui       # drive the built page in three real browsers
@@ -214,7 +269,7 @@ one directory was one directory too few.
 `GM2D_ORIGIN` skips the local server entirely and walks a page that is already
 up, which in practice means **the live one**. That is the *verify against the
 live page* step this file has demanded since M8, done by the thing that already
-holds all forty-two questions instead of by a person remembering four.
+holds all forty-six questions instead of by a person remembering four.
 
 **`make test-ui` and `make play` are different tools.** The first walks a route
 chosen to exercise checks and asserts; the second starts a new game and plays
@@ -316,6 +371,48 @@ will arrive wrong, and the loader is where that is caught.
 `try_step` repairs too, not only `load_json`. A position you cannot stand on is
 a dead end rather than a glitch — there is no key that gets you out of it — so
 the first keypress fixes it whatever put it there.
+
+## A coordinate means nothing without the map it came from
+
+**The worst bug this project has shipped, and the one it was hardest to
+believe.** Reported from a real save: after clearing the first floor of the
+Drambus Stack, the character could make **one move per page load** and click
+**one button per page load**, and the file loaded onto West Bambulon when it
+should have been on the Treyway. A new game had none of it.
+
+It was a panic. In a wasm build a panic is an `unreachable` on the console and
+nothing else, and because the page's handlers each call into the shim, the
+first one to touch the fault poisons the module and every handler after it is
+dead — which is exactly what *one move and then nothing, until you reload*
+looks like from a chair.
+
+The cause is one sentence: **a 16×16 map's coordinates were being read against
+a 20×20 map's grid.** `WorldState::at` is a position and `WorldState::map` is
+the map it is a position on, and every lookup in `world.rs` took the first and
+assumed the second. `region_of[260]` on a 256-tile grid is a panic; `[190]` is
+not, and quietly answers about somewhere else.
+
+- **Found by bisecting the shim's exports against the deployed page**, not by
+  reading. The save was replayed in a browser with one export stubbed at a
+  time until the panic moved. It was `quest_log_json` — the quest log asks
+  where an errand points, which asks every map about a position, which is the
+  one code path in the game that hands a coordinate to a map that did not
+  produce it.
+- **`idx` returns `Option<usize>` now**, and everything downstream of it does
+  too: `terrain_at`, `region_index`, `region_at`. An out-of-bounds coordinate
+  is a question with no answer, not a slot in a vector.
+- **And `crossing_between` checks the map id before anything else.** Bounds
+  alone would have turned the panic into a wrong answer — a crossing on West
+  Bambulon refusing a step taken in the Stack — which is the failure that does
+  not announce itself. *A guard that converts a crash into a silent lie is half
+  a fix.*
+- **`terrain_name` answers `""` off-map** rather than refusing, because it
+  feeds a label and a label has somewhere to put nothing.
+- The save is in the repository and the gate plants it:
+  `check_the_frozen_save_is_playable` loads that exact file, walks it, and
+  opens the log. **A bug reported with a save attached should never be fixed
+  without that save becoming a check** — everything else about this one was
+  reconstruction.
 
 ## The north is a decision, not a slope
 
@@ -870,6 +967,41 @@ Two things now stop it happening again:
   level 5 at a mean of ~27 fights across nine seeded walks of the pit. Moving
   the map's regions moves this; the band is the contract.
 
+## A row is earned, not scheduled
+
+Every level added one row to one grid, in a fixed rotation, from M1 to M12.
+`PLAN-M12.md`'s thesis is that a board reads as inventory space rather than a
+puzzle, and M12.0 went and measured it before anything tried to move it:
+
+> **Fill goes *down* as you level.** 43% at level five, 37% at eight. Rows
+> arrive on a clock and components do not, so levelling dilutes you — and a
+> board with room for everything is a board that never asks which thing.
+
+So a scheduled row is dilution on a timer, and the rotation is gone.
+`progression::rows_for` and `grows_at` are retired; there is `base_rows()`,
+which is three for every frame for ever, and `board_rows(granted)`.
+
+- **A row is a thing you buy or a thing you finish.** Seven skill nodes grant
+  one — one for each of the five frames, and a second for the weapon and the
+  chest — and two errands do. Every level now poses the game's own question with
+  the player's hands on it — power on the board you have, or a bigger board —
+  which is the pressure the whole block is about.
+- **Nothing is banked, and the save needed no migration**, which is a
+  divergence from `PLAN-M12.md`. `BoardSave::rows` is already written and
+  restored verbatim and `resize_boards` only ever grows, so an old file keeps
+  every row it ever earned without a ledger. Where a row *came from* is derived
+  from `skills_taken` and `quests_done`, the same way a node's effect and the
+  tower's fallen floors are.
+- **`Quest::rows` is a `RowReward` and `Quest::granted` is a different
+  question.** The first is what finishing pays; the second is whether the
+  errand is ever offered at a counter at all. Both arrived in M12 and they are
+  not the same field wearing two hats.
+- **Two pillar tests were retired rather than repaired**, and that is the
+  honest move: they asserted that level *N* implies a particular board, which
+  was the guarantee this milestone deliberately removed. A test that pins the
+  behaviour you are changing is a test to delete in the commit that changes it,
+  with the reason in the message.
+
 ## Experience is carried, and a town is the bonfire
 
 **A fight pays into your pocket. A town is the only thing that turns it into a
@@ -1331,11 +1463,16 @@ town sells a fixed shelf, and a town asks you for something.**
   — most of a helmet, a pair of molds and a whole weapon — which made the shop
   decoration for the first hour. Two pieces assemble one weapon that beats a
   Cave Rat and a Bog Toad and loses to a Bone Archer, which is the opening.
-- **The Iron Blade is seated turned, and has to be.** It is one cell wide and
-  **four tall**; a starting weapon frame is three rows. Upright it does not fit
+- **The Iron Blade has to end up turned.** It is one cell wide and **four
+  tall**; a starting weapon frame is three rows. Upright it does not fit
   anywhere, the weapon assembles nothing, and a character who cannot win cannot
-  earn — the M4 soft-lock, exactly. The fifth field of a `STARTER` row is the
-  rotation and this is what it is for.
+  earn — the M4 soft-lock, exactly. **Auto-pack is what turns it**, and the
+  board starts empty: the kit is *given into the bag*.
+  `character.rs`'s `STARTER` constant and its `seat` method are **dead code**
+  and their comments describe a game that seats the kit, which this one has not
+  done for some time. This file quoted that comment as live fact until M12.4
+  read it — `TRIAGE-M12.md` row 12. **A constant nothing calls is a comment
+  nothing checks.**
 - **A shelf is content.** `data/shops.json` holds each town's stock and it never
   changes; the save carries `WorldState::bought`, which is a town id and an
   index. Same discipline as the map. `Game::shop` and `ShopSave` are gone, and
@@ -1346,9 +1483,80 @@ town sells a fixed shelf, and a town asks you for something.**
   three" would come back pointing at something else. It also just reads better:
   the gap is the memory of what you took.
 - **Append to a town's stock, never insert.** Same reason.
-- Reroll and pinning are gone with the random shelf. A town that sells
-  something different every visit is not a place, and three of them are one
-  slot machine in three costumes.
+- Reroll and pinning are gone **from the shelf**, and that has not changed: a
+  town that sells something different every visit is not a place, and three of
+  them are one slot machine in three costumes. What M12 put under the counter
+  turns over, and the shelf above it still does not — see *Three tiers*.
+
+## Three tiers, and an order that arrives on the world's clock
+
+The shelf was the only way to buy anything, and a shelf that never changes is a
+shelf you have finished. M12 put two more counters under it, and the three are
+one design: **luck is cheap, choice is dear, and the middle is a shelf.**
+
+| tier | price | how it is chosen |
+|---|---|---|
+| the bargain barrel | ×1 of catalogue, nothing over 60 | rolled, 13 lines, the same in every town |
+| the shelf | ×5 | authored, per town, never rerolls |
+| the order book | ×10, nothing under 65 | rolled, per town, and it does not arrive when you pay |
+
+- **A commission is not a purchase, it is a wait.** You pay, and the piece
+  arrives after three to ten **fights** — `shop::fights_for`, derived from the
+  price, so a dearer thing takes longer. Not a timer and not a step count:
+  fights are the thing this game actually spends, so an order is paid for in
+  the currency the rest of the game is denominated in.
+- **One order per town at a time**, and the refusal names what is already on
+  the bench. Three towns is three orders, which is a decision about where you
+  are going rather than a queue.
+- **The barrel holds nothing the shelf holds, nothing off a creature, and
+  nothing you carry rather than wear.** That list is checked at load in
+  `ShopsData::parse` and again on every roll — *the rules are the rules whoever
+  rolled it*, so a rerolled barrel is held to what the authored one passed.
+  **The `EVENT_ONLY` list was read with a regex, twice, and under-captured
+  both times**, which is how a Gold Chip reached the barrel; it is selected
+  through the engine's own constant now.
+- **Everything costs five times what it did**, on the human's instruction, and
+  the starting purse moved with it (28 → 140). The catalogue's own `price`
+  field did not move — `shelf_price` and `commission_price` are percentages of
+  it — so the fingerprint is untouched and **no save was refused for this.**
+- **The income was not scaled**, and the correction is the finding: see the
+  rule *When a test disagrees with a cost, suspect the test's idea of income
+  first.*
+
+### Turning one over
+
+The barrel and the order book reroll. The shelf does not, for the reason it
+never did.
+
+- **`n*n` for the nth**, counted **per type** and reset every ten levels in
+  every town. The curve is the point — the first is a shrug and the eighth
+  costs sixty-four — and without the reset it is a wall by level fifteen.
+  `reroll_band(level)` is `level / 10` and the counters clear when it moves,
+  which is derived from experience like everything else and not a stored date.
+- **The thing you are waiting for is never rerolled.** `roll_commissions`
+  takes a `keep`, re-derives its fights from its price like any other line, and
+  fills around it. A reroll that could delete a paid order would make the
+  button a trap.
+- **A refusal spends nothing**, pinned in a test, because the first thing
+  anybody does with a refused button is press it again.
+- **`rolled_barrel` and `rolled_ledgers` default**, so a save from before M12
+  opens on the authored barrel with the counters at zero — which is what that
+  character had.
+
+### A licence you can buy
+
+Spike Kaklon sells the Kaklon Patent's paper for **5,000 Fnorp** to anybody
+whose class did not come with it, and each ench on his table is **2,000**.
+
+- **`Character::licensed()` is the class *or* the paper**, one function, so
+  every screen that asks whether enchs are yours asks it once. `bought_licence`
+  is the only new field, and it is a `bool` on the character rather than a
+  flag in the world, because it is a thing about you.
+- **The class is still the identity and the paper is still not.** A licensee
+  gets the Patent's tree, its two awarded enchs and its spin nodes; a buyer
+  gets the rack and the bench. Five thousand is priced against that gap
+  deliberately — it is late money, and what it buys is the ability to use what
+  the game already paid you.
 
 ## Errands
 
@@ -1409,6 +1617,73 @@ slay something, bring something, or go somewhere and report.
   handed over whether or not the character is licensed: an errand does not know
   what you became, and a reward that vanished for three players in four would
   be worse than one they cannot use yet.
+
+## Forty-one dismissals, and the choice nobody would take
+
+This file used to say the Kettleworks field's forty-one events were prose and
+nothing else, and that the answer was owed rather than written. M12.5 is that
+answer, and it took two passes because the first one was not enough.
+
+**The first pass gave the events something to do.** Nine of the fifty-six asked
+a question before; forty-three do now, over seventy-three choices. Four
+outcomes were added to `tile_event::Outcome` and every one is a thing the
+engine could already do somewhere else:
+
+| outcome | what it is |
+|---|---|
+| `Supply { id, n }` | tins, so a map can restock you |
+| `Tire(u32)` | fatigue, so a choice can cost the only thing a fight spends |
+| `Warp { map, at }` | put down somewhere else — including under the lake, early |
+| `Errand(String)` | hand over an errand |
+
+- **`Outcome::describe` and `Requirement::describe` are ports, not
+  inventions.** Both existed on `event::Outcome` — the campaign's dead type —
+  with the doc comments that are the design, and this file's *Two types called
+  Outcome* section is where that was written down as a debt. It was paid by
+  moving the pattern to the live type, which is what that section said to do.
+- **A warp is never a way home.** `a_warp_is_never_a_way_home` refuses one that
+  lands in a town, because the Drover's Stride is what a ride home costs and an
+  event that undercuts it makes a whole set a curiosity.
+- **Every flag an event sets is read by something.** A `Flag` outcome that
+  nothing consults is a promise into a counter, which is exactly the shape of
+  the `Outcome::Xp` bug that went four blocks unnoticed.
+
+**The second pass is the one that matters, and it came from the human playing
+it:**
+
+> *"at THE SHALLOWS MARKER, to the user its either 12 experience or 20
+> experience, so they'd always take the 20 cause why would you take the smaller
+> number."*
+
+Which is right, and it is not a tuning problem. Both branches opened a
+different chain of content and **neither branch said so**, so the screen was
+offering a small number beside a large one. A choice whose consequence is
+invisible is not a choice.
+
+- **A root choice hands over an errand, and no two branches the same one.**
+  That is the fix and it is structural: an errand is the one thing this game
+  has that says *something has opened and it is somewhere else* — it lands in
+  the log, and the log points at the map. **Ten roots, twenty-one chains.**
+- **The lint allows a third answer, and naming it is the whole of what makes
+  it usable.** A choice at a root may start a chain, or **continue** one — an
+  event is often both, and The Standing Frame begins two chains while being the
+  second rung of a third, its cork branch gated on the cork you took at the
+  boundary. What `every_choice_at_a_chain_root_starts_its_own_errand` refuses is
+  the third kind: an ungated choice at a root that goes nowhere, which is
+  exactly the smaller number sitting beside the larger one.
+- **A chain errand is `granted`.** It never appears at a counter, because the
+  branch you did *not* take must not be sitting on a shelf a moment later
+  offering itself for the asking. `quest::at` filters them and `stage()`
+  reports one you were never given as `Locked`.
+- **The chains pay things, not points.** Enchs, map shards, rows, a ride under
+  the lake — `the_chains_pay_more_than_experience` is the lint, because
+  experience is the reward that reads identically whichever branch paid it.
+- **`geared_from` had to learn that chains are exclusive.** The fixture gave
+  itself all twenty-one chain rewards, which is a character no player can be,
+  and it broke a reachability check by making the tower's floors look cheap.
+  One reward per root now. *A fixture that can hold every branch of a mutually
+  exclusive choice is measuring a game nobody plays* — the same failure shape
+  as measuring a pool by what it contains rather than what it deals.
 
 ## A log that points at the map
 
@@ -1565,8 +1840,9 @@ lost.** Two things give it back and they are not the same thing:
   round. The town is what makes the walk home worth taking rather than a
   formality.
 
-The shelf was retuned when the town started mending — 6/16/40 → **4/11/28**. A
-tin no longer buys back a fight, it buys the walk home, so
+The shelf was retuned when the town started mending — 6/16/40 → 4/11/28, and
+**20/55/140 since M12.6 put every price in the game up fivefold**. A tin no
+longer buys back a fight, it buys the walk home, so
 `a_restorative_costs_less_than_the_walk_home` prices it under what the fights it
 undoes pay rather than at several times over, with a floor, because a tin that
 costs nothing is not a decision.
@@ -1687,6 +1963,36 @@ of thing it is, and explains itself on hover.
   shape half of the colourblind triple-encoding, so everything that draws a
   cell draws the same one — at 34px on the board, 11px in the bag, 14px on a
   shelf.
+
+## A grid says what it takes
+
+The packing screen showed what you had built and never what a grid wanted, so
+the recipes were a thing you learned by trying combinations or by reading
+`piece.rs`. `recipeBox` prints them above each grid on the packing panel.
+
+- **Derived in core, never typed.** `piece::recipe_parts` reads the recipe
+  table, so retuning a recipe retunes the line — the same reason `Node::line`
+  is derived rather than written into a blurb. Unthemed, TONE 13a: somebody
+  comparing what two grids want is comparing counts.
+- **Opt-in, and only on your own board.** The same `cards()` builder draws your
+  grids, the creature's panel and both sides of the replay; a creature's board
+  is not something you pack, so only the packing screen passes `showRecipes`.
+- **The way's name is printed only where there is a choice.** The weapon grid
+  has six ways of being built and the other four have one each; naming the way
+  on a grid with one way is a label that carries nothing.
+- **An empty grid stops being skipped**, and that was the actual bug hiding
+  underneath. `cards()` skipped a grid with nothing in it — so a chest with no
+  chest pieces printed no heading, no card and no hint, and the one place a
+  player most needs to be told what a chest takes was the one place that said
+  nothing at all.
+
+**And the controls blurb at the top of the page is gone**, on the human's ask —
+four lines of screen that were read once and then held that space for the rest
+of the sitting. It had also started to lie: *"every level adds a row to one
+frame"* is exactly what M12.3 retires. The canvas keeps its `aria-label`, which
+is where a control belongs for somebody who cannot see the board. **A paragraph
+of instructions is a paragraph that has to be maintained like any other string,
+and nothing was checking that one.**
 
 ## Art
 
@@ -2066,6 +2372,26 @@ live build f5654c7e
   console errors: none
 ```
 
+M12's was the same tool pointed at the same place, and the interesting part is
+what it did **not** need doing by hand:
+
+```
+live build ccfeb16d
+  index.html asks app.js?v=ccfeb16d   app.js carries BUILD='ccfeb16d'
+  chromium walked the gate    ok      firefox  walked the gate    ok
+  webkit   walked the gate    ok
+  46 checks, three engines            the frozen save loads and walks
+  the barrel is under the counter     a grid says what it takes
+  console errors: none                off-origin requests: none
+```
+
+**The barrel check is the one worth reading twice.** It carried its own `12`
+for the dearest thing the barrel may hold, and every price in the game had just
+gone up fivefold — so it failed thirteen lines in three engines, thirty-nine
+red lines for one stale constant. It reads `shop::BARREL_CEILING` off
+`window.__shopJson()` now. **A gate that hardcodes a number core owns is a
+second rulebook with a longer feedback loop than the first.**
+
 M11's was the first that nobody assembled by hand. `GM2D_ORIGIN` points the
 gate at the deployed page, so the live check is all forty-two questions in
 three engines rather than the four or five somebody thought of on the day:
@@ -2084,7 +2410,7 @@ live build 43804e49
 **The hand-written table is not obsolete and should still be written**, because
 the gate asks the questions somebody already thought to encode and a deploy
 note should also record what you went and looked at. What changed is that the
-floor is now forty-two rather than zero.
+floor is now forty-six rather than zero.
 
 M9's was:
 
@@ -2216,6 +2542,10 @@ about a string. Every one caught something on its first run:
 | 11.6 | **The golem's fallback was taken**, which §8 row 6 named in advance so that taking it would be a decision rather than a retreat. It handles one fight an entry rather than standing as a third board in the replay. The reason is not the layout — it is rule 5: a third board is a third set of numbers the page must not invent, and the honest version is a third combatant in `combat.rs`, which is new combat code in a block that has added none. | `crates/core/src/survey.rs` |
 | 11.9 | **Six sets, not seven, and the tower keeps its borrowed bosses.** §8 row 8 puts three sets on tower floors; a floor is one sitting, so a set off a floor's *pool* is unfarmable — the tower carries one set instead, three certainties off floors five, three and one, so climbing is the grind. And §M11.9 asks for distinct bosses on the floors that shipped on borrowed frames: M11.7 measured every one of those frames against the board the game hands out and retuned the block around the result; re-dressing them threw that measurement away, and the first attempt produced a boss nothing could beat. The eight new creatures stand in *pools*, where a new face costs nothing that has to be re-measured against reachability. | `crates/core/src/combat.rs`, `crates/core/src/piece.rs` |
 
+| 12.3 | **No ledger for a granted row, and two MVP pillar tests retired.** `PLAN-M12.md` asks for granted rows to be banked in the save; `BoardSave::rows` already is, and `resize_boards` only ever grows, so an old file keeps what it earned without a migration. What a row came *from* stays derived from `skills_taken` and `quests_done`. The two tests asserting *level N implies board B* are gone rather than repaired — that guarantee is what the milestone removes. | `crates/core/src/progression.rs` |
+| 12.5 | **Every root choice hands over its own errand**, which the plan does not ask for. §M12.5 asks events to pay something and say what they pay; that was built and was still not a decision, because both branches of a root opened invisible content. The errand is the visibility, and it is why chain errands had to become `granted` — an unoffered kind of errand the plan has no row for. | `crates/core/src/quest.rs`, `Quest::granted` |
+| 12.6 | **Rerolls, which `PLAN-M12.md` §0 declines by name.** The block's founding decision was no reroll, on the grounds that a shelf which changes every visit is not a place. That still holds and the *shelf* still never rolls; what turns over is the barrel and the order book, which are rolled to begin with. The reversal is the human's, narrowed to the two tiers where "give me a different one" is not the same as "give me a different town". | `crates/core/src/shop.rs` |
+
 Also true, and not in the brief because it could not have been:
 
 - **§C.1's code was gone before the fix was written.** The bounty was paid in
@@ -2249,7 +2579,7 @@ and M5's trees may spend them again.
 
 ## Numbers, so a regression is visible
 
-Every figure below was re-measured for M10.3 rather than carried forward.
+Every figure below was re-measured for M12.6 rather than carried forward.
 
 | | |
 |---|---|
@@ -2304,10 +2634,13 @@ Every figure below was re-measured for M10.3 rather than carried forward.
 | M12.1a + M12.2: three tiers, and an order on the world's clock | 662 passing |
 | M12.5: events that pay something, and say what they pay | 670 passing |
 | M12.3: slower cells — a row is earned, not scheduled | 671 passing |
-| M12.6: a chain you can see, a licence you can buy, and a list you can turn over | 687 passing |
-| **The economy, multiplied by five** | **687 passing** |
+| M12.4: played to the ending, triaged, written down | 671 passing |
+| **M12.6: a chain you can see, a licence you can buy, and prices that mean it** | **687 passing** |
 
-Note M11.0 and M11.8 add none, and both are honest. M11.0 moved every string
+Note M12.4 adds none, and neither did M11.0 or M11.8 — all three are honest.
+M12.4 is a playthrough, a triage and a brief; its deliverable is
+`TRIAGE-M12.md`'s thirteen rows and the finding that two of them are not the
+builder's. M11.0 moved every string
 the game says through one door and changed no behaviour the suite could see;
 M11.8's deliverable is a harness for somebody who is not allowed to read the
 suite. M11.7 adds one — a block that was unfinishable was fixed by *retuning
@@ -2315,35 +2648,40 @@ content*, and one check now measures what a range used to guess at.
 
 | | |
 |---|---|
-| Catalogue | **568 components**, up from 544 — **two seams this block**: M11.5's six instrument parts (→ 550) and M11.9's eighteen set pieces (→ 568) |
+| Catalogue | **568 components, and M12 did not move it** — every save that opened on M11 opens on M12. M11's two seams (544 → 550 → 568) are the last there have been. **Prices are ×5 as of M12.6** and that is seam-free: `catalog_fingerprint` hashes names only |
 | Pieces that apply a curse | 59 of 568, 4 kinds, 2 on the starting shelf |
 | Sets | **9**, of three components each bar the Toad Frame's two — every piece `EVENT_ONLY`, off one creature **or one stack of floors**, in one grid |
 | Ladder | **58 creatures**, rated 16 to 2958 |
 | `crates/core` | ~42.4k lines, up from 40.4k at M10.3, down from ~50k at the fork |
 | wasm | 1340 KB, up from 1178 KB at M10.3 |
-| Save format | v1. Every M11 field defaults; the block's two catalogue seams refuse an older file **by name**, which is the design |
+| Save format | v1. **No seam in M12.** Every field it added defaults — `commissions`, `rolled_barrel`, `rolled_ledgers`, `rerolls`, `bought_licence` — so an older file opens on the authored barrel with no orders and no licence, which is what those characters had |
 | Maps | **11**, in `data/maps/*.tiles.json` — west-bambulon 20×20, the-great-gear-cave 9×5, the-treyway 16×16, kettleworks-field 20×20, five Drambus Stack floors 10×10, under-the-lake 13×9, the-reach 20×20 |
 | Places | 2 towns, 56 events, 11 gates, 7 bosses, 2 crossings, 1 bench, 1 door — 41 of the events are the Kettleworks field alone |
+| Events | 56 placed: **43 ask something and 13 are notes**, over **73 choices**. **21 chains from 10 roots**, every root choice handing over an errand. Was 9 asking and 0 chains before M12.5 |
 | `PlaceKind` | 7: town, event, gate, boss, door, crossing, bench — **unchanged**; the Stack is `PlaceDef::floors` on a gate, not an eighth kind |
 | Effect kinds | 6: stat, start_with, grow_slot_rows, assembly_pct, grants, gives_ench — **unchanged** |
 | Ench effect kinds | 4: power, haste, spin, fragile — **unchanged** |
 | `Rule` kinds | **9**: curse_on_activate, spin_extra, spin_keep, spin_every, scout, rout, wade, **survey**, **homeward** |
 | Instruments | 3 — compass, atlas, survey golem; all three build on the **weapon** grid, and a weapon grid holds gear or an instrument and never both |
 | Data files | **23** — 12 in `data/` and 11 in `data/maps/`; `data::FILES` is the list `data_is_current` walks |
-| Starting kit | 2 components, 28 Fnorp, 1 assembled weapon |
-| Towns | **2 placed** (the pit and Kettleworks), 1 staged; fixed shelves of 11 / 15 / 17, no reroll; none of them sells an ench |
-| Errands | **19** |
-| Enchs | 6 — 3 on the van's table, 2 awarded by a class tree, 1 off an errand |
-| Restoratives | 3, at 4 / 11 / 28 Fnorp — and one of them is now also a bus fare |
-| Boards | 6×3 at level 1, one row a level, 6×8 ceiling |
+| Starting kit | 2 components, **140 Fnorp**, 1 assembled weapon. The purse moved ×5 with the prices; at 28 a beginner could afford three of thirteen barrel lines and no helmet, and both M4 soft-lock guards said so |
+| Towns | **2 placed** (the pit and Kettleworks), 1 staged; fixed shelves of 11 / 15 / 17 that **still never reroll**; none sells an ench. Under each counter: a **13-line barrel** and an **order book** (8 lines over 3 towns), and those two *do* turn over |
+| Errands | **40** — 19 authored, and **21 chain errands a choice hands over**. A chain errand is `granted`: never offered at a counter, because the branch you did not take must not be sitting on the tile a moment later |
+| Enchs | **8** — 3 on the van's table at **2,000 each**, 2 awarded by a class tree, 1 off an errand, and **2 written for the ends of chains**. The van also sells **a licence for 5,000** to anybody whose class did not come with one |
+| Restoratives | 3, at **20 / 55 / 140** Fnorp — and one of them is now also a bus fare |
+| The counters | shelf **×5** of catalogue, order book **×10**, barrel **×1**. The barrel holds nothing dearer than 60 and the book nothing cheaper than 65, so the three tiers cannot overlap |
+| A reroll | `n*n` Fnorp for the nth, counted **per type**, wiped every ten levels in every town. The line you have on order is never rerolled out from under you |
+| Board pressure | fill **43%** at level five and **37%** at eight before M12 — *down*, because rows arrived on a clock and components did not. `pressure::of` is the measurement and `pressure::target` is what it is aimed at |
+| Boards | 6×3 on every frame at level 1, 6×8 ceiling. **A row is no longer a thing a level hands you** — it is a skill point or a finished errand, **7 nodes and 2 errands**, and M12.0's measurement of why is in *A row is earned, not scheduled* |
 | Level 5 | ~27 fights, mean of nine seeded walks |
 | The Treyway | brackets levels **12–16**, not the plan's 5–9 — the door behind it is behind a crossing that asks for 9 |
 | A whole playthrough | **342 wins, 170 losses, level 14, 4,406 steps** to the door under the lake |
-| Skill trees | 13 base nodes + gorillathon 8, funnel-sergeant 8, worm-fact-keeper 10, kaklon-patent 8, top-of-the-bill 8 |
+| Skill trees | **17 base nodes** + gorillathon 8, funnel-sergeant 8, worm-fact-keeper 10, kaklon-patent 8, top-of-the-bill 8. **7 of the base's grow a row**, one for each of the five frames, because M12.3 made a row a thing you buy |
 | Classes offered | 5, and every one of their powers reaches something — a lint says so |
 | Figures | 27 `.tex` → **81 SVGs** (13 family drawings, 4 drawn for themselves, 5 classes, 3 towns, you) |
 | Art coverage | **58 of 58 creatures**, 3 of 3 towns, 5 of 5 classes, and you. The set pieces, the instruments and the enchs have no art and want none — a component has never had a figure |
-| Browser gate | **42 checks**, 3 engines, and they can be pointed at the live page |
+| Browser gate | **46 checks**, 3 engines, pointed at the live page for M12's deploy |
+| The suite | **687 passing, and 14 seconds warm.** `[profile.test] opt-level = 2` since M12.6: `drops.rs` alone ran 66s at `opt-level 0`, more than the other 57 files together, and is 6.7s now. Debug assertions and overflow checks stay on — this is the `test` profile, not `--release` |
 
 Note the catalogue is **568**, not the 374 the retheme document counts — it
 grew upstream after that document was written, and three times here. Any
@@ -2401,6 +2739,29 @@ of the Bill's ten-second window is open two thirds of the time.
    The walker is our instrument and M11.8 built a second one that is not — how
    much more to invest in the first now that the second exists is a real
    question and not a bug report.
+
+**Answered by the human for `PLAN-M12.md`**, and three of them reversed what
+the plan had written down: **rerolls come back** for the barrel and the order
+book but not the shelf; **every price goes up fivefold and the income does
+not**; and the licence is a thing you can buy for 5,000 rather than a thing
+only a class carries. The rest of §8 was taken as proposed or decided in the
+commit that needed it, and the three the block *diverged* on are in the
+divergence table above.
+
+**`PLAN-M12-EXEC.md` §8 row 13 is the one live question this block leaves**, and
+it is the block's own biggest miss written down as a decision rather than
+defended: **should Auto-pack seat filler into the cells it has finished with?**
+The button refuses any placement that does not strictly improve `(items
+assembled, what they rate)`, so the barrel fills the *bag* and not the board —
+203 owned components fitting nowhere at the end of the closing run, which is why
+the fill target is missed and why nothing else in the block can reach it.
+`PLAN.md` already says the button must "leave nothing obvious in the bag" and it
+is leaving two hundred; against that, a final seating pass raises the floor of
+player power across the whole early game, which is a judgement about how the
+game should feel and not a bug. `TRIAGE-M12.md` rows 8, 9 and 11 are the
+adjacent numbers — the loss rate is up a fifth since the shelf went ×5, and
+whether `pressure::target`'s 70% at level three was ever the right number is a
+question the block never asked.
 
 **No longer open:** errands exist, as `crates/core/src/quest.rs` — a new module
 rather than upstream's, which was a chain of receipts along a road. `town.rs`

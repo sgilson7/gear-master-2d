@@ -11,18 +11,20 @@
 //! happen, and a level that lands one experience point differently on one
 //! machine is a save that disagrees with itself.
 //!
-//! # The rotation
+//! # The rows
 //!
-//! Each level adds one row to one grid, in the fixed order weapon, chest,
-//! helmet, gloves, greaves. Fixed rather than chosen because it makes
-//! [`rows_for`] a pure function of the level: a save carrying `level` implies
-//! its board sizes and cannot disagree with them, and a save that has been
-//! edited by hand is caught rather than believed.
+//! **A level does not hand one out.** Every grid starts at [`STARTING_ROWS`]
+//! and stays there until something is earned for it — a skill point spent on a
+//! row node, or an errand finished that pays one. M12.3 retired the rotation
+//! that used to grow one grid a level, and [`board_rows`] is what replaced
+//! [`rows_for`]: a pure function of what has been earned rather than of the
+//! level, so it is still checkable rather than trusted.
 //!
-//! Skill nodes may grant rows out of turn. Those are recorded separately and
-//! added on top, so the function stays pure — see [`board_rows`].
+//! Why it changed is measured rather than argued: fill went *down* as a
+//! character levelled — 43% at five, 37% at eight — because rows arrived on a
+//! clock and components did not. See `crate::pressure`.
 
-use crate::piece::SlotKind;
+
 
 /// Rows every grid starts with.
 ///
@@ -33,20 +35,16 @@ use crate::piece::SlotKind;
 /// `enemies.json` is the evidence they are not sharing this number.
 pub const STARTING_ROWS: u8 = 3;
 
-/// The largest grid a level-up will build to.
+/// The tallest a grid is ever built to, however the rows were earned.
 ///
 /// The engine's own `SLOT_H`. Beyond it the catalogue has nothing that needs
 /// the room, and a board taller than the pieces is a board with a dead half.
 pub const MAX_ROWS: u8 = crate::slot::SLOT_H;
 
-/// Which grid each level grows, in order from level 2.
-pub const ROTATION: [SlotKind; 5] = [
-    SlotKind::Weapon,
-    SlotKind::Chest,
-    SlotKind::Helmet,
-    SlotKind::Gloves,
-    SlotKind::Greaves,
-];
+// `ROTATION` — the fixed weapon/chest/helmet/gloves/greaves order a level used
+// to grow — is deleted rather than kept, because M12.3 retired the thing it
+// described. A `pub const` nothing calls is a comment nothing checks, and this
+// file has one of those in `character.rs::STARTER` already.
 
 /// The highest level the table covers.
 pub const MAX_LEVEL: usize = 32;

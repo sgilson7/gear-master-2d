@@ -437,20 +437,12 @@ pub struct Banking {
     pub receipt: Vec<String>,
 }
 
-/// Turn what the character is carrying into levels.
-///
-/// **The only place a level happens.** A fight used to do this the instant the
-/// experience was won, which made the walk home a formality; now the walk home
-/// is the game. Everything a level-up used to print — the level, the point,
-/// the row — prints here instead, because here is where it occurs.
-///
-/// Safe to call with nothing carried: it says so and changes nothing.
 /// The names of places this level made visible, in map order.
 ///
 /// Reads every shipped map rather than the one underfoot: a level opens what it
 /// opens, and being told about it while standing somewhere else is better than
 /// not being told.
-fn opened_by(game: &Game, was: u32, now: u32) -> Vec<String> {
+fn opened_by(was: u32, now: u32) -> Vec<String> {
     if now <= was {
         return Vec::new();
     }
@@ -466,6 +458,18 @@ fn opened_by(game: &Game, was: u32, now: u32) -> Vec<String> {
     out
 }
 
+/// Turn what the character is carrying into levels.
+///
+/// **The only place a level happens.** A fight used to do this the instant the
+/// experience was won, which made the walk home a formality; now the walk home
+/// is the game. Everything a level-up prints — the level, the point, what the
+/// level opened — prints here, because here is where it occurs.
+///
+/// It no longer prints a row. M12.3 retired the rotation that grew one grid a
+/// level; `grew` is still on the receipt because an errand or a node can still
+/// pay one, and that is reported where it happens.
+///
+/// Safe to call with nothing carried: it says so and changes nothing.
 pub fn bank(game: &mut Game) -> Banking {
     let was = game.character.level();
     let spent = game.character.carried;
@@ -517,7 +521,7 @@ pub fn bank(game: &mut Game) -> Banking {
     //
     // Core's, because *which* places a level opens is a rule; the page prints
     // what it is told.
-    for id in opened_by(game, was, game.character.level()) {
+    for id in opened_by(was, game.character.level()) {
         receipt.push(format!("Somebody is at {id} who was not there before."));
     }
     Banking { spent, levels, grew, receipt }

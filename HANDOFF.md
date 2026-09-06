@@ -71,7 +71,7 @@ web/                   vanilla ES modules, no bundler
   shape.js             a component's shape, small
 data/*.json            all the content
 data/maps/*.tiles.json one file per map, named for its id — eleven of them
-testing/drive.py       the deploy gate: 42 checks, three browsers, and it can
+testing/drive.py       the deploy gate: 46 checks, three browsers, and it can
                        be pointed at the live page with GM2D_ORIGIN
 testing/playthrough.py `make play` — a walker somebody who built it wrote
 testing/agent_driver.py one command per turn, for an agent that may not read
@@ -261,12 +261,25 @@ REBASELINE_GOLDEN_COMBAT=1 cargo test -p gm2d-core
 
 ## 9. What is being built next
 
-**M12 is built and unpushed.** Seven milestones — M12.B (a player's save that
-could not be played), M12.0 (the measure), M12.1 and M12.1a (the barrel and the
-price tiers), M12.2 (commissions), M12.5 (events that pay) and M12.3 (a row is
-earned, not scheduled). 630 tests became **671**, the browser gate grew four
-checks, and **no save seam anywhere**: the catalogue is still 568, so every file
-that opened on M11 opens on M12.
+**M12 is done and live at `ccfeb16d`.** Eight milestones — M12.B (a player's
+save that could not be played), M12.0 (the measure), M12.1 and M12.1a (the
+barrel and the price tiers), M12.2 (commissions), M12.5 (events that pay),
+M12.3 (a row is earned, not scheduled) and M12.6 (a chain you can see, a licence
+you can buy, and prices that mean it). 630 tests became **687**, the browser
+gate grew to **46 checks**, and **no save seam anywhere**: the catalogue is
+still 568, so every file that opened on M11 opens on M12 — the fivefold price
+rise included, because `catalog_fingerprint` hashes names and not prices.
+
+The deploy was verified the way `CLAUDE.md` has demanded since M8, and for the
+second time by the gate itself rather than by hand: `GM2D_ORIGIN=… drive.py`
+walked all forty-six checks in three engines against the deployed page, and the
+player's own frozen save was loaded on the live site and walked.
+
+Three things in the block reversed a decision the plan had written down, all
+three on the human's word: **rerolls came back** for the barrel and the order
+book (never the shelf), **every price went up fivefold and the income did not**,
+and **a licence is a thing you can buy** for 5,000 rather than a thing only a
+class carries. `PLAN-M12-EXEC.md` §7 is the divergence list.
 
 `TRIAGE-M12.md` is the sweep. Two of its thirteen rows are not the builder's
 and are named as outstanding: **an agent spot-run** against a deployed build
@@ -281,9 +294,7 @@ can reach the fill target without answering it.
 
 ### Before this
 
-
-
-**Nothing is planned.** `PLAN-M9.md`, `PLAN-M10.md` and `PLAN-M11.md` are all
+**Nothing is planned beyond M12.** `PLAN-M9.md`, `PLAN-M10.md` and `PLAN-M11.md` are all
 done and all deployed — M11 at `43804e49`, verified by pointing the gate itself
 at the live page. Before you deploy the next one, read *A deployed fix is not a
 delivered fix* in `CLAUDE.md`: M8.0 through M8.8 sat local for a whole block

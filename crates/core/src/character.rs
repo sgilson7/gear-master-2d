@@ -35,30 +35,14 @@ use crate::piece::{PieceId, PieceRegistry, SlotKind, CATALOG};
 use crate::slot::{PlaceError, SLOT_W};
 use crate::stats::Stats;
 
-/// What a Sprocketman climbs out of the pit with, and where it sits.
-///
-/// Every component here is at most three cells tall, because the frames start
-/// at three rows. A whole weapon, most of a helmet, and a pair of molds — no
-/// chest, because a chest wants a base and a layer and there is no room for
-/// both. The chest is the first thing a player buys into.
-const STARTER: &[(&str, SlotKind, u8, u8, u8)] = &[
-    ("Oak Handle", SlotKind::Weapon, 0, 0, 0),
-    // **Turned, and it has to be.** An Iron Blade is one cell wide and four
-    // tall, and a starting weapon frame is three rows: upright it does not fit
-    // anywhere on the board, the weapon assembles nothing, and a character who
-    // cannot win cannot earn. That is the M4 soft-lock exactly, and the reason
-    // the fifth field of these rows exists.
-    ("Iron Blade", SlotKind::Weapon, 1, 0, 1),
-    ("Ruby Inlay", SlotKind::Weapon, 1, 1, 0),
-    ("Balance Weight", SlotKind::Weapon, 2, 1, 0),
-    ("Steel Frame", SlotKind::Helmet, 0, 0, 0),
-    ("Iron Plating", SlotKind::Helmet, 3, 0, 0),
-    ("Visor of Focus", SlotKind::Helmet, 0, 2, 0),
-    ("Leather Material", SlotKind::Gloves, 0, 0, 0),
-    ("Gripping Mold", SlotKind::Gloves, 2, 0, 0),
-    ("Runed Material", SlotKind::Greaves, 0, 0, 0),
-    ("Greave Mold", SlotKind::Greaves, 2, 0, 0),
-];
+// **`STARTER` and `seat` are deleted, not kept.** They were an *arrangement*:
+// eleven components with a cell and a rotation each, seated onto the board by
+// `apply_preset`. The kit has been two components given into the bag since M7
+// and the board starts empty — **Auto-pack is what turns the Iron Blade now**,
+// which is the same soft-lock guard by another route. The comment on the dead
+// constant went on saying the kit was seated, and `CLAUDE.md` quoted it as live
+// fact for five blocks (`TRIAGE-M12.md` row 12). A constant nothing calls is a
+// comment nothing checks.
 
 /// What a new character owns. **Two pieces, and they make one weapon.**
 ///
@@ -1248,23 +1232,6 @@ impl Character {
             }
         }
         any
-    }
-
-    /// Clear every grid and seat a layout, skipping anything not owned or not
-    /// fitting. Shared by both arrangements so they cannot diverge in how they
-    /// are applied.
-    fn seat(&mut self, layout: &[(&str, SlotKind, u8, u8, u8)]) {
-        for k in SlotKind::ALL {
-            self.loadout.slot_mut(k).clear();
-        }
-        for &(name, kind, ax, ay, rot) in layout {
-            let Some(id) = self.find_by_name(name) else { continue };
-            self.registry.set_rotation(id, rot);
-            self.loadout.remove_anywhere(id);
-            if self.loadout.can_place(&self.registry, id, kind, ax, ay).is_ok() {
-                self.loadout.slot_mut(kind).place(&self.registry, id, ax, ay);
-            }
-        }
     }
 
     // ------------------------------------------------------------ readings

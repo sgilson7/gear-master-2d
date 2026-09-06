@@ -261,7 +261,7 @@ REBASELINE_GOLDEN_COMBAT=1 cargo test -p gm2d-core
 
 ## 9. What is being built next
 
-**M12 is done and live at `ccfeb16d`.** Eight milestones — M12.B (a player's
+**M12 is done and live**, at build stamp `d8965cf7`. Eight milestones — M12.B (a player's
 save that could not be played), M12.0 (the measure), M12.1 and M12.1a (the
 barrel and the price tiers), M12.2 (commissions), M12.5 (events that pay),
 M12.3 (a row is earned, not scheduled) and M12.6 (a chain you can see, a licence

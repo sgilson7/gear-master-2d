@@ -39,7 +39,7 @@ walks all forty-two gate checks against the deployed page, three engines. See
 *A deployed fix is not a delivered fix* for why that is a separate step from
 the deploy going green.
 
-**M12 is done and live at `ccfeb16d`**, verified the way this file has demanded
+**M12 is done and live**, verified the way this file has demanded
 since M8: `GM2D_ORIGIN=… drive.py` walked all forty-six checks in three engines
 against the deployed page, and the player's own frozen save was loaded on it and
 walked. Eight milestones — M12.B (a save that could not be played), M12.0 (the
@@ -2376,14 +2376,29 @@ M12's was the same tool pointed at the same place, and the interesting part is
 what it did **not** need doing by hand:
 
 ```
-live build ccfeb16d
-  index.html asks app.js?v=ccfeb16d   app.js carries BUILD='ccfeb16d'
+live build ccfeb16d                   and d8965cf7 after the doc sweep
+  index.html asks app.js?v=<X>        app.js carries BUILD='<X>'
   chromium walked the gate    ok      firefox  walked the gate    ok
   webkit   walked the gate    ok
   46 checks, three engines            the frozen save loads and walks
   the barrel is under the counter     a grid says what it takes
   console errors: none                off-origin requests: none
 ```
+
+**A stamp is not a commit and this block moved it twice.** M12.6 deployed
+`ccfeb16d`; deleting `STARTER`, `seat` and `ROTATION` a commit later rebuilt
+the wasm and the stamp became `d8965cf7` — *dead code is still bytes the
+browser caches.* So a sentence in this file naming the live stamp goes stale on
+the next deploy whatever that deploy was for, and the two named here are a
+record rather than a claim about now. **What has to agree is the page with
+itself**, which is why the table above asks for the pair and not the number.
+
+**Most checks pass silently.** Fifty-three `ok:` lines came back for
+forty-six checks, which does not divide and is not meant to: only some of them
+announce, and the four M12 added are among the quiet ones. **Read the exit
+code, and never a pipeline's** — `drive.py … | tail -30` reports `tail`'s
+status, which is zero whatever the gate found. The first live walk of
+`d8965cf7` was run that way and had to be run again to mean anything.
 
 **The barrel check is the one worth reading twice.** It carried its own `12`
 for the dearest thing the barrel may hold, and every price in the game had just

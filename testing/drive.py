@@ -563,7 +563,7 @@ def check_a_choice_says_what_it_pays(page, name, fails):
 
 
 def check_a_grid_says_what_it_takes(page, name, fails):
-    """Every grid names its recipe, and an empty grid names it too.
+    """Every grid says what it takes, at the grid, to a pointer and to a key.
 
     **M12.B.** `piece::recipe_parts` has read the recipe table since the fork
     and no screen ever printed it for a *grid* — so a player who had not read
@@ -571,34 +571,95 @@ def check_a_grid_says_what_it_takes(page, name, fails):
     layers. The M12.0 probe measured what that costs: the greaves grid sits at
     0% for fourteen levels of a whole playthrough.
 
-    The empty grid is the point. The panel used to skip a slot with no items,
-    which meant the one place the question is asked was the one place nothing
-    was said — so this counts five grids rather than however many are packed.
+    **And it is asked at the grid now.** It was five boxes down the right-hand
+    panel, above the cards for whatever that grid had already made, which is a
+    long way from the empty greaves frame the question is about — and the panel
+    is what a hover scrolls. It is a `?` beside each frame's own name, so this
+    walks the five buttons rather than reading a list.
+
+    The empty grid is still the point: all five answer, whether or not anything
+    is seated in them.
 
     **Read off the screen and not out of the page's objects.** The first
     version of this reached for `window.__board.slots`, which is the canvas
     painter rather than the payload, and failed in all three engines on the
     word `undefined`. What is being checked is whether a player can read it.
+
+    **And by the gesture, not by calling the handler.** A hover here is a real
+    hover: a button positioned off the frame it belongs to, or one the canvas
+    covered, would pass any check that reached for the element and asked it to
+    show itself.
     """
-    got = page.evaluate("""() => ({
-      heads: [...document.querySelectorAll('#panel-yours .grid-of')].map(e => e.textContent),
-      boxes: [...document.querySelectorAll('#panel-yours .recipe')].map(e => ({
-        lines: [...e.querySelectorAll('li')].map(li => (li.textContent || '').trim()),
-      })),
+    slots = ["weapon", "helmet", "chest", "gloves", "greaves"]
+    seen = {}
+    for slot in slots:
+        sel = f".frame-help[data-slot='{slot}']"
+        if not page.is_visible(sel):
+            fails.append(f"{name}: the {slot} frame has no ? beside its name")
+            continue
+        # The button has to be the thing at its own middle. One that had slid
+        # under the canvas, or under a card, would still hover from Playwright
+        # and never from a hand.
+        on_top = page.evaluate("""(sel) => {
+          const r = document.querySelector(sel).getBoundingClientRect();
+          const el = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+          return el?.dataset?.slot ?? el?.tagName ?? null;
+        }""", sel)
+        if on_top != slot:
+            fails.append(f"{name}: the {slot} frame's ? is covered by {on_top!r}")
+            continue
+        page.hover(sel)
+        page.wait_for_selector("#frame-card", state="visible", timeout=4000)
+        seen[slot] = page.evaluate("""() => ({
+          head: (document.querySelector('#frame-card h4')?.textContent ?? '').trim(),
+          lines: [...document.querySelectorAll('#frame-card .recipe li')]
+                   .map(li => (li.textContent || '').trim()),
+        })""")
+    missing = [s for s in slots if s not in seen]
+    if missing:
+        fails.append(f"{name}: nothing said what {missing} take")
+    # **Beside its own frame, and not merely somewhere on the page.** The board
+    # draws the labels, so where they are is pixels and cannot be read — but
+    # the controls have to lie out the way the frames do: five distinct spots,
+    # in the board's own order down and across. A layer that had collapsed into
+    # the corner would still hover, still answer, and be beside nothing.
+    where = page.evaluate("""() => [...document.querySelectorAll('.frame-help')].map(b => {
+      const r = b.getBoundingClientRect();
+      return { slot: b.dataset.slot, x: Math.round(r.left), y: Math.round(r.top) };
     })""")
-    want = {"weapon", "helmet", "chest", "gloves", "greaves"}
-    heads = set(got["heads"])
-    if not want <= heads:
-        fails.append(f"{name}: the packing panel names {sorted(heads)}, "
-                     f"and never says what {sorted(want - heads)} take")
-    if len(got["boxes"]) != len(got["heads"]):
-        fails.append(f"{name}: {len(got['heads'])} grid headings and "
-                     f"{len(got['boxes'])} recipe boxes")
+    if len({(w["x"], w["y"]) for w in where}) != len(where):
+        fails.append(f"{name}: the frame controls are stacked on each other: {where}")
+    # Reading order: down the rows the board wrapped into, then across.
+    order = [w["slot"] for w in sorted(where, key=lambda w: (round(w["y"] / 24), w["x"]))]
+    if order != slots:
+        fails.append(f"{name}: the frame controls read {order}, and the frames are {slots}")
+    # It is a hover, so it comes off again — a card that stayed up would sit
+    # over the board for the rest of the sitting.
+    page.mouse.move(4, 4)
+    page.wait_for_timeout(60)
+    if page.is_visible("#frame-card"):
+        fails.append(f"{name}: what a frame takes stayed on screen after the pointer left")
+    # **The keyboard reaches it too.** The reason it is a button and not a
+    # hotspot painted on the canvas; a hover-only answer is TONE's "shown"
+    # for a mouse and nothing at all for anybody else.
+    #
+    # Guarded on the button being there rather than assuming it: the first run
+    # of this against a build with the controls removed threw on `null.focus`,
+    # which ends the walk and takes every finding after it — the crash the
+    # `fails` list is passed in to prevent, one line further down.
+    if "chest" in seen:
+        page.evaluate("() => document.querySelector(\".frame-help[data-slot='chest']\").focus()")
+        page.wait_for_timeout(80)
+        if not page.is_visible("#frame-card"):
+            fails.append(f"{name}: focusing a frame's ? said nothing")
+        page.evaluate("() => document.activeElement.blur()")
     # **Not vacuous:** every box carries a count, and the set names more than
     # one kind of part — a box reading "1 thing" everywhere would pass a check
     # that only counted boxes.
     kinds = set()
-    for head, box in zip(got["heads"], got["boxes"]):
+    for head, box in seen.items():
+        if head not in box["head"]:
+            fails.append(f"{name}: the {head} frame's card is headed {box['head']!r}")
         if not box["lines"]:
             fails.append(f"{name}: the {head} grid has a recipe box with nothing in it")
             continue

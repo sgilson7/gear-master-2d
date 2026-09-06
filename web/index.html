@@ -338,7 +338,13 @@
             Shift-click a finished item to lock it. Green is where it fits &mdash; core decides that, not the page.</p>
           <div class="packing">
             <div>
-              <canvas id="board" width="900" height="420"></canvas>
+              <!-- The board, and over it the layer of `?` controls that stand
+                   beside the frame names the canvas draws. What a grid takes
+                   is asked at the grid now, not five boxes down a list. -->
+              <div class="boardwrap" id="boardwrap">
+                <canvas id="board" width="900" height="420"></canvas>
+                <div id="frame-help"></div>
+              </div>
               <p id="holding" class="holding"></p>
               <p id="board-says" class="says" hidden></p>
               <!-- The rack. Only there for a licensee: enching is what the
@@ -431,5 +437,7 @@
   <!-- What one component is. Outside every screen, because it is pinned to the
        viewport and the shelf, the bag and the board all summon it. -->
   <div id="piece-card" class="made" hidden></div>
+  <!-- What one frame takes, pinned beside the ? that asked for it. -->
+  <div id="frame-card" class="made" hidden></div>
 </body>
 </html>

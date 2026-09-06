@@ -568,7 +568,10 @@ function paintHistory() {
   lines(history, $('history-list'));
   // The end of it is what you opened it to read.
   const box = $('history-list');
-  box.lastElementChild?.scrollIntoView({ block: 'nearest' });
+  // The same reveal the card list uses: a strip of transcript is not a reason
+  // to move anything that is not the transcript.
+  const end = box.lastElementChild;
+  if (end) revealInside(end);
 }
 
 function openHistory() {
@@ -669,6 +672,9 @@ let packingOnly = false;
 /// on are one target. Before this each stage carried its own row and the three
 /// stages are 15, 19 and 3 lines tall.
 function stage(which) {
+  // A card pinned to the viewport outlives the screen under it unless it is
+  // told otherwise — the same reason leaving a town hides the component card.
+  hideFrame();
   for (const s of ['board', 'replay', 'result']) $(`stage-${s}`).hidden = s !== which;
   const board = which === 'board';
   $('go').hidden = !board || packingOnly;
@@ -736,6 +742,40 @@ function paintTheirs(m) {
     `What it is wearing${any ? ` (${(m.items ?? []).length})` : ''}`;
 }
 
+/// The nearest box this element scrolls inside, and **nothing above it**.
+///
+/// Whether it happens to be overflowing right now is not the question — a
+/// container that fits its contents is a container the reveal below can decide
+/// to leave alone. Asking `scrollHeight > clientHeight` here would walk past a
+/// panel that fits and hand back the stage behind it, which is the bug.
+function scrollBoxOf(el) {
+  for (let p = el.parentElement; p && p !== document.body; p = p.parentElement) {
+    const y = getComputedStyle(p).overflowY;
+    if (y === 'auto' || y === 'scroll') return p;
+  }
+  return null;
+}
+
+/// Bring an element into view **inside its own scroll box and nowhere else**.
+///
+/// `scrollIntoView` scrolls *every* scrollable ancestor, and the packing screen
+/// has two: the card list on the right, and `.stages`, which is the box the
+/// board itself is standing in. So pointing at a seated component scrolled the
+/// panel — correct — and walked the board up off the top of the screen at the
+/// same time, under the cursor, mid-edit, on every hover. The grid you were
+/// working in moved because you looked at it.
+///
+/// This is `block: 'nearest'` written out for one box: do nothing when the
+/// element is already readable, and otherwise move the least that makes it so,
+/// capped so a card taller than the box still arrives top-first.
+function revealInside(el) {
+  const box = scrollBoxOf(el);
+  if (!box) return;
+  const e = el.getBoundingClientRect(), b = box.getBoundingClientRect();
+  if (e.top < b.top) box.scrollTop += e.top - b.top;
+  else if (e.bottom > b.bottom) box.scrollTop += Math.min(e.bottom - b.bottom, e.top - b.top);
+}
+
 /// Light the card for the item being pointed at, on either side.
 function lightCard(root, key) {
   let target = null;
@@ -744,7 +784,7 @@ function lightCard(root, key) {
     el.classList.toggle('pointed', on);
     if (on) target = el;
   }
-  if (target) target.scrollIntoView({ block: 'nearest' });
+  if (target) revealInside(target);
 }
 
 function showTab(which) {
@@ -757,6 +797,8 @@ function showTab(which) {
 }
 
 function closeFight() {
+  hideFrame();
+  hidePiece();
   $('fight').hidden = true;
   paintPanel(); draw(); autosave();
   // A fight is where a level lands, so it is where the fork is offered.
@@ -920,10 +962,7 @@ function bolt(pieceId) {
 // did not. The panel renders `status` unchanged — that sentence is the engine's
 // and it is better than any summary of it.
 function paintMade(st) {
-  const { html, any } = cards(st.slots, true);
-  // The recipes are drawn whether or not anything is seated — an empty grid is
-  // exactly where the question is asked — so the nudge sits above them rather
-  // than instead of them.
+  const { html, any } = cards(st.slots);
   $('panel-yours').innerHTML = `<h4>What the frames made</h4>` +
     (any ? '' : `<p class="empty">Nothing seated yet. Click a component in the bag, then click a cell.</p>`) +
     html;
@@ -1059,26 +1098,95 @@ function recipeBox(slot) {
   return `<div class="recipe"><span class="recipe-h">what it takes</span><ul>${rows}</ul></div>`;
 }
 
-/// **`recipes` is opt-in, because a creature's board is not something you
-/// pack.** The same builder draws your grids, the creature's panel and both
-/// sides of the replay; only your packing screen is a place where "what it
-/// takes" is a thing you can act on.
-///
-/// And your side no longer skips an empty grid. Skipping it is what hid the
-/// question: a grid with nothing in it printed no heading, no card and no
-/// hint, so the one place a player most needs to be told what a chest wants
-/// was the one place that said nothing at all.
-function cards(slots, showRecipes = false) {
+/// **What a grid takes is no longer in this list, and an empty grid is skipped
+/// again.** M12.B put the recipe here because the one place a player needs to
+/// be told what a chest wants was saying nothing at all — which was true, and
+/// this was the wrong place to say it: five boxes down a column, above the
+/// cards for the items that grid had already made, a long way from the empty
+/// greaves frame the question is actually about. It is a `?` beside the
+/// frame's own name now, on the board. So the reason to print a heading for a
+/// grid that made nothing went with it, and this list is one builder with one
+/// behaviour on both sides again.
+function cards(slots) {
   const parts = [];
   let any = false;
   for (const slot of slots) {
-    if (!slot.items.length && !showRecipes) continue;
-    if (slot.items.length) any = true;
+    if (!slot.items.length) continue;
+    any = true;
     parts.push(`<p class="grid-of">${slot.slot}</p>`);
-    if (showRecipes) parts.push(recipeBox(slot));
     for (const i of slot.items) parts.push(oneCard(i, slot.slot));
   }
   return { html: parts.join(''), any };
+}
+
+/// The size of the `?` beside a frame's name, in canvas pixels.
+const FRAME_HELP = 15;
+
+/// A `?` beside each frame's name, kept where the board says the name ends.
+///
+/// **A real button rather than a hotspot painted on the canvas.** It takes
+/// focus, so what a grid takes is reachable from the keyboard the same way a
+/// skill node's detail is — and a control drawn into the canvas would be a
+/// second thing hit-testing the board's pixels.
+///
+/// Called from `Board#onlayout`, which fires on every fit — a refresh, a
+/// window resize, a frame that grew a row — so the buttons follow the grids
+/// rather than being placed once and going stale.
+function frameHelp() {
+  const layer = $('frame-help');
+  const spots = board.helpSpots(FRAME_HELP);
+  if (!spots.length) { layer.replaceChildren(); return; }
+  const c = $('board');
+  // **Canvas pixels are not always CSS pixels.** `Board#fit` floors the
+  // backing store at 560 wide, so a narrow column displays it scaled — and it
+  // pins the CSS *height* to the backing height, so the two axes scale by
+  // different amounts. Both are asked for rather than assumed. The offsets are
+  // the canvas's content box: `clientLeft` is its border, which is 1px of
+  // drift on every button if it is left out.
+  const kx = c.clientWidth / c.width, ky = c.clientHeight / c.height;
+  const ox = c.offsetLeft + c.clientLeft, oy = c.offsetTop + c.clientTop;
+  const have = new Map([...layer.children].map((b) => [b.dataset.slot, b]));
+  for (const spot of spots) {
+    let b = have.get(spot.slot);
+    if (!b) {
+      b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'frame-help';
+      b.dataset.slot = spot.slot;
+      b.textContent = '?';
+      b.setAttribute('aria-label', `what the ${spot.slot} frame takes`);
+      const show = () => showFrame(b, spot.slot);
+      b.onpointerenter = show;
+      b.onfocus = show;
+      // A touch screen has no hover, and this is the whole of what the button
+      // does — so the tap that would otherwise do nothing opens it.
+      b.onclick = show;
+      b.onpointerleave = hideFrame;
+      b.onblur = hideFrame;
+      layer.append(b);
+    }
+    b.style.left = `${ox + spot.x * kx}px`;
+    b.style.top = `${oy + spot.y * ky}px`;
+    b.style.width = b.style.height = `${Math.round(FRAME_HELP * kx)}px`;
+  }
+}
+
+/// What one frame takes, pinned beside the `?` that asked.
+///
+/// Read off the board's own payload, which is core's answer — `recipeBox` is
+/// the same builder that printed this in the panel, so moving where the
+/// question is asked did not fork what the answer says.
+function showFrame(anchor, slot) {
+  const s = board.state?.slots.find((x) => x.slot === slot);
+  const box = $('frame-card');
+  if (!s) { box.hidden = true; return; }
+  box.innerHTML = `<h4>the ${slot} frame</h4>${recipeBox(s)}`;
+  box.hidden = false;
+  pinNear(box, anchor);
+}
+
+function hideFrame() {
+  $('frame-card').hidden = true;
 }
 
 function boardSays(text) {
@@ -1875,6 +1983,14 @@ function showPiece(anchor, p) {
   const box = $('piece-card');
   box.innerHTML = pieceCardHtml(p);
   box.hidden = false;
+  pinNear(box, anchor);
+}
+
+/// Put a floating card beside whatever summoned it, and keep it on the screen.
+///
+/// Takes an element or a bare rectangle, because the board summons one from a
+/// few cells of a canvas rather than from an element of its own.
+function pinNear(box, anchor) {
   const r = anchor instanceof Element ? anchor.getBoundingClientRect() : anchor;
   const w = box.offsetWidth, h = box.offsetHeight;
   const left = Math.min(Math.max(8, r.left), window.innerWidth - w - 8);
@@ -2100,6 +2216,8 @@ async function main() {
     look: look_json, lookOver: look_over,
   });
   board.onsay = boardSays;
+  // The `?` controls stand on the canvas, so they follow every layout it does.
+  board.onlayout = frameHelp;
   // An ench in hand takes the click instead of the board: picking a component
   // up and bolting something to it are two different gestures on one target,
   // and which one is happening is decided by whether anything is in hand.

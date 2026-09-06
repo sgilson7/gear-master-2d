@@ -324,6 +324,18 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
 .recipe li { font-family: var(--mono); font-size: 11.5px; color: var(--ink-2);
   line-height: 1.5; }
 .recipe li b { color: var(--ink); font-weight: 600; }
+/* And where it is asked, which moved. The `?` stands beside the frame's name
+   on the board rather than five boxes down the panel beside it — the question
+   belongs at the empty greaves grid, not above the cards for the items the
+   weapon grid has already made. The layer is inert and the buttons are not, so
+   the canvas keeps every pixel it hit-tests. */
+.boardwrap { position: relative; }
+#frame-help { position: absolute; inset: 0; pointer-events: none; }
+.frame-help { position: absolute; pointer-events: auto; padding: 0;
+  display: grid; place-items: center; border-radius: 50%;
+  background: #1b1b26; border: 1px solid var(--line); color: var(--ink-3);
+  font-family: var(--mono); font-size: 10px; line-height: 1; cursor: help; }
+.frame-help:hover, .frame-help:focus-visible { color: var(--brass); border-color: var(--brass); }
 
 /* --- M12.6: turning a list over ---------------------------------------- */
 .rollbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 8px}
@@ -540,15 +552,25 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
 .shape { display: block; image-rendering: pixelated; }
 .ware-top { display: flex; align-items: flex-end; min-height: 46px; margin-bottom: 6px; }
 
-/* The component hover card, wherever it was summoned from. */
-#piece-card {
+/* The two floating cards: one component, and what one frame takes. Both are
+   pinned to the viewport by `pinNear`, so neither is dragged around by a list
+   that scrolls under it. */
+#piece-card, #frame-card {
   position: fixed; z-index: 21; width: min(34ch, 92vw);
   background: var(--surface); border: 1px solid var(--line);
   box-shadow: 0 6px 24px rgb(0 0 0 / .28); padding: 12px 14px;
   pointer-events: none;
 }
-#piece-card[hidden] { display: none; }
+/* `.made` is a box with a background and a border and no `display` of its
+   own — but these two set one, so they carry their own `[hidden]`. The rule
+   that has been learned three times here. */
+#piece-card[hidden], #frame-card[hidden] { display: none; }
 #piece-card > b { font-size: 14.5px; }
+#frame-card { width: min(40ch, 92vw); }
+#frame-card h4 { margin-bottom: 8px; }
+/* On its own ground rather than the panel's recessed one: there is no panel
+   behind it here, and the left rule is what still says "a spec". */
+#frame-card .recipe { margin: 0; background: transparent; padding: 0 0 0 9px; }
 
 /* The two boards in the replay. Scroll rather than shrink: a grid drawn small
    enough to always fit would stop reading as the board you packed. */

@@ -240,6 +240,7 @@ REBASELINE_GOLDEN_COMBAT=1 cargo test -p gm2d-core
 | Something works the first time and misbehaves the second | nothing checked the second visit. A key that stays in the bag, an event that re-opens for ever, a door that re-locks — all one fault |
 | The map on screen is not the map you are on | `paintPanel` did not re-read. `position()` carries the map id — trap in *A stale map, shipped since M8* |
 | A row you hid is still laid out | a `display` rule beat `[hidden]` — trap 9 |
+| A screen shifts under the cursor when you hover something | something called `scrollIntoView`, which scrolls *every* scrollable ancestor and not the nearest. `revealInside` in `app.js` — see *A reveal scrolls everything above it* in CLAUDE.md |
 | A whole region cannot be beaten and the suite is green | the reachability check is a range, not a measurement — trap 10 |
 | The playtest agent's save stopped loading | somebody rebuilt `dist/web` under it and moved the fingerprint. Use `GM2D_WEB` |
 

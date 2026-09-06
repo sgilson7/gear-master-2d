@@ -1968,23 +1968,34 @@ of thing it is, and explains itself on hover.
 
 The packing screen showed what you had built and never what a grid wanted, so
 the recipes were a thing you learned by trying combinations or by reading
-`piece.rs`. `recipeBox` prints them above each grid on the packing panel.
+`piece.rs`. `recipeBox` prints them, and **it prints them at the grid**: a `?`
+beside the frame's own name on the board, which opens a card pinned to the
+viewport.
 
 - **Derived in core, never typed.** `piece::recipe_parts` reads the recipe
   table, so retuning a recipe retunes the line — the same reason `Node::line`
   is derived rather than written into a blurb. Unthemed, TONE 13a: somebody
   comparing what two grids want is comparing counts.
-- **Opt-in, and only on your own board.** The same `cards()` builder draws your
-  grids, the creature's panel and both sides of the replay; a creature's board
-  is not something you pack, so only the packing screen passes `showRecipes`.
 - **The way's name is printed only where there is a choice.** The weapon grid
   has six ways of being built and the other four have one each; naming the way
   on a grid with one way is a label that carries nothing.
-- **An empty grid stops being skipped**, and that was the actual bug hiding
-  underneath. `cards()` skipped a grid with nothing in it — so a chest with no
-  chest pieces printed no heading, no card and no hint, and the one place a
-  player most needs to be told what a chest takes was the one place that said
-  nothing at all.
+- **It was in the panel first, and the panel was the wrong place.** M12.B put
+  it above each grid's cards in the right-hand list, which is five boxes down a
+  column and a long way from the empty greaves frame the question is actually
+  about — and the list is the thing a hover scrolls. Asking at the frame is
+  what the panel was standing in for. **An empty grid is skipped in the list
+  again**, because the reason it stopped being skipped went with the recipe.
+- **A button, not a hotspot painted on the canvas.** It takes focus, so the
+  recipe is reachable from a keyboard the way a skill node's detail is — and a
+  control drawn into the canvas would be a second thing hit-testing the board's
+  pixels. The canvas draws the label, so `Board#helpSpots` **measures** where
+  that label ends and reports a spot; `Board#onlayout` fires on every fit, so
+  the controls follow a frame that grew a row rather than being placed once.
+- **Canvas pixels are not always CSS pixels.** `Board#fit` floors the backing
+  store at 560 wide and pins the CSS height to the backing height, so a narrow
+  column scales the two axes by different amounts. `frameHelp` asks for both
+  and adds `clientLeft` — the canvas's own border, which is a pixel of drift on
+  every button if it is left out.
 
 **And the controls blurb at the top of the page is gone**, on the human's ask —
 four lines of screen that were read once and then held that space for the rest
@@ -2243,6 +2254,35 @@ walker's pathfinder each carried their own hardcoded list of impassable terrain
 (`rock`, `water`). Both read core's `walk` grid now. **A second list of what
 you cannot stand on is a second answer to a question `World::walkable` already
 answers**, and M11.4 changed that answer.
+
+## A reveal scrolls everything above it
+
+Reported from a real session: pointing at a component on the packing board made
+**the board itself jump up the screen**, so a grid you were editing walked out
+from under the cursor. Reported as random; it was not — it happened on every
+hover that lit a card the panel had to scroll to.
+
+`lightCard` finished with `target.scrollIntoView({ block: 'nearest' })`, and
+**`scrollIntoView` scrolls every scrollable ancestor, not the nearest one.** On
+this screen there are two: the card list on the right, which is the box that
+wanted to move, and `.stages`, which is the box the board is standing in.
+Measured against the old build at 1280×620, one hover took the canvas from
+249px down the viewport to 69 — 180 pixels, in the middle of a drag.
+
+- **`revealInside` is `block: 'nearest'` written out for one box**, and
+  `scrollBoxOf` finds it. Do nothing when the element is already readable;
+  otherwise move the least that makes it so, capped so a card taller than the
+  box arrives top-first.
+- **Whether the box is overflowing right now is not the question.**
+  `scrollBoxOf` matches on `overflow-y` alone: asking `scrollHeight >
+  clientHeight` walks straight past a panel that happens to fit and hands back
+  the stage behind it, which is the bug with an extra step.
+- **`overflow: hidden` does not mean unscrollable.** It means the *player*
+  cannot scroll it. A script still can, and nothing scrolls it back — which is
+  why `.screen.framed`'s hidden overflow was no protection here.
+- The history list had the same call for the same reason and goes through the
+  same door. **Fix the class, not the instance** — there is one reveal now, and
+  the next list that wants one will not have to rediscover this.
 
 ## Screens, and the three times one covered another
 

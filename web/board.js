@@ -71,6 +71,10 @@ export class Board {
     this.onchange = () => {};
     this.onhold = () => {};
     this.onpoint = () => {};
+    /// Fired whenever the grids have been laid out afresh, so anything
+    /// standing on top of the canvas can follow them. The board says where its
+    /// frames are and decides nothing about what is put there.
+    this.onlayout = () => {};
     /// Somebody else's chance at a click on a component. Returns true when it
     /// took it, and the board does nothing further with that press.
     this.onclaim = null;
@@ -135,6 +139,27 @@ export class Board {
     // border width cannot quietly bring the squash back.
     const chrome = this.c.offsetHeight - this.c.clientHeight;
     this.c.style.height = `${h + chrome}px`;
+    this.onlayout();
+  }
+
+  /// Where each frame's label ends, in the canvas's own pixels.
+  ///
+  /// This file draws that label, so it is the only thing that knows where it
+  /// stops — and the width is **measured** rather than counted off the name,
+  /// because the text is 11px mono and a guessed offset would drift the moment
+  /// the label or the font changed. What gets put there is somebody else's
+  /// business: this reports a spot and decides nothing.
+  helpSpots(size = 15) {
+    if (!this.state || !this.boxes) return [];
+    const g = this.c.getContext('2d');
+    g.font = '11px ui-monospace, Menlo, monospace';
+    return this.slotOrder.map((name) => {
+      const b = this.boxes[name];
+      const w = g.measureText(name.toUpperCase()).width;
+      // The label sits on its baseline at `b.y - 8`, so its cap is centred a
+      // few pixels above that.
+      return { slot: name, x: Math.round(b.x + w + 7), y: Math.round(b.y - 12 - size / 2) };
+    });
   }
 
   layout() {

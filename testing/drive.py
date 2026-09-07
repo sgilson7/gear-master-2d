@@ -698,17 +698,29 @@ def check_the_frozen_save_is_playable(page, name, fails):
     errors = []
     page.on("pageerror", lambda e: errors.append(str(e)))
     page.set_input_files("#file", str(fixture))
+    # **Wait for the thing being asserted, not for a word that was already
+    # there.** This waited for any `#tape` line reading "Loaded" — and the
+    # upload block two steps above logs exactly that for the walk's own save,
+    # which is still sitting on a four-line strip. So the wait was satisfied
+    # before this file had been parsed at all, and the map read a moment later
+    # was the walk's own map rather than the fixture's. The check raced on
+    # every run in every engine and usually won; it lost once in firefox
+    # against the live page, where the file arrives over a network and the
+    # assertion does not.
+    #
+    # One wait covers both of the old branches: a file that never loaded and a
+    # file that loaded somewhere else are the same sentence with a different
+    # map in it, and the strip says which.
     try:
         page.wait_for_function(
-            "() => Array.from(document.querySelectorAll('#tape li'))"
-            ".some(e => (e.textContent || '').includes('Loaded'))", timeout=10000)
+            "() => JSON.parse(window.__position()).map === 'kettleworks-field'", timeout=10000)
     except Exception:
         said = page.eval_on_selector_all("#tape li", "e => e.map(x => x.textContent)")
-        fails.append(f"{name}: the reported save never loaded. The strip says {said[-1:]!r}")
+        where = json.loads(page.evaluate("() => window.__position()"))
+        fails.append(f"{name}: the reported save is on the field, and ten seconds after "
+                     f"loading it the game is on {where['map']!r}. "
+                     f"The strip says {said[-1:]!r}")
         return
-    where = json.loads(page.evaluate("() => window.__position()"))
-    if where["map"] != "kettleworks-field":
-        fails.append(f"{name}: the save is on the field and the game opened on {where['map']!r}")
     # The log is what trapped, so read it before anything else.
     try:
         page.evaluate("() => window.__log()")

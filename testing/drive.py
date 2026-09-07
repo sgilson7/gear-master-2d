@@ -783,6 +783,14 @@ def check_a_swing_climbs_with_fury(page, name, fails):
         got = page.evaluate("""() => {
           const r = window.__replay;
           if (!r || !r.log) return null;
+          // **Stop the playback before driving the head by hand.** It starts
+          // playing the moment the fight is run, so a scrub that walks to the
+          // end is racing a clock that is already most of the way there — and
+          // whichever of the two arrives first decides whether the screen is
+          // still on the replay when this returns. CI lost that race and the
+          // exit path clicked a Skip button that had already been replaced by
+          // the receipt.
+          r.playing = false;
           // What each row said, every quarter second, beside what the log says
           // that item had last hit for at the same moment. The page is being
           // compared against core's answer rather than against itself — the
@@ -836,7 +844,11 @@ def check_a_swing_climbs_with_fury(page, name, fails):
             fails.append(f"{name}: a swing climbed above what the card estimated and "
                          f"nothing was marked as risen: {moved}")
     finally:
-        page.click("#skip")
+        # Skip is only there while there is something left to skip. Pausing the
+        # playback above makes that the common case, and a fight that ended
+        # anyway is still a fight this has to walk out of.
+        if page.is_visible("#skip"):
+            page.click("#skip")
         page.wait_for_selector("#stage-result", state="visible", timeout=20000)
         page.click("#done")
         page.wait_for_selector("#fight", state="hidden", timeout=8000)

@@ -528,6 +528,11 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
 .tick-track i { display: block; height: 100%; width: 0; background: var(--ink-3); }
 .tick.ready .tick-track i { background: var(--brass); }
 .tick-hit { text-align: right; color: var(--ink-3); }
+/* The number beside a row is the swing it last threw, not the one it opened
+   on — fury and the spin both raise it mid-fight. Lit while it is above the
+   opening figure, so a board winding up says so without anybody holding two
+   numbers in their head. */
+.tick-hit.risen { color: var(--brass); font-weight: 600; }
 .tick.has-card { cursor: help; }
 .tick.has-card:hover, .tick.has-card:focus-visible {
   background: color-mix(in srgb, #69cdeb 14%, transparent); outline: none;
@@ -583,12 +588,22 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
 /* The shape sits beside the name in the hover card, not above it. */
 #piece-card .made-item { display: grid; gap: 2px; }
 
-/* The character sheet on the standing panel. */
-#sheet { list-style: none; margin: 0 0 14px; padding: 0; font-size: 13px; line-height: 1.55; }
-#sheet li { position: relative; padding-left: 11px; }
-#sheet li::before { content: "·"; position: absolute; left: 0; color: var(--ink-3); }
+/* The character sheet on the standing panel, and the pool table under it.
+   **Both named, because `.stats` is scoped to `.made` and this panel is not
+   one** — the same trap `.made .tabs` set for the tree's tab strip, which
+   inherited nothing and stacked. A list that wears a class for its meaning
+   still has to be given its look where it stands. */
+#sheet, #pools-pay { list-style: none; margin: 0 0 14px; padding: 0;
+  font-size: 13px; line-height: 1.55; }
+#sheet li, #pools-pay li { position: relative; padding-left: 11px; }
+#sheet li::before, #pools-pay li::before {
+  content: "·"; position: absolute; left: 0; color: var(--ink-3); }
 #sheet li.dim { color: var(--ink-3); }
-#sheet li.none { color: var(--ink-3); font-style: italic; }
+#sheet li.none, #pools-pay li.none { color: var(--ink-3); font-style: italic; }
+/* The pool is the world's word and what it pays is the engine's, so the rate
+   is set in the face the rest of the game sets a spec in. */
+#pools-pay li { color: var(--ink-2); }
+#pools-pay li b { color: var(--ink); font-weight: 600; }
 /* A rule is not a stat. It moves no bar, so it gets the one visual difference
    on this list: the brass the page already uses for something earned. */
 #sheet li.rule { color: var(--brass); cursor: help; }

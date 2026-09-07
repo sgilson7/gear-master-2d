@@ -46,20 +46,24 @@ Break any of these and the failure is silent and expensive.
 ## 3. The shape of the code
 
 ```
-crates/core/           the engine — no graphics, no wasm, ~42k lines
+crates/core/           the engine — no graphics, no wasm, ~43.9k lines
   piece.rs             the component catalogue (568) + Trigger/Action + describe
   loadout.rs           grids, items, recipes, the assembly pipeline
   combat.rs            the fight. No RNG. 50ms ticks. `simulate_*` ladder
   character.rs         the player: boards, xp, fatigue, supplies, skills, class
   world.rs             maps, terrain, regions, places, stepping
-  quest.rs             errands: give / carry / hand in
+  quest.rs             errands: give / carry / hand in, and `granted` chains
   skills.rs            the tree, and `Effect` — what a node does
   rule.rs              `Rule` — what a node *or an item* grants that is not a number
+  progression.rs       levels, and rows — which a level no longer hands out
   drops.rs             what a creature leaves behind, and how often
   explain.rs           what one component does, in the engine's own words
   fatigue.rs           what a fight costs beyond the fight, + restoratives
-  shop.rs              town shelves, which are content and not state
+  shop.rs              the three counters: barrel, shelf, order book, rerolls
   survey.rs            what an instrument does to a map you are reading
+  pressure.rs          board pressure as two numbers — fill and bench, + target
+  tile_event.rs        the `Outcome` the game actually uses. NOT `event.rs`,
+                       which is the cut campaign's and has the better describer
   save.rs              the hand-written save mirror. Read its module doc.
 crates/wasm/src/lib.rs the shim. One file. Big. Decides nothing.
 crates/lab/            the authoring bench. NOT shipped — nothing depends on it
@@ -111,7 +115,7 @@ fighting differently:
 REBASELINE_GOLDEN_COMBAT=1 cargo test -p gm2d-core
 ```
 
-## 5. Eleven traps, each of which has already cost a day
+## 5. Twelve traps, each of which has already cost a day
 
 1. **`Loadout::locks` is state, not geometry.** Two components that touch are
    one item unless a lock says otherwise, and which locks exist depends on the
@@ -155,7 +159,14 @@ REBASELINE_GOLDEN_COMBAT=1 cargo test -p gm2d-core
    in M11, hiding nothing and printing "surveying with —" on every map for four
    attempts. **Anything that sets `display` on an element it also hides needs
    its own `[hidden] { display: none }`.**
-11. **A reachability check whose lower bound is "not everything works" cannot
+11. **`scrollIntoView` scrolls every scrollable ancestor.** Not the nearest —
+    every one, including boxes the player cannot scroll, because
+    `overflow: hidden` is only a restriction on *them*. Lighting a card in the
+    packing panel therefore scrolled the panel *and* walked the board 180px up
+    the screen, under the cursor, mid-drag, on every hover. Reveal inside one
+    box: `revealInside` in `app.js`, and use it rather than writing a second
+    one.
+12. **A reachability check whose lower bound is "not everything works" cannot
     tell a cost from a wall.** `(2..5).contains(&taken)` passed on a tower
     nobody could climb, and the whole M11 block shipped unfinishable behind 597
     green tests. Measure against the board the player actually has —
@@ -165,20 +176,53 @@ REBASELINE_GOLDEN_COMBAT=1 cargo test -p gm2d-core
 
 ## 6. How the game plays, as of now
 
-- **Start:** two components — an Oak Handle and an Iron Blade, seated *turned*,
-  because the blade is 1×4 and a starting frame is three rows. Twenty-eight
-  Fnorp.
+- **Start:** two components — an Oak Handle and an Iron Blade — **given into
+  the bag, on an empty board**. Auto-pack is what turns the blade, which is 1×4
+  against a three-row frame, and that turn is the M4 soft-lock guard. **140
+  Fnorp.** (`STARTER` and `seat`, which *seated* an eleven-piece arrangement,
+  are deleted — their comment outlived them by five blocks and this file
+  repeated it.)
 - **Experience is carried, not banked.** A fight pays into your pocket; a town
   is the only place it becomes a level; a defeat takes everything unbanked and
   nothing you had spent.
+- **A row is earned, not scheduled** — M12.3, and the biggest change to how the
+  game plays since the MVP. Every frame is 6×3 for ever, ceiling 6×8, and a
+  level hands out **nothing**: seven skill nodes grant a row and two errands do.
+  So every level poses the game's own question with your hands on it — power on
+  the board you have, or a bigger board. Anything you remember about a fixed
+  weapon/chest/helmet/gloves/greaves rotation is gone with `ROTATION`.
+- **Three pools pay you for holding them**, and the standing panel says so:
+  a point of **fury** is +1 physical damage, a point of **devotion** is +2 to
+  both resistances, a point of **harvest** is +1 regen. So what an item hits
+  for climbs during a fight — the replay's row shows the last swing the log
+  attributes to it, not the estimate it opened with.
 - **Fatigue** takes 4% of your maximum health every battle, won or lost, capped
-  at 60%. Only a restorative gives it back.
-- **Shelves are fixed.** Each town sells a set list, once each, no reroll.
+  at 60%. Two things give it back and they are not the same thing: a **town**
+  takes all of it off on arrival, and a **tin** takes some off wherever you are
+  standing. A tin is what you drink four tiles in with something on the next
+  square; the town is what makes the walk home worth taking, and it is the only
+  rest point this game has or needs — combat health resets at every bell, so a
+  rest would restore something that was never spent.
+- **A town has three counters, and only the middle one is a place.** The
+  **bargain barrel** under it is rolled, thirteen lines, the same in every town,
+  ×1 of catalogue and nothing over 60. The **shelf** is authored per town, ×5,
+  sold once each, and **never rerolls** — that has not changed and is not going
+  to. The **order book** above it is ×10, nothing under 65, and what you buy
+  there **arrives after three to ten fights**, not after a timer. The barrel and
+  the book reroll at `n*n` for the nth, counted per type and wiped every tenth
+  level; the line you have on order is never rerolled out from under you.
+- **Every price in the game is ×5 as of M12.6 and the income is not.** That was
+  the human's call and it is a correction, not a squeeze — see *when a test
+  disagrees with a cost, suspect the test's idea of income first* in CLAUDE.md.
 - **Errands** have a giver and a turn-in, which may differ; three goals — slay,
-  bring, or go somewhere and report.
-- **A town takes the tiredness off**, and it is the only thing that does apart
-  from a tin. A tin is what you drink four tiles in with something on the next
-  square; the town is what makes the walk home worth taking.
+  bring, or go somewhere and report. Nineteen are authored and asked for at a
+  counter; **twenty-one are chain errands a choice hands over** and are never
+  offered, because the branch you did not take must not be on the tile a moment
+  later offering itself.
+- **Events pay things and say what they pay.** Fifty-six placed, forty-three ask
+  something, seventy-three choices, and **ten of them are chain roots** whose
+  every branch opens a different errand. Before M12.5 nine asked anything at
+  all and forty-one were prose that paid nothing.
 - **Eleven maps and two towns.** West Bambulon is where you start; the Great
   Gear Cave is a short dungeon behind a gate that wants Marbulon's key, and its
   boss drops the key to **a door in the western wall**. Behind that door is
@@ -219,8 +263,11 @@ REBASELINE_GOLDEN_COMBAT=1 cargo test -p gm2d-core
   refuses in four named ways, and one of them is *not from under the lake*,
   because that is the one map where the walk is the content.
 - **A class is one of five**, taken at level five and permanent. **The Kaklon
-  Patent** and **Top of the Bill** are the two that can bolt **enchs** onto
-  components — a rack on the packing screen, one ench a component. The Patent's
+  Patent** and **Top of the Bill** are the two that come with the right to bolt
+  **enchs** onto components — a rack on the packing screen, one ench a
+  component — and since M12.6 **anybody else can buy the paper for 5,000** from
+  the man in the van, who also sells each ench at 2,000. `Character::licensed()`
+  is the class *or* the paper, in one function, so every screen asks once. The Patent's
   tree awards the turn that stacks power; the Bill is paid half again for a win
   under ten seconds and its tree awards **The Chonga Swing**, which triples an
   item's power and breaks it after one activation, for the fight rather than for
@@ -261,6 +308,32 @@ REBASELINE_GOLDEN_COMBAT=1 cargo test -p gm2d-core
   to. Check the current standing instruction before you deploy.
 
 ## 9. What is being built next
+
+**Nothing.** The tree is between blocks: M12 is done and live, two reported
+faults have been fixed and deployed since, and the next block is a spec
+somebody writes. If you are picking this up to execute one, read §9 to the end
+— the four lists below are what is already known to be worth doing, and three
+things are outstanding rather than open (the two `TRIAGE-M12.md` rows that are
+not the builder's, and `PLAN-M12-EXEC.md` §8 row 13).
+
+**Since the block closed**, both reported from play and both on `main`:
+
+| | |
+|---|---|
+| `d45643e` | pointing at an item no longer scrolls the board off the screen — `scrollIntoView` moves *every* scrollable ancestor. And what a grid takes moved out of the right-hand list onto a `?` beside the frame's own name |
+| `2cfb8f6` | the frozen-save gate check waited for any tape line reading *Loaded*, which the walk's own upload had already printed. It waits for the position now |
+
+Neither of those two touched the engine: still catalogue **568**, no save seam.
+The page they left up is `07a29306`, asked for and carried — and the *pair* is
+what has to agree, never the number.
+
+**The third does touch it, in one field.** `Event::Hit` now carries `by_item`,
+the index of the item that threw the swing, because the replay's per-item
+number was the estimate the card made before the bell and never moved — while
+held fury is added to every swing and a spin lifts an item's own power. And
+`Combatant::pool_pays` finally has a screen: *what a banked pool pays, per
+point*, on the standing panel, ported from the original's reference shelf and
+drawn from the same function. **691 tests, 48 gate checks.**
 
 **M12 is done and live**, at build stamp `d8965cf7`. Eight milestones — M12.B (a player's
 save that could not be played), M12.0 (the measure), M12.1 and M12.1a (the

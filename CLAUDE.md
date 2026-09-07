@@ -58,6 +58,37 @@ events that pay something and say what they pay — added on the human's ask.
 `PLAN-M9.md`, `PLAN-M10.md` and `PLAN-M11.md` are done; `PLAN.md` §6d is what
 M11 left open, §6c is M10.3's, §6b is M9.4's and §6a is M8.8's.
 
+**Nothing is in flight, and two things have shipped since the block closed.**
+Both were reported from play, both are on `main`, both are live and were walked
+on the live page:
+
+| | |
+|---|---|
+| `d45643e` | a hover no longer moves the board, and what a grid takes moved onto the grid |
+| `2cfb8f6` | the frozen-save gate check waited on a word that was already on the strip |
+| *(uncommitted)* | what a banked pool pays, and a replay row that shows the swing rather than the estimate |
+
+Neither touched the engine: **687 tests, catalogue still 568, no save seam**, so
+every file that opened on M12 opens on this. The page they left up asks for
+`app.js?v=07a29306` and that `app.js` carries `BUILD='07a29306'` — a record of
+that deploy and not a claim about now, the same way the two M12 stamps below
+are, and `2cfb8f6` did not move it because a change to `testing/drive.py` is not
+a change to anything the browser caches. **What has to agree is the pair.**
+
+**The tree is between blocks.** The next one is a spec somebody writes; what is
+already written down as worth doing is in *Open questions the human has not
+answered* at the bottom of this file, and `HANDOFF.md` §9 ranks the four lists
+by what they are worth. **Where it goes is a convention and worth keeping:** a
+block's frame is `PLAN-M13.md`, and if the frame turns out to be a different
+document from the one you execute, `PLAN-M13-EXEC.md` **wins where the two
+disagree** — the same relationship `PLAN.md` has with `PLANNING-BRIEF.md` and
+`PLAN-M12-EXEC.md` had with its frame. Divergences from a plan go in the table
+at the bottom of this file with their reasons, in the commit that makes them,
+because a divergence nobody wrote down is indistinguishable from a mistake. Three things are outstanding rather than open: the two
+rows of `TRIAGE-M12.md` that are not the builder's — an agent spot-run against
+a deployed build, and the friend — and `PLAN-M12-EXEC.md` §8 row 13, which is
+the block's own biggest miss written down as a decision.
+
 **M12's thesis is board pressure.** Cells outnumber pieces, so a board reads
 as inventory space rather than a puzzle, and there is no moment where putting
 one thing down means taking another up. Everything in the block is a lever on
@@ -894,6 +925,78 @@ names since M1 and the page rendered none of them.
   the bite went off rather than failing one. Which activations are shakeable is
   a property of the fight.
 
+## A swing is not a constant, and the row said it was
+
+Asked directly: does fury give strength, devotion resistances, harvest regen —
+the way the original does? It does, and the code is **byte-identical**:
+`Combatant::held_bonus` in `combat.rs` diffs clean against
+`sgilson7/gear-master`, and so does `stats::after_defences`. Measured rather
+than read, end to end in GM2D fights:
+
+| one point of | pays | measured |
+|---|---|---|
+| **fury** (rage) | +1 physical damage | a swing went 30 → 40 → 42 → 44 → 46 as it banked |
+| **devotion** (faith) | +2 physical *and* +2 magic resist | 12 faith turned a 40-damage bite into 30 |
+| **harvest** (nature) | +1 regen | 2 nature is a 1-point heal every half second |
+
+Resistance and hardening are in and are the original's: resist cuts the blow,
+piercing cuts the resistance, hardening cancels the piercing, and resist clamps
+at 95. Twenty-seven components grant physical resist, thirty magic resist, five
+physical hardening, four magic hardening, and all fifty-eight creatures carry
+resistances.
+
+**What had not come across was the screen.** The original draws a panel headed
+*what a banked pool pays, per point*, built from `Combatant::pool_pays` so the
+drawing cannot disagree with the rulebook. GM2D had `pool_pays` in core and
+**nothing read it**, so a board banked fury for a whole fight, the replay
+printed `fury 8`, and no screen anywhere said the 8 was eight more damage on
+every swing. Fourth time this shape has been found here, after four skill
+nodes, the opening armour bar and the ench rack.
+
+- **The panel is derived twice over.** `pool_pays` gives the rates and
+  `Combatant::pools_worth_holding` gives the list: a pool has to be one the
+  catalogue can *grant* and one that pays something for being *held*. Mana and
+  insight fail the second — they are spent, and empower or wound rather than
+  paying a wearer for sitting on a pile — and the three fusions fail the first,
+  because nothing in this catalogue makes one. So the panel is three lines, and
+  a component that starts granting a pool puts it there without anybody
+  remembering to.
+- **Two registers on one line, TONE 13a.** The pool's *name* is the world's
+  word and goes through the theme; what it *pays* is the engine's, unthemed and
+  with the number in it, because somebody comparing two pools is comparing
+  numbers.
+
+**And the number beside an item in the replay was the opening estimate, for the
+whole fight.** Held fury is added to every swing and a spin adds to the item's
+own power, so what an item hits for at the tenth second is not what it hit for
+at the first — and the row printed `hit_for` off the pre-bell stats and never
+moved. The fight had always been right; the row was describing a different one.
+
+- **`Event::Hit` carries the item that threw it.** `by_item` indexes the
+  swinger's own item list — the same index `Activate` reports — so a screen can
+  put a number beside the row that earned it. The three push sites all had it
+  in scope already: `activate` has `idx` and `apply` takes `owner`.
+- **Read, never derived.** The row shows the last swing the log attributes to
+  that item at or before the playback head, and the opening estimate until it
+  first swings. Scrubbing backwards puts the old number back, so it reads the
+  whole list every frame rather than remembering what it drew last.
+- **`damage` is the swing, before the defender's answer**, and that is
+  deliberate and old: *a hit that is turned aside completely still has to show
+  up, or a player stacking resistance sees nothing happening at all.* It cost
+  an afternoon here — the first end-to-end measurement of devotion read
+  `Event::Hit.damage`, saw 40 either way and nearly reported the mechanic
+  broken. What a blow actually cost is `target_health` on the same entry.
+- **The serialised `amount` for a hit was `damage + absorbed`** — a swing plus
+  part of what that swing lost to armour, which is not a quantity anything
+  could use. Nothing read it. It is the swing now.
+- **The golden fixture prints `Hit` by hand, and only `Hit`.** That fixture is
+  a character-for-character comparison against a transcript captured from
+  upstream, so a field GM2D adds to an event upstream also has cannot appear in
+  it. Every value upstream printed is still printed, so a swing that lands
+  differently still fails; what is dropped is one field that did not exist when
+  the capture was taken. **A second hand-written arm there should be argued for
+  the same way this one was.**
+
 ## Curses were always there, and nothing said so
 
 Reported as *"are curses in the game? if not, they need to be added"*. They
@@ -1468,11 +1571,22 @@ town sells a fixed shelf, and a town asks you for something.**
   anywhere, the weapon assembles nothing, and a character who cannot win cannot
   earn — the M4 soft-lock, exactly. **Auto-pack is what turns it**, and the
   board starts empty: the kit is *given into the bag*.
-  `character.rs`'s `STARTER` constant and its `seat` method are **dead code**
-  and their comments describe a game that seats the kit, which this one has not
-  done for some time. This file quoted that comment as live fact until M12.4
-  read it — `TRIAGE-M12.md` row 12. **A constant nothing calls is a comment
-  nothing checks.**
+  `character.rs`'s `STARTER` constant and its `seat` method were an
+  *arrangement* — eleven components with a cell and a rotation each — and they
+  are **deleted**, in `64533fb`, with a comment where they stood saying so.
+  Their own comments had described a game that seats the kit, which this one
+  has not been for some time, and this file quoted that comment as live fact
+  for five blocks until M12.4 read it — `TRIAGE-M12.md` row 12. **A constant
+  nothing calls is a comment nothing checks** — and so is a comment beside a
+  constant that moved. M12.6 multiplied every price by five and left two
+  `_note` fields in `data/shops.json` describing the old ones: the barrel's
+  said *twelve Fnorp or under* where `shop::BARREL_CEILING` is 60, and the pit
+  shelf's said *everything on it is under six Fnorp. A starting character has
+  twenty-eight* where that shelf is 75 to 125 and the purse is 140. **That is
+  the gate's hardcoded `12` a third time**, in the one place nothing could
+  catch it: a `_note` key is not read by the parser, so no test can disagree
+  with it. Both corrected, and the ratios they describe never moved — the whole
+  economy scaled together.
 - **A shelf is content.** `data/shops.json` holds each town's stock and it never
   changes; the save carries `WorldState::bought`, which is a town id and an
   index. Same discipline as the map. `Game::shop` and `ShopSave` are gone, and
@@ -2425,6 +2539,41 @@ live build ccfeb16d                   and d8965cf7 after the doc sweep
   console errors: none                off-origin requests: none
 ```
 
+The first deploy after the block was two reported UI faults, and its table is
+the shortest one here because the gate asked forty-six of the questions:
+
+```
+live build 07a29306
+  index.html asks app.js?v=07a29306   app.js carries BUILD='07a29306'
+  chromium walked the gate    ok      firefox  walked the gate    ok*
+  webkit   walked the gate    ok
+  pointing at a seated item: board top 249 -> 249, and its card lit
+  five ? beside five frames           each says what its frame takes
+  console errors: none                off-origin requests: none
+```
+
+**\* and the asterisk is the finding.** Firefox failed one check on that walk
+and passed it on a re-run a minute later, which is the shape this file has
+called a flake worse than a red. It was not the page:
+`check_the_frozen_save_is_playable` uploaded the fixture and then waited for
+**any** `#tape` line reading *Loaded* — and the upload block two steps above it
+loads the walk's own save, which logs exactly that, on a four-line strip. So
+the wait was satisfied by the previous load before the file had been parsed,
+and the map read a moment later was the walk's own.
+
+- **Wait for the thing you are asserting.** It waits for the position to be on
+  the field now, with the same ten seconds to get there, and one sentence
+  covers both of the old branches — a file that never loaded and a file that
+  loaded somewhere else are the same sentence with a different map in it.
+- **The check raced on every run in every engine and usually won.** Nothing
+  about firefox was wrong; what it did differently was fetch the file over a
+  network while the assertion after it did not. **A green suite is not evidence
+  a check is not racing**, and the only reason this one was ever seen is that
+  the live walk is slower than the local one.
+- Nine passes against the live page since — three walks, three engines — and no
+  recurrence. That is evidence and not proof; what makes it a fix is that the
+  race no longer exists to lose.
+
 **A stamp is not a commit and this block moved it twice.** M12.6 deployed
 `ccfeb16d`; deleting `STARTER`, `seat` and `ROTATION` a commit later rebuilt
 the wasm and the stamp became `d8965cf7` — *dead code is still bytes the
@@ -2691,6 +2840,7 @@ Every figure below was re-measured for M12.6 rather than carried forward.
 | M12.3: slower cells — a row is earned, not scheduled | 671 passing |
 | M12.4: played to the ending, triaged, written down | 671 passing |
 | **M12.6: a chain you can see, a licence you can buy, and prices that mean it** | **687 passing** |
+| A swing is not a constant, and the row said it was | **691 passing** |
 
 Note M12.4 adds none, and neither did M11.0 or M11.8 — all three are honest.
 M12.4 is a playthrough, a triage and a brief; its deliverable is
@@ -2707,8 +2857,8 @@ content*, and one check now measures what a range used to guess at.
 | Pieces that apply a curse | 59 of 568, 4 kinds, 2 on the starting shelf |
 | Sets | **9**, of three components each bar the Toad Frame's two — every piece `EVENT_ONLY`, off one creature **or one stack of floors**, in one grid |
 | Ladder | **58 creatures**, rated 16 to 2958 |
-| `crates/core` | ~42.4k lines, up from 40.4k at M10.3, down from ~50k at the fork |
-| wasm | 1340 KB, up from 1178 KB at M10.3 |
+| `crates/core` | **~43.9k lines**, down from ~50k at the fork — `wc -l` over every `.rs` under `crates/core/src`. The method is named because the figure carried here through M12.6 was 42.4k and no Rust has moved since |
+| wasm | **1439 KB**, up from 1178 KB at M10.3 — `dist/web/pkg/gm2d_wasm_bg.wasm` after `make web`. CI builds its own and the two are not bit-identical, which is why the *stamp* is checked against itself and never against a number |
 | Save format | v1. **No seam in M12.** Every field it added defaults — `commissions`, `rolled_barrel`, `rolled_ledgers`, `rerolls`, `bought_licence` — so an older file opens on the authored barrel with no orders and no licence, which is what those characters had |
 | Maps | **11**, in `data/maps/*.tiles.json` — west-bambulon 20×20, the-great-gear-cave 9×5, the-treyway 16×16, kettleworks-field 20×20, five Drambus Stack floors 10×10, under-the-lake 13×9, the-reach 20×20 |
 | Places | 2 towns, 56 events, 11 gates, 7 bosses, 2 crossings, 1 bench, 1 door — 41 of the events are the Kettleworks field alone |
@@ -2735,8 +2885,8 @@ content*, and one check now measures what a range used to guess at.
 | Classes offered | 5, and every one of their powers reaches something — a lint says so |
 | Figures | 27 `.tex` → **81 SVGs** (13 family drawings, 4 drawn for themselves, 5 classes, 3 towns, you) |
 | Art coverage | **58 of 58 creatures**, 3 of 3 towns, 5 of 5 classes, and you. The set pieces, the instruments and the enchs have no art and want none — a component has never had a figure |
-| Browser gate | **46 checks**, 3 engines, pointed at the live page for M12's deploy |
-| The suite | **687 passing, and 14 seconds warm.** `[profile.test] opt-level = 2` since M12.6: `drops.rs` alone ran 66s at `opt-level 0`, more than the other 57 files together, and is 6.7s now. Debug assertions and overflow checks stay on — this is the `test` profile, not `--release` |
+| Browser gate | **48 checks**, 3 engines, pointed at the live page for M12's deploy. The two newest are the pool panel and the swing that climbs |
+| The suite | **691 passing, and 14 seconds warm.** `[profile.test] opt-level = 2` since M12.6: `drops.rs` alone ran 66s at `opt-level 0`, more than the other 57 files together, and is 6.7s now. Debug assertions and overflow checks stay on — this is the `test` profile, not `--release` |
 
 Note the catalogue is **568**, not the 374 the retheme document counts — it
 grew upstream after that document was written, and three times here. Any

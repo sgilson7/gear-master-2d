@@ -4003,6 +4003,39 @@ impl Combatant {
         probe.held_bonus()
     }
 
+    /// The pools a board can actually bank **and** that pay something for
+    /// being held.
+    ///
+    /// Two questions, and neither of them is a screen's. Something in the
+    /// catalogue has to be able to *give* you the pool, and holding it has to
+    /// *do* something — [`Combatant::pool_pays`] is the second answer and the
+    /// catalogue is the first. Mana and insight fail the second: they are
+    /// spent and they empower, and neither pays a wearer for sitting on a pile
+    /// of it. The three fusions fail the first, because nothing in this
+    /// catalogue makes one.
+    ///
+    /// Derived rather than listed, so a component that starts granting a pool
+    /// puts it on the panel without anybody remembering to.
+    pub fn pools_worth_holding() -> Vec<crate::piece::Resource> {
+        crate::piece::Resource::ALL
+            .into_iter()
+            .filter(|&r| Combatant::pool_pays(r) != Stats::ZERO)
+            .filter(|&r| {
+                crate::piece::CATALOG.iter().any(|d| {
+                    d.triggers.iter().any(|t| {
+                        let mut found = false;
+                        crate::piece::walk_actions(t, &mut |a| {
+                            if let crate::piece::Action::Gain { what, .. } = a {
+                                found |= *what == r;
+                            }
+                        });
+                        found
+                    })
+                })
+            })
+            .collect()
+    }
+
     pub fn held_bonus(&self) -> Stats {
         let m = self.overflowing.max(1);
         let (rage, faith, nature) = (self.rage * m, self.faith * m, self.nature * m);
@@ -4225,7 +4258,27 @@ pub enum Event {
     /// The fight has gone on long enough and is now ending itself. `pct` is
     /// the share of maximum health both sides are losing this second.
     SuddenDeath { pct: i32 },
-    Hit { by: Side, damage: i32, absorbed: i32, target_health: i32, target_armor: i32 },
+    /// A blow, and **which of the swinger's items threw it**.
+    ///
+    /// `damage` is the swing before any of the defender's answers, which is
+    /// deliberate - see the note where it is pushed. `by_item` indexes the
+    /// swinger's own item list, the same index `Activate` reports, so a screen
+    /// can put the number beside the row that earned it. `None` is a blow no
+    /// item owns.
+    ///
+    /// **What an item hits for moves during a fight, and carrying the index is
+    /// what lets a screen say so.** Held fury is added to every swing and a
+    /// spin lifts the item's own power, so the tenth second is not the
+    /// first - and a row printing one figure for the whole fight was printing
+    /// the opening estimate for ever.
+    Hit {
+        by: Side,
+        by_item: Option<usize>,
+        damage: i32,
+        absorbed: i32,
+        target_health: i32,
+        target_armor: i32,
+    },
     /// An item came round and nothing happened - a misfire ate it.
     Misfired { side: Side, item: String },
     /// An attack was warded off before it landed. Ticket to Ride.
@@ -4523,7 +4576,7 @@ impl CombatLog {
                     )
                 }
             }
-            Event::Hit { by, damage, absorbed, target_health, target_armor } => {
+            Event::Hit { by, by_item: _, damage, absorbed, target_health, target_armor } => {
                 let soak = if *absorbed > 0 {
                     format!(" ({} soaked, {} armor left)", absorbed, target_armor)
                 } else {
@@ -5815,6 +5868,7 @@ fn activate(
                     at_ms: t,
                     event: Event::Hit {
                         by: side,
+                        by_item: Some(idx),
                         damage: swing,
                         absorbed: absorbed_total,
                         target_health: hp,
@@ -6543,6 +6597,7 @@ fn apply(
                 at_ms: t,
                 event: Event::Hit {
                     by: on.other(front).side,
+                    by_item: owner,
                     damage: amount,
                     absorbed,
                     target_health: hp,
@@ -6610,6 +6665,7 @@ fn apply(
                         at_ms: t,
                         event: Event::Hit {
                             by: on.other(front).side,
+                            by_item: owner,
                             damage: raw,
                             absorbed,
                             target_health: hp,

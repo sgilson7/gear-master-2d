@@ -54,6 +54,15 @@
                +60 max health and there was nowhere at all to see either. -->
           <h4 class="sub-h">What you are</h4>
           <ul id="sheet" class="stats"></ul>
+          <!-- **What a banked pool pays, per point.** Ported from the
+               original's reference shelf, and drawn from the same function:
+               `Combatant::pool_pays` runs the rulebook on a probe holding one
+               point, so this cannot disagree with the fight. Without it a board
+               banks fury all the way through a fight, the replay prints
+               `fury 8`, and nothing anywhere says the 8 is eight more damage on
+               every swing. -->
+          <h4 class="sub-h">What a banked pool pays, per point</h4>
+          <ul id="pools-pay" class="stats"></ul>
           <!-- What you are carrying to take the tiredness off, usable here:
                the decision this mechanic exists for is the one on the road.
                **Not `id="pack"`** — the town already has a Pack Your Frames

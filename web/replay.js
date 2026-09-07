@@ -124,8 +124,21 @@ export class Replay {
       const turns = this.log.entries
         .filter((e) => e.kind === 'turned' && e.side === side && e.index === i)
         .map((e) => ({ at: e.at, to: e.amount }));
+      // **Every swing this item threw, and what it came to.** The number
+      // beside a row is not a constant: held fury is added to every swing and
+      // a spin lifts the item's own power, so an item hits harder at the tenth
+      // second than at the first. `item.hit_for` is the estimate before the
+      // bell and it is what the row opens on; each hit the log attributes to
+      // this item replaces it as the head goes past.
+      //
+      // Read, never derived — the same rule the health bar and the armour bar
+      // each had to learn. Core says which item swung and what the swing was.
+      const swings = this.log.entries
+        .filter((e) => e.kind === 'hit' && e.side === side && e.index === i)
+        .map((e) => ({ at: e.at, n: e.amount }));
       return { el: row, fill: row.querySelector('i'), cd: item.cooldown_ms || 1, acts,
-               turns, slot: item.slot,
+               turns, slot: item.slot, swings, opened: item.hit_for > 0 ? item.hit_for : '',
+               hit: row.querySelector('.tick-hit'),
                cycle: item.card?.turns ?? [], cells: item.cells ?? [] };
     });
   }
@@ -357,6 +370,20 @@ export class Replay {
         const frac = Math.max(0, Math.min(1, (this.t - last) / r.cd));
         r.fill.style.width = `${(frac * 100).toFixed(1)}%`;
         r.el.classList.toggle('ready', frac >= 1);
+        // What it last hit for, which is not what it opened at. Scrubbing
+        // backwards has to put the old number back, so this reads the whole
+        // list every frame rather than remembering the last one it drew.
+        if (r.hit) {
+          let n = r.opened;
+          for (const sw of r.swings) { if (sw.at <= this.t) n = sw.n; else break; }
+          const text = n === '' ? '' : String(n);
+          if (r.hit.textContent !== text) {
+            r.hit.textContent = text;
+            // Lit while it is higher than the item opened at, so a board that
+            // is winding up says so without anybody reading two numbers.
+            r.hit.classList.toggle('risen', n !== '' && r.opened !== '' && n > r.opened);
+          }
+        }
         // Fired within the shake window, and it has cells on a board.
         const since = this.t - last;
         if (last > 0 && since >= 0 && since < SHAKE_MS && r.cells?.length) {

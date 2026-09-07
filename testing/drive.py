@@ -677,6 +677,178 @@ def check_a_grid_says_what_it_takes(page, name, fails):
             fails.append(f"{name}: a recipe says {k!r}, which is the theme's word for it")
 
 
+def check_the_panel_says_what_a_pool_pays(page, name, fails):
+    """A banked pool says what it is buying you.
+
+    **Ported from the original, which draws the same table from the same
+    function.** GM2D had the rulebook — `Combatant::pool_pays` runs
+    `held_bonus` on a probe holding one point — and no screen read it, so a
+    board banked fury for a whole fight, the replay printed `fury 8`, and
+    nothing anywhere said the 8 was eight more damage on every swing. Fourth
+    time this shape has been found here, after four skill nodes, the opening
+    armour bar and the ench rack.
+
+    Read off the screen and compared against **core's own answer**, not against
+    a list written down twice — the same reason the fit preview is checked
+    against `legal_anchors` rather than against a copy of it.
+    """
+    want = page.evaluate("() => window.__pools().pools")
+    got = page.evaluate("""() => [...document.querySelectorAll('#pools-pay li')].map(
+      e => e.textContent.replace(/\\s+/g, ' ').trim())""")
+    if len(got) != len(want):
+        fails.append(f"{name}: core names {len(want)} pools worth holding and the panel prints "
+                     f"{len(got)}: {got}")
+        return
+    if not want:
+        fails.append(f"{name}: core says no pool pays anything for being held")
+        return
+    for pool in want:
+        line = next((g for g in got if g.startswith(pool["name"])), None)
+        if line is None:
+            fails.append(f"{name}: the panel never mentions {pool['name']!r}: {got}")
+            continue
+        # **The rate, not a mood.** A line with no digit in it is a line that
+        # has stopped being a spec.
+        if not any(c.isdigit() for c in line):
+            fails.append(f"{name}: {pool['name']} pays {line!r}, which names no number")
+        for part in pool["pays"]:
+            if part not in line:
+                fails.append(f"{name}: core says {pool['name']} pays {part!r} and the panel "
+                             f"says {line!r}")
+    # The three the catalogue actually grants. A panel that had quietly lost one
+    # would still pass everything above.
+    names = {p["name"] for p in want}
+    for wanted in ("fury", "devotion", "harvest"):
+        if wanted not in names:
+            fails.append(f"{name}: {wanted} is not among the pools worth holding: {sorted(names)}")
+
+
+def check_a_swing_climbs_with_fury(page, name, fails):
+    """What an item hits for is the fight's number, not the opening estimate.
+
+    **A swing is not a constant.** Held fury is added to every one of them and
+    a spin lifts the item's own power, so an item hits harder at the tenth
+    second than at the first — and the replay's row printed one figure for the
+    whole fight, which was the estimate the card made before the bell.
+
+    Planted twice, for the two reasons this file has learned to plant. The
+    board, because one that banks fury and never spends it is two components
+    and walking to them is twenty minutes of shopping. And **the fight**,
+    because a pit creature dies in two swings and the pool never banks: the
+    first version of this walked into whatever the ground rolled and passed or
+    failed on how much health it happened to have.
+
+    The head is driven by hand rather than watched, because what is under test
+    is what the row says at a given moment; a real-time scrub would be a test
+    of the animation.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+
+    def a_fury_board_in_a_long_fight(body):
+        strip_the_boards(body)
+        reg = body["character"].setdefault("registry", [])
+        owned = body["character"].setdefault("owned", [])
+        # A blade that swings, and a helmet that banks fury every time it comes
+        # round. The plating spends the pool as well — six for thirty armour —
+        # so the number goes back down as well as up, which is why this asks
+        # whether it *moved* rather than whether it only ever rose.
+        for slot, pieces in [
+            ("weapon", [("Oak Handle", 0, 0), ("Iron Blade", 1, 0)]),
+            ("helmet", [("Tin Frame", 0, 0), ("Scarred Plating", 2, 0)]),
+            # And a chest, so the character lives long enough for the helmet to
+            # come round: its bar is four seconds and the first draft died at
+            # three and a half, which reads as "the number never moved".
+            ("chest", [("Sackcloth Base", 0, 0), ("Rag Layer", 2, 0)]),
+        ]:
+            board = next(b for b in body["character"]["boards"] if b[0] == slot)[1]
+            board["rows"] = max(board.get("rows", 3), 4)
+            for piece, x, y in pieces:
+                reg.append({"def": piece, "rot": 0})
+                owned.append(len(reg) - 1)
+                board["placed"].append([len(reg) - 1, x, y])
+        # **A sandbag, chosen by measurement.** The Iron Sentinel has 240
+        # health and one item, so this board wins in about eleven seconds —
+        # long enough for the helmet to bank fury four times and for the
+        # weapon to spend a spin. Something bigger kills the character before
+        # either happens, which is a check that fails for the wrong reason.
+        body["encounter"] = {"enemy": "Iron Sentinel", "at": body["world"]["at"]}
+
+    plant(page, base, a_fury_board_in_a_long_fight, stem="fury-swing")
+    page.wait_for_selector("#fight", state="visible", timeout=8000)
+    page.click("#go")
+    page.wait_for_selector("#stage-replay", state="visible", timeout=10000)
+    try:
+        got = page.evaluate("""() => {
+          const r = window.__replay;
+          if (!r || !r.log) return null;
+          // What each row said, every quarter second, beside what the log says
+          // that item had last hit for at the same moment. The page is being
+          // compared against core's answer rather than against itself — the
+          // same reason the fit preview is checked against `legal_anchors`.
+          const es = r.log.entries ?? [];
+          const frames = [];
+          for (let t = 0; t <= r.log.duration_ms; t += 250) {
+            r.t = t; r.draw();
+            const rows = [...document.querySelectorAll('#ticks-you .tick')];
+            frames.push(rows.map((row, i) => {
+              let want = null;
+              for (const e of es) {
+                if (e.kind === 'hit' && e.side === 'player' && e.index === i && e.at <= t) {
+                  want = e.amount;
+                }
+              }
+              return {
+                name: row.querySelector('.tick-name').textContent,
+                shown: row.querySelector('.tick-hit').textContent,
+                risen: row.querySelector('.tick-hit').classList.contains('risen'),
+                want,
+              };
+            }));
+          }
+          return frames;
+        }""")
+        if not got:
+            fails.append(f"{name}: the replay never loaded")
+            return
+        seen, risen, wrong = {}, set(), []
+        for frame in got:
+            for row in frame:
+                if row["shown"]:
+                    seen.setdefault(row["name"], []).append(int(row["shown"]))
+                    if row["risen"]:
+                        risen.add(row["name"])
+                # Once that item has swung, the row shows that swing and no
+                # other number.
+                if row["want"] is not None and row["shown"] != str(row["want"]):
+                    wrong.append((row["name"], row["shown"], row["want"]))
+        moved = {k: sorted(set(v)) for k, v in seen.items() if len(set(v)) > 1}
+        if wrong:
+            fails.append(f"{name}: a row printed a number the log disagrees with "
+                         f"(row, shown, log): {wrong[:3]}")
+        if not seen:
+            fails.append(f"{name}: no row showed a number at all")
+        elif not moved:
+            fails.append(f"{name}: every row printed one number for the whole fight — "
+                         f"{ {k: v[0] for k, v in seen.items()} }")
+        elif not risen:
+            fails.append(f"{name}: a swing climbed above what the card estimated and "
+                         f"nothing was marked as risen: {moved}")
+    finally:
+        page.click("#skip")
+        page.wait_for_selector("#stage-result", state="visible", timeout=20000)
+        page.click("#done")
+        page.wait_for_selector("#fight", state="hidden", timeout=8000)
+        # **Put the walk's own game back.** This one strips all five grids to
+        # plant two items on three of them, and everything after it reads the
+        # character it leaves behind — the ench check downloaded a board with
+        # nothing on it to bolt a swing to, and reported that nothing ever
+        # broke. The frozen-save check already ends this way and for the same
+        # reason.
+        plant(page, base, lambda body: None, stem="fury-restore")
+
+
 def check_the_frozen_save_is_playable(page, name, fails):
     """A player's save that used to trap the module, loaded and walked.
 
@@ -3887,6 +4059,7 @@ def walk_the_gate(browser, name, fails=None):
 
     # --- what a creature leaves behind ---------------------------------------
     check_a_set_reads(page, name, fails)
+    check_a_swing_climbs_with_fury(page, name, fails)
     check_an_instrument_takes_the_grid(page, name, fails)
     check_the_long_way_back(page, name, fails)
     check_the_reach_reads_through_what_you_carry(page, name, fails)
@@ -3904,6 +4077,7 @@ def walk_the_gate(browser, name, fails=None):
     check_scouting_is_earned(page, name, fails)
 
     # --- the log ---------------------------------------------------------------
+    check_the_panel_says_what_a_pool_pays(page, name, fails)
     check_the_game_talks_in_one_place(page, name, fails)
 
     ctx.close()
@@ -4009,6 +4183,8 @@ def main():
     print("ok: walk, download, reload, upload — position and stream both came back")
     print("ok: a wrong file was refused with a sentence and changed nothing")
     print("ok: a save from an older build does not wedge the player in the scenery")
+    print("ok: a banked pool says what it pays, and the rates are core's")
+    print("ok: what an item hits for climbs as fury banks, and the row says so")
     print("ok: the game talks in one place, and the history holds the sitting")
     print("ok: no console errors, no off-origin requests")
 

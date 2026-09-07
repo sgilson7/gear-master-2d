@@ -75,10 +75,35 @@ pub fn render(
 /// prose rendering is a second implementation of the log and would need its
 /// own tests. `Debug` changes only when the data changes, which is the
 /// question being asked.
+/// One event, in the shape upstream's capture holds.
+///
+/// **`Event::Hit` is printed by hand, and only that one.** The fixture is a
+/// character-for-character comparison against a transcript captured from
+/// `sgilson7/gear-master @ e93a391`, so a field GM2D adds to an event upstream
+/// also has cannot appear in it — and `by_item`, which names the item that
+/// threw a swing so a screen can put the number beside the row that earned it,
+/// is exactly that. It changes nothing about how the fight goes, which is the
+/// only thing this fixture is asking.
+///
+/// Every value upstream printed is still printed, so a swing that lands
+/// differently still fails the comparison. What is dropped is one field that
+/// did not exist when the capture was taken. Anything else keeps `{:?}`, and a
+/// second hand-written arm here should be argued for the same way this one is.
+fn line(e: &gm2d_core::combat::Event) -> String {
+    use gm2d_core::combat::Event;
+    match e {
+        Event::Hit { by, by_item: _, damage, absorbed, target_health, target_armor } => format!(
+            "Hit {{ by: {by:?}, damage: {damage}, absorbed: {absorbed}, \
+             target_health: {target_health}, target_armor: {target_armor} }}"
+        ),
+        other => format!("{other:?}"),
+    }
+}
+
 pub fn transcript(log: &CombatLog) -> String {
     let mut s = String::new();
     for e in &log.entries {
-        s.push_str(&format!("{:>6} {} {:?}\n", e.at_ms, e.who, e.event));
+        s.push_str(&format!("{:>6} {} {}\n", e.at_ms, e.who, line(&e.event)));
     }
     s.push_str(&format!("outcome {:?} in {}ms\n", log.outcome, log.duration_ms));
     s

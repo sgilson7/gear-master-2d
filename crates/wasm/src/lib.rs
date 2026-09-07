@@ -1426,6 +1426,47 @@ fn side_items(
     out
 }
 
+/// **What a banked pool pays, per point.**
+///
+/// Ported from the original's reference shelf, which draws the same table from
+/// the same function. Every number here is asked of the engine rather than
+/// written down: `Combatant::pool_pays` runs `held_bonus` on a probe holding
+/// exactly one point, so a panel cannot disagree with the rulebook — this shim
+/// does not know the rates and neither does the page.
+///
+/// It is the answer to a question nothing on any screen could answer. A board
+/// banks fury for a whole fight, the replay prints `fury 8`, and until now
+/// there was nowhere at all to learn that the 8 is eight more physical damage
+/// on every swing.
+///
+/// **Two registers, kept apart, TONE 13a.** The pool's *name* is the world's
+/// word and goes through the theme; what it *pays* is the engine's, unthemed
+/// and with the number in it, because somebody comparing two pools is
+/// comparing numbers.
+#[wasm_bindgen]
+pub fn pools_json() -> String {
+    with(|g| {
+        let theme = gm2d_core::theme::by_id(&g.theme);
+        let rows: Vec<_> = gm2d_core::combat::Combatant::pools_worth_holding()
+            .into_iter()
+            .map(|r| {
+                let pays = gm2d_core::combat::Combatant::pool_pays(r);
+                serde_json::json!({
+                    "id": r.name(),
+                    "name": theme.retell(r.name()),
+                    // The parts, so a pool that pays two things reads as two
+                    // things. `Stats::parts` is the engine's own phrasing and
+                    // is what the item card splits on.
+                    "pays": pays.parts().into_iter()
+                        .map(|(t, _)| t)
+                        .collect::<Vec<_>>(),
+                })
+            })
+            .collect();
+        serde_json::json!({ "pools": rows }).to_string()
+    })
+}
+
 /// Run the fight and hand back the log.
 ///
 /// Nothing is banked here. The page plays the replay first and calls
@@ -1536,12 +1577,29 @@ pub fn fight_json() -> String {
                 let (kind, side, item, index, amount) = match &e.event {
                     Event::Activate { side, item, index } =>
                         ("activate", *side, item.clone(), *index as i64, 0),
-                    Event::Hit { by, damage, absorbed, target_health, target_armor } => {
+                    Event::Hit { by, by_item, damage, absorbed, target_health, target_armor } => {
                         // The target is the other side, and its armour came
                         // back with its health.
                         if *by == Side::Player { eh = *target_health; ea = *target_armor; }
                         else { ph = *target_health; pa = *target_armor; }
-                        ("hit", *by, String::new(), -1, (*damage + *absorbed) as i64)
+                        // **The index of the item that swung it, and the swing
+                        // itself.** Both so the replay can keep each row's
+                        // number current: fury is added to every swing and a
+                        // spin lifts the item's own power, so what an item hits
+                        // for climbs during a fight, and a row printing the
+                        // opening estimate for thirty seconds is printing a
+                        // number the fight stopped agreeing with at the second
+                        // activation.
+                        //
+                        // `amount` was `damage + absorbed`, which is a swing
+                        // plus a part of what that swing lost to armour — not a
+                        // quantity anything could use, and nothing read it. It
+                        // is the swing now, which is what `hit_for` estimates
+                        // before the bell and therefore the number the row is
+                        // already showing.
+                        let _ = absorbed;
+                        ("hit", *by, String::new(),
+                         by_item.map(|i| i as i64).unwrap_or(-1), *damage as i64)
                     }
                     Event::MindHit { by, amount, target_max_health } => {
                         if *by == Side::Player { emax = *target_max_health; }

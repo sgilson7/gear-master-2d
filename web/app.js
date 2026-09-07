@@ -9,7 +9,7 @@ import init, {
   shop_json, bench_json, buy, buy_barrel, order, collect_order, buy_supply, buy_ench,
   reroll_barrel, reroll_ledger, buy_licence, use_supply, quests_json, take_quest, hand_in_quest, bank_xp,
   quest_log_json, guide_json, pin_quest,
-  character_json, skills_json, take_skill, pressure_json,
+  character_json, skills_json, take_skill, pressure_json, pools_json,
   class_offer_json, choose_class, class_name, all_trees_json,
   gold, piece_count, version, save_version,
   board_json, legal_anchors, place, pick_up, rotate, toggle_lock, undo, clear_board,
@@ -403,6 +403,7 @@ function paintPanel() {
   $('gold').textContent = gold();
   paintSheet(c);
   paintYou(c.class);
+  paintPools();
   refreshErrandMarks();
 }
 
@@ -487,6 +488,23 @@ function paintSheet(c) {
     rows.push(`<li class="rule" title="${(r.detail ?? []).join(' ')}">${r.line}</li>`);
   }
   $('sheet').innerHTML = rows.join('') || `<li class="none">nothing yet</li>`;
+}
+
+/// What one point of each banked pool is worth, per point.
+///
+/// **The rates are core's and this prints them.** `Combatant::pool_pays` runs
+/// `held_bonus` on a probe holding exactly one point, so the panel cannot
+/// disagree with the fight — and which pools appear is core's too, because a
+/// pool nothing grants and a pool that pays nothing for being held are both
+/// things a player should not be reading about. The page has no list.
+///
+/// Two registers, TONE 13a: the pool's name is the world's word and what it
+/// pays is the engine's, unthemed and with the number in it.
+function paintPools() {
+  const rows = (JSON.parse(pools_json()).pools ?? []).map(
+    (p) => `<li><b>${p.name}</b> — ${p.pays.join(', ')}</li>`);
+  $('pools-pay').innerHTML = rows.join('') ||
+    `<li class="none">nothing on this board banks one</li>`;
 }
 
 /// Ask core where the errands are. Cheap, and called wherever one could have
@@ -2274,6 +2292,9 @@ async function main() {
   // `core::pressure`, and the walker printing it is the same discipline as the
   // page drawing a number core sent it.
   window.__pressure = () => JSON.parse(pressure_json());
+  // What a banked pool pays, so the gate can compare the panel against core's
+  // answer rather than against a list written twice.
+  window.__pools = () => JSON.parse(pools_json());
   window.__shopJson = () => shop_json();
   window.__trees = () => JSON.parse(all_trees_json());
   window.__places = () => world.places;

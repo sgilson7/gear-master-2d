@@ -58,22 +58,29 @@ events that pay something and say what they pay — added on the human's ask.
 `PLAN-M9.md`, `PLAN-M10.md` and `PLAN-M11.md` are done; `PLAN.md` §6d is what
 M11 left open, §6c is M10.3's, §6b is M9.4's and §6a is M8.8's.
 
-**Nothing is in flight, and two things have shipped since the block closed.**
-Both were reported from play, both are on `main`, both are live and were walked
-on the live page:
+**Nothing is in flight, and everything below has shipped since the block
+closed.** All of it was reported from play, all of it is on `main`, and all of
+it was walked on the live page:
 
 | | |
 |---|---|
 | `d45643e` | a hover no longer moves the board, and what a grid takes moved onto the grid |
 | `2cfb8f6` | the frozen-save gate check waited on a word that was already on the strip |
-| *(uncommitted)* | what a banked pool pays, and a replay row that shows the swing rather than the estimate |
+| `9f7ef4c` | a swing is not a constant, and the replay row said it was |
+| `b3b296f` | the swing check raced the playback it was scrubbing |
+| `d03d8c1` | the Kettleworks was a wall, and the wall was the gear |
+| `f114cdf` | a defeat costs you your place, and the door is the door again |
+| `98ff7cf` | a card you cannot leave, and a card carrying somebody else's errands |
+| `3d5c059` | a chain errand you can finish, and a fight you can slow down and read |
+| *(this one)* | a locked choice names the chain, a bank, a door that survives a reload, and a page that notices a new build |
 
-Neither touched the engine: **687 tests, catalogue still 568, no save seam**, so
-every file that opened on M12 opens on this. The page they left up asks for
-`app.js?v=07a29306` and that `app.js` carries `BUILD='07a29306'` — a record of
-that deploy and not a claim about now, the same way the two M12 stamps below
-are, and `2cfb8f6` did not move it because a change to `testing/drive.py` is not
-a change to anything the browser caches. **What has to agree is the pair.**
+**One of them touched the save and none of them the catalogue.** The bank adds
+`Character::banked`, which defaults empty and is skipped when it is — so the
+catalogue is still 568, there is still no seam, and every file that opened on
+M12 opens on this. The stamp a deploy leaves is a record of that deploy and not
+a claim about now, the same way the two M12 stamps below are; **what has to
+agree is the pair**, `index.html` asking for `app.js?v=X` and that `app.js`
+carrying `BUILD='X'`.
 
 **The tree is between blocks.** The next one is a spec somebody writes; what is
 already written down as worth doing is in *Open questions the human has not
@@ -1905,6 +1912,53 @@ whose class did not come with it, and each ench on his table is **2,000**.
   deliberately — it is late money, and what it buys is the ability to use what
   the game already paid you.
 
+## The bank, and what "banked" costs you
+
+Asked for as *"make it so you can place your items from your bag into a bank
+accessible from any town, its the same bank for all towns with infinite size"*.
+One vault, every town, no limit — and the interesting half is not the size.
+
+- **Banked is not carried, and that is the whole feature.** `Character::deposit`
+  moves the id **out of `owned`** and into `banked`. So a banked component does
+  not pack, does not bench, is not a key you are holding, and cannot be handed
+  over a counter — three consumers that all read `owned` and are therefore all
+  right for free. The alternative, a second list that still counts as yours, is
+  a bigger bag with a screen in front of it, and a bigger bag is not a decision
+  about anything.
+- **It is on the character, not in the world**, for the reason `bought_licence`
+  is: what you have put away is a fact about you rather than about a place. A
+  vault per town would be a thing you had to remember the location of, which is
+  bookkeeping rather than a choice — and `bank_json` takes no town id, because
+  there is nothing about a place in the answer.
+- **A seated component is refused by name and nothing moves.** Banking happens
+  in a town, where the board is not on the screen, so lifting a piece off a
+  grid here would break an item somewhere the player cannot watch it happen.
+  `spend_one` does lift; the difference is that handing in a tally is forced
+  and this is a choice. *A refusal spends nothing* — the reroll's rule, pinned
+  the same way.
+- **The registry keeps a deposited piece**, so a `PieceId` in the vault stays
+  valid and comes back the same component with its ench still on it, because an
+  ench names a piece and not a cell.
+- **`Game::eq` had to learn about it.** That operator is hand-written and lists
+  fields by name, and `banked` is not in `owned` — so a save that dropped it
+  would have round-tripped green and quietly emptied somebody's vault. The
+  comment above it warns about exactly this, one field earlier.
+- **No seam.** `banked` is `#[serde(default)]` and skipped when empty, so no
+  fingerprint moved and every older save opens with an empty bank, which is
+  what those characters had.
+- **It takes pressure off the bench, deliberately.** M12's whole thesis is that
+  a board reads as inventory space; a vault is a place to put what you are not
+  using, so `pressure::of`'s bench falls when you use one. That is the feature
+  working, not a regression in the measurement — but the number in
+  `testing/transcripts/m12.0.txt` was taken before there was anywhere to put
+  anything, and a later run that banks is not comparable with it.
+
+**Two towns is the check.** `tests/bank.rs` proves a deposit leaves the bag in
+milliseconds; what only a browser can answer is whether the vault the *second*
+town opens is the same one — a list per town would pass every unit test in the
+repository and lose your gear the moment you walked east. So the gate banks
+something at the pit, plants itself onto Kettleworks, and asks there.
+
 ## Errands
 
 `crates/core/src/quest.rs`, `data/quests.json`. **Not** upstream's `quest.rs`
@@ -1964,6 +2018,56 @@ slay something, bring something, or go somewhere and report.
   handed over whether or not the character is licensed: an errand does not know
   what you became, and a reward that vanished for three players in four would
   be worse than one they cannot use yet.
+
+## A locked choice was a wall, and is a target now
+
+Reported from play, standing at the wall an errand had sent them to:
+
+> *"I'm trying to submit the quest 'the cork you took' at the cork boundary,
+> but there is no button in the event for me to turn it in ... when I was doing
+> the part in the kettleworks, i had the strip of cork in my loose bag but I
+> was not able to start the quest at the event you had to go to."*
+
+**Two faults, and only the first was mine.** The missing button is the granted-
+errand filter — fixed in the commit before this one, verified on the live build
+with THE CORK YOU TOOK sitting on the boundary's counter marked ready.
+
+The second is the chain itself. The cork ladder is four rungs and two maps:
+
+| rung | where | needs | hands over |
+|---|---|---|---|
+| the cork boundary | west-bambulon | — | `has-cork`, and the errand |
+| the standing frame | west-bambulon | `has-cork` | `corked-the-frame` |
+| the rind wall | kettleworks | `corked-the-frame` | `corked-the-wall` |
+| the crumb field | kettleworks | `corked-the-wall` | — |
+
+And the errand's own brief says *"You have a strip of boundary cork ... somebody
+at Kettleworks has built a wall out of the same stuff and left a gap in it.
+Take the strip and see where it goes."* It sends you to the third rung holding
+the first one's key. The wall then refuses, correctly, and the plain statement
+before the attempt read **"Requires: corked the frame"** — the name of a fact,
+with nothing anywhere saying where a frame might be.
+
+- **`Requirement::wants` names the event that hands the flag over**, so the
+  line reads *"Requires: corked the frame — THE STANDING FRAME"*. Sixteen
+  events in this game have exactly one choice and it is gated on a flag; every
+  one of them says where to go now.
+- **Looked up, never listed.** Whichever choice sets the flag is the one that
+  opens the door, so the events are asked and the answer cannot go stale when a
+  chain is re-authored.
+- **It takes the events rather than reaching for `data::events()`.** This is
+  called while that data is being read, and a lazy static that asks for itself
+  is a deadlock.
+- `Requirement::describe` is *the plain statement before an attempt* and
+  `unmet` is the flavour after one — the split `event.rs`'s dead type wrote
+  down and M12.5 ported. This is that split finally paying: with only the
+  flavour a refusal is a wall, and the statement is what makes it a target.
+
+**What is still open is a content call and it is the human's.** The brief points
+at the wall and does not mention the frame. Either the brief should say so, or
+the wall should take `has-cork` and the ladder should be three rungs. Both are
+defensible and neither is a bug in the engine; the check that the ladder *has*
+a bottom is `the_cork_chain_is_a_ladder_and_not_a_wall`.
 
 ## Forty-one dismissals, and the choice nobody would take
 
@@ -2631,6 +2735,33 @@ Measured against the old build at 1280×620, one hover took the canvas from
   same door. **Fix the class, not the instance** — there is one reveal now, and
   the next list that wants one will not have to rediscover this.
 
+## The world the page is holding is not the world it loaded
+
+`main()` read the world into the page and then restored the autosave, in that
+order, and never read it again. So the copy every screen drew was the **fresh
+game's** — the one the module starts with, where `answered` is empty and every
+`hidden_until` place is therefore hidden.
+
+Reported from a real save: *"when I reloaded the browser, the door to the
+treyway from the end of all gears disappeared, so i cant leave anymore in my
+save until I go into another menu like the tree, then it reappears."* Which is
+exactly right, and the second half is the diagnosis: every screen in this game
+re-reads the world on its way out, so opening and closing anything put the door
+back. A player who never opened the tree could not leave the map.
+
+- **The same fault as the stale map, one step earlier.** That one was a page
+  drawing the map it last read while the player was moved to another; this is a
+  page drawing the world it read before the save was loaded. Both are the rule:
+  **a page that draws a world has to be told which world, every time it can
+  have changed** — and *a save being restored* is the largest change there is.
+- **It is invisible to anything that plays a new game.** The gate walks from a
+  fresh start, where the page's copy and core's agree, and every check was
+  green through it for as long as the door has existed.
+  `check_a_door_survives_a_reload` plants a save with the Cave answered,
+  reloads, and asks the page — **before touching anything**, because a check
+  that clicks first cannot tell a page that had the door from one that went and
+  fetched it.
+
 ## Screens, and the three times one covered another
 
 Three bugs, one shape, and **not one of them was visible by reading the
@@ -2733,6 +2864,31 @@ re-serve the same cached document and would loop. `sessionStorage` guards
 against a genuine mismatch looping anyway.
 
 `packaging/package-web.sh` fails the build if the stamp is not applied.
+
+**And the self-heal only ran once, which is the other half of the same
+problem.** `freshEnough` fires at load: it covers the tab opened *after* a
+deploy and none of the ones that were already open. A sitting is hours and a
+deploy is six minutes, so the common case is somebody looking at a page that
+was current when they started — which from a chair is indistinguishable from
+the fix having never shipped. It was reported that way twice in one block:
+*"there is no button in the autobattling view that allows you to set the speed
+of battle and view the combat log"*, against a build that had shipped all four
+buttons, measured on screen at every viewport from 800×900 up.
+
+So the page keeps asking — every five minutes, and on the way back to a
+foreground tab, because somebody returning after an hour away is the likeliest
+person in the world to be holding an old page. **What it must not do is
+navigate.** A page yanked out from under somebody mid-fight loses the fight,
+and a stale page is a smaller problem than that; it says so instead, once, on
+the strip through `log()`, and then stops asking.
+
+**And a check that reaches a button by id is not asking the question the player
+asked.** The playback controls were driven by `page.click("#combat-log")`,
+which passes just as happily on a control that has wrapped off the bottom of
+the bar. It measures the rects now — un-hidden, laid out, inside the window —
+and returns before the clicks if any of them is unreachable, because a click
+that times out ends a check with a Playwright traceback instead of the sentence
+that says what is wrong.
 
 **Deploying is three things, and finishing the first is not finishing.**
 `make publish` runs the engine suite and pushes; Actions then runs the suite
@@ -3078,6 +3234,8 @@ Every figure below was re-measured for M12.6 rather than carried forward.
 | A defeat costs you your place | **698 passing** |
 | Twenty-one errands that could be taken and never finished | **700 passing** |
 | The speed of a fight, and a log you can read | **701 passing** |
+| A locked choice was a wall, and is a target now | **703 passing** |
+| A bank, a door that survives a reload, and a sheet on the screen that changes it | **710 passing** |
 
 Note M12.4 adds none, and neither did M11.0 or M11.8 — all three are honest.
 M12.4 is a playthrough, a triage and a brief; its deliverable is
@@ -3096,7 +3254,7 @@ content*, and one check now measures what a range used to guess at.
 | Ladder | **58 creatures**, rated 16 to 2958. Six are stepped down: the Kettleworks field's five and The Gearwright, at `gear_offset: -2` plus a body trim where the footprint families ran out — 12 to 16% each |
 | `crates/core` | **~43.9k lines**, down from ~50k at the fork — `wc -l` over every `.rs` under `crates/core/src`. The method is named because the figure carried here through M12.6 was 42.4k and no Rust has moved since |
 | wasm | **1439 KB**, up from 1178 KB at M10.3 — `dist/web/pkg/gm2d_wasm_bg.wasm` after `make web`. CI builds its own and the two are not bit-identical, which is why the *stamp* is checked against itself and never against a number |
-| Save format | v1. **No seam in M12.** Every field it added defaults — `commissions`, `rolled_barrel`, `rolled_ledgers`, `rerolls`, `bought_licence` — so an older file opens on the authored barrel with no orders and no licence, which is what those characters had |
+| Save format | v1. **No seam, still.** `banked` — the bank — is the newest field and defaults empty, so a save from before there was one opens without a vault, which is what those characters had. **No seam in M12** either: Every field it added defaults — `commissions`, `rolled_barrel`, `rolled_ledgers`, `rerolls`, `bought_licence` — so an older file opens on the authored barrel with no orders and no licence, which is what those characters had |
 | Maps | **11**, in `data/maps/*.tiles.json` — west-bambulon 20×20, the-great-gear-cave 9×5, the-treyway 16×16, kettleworks-field 20×20, five Drambus Stack floors 10×10, under-the-lake 13×9, the-reach 20×20 |
 | Places | 2 towns, 56 events, 11 gates, 7 bosses, 2 crossings, 1 bench, 1 door — 41 of the events are the Kettleworks field alone |
 | Events | 56 placed: **43 ask something and 13 are notes**, over **73 choices**. **21 chains from 10 roots**, every root choice handing over an errand. Was 9 asking and 0 chains before M12.5 |
@@ -3122,8 +3280,8 @@ content*, and one check now measures what a range used to guess at.
 | Classes offered | 5, and every one of their powers reaches something — a lint says so |
 | Figures | 27 `.tex` → **81 SVGs** (13 family drawings, 4 drawn for themselves, 5 classes, 3 towns, you) |
 | Art coverage | **58 of 58 creatures**, 3 of 3 towns, 5 of 5 classes, and you. The set pieces, the instruments and the enchs have no art and want none — a component has never had a figure |
-| Browser gate | **52 checks**, 3 engines, pointed at the live page for M12's deploy. The two newest are the pool panel and the swing that climbs |
-| The suite | **701 passing, and 14 seconds warm.** `[profile.test] opt-level = 2` since M12.6: `drops.rs` alone ran 66s at `opt-level 0`, more than the other 57 files together, and is 6.7s now. Debug assertions and overflow checks stay on — this is the `test` profile, not `--release` |
+| Browser gate | **54 checks**, 3 engines, pointed at the live page for M12's deploy. The two newest are the bank across two towns and a door that survives a reload |
+| The suite | **710 passing, and 14 seconds warm.** `[profile.test] opt-level = 2` since M12.6: `drops.rs` alone ran 66s at `opt-level 0`, more than the other 57 files together, and is 6.7s now. Debug assertions and overflow checks stay on — this is the `test` profile, not `--release` |
 
 Note the catalogue is **568**, not the 374 the retheme document counts — it
 grew upstream after that document was written, and three times here. Any

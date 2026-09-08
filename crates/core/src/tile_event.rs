@@ -139,6 +139,19 @@ impl Outcome {
     }
 }
 
+/// Whether this outcome raises `flag`, however deep it is nested.
+///
+/// `Outcome::All` holds outcomes, so a flag can sit one level down from the
+/// choice — which is where every chain in the game puts it, beside the errand
+/// it hands over.
+fn sets_flag(o: &Outcome, flag: &str) -> bool {
+    match o {
+        Outcome::Flag(f) => f == flag,
+        Outcome::All(list) => list.iter().any(|x| sets_flag(x, flag)),
+        _ => false,
+    }
+}
+
 impl Requirement {
     /// What this asks for, in a plain sentence.
     ///
@@ -161,6 +174,38 @@ impl Requirement {
             Requirement::Gold(n) => format!("Requires: {n} Fnorp"),
             Requirement::Flag(what) => format!("Requires: {}", what.replace('-', " ")),
             Requirement::Holding(name) => format!("Requires: {name}"),
+        }
+    }
+
+    /// The same statement, and **where the thing it wants comes from**.
+    ///
+    /// A gold requirement names a number you can go and earn and a held
+    /// component names a thing you can go and get. A *flag* names a fact about
+    /// something you did, and until now the line said only what the fact was
+    /// called — *"Requires: corked the frame"* — which is a wall rather than a
+    /// target. Reported from play by somebody standing at the wall the errand
+    /// had sent them to, holding the cork the errand said to bring, being told
+    /// they had not corked a frame, with nothing anywhere saying where a frame
+    /// might be.
+    ///
+    /// **The source is looked up, never listed.** Whichever choice sets the
+    /// flag is the one that opens this door, so the events are asked and the
+    /// answer cannot go stale when a chain is re-authored. Sixteen events in
+    /// the game have exactly one choice and it is gated on a flag; every one
+    /// of them says where to go now.
+    ///
+    /// Takes the events rather than reaching for `data::events()`, because
+    /// this is called while that data is being read and a lazy static that
+    /// asks for itself is a deadlock.
+    pub fn wants(&self, events: &EventsData) -> String {
+        let plain = self.describe();
+        let Requirement::Flag(what) = self else { return plain };
+        let from = events.events.iter().find(|e| {
+            e.choices.iter().any(|c| sets_flag(&c.outcome, what))
+        });
+        match from {
+            Some(e) => format!("{plain} — {}", e.title),
+            None => plain,
         }
     }
 }

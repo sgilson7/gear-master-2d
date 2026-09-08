@@ -470,3 +470,68 @@ fn the_chains_pay_more_than_experience() {
     assert!(instrument >= 3, "only {instrument} chains pay an instrument's part");
     assert!(chain.iter().all(|q| q.gold > 0), "a chain that pays no Fnorp at all");
 }
+
+/// **A locked choice says where its key is.**
+///
+/// Reported from play: standing at the wall an errand had sent them to,
+/// holding the cork the errand said to bring, told they had not corked a frame
+/// — and nothing anywhere saying where a frame might be. `Requirement::describe`
+/// is *the plain statement before an attempt*, and for a flag the plain
+/// statement was the flag's own name, which is a wall rather than a target.
+#[test]
+fn every_flag_a_choice_wants_names_the_place_that_gives_it() {
+    let events = gm2d_core::data::events();
+    let mut checked = 0;
+    for e in &events.events {
+        for c in &e.choices {
+            let gm2d_core::tile_event::Requirement::Flag(f) = &c.requires else { continue };
+            let line = c.requires.wants(&events);
+            assert!(
+                line.contains('—'),
+                "{}: a choice wants {f:?} and the line does not say where that comes from: \
+                 {line:?}",
+                e.id
+            );
+            // And it names a real event rather than the flag twice over.
+            let named = line.split('—').nth(1).unwrap_or("").trim().to_string();
+            assert!(
+                events.events.iter().any(|x| x.title == named),
+                "{}: points at {named:?}, which is not an event in this game",
+                e.id
+            );
+            checked += 1;
+        }
+    }
+    assert!(checked >= 15, "only {checked} flag-gated choices found; the chains have more");
+}
+
+/// The cork chain, which is where it was reported, walked as data.
+///
+/// **A rung whose key is on another map is a rung the errand has to mention**,
+/// and this is the check that the ladder at least *has* a bottom: every flag a
+/// choice in it wants is one some other choice hands out.
+#[test]
+fn the_cork_chain_is_a_ladder_and_not_a_wall() {
+    let events = gm2d_core::data::events();
+    let rung = |id: &str| events.events.iter().find(|e| e.id == id).expect(id);
+    for (place, wanted) in [
+        ("the-standing-frame", "has-cork"),
+        ("the-rind-wall", "corked-the-frame"),
+        ("the-crumb-field", "corked-the-wall"),
+    ] {
+        let e = rung(place);
+        assert!(
+            e.choices.iter().any(|c| matches!(&c.requires,
+                gm2d_core::tile_event::Requirement::Flag(f) if f == wanted)),
+            "{place} no longer asks for {wanted}; the chain was re-authored and this was not"
+        );
+        assert!(
+            !c_wants(&events, wanted).is_empty(),
+            "{place} wants {wanted} and nothing in the game hands it over"
+        );
+    }
+}
+
+fn c_wants(events: &gm2d_core::tile_event::EventsData, flag: &str) -> String {
+    gm2d_core::tile_event::Requirement::Flag(flag.to_string()).wants(events)
+}

@@ -526,6 +526,19 @@ def check_a_choice_says_what_it_pays(page, name, fails):
         # A locked choice says what it wants as well as what it would pay.
         if c["off"] and not c["wants"]:
             fails.append(f"{name}: {c['label']!r} is refused and never says what would open it")
+        # **And a flag says where the flag comes from.** Reported from play by
+        # somebody at the wall an errand had sent them to, holding the cork the
+        # errand said to bring, told they had not corked a frame — with nothing
+        # anywhere saying where a frame might be. A requirement naming only the
+        # fact is a wall; naming the event that hands it over is a target.
+        # Gold and a held component name themselves, so this is only asked of
+        # the ones that do not.
+        for w in c["wants"]:
+            plain = ("Fnorp" in w) or (":" in w and "—" not in w and "Requires:" not in w)
+            if w.startswith("Requires:") and "Fnorp" not in w and "—" not in w:
+                fails.append(f"{name}: {c['label']!r} wants {w!r} and never says where "
+                             f"that comes from")
+            del plain
     themed = ("cork", "nut freeze", "the funny", "semuta")
     for c in card:
         for line in c["spec"]:
@@ -914,6 +927,34 @@ def check_the_replay_can_be_slowed_and_read(page, name, fails):
 
         page.click("#go")
         page.wait_for_selector("#stage-replay", state="visible", timeout=10000)
+
+        # --- and all four are somewhere a player can see -----------------------
+        # Reported as *"there is no button in the autobattling view that allows
+        # you to set the speed of battle and view the combat log"*, against a
+        # build that had shipped all four. They were there and the tab was old.
+        # But the rest of this check clicks them by selector, which passes just
+        # as happily on a control that has wrapped off the bottom of the bar —
+        # **a check that reaches a button by id is not asking the question the
+        # player asked.** So ask it: un-hidden, laid out, and inside the window.
+        off = page.evaluate("""() => {
+          const bad = [];
+          for (const id of ['speed', 'pause', 'step', 'combat-log']) {
+            const e = document.getElementById(id), r = e.getBoundingClientRect();
+            if (e.hidden) bad.push(`${id} is hidden`);
+            else if (!r.width || !r.height) bad.push(`${id} has no box`);
+            else if (r.bottom > innerHeight || r.top < 0 || r.right > innerWidth)
+              bad.push(`${id} is outside the window at ${Math.round(r.top)}`);
+          }
+          return bad;
+        }""")
+        for why in off:
+            fails.append(f"{name}: during the replay, {why}")
+        # And stop here if any of them is unreachable. Everything below clicks
+        # these four, and a click that times out ends the check with a
+        # Playwright traceback instead of the sentence that says what is wrong
+        # — the failure this file already learned once, from the other end.
+        if off:
+            return
         # --- pause holds the head, step goes to the next thing that happened -
         page.click("#pause")
         page.wait_for_timeout(120)
@@ -976,6 +1017,109 @@ def check_the_replay_can_be_slowed_and_read(page, name, fails):
             page.click("#done")
         page.wait_for_selector("#fight", state="hidden", timeout=8000)
 
+
+
+def check_the_bank_is_one_vault_in_every_town(page, name, fails):
+    """A component put away in one town is in the bank in the other one.
+
+    Asked for as *"make it so you can place your items from your bag into a
+    bank accessible from any town, its the same bank for all towns with
+    infinite size"*.
+
+    **The half worth driving a browser for is "the same bank".** That a
+    deposit leaves the bag is core's, and `tests/bank.rs` says so in
+    milliseconds. What only a walk can answer is whether the vault a second
+    town opens is the same one — a list per town would pass every unit test in
+    the repository and lose your gear the moment you walked east.
+
+    Planted at both counters, because the two towns are on different maps and
+    the walk between them is the rest of the game.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+
+    def beside_the_pit(body):
+        body["world"]["map"] = ""
+        body["world"]["at"] = [2, 18]
+
+    try:
+        plant(page, base, beside_the_pit, stem="bank-pit")
+        page.keyboard.press("ArrowLeft")
+        page.wait_for_timeout(400)
+        if not page.is_visible("#town"):
+            fails.append(f"{name}: the step onto the pit opened no town")
+            return
+
+        def top(el):
+            return el.inner_text().split("\n")[0].strip()
+
+        try:
+            bag = page.query_selector_all("#bank-bag .wares")
+            if not bag:
+                # Not a pass. A walk that reaches a counter with an empty bag
+                # cannot answer the question, and saying so is the finding.
+                fails.append(f"{name}: nothing loose in the bag at the counter, "
+                             f"so the bank proves nothing here")
+                return
+            put = top(bag[0])
+            bag[0].click()
+            page.wait_for_timeout(200)
+            held = [top(e) for e in page.query_selector_all("#bank-held .wares")]
+            if put not in held:
+                fails.append(f"{name}: banked {put!r} and the vault holds {held}")
+                return
+            if put in [top(e) for e in page.query_selector_all("#bank-bag .wares")]:
+                fails.append(f"{name}: {put!r} is in the bank and still in the bag")
+        finally:
+            if page.is_visible("#town"):
+                page.click("#leave")
+                page.wait_for_selector("#town", state="hidden", timeout=5000)
+
+        # --- the other town, on another map -----------------------------------
+        with page.expect_download(timeout=20000) as dl:
+            page.click("#download")
+        banked_save = dl.value.path()
+
+        def beside_kettleworks(body):
+            body["world"]["map"] = "kettleworks-field"
+            body["world"]["at"] = [3, 16]
+
+        plant(page, banked_save, beside_kettleworks, stem="bank-kettleworks")
+        page.keyboard.press("ArrowLeft")
+        page.wait_for_timeout(400)
+        if not page.is_visible("#town"):
+            fails.append(f"{name}: never reached Kettleworks to ask it about the bank")
+            return
+        try:
+            held = [top(e) for e in page.query_selector_all("#bank-held .wares")]
+            if put not in held:
+                fails.append(f"{name}: {put!r} went into the bank at the pit and "
+                             f"Kettleworks' bank holds {held} — that is a vault a "
+                             f"town, not a bank")
+                return
+            # And it comes back out here, which is the whole point of putting it in.
+            for e in page.query_selector_all("#bank-held .wares"):
+                if top(e) == put:
+                    e.click()
+                    break
+            page.wait_for_timeout(200)
+            back = [top(e) for e in page.query_selector_all("#bank-bag .wares")]
+            if put not in back:
+                fails.append(f"{name}: withdrew {put!r} in the second town and the "
+                             f"bag holds {back}")
+        finally:
+            if page.is_visible("#town"):
+                page.click("#leave")
+                page.wait_for_selector("#town", state="hidden", timeout=5000)
+
+    finally:
+        # **Put the walk back where it was found.** This check plants itself
+        # onto another map, and the gate is one long walk: a check that ends
+        # somewhere else hands the next one a game it was not written for.
+        # Reported here as "the overworld has no crossing on it", four checks
+        # further down.
+        plant(page, base, lambda body: None, stem="bank-restore")
 
 def check_a_chain_errand_can_be_handed_in(page, name, fails):
     """A chain errand can be finished where it came from.
@@ -3930,6 +4074,64 @@ def check_a_stale_autosave(browser, name):
     return fails
 
 
+
+def check_a_door_survives_a_reload(browser, name):
+    """A conditional place is still there after the browser is closed and opened.
+
+    Reported from a real save: *"when I reloaded the browser, the door to the
+    treyway from the end of all gears disappeared, so i cant leave anymore in
+    my save until I go into another menu like the tree, then it reappears."*
+
+    The door in the wall is `hidden_until: the-bottom-of-the-cave`, so whether
+    it exists at all is a question about `answered`. `main()` read the world
+    into the page **before** restoring the autosave — so the copy it drew was
+    the fresh game's, where nothing is answered and every conditional place is
+    hidden, and opening any screen that re-read the world put the door back.
+
+    Planted and reloaded, because the whole bug is what happens on the way in.
+    Own context, like the stale-autosave check: this one owns a page load.
+    """
+    fails = []
+    ctx = browser.new_context()
+    page = ctx.new_page()
+    page.on("pageerror", lambda e: fails.append(f"{name}: pageerror: {e}"))
+    page.goto(ORIGIN + "/", wait_until="networkidle")
+    page.wait_for_function("document.getElementById('coords').textContent !== '—'", timeout=20000)
+
+    # One step, so there is an autosave to open the door in.
+    page.keyboard.press("ArrowRight")
+    leave_town(page) or dismiss_card(page)
+    if page.is_visible("#fight"):
+        page.click("#run")
+        page.wait_for_selector("#fight", state="hidden", timeout=8000)
+
+    opened = page.evaluate("""() => {
+      const v = JSON.parse(localStorage.getItem('gm2d.autosave'));
+      const w = v.state.world ?? (v.state.world = {});
+      w.map = "";
+      w.answered = [...new Set([...(w.answered ?? []), 'the-bottom-of-the-cave'])];
+      return JSON.stringify(v);
+    }""")
+    page.evaluate("s => localStorage.setItem('gm2d.autosave', s)", opened)
+    page.reload(wait_until="networkidle")
+    page.wait_for_function("document.getElementById('coords').textContent !== '—'", timeout=20000)
+
+    # **Ask before touching anything.** Every screen in this game re-reads the
+    # world on its way out, so a check that clicks first cannot tell a page
+    # that had the door from one that went and fetched it.
+    def door():
+        return page.evaluate("""() => (window.__world().places ?? [])
+            .some(p => p.id === 'the-door-in-the-wall')""")
+
+    if not door():
+        fails.append(f"{name}: the door the save had opened is not on the map after a reload")
+        # And say whether the engine has it, so the next person knows which
+        # half to look in rather than starting from the top.
+        if page.evaluate("""() => JSON.parse(window.__worldJson?.() ?? '{}').places
+              ?.some(p => p.id === 'the-door-in-the-wall') ?? null"""):
+            fails.append(f"{name}: core has it and the page is drawing an older world")
+    ctx.close()
+    return fails
 def walk_the_gate(browser, name, fails=None):
     """Returns a list of failures; empty means the gate is passed.
 
@@ -4422,6 +4624,7 @@ def walk_the_gate(browser, name, fails=None):
     check_a_swing_climbs_with_fury(page, name, fails)
     check_the_replay_can_be_slowed_and_read(page, name, fails)
     check_a_chain_errand_can_be_handed_in(page, name, fails)
+    check_the_bank_is_one_vault_in_every_town(page, name, fails)
     check_a_card_can_always_be_left(page, name, fails)
     check_a_defeat_costs_you_your_place(page, name, fails)
     check_an_instrument_takes_the_grid(page, name, fails)
@@ -4477,6 +4680,7 @@ def main():
                     fails.append(f"{name}: could not launch ({e})")
                     continue
                 fails += check_a_stale_autosave(b, name)
+                fails += check_a_door_survives_a_reload(b, name)
                 mine = []
                 try:
                     walk_the_gate(b, name, mine)

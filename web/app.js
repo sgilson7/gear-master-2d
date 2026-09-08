@@ -17,6 +17,7 @@ import init, {
   encounter_json, fight_json, settle_fight, flee,
   errand_marks_json, go_home,
   ench_rack_json, attach_ench, detach_ench, toggle_ench,
+  bank_json, bank_put, bank_take,
 } from './pkg/gm2d_wasm.js';
 import { Board } from './board.js';
 import { Theirs } from './theirs.js';
@@ -487,7 +488,15 @@ function paintSheet(c) {
   for (const r of c.rules ?? []) {
     rows.push(`<li class="rule" title="${(r.detail ?? []).join(' ')}">${r.line}</li>`);
   }
-  $('sheet').innerHTML = rows.join('') || `<li class="none">nothing yet</li>`;
+  // **Both screens, one list.** The map panel asks what you are before you go
+  // out; the packing panel asks it while you are changing it, which is the
+  // moment a number is worth watching. Same rows, written twice rather than
+  // derived twice — a second painter is a second answer.
+  const html = rows.join('') || `<li class="none">nothing yet</li>`;
+  for (const id of ['sheet', 'pack-sheet']) {
+    const el = $(id);
+    if (el) el.innerHTML = html;
+  }
 }
 
 /// What one point of each banked pool is worth, per point.
@@ -1734,7 +1743,63 @@ function openTown(id) {
   paintQuests();
   paintTins();
   paintCarrying();
+  paintBank();
   $('town').hidden = false;
+}
+
+/// The bank: your bag on one shelf, the vault on the other.
+///
+/// **One vault and every town opens it**, so this asks core for no town id —
+/// there is nothing about a place in the answer. Both shelves are drawn by one
+/// builder, because a component nothing is holding reads the same whichever
+/// side of the counter it is on, and two builders would be two answers to
+/// *is a shared piece grey*.
+function paintBank() {
+  const b = JSON.parse(bank_json());
+  const shelf = (box, list, empty, move, said) => {
+    box.replaceChildren();
+    if (!list.length) {
+      const p = document.createElement('p');
+      p.className = 'note';
+      p.textContent = empty;
+      box.appendChild(p);
+      return;
+    }
+    for (const w of list) {
+      const el = document.createElement('button');
+      el.type = 'button';
+      el.className = 'wares';
+      el.innerHTML = `<span class="ware-top"></span><b>${w.name}</b>` +
+        `<span class="meta">${w.slot} · ${w.kind}</span>`;
+      el.querySelector('.ware-top').appendChild(shapeCanvas(w));
+      // The same hover card the shelf and the bag show. A component is a
+      // shape and a sentence wherever it appears.
+      const read = () => showPiece(el, w);
+      el.onpointerenter = read;
+      el.onfocus = read;
+      el.onpointerleave = hidePiece;
+      el.onblur = hidePiece;
+      el.onclick = () => {
+        // **Core's refusal, printed as it came.** A seated component is
+        // refused by name with what to do about it, and a page composing its
+        // own sentence here would be a second rulebook about what may be
+        // banked.
+        const why = move(w.id);
+        townSays(why || said(w.name), !!why);
+        hidePiece();
+        paintBank();
+        // The bag changed, so anything counting what you own has: the panel's
+        // sheet, and the packing screen's bag when you next open it.
+        paintPanel();
+        autosave();
+      };
+      box.appendChild(el);
+    }
+  };
+  shelf($('bank-bag'), b.bag, 'Nothing loose in your bag.',
+        bank_put, (n) => `${n} goes in the bank.`);
+  shelf($('bank-held'), b.banked, 'The bank is empty.',
+        bank_take, (n) => `${n} comes back out.`);
 }
 
 function paintShelf() {
@@ -2252,26 +2317,63 @@ function stamp() {
 // differ. Guarded by sessionStorage so a genuine mismatch cannot loop.
 const BUILD = '__BUILD__';
 
-async function freshEnough() {
-  if (sessionStorage.getItem('gm2d.reloaded') === BUILD) return true;
+// The live stamp, or null if it could not be had. Offline, or the fetch was
+// blocked: a stale page is better than no page, and both callers treat "could
+// not ask" as "carry on".
+async function liveStamp() {
   try {
     const res = await fetch(`./index.html?cb=${Date.now()}`, { cache: 'no-store' });
     const html = await res.text();
-    const live = html.match(/app\.js\?v=([a-f0-9]+)/)?.[1];
-    if (live && live !== BUILD) {
-      sessionStorage.setItem('gm2d.reloaded', live);
-      // Navigate to a different URL rather than reloading. `location.reload()`
-      // is allowed to re-serve the same cached document, which would land back
-      // here and loop; a query the browser has never seen forces a fresh fetch
-      // of the entry point, and that is the whole problem being solved.
-      location.replace(`${location.pathname}?v=${live}`);
-      return false;
-    }
+    return html.match(/app\.js\?v=([a-f0-9]+)/)?.[1] ?? null;
   } catch {
-    // Offline, or the fetch was blocked. Carry on with what we have: a stale
-    // page is better than no page.
+    return null;
+  }
+}
+
+async function freshEnough() {
+  if (sessionStorage.getItem('gm2d.reloaded') === BUILD) return true;
+  const live = await liveStamp();
+  if (live && live !== BUILD) {
+    sessionStorage.setItem('gm2d.reloaded', live);
+    // Navigate to a different URL rather than reloading. `location.reload()`
+    // is allowed to re-serve the same cached document, which would land back
+    // here and loop; a query the browser has never seen forces a fresh fetch
+    // of the entry point, and that is the whole problem being solved.
+    location.replace(`${location.pathname}?v=${live}`);
+    return false;
   }
   return true;
+}
+
+// The check above happens once, at load, which covers the tab that is opened
+// after a deploy and none of the ones that were already open. A sitting is
+// hours long and a deploy takes six minutes, so the common case is a player
+// who is looking at a page that was current when they started and is not now —
+// which reads exactly like the fix having never shipped. It has been reported
+// that way.
+//
+// So keep asking. What this must not do is navigate: a page yanked out from
+// under somebody mid-fight loses the fight, and a stale page is a smaller
+// problem than that. It says so instead, once, through the one door the game
+// talks through, and then stops asking.
+const BUILD_WATCH_MS = 5 * 60 * 1000;
+let toldAboutBuild = false;
+
+async function checkForNewBuild() {
+  if (toldAboutBuild) return;
+  const live = await liveStamp();
+  if (!live || live === BUILD) return;
+  toldAboutBuild = true;
+  log('There is a newer build of the game than this page. Reload to get it - your save is kept.');
+}
+
+function watchForNewBuild() {
+  setInterval(checkForNewBuild, BUILD_WATCH_MS);
+  // And on the way back to the tab, because somebody returning after an hour
+  // away is the likeliest person in the world to be holding an old page.
+  addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') checkForNewBuild();
+  });
 }
 
 async function main() {
@@ -2297,6 +2399,16 @@ async function main() {
     if (saved) { load_json(saved); restored = true; }
   } catch { localStorage.removeItem(AUTOSAVE); }
   if (!restored) new_game(Date.now());
+  // **And read the world again, because the game is not the one it was two
+  // lines ago.** The read above happened against the fresh game the module
+  // starts with, where nothing is answered and every conditional place is
+  // therefore hidden. Restoring an autosave changes core's world and cannot
+  // change this copy, so a door the save had opened was drawn as wall until
+  // some other screen happened to re-read — reported as the way out of the
+  // Treyway vanishing on reload and coming back after opening the tree.
+  // Same fault as the stale map: a page that draws a world has to be told
+  // which world, every time it can have changed.
+  world = JSON.parse(world_json());
 
   addEventListener('keydown', (e) => {
     if (!$('fight').hidden) {
@@ -2385,6 +2497,11 @@ async function main() {
     $('undo').disabled = !st.undoable;
     paintMade(st);
     paintRack();
+    // **And what you are, because packing is what changes it.** The map
+    // panel's copy is painted on a step; this one has to be painted on a
+    // seat, or the screen where you move your strength around is the one
+    // screen that does not show it moving.
+    paintSheet(JSON.parse(character_json()));
   };
   // Scoped to its own panel: both sides draw `.made-item` now, and an
   // unscoped query lit a creature's card when you pointed at your own blade.
@@ -2592,6 +2709,7 @@ async function main() {
   else if (!offerClass()) $('map').focus();
   $('status').textContent =
     `core: ${piece_count()} pieces · v${version()} · save v${save_version()}`;
+  watchForNewBuild();
 }
 
 main();

@@ -120,6 +120,12 @@ pub struct CharacterSave {
     /// so rebuilding in order restores the ids as well as the pieces.
     pub registry: Vec<InstanceSave>,
     pub owned: Vec<u32>,
+    /// What is in the bank, as registry indices, exactly like `owned`.
+    ///
+    /// Defaults empty, so every save written before there was a bank opens
+    /// with an empty one — which is what those characters had.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub banked: Vec<u32>,
     pub boards: Vec<(String, BoardSave)>,
     pub locks: Vec<LockSave>,
     /// Seeds the item-name hash. Without it every stat survives a round trip
@@ -237,6 +243,7 @@ impl SaveFile {
         let Character {
             registry,
             owned,
+            banked,
             loadout,
             gold,
             grown_health,
@@ -308,6 +315,7 @@ impl SaveFile {
                     supplies: supplies.clone(),
                     registry: instances,
                     owned: owned.iter().map(|p| p.0).collect(),
+                    banked: banked.iter().map(|p| p.0).collect(),
                     boards,
                     locks: locks
                         .iter()
@@ -429,6 +437,7 @@ impl SaveFile {
             grown_health,
             registry: instances,
             owned,
+            banked,
             boards,
             locks,
             name_seed,
@@ -503,6 +512,13 @@ impl SaveFile {
         character.owned = owned
             .iter()
             .map(|&p| check(p, "the inventory"))
+            .collect::<Result<_, _>>()?;
+        // Checked against the registry the same way, because a bank naming a
+        // component the file does not carry is the same corruption as a bag
+        // doing it.
+        character.banked = banked
+            .iter()
+            .map(|&p| check(p, "the bank"))
             .collect::<Result<_, _>>()?;
         character.loadout = loadout;
         character.gold = gold;

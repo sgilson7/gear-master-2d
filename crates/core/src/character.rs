@@ -181,6 +181,26 @@ pub struct Character {
     /// is what those characters were.
     #[serde(default)]
     pub bought_licence: bool,
+    /// Components put away in the bank.
+    ///
+    /// **Banked is not carried.** A deposited component leaves `owned`
+    /// entirely: it does not pack, it does not bench, it is not a key you are
+    /// holding, and it cannot be handed over a counter. That is the whole of
+    /// what a bank is. The alternative — a second list that still counts as
+    /// yours — is a bigger bag with a screen in front of it, and a bigger bag
+    /// is not a decision about anything.
+    ///
+    /// **One list, and every town reaches it.** It is on the character rather
+    /// than in the world for the reason `bought_licence` is: what you have put
+    /// away is a fact about you, not about a place. A vault per town would be
+    /// a thing you had to remember the location of, which is bookkeeping
+    /// rather than a choice.
+    ///
+    /// The registry keeps a deposited piece, so a `PieceId` in here stays
+    /// valid and comes back the same component — with its ench still on it,
+    /// because an ench names a piece and not a cell.
+    #[serde(default)]
+    pub banked: Vec<PieceId>,
     /// Enchs bolted to a component, and whether each is switched on.
     ///
     /// The attachment names a `PieceId`, not a cell, so it survives a repack:
@@ -219,6 +239,7 @@ impl Character {
             bought_licence: false,
             registry: PieceRegistry::new(),
             owned: Vec::new(),
+            banked: Vec::new(),
             loadout: Loadout::new(),
             gold: 0,
             grown_health: 0,
@@ -312,6 +333,40 @@ impl Character {
 
     pub fn is_equipped(&self, id: PieceId) -> bool {
         self.loadout.slot_holding(id).is_some()
+    }
+
+    /// Put a loose component in the bank.
+    ///
+    /// **Loose only, and a seated one is refused by name.** Banking happens in
+    /// a town, where the board is not on the screen — so lifting a piece off a
+    /// grid here would break an item somewhere the player cannot watch it
+    /// happen. `spend_one` does lift, and the difference is that handing in a
+    /// tally is forced where this is a choice.
+    pub fn deposit(&mut self, id: PieceId) -> Result<(), String> {
+        let name = self.registry.def(id).name;
+        if self.is_equipped(id) {
+            return Err(format!("{name} is on one of your boards. Take it off first."));
+        }
+        if !self.owned.contains(&id) {
+            return Err(format!("{name} is not in your bag."));
+        }
+        self.owned.retain(|&o| o != id);
+        self.banked.push(id);
+        Ok(())
+    }
+
+    /// Take one back out.
+    ///
+    /// It returns to the bag rather than to a board: where a component goes is
+    /// the packing screen's question and this is a counter in a town.
+    pub fn withdraw(&mut self, id: PieceId) -> Result<(), String> {
+        let name = self.registry.def(id).name;
+        let Some(i) = self.banked.iter().position(|&b| b == id) else {
+            return Err(format!("{name} is not in the bank."));
+        };
+        self.banked.remove(i);
+        self.owned.push(id);
+        Ok(())
     }
 
     /// First owned component with this catalogue name.

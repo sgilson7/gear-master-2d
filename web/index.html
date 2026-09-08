@@ -311,11 +311,25 @@
         <div id="tins" class="shelf"></div>
         <h3 class="sub-h">What you are carrying</h3>
         <p id="carrying" class="note"></p>
+        <!-- **The bank. One vault, and every town opens the same one** — so
+             the heading names no town, and what is in it travels with you
+             rather than with the place. Two shelves, because putting a thing
+             in and taking it back out are two different gestures and a single
+             list that toggled would make you read every card to find out
+             which one a click was about. -->
+        <h3 class="sub-h">The bank</h3>
+        <p class="note">The same bank in every town, and it holds as much as you
+          like. Click something in your bag to put it in; click something in the
+          bank to take it back out. Anything seated on one of your boards has to
+          come off there first.</p>
+        <div id="bank-bag" class="shelf"></div>
+        <h4 class="sub-h">In the bank</h4>
+        <div id="bank-held" class="shelf"></div>
         </div><!-- /.stages -->
         <p id="town-says" class="says" hidden></p>
         <div class="actionbar">
-          <button id="pack" type="button" class="primary advance">Pack your frames</button>
-          <button id="bank" type="button">Spend it</button>
+          <button id="pack" type="button" class="primary advance">Inventory / Character Sheet</button>
+          <button id="bank" type="button">Level up</button>
           <button id="leave" type="button">Back out</button>
         </div>
       </div>
@@ -368,6 +382,14 @@
               </div>
             </div>
             <aside class="made" id="made">
+              <!-- **What you are, on the screen where you change it.** The map
+                   panel says the same thing, out of the same painter, because
+                   two lists answering "what am I" is exactly how a sheet and a
+                   bar come to disagree. It stands outside the tabs: what you
+                   are is not one of the two boards, it is the thing packing
+                   one of them is for. -->
+              <h4 class="sub-h">What you are</h4>
+              <ul id="pack-sheet" class="stats"></ul>
               <!-- Two boards, one panel. Yours and its, side by side in the
                    same cards, because the question on this screen is which of
                    the two is better packed. -->

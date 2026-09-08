@@ -33,6 +33,17 @@ fn a_played_game() -> Game {
     g.character.grow_slot(SlotKind::Weapon, 2);
     g.character.grow_slot(SlotKind::Chest, 1);
 
+    // Something in the bank, because it is a second list of components that
+    // `owned` does not carry — a save that wrote one and not the other would
+    // pass every other assertion in this file.
+    let spare = *g
+        .character
+        .owned
+        .iter()
+        .find(|&&id| !g.character.is_equipped(id))
+        .expect("a full bag has something loose in it");
+    g.character.deposit(spare).expect("a loose piece banks");
+
     // And a stream that has moved, so restoring the seed instead of the state
     // would be caught.
     for _ in 0..11 {

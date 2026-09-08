@@ -725,7 +725,11 @@ pub fn event_json(id: &str) -> String {
                     // that says only *what it says when you try* is a dead
                     // end; one that also says what it wants is a target to
                     // come back to.
-                    "wants": c.requires.describe(),
+                    // **What it wants, and where that comes from.** A flag
+                    // requirement used to name only the fact — "Requires:
+                    // corked the frame" — which tells a player what they have
+                    // not done and not where to go and do it.
+                    "wants": c.requires.wants(&events),
                     "outcome": c.outcome.describe(),
                 })
             })
@@ -1071,6 +1075,39 @@ fn item_card(
 
 }
 
+/// One loose component, as every screen that lists loose components draws it.
+///
+/// **One builder, three shelves.** The packing screen's bag, the bank's bag
+/// and the bank's vault all show the same thing — a component nothing is
+/// holding — and three copies of this would be three answers to *is a shared
+/// piece grey*. Same reasoning as `oneCard` on the page and `side_slots` for
+/// the two boards.
+fn loose_entry(
+    ch: &gm2d_core::character::Character,
+    theme: &'static gm2d_core::theme::Theme,
+    enchs: &gm2d_core::ench::EnchsData,
+    p: gm2d_core::piece::PieceId,
+) -> serde_json::Value {
+    let d = ch.registry.def(p);
+    // Loose, and it fits more than one grid: no hue and the shared diamond,
+    // because it is not a glove or a greave until it is in one. Role
+    // brightness still reads.
+    let mut v = piece_payload(
+        d,
+        theme,
+        ench_json(ch, enchs, p),
+        serde_json::json!(ch.registry.shape(p).cells()),
+        None,
+    );
+    let o = v.as_object_mut().expect("an object");
+    o.insert("id".into(), p.0.into());
+    o.insert("slot".into(), slot_name(d.slot).into());
+    o.insert("rotation".into(), ch.registry.rotation(p).into());
+    o.insert("price".into(), d.price.into());
+    o.insert("shared".into(), d.shared().into());
+    v
+}
+
 /// The five grids, everything on them, and what it all assembles into.
 ///
 /// One call rather than a dozen getters, because the board is drawn as a whole
@@ -1164,25 +1201,7 @@ pub fn board_json() -> String {
         let bag: Vec<_> = ch
             .inventory()
             .into_iter()
-            .map(|p| {
-                let d = ch.registry.def(p);
-                // Loose, and it fits more than one grid: no hue and the shared
-                // diamond, because it is not a glove or a greave until it is in
-                // one. Role brightness still reads.
-                let look = gm2d_core::look::look(d, None);
-                let (ink, ink_a) = gm2d_core::look::motif_ink(look.fill);
-                let mut v = piece_payload(
-                    d, theme, ench_json(ch, &enchs, p),
-                    serde_json::json!(ch.registry.shape(p).cells()), None);
-                let o = v.as_object_mut().expect("an object");
-                o.insert("id".into(), p.0.into());
-                o.insert("slot".into(), slot_name(d.slot).into());
-                o.insert("rotation".into(), ch.registry.rotation(p).into());
-                o.insert("price".into(), d.price.into());
-                o.insert("shared".into(), d.shared().into());
-                let _ = (look, ink, ink_a);
-                v
-            })
+            .map(|p| loose_entry(ch, theme, &enchs, p))
             .collect();
 
         let stats = ch.player_stats();
@@ -2744,6 +2763,52 @@ pub fn detach_ench(piece: u32) -> String {
 pub fn toggle_ench(piece: u32) -> bool {
     use gm2d_core::piece::PieceId;
     with_mut(|g| g.character.toggle_ench(PieceId(piece)).unwrap_or(false))
+}
+
+/// The bank: what is in your bag, and what is in the vault.
+///
+/// **One vault, and every town reaches the same one**, so this takes no town
+/// id — there is nothing about a place in the answer. Both lists are built by
+/// `loose_entry`, the same builder the packing screen's bag uses, because a
+/// component nothing is holding is the same thing on all three shelves.
+#[wasm_bindgen]
+pub fn bank_json() -> String {
+    with(|g| {
+        let ch = &g.character;
+        let theme = gm2d_core::theme::by_id(&g.theme);
+        let enchs = gm2d_core::data::enchs();
+        let bag: Vec<_> = ch
+            .inventory()
+            .into_iter()
+            .map(|p| loose_entry(ch, theme, &enchs, p))
+            .collect();
+        let banked: Vec<_> = ch
+            .banked
+            .iter()
+            .map(|&p| loose_entry(ch, theme, &enchs, p))
+            .collect();
+        serde_json::json!({ "bag": bag, "banked": banked }).to_string()
+    })
+}
+
+/// Put one in. Empty on success, the refusal otherwise.
+#[wasm_bindgen]
+pub fn bank_put(piece: u32) -> String {
+    use gm2d_core::piece::PieceId;
+    with_mut(|g| match g.character.deposit(PieceId(piece)) {
+        Ok(()) => String::new(),
+        Err(why) => why,
+    })
+}
+
+/// Take one out. It goes back to the bag, not onto a board.
+#[wasm_bindgen]
+pub fn bank_take(piece: u32) -> String {
+    use gm2d_core::piece::PieceId;
+    with_mut(|g| match g.character.withdraw(PieceId(piece)) {
+        Ok(()) => String::new(),
+        Err(why) => why,
+    })
 }
 
 /// Open the board outside a fight, so a player can pack in town.

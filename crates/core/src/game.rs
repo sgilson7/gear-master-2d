@@ -665,6 +665,10 @@ impl PartialEq for Game {
             && a.skills_taken == b.skills_taken
             && a.class == b.class
             && a.enchs_owned == b.enchs_owned
+            // What is in the bank, which is not in `owned` and so is compared
+            // nowhere above. A save that dropped it would round-trip green
+            // and empty somebody's vault.
+            && a.banked == b.banked
             && a.enchanted == b.enchanted
             && self.world == other.world
             && self.encounter == other.encounter

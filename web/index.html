@@ -430,6 +430,14 @@
           <button id="preset" type="button">Auto-pack</button>
           <button id="clear" type="button">Clear</button>
           <button id="fight-save" type="button">Download save</button>
+          <!-- **The playback controls, and they are on the bar before the
+               fight as well as during it.** A slow replay is something you
+               line up in advance; catching it halfway is how you miss the
+               thing you slowed it down to see. -->
+          <button id="speed" type="button" title="How fast the replay runs (up and down arrows)">Speed 1×</button>
+          <button id="pause" type="button" hidden title="Stop where it is (space)">Pause</button>
+          <button id="step" type="button" hidden title="To the next thing that happens (right arrow)">Step</button>
+          <button id="combat-log" type="button" hidden>The log</button>
         </div>
       </div>
     </div>
@@ -445,6 +453,25 @@
   <div id="node-detail" hidden></div>
   <!-- What one component is. Outside every screen, because it is pinned to the
        viewport and the shelf, the bag and the board all summon it. -->
+  <!-- **The combat log.** Ported from the original, and the good idea in it is
+       not the transcript: it is that a transcript is true and unreadable, so
+       both boards flank it and clicking an item narrows the log to that item's
+       own lines and prints its account. -->
+  <div id="combat" class="screen" hidden>
+    <div class="screenbox">
+      <div class="taperow">
+        <h3>The log</h3>
+        <button id="combat-close" type="button" class="small">Close</button>
+      </div>
+      <p class="note" id="combat-note">&mdash;</p>
+      <div class="combat-cols">
+        <div class="rail" id="combat-yours"></div>
+        <ol id="combat-lines" class="tape whole"></ol>
+        <div class="rail" id="combat-theirs"></div>
+      </div>
+    </div>
+  </div>
+
   <div id="piece-card" class="made" hidden></div>
   <!-- What one frame takes, pinned beside the ? that asked for it. -->
   <div id="frame-card" class="made" hidden></div>

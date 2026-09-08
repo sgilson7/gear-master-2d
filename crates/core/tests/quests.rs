@@ -413,3 +413,70 @@ fn a_pin_is_one_errand_and_survives_being_walked_away_from() {
     quest::hand_in(&mut g, "the-eyes-have-it").unwrap();
     assert_eq!(g.world.pinned, None, "a finished errand is still pinned");
 }
+
+/// **A chain errand can be handed in.** Reported from play: *"i have the quest
+/// what is behind the door, and when I try to turn it in to marbulon, I am
+/// unable to as she does not have a button in her event to submit this new
+/// quest completion."*
+///
+/// `QuestsData::at` filtered every `granted` errand out of the list a place is
+/// concerned with, so that a branch you did not take could not sit on the tile
+/// offering itself. That rule is right and this was not the way to get it:
+/// **`stage` already reports a chain errand nobody has been given as
+/// `Locked`**, so the filter was never what kept it off the counter — all it
+/// did was take the hand-in away too. Twenty-one errands over ten places, and
+/// none of them could be finished.
+#[test]
+fn a_chain_errand_is_handed_in_where_it_came_from() {
+    let quests = data::quests();
+    let chains: Vec<_> = quests.quests.iter().filter(|q| q.granted).collect();
+    assert!(chains.len() > 15, "the chains are the thing being checked: {}", chains.len());
+
+    for q in &chains {
+        let back = gm2d_core::quest::QuestsData::turn_in_of(q);
+        assert!(
+            quests.at(back).iter().any(|x| x.id == q.id),
+            "{}: handed in at {back}, and {back} does not list it — so it cannot be \
+             finished at all",
+            q.id
+        );
+    }
+}
+
+/// And the rule that filter was standing in for still holds: a chain errand
+/// nobody has been handed is not on offer anywhere.
+#[test]
+fn a_chain_errand_nobody_gave_you_is_not_on_offer() {
+    let mut g = Game::new(7, "td");
+    let quests = data::quests();
+    for q in quests.quests.iter().filter(|q| q.granted) {
+        assert_eq!(
+            quest::stage(&g, q),
+            Stage::Locked,
+            "{} is a chain errand and reads as available before anything handed it over",
+            q.id
+        );
+    }
+    // Handed over, it becomes something you are carrying — and only then.
+    let one = quests.quests.iter().find(|q| q.granted).expect("a chain errand");
+    g.world.quests_taken.push(one.id.clone());
+    assert_ne!(quest::stage(&g, one), Stage::Locked, "{} never came off the shelf", one.id);
+
+    // **And the counter obeys the same rule**, which is the half that changed:
+    // testing `stage` alone would prove the rulebook and not the screen. The
+    // one that was handed over shows; the ones that were not do not.
+    let here = quest::shown_at(&g, &quests, &one.giver);
+    assert!(
+        here.iter().any(|q| q.id == one.id),
+        "{} is on you and its own giver will not talk about it",
+        one.id
+    );
+    for q in quests.quests.iter().filter(|q| q.granted && q.id != one.id) {
+        assert!(
+            !quest::shown_at(&g, &quests, &q.giver).iter().any(|x| x.id == q.id),
+            "{} was never handed over and is sitting on {} offering itself",
+            q.id,
+            q.giver
+        );
+    }
+}

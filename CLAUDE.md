@@ -445,6 +445,45 @@ not, and quietly answers about somewhere else.
   without that save becoming a check** — everything else about this one was
   reconstruction.
 
+## Twenty-one errands that could be taken and never finished
+
+Reported from play: *"i have the quest what is behind the door, and when I try
+to turn it in to marbulon, I am unable to as she does not have a button in her
+event to submit this new quest completion. this is probably a greater issue
+across the quest chains."* It was: **all twenty-one chain errands, over ten
+turn-in places.** The whole of what M12.5 added could be started and none of it
+could be handed in.
+
+`QuestsData::at` filtered every `granted` errand out of the list a place is
+concerned with. The intent is right and is written above it — *the branch you
+did not take must not be sitting on the tile offering itself* — and it was the
+wrong instrument, because **`at` answers a different question from the one that
+rule is about**:
+
+| question | whose | where it lives |
+|---|---|---|
+| which errands is this place concerned with | the data's | `QuestsData::at` |
+| which of them will it talk to *you* about | the character's | `quest::shown_at` |
+
+- **The filter was never what kept a chain off the counter.** `stage` already
+  answers `Locked` for one nobody has been handed — *"a granted errand that has
+  not been granted is not offered, it simply is not yet"* — and `Locked` is
+  what the new filter hides. So the rule is unchanged and the hand-in comes
+  back. The filter's only effect was the bug.
+- **The shim held half the rule and could not see the other half.** It was
+  already filtering `Offered | Locked` at a place that is not the giver, which
+  is the same kind of judgement; the two halves were in two crates and neither
+  knew about the other. `shown_at` is both, in core, once — and the shim calls
+  it instead of assembling its own answer.
+- **A rule with two homes is a rule with two answers**, which is the thing the
+  shim is not allowed to do and this is what it looks like when it happens by
+  accretion rather than by decision.
+- **Both directions are tested**, because fixing this by deleting the filter
+  outright would have put every unearned branch back on the counter. The core
+  test hands one chain errand over and then asserts the other twenty are still
+  invisible at their own givers — and it asks `shown_at` rather than `stage`,
+  because testing the rulebook is not testing the screen.
+
 ## A card you cannot leave, and a card carrying somebody else's errands
 
 Two faults reported together, both on the event card, and one of them is a
@@ -1059,6 +1098,48 @@ names since M1 and the page rendered none of them.
 - One `oneCard` in `app.js` renders an item for the packing panel, the
   creature's panel and both sides of the replay. Four places, one answer to "is
   cork a standing stat".
+
+## The speed of a fight, and a log you can read
+
+Both ported from the original, and the interesting thing about the port is how
+little of it was engine: **`CombatLog::describe` has written a sentence for
+every event since the fork and `combat::tally_items` has answered which lines
+belong to which item, and neither was read by anything.** The whole of this was
+interface — two more derived answers that had nowhere they were shown.
+
+**The speed control steps 1 → ½ → ¼ → 2**, which is the original's cycle and is
+a *slow-down*: the reason to reach for it is always that something went past
+too fast to read, so the first press has to make it slower rather than faster.
+**Settable before the fight as well as during it**, which is the original's
+note and the better half of the idea — a replay you slowed down after it
+started is one you already missed.
+
+- **A step is to the next thing that happened, not a slice of time.** Stepping
+  by fifty milliseconds walks a player through a second of nothing to reach the
+  blow they were waiting for; the log is a list of moments and the step goes to
+  the next one. The check compares against the log's own next entry.
+- Space pauses, right steps, up and down change the rate — the original's keys,
+  guarded on the replay stage being up, because those arrows walk the map
+  everywhere else.
+
+**The log screen is the transcript with both boards flanking it**, and the
+arrangement is the whole idea rather than decoration. The original writes it
+down: *the transcript is true and unreadable — forty lines of consequence, and
+the question a player has is what did that piece do.* So clicking an item
+narrows the list to that item's own lines and prints its account: activations,
+goofs, seconds stopped, and what it put in.
+
+- **Which lines are an item's own is core's answer.** `ItemTally::entries` is
+  documented as *"the interface shows the log filtered to these"* — written for
+  an interface that did not exist here until now. The page filters on that list
+  and never works out ownership itself.
+- **The page prints the sentence and does not compose one.** The gate compares
+  every rendered line against `entries[].text` and every narrowed list against
+  the tally, so a page that started writing its own account of a fight would be
+  caught — it is the *"the page draws numbers core sent it"* rule applied to
+  prose.
+- `describe` matches the event enum exhaustively, so a new variant is a compile
+  error there rather than a blank line on the screen.
 
 ## Both boards, and the jolt
 
@@ -2995,6 +3076,8 @@ Every figure below was re-measured for M12.6 rather than carried forward.
 | A swing is not a constant, and the row said it was | **691 passing** |
 | The Kettleworks was a wall, and the wall was the gear | **697 passing** |
 | A defeat costs you your place | **698 passing** |
+| Twenty-one errands that could be taken and never finished | **700 passing** |
+| The speed of a fight, and a log you can read | **701 passing** |
 
 Note M12.4 adds none, and neither did M11.0 or M11.8 — all three are honest.
 M12.4 is a playthrough, a triage and a brief; its deliverable is
@@ -3039,8 +3122,8 @@ content*, and one check now measures what a range used to guess at.
 | Classes offered | 5, and every one of their powers reaches something — a lint says so |
 | Figures | 27 `.tex` → **81 SVGs** (13 family drawings, 4 drawn for themselves, 5 classes, 3 towns, you) |
 | Art coverage | **58 of 58 creatures**, 3 of 3 towns, 5 of 5 classes, and you. The set pieces, the instruments and the enchs have no art and want none — a component has never had a figure |
-| Browser gate | **50 checks**, 3 engines, pointed at the live page for M12's deploy. The two newest are the pool panel and the swing that climbs |
-| The suite | **698 passing, and 14 seconds warm.** `[profile.test] opt-level = 2` since M12.6: `drops.rs` alone ran 66s at `opt-level 0`, more than the other 57 files together, and is 6.7s now. Debug assertions and overflow checks stay on — this is the `test` profile, not `--release` |
+| Browser gate | **52 checks**, 3 engines, pointed at the live page for M12's deploy. The two newest are the pool panel and the swing that climbs |
+| The suite | **701 passing, and 14 seconds warm.** `[profile.test] opt-level = 2` since M12.6: `drops.rs` alone ran 66s at `opt-level 0`, more than the other 57 files together, and is 6.7s now. Debug assertions and overflow checks stay on — this is the `test` profile, not `--release` |
 
 Note the catalogue is **568**, not the 374 the retheme document counts — it
 grew upstream after that document was written, and three times here. Any

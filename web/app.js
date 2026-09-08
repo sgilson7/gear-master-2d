@@ -672,6 +672,93 @@ function showCard(title, prose, choices, onPick) {
   $('card').hidden = false;
 }
 
+/// **The combat log, ported from the original.**
+///
+/// The transcript is core's — `CombatLog::describe` writes every line and the
+/// page prints them unchanged, the same rule the item card obeys. What the
+/// original works out and this borrows is the *shape*: forty lines of
+/// consequence is true and unreadable, and the question a player has is what
+/// one piece did. So both boards flank the list and clicking an item narrows
+/// it to that item's own lines.
+///
+/// `focus` is `{side, index}` or null for everything.
+let logFocus = null;
+
+function openCombatLog() {
+  logFocus = null;
+  paintCombatLog();
+  $('combat').hidden = false;
+  $('combat-close').focus();
+}
+
+function closeCombatLog() {
+  $('combat').hidden = true;
+  $('map').focus();
+}
+
+function paintCombatLog() {
+  const log = replay?.log;
+  if (!log) return;
+  const secs = (log.duration_ms / 1000).toFixed(1);
+  $('combat-note').textContent =
+    `${secs}s · ${log.enemy?.name ?? 'it'} · ${log.entries.length} things happened`;
+
+  // The two rails. **Which lines belong to an item is core's answer** —
+  // `tally_items` returns them — so clicking one is a filter and never a
+  // second reading of the fight.
+  for (const [side, host] of [['player', $('combat-yours')], ['enemy', $('combat-theirs')]]) {
+    host.replaceChildren();
+    for (const t of log.tallies?.[side] ?? []) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'wares railitem'
+        + (logFocus && logFocus.side === side && logFocus.index === t.index ? ' pinned' : '');
+      const did = (t.did ?? []).map((d) => `${d.n} ${d.what}`).join(' · ');
+      b.innerHTML = `<b>${t.name}</b>`
+        + `<span class="meta">${t.activations} activations`
+        + (t.misfires ? ` · ${t.misfires} goofed` : '')
+        + (t.stunned_ms ? ` · stopped ${(t.stunned_ms / 1000).toFixed(1)}s` : '')
+        + `</span>`
+        + (did ? `<span class="cost">${did}</span>` : '');
+      b.onclick = () => {
+        const same = logFocus && logFocus.side === side && logFocus.index === t.index;
+        logFocus = same ? null : { side, index: t.index };
+        paintCombatLog();
+      };
+      host.appendChild(b);
+    }
+    if (!host.children.length) {
+      host.innerHTML = `<p class="empty">nothing on this side acted</p>`;
+    }
+  }
+
+  // Filtered, the list is that item's own entries; otherwise all of them. One
+  // index list either way, so the printing does not have to care.
+  const show = logFocus
+    ? (log.tallies?.[logFocus.side] ?? []).find((t) => t.index === logFocus.index)?.entries ?? []
+    : log.entries.map((_, i) => i);
+  const box = $('combat-lines');
+  box.replaceChildren(...show.map((i) => {
+    const e = log.entries[i];
+    const li = document.createElement('li');
+    li.textContent = e.text;
+    li.classList.toggle('bad', e.side === 'enemy');
+    return li;
+  }));
+  if (!show.length) {
+    const li = document.createElement('li');
+    li.textContent = 'It did nothing anybody wrote down.';
+    box.replaceChildren(li);
+  }
+}
+
+/// The playback controls, and the one label that says which state they are in.
+function paintSpeed() {
+  const s = replay?.speed ?? 1;
+  $('speed').textContent = `Speed ${s === 0.25 ? '¼' : s === 0.5 ? '½' : s}×`;
+  $('pause').textContent = replay?.playing ? 'Pause' : 'Play';
+}
+
 function closeCard() {
   $('card-errands').hidden = true;
   $('card').hidden = true;
@@ -727,6 +814,15 @@ function stage(which) {
   $('skip').hidden = which !== 'replay';
   $('done').hidden = which !== 'result';
   for (const id of ['run', 'undo', 'preset', 'clear', 'fight-save']) $(id).hidden = !board;
+  // **Speed is settable before the fight as well as during it**, which is the
+  // original's rule and the reason the control is worth having: a replay you
+  // slowed down after it started is one you already missed. Pause and step are
+  // the replay's own, and the log is readable from the moment there is one.
+  $('speed').hidden = which === 'result';
+  $('pause').hidden = which !== 'replay';
+  $('step').hidden = which !== 'replay';
+  $('combat-log').hidden = which === 'board';
+  paintSpeed();
   // In a town there is nothing to fight, so the way out takes the slot rather
   // than leaving it empty and sliding everything left.
   const takes = packingOnly && board;
@@ -2231,6 +2327,21 @@ async function main() {
     // that does not take Escape, because it is the one decision that does not
     // come off.
     if (!$('fork').hidden) return;
+    if (e.key === 'Escape' && !$('combat').hidden) { closeCombatLog(); return; }
+    // **The original's keys**, and they are only live while a replay is on
+    // screen: space pauses, right steps to the next thing that happened, up
+    // and down change the rate. Guarded on the stage rather than on the
+    // screen, because these arrows walk the map everywhere else.
+    if (!$('fight').hidden && !$('stage-replay').hidden && $('card').hidden) {
+      if (e.key === ' ') { e.preventDefault(); replay.pause(); paintSpeed(); return; }
+      if (e.key === 'ArrowRight') { e.preventDefault(); replay.step(); paintSpeed(); return; }
+      if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        replay.nextSpeed();
+        paintSpeed();
+        return;
+      }
+    }
     if (e.key === 'Escape' && !$('card').hidden) { closeCard(); return; }
     // `d` is east on WASD, so the overlay gets its own key and a button.
     if (e.key === '`' && !$('scout').hidden) { e.preventDefault(); toggleScout(); return; }
@@ -2429,6 +2540,13 @@ async function main() {
   $('done').onclick = closeFight;
 
   $('card-close').onclick = closeCard;
+  // **The playback controls.** `Replay` owns what they mean; this only says
+  // which one was pressed and repaints the label.
+  $('speed').onclick = () => { replay.nextSpeed(); paintSpeed(); };
+  $('pause').onclick = () => { replay.pause(); paintSpeed(); };
+  $('step').onclick = () => { replay.step(); paintSpeed(); };
+  $('combat-log').onclick = openCombatLog;
+  $('combat-close').onclick = closeCombatLog;
   $('map').onclick = () => $('map').focus();
 
   $('download').onclick = () => {

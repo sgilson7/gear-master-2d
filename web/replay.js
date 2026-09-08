@@ -143,6 +143,43 @@ export class Replay {
     });
   }
 
+  /// **Step through the playback rates, the way the original does.**
+  ///
+  /// Two down to a quarter and then back to double, which is a *slow-down*
+  /// cycle: the reason to touch this control is almost always that something
+  /// went past too fast to read, so the first press has to make it slower.
+  /// Settable before a fight as well as during one, so a slow replay can be
+  /// lined up in advance rather than caught halfway.
+  nextSpeed() {
+    this.speed = this.speed >= 2 ? 1
+      : this.speed >= 1 ? 0.5
+      : this.speed >= 0.5 ? 0.25
+      : 2;
+    return this.speed;
+  }
+
+  /// Stop where the head is, or start again from there.
+  pause() {
+    if (this.playing) { this.playing = false; this.draw(); return false; }
+    this.play();
+    return true;
+  }
+
+  /// One activation forward, whoever it belongs to.
+  ///
+  /// **A step is to the next thing that happened, not a fixed slice of time.**
+  /// Stepping by 50ms would walk a player through a second of nothing to reach
+  /// the blow they were waiting for; the log is a list of moments and this
+  /// goes to the next one.
+  step() {
+    if (!this.log) return;
+    this.playing = false;
+    const next = (this.log.entries ?? []).find((e) => e.at > this.t);
+    this.t = next ? next.at : this.log.duration_ms;
+    this.draw();
+    if (this.t >= this.log.duration_ms) this.onend();
+  }
+
   play() {
     if (!this.log || this.playing) return;
     this.playing = true;

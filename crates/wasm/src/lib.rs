@@ -1712,6 +1712,13 @@ pub fn fight_json() -> String {
                     "at": e.at_ms, "kind": kind,
                     "side": if side == Side::Player { "player" } else { "enemy" },
                     "item": item, "index": index, "amount": amount,
+                    // **The sentence is core's.** `CombatLog::describe` has
+                    // written one for every event since the fork and nothing
+                    // has ever read it — the transcript the original shows on
+                    // its combat log screen is this, and a page composing its
+                    // own would be a second account of a fight that already
+                    // has one.
+                    "text": log.describe(e),
                     "ph": ph.max(0), "pmax": pmax.max(1), "pa": pa.max(0),
                     "eh": eh.max(0), "emax": emax.max(1), "ea": ea.max(0),
                     "pp": pp, "ep": ep,
@@ -1720,9 +1727,36 @@ pub fn fight_json() -> String {
             })
             .collect();
 
+        // **What each item did, and which lines are its own.**
+        //
+        // `combat::tally_items` has answered this since the fork and nothing
+        // has read it either. Its `entries` field is documented as *"the
+        // interface shows the log filtered to these"*, which is the original's
+        // combat log screen: a transcript is true and unreadable, and the
+        // question a player actually has is what one piece did.
+        let tally = |side: Side| -> Vec<serde_json::Value> {
+            gm2d_core::combat::tally_items(&log, side, 0)
+                .into_iter()
+                .map(|t| {
+                    serde_json::json!({
+                        "index": t.index,
+                        "name": t.name,
+                        "activations": t.activations,
+                        "misfires": t.misfires,
+                        "stunned_ms": t.stunned_ms,
+                        "entries": t.entries,
+                        "did": t.contributed.iter()
+                            .map(|c| serde_json::json!({ "what": c.what, "n": c.amount }))
+                            .collect::<Vec<_>>(),
+                    })
+                })
+                .collect()
+        };
+
         serde_json::json!({
             "outcome": format!("{:?}", log.outcome).to_lowercase(),
             "duration_ms": log.duration_ms,
+            "tallies": { "player": tally(Side::Player), "enemy": tally(Side::Enemy) },
             "pools": ["the Funny", "fury", "devotion", "harvest"],
             "player": {
                 "name": "you", "max_health": log.player.max_health,
@@ -2291,20 +2325,13 @@ pub fn quests_json() -> String {
         // they are in.
         let Some(town) = place_here(g) else { return "[]".into() };
         let quests = gm2d_core::data::quests();
-        let out: Vec<_> = quests
-            .at(&town)
+        // **Which errands this place will talk to you about is core's.** It was
+        // half here and half in `QuestsData::at`, and the half that was here
+        // could not see the other — so a chain errand was filtered out of its
+        // own hand-in and twenty-one of them could never be finished. One
+        // function answers it now: `quest::shown_at`.
+        let out: Vec<_> = gm2d_core::quest::shown_at(g, &quests, &town)
             .into_iter()
-            // **You do not hear about an errand at the place it is handed in.**
-            // `at` returns both ends so a screen can find it either way, but a
-            // clerk who has not been told about the heap has nothing to say
-            // about it — an errand shows at its turn-in only once it is on you.
-            .filter(|q| {
-                q.giver == town
-                    || !matches!(
-                        gm2d_core::quest::stage(g, q),
-                        gm2d_core::quest::Stage::Offered | gm2d_core::quest::Stage::Locked
-                    )
-            })
             .map(|q| {
                 let stage = gm2d_core::quest::stage(g, q);
                 let (have, want) = match stage {

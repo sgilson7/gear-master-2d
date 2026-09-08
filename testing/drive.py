@@ -878,6 +878,167 @@ def leave_the_card(page):
     page.wait_for_selector("#card", state="hidden", timeout=5000)
 
 
+def check_the_replay_can_be_slowed_and_read(page, name, fails):
+    """The playback controls and the combat log, ported from the original.
+
+    Two things the original has and this did not. **Speed** steps 1 → ½ → ¼ →
+    2 — a slow-down cycle, because the reason to reach for it is always that
+    something went past too fast to read — and it is settable *before* a fight
+    as well as during one, since a replay you slowed down after it started is
+    one you already missed. **The log** is the transcript with both boards
+    flanking it: clicking an item narrows the list to that item's own lines.
+
+    Neither number here is the page's. `CombatLog::describe` writes every line
+    and `combat::tally_items` says which lines belong to which item; both have
+    been in the engine since the fork and nothing read them until now, so what
+    this checks is that the screen is showing core's answer and not one of its
+    own.
+    """
+    if not walk_until_a_fight(page):
+        fails.append(f"{name}: never found a fight to watch")
+        return
+    try:
+        page.click("#preset")
+        # --- the cycle, before the fight has started ------------------------
+        if not page.is_visible("#speed"):
+            fails.append(f"{name}: no speed control before the fight")
+            return
+        seen = []
+        for _ in range(4):
+            page.click("#speed")
+            seen.append(page.text_content("#speed"))
+        if len(set(seen)) != 4:
+            fails.append(f"{name}: the speed control does not cycle: {seen}")
+        if page.text_content("#speed") != "Speed 1×":
+            fails.append(f"{name}: four presses did not come back round: {seen}")
+
+        page.click("#go")
+        page.wait_for_selector("#stage-replay", state="visible", timeout=10000)
+        # --- pause holds the head, step goes to the next thing that happened -
+        page.click("#pause")
+        page.wait_for_timeout(120)
+        held = page.evaluate("() => window.__replay.t")
+        page.wait_for_timeout(350)
+        if page.evaluate("() => window.__replay.t") != held:
+            fails.append(f"{name}: paused and the playback kept going")
+        moved = page.evaluate("""() => {
+          const r = window.__replay, was = r.t;
+          const next = (r.log.entries ?? []).find(e => e.at > was);
+          document.getElementById('step').click();
+          return { was, now: r.t, wanted: next ? next.at : r.log.duration_ms };
+        }""")
+        if moved["now"] != moved["wanted"]:
+            fails.append(f"{name}: a step went to {moved['now']} and the next thing "
+                         f"happened at {moved['wanted']}")
+
+        # --- the log ---------------------------------------------------------
+        page.click("#combat-log")
+        page.wait_for_selector("#combat", state="visible", timeout=5000)
+        got = page.evaluate("""() => {
+          const lines = [...document.querySelectorAll('#combat-lines li')].map(e => e.textContent);
+          const rails = [...document.querySelectorAll('#combat-yours .railitem')];
+          return {
+            lines,
+            entries: (window.__replay.log.entries ?? []).length,
+            texts: (window.__replay.log.entries ?? []).map(e => e.text),
+            rails: rails.length,
+          };
+        }""")
+        if got["rails"] == 0:
+            fails.append(f"{name}: the log names none of your items")
+        # **Core's sentences, unchanged.** A page composing its own would be a
+        # second account of a fight that already has one.
+        if got["lines"] != got["texts"]:
+            fails.append(f"{name}: the log is not printing the engine's lines: "
+                         f"{got['lines'][:2]} against {got['texts'][:2]}")
+        if got["rails"]:
+            page.click("#combat-yours .railitem")
+            page.wait_for_timeout(120)
+            after = page.evaluate("""() => {
+              const shown = [...document.querySelectorAll('#combat-lines li')].map(e => e.textContent);
+              const t = window.__replay.log.tallies.player[0];
+              return { shown, want: t.entries.map(i => window.__replay.log.entries[i].text) };
+            }""")
+            if after["shown"] != after["want"]:
+                fails.append(f"{name}: narrowing to an item shows {len(after['shown'])} lines "
+                             f"and core says it owns {len(after['want'])}")
+            if len(after["shown"]) >= got["entries"]:
+                fails.append(f"{name}: narrowing to one item narrowed nothing")
+        page.click("#combat-close")
+        page.wait_for_selector("#combat", state="hidden", timeout=5000)
+    finally:
+        if page.is_visible("#combat"):
+            page.click("#combat-close")
+        if page.is_visible("#skip"):
+            page.click("#skip")
+            page.wait_for_selector("#stage-result", state="visible", timeout=20000)
+        if page.is_visible("#done"):
+            page.click("#done")
+        page.wait_for_selector("#fight", state="hidden", timeout=8000)
+
+
+def check_a_chain_errand_can_be_handed_in(page, name, fails):
+    """A chain errand can be finished where it came from.
+
+    Reported from play: *"i have the quest what is behind the door, and when I
+    try to turn it in to marbulon, I am unable to as she does not have a button
+    in her event to submit this new quest completion."* True of all twenty-one
+    of them, over ten places — `QuestsData::at` filtered every granted errand
+    out of the list a place is concerned with, which was meant to keep a branch
+    you did not take off the counter and took the hand-in away with it.
+
+    Planted at the point of handing in, because the road to it is a chain of
+    choices and what has to be proved is the counter.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+    QUEST = "what-is-behind-the-door"
+
+    def carrying_it(body):
+        w = body.setdefault("world", {})
+        w["map"] = ""
+        w["quests_taken"] = list(w.get("quests_taken", [])) + [QUEST]
+        # Her door unread, so the card opens; and the errand's own goal done,
+        # which for a "go and look" is a marker rather than a bag of things.
+        w["answered"] = [a for a in w.get("answered", []) if a != "marbulons-door"]
+        w["answered"].append(f"word:{QUEST}")
+
+    plant(page, base, carrying_it, stem="chain-handin")
+    page.evaluate("(at) => window.__standAt(at)", [4, 10])
+    page.keyboard.press("ArrowLeft")
+    page.wait_for_timeout(400)
+    if not page.is_visible("#card"):
+        fails.append(f"{name}: stepping onto her door opened nothing")
+        return
+    try:
+        rows = page.evaluate("""() => [...document.querySelectorAll('#card-errands .errand')]
+            .map(b => ({ text: b.innerText.replace(/\\s+/g, ' ').trim().slice(0, 70),
+                         disabled: b.disabled, ready: b.classList.contains('ready') }))""")
+        mine = [r for r in rows if "BEHIND THE DOOR" in r["text"].upper()]
+        if not mine:
+            fails.append(f"{name}: she is carrying no button for the errand she gave: "
+                         f"{[r['text'] for r in rows]}")
+            return
+        row = mine[0]
+        if row["disabled"]:
+            fails.append(f"{name}: the errand is on her counter and cannot be clicked: {row}")
+            return
+        # Hand it in, and it stops being outstanding.
+        page.click("#card-errands .errand:has-text('BEHIND THE DOOR')")
+        page.wait_for_timeout(300)
+        said = " ".join(tape(page)[-3:])
+        after = page.evaluate("""() => [...document.querySelectorAll('#card-errands .errand')]
+            .filter(b => b.innerText.toUpperCase().includes('BEHIND THE DOOR'))
+            .map(b => b.className)""")
+        if not any("sold" in c for c in after):
+            fails.append(f"{name}: handed it in and it is still outstanding: {after}; "
+                         f"the strip says {said!r}")
+    finally:
+        leave_the_card(page)
+        plant(page, base, lambda body: None, stem="chain-handin-restore")
+
+
 def check_a_card_can_always_be_left(page, name, fails):
     """Every event card has a visible way out, and shows nothing but its own.
 
@@ -4259,6 +4420,8 @@ def walk_the_gate(browser, name, fails=None):
     # --- what a creature leaves behind ---------------------------------------
     check_a_set_reads(page, name, fails)
     check_a_swing_climbs_with_fury(page, name, fails)
+    check_the_replay_can_be_slowed_and_read(page, name, fails)
+    check_a_chain_errand_can_be_handed_in(page, name, fails)
     check_a_card_can_always_be_left(page, name, fails)
     check_a_defeat_costs_you_your_place(page, name, fails)
     check_an_instrument_takes_the_grid(page, name, fails)
@@ -4384,6 +4547,8 @@ def main():
     print("ok: walk, download, reload, upload — position and stream both came back")
     print("ok: a wrong file was refused with a sentence and changed nothing")
     print("ok: a save from an older build does not wedge the player in the scenery")
+    print("ok: the replay can be slowed, paused, stepped and read as a log")
+    print("ok: a chain errand can be handed in where it came from")
     print("ok: an event card can always be left, and shows nothing but its own")
     print("ok: a defeat costs you your place, and the door is the door again")
     print("ok: a banked pool says what it pays, and the rates are core's")

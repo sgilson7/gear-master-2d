@@ -172,3 +172,69 @@ fn an_unknown_creature_does_not_produce_a_fight() {
     g.encounter = Some(Encounter { enemy: "A Thing From Another Game".into(), at: [0, 0] });
     assert!(fight::run(&g, D).is_none());
 }
+
+/// **The combat log screen's two questions, both of them core's.**
+///
+/// Ported from the original, where the same two functions answer them:
+/// `CombatLog::describe` writes the line and `combat::tally_items` says which
+/// lines belong to which item. Both have been in this engine since the fork
+/// and neither was read by anything — the interface is the whole of what M13
+/// added, so this is what stops it drifting.
+#[test]
+fn every_line_of_a_fight_has_a_sentence_and_an_owner() {
+    use gm2d_core::combat::{self, Event, Side};
+
+    let ch = common::preset_board();
+    let spec = combat::LADDER.iter().find(|m| m.name == "Rust Colossus").expect("a long fight");
+    let log = combat::simulate_at(ch.player_stats(), &ch.combat_items(), spec, Difficulty::Easy);
+    assert!(log.entries.len() > 20, "too short a fight to say anything: {}", log.entries.len());
+
+    // Every entry reads as something. `describe` matches the event enum
+    // exhaustively, so a new variant is a compile error there rather than a
+    // blank line here — this is the other half: that what it writes is not
+    // empty and carries its moment.
+    for e in &log.entries {
+        let line = log.describe(e);
+        assert!(!line.trim().is_empty(), "an entry at {}ms reads as nothing", e.at_ms);
+        assert!(
+            line.contains('s') || line.starts_with("--"),
+            "a line with no moment in it: {line:?}"
+        );
+    }
+
+    // And every item's own lines are its own. `entries` is what the screen
+    // filters on, so an index out of range or an activation missing from it is
+    // a rail that lies about what a piece did.
+    for side in [Side::Player, Side::Enemy] {
+        for t in combat::tally_items(&log, side, 0) {
+            for &i in &t.entries {
+                assert!(i < log.entries.len(), "{} points at entry {i} of {}", t.name, log.entries.len());
+            }
+            let acts: Vec<usize> = log
+                .entries
+                .iter()
+                .enumerate()
+                .filter(|(_, e)| {
+                    matches!(&e.event, Event::Activate { side: s, index, .. }
+                             if *s == side && *index == t.index)
+                })
+                .map(|(i, _)| i)
+                .collect();
+            for i in &acts {
+                assert!(
+                    t.entries.contains(i),
+                    "{} activated at entry {i} and its own list does not have it",
+                    t.name
+                );
+            }
+            assert_eq!(
+                t.activations as usize,
+                acts.len(),
+                "{} counts {} activations and the log holds {}",
+                t.name,
+                t.activations,
+                acts.len()
+            );
+        }
+    }
+}

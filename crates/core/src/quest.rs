@@ -252,10 +252,6 @@ impl QuestsData {
     pub fn at(&self, place: &str) -> Vec<&Quest> {
         self.quests
             .iter()
-            // **A granted errand is never on a counter.** It is handed over by
-            // a choice, and the branch you did not take must not be sitting on
-            // the tile offering itself the moment you have chosen.
-            .filter(|q| !q.granted)
             .filter(|q| q.giver == place || Self::turn_in_of(q) == place)
             .collect()
     }
@@ -325,6 +321,43 @@ pub fn done(game: &Game, id: &str) -> bool {
 /// rather than two.
 pub fn spoken(id: &str) -> String {
     format!("word:{id}")
+}
+
+/// The errands a place has something to say about **to this character**.
+///
+/// Two questions live here and they used to be one, which is how twenty-one
+/// errands became unfinishable. *Which errands is this place concerned with*
+/// is the data's and is [`QuestsData::at`]. *Which of them will it talk to you
+/// about* is the character's, and it is this.
+///
+/// **A granted errand is never on a counter, and is always handed in at one.**
+/// It is handed over by a choice, and the branch you did not take must not be
+/// sitting on the tile offering itself the moment you have chosen — but the
+/// branch you *did* take has to be able to come back. `at` filtered every
+/// granted errand out for the first half and took the second half with it:
+/// reported from play as *"I have the quest what is behind the door, and when
+/// I try to turn it in to marbulon ... she does not have a button"*, and it was
+/// true of all twenty-one of them over ten places.
+///
+/// The filter was never what kept a chain off the counter either. `stage`
+/// already answers `Locked` for one nobody has been handed, and `Locked` is
+/// what this hides — so the rule is unchanged and the hand-in comes back.
+pub fn shown_at<'a>(game: &Game, quests: &'a QuestsData, place: &str) -> Vec<&'a Quest> {
+    quests
+        .at(place)
+        .into_iter()
+        .filter(|q| {
+            // A chain errand appears once it is on you and not before.
+            !q.granted || !matches!(stage(game, q), Stage::Locked)
+        })
+        // **You do not hear about an errand at the place it is handed in.**
+        // `at` returns both ends so a screen can find it either way, but a
+        // clerk who has not been told about the heap has nothing to say about
+        // it — an errand shows at its turn-in only once it is on you.
+        .filter(|q| {
+            q.giver == place || !matches!(stage(game, q), Stage::Offered | Stage::Locked)
+        })
+        .collect()
 }
 
 pub fn stage(game: &Game, q: &Quest) -> Stage {

@@ -445,6 +445,43 @@ not, and quietly answers about somewhere else.
   without that save becoming a check** — everything else about this one was
   reconstruction.
 
+## A defeat costs you your place
+
+Reported from play: *"when you die there, and you return to the overworld
+through a door, you appear back exactly where you died in the overworld,
+instead of at the door to the overworld."*
+
+The bookmark is real and is the right idea: `WorldState::positions` remembers
+where you were on each map you have left, so **a gate that names no landing
+tile lands you where you left off** — which is what makes the Treyway a
+country rather than a chute, and it is written in the map file rather than
+branched on in the shim.
+
+**What it did not distinguish is walking off a map from being carried off
+one.** The defeat path wrote the bookmark down with a comment arguing that
+coming back should put you *"into the fight they lost"*. It reads well and it
+plays badly, and the report is the answer: a border you re-enter in the middle
+of is not a border.
+
+- **`WorldState::forget` is the rule and it is core's**, called by the shim's
+  walk-home. Forgetting rather than overwriting, so `World::arrival` falls
+  through to the map's own start — which on the Treyway is the tile the door
+  put you on the first time. *"At the door"* is then a fact the map states
+  rather than a coordinate somebody wrote down twice.
+- **Only the map you fell on.** Dying on the Treyway must not lose your place
+  on a map you have every right to still be standing on, and the core test
+  says so in its third assertion.
+- **Riding home on the Drover's Stride still remembers.** That is a decision
+  and this was not: you paid a tin to leave, and coming back where you left is
+  what you paid for. A defeat takes what you were carrying, and now it takes
+  your place as well.
+- **The engine half and the half that was wrong are in different crates.**
+  `tests/world.rs` covers the rule; the walk home lives in the shim, which is
+  where the bookmark was being written, so `check_a_defeat_costs_you_your_place`
+  is the one that would have caught it. It plants a death on the Treyway, walks
+  back through the door and reads the tile — and with the old line put back it
+  says *came back in at [4, 4], which is where the player died*.
+
 ## The north is a decision, not a slope
 
 Nothing stopped a level-one character walking fifteen tiles north into a region
@@ -599,6 +636,66 @@ the rename was cheaper before the nine than after.
   forty-one dismissals that pay nothing and ask nothing are texture only if
   something on the map rewards having read them, and nothing does. `PLAN-
   M12-EXEC.md` §M12.5 is where that is answered rather than defended.
+
+## The Kettleworks was a wall, and the wall was the gear
+
+Reported from play: *"the monsters in area 2 the kettleworks are like insanely
+difficult to defeat by the time you get there ... the only one I can reliably
+kill is the thing in the fortieth kettle due to timing it out."* Both halves
+were true, and the second is the tell — **a win at the sudden-death clock is
+not a win a board earned.**
+
+**The yardstick is the human's and it is now a test.** Level ten, any class,
+**one assembled item to a grid**, on the three-row frames a level ten stands up
+in, owning both shelves and everything the errands pay. Generous about gear and
+mean about space, which is the safe direction. Measured before anything moved,
+that board beat *nothing* in the field: The Curator, the Pale Twin and the
+Kettle Wight all ran to the buzzer and both hounds killed it in eight seconds.
+
+- **The body numbers are not the lever, and this is the finding.** Health,
+  strength, regen and both resistances scaled to **seventy percent** changed
+  not one outcome. Almost all of what a Kettleworks creature *rates* — and all
+  of what it does to you — is the gear it wears, which is also what
+  `creature_rating` is mostly counting. The Kettle Wight has no weapon at all:
+  it is a wall of 82 armour an activation, and cutting its health to 60% still
+  ended every fight at the buzzer because the clock was doing the killing
+  either way.
+- **`gear_offset` is the dial, and its own doc says what it costs to move.**
+  *Move one off zero only with evidence from a densely packed profile* — six
+  creatures are off zero now and the evidence is written where the dial is. It
+  steps every piece down its own footprint family, so a board still packs
+  exactly as authored.
+- **The dial saturates.** The Hoop Hound's families bottom out at −8% and the
+  Kettle Wight's at −9%, so four of them needed a body trim on top to reach the
+  band that was asked for. Every creature the field actually deals is down 12
+  to 16%.
+- **Two creatures were moved rather than tuned.** Lord Drabley Henpeck is off
+  the first map entirely and kept for a boss fight somebody has still to place;
+  The Rice Criers moved from the first map into the Kettleworks, which is what
+  a 471 belongs beside. West Bambulon's deepest region would have been a pool of
+  one, so it took Rust Colossus as well — *content waiting for a map is fine
+  and a region that deals the same fight for ever is not*.
+
+### And easing a creature makes its neighbour rarer
+
+**The fourth day this project has lost to `draw_enemy`'s weighting**, and the
+first time it was self-inflicted. A pool's weight is `(max + 1 − rating)`, so
+the hardest member is the rarest — which means **lowering one creature promotes
+whoever is left at the top into being almost never drawn.** Twice in one
+afternoon:
+
+- Easing The Curator and the Pale Twin made **The Gearwright** the ceiling of
+  the first Treyway, and the Drover's Stride comes off it: 25% of draws became
+  0%, and `a_set_is_never_behind_the_rarest_fight_in_its_region` said so.
+- Easing the **Ruin Hound** made the **Slag Warden** the ceiling of the Kolok
+  Downs, and an instrument part went from 25 wins to **647**.
+
+The rule that comes out of it: **ease a pool, not a creature.** A whole pool
+stepped together keeps its order and its shares; one member stepped alone
+reshuffles who is rare, and what is hung off the rare one goes with it. The
+Gearwright came down with its poolmates. The Ruin Hound went back to zero
+instead — it is the field's ceiling and is dealt **0% of the time there**, so
+easing it bought a player nothing and cost a set its owner.
 
 ## The Drambus Stack, and the counter that is not there
 
@@ -2841,6 +2938,8 @@ Every figure below was re-measured for M12.6 rather than carried forward.
 | M12.4: played to the ending, triaged, written down | 671 passing |
 | **M12.6: a chain you can see, a licence you can buy, and prices that mean it** | **687 passing** |
 | A swing is not a constant, and the row said it was | **691 passing** |
+| The Kettleworks was a wall, and the wall was the gear | **697 passing** |
+| A defeat costs you your place | **698 passing** |
 
 Note M12.4 adds none, and neither did M11.0 or M11.8 — all three are honest.
 M12.4 is a playthrough, a triage and a brief; its deliverable is
@@ -2856,7 +2955,7 @@ content*, and one check now measures what a range used to guess at.
 | Catalogue | **568 components, and M12 did not move it** — every save that opened on M11 opens on M12. M11's two seams (544 → 550 → 568) are the last there have been. **Prices are ×5 as of M12.6** and that is seam-free: `catalog_fingerprint` hashes names only |
 | Pieces that apply a curse | 59 of 568, 4 kinds, 2 on the starting shelf |
 | Sets | **9**, of three components each bar the Toad Frame's two — every piece `EVENT_ONLY`, off one creature **or one stack of floors**, in one grid |
-| Ladder | **58 creatures**, rated 16 to 2958 |
+| Ladder | **58 creatures**, rated 16 to 2958. Six are stepped down: the Kettleworks field's five and The Gearwright, at `gear_offset: -2` plus a body trim where the footprint families ran out — 12 to 16% each |
 | `crates/core` | **~43.9k lines**, down from ~50k at the fork — `wc -l` over every `.rs` under `crates/core/src`. The method is named because the figure carried here through M12.6 was 42.4k and no Rust has moved since |
 | wasm | **1439 KB**, up from 1178 KB at M10.3 — `dist/web/pkg/gm2d_wasm_bg.wasm` after `make web`. CI builds its own and the two are not bit-identical, which is why the *stamp* is checked against itself and never against a number |
 | Save format | v1. **No seam in M12.** Every field it added defaults — `commissions`, `rolled_barrel`, `rolled_ledgers`, `rerolls`, `bought_licence` — so an older file opens on the authored barrel with no orders and no licence, which is what those characters had |
@@ -2885,8 +2984,8 @@ content*, and one check now measures what a range used to guess at.
 | Classes offered | 5, and every one of their powers reaches something — a lint says so |
 | Figures | 27 `.tex` → **81 SVGs** (13 family drawings, 4 drawn for themselves, 5 classes, 3 towns, you) |
 | Art coverage | **58 of 58 creatures**, 3 of 3 towns, 5 of 5 classes, and you. The set pieces, the instruments and the enchs have no art and want none — a component has never had a figure |
-| Browser gate | **48 checks**, 3 engines, pointed at the live page for M12's deploy. The two newest are the pool panel and the swing that climbs |
-| The suite | **691 passing, and 14 seconds warm.** `[profile.test] opt-level = 2` since M12.6: `drops.rs` alone ran 66s at `opt-level 0`, more than the other 57 files together, and is 6.7s now. Debug assertions and overflow checks stay on — this is the `test` profile, not `--release` |
+| Browser gate | **49 checks**, 3 engines, pointed at the live page for M12's deploy. The two newest are the pool panel and the swing that climbs |
+| The suite | **698 passing, and 14 seconds warm.** `[profile.test] opt-level = 2` since M12.6: `drops.rs` alone ran 66s at `opt-level 0`, more than the other 57 files together, and is 6.7s now. Debug assertions and overflow checks stay on — this is the `test` profile, not `--release` |
 
 Note the catalogue is **568**, not the 374 the retheme document counts — it
 grew upstream after that document was written, and three times here. Any

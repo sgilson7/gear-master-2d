@@ -861,6 +861,83 @@ def check_a_swing_climbs_with_fury(page, name, fails):
         plant(page, base, lambda body: None, stem="fury-restore")
 
 
+def check_a_defeat_costs_you_your_place(page, name, fails):
+    """Die on the Treyway and the door is the door again.
+
+    Reported from play: *"when you die there, and you return to the overworld
+    through a door, you appear back exactly where you died in the overworld,
+    instead of at the door to the overworld."* The bookmark a map keeps is for
+    one you *walked off* — a border you re-enter in the middle of is not a
+    border, and being carried home unconscious is not walking off.
+
+    The engine half is `tests/world.rs`; this is the half that was actually
+    wrong, because the walk home lives in the shim and the shim was writing the
+    bookmark down.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+
+    def on_the_treyway_about_to_lose(body):
+        strip_the_boards(body)
+        w = body.setdefault("world", {})
+        w["map"] = "the-treyway"
+        w["at"] = [4, 4]
+        # The Cave is done and the door has been through once, so it is open
+        # and its paragraph is spent — this check is about the second crossing.
+        w["answered"] = list(w.get("answered", [])) + [
+            "the-bottom-of-the-cave", "the-door-in-the-wall"]
+        w["last_town"] = "the-end-of-all-gears"
+        # Something that will certainly win, against a board with nothing on it.
+        body["encounter"] = {"enemy": "Verdigris", "at": [4, 4]}
+
+    plant(page, base, on_the_treyway_about_to_lose, stem="died-out-there")
+    page.wait_for_selector("#fight", state="visible", timeout=8000)
+    page.click("#go")
+    page.wait_for_selector("#stage-replay", state="visible", timeout=10000)
+    page.click("#skip")
+    page.wait_for_selector("#stage-result", state="visible", timeout=20000)
+    page.click("#done")
+    page.wait_for_selector("#fight", state="hidden", timeout=8000)
+    dismiss_card(page)
+
+    where = json.loads(page.evaluate("() => window.__position()"))
+    if where["map"] != "west-bambulon":
+        fails.append(f"{name}: a defeat on the Treyway left the player on {where['map']!r}")
+        return
+
+    # Back through the door. It is open, so this is one step.
+    spot = page.evaluate("""() => (window.__world().places ?? [])
+        .find(p => p.id === 'the-door-in-the-wall')""")
+    if not spot:
+        fails.append(f"{name}: the door in the wall is not on the map after a defeat")
+        return
+    page.evaluate("(at) => window.__standAt(at)", [spot["at"][0] + 1, spot["at"][1]])
+    page.keyboard.press("ArrowLeft")
+    page.wait_for_timeout(400)
+    dismiss_card(page)
+    back = json.loads(page.evaluate("() => window.__position()"))
+    at = [back["x"], back["y"]]
+    if back["map"] != "the-treyway":
+        fails.append(f"{name}: the door did not open after a defeat: on {back['map']!r}")
+        return
+    # **The door, read off the map rather than named here.** The far side of
+    # this border has a gate standing on it — the way back into Bambulon — so
+    # "at the door" is a tile the map states rather than one this check knows.
+    door = page.evaluate("""() => (window.__world().places ?? [])
+        .find(p => p.id === 'the-door-back')?.at ?? null""")
+    if at == [4, 4]:
+        fails.append(f"{name}: came back in at [4, 4], which is where the player died — "
+                     f"the map it was carried off still remembers it")
+    elif door is not None and at != door:
+        fails.append(f"{name}: came back in at {at} and the door back is at {door}")
+    # **Put the walk's own game back**, and this one has to: it ends standing
+    # on another map, and the check after it asks the overworld where its
+    # crossings are. It got "the overworld has no crossing on it", which is
+    # true of the Treyway and is not what that check was asking.
+    plant(page, base, lambda body: None, stem="died-out-there-restore")
+
+
 def check_the_frozen_save_is_playable(page, name, fails):
     """A player's save that used to trap the module, loaded and walked.
 
@@ -4072,6 +4149,7 @@ def walk_the_gate(browser, name, fails=None):
     # --- what a creature leaves behind ---------------------------------------
     check_a_set_reads(page, name, fails)
     check_a_swing_climbs_with_fury(page, name, fails)
+    check_a_defeat_costs_you_your_place(page, name, fails)
     check_an_instrument_takes_the_grid(page, name, fails)
     check_the_long_way_back(page, name, fails)
     check_the_reach_reads_through_what_you_carry(page, name, fails)
@@ -4195,6 +4273,7 @@ def main():
     print("ok: walk, download, reload, upload — position and stream both came back")
     print("ok: a wrong file was refused with a sentence and changed nothing")
     print("ok: a save from an older build does not wedge the player in the scenery")
+    print("ok: a defeat costs you your place, and the door is the door again")
     print("ok: a banked pool says what it pays, and the rates are core's")
     print("ok: what an item hits for climbs as fury banks, and the row says so")
     print("ok: the game talks in one place, and the history holds the sitting")

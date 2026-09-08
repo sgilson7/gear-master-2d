@@ -1768,12 +1768,20 @@ pub fn settle_fight() -> String {
             let want = g.world.last_town.clone();
             let marks = seen_by(g);
             let mut moved = false;
-            // Where you fell is where you were, and a defeat is a placement
-            // rather than a step — so the map you are carried off remembers
-            // you, the same as a gate would. Without this a player who dies on
-            // the Treyway walks back through the door into its southern corner
-            // instead of into the fight they lost.
-            g.world.remember();
+            // **A defeat costs you your place.** The map you are carried off
+            // forgets you, so walking back in is an arrival: `World::arrival`
+            // falls through to the map's own start, which is the tile the door
+            // put you on the first time.
+            //
+            // This line used to `remember()`, on the argument that coming back
+            // should put you into the fight you lost. Reported as a bug in as
+            // many words — *you appear back exactly where you died, instead of
+            // at the door to the overworld* — and the reporter is right: a
+            // border you re-enter in the middle of is not a border. The rule
+            // is `WorldState::forget` and it is core's, because a rule the
+            // suite cannot reach is a rule with two answers.
+            let fell_on = g.world.map_id();
+            g.world.forget(&fell_on);
             for (id, _) in gm2d_core::data::MAPS {
                 map_in(id, &marks, |w| {
                     if !moved {

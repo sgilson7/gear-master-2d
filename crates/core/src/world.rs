@@ -1316,6 +1316,30 @@ impl WorldState {
         self.positions.iter().find(|(k, _)| k == map).map(|(_, at)| *at)
     }
 
+    /// Give up the bookmark on a map, so coming back is an arrival again.
+    ///
+    /// **A defeat costs you your place as well as what you were carrying.**
+    /// A bookmark is for a map you *walked off*: you left through a border and
+    /// coming back through it puts you where you were standing, which is what
+    /// makes the Treyway a country and not a chute. Being carried home
+    /// unconscious is not walking off, and reported as a bug in exactly those
+    /// terms — *you appear back exactly where you died, instead of at the door
+    /// to the overworld.*
+    ///
+    /// The note this replaces argued the other way, that coming back should
+    /// put you "into the fight they lost". It reads well and it plays badly: a
+    /// border you are returned to the far side of is a border, and one that
+    /// deposits you back in the middle of the country that just killed you is
+    /// a door that does not work.
+    ///
+    /// Forgetting rather than overwriting, so [`World::arrival`] falls through
+    /// to the map's own start — the same tile the door put you on the first
+    /// time, which is what makes this "at the door" rather than "at some tile
+    /// somebody chose twice".
+    pub fn forget(&mut self, map: &str) {
+        self.positions.retain(|(k, _)| k != map);
+    }
+
     pub fn bump(&mut self, what: &str) {
         self.add(what, 1);
     }

@@ -502,3 +502,43 @@ fn a_save_from_before_the_world_existed_still_walks() {
         .any(|d| step(&w, &mut g.world.clone(), &mut rng, D, d, &Allowances::default()).moved);
     assert!(moved, "the player is walled in at {:?}", g.world.at);
 }
+
+/// **A defeat costs you your place on the map as well as what you were
+/// carrying**, so walking back in is an arrival.
+///
+/// Reported from play: *"when you die there, and you return to the overworld
+/// through a door, you appear back exactly where you died in the overworld,
+/// instead of at the door to the overworld."* The bookmark is for a map you
+/// walked off — a border you re-enter in the middle of is not a border.
+#[test]
+fn a_map_you_were_carried_off_forgets_you() {
+    use gm2d_core::world::{overworld, WorldState};
+    let mut st = WorldState::default();
+    let treyway = gm2d_core::data::map("the-treyway", D);
+    let door = [treyway.start.0, treyway.start.1];
+
+    // Walked in, walked about, walked off: the bookmark is what a border is
+    // for, and coming back puts you where you were.
+    st.map = "the-treyway".to_string();
+    st.at = [4, 4];
+    st.remember();
+    assert_eq!(st.recall("the-treyway"), Some([4, 4]));
+    assert_eq!(treyway.arrival(&st), [4, 4], "a border you walked off puts you back");
+
+    // Carried off it instead. The map forgets, so the door is the door again.
+    st.forget("the-treyway");
+    assert_eq!(st.recall("the-treyway"), None);
+    assert_eq!(
+        treyway.arrival(&st),
+        door,
+        "a map you died on still remembers where you fell"
+    );
+
+    // And it is only that map: dying on one does not lose your place on
+    // another you have every right to still be standing on.
+    st.map = overworld();
+    st.at = [7, 7];
+    st.remember();
+    st.forget("the-treyway");
+    assert_eq!(st.recall(&overworld()), Some([7, 7]), "the wrong map was forgotten");
+}

@@ -72,7 +72,7 @@ it was walked on the live page:
 | `f114cdf` | a defeat costs you your place, and the door is the door again |
 | `98ff7cf` | a card you cannot leave, and a card carrying somebody else's errands |
 | `3d5c059` | a chain errand you can finish, and a fight you can slow down and read |
-| *(this one)* | a locked choice names the chain, a bank, a door that survives a reload, and a page that notices a new build |
+| `eabc973` | a locked choice names the chain, a bank, a door that survives a reload, and a page that notices a new build |
 
 **One of them touched the save and none of them the catalogue.** The bank adds
 `Character::banked`, which defaults empty and is skipped when it is — so the
@@ -2962,6 +2962,28 @@ and the map read a moment later was the walk's own.
 - Nine passes against the live page since — three walks, three engines — and no
   recurrence. That is evidence and not proof; what makes it a fix is that the
   race no longer exists to lose.
+
+The deploy after that one is four reported faults and a feature, and its table
+is short for the same reason — the gate asked fifty-four of the questions, in
+three engines, against the live page:
+
+```
+live build c236ca4c
+  index.html asks app.js?v=c236ca4c   app.js carries BUILD='c236ca4c'
+  chromium walked the gate    ok      firefox  walked the gate    ok
+  webkit   walked the gate    ok      54 checks, no failures
+  town buttons: 'Inventory / Character Sheet' and 'Level up'
+  the bank: 2 loose in the bag, the vault opens, and Kettleworks opens the same one
+  the inventory sheet: 3 rows, and they move when you pack
+  playback controls, board stage: speed only — the other three are the replay's
+  playback controls, replay stage: all four, un-hidden and inside the window
+  console errors: none                off-origin requests: none
+```
+
+**The door check is the one that matters here**, and it is in the gate rather
+than in this table: it plants a save with the Cave answered, reloads, and asks
+the page before touching anything. That is the reported fault reproduced, and
+it is green on the live build.
 
 **A stamp is not a commit and this block moved it twice.** M12.6 deployed
 `ccfeb16d`; deleting `STARTER`, `seat` and `ROTATION` a commit later rebuilt

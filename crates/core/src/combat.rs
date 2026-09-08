@@ -273,10 +273,29 @@ pub struct MonsterSpec {
     /// preferable to rewriting its loadout, because the harder settings still
     /// climb from wherever it is put.
     ///
-    /// Every monster sits at 0. Eight mid-ladder ones were once stepped down
-    /// to soften a wall at rung 9, but the wall turned out to be the balance
-    /// harness packing its builds too loosely, not the monsters. Move one off
-    /// zero only with evidence from a densely packed profile.
+    /// Eight mid-ladder ones were once stepped down to soften a wall at rung
+    /// 9, but the wall turned out to be the balance harness packing its builds
+    /// too loosely, not the monsters. **Move one off zero only with evidence
+    /// from a densely packed profile.**
+    ///
+    /// **Six are off zero, and this is the evidence.** The Kettleworks field
+    /// pool sits at -2, reported from play as unbeatable on arrival and
+    /// measured against a level-ten board that has bought both shelves, done
+    /// the errands and packed one item to a grid — a densely packed profile at
+    /// the level the map is met at. At 0 that board beat *nothing* in the
+    /// pool: The Curator, Pale Twin and the Kettle Wight all ran to the
+    /// sudden-death clock and both hounds killed it. At -2 the two commonest
+    /// draws are ordinary fights — The Curator dies in seventeen seconds
+    /// rather than at the buzzer — and the pool's ratings fall 7 to 17%.
+    ///
+    /// Body numbers were tried first and are not the lever: health, strength,
+    /// regen and both resistances scaled to *seventy* percent changed not one
+    /// outcome. Almost all of a Kettleworks creature's rating is the gear it
+    /// wears, which is what this dial moves and what `creature_rating` is
+    /// mostly counting.
+    ///
+    /// `tests/kettleworks.rs` is the measurement, kept so the next person to
+    /// touch this pool finds out what it cost rather than what it is.
     pub gear_offset: i32,
     /// Gold awarded for beating it.
     pub bounty: i32,
@@ -1389,8 +1408,8 @@ pub const LADDER: &[MonsterSpec] = &[
     MonsterSpec {
         name: "Grave Chorus",
         // gear rating 154
-        health: 1060,
-        strength: 34,
+        health: 950,
+        strength: 31,
         regen: 2,
         mind_resist: 26,
         physical_resist: 26,
@@ -1409,7 +1428,7 @@ pub const LADDER: &[MonsterSpec] = &[
             ("Pilgrim Sole", SlotKind::Greaves, 4, 2, 0),
             ("Consecrated Plating", SlotKind::Greaves, 0, 3, 0),
         ],
-        gear_offset: 0,
+        gear_offset: -2,
         bounty: 80,
         sprite: MonsterSprite::Choir,
         rank: Rank::Ordinary,
@@ -1480,7 +1499,7 @@ pub const LADDER: &[MonsterSpec] = &[
             ("Rootwoven Material", SlotKind::Greaves, 0, 2, 1),
             ("Gravewalker Mold", SlotKind::Greaves, 0, 5, 0),
         ],
-        gear_offset: 0,
+        gear_offset: -2,
         bounty: 93,
         sprite: MonsterSprite::Curator,
         rank: Rank::Ordinary,
@@ -1523,8 +1542,8 @@ pub const LADDER: &[MonsterSpec] = &[
     MonsterSpec {
         name: "Pale Twin",
         // gear rating 259
-        health: 1320,
-        strength: 40,
+        health: 1190,
+        strength: 36,
         regen: 3,
         mind_resist: 32,
         physical_resist: 33,
@@ -1546,7 +1565,7 @@ pub const LADDER: &[MonsterSpec] = &[
             ("Pilgrim Sole", SlotKind::Greaves, 2, 4, 0),
             ("Consecrated Plating", SlotKind::Greaves, 4, 4, 0),
         ],
-        gear_offset: 0,
+        gear_offset: -2,
         bounty: 107,
         sprite: MonsterSprite::Twin,
         rank: Rank::Ordinary,
@@ -1701,9 +1720,9 @@ pub const LADDER: &[MonsterSpec] = &[
     },
     MonsterSpec {
         name: "The Gearwright",
-        health: 720,
-        strength: 26,
-        regen: 4,
+        health: 540,
+        strength: 19,
+        regen: 3,
         mind_resist: 40,
         physical_resist: 18,
         magic_resist: 13,
@@ -1732,7 +1751,7 @@ pub const LADDER: &[MonsterSpec] = &[
             ("Stormcaught Frame", SlotKind::Helmet, 0, 2, 0),
             ("Consecrated Plating", SlotKind::Helmet, 3, 3, 0),
         ],
-        gear_offset: 0,
+        gear_offset: -2,
         bounty: 152,
         sprite: MonsterSprite::Gearwright,
         rank: Rank::Mini,
@@ -2954,8 +2973,8 @@ pub const LADDER: &[MonsterSpec] = &[
     // There is rainwater in it. Something lives in the rainwater.
     MonsterSpec {
         name: "Kettle Wight",
-        health: 1020,
-        strength: 30,
+        health: 865,
+        strength: 26,
         regen: 2,
         mind_resist: 26,
         curse_resist: 26,
@@ -2975,7 +2994,7 @@ pub const LADDER: &[MonsterSpec] = &[
         ("Ungloved Layer", SlotKind::Chest, 0, 3, 0),
         ("Split Weave", SlotKind::Chest, 0, 5, 0),
         ],
-        gear_offset: 0,
+        gear_offset: -2,
         bounty: 43,
         sprite: MonsterSprite::Wisp,
         rank: Rank::Ordinary,
@@ -2986,8 +3005,8 @@ pub const LADDER: &[MonsterSpec] = &[
     // for anything. The hooper has stopped calling it.
     MonsterSpec {
         name: "Hoop Hound",
-        health: 1520,
-        strength: 38,
+        health: 1290,
+        strength: 32,
         regen: 2,
         mind_resist: 33,
         curse_resist: 33,
@@ -3020,7 +3039,7 @@ pub const LADDER: &[MonsterSpec] = &[
         ("Seal of the Deep", SlotKind::Gloves, 4, 0, 0),
         ("Opening Grudge", SlotKind::Gloves, 4, 1, 0),
         ],
-        gear_offset: 0,
+        gear_offset: -2,
         bounty: 53,
         sprite: MonsterSprite::Hound,
         rank: Rank::Ordinary,

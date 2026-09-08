@@ -972,6 +972,15 @@ fn gear_at_every_difficulty() -> String {
 /// milestone borrowed one for each of them. No creature that had a board
 /// changed what it wears, on any of the four settings.
 ///
+/// **Re-baselined for the Kettleworks, and it is the third legitimate one.**
+/// 236 placements moved and every one of them belongs to the seven creatures
+/// that were deliberately stepped down: Grave Chorus, Hoop Hound, Kettle
+/// Wight, Pale Twin, Ruin Hound, The Curator and The Gearwright. Nothing else
+/// moved a line, which is what the fixture is for — `gear_offset` reaches
+/// every piece a creature wears, so "I changed one dial" and "I changed
+/// seventy-eight placements" are the same sentence and this is where the
+/// second half of it gets checked.
+///
 #[test]
 fn no_creature_changed_what_it_wears() {
     let want = include_str!("fixtures/gear_at.txt");

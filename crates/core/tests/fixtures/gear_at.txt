@@ -757,79 +757,79 @@ LADDER[13] Grave Chorus EASY Weapon 3,0 r0
 LADDER[13] Grave Chorus EASY Weapon 3,1 r2
     Kingsbane
 LADDER[13] Grave Chorus EASY Weapon 0,2 r0
-    Bileglass Vial
+    Balance Weight
 LADDER[13] Grave Chorus EASY Greaves 0,0 r0
-    Ashwoven Material
+    Pathfinder Material
 LADDER[13] Grave Chorus EASY Greaves 3,0 r0
-    Coldstep Mold
+    Hobbling Mold
 LADDER[13] Grave Chorus EASY Greaves 0,1 r0
-    Bulwark Plating
+    Warded Plating
 LADDER[13] Grave Chorus EASY Greaves 2,2 r0
     Runed Material
 LADDER[13] Grave Chorus EASY Greaves 4,2 r0
-    Coldstep Mold
+    Hobbling Mold
 LADDER[13] Grave Chorus EASY Greaves 0,3 r0
-    Bulwark Plating
+    Warded Plating
 LADDER[13] Grave Chorus MEDIUM Weapon 0,0 r1
     Chained Codex
 LADDER[13] Grave Chorus MEDIUM Weapon 3,0 r0
     Kingsblood Ink
 LADDER[13] Grave Chorus MEDIUM Weapon 3,1 r2
-    Cometfall
+    Kingsbane
 LADDER[13] Grave Chorus MEDIUM Weapon 0,2 r0
-    Bloodstone Bead
+    Clockwork Key
 LADDER[13] Grave Chorus MEDIUM Greaves 0,0 r0
-    Rootwoven Material
+    Pathfinder Material
 LADDER[13] Grave Chorus MEDIUM Greaves 3,0 r0
-    Pilgrim Sole
+    Ironshod Sole
 LADDER[13] Grave Chorus MEDIUM Greaves 0,1 r0
-    Consecrated Plating
+    Braced Plating
 LADDER[13] Grave Chorus MEDIUM Greaves 2,2 r0
-    Plaguewalkers
+    Runed Material
 LADDER[13] Grave Chorus MEDIUM Greaves 4,2 r0
-    Pilgrim Sole
+    Ironshod Sole
 LADDER[13] Grave Chorus MEDIUM Greaves 0,3 r0
-    Consecrated Plating
+    Braced Plating
 LADDER[13] Grave Chorus HARD Weapon 0,0 r1
     Chained Codex
 LADDER[13] Grave Chorus HARD Weapon 3,0 r0
     Kingsblood Ink
 LADDER[13] Grave Chorus HARD Weapon 3,1 r2
-    Cometfall
+    Kingsbane
 LADDER[13] Grave Chorus HARD Weapon 0,2 r0
-    Bloodstone Bead
+    Clockwork Key
 LADDER[13] Grave Chorus HARD Greaves 0,0 r0
-    Rootwoven Material
+    Pathfinder Material
 LADDER[13] Grave Chorus HARD Greaves 3,0 r0
-    Pilgrim Sole
+    Ironshod Sole
 LADDER[13] Grave Chorus HARD Greaves 0,1 r0
-    Consecrated Plating
+    Braced Plating
 LADDER[13] Grave Chorus HARD Greaves 2,2 r0
-    Plaguewalkers
+    Runed Material
 LADDER[13] Grave Chorus HARD Greaves 4,2 r0
-    Pilgrim Sole
+    Ironshod Sole
 LADDER[13] Grave Chorus HARD Greaves 0,3 r0
-    Consecrated Plating
+    Braced Plating
 LADDER[13] Grave Chorus INSANE Weapon 0,0 r1
     Chained Codex
 LADDER[13] Grave Chorus INSANE Weapon 3,0 r0
     Kingsblood Ink
 LADDER[13] Grave Chorus INSANE Weapon 3,1 r2
-    Cometfall
+    Kingsbane
 LADDER[13] Grave Chorus INSANE Weapon 0,2 r0
-    Bloodstone Bead
+    Clockwork Key
 LADDER[13] Grave Chorus INSANE Greaves 0,0 r0
-    Rootwoven Material
+    Pathfinder Material
 LADDER[13] Grave Chorus INSANE Greaves 3,0 r0
-    Pilgrim Sole
+    Ironshod Sole
 LADDER[13] Grave Chorus INSANE Greaves 0,1 r0
-    Consecrated Plating
+    Braced Plating
 LADDER[13] Grave Chorus INSANE Greaves 2,2 r0
-    Plaguewalkers
+    Runed Material
 LADDER[13] Grave Chorus INSANE Greaves 4,2 r0
-    Pilgrim Sole
+    Ironshod Sole
 LADDER[13] Grave Chorus INSANE Greaves 0,3 r0
-    Consecrated Plating
+    Braced Plating
 LADDER[14] The Hollow King EASY Weapon 0,0 r0
     Spinning Orb
 LADDER[14] The Hollow King EASY Weapon 3,0 r1
@@ -969,7 +969,7 @@ LADDER[14] The Hollow King INSANE Gloves 2,3 r0
 LADDER[15] The Curator EASY Weapon 0,0 r0
     Tidecaller Orb
 LADDER[15] The Curator EASY Weapon 3,0 r0
-    Sunder
+    Choir of Ash
 LADDER[15] The Curator EASY Weapon 0,2 r1
     Hollow Lance
 LADDER[15] The Curator EASY Weapon 3,1 r1
@@ -977,69 +977,69 @@ LADDER[15] The Curator EASY Weapon 3,1 r1
 LADDER[15] The Curator EASY Greaves 0,0 r1
     Spun Material
 LADDER[15] The Curator EASY Greaves 2,0 r0
-    Deeprooted Sole
+    Deepwinter Mold
 LADDER[15] The Curator EASY Greaves 1,1 r0
-    Bulwark Plating
+    Warded Plating
 LADDER[15] The Curator EASY Greaves 3,1 r0
-    Ashwoven Material
+    Pathfinder Material
 LADDER[15] The Curator EASY Greaves 3,2 r0
-    Coldstep Mold
+    Hobbling Mold
 LADDER[15] The Curator EASY Greaves 1,3 r0
-    Bulwark Plating
+    Warded Plating
 LADDER[15] The Curator EASY Greaves 0,2 r1
-    Ashwoven Material
+    Pathfinder Material
 LADDER[15] The Curator EASY Greaves 0,5 r0
-    Deeprooted Sole
+    Deepwinter Mold
 LADDER[15] The Curator MEDIUM Weapon 0,0 r0
-    Emberheart Orb
+    Tidecaller Orb
 LADDER[15] The Curator MEDIUM Weapon 3,0 r0
-    Slash and Burn
+    Shatterbolt
 LADDER[15] The Curator MEDIUM Weapon 0,2 r1
     Hollow Lance
 LADDER[15] The Curator MEDIUM Weapon 3,1 r1
     Ember Alignment
 LADDER[15] The Curator MEDIUM Greaves 0,0 r1
-    Sanctified Material
+    Spun Material
 LADDER[15] The Curator MEDIUM Greaves 2,0 r0
-    Gravewalker Mold
+    Stormstep Mold
 LADDER[15] The Curator MEDIUM Greaves 1,1 r0
-    Consecrated Plating
+    Braced Plating
 LADDER[15] The Curator MEDIUM Greaves 3,1 r0
-    Rootwoven Material
+    Pathfinder Material
 LADDER[15] The Curator MEDIUM Greaves 3,2 r0
-    Pilgrim Sole
+    Ironshod Sole
 LADDER[15] The Curator MEDIUM Greaves 1,3 r0
-    Consecrated Plating
+    Braced Plating
 LADDER[15] The Curator MEDIUM Greaves 0,2 r1
-    Rootwoven Material
+    Pathfinder Material
 LADDER[15] The Curator MEDIUM Greaves 0,5 r0
-    Gravewalker Mold
+    Stormstep Mold
 LADDER[15] The Curator HARD Weapon 0,0 r0
-    Orb of the Nine
+    Tidecaller Orb
 LADDER[15] The Curator HARD Weapon 3,0 r0
-    Slash and Burn
+    Sunder
 LADDER[15] The Curator HARD Weapon 0,2 r1
     Hollow Lance
 LADDER[15] The Curator HARD Weapon 3,1 r1
     Ember Alignment
 LADDER[15] The Curator HARD Greaves 0,0 r1
-    Sanctified Material
+    Spun Material
 LADDER[15] The Curator HARD Greaves 2,0 r0
-    Echo Sole
+    Deeprooted Sole
 LADDER[15] The Curator HARD Greaves 1,1 r0
-    Consecrated Plating
+    Bulwark Plating
 LADDER[15] The Curator HARD Greaves 3,1 r0
-    Rootwoven Material
+    Ashwoven Material
 LADDER[15] The Curator HARD Greaves 3,2 r0
-    Pilgrim Sole
+    Coldstep Mold
 LADDER[15] The Curator HARD Greaves 1,3 r0
-    Consecrated Plating
+    Bulwark Plating
 LADDER[15] The Curator HARD Greaves 0,2 r1
-    Rootwoven Material
+    Ashwoven Material
 LADDER[15] The Curator HARD Greaves 0,5 r0
-    Echo Sole
+    Deeprooted Sole
 LADDER[15] The Curator INSANE Weapon 0,0 r0
-    Reliquary Orb
+    Emberheart Orb
 LADDER[15] The Curator INSANE Weapon 3,0 r0
     Slash and Burn
 LADDER[15] The Curator INSANE Weapon 0,2 r1
@@ -1049,7 +1049,7 @@ LADDER[15] The Curator INSANE Weapon 3,1 r1
 LADDER[15] The Curator INSANE Greaves 0,0 r1
     Sanctified Material
 LADDER[15] The Curator INSANE Greaves 2,0 r0
-    Echo Sole
+    Gravewalker Mold
 LADDER[15] The Curator INSANE Greaves 1,1 r0
     Consecrated Plating
 LADDER[15] The Curator INSANE Greaves 3,1 r0
@@ -1061,7 +1061,7 @@ LADDER[15] The Curator INSANE Greaves 1,3 r0
 LADDER[15] The Curator INSANE Greaves 0,2 r1
     Rootwoven Material
 LADDER[15] The Curator INSANE Greaves 0,5 r0
-    Echo Sole
+    Gravewalker Mold
 LADDER[16] Salt Idol EASY Weapon 0,0 r1
     Cursed Handle
 LADDER[16] Salt Idol EASY Weapon 3,0 r1
@@ -1169,7 +1169,7 @@ LADDER[16] Salt Idol INSANE Greaves 1,5 r0
 LADDER[17] Pale Twin EASY Weapon 0,0 r0
     Tidecaller Orb
 LADDER[17] Pale Twin EASY Weapon 3,0 r0
-    Sunder
+    Choir of Ash
 LADDER[17] Pale Twin EASY Weapon 0,2 r1
     Hollow Lance
 LADDER[17] Pale Twin EASY Weapon 3,1 r0
@@ -1179,79 +1179,79 @@ LADDER[17] Pale Twin EASY Weapon 4,2 r2
 LADDER[17] Pale Twin EASY Greaves 0,0 r1
     Spun Material
 LADDER[17] Pale Twin EASY Greaves 2,0 r0
-    Coldstep Mold
+    Hobbling Mold
 LADDER[17] Pale Twin EASY Greaves 4,0 r0
     Runed Material
 LADDER[17] Pale Twin EASY Greaves 3,2 r0
-    Coldstep Mold
+    Hobbling Mold
 LADDER[17] Pale Twin EASY Greaves 1,2 r0
-    Bulwark Plating
+    Warded Plating
 LADDER[17] Pale Twin EASY Greaves 0,3 r0
     Spun Material
 LADDER[17] Pale Twin EASY Greaves 2,4 r0
-    Coldstep Mold
+    Hobbling Mold
 LADDER[17] Pale Twin EASY Greaves 4,4 r0
-    Bulwark Plating
+    Warded Plating
 LADDER[17] Pale Twin MEDIUM Weapon 0,0 r0
-    Emberheart Orb
+    Tidecaller Orb
 LADDER[17] Pale Twin MEDIUM Weapon 3,0 r0
-    Slash and Burn
+    Shatterbolt
 LADDER[17] Pale Twin MEDIUM Weapon 0,2 r1
     Hollow Lance
 LADDER[17] Pale Twin MEDIUM Weapon 3,1 r0
-    Cometfall
+    Kingsbane
 LADDER[17] Pale Twin MEDIUM Weapon 4,2 r2
     Ember Alignment
 LADDER[17] Pale Twin MEDIUM Greaves 0,0 r1
-    Sanctified Material
+    Spun Material
 LADDER[17] Pale Twin MEDIUM Greaves 2,0 r0
-    Pilgrim Sole
+    Ironshod Sole
 LADDER[17] Pale Twin MEDIUM Greaves 4,0 r0
-    Plaguewalkers
+    Runed Material
 LADDER[17] Pale Twin MEDIUM Greaves 3,2 r0
-    Pilgrim Sole
+    Ironshod Sole
 LADDER[17] Pale Twin MEDIUM Greaves 1,2 r0
-    Consecrated Plating
+    Braced Plating
 LADDER[17] Pale Twin MEDIUM Greaves 0,3 r0
-    Sanctified Material
+    Spun Material
 LADDER[17] Pale Twin MEDIUM Greaves 2,4 r0
-    Pilgrim Sole
+    Ironshod Sole
 LADDER[17] Pale Twin MEDIUM Greaves 4,4 r0
-    Consecrated Plating
+    Braced Plating
 LADDER[17] Pale Twin HARD Weapon 0,0 r0
-    Orb of the Nine
+    Tidecaller Orb
 LADDER[17] Pale Twin HARD Weapon 3,0 r0
-    Slash and Burn
+    Sunder
 LADDER[17] Pale Twin HARD Weapon 0,2 r1
     Hollow Lance
 LADDER[17] Pale Twin HARD Weapon 3,1 r0
-    Starfall
+    Kingsbane
 LADDER[17] Pale Twin HARD Weapon 4,2 r2
     Ember Alignment
 LADDER[17] Pale Twin HARD Greaves 0,0 r1
-    Sanctified Material
+    Spun Material
 LADDER[17] Pale Twin HARD Greaves 2,0 r0
-    Pilgrim Sole
+    Coldstep Mold
 LADDER[17] Pale Twin HARD Greaves 4,0 r0
-    Warplate Greave
+    Runed Material
 LADDER[17] Pale Twin HARD Greaves 3,2 r0
-    Pilgrim Sole
+    Coldstep Mold
 LADDER[17] Pale Twin HARD Greaves 1,2 r0
-    Consecrated Plating
+    Bulwark Plating
 LADDER[17] Pale Twin HARD Greaves 0,3 r0
-    Sanctified Material
+    Spun Material
 LADDER[17] Pale Twin HARD Greaves 2,4 r0
-    Pilgrim Sole
+    Coldstep Mold
 LADDER[17] Pale Twin HARD Greaves 4,4 r0
-    Consecrated Plating
+    Bulwark Plating
 LADDER[17] Pale Twin INSANE Weapon 0,0 r0
-    Reliquary Orb
+    Emberheart Orb
 LADDER[17] Pale Twin INSANE Weapon 3,0 r0
     Slash and Burn
 LADDER[17] Pale Twin INSANE Weapon 0,2 r1
     Hollow Lance
 LADDER[17] Pale Twin INSANE Weapon 3,1 r0
-    Starfall
+    Cometfall
 LADDER[17] Pale Twin INSANE Weapon 4,2 r2
     Ember Alignment
 LADDER[17] Pale Twin INSANE Greaves 0,0 r1
@@ -1259,7 +1259,7 @@ LADDER[17] Pale Twin INSANE Greaves 0,0 r1
 LADDER[17] Pale Twin INSANE Greaves 2,0 r0
     Pilgrim Sole
 LADDER[17] Pale Twin INSANE Greaves 4,0 r0
-    Rootbound Material
+    Plaguewalkers
 LADDER[17] Pale Twin INSANE Greaves 3,2 r0
     Pilgrim Sole
 LADDER[17] Pale Twin INSANE Greaves 1,2 r0
@@ -1803,23 +1803,23 @@ LADDER[22] The Gearwright EASY Weapon 0,0 r0
 LADDER[22] The Gearwright EASY Weapon 3,0 r1
     Sunderer
 LADDER[22] The Gearwright EASY Weapon 0,1 r1
-    Bloodstone Bead
+    Clockwork Key
 LADDER[22] The Gearwright EASY Weapon 2,1 r0
-    Forking Bead
+    Silver Charm
 LADDER[22] The Gearwright EASY Gloves 0,0 r1
     Sevenleague Boots
 LADDER[22] The Gearwright EASY Gloves 3,0 r1
-    Nimble Mold
+    Empowering Mold
 LADDER[22] The Gearwright EASY Gloves 4,1 r0
     Sevenleague Boots
 LADDER[22] The Gearwright EASY Gloves 2,2 r1
-    Nimble Mold
+    Empowering Mold
 LADDER[22] The Gearwright EASY Greaves 0,0 r0
     Bulwark Material
 LADDER[22] The Gearwright EASY Greaves 3,0 r0
     Treadmill Sole
 LADDER[22] The Gearwright EASY Greaves 0,2 r0
-    Bulwark Plating
+    Warded Plating
 LADDER[22] The Gearwright EASY Greaves 2,2 r1
     Sevenleague Boots
 LADDER[22] The Gearwright EASY Greaves 0,4 r0
@@ -1833,35 +1833,35 @@ LADDER[22] The Gearwright EASY Helmet 3,1 r3
 LADDER[22] The Gearwright EASY Helmet 0,2 r0
     Stormcaught Frame
 LADDER[22] The Gearwright EASY Helmet 3,3 r0
-    Bulwark Plating
+    Warded Plating
 LADDER[22] The Gearwright MEDIUM Weapon 0,0 r0
     Kingmaker Hilt
 LADDER[22] The Gearwright MEDIUM Weapon 3,0 r1
     Sunderer
 LADDER[22] The Gearwright MEDIUM Weapon 0,1 r1
-    Oathstone Bead
+    Bileglass Vial
 LADDER[22] The Gearwright MEDIUM Weapon 2,1 r0
-    Fury Sigil
+    Duelist's Fob
 LADDER[22] The Gearwright MEDIUM Gloves 0,0 r1
     Sevenleague Boots
 LADDER[22] The Gearwright MEDIUM Gloves 3,0 r1
-    Quickfinger Mold
+    Empowering Mold
 LADDER[22] The Gearwright MEDIUM Gloves 4,1 r0
     Sevenleague Boots
 LADDER[22] The Gearwright MEDIUM Gloves 2,2 r1
-    Quickfinger Mold
+    Empowering Mold
 LADDER[22] The Gearwright MEDIUM Greaves 0,0 r0
-    Titan's Grip
+    Bulwark Material
 LADDER[22] The Gearwright MEDIUM Greaves 3,0 r0
-    Worldstrider Sole
+    Treadmill Sole
 LADDER[22] The Gearwright MEDIUM Greaves 0,2 r0
-    Consecrated Plating
+    Braced Plating
 LADDER[22] The Gearwright MEDIUM Greaves 2,2 r1
     Sevenleague Boots
 LADDER[22] The Gearwright MEDIUM Greaves 0,4 r0
-    Worldstrider Sole
+    Treadmill Sole
 LADDER[22] The Gearwright MEDIUM Helmet 0,0 r0
-    Steel Frame
+    Helm of Blades
 LADDER[22] The Gearwright MEDIUM Helmet 3,0 r0
     Scrying Lens
 LADDER[22] The Gearwright MEDIUM Helmet 3,1 r3
@@ -1869,43 +1869,43 @@ LADDER[22] The Gearwright MEDIUM Helmet 3,1 r3
 LADDER[22] The Gearwright MEDIUM Helmet 0,2 r0
     Stormcaught Frame
 LADDER[22] The Gearwright MEDIUM Helmet 3,3 r0
-    Consecrated Plating
+    Braced Plating
 LADDER[22] The Gearwright HARD Weapon 0,0 r0
     Kingmaker Hilt
 LADDER[22] The Gearwright HARD Weapon 3,0 r1
     Sunderer
 LADDER[22] The Gearwright HARD Weapon 0,1 r1
-    Oathstone Bead
+    Bloodstone Bead
 LADDER[22] The Gearwright HARD Weapon 2,1 r0
-    Grudge Bead
+    Forking Bead
 LADDER[22] The Gearwright HARD Gloves 0,0 r1
     Sevenleague Boots
 LADDER[22] The Gearwright HARD Gloves 3,0 r1
-    Chainlink Mold
+    Nimble Mold
 LADDER[22] The Gearwright HARD Gloves 4,1 r0
     Sevenleague Boots
 LADDER[22] The Gearwright HARD Gloves 2,2 r1
-    Chainlink Mold
+    Nimble Mold
 LADDER[22] The Gearwright HARD Greaves 0,0 r0
-    Titan's Grip
+    Bulwark Material
 LADDER[22] The Gearwright HARD Greaves 3,0 r0
-    Worldstrider Sole
+    Treadmill Sole
 LADDER[22] The Gearwright HARD Greaves 0,2 r0
-    Consecrated Plating
+    Bulwark Plating
 LADDER[22] The Gearwright HARD Greaves 2,2 r1
     Sevenleague Boots
 LADDER[22] The Gearwright HARD Greaves 0,4 r0
-    Worldstrider Sole
+    Treadmill Sole
 LADDER[22] The Gearwright HARD Helmet 0,0 r0
-    Mage's Circlet
+    Helm of Blades
 LADDER[22] The Gearwright HARD Helmet 3,0 r0
-    Visor of Focus
+    Scrying Lens
 LADDER[22] The Gearwright HARD Helmet 3,1 r3
     Bloomcap
 LADDER[22] The Gearwright HARD Helmet 0,2 r0
-    Anvil Frame
+    Stormcaught Frame
 LADDER[22] The Gearwright HARD Helmet 3,3 r0
-    Consecrated Plating
+    Bulwark Plating
 LADDER[22] The Gearwright INSANE Weapon 0,0 r0
     Kingmaker Hilt
 LADDER[22] The Gearwright INSANE Weapon 3,0 r1
@@ -1913,15 +1913,15 @@ LADDER[22] The Gearwright INSANE Weapon 3,0 r1
 LADDER[22] The Gearwright INSANE Weapon 0,1 r1
     Oathstone Bead
 LADDER[22] The Gearwright INSANE Weapon 2,1 r0
-    Grudge Bead
+    Fury Sigil
 LADDER[22] The Gearwright INSANE Gloves 0,0 r1
     Sevenleague Boots
 LADDER[22] The Gearwright INSANE Gloves 3,0 r1
-    Chainlink Mold
+    Quickfinger Mold
 LADDER[22] The Gearwright INSANE Gloves 4,1 r0
     Sevenleague Boots
 LADDER[22] The Gearwright INSANE Gloves 2,2 r1
-    Chainlink Mold
+    Quickfinger Mold
 LADDER[22] The Gearwright INSANE Greaves 0,0 r0
     Titan's Grip
 LADDER[22] The Gearwright INSANE Greaves 3,0 r0
@@ -1933,13 +1933,13 @@ LADDER[22] The Gearwright INSANE Greaves 2,2 r1
 LADDER[22] The Gearwright INSANE Greaves 0,4 r0
     Worldstrider Sole
 LADDER[22] The Gearwright INSANE Helmet 0,0 r0
-    Chapel Frame
+    Steel Frame
 LADDER[22] The Gearwright INSANE Helmet 3,0 r0
-    Visor of Focus
+    Scrying Lens
 LADDER[22] The Gearwright INSANE Helmet 3,1 r3
     Bloomcap
 LADDER[22] The Gearwright INSANE Helmet 0,2 r0
-    Stonewall Frame
+    Stormcaught Frame
 LADDER[22] The Gearwright INSANE Helmet 3,3 r0
     Consecrated Plating
 LADDER[23] Crowned Hollow EASY Weapon 0,0 r0
@@ -7247,11 +7247,11 @@ LADDER[49] Francis INSANE Weapon 0,0 r1
 LADDER[49] Francis INSANE Weapon 3,0 r0
     Bonesaw
 LADDER[50] Kettle Wight EASY Weapon 0,0 r0
-    Reliquary Orb
+    Emberheart Orb
 LADDER[50] Kettle Wight EASY Helmet 0,0 r0
-    Stonewall Frame
+    Stormcaught Frame
 LADDER[50] Kettle Wight EASY Helmet 3,0 r0
-    Scarred Plating
+    Bronze Plating
 LADDER[50] Kettle Wight EASY Helmet 3,1 r0
     Four Hundred and Second Step
 LADDER[50] Kettle Wight EASY Helmet 5,0 r0
@@ -7261,19 +7261,19 @@ LADDER[50] Kettle Wight EASY Chest 0,0 r0
 LADDER[50] Kettle Wight EASY Chest 2,0 r0
     Wickstub
 LADDER[50] Kettle Wight EASY Chest 3,0 r0
-    Oathplate
+    Aether Layer
 LADDER[50] Kettle Wight EASY Chest 2,2 r0
     Adamant Carapace
 LADDER[50] Kettle Wight EASY Chest 0,3 r0
     Wrathbreaker
 LADDER[50] Kettle Wight EASY Chest 0,5 r0
-    Lightweave
+    Seedbed Layer
 LADDER[50] Kettle Wight MEDIUM Weapon 0,0 r0
-    Worldeye Orb
+    Orb of the Nine
 LADDER[50] Kettle Wight MEDIUM Helmet 0,0 r0
-    Overseer's Circlet
+    Anvil Frame
 LADDER[50] Kettle Wight MEDIUM Helmet 3,0 r0
-    Lonely Plating
+    Layered Plating
 LADDER[50] Kettle Wight MEDIUM Helmet 3,1 r0
     Four Hundred and Second Step
 LADDER[50] Kettle Wight MEDIUM Helmet 5,0 r0
@@ -7283,19 +7283,19 @@ LADDER[50] Kettle Wight MEDIUM Chest 0,0 r0
 LADDER[50] Kettle Wight MEDIUM Chest 2,0 r0
     Wickstub
 LADDER[50] Kettle Wight MEDIUM Chest 3,0 r0
-    The Growing Weight
+    Bulwark Layer
 LADDER[50] Kettle Wight MEDIUM Chest 2,2 r0
     Adamant Carapace
 LADDER[50] Kettle Wight MEDIUM Chest 0,3 r0
-    Ungloved Layer
+    Wrathbreaker
 LADDER[50] Kettle Wight MEDIUM Chest 0,5 r0
-    Split Weave
+    Blight Layer
 LADDER[50] Kettle Wight HARD Weapon 0,0 r0
-    Grovemind Orb
+    Reliquary Orb
 LADDER[50] Kettle Wight HARD Helmet 0,0 r0
-    Overseer's Circlet
+    Stonewall Frame
 LADDER[50] Kettle Wight HARD Helmet 3,0 r0
-    Lonely Plating
+    Scarred Plating
 LADDER[50] Kettle Wight HARD Helmet 3,1 r0
     Four Hundred and Second Step
 LADDER[50] Kettle Wight HARD Helmet 5,0 r0
@@ -7305,15 +7305,15 @@ LADDER[50] Kettle Wight HARD Chest 0,0 r0
 LADDER[50] Kettle Wight HARD Chest 2,0 r0
     Wickstub
 LADDER[50] Kettle Wight HARD Chest 3,0 r0
-    The Growing Weight
+    Oathplate
 LADDER[50] Kettle Wight HARD Chest 2,2 r0
     Adamant Carapace
 LADDER[50] Kettle Wight HARD Chest 0,3 r0
-    Ungloved Layer
+    Wrathbreaker
 LADDER[50] Kettle Wight HARD Chest 0,5 r0
-    Thornmail Layer
+    Lightweave
 LADDER[50] Kettle Wight INSANE Weapon 0,0 r0
-    Grovemind Orb
+    Worldeye Orb
 LADDER[50] Kettle Wight INSANE Helmet 0,0 r0
     Overseer's Circlet
 LADDER[50] Kettle Wight INSANE Helmet 3,0 r0
@@ -7333,7 +7333,7 @@ LADDER[50] Kettle Wight INSANE Chest 2,2 r0
 LADDER[50] Kettle Wight INSANE Chest 0,3 r0
     Ungloved Layer
 LADDER[50] Kettle Wight INSANE Chest 0,5 r0
-    Wildfire Layer
+    Split Weave
 LADDER[51] Hoop Hound EASY Weapon 0,0 r0
     Godsteel Haft
 LADDER[51] Hoop Hound EASY Weapon 1,0 r0
@@ -7341,7 +7341,7 @@ LADDER[51] Hoop Hound EASY Weapon 1,0 r0
 LADDER[51] Hoop Hound EASY Weapon 3,0 r0
     Worldsplitter
 LADDER[51] Hoop Hound EASY Weapon 3,1 r0
-    Corded Grip
+    Ash Haft
 LADDER[51] Hoop Hound EASY Weapon 4,2 r0
     Blade of Helms
 LADDER[51] Hoop Hound EASY Weapon 1,3 r0
@@ -7349,15 +7349,15 @@ LADDER[51] Hoop Hound EASY Weapon 1,3 r0
 LADDER[51] Hoop Hound EASY Weapon 5,1 r0
     Bulwark Bead
 LADDER[51] Hoop Hound EASY Weapon 1,4 r0
-    Fury Sigil
+    Duelist's Fob
 LADDER[51] Hoop Hound EASY Weapon 2,4 r0
-    Iron Fang
+    Arcane Splinter
 LADDER[51] Hoop Hound EASY Weapon 4,4 r0
-    Cursed Handle
+    Ambusher's Grip
 LADDER[51] Hoop Hound EASY Helmet 0,0 r0
     Aegis Crown
 LADDER[51] Hoop Hound EASY Helmet 3,0 r0
-    Scarred Plating
+    Bronze Plating
 LADDER[51] Hoop Hound EASY Helmet 3,1 r0
     Four Hundred and Second Step
 LADDER[51] Hoop Hound EASY Helmet 5,0 r0
@@ -7365,23 +7365,23 @@ LADDER[51] Hoop Hound EASY Helmet 5,0 r0
 LADDER[51] Hoop Hound EASY Helmet 3,2 r0
     Listening Frame
 LADDER[51] Hoop Hound EASY Helmet 0,3 r0
-    Braced Plating
+    Warding Plate
 LADDER[51] Hoop Hound EASY Helmet 4,4 r0
     Tithe Collector
 LADDER[51] Hoop Hound EASY Helmet 0,5 r0
     Antechamber Crown
 LADDER[51] Hoop Hound EASY Helmet 3,5 r0
-    Layered Plating
+    Tin Plating
 LADDER[51] Hoop Hound EASY Helmet 2,6 r0
-    Mage's Circlet
+    Helm of Blades
 LADDER[51] Hoop Hound EASY Gloves 0,0 r0
-    Anchor Material
+    Mage's Wrapping
 LADDER[51] Hoop Hound EASY Gloves 2,0 r0
     Throttling Mold
 LADDER[51] Hoop Hound EASY Gloves 4,0 r0
-    Storm Signet
+    Ring of Hours
 LADDER[51] Hoop Hound EASY Gloves 4,1 r0
-    Ring of Embers
+    Piercer's Band
 LADDER[51] Hoop Hound MEDIUM Weapon 0,0 r0
     Godsteel Haft
 LADDER[51] Hoop Hound MEDIUM Weapon 1,0 r0
@@ -7389,23 +7389,23 @@ LADDER[51] Hoop Hound MEDIUM Weapon 1,0 r0
 LADDER[51] Hoop Hound MEDIUM Weapon 3,0 r0
     Worldsplitter
 LADDER[51] Hoop Hound MEDIUM Weapon 3,1 r0
-    Ambusher's Grip
+    Oak Handle
 LADDER[51] Hoop Hound MEDIUM Weapon 4,2 r0
     Blade of Helms
 LADDER[51] Hoop Hound MEDIUM Weapon 1,3 r0
-    Manaflay
+    Windup Key
 LADDER[51] Hoop Hound MEDIUM Weapon 5,1 r0
     Bulwark Bead
 LADDER[51] Hoop Hound MEDIUM Weapon 1,4 r0
-    Grudge Bead
+    Forking Bead
 LADDER[51] Hoop Hound MEDIUM Weapon 2,4 r0
-    Adamant Fang
+    Bronze Fang
 LADDER[51] Hoop Hound MEDIUM Weapon 4,4 r0
-    Zealot's Haft
+    Ironbound Haft
 LADDER[51] Hoop Hound MEDIUM Helmet 0,0 r0
     Aegis Crown
 LADDER[51] Hoop Hound MEDIUM Helmet 3,0 r0
-    Lonely Plating
+    Layered Plating
 LADDER[51] Hoop Hound MEDIUM Helmet 3,1 r0
     Four Hundred and Second Step
 LADDER[51] Hoop Hound MEDIUM Helmet 5,0 r0
@@ -7413,23 +7413,23 @@ LADDER[51] Hoop Hound MEDIUM Helmet 5,0 r0
 LADDER[51] Hoop Hound MEDIUM Helmet 3,2 r0
     Listening Frame
 LADDER[51] Hoop Hound MEDIUM Helmet 0,3 r0
-    Bulwark Plating
+    Warded Plating
 LADDER[51] Hoop Hound MEDIUM Helmet 4,4 r0
-    Doubter's Crest
+    Tithe Collector
 LADDER[51] Hoop Hound MEDIUM Helmet 0,5 r0
     Antechamber Crown
 LADDER[51] Hoop Hound MEDIUM Helmet 3,5 r0
-    Scarred Plating
+    Bronze Plating
 LADDER[51] Hoop Hound MEDIUM Helmet 2,6 r0
-    Chapel Frame
+    Steel Frame
 LADDER[51] Hoop Hound MEDIUM Gloves 0,0 r0
-    Warmed Material
+    Leather Material
 LADDER[51] Hoop Hound MEDIUM Gloves 2,0 r0
     Throttling Mold
 LADDER[51] Hoop Hound MEDIUM Gloves 4,0 r0
-    Seal of the Deep
+    Ring of Hours
 LADDER[51] Hoop Hound MEDIUM Gloves 4,1 r0
-    Opening Grudge
+    Tithe Ring
 LADDER[51] Hoop Hound HARD Weapon 0,0 r0
     Godsteel Haft
 LADDER[51] Hoop Hound HARD Weapon 1,0 r0
@@ -7437,23 +7437,23 @@ LADDER[51] Hoop Hound HARD Weapon 1,0 r0
 LADDER[51] Hoop Hound HARD Weapon 3,0 r0
     Worldsplitter
 LADDER[51] Hoop Hound HARD Weapon 3,1 r0
-    Ironbound Haft
+    Corded Grip
 LADDER[51] Hoop Hound HARD Weapon 4,2 r0
     Blade of Helms
 LADDER[51] Hoop Hound HARD Weapon 1,3 r0
-    Balance Weight
+    Windup Key
 LADDER[51] Hoop Hound HARD Weapon 5,1 r0
-    Leech Bead
+    Bulwark Bead
 LADDER[51] Hoop Hound HARD Weapon 1,4 r0
-    Grudge Bead
+    Fury Sigil
 LADDER[51] Hoop Hound HARD Weapon 2,4 r0
-    Gluttonous Fang
+    Iron Fang
 LADDER[51] Hoop Hound HARD Weapon 4,4 r0
-    Zealot's Haft
+    Cursed Handle
 LADDER[51] Hoop Hound HARD Helmet 0,0 r0
     Aegis Crown
 LADDER[51] Hoop Hound HARD Helmet 3,0 r0
-    Lonely Plating
+    Scarred Plating
 LADDER[51] Hoop Hound HARD Helmet 3,1 r0
     Four Hundred and Second Step
 LADDER[51] Hoop Hound HARD Helmet 5,0 r0
@@ -7461,23 +7461,23 @@ LADDER[51] Hoop Hound HARD Helmet 5,0 r0
 LADDER[51] Hoop Hound HARD Helmet 3,2 r0
     Listening Frame
 LADDER[51] Hoop Hound HARD Helmet 0,3 r0
-    Consecrated Plating
+    Braced Plating
 LADDER[51] Hoop Hound HARD Helmet 4,4 r0
-    Heartwood Crest
+    Tithe Collector
 LADDER[51] Hoop Hound HARD Helmet 0,5 r0
     Antechamber Crown
 LADDER[51] Hoop Hound HARD Helmet 3,5 r0
-    Lonely Plating
+    Layered Plating
 LADDER[51] Hoop Hound HARD Helmet 2,6 r0
-    Chapel Frame
+    Mage's Circlet
 LADDER[51] Hoop Hound HARD Gloves 0,0 r0
-    Hide Material
+    Anchor Material
 LADDER[51] Hoop Hound HARD Gloves 2,0 r0
-    Warding Mold
+    Throttling Mold
 LADDER[51] Hoop Hound HARD Gloves 4,0 r0
-    Seal of Power
+    Storm Signet
 LADDER[51] Hoop Hound HARD Gloves 4,1 r0
-    Hermit's Band
+    Ring of Embers
 LADDER[51] Hoop Hound INSANE Weapon 0,0 r0
     Godsteel Haft
 LADDER[51] Hoop Hound INSANE Weapon 1,0 r0
@@ -7485,17 +7485,17 @@ LADDER[51] Hoop Hound INSANE Weapon 1,0 r0
 LADDER[51] Hoop Hound INSANE Weapon 3,0 r0
     Worldsplitter
 LADDER[51] Hoop Hound INSANE Weapon 3,1 r0
-    Cursed Handle
+    Ambusher's Grip
 LADDER[51] Hoop Hound INSANE Weapon 4,2 r0
     Blade of Helms
 LADDER[51] Hoop Hound INSANE Weapon 1,3 r0
-    Clockwork Key
+    Manaflay
 LADDER[51] Hoop Hound INSANE Weapon 5,1 r0
-    Quickening Charm
+    Bulwark Bead
 LADDER[51] Hoop Hound INSANE Weapon 1,4 r0
     Grudge Bead
 LADDER[51] Hoop Hound INSANE Weapon 2,4 r0
-    Gluttonous Fang
+    Adamant Fang
 LADDER[51] Hoop Hound INSANE Weapon 4,4 r0
     Zealot's Haft
 LADDER[51] Hoop Hound INSANE Helmet 0,0 r0
@@ -7509,23 +7509,23 @@ LADDER[51] Hoop Hound INSANE Helmet 5,0 r0
 LADDER[51] Hoop Hound INSANE Helmet 3,2 r0
     Listening Frame
 LADDER[51] Hoop Hound INSANE Helmet 0,3 r0
-    Consecrated Plating
+    Bulwark Plating
 LADDER[51] Hoop Hound INSANE Helmet 4,4 r0
-    Reckoning Crest
+    Doubter's Crest
 LADDER[51] Hoop Hound INSANE Helmet 0,5 r0
     Antechamber Crown
 LADDER[51] Hoop Hound INSANE Helmet 3,5 r0
-    Lonely Plating
+    Scarred Plating
 LADDER[51] Hoop Hound INSANE Helmet 2,6 r0
     Chapel Frame
 LADDER[51] Hoop Hound INSANE Gloves 0,0 r0
-    Ironhide Wrap
+    Warmed Material
 LADDER[51] Hoop Hound INSANE Gloves 2,0 r0
-    Rending Mold
+    Throttling Mold
 LADDER[51] Hoop Hound INSANE Gloves 4,0 r0
-    Mirrorplate Ring
+    Seal of the Deep
 LADDER[51] Hoop Hound INSANE Gloves 4,1 r0
-    Unshod Signet
+    Opening Grudge
 LADDER[52] Curd Wraith EASY Weapon 0,0 r0
     Reliquary Orb
 LADDER[52] Curd Wraith EASY Chest 0,0 r0

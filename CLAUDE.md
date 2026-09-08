@@ -445,6 +445,61 @@ not, and quietly answers about somewhere else.
   without that save becoming a check** — everything else about this one was
   reconstruction.
 
+## A card you cannot leave, and a card carrying somebody else's errands
+
+Two faults reported together, both on the event card, and one of them is a
+soft-lock:
+
+> *"events do not have a way to close them without making a decision; some
+> events in the kettleworks are locked, and so you get trapped in the event
+> screen, and have to reload the browser page to get out."*
+
+**`showCard` hid the action bar whenever an event had choices** — a decision
+is a decision — and **sixteen events have exactly one choice, gated behind a
+flag.** They are the second rung of a chain: locked until you have taken the
+first, which is the whole design of M12.5's roots. Walk onto one without the
+flag and the card is an unclickable button with no exit. `the-quench-pond`,
+`the-hooper`, `the-scrap-line` and thirteen more.
+
+**Escape had closed the card the whole time**, and that is the other half of
+the finding rather than a mitigation: *a thing that works and cannot be seen
+is a thing that does not work* — the fourth time that sentence has been the
+answer here. The way out is on the screen now, on every card, and **walking on
+does not answer the event**: it is not marked, and the tile offers it again,
+which is what makes leaving one a choice rather than a way to lose it.
+
+- **`#card-bar` is unconditional.** Not "shown when nothing is takeable",
+  which would be a second rule about what a card is for and would leave the
+  next kind of unanswerable event to find out about the hard way.
+
+And the second, which is the Marbulon report finally caught:
+
+> *"you see her quests below the text box when you walk through the gate to
+> the kettleworks as well as the overworld."*
+
+**`#card-errands` was painted by `openEvent` and cleared by nobody.** The door
+in the western wall shows its paragraph through `showCard` *directly*, so
+Marbulon's errands from two tiles back were still in the card when the border
+drew its own. **`showCard` owns every part of the card now** — title, prose,
+choices, receipt, errands, bar — which is the only version of that rule that
+cannot go stale, and `openEvent` paints the errands *after* it rather than
+before. The same shape as `paintPanel` having to be told which map, every
+time.
+
+- **I looked straight past this twice.** Two sittings of "cannot reproduce"
+  read the card's text truncated to four hundred characters, and the errands
+  are *below* the prose. The reporter's own words said "below the text box"
+  and I read them as "instead of the text". **When a report says where on the
+  screen a thing is, that is the instruction, not the decoration.**
+- The check reproduces both in the reporter's words with the fixes reverted:
+  *"MARBULON'S DOOR" has 2 choices (2 takeable) and no way out of it*, and
+  *the door's card is carrying the last place's errands*.
+- And it must not need the button it is testing. The first version clicked
+  `#card-close` to get on with its next assertion, so on a broken build it
+  hung for thirty seconds and reported a traceback instead of the finding it
+  had already made. `leave_the_card` takes the button if it is there and
+  Escape if it is not.
+
 ## A defeat costs you your place
 
 Reported from play: *"when you die there, and you return to the overworld
@@ -2984,7 +3039,7 @@ content*, and one check now measures what a range used to guess at.
 | Classes offered | 5, and every one of their powers reaches something — a lint says so |
 | Figures | 27 `.tex` → **81 SVGs** (13 family drawings, 4 drawn for themselves, 5 classes, 3 towns, you) |
 | Art coverage | **58 of 58 creatures**, 3 of 3 towns, 5 of 5 classes, and you. The set pieces, the instruments and the enchs have no art and want none — a component has never had a figure |
-| Browser gate | **49 checks**, 3 engines, pointed at the live page for M12's deploy. The two newest are the pool panel and the swing that climbs |
+| Browser gate | **50 checks**, 3 engines, pointed at the live page for M12's deploy. The two newest are the pool panel and the swing that climbs |
 | The suite | **698 passing, and 14 seconds warm.** `[profile.test] opt-level = 2` since M12.6: `drops.rs` alone ran 66s at `opt-level 0`, more than the other 57 files together, and is 6.7s now. Debug assertions and overflow checks stay on — this is the `test` profile, not `--release` |
 
 Note the catalogue is **568**, not the 374 the retheme document counts — it

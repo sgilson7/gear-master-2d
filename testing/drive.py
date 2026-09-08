@@ -861,6 +861,116 @@ def check_a_swing_climbs_with_fury(page, name, fails):
         plant(page, base, lambda body: None, stem="fury-restore")
 
 
+def leave_the_card(page):
+    """Shut the event card, by the button if there is one and by Escape if not.
+
+    **The check must not need the thing it is checking.** The way out of a card
+    is what this file is testing, so a check that clicks `#card-close` to get on
+    with its next assertion cannot run at all on a build where that button is
+    hidden — the first version of this hung for thirty seconds on exactly that
+    and reported a Playwright traceback instead of the finding it had already
+    made. Escape has always closed this card, which is why it is the fallback.
+    """
+    if page.is_visible("#card-close"):
+        page.click("#card-close")
+    else:
+        page.keyboard.press("Escape")
+    page.wait_for_selector("#card", state="hidden", timeout=5000)
+
+
+def check_a_card_can_always_be_left(page, name, fails):
+    """Every event card has a visible way out, and shows nothing but its own.
+
+    Two faults reported together. **The way out was hidden whenever an event
+    had choices**, on the grounds that a decision is a decision — and sixteen
+    events in the game have exactly one choice, gated behind a flag, because
+    they are the second rung of a chain. Walk onto one without the flag and the
+    card had an unclickable button and no exit; the reporter had to reload the
+    page. Escape closed it the whole time, which is the other half of the
+    finding: the way out *worked* and could not be seen.
+
+    **And the errands section kept the last place's errands.** It is painted by
+    `openEvent` and was cleared by nobody, so the door in the western wall —
+    which shows its paragraph through `showCard` directly — carried Marbulon's
+    errands under it two tiles later. Reported as *"you see her quests below the
+    text box when you walk through the gate"*.
+
+    Walked rather than patrolled, along the one row that has both on it: her
+    door at [3, 10] asks two questions and offers errands, and the door in the
+    wall two tiles west of it shows a paragraph and offers none. The patrol
+    finds neither — it is six steps east and six west of the pit.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+
+    def by_her_door(body):
+        w = body.setdefault("world", {})
+        w["map"] = ""
+        # **Her door, unanswered.** The walk may have read it already by the
+        # time this check runs — an answered event shows no choices, and a card
+        # with no choices is not the case under test. Taken back out rather
+        # than hoped about.
+        w["answered"] = [a for a in w.get("answered", []) if a != "marbulons-door"]
+        w["answered"].append("the-bottom-of-the-cave")
+        w["quests_taken"] = list(w.get("quests_taken", [])) + ["marbulon-asks-first"]
+        reg = body["character"].setdefault("registry", [])
+        reg.append({"def": "The Deep Gate Key", "rot": 0})
+        body["character"]["owned"].append(len(reg) - 1)
+
+    plant(page, base, by_her_door, stem="her-door")
+    read = """() => {
+      const bar = document.getElementById('card-bar');
+      const btns = [...document.querySelectorAll('#card-choices button')];
+      return {
+        title: document.getElementById('card-title').innerText.trim(),
+        choices: btns.length,
+        takeable: btns.filter(b => !b.disabled).length,
+        wayOut: !bar.hidden && !document.getElementById('card-close').hidden,
+        errands: document.getElementById('card-errands').innerText.trim().slice(0, 60),
+        errandsShown: !document.getElementById('card-errands').hidden,
+      };
+    }"""
+
+    # --- an event that asks something, and offers errands -------------------
+    page.evaluate("(at) => window.__standAt(at)", [4, 10])
+    page.keyboard.press("ArrowLeft")
+    page.wait_for_timeout(400)
+    if not page.is_visible("#card"):
+        fails.append(f"{name}: stepping onto Marbulon's door opened nothing")
+        return
+    her = page.evaluate(read)
+    if her["choices"] < 1:
+        fails.append(f"{name}: her door asks nothing: {her}")
+    # **The fix.** However many choices are on it, there is a way out of it.
+    if not her["wayOut"]:
+        fails.append(f"{name}: {her['title']!r} has {her['choices']} choices "
+                     f"({her['takeable']} takeable) and no way out of it")
+    if not her["errandsShown"]:
+        fails.append(f"{name}: her door offers errands and the card shows none")
+    leave_the_card(page)
+
+    # --- and a card that is somebody else's ----------------------------------
+    page.evaluate("(at) => window.__standAt(at)", [2, 10])
+    page.keyboard.press("ArrowLeft")
+    page.wait_for_timeout(500)
+    if page.evaluate("() => window.__world().id") != "the-treyway":
+        fails.append(f"{name}: the door did not open with the key in the bag")
+        return
+    if not page.is_visible("#card"):
+        fails.append(f"{name}: crossing the border said nothing")
+        return
+    door = page.evaluate(read)
+    if door["errands"]:
+        fails.append(f"{name}: the door's card is carrying the last place's errands: "
+                     f"{door['errands']!r}")
+    if not door["wayOut"]:
+        fails.append(f"{name}: no way out of the border's own paragraph")
+    leave_the_card(page)
+    # Put the walk's own game back: this one ends on another map.
+    plant(page, base, lambda body: None, stem="her-door-restore")
+
+
 def check_a_defeat_costs_you_your_place(page, name, fails):
     """Die on the Treyway and the door is the door again.
 
@@ -4149,6 +4259,7 @@ def walk_the_gate(browser, name, fails=None):
     # --- what a creature leaves behind ---------------------------------------
     check_a_set_reads(page, name, fails)
     check_a_swing_climbs_with_fury(page, name, fails)
+    check_a_card_can_always_be_left(page, name, fails)
     check_a_defeat_costs_you_your_place(page, name, fails)
     check_an_instrument_takes_the_grid(page, name, fails)
     check_the_long_way_back(page, name, fails)
@@ -4273,6 +4384,7 @@ def main():
     print("ok: walk, download, reload, upload — position and stream both came back")
     print("ok: a wrong file was refused with a sentence and changed nothing")
     print("ok: a save from an older build does not wedge the player in the scenery")
+    print("ok: an event card can always be left, and shows nothing but its own")
     print("ok: a defeat costs you your place, and the door is the door again")
     print("ok: a banked pool says what it pays, and the rates are core's")
     print("ok: what an item hits for climbs as fury banks, and the row says so")

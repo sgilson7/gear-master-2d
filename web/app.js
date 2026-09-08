@@ -643,7 +643,32 @@ function showCard(title, prose, choices, onPick) {
     box.appendChild(b);
   });
   $('card-receipt').hidden = true;
-  $('card-bar').hidden = choices.length > 0;
+  // **A card this one is not about must not still be on it.** The errands
+  // section is painted by `openEvent` and was cleared by nobody: the door in
+  // the wall shows its paragraph through `showCard` directly, so Marbulon's
+  // errands from two tiles back were still sitting under it — reported as
+  // *"you see her quests below the text box when you walk through the gate"*.
+  // This function owns every part of the card, which is the only version of
+  // that rule that cannot go stale: the same shape as `paintPanel` having to
+  // be told which map, every time.
+  $('card-errands').hidden = true;
+  $('card-errands').replaceChildren();
+  // **There is always a way out, and now it is on the screen.**
+  //
+  // This was `choices.length > 0`: an event with choices hid the bar, on the
+  // grounds that a decision is a decision. Sixteen events in the game have
+  // exactly one choice and it is gated behind a flag — the second rung of a
+  // chain, locked until you have taken the first — so walking onto one
+  // without the flag left a card with an unclickable button and no exit, and
+  // the only way out was to reload the page.
+  //
+  // Escape has closed this card the whole time, which is the other half of
+  // the finding: the way out *worked* and could not be seen, and a thing that
+  // works and cannot be seen is a thing that does not work. So the button is
+  // always there. Walking on does not answer the event — it is not marked, and
+  // the tile offers it again — which is what makes leaving one a real option
+  // rather than a way to lose it.
+  $('card-bar').hidden = false;
   $('card').hidden = false;
 }
 
@@ -656,7 +681,6 @@ function closeCard() {
 function openEvent(id) {
   const e = JSON.parse(event_json(id));
   if (e.error) { log(e.error, true); return; }
-  paintErrands($('card-errands'), null);
   // **Spent doors are not offered again.** The card reopens because the place
   // may still have an errand on it; the choices were answered once and that
   // was right.
@@ -671,6 +695,10 @@ function openEvent(id) {
     $('card-bar').hidden = false;
     paintPanel(); draw(); autosave();
   });
+  // **After the card is built, not before.** `showCard` clears this section
+  // because it owns the card; painting first would hand the errands over and
+  // then wipe them.
+  paintErrands($('card-errands'), null);
 }
 
 // ---------------------------------------------------------------- the fight

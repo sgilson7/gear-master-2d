@@ -90,7 +90,11 @@ a claim about now, the same way the two M12 stamps below are; **what has to
 agree is the pair**, `index.html` asking for `app.js?v=X` and that `app.js`
 carrying `BUILD='X'`.
 
-**M13 is done and live**, ten milestones, and the block's frame is
+**M13 is done and live**, deployed at `ac2256c7` on the human's word, verified
+the way this file has demanded since M8: `GM2D_ORIGIN=… drive.py` walked all
+sixty-three checks in three engines against the deployed page, and every screen
+the block added was driven on it by hand as well — see the note in *A deployed
+fix is not a delivered fix*. Ten milestones, and the block's frame is
 `PLAN-M13-2.md` — there is no `PLAN-M13.md`; the file on disk is the `-2`.
 `HANDOFF-M13.md` is the block's own door in and `SECOND-ORDER-M13.md` is its
 notebook: **twenty-three rows, one a consequence the plan did not ask for and
@@ -3497,6 +3501,36 @@ live build a418bea0
 **Seventeen with real coordinates is the whole of the wire fix**, and the
 number the old gate could not tell from seventeen at the origin.
 
+**M13's is the shortest table here and the most of it is not in the table.**
+Sixty-three of the questions are the gate's, walked against the deployed page in
+three engines, so what is written out by hand is only the part a person went and
+looked at:
+
+```
+live build ac2256c7
+  index.html asks app.js?v=ac2256c7   app.js carries BUILD='ac2256c7'
+  chromium walked the gate    ok      firefox  walked the gate    ok
+  webkit   walked the gate    ok      63 ok lines, no failures
+  the van, one tree finished  three papers drawn; the expert one greyed,
+                              "He wants 2 finished class trees, and you have
+                              finished 1 of the 1 you are."
+  the second fork             four cards, each naming what its pairing reaches
+  Escape                      closes it, and the paper is still in the pack
+  reload                      it does not come back; the sheet offers it
+  two trees finished          "The LoudCalculation paper", nothing to pay
+  taking it                   a fourth tab, promise at its head
+  one point on lc-rate-card   "2.0 strength a point of mana" -> "1.6"
+  a Full Bill's rack          "Two enchs a component", and two went on
+  console errors: none                off-origin requests: none
+```
+
+**The promise moving is the line worth reading twice.** It is the whole of what
+M13.6 fixed one layer down — `CLASSES` is the roster before a point is spent, and
+a tab printing it would have said the same sentence after twelve points as
+before them. And *"a point of mana"* is M13.9's: that sentence said **Funny**
+until a lint read the theme instead of a list, and Funny is that theme's word
+for magic.
+
 **A stamp is not a commit and this block moved it twice.** M12.6 deployed
 `ccfeb16d`; deleting `STARTER`, `seat` and `ROTATION` a commit later rebuilt
 the wasm and the stamp became `d8965cf7` — *dead code is still bytes the
@@ -3506,8 +3540,9 @@ record rather than a claim about now. **What has to agree is the page with
 itself**, which is why the table above asks for the pair and not the number.
 
 **Most checks pass silently.** Fifty-three `ok:` lines came back for
-forty-six checks, which does not divide and is not meant to: only some of them
-announce, and the four M12 added are among the quiet ones. **Read the exit
+forty-six checks, which does not divide and is not meant to — and sixty-three
+come back now for the same reason: only some of them announce, and the four M12
+added and two of M13.8's five are among the quiet ones. **Read the exit
 code, and never a pipeline's** — `drive.py … | tail -30` reports `tail`'s
 status, which is zero whatever the gate found. The first live walk of
 `d8965cf7` was run that way and had to be run again to mean anything.

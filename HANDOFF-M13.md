@@ -1,26 +1,28 @@
-# HANDOFF-M13.md — where M13 stopped, and how to pick it up
+# HANDOFF-M13.md — what the block was, and what it found
 
-*Written mid-block, on the human's word. `PLAN-M13-2.md` is the frame (there is
-no `PLAN-M13.md`; the file on disk is the `-2`). This file is the door back in —
-read it, then `SECOND-ORDER-M13.md`, then carry on at §6.*
+*Written mid-block on the human's word and finished with the block.
+`PLAN-M13-2.md` is the frame (there is no `PLAN-M13.md`; the file on disk is the
+`-2`). Read this, then `SECOND-ORDER-M13.md`.*
 
-*Second sitting: **M13.6 is done.** §3 is kept as the record of what it found,
-rewritten to say what was actually wrong; §6 is the live list.*
+*`CLAUDE.md` is now the current account of the repo; this file is the block's own
+record — what each milestone found, and why the divergences are what they are.*
 
 ---
 
 ## 0. State in one paragraph
 
-**Nothing is committed.** Everything below is uncommitted work on `main` at
-`633f9bf`. **All ten milestones are done**, the suite is green at **785
-passing** and **34 seconds warm**, and the gate walks **all three engines** with
-five new checks in it.
+**All ten milestones are done and the block has shipped.** The suite is green at
+**785 passing** and **34 seconds warm**, and the gate walks **all three engines**
+with five new checks in it.
 M13.6 turned out to be the block's biggest milestone by a distance: it found
 that **thirty-eight of the sixty expert nodes changed nothing**, and four
 separate engine faults behind that. §3 is the account; §3a is M13.7's own.
 
-**Do not `git push` or `make publish`.** Nothing here has been deployed. What is
-left is M13.9.
+**It is committed, pushed and live.** `f2d1bd4` on `main`, deployed at build
+`ac2256c7` on the human's explicit ask, and verified against the deployed page:
+sixty-three gate checks in three engines, plus every screen the block added
+driven on the live URL by hand. `CLAUDE.md` carries the deploy note and the
+numbers.
 
 ---
 
@@ -279,14 +281,13 @@ are in `reward::expert_pct`. `FullBill` is the board's.
 
 ## 6. What is left
 
-**Nothing in the block.** What is left is not the builder's:
+**Nothing in the block, and nothing outstanding in the pipeline.** Committed as
+`f2d1bd4`, pushed, and live at `ac2256c7` with the live walk green in three
+engines. `CLAUDE.md` has the numbers, the nine divergences and the deploy note.
 
-1. **A human's word before anything is pushed.** Nothing here is committed and
-   nothing is deployed. `git log origin/main..HEAD` is empty and the whole block
-   is in the working tree.
-2. **`CLAUDE.md`'s numbers**, §7 below, and a deploy note in the shape the
-   others take.
-3. **One decision the code asks for and does not make**:
+What is left is one decision, and it is not the builder's:
+
+1. **One decision the code asks for and does not make**:
    `Character::grown_health` is a save field nothing in the game writes.
    Deleting it is a design decision — it is where health-per-level would go if
    it is ever wanted — and `tests/save.rs` deliberately round-trips a twelve

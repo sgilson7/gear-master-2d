@@ -73,7 +73,7 @@ it was walked on the live page:
 | `98ff7cf` | a card you cannot leave, and a card carrying somebody else's errands |
 | `3d5c059` | a chain errand you can finish, and a fight you can slow down and read |
 | `eabc973` | a locked choice names the chain, a bank, a door that survives a reload, and a page that notices a new build |
-| *(this one)* | an instrument has a frame of its own, and surveying no longer costs your sword arm |
+| `5ff7eb4` | an instrument has a frame of its own, and surveying no longer costs your sword arm |
 
 **Two of them touched the save and none of them the catalogue.** The bank adds
 `Character::banked`, which defaults empty and is skipped when it is; the
@@ -3076,6 +3076,25 @@ live build c236ca4c
 than in this table: it plants a save with the Cave answered, reloads, and asks
 the page before touching anything. That is the reported fault reproduced, and
 it is green on the live build.
+
+The deploy after that is the Reach's own frame, and its table is the first one
+here whose interesting line is a *zero*:
+
+```
+live build 502ea52d
+  index.html asks app.js?v=502ea52d   app.js carries BUILD='502ea52d'
+  chromium walked the gate    ok      firefox  walked the gate    ok
+  webkit   walked the gate    ok      55 checks, no failures
+  the edge refuses            and opens the frame, carrying the shut prose
+  the frame's bag             3 parts, and nothing that cannot go on it
+  a compass built there       reads "-20% on how often the ground stops you"
+  the weapon grid             0 pieces moved
+  going in                    the-reach, panel reads "compass — -20% encounters"
+  console errors: none                off-origin requests: none
+```
+
+**The zero is the report.** Building an instrument took nothing off the board
+you fight with, which is the whole of what was asked for.
 
 **A stamp is not a commit and this block moved it twice.** M12.6 deployed
 `ccfeb16d`; deleting `STARTER`, `seat` and `ROTATION` a commit later rebuilt

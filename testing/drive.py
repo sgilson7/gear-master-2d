@@ -371,6 +371,32 @@ def check_every_skill_says_what_it_does(page, name, fails):
         fails.append(f"{name}: the tree drew {len(shape['tiers'])} row(s), so it is still a list")
     if shape["wires"] != shape["edges"]:
         fails.append(f"{name}: {shape['edges']} prerequisites and {shape['wires']} lines drawn")
+    # **And they are somewhere**, which counting them does not ask.
+    #
+    # Reported as *"they only appear after you make a skill purchase"*:
+    # `openTree` painted before it un-hid the screen, and `drawWires` measures
+    # — `getBoundingClientRect` on a `display: none` subtree is all zeroes, so
+    # every wire was drawn as `M 0 0 V 0 H 0 V 0` on an svg zero wide. Taking a
+    # node repaints while the screen is up, which is why they turned up on the
+    # first purchase and never before.
+    #
+    # The count above was green through all of it. **A check that counts
+    # elements is not asking whether they are drawn** — this is the "compares
+    # zero with zero" shape, one level along, and it is asked here before
+    # anything on this screen has been clicked.
+    drawn = page.evaluate("""() => {
+      const svg = document.querySelector('#nodes .wires');
+      const flat = [...document.querySelectorAll('#nodes .wires path')].filter(p => {
+        const n = ((p.getAttribute('d') || '').match(/-?\\d+(\\.\\d+)?/g) || []).map(Number);
+        return !n.some(v => Math.abs(v) > 1);
+      }).length;
+      return { width: svg ? Number(svg.getAttribute('width')) : 0, flat };
+    }""")
+    if not drawn["width"]:
+        fails.append(f"{name}: the tree's wires are drawn on an svg {drawn['width']} wide")
+    if drawn["flat"]:
+        fails.append(f"{name}: {drawn['flat']} of the tree's wires are at the origin, "
+                     f"which is what a hidden screen measures as")
 
     # And hovering one opens the card that explains the words in it.
     page.hover("#nodes .wares")
@@ -4567,10 +4593,19 @@ def walk_the_gate(browser, name, fails=None):
         page.click("#skills")
         page.wait_for_selector("#tree", state="visible", timeout=8000)
         nodes = page.locator("#nodes .wares").count()
-        # 14 to 19 since M12.3: a row is bought at the tree now, so the tree
-        # grew the nodes to buy one with. Same widening as the core test.
-        if not (14 <= nodes <= 19):
-            fails.append(f"{name}: the tree shows {nodes} nodes and the plan asks for 14 to 19")
+        # **Against core's own count, not a number written here.** This carried
+        # `14 <= nodes <= 19`, a bound the engine already asserts in
+        # `the_shipped_tree_is_coherent` — so growing the tree failed thirty-nine
+        # lines in three engines over a constant that had gone stale, which is
+        # the barrel's hardcoded `12` all over again. What a browser can say
+        # that no engine test can is that the screen draws EVERY node core has.
+        want = page.evaluate("""() => {
+          const all = window.__trees();
+          const id = document.querySelector('#tree-tabs button.on')?.dataset.tree;
+          return (all.trees.find(t => t.id === id) ?? all.trees[0]).nodes.length;
+        }""")
+        if nodes != want:
+            fails.append(f"{name}: core's tree has {want} nodes and the screen draws {nodes}")
         buyable = page.locator("#nodes .wares:not(:disabled)")
         if buyable.count() == 0:
             fails.append(f"{name}: a point to spend and nothing to spend it on")

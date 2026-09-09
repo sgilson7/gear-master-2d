@@ -148,9 +148,14 @@ fn a_row_is_earned_from_the_tree_or_from_the_world() {
             })
         })
         .count();
+    // **Six to twelve since M13**, and the widening is the ask rather than a
+    // bound loosened to fit: the tree grew five tiers whose whole job is rows,
+    // so that every frame can be walked up to the original game's eight. See
+    // `every_frame_can_be_walked_to_the_old_size`, which is the bound that
+    // actually matters — this one only says the nodes are here.
     assert!(
-        (6..=8).contains(&in_base),
-        "the base tree has {in_base} row nodes; the plan asks for six to eight"
+        (6..=12).contains(&in_base),
+        "the base tree has {in_base} row nodes; the plan asks for six to twelve"
     );
 
     // Every slot can be grown from the base tree, or one frame is unreachable
@@ -263,6 +268,77 @@ fn a_bought_node_does_something_immediately() {
     assert_eq!(c.loadout.assembly_pct, 10, "Flush Fit changed no rule");
 }
 
+/// The base tree walks every frame up to the size the old game had, and no
+/// further — with nothing spent on a row that cannot be given.
+///
+/// Asked for in as many words: *"more rows to all of the gear slots, but get
+/// progressively more expensive per additional row you add, up to the original
+/// gear master size"*. Three claims, and each is a line here.
+///
+/// **The last one is the one worth having a test for.** `board_rows` clamps at
+/// `MAX_ROWS`, so a tree that over-grants does not break anything — it just
+/// quietly sells a point for nothing, which is exactly the failure eight nodes
+/// shipped with for two milestones. A grant past the ceiling is a promise that
+/// reaches nothing.
+#[test]
+fn every_frame_can_be_walked_to_the_old_size() {
+    let tree = data::skills();
+    let base = tree.base().expect("a base tree");
+    let all: Vec<String> = base.nodes.iter().map(|n| n.id.clone()).collect();
+    let granted = tree.granted_rows(&all);
+
+    for k in SlotKind::ALL {
+        let rows = progression::board_rows(granted[k.index()]);
+        assert_eq!(
+            rows,
+            progression::MAX_ROWS,
+            "{k:?} reaches {rows} rows with the whole base tree taken, and the old \
+             game's frames are {}",
+            progression::MAX_ROWS,
+        );
+        // And not one grant more than that, which is a point spent on nothing.
+        assert_eq!(
+            progression::STARTING_ROWS + granted[k.index()],
+            progression::MAX_ROWS,
+            "{k:?} is granted {} rows and can only use {}",
+            granted[k.index()],
+            progression::MAX_ROWS - progression::STARTING_ROWS,
+        );
+    }
+}
+
+/// A row costs more the deeper you go for it.
+///
+/// The other half of the same ask. Read off the tree rather than listed here:
+/// the row nodes are sorted by how deep they sit, and a node deeper than
+/// another may never cost less. **Depth rather than a hand-written order**,
+/// because the order is what the prerequisites already say and a second copy
+/// of it here would go stale the first time a tier was re-parented.
+#[test]
+fn a_row_costs_more_the_deeper_it_is() {
+    use gm2d_core::skills::Effect;
+    let tree = data::skills();
+    let base = tree.base().expect("a base tree");
+    let mut rows: Vec<(u32, u32, &str)> = base
+        .nodes
+        .iter()
+        .filter(|n| n.effects.iter().any(|e| matches!(e, Effect::GrowSlotRows { .. })))
+        .map(|n| (base.depth_of(&n.id), n.cost, n.id.as_str()))
+        .collect();
+    rows.sort();
+    for pair in rows.windows(2) {
+        let (da, ca, ia) = pair[0];
+        let (db, cb, ib) = pair[1];
+        if db > da {
+            assert!(cb >= ca, "{ib} is deeper than {ia} and cheaper: {cb} against {ca}");
+        }
+    }
+    // And it actually climbs rather than sitting flat all the way down.
+    let (_, first, _) = rows.first().copied().expect("row nodes");
+    let (_, last, _) = rows.last().copied().expect("row nodes");
+    assert!(last > first, "the deepest row node costs {last} and the shallowest {first}");
+}
+
 /// Every node in the shipped tree is reachable, and every prerequisite exists.
 ///
 /// A node whose prerequisite is misspelled is a node no player can ever take,
@@ -271,13 +347,13 @@ fn a_bought_node_does_something_immediately() {
 fn the_shipped_tree_is_coherent() {
     let tree = data::skills();
     let base = tree.base().expect("a base tree");
-    // **14 to 19 since M12.3**, and the widening is the milestone rather than
-    // a bound being loosened to fit: `PLAN-M12.md` §8 row 6 asks for six to
-    // eight row nodes in the base tree, and the base tree had three. A row is
-    // bought here now, so this is where the nodes to buy it are.
+    // **14 to 24 since M13**, widened twice for the same reason and both times
+    // as the milestone rather than to fit: M12.3 made a row a thing you buy
+    // and took this from three row nodes to seven, and M13 added five tiers
+    // that carry the rest of the way to the old game's eight-row frames.
     assert!(
-        (14..=19).contains(&base.nodes.len()),
-        "the base tree has {} nodes and the plan asks for 14 to 19",
+        (14..=24).contains(&base.nodes.len()),
+        "the base tree has {} nodes and the plan asks for 14 to 24",
         base.nodes.len()
     );
 

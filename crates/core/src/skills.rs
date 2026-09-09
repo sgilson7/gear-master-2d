@@ -270,8 +270,45 @@ fn many_or_one<S: serde::Serializer>(v: &[Effect], s: S) -> Result<S::Ok, S::Err
 
 impl Node {
     /// Every effect's [`Effect::line`], in one unthemed sentence.
+    ///
+    /// **A node that grows every frame says so once.** Listing the five
+    /// separately came to a hundred and thirty-three characters — half again
+    /// over what `a_mechanical_line_stays_short_enough_to_read_at_a_glance`
+    /// allows, and a line nobody reads is a line that is not there. It is
+    /// collapsed rather than hand-written, so a tier that stops covering all
+    /// five goes back to naming them and cannot quietly claim the set.
     pub fn line(&self) -> String {
-        self.effects.iter().map(Effect::line).collect::<Vec<_>>().join(", ")
+        let mut parts: Vec<String> = Vec::new();
+        let grows: Vec<(&str, u8)> = self
+            .effects
+            .iter()
+            .filter_map(|e| match e {
+                Effect::GrowSlotRows { slot, rows } => Some((slot.as_str(), *rows)),
+                _ => None,
+            })
+            .collect();
+        // Every worn frame, all by the same amount, and none of them twice.
+        let every = crate::piece::SlotKind::ALL.len();
+        let same = grows.first().map(|(_, r)| *r);
+        // Through `slot_of`, which is the one place a slot's written name is
+        // turned into a slot — a second mapping here would be a second answer
+        // to what "greaves" means.
+        let covers_all = grows.len() == every
+            && grows.iter().all(|(_, r)| Some(*r) == same)
+            && crate::piece::SlotKind::ALL
+                .iter()
+                .all(|&k| grows.iter().any(|(s, _)| slot_of(s) == Some(k)));
+        if covers_all {
+            let rows = same.unwrap_or(0);
+            parts.push(format!("+{rows} row{} on every grid", if rows == 1 { "" } else { "s" }));
+        }
+        for e in &self.effects {
+            if covers_all && matches!(e, Effect::GrowSlotRows { .. }) {
+                continue;
+            }
+            parts.push(e.line());
+        }
+        parts.join(", ")
     }
 
     /// Every effect's [`Effect::detail`], for the hover.

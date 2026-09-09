@@ -1423,8 +1423,18 @@ function openTree() {
   // schedule, so what this says is how many rows have been *earned* — which
   // is the number the screen it sits on is now for.
   $('tree-next').textContent = rowsEarned(c);
-  paintTree();
+  // **Shown before it is painted, because the wires are measured.**
+  // `drawWires` reads `getBoundingClientRect` — the rows are flex and wrap, so
+  // where a node actually *is* is the only thing that can be trusted — and a
+  // hidden screen is `display: none`, where every rect is zero. So the first
+  // open drew every wire as a degenerate path at the origin and the tree came
+  // up with no lines in it; taking a node repaints while the screen is up,
+  // which is why they appeared on the first purchase and not before.
+  //
+  // Reported as *"they only appear after you make a skill purchase"*, which is
+  // the diagnosis. **You cannot measure an element that is not laid out.**
   $('tree').hidden = false;
+  paintTree();
 }
 
 /// Which tree is on screen. Kept across repaints so taking a node does not

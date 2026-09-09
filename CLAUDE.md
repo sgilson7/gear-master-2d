@@ -1608,6 +1608,74 @@ Rules that came out of it:
   on it and reads the opening row now. Negative-test every new check by
   breaking the thing it guards.
 
+## A row is bought all the way up to the old size
+
+M12.3 made a row a thing you buy and gave the base tree seven nodes that sell
+one. That took a frame from three rows to four, or to five for the weapon and
+the chest, and stopped — well short of the six-by-eight the original game
+ships. Asked for:
+
+> *"add another 5 rows to the sprocketmans craft tree; the skill bonuses should
+> include things like more rows to all of the gear slots, but get progressively
+> more expensive per additional row you add, up to the original gear master
+> size"*
+
+Five tiers, and they are a spine rather than a rack: The Fourth Course evens up
+the three frames M12.3 left behind, and the three above it each give **a row on
+every grid**, at three, four, five, six and seven points.
+
+- **Every frame lands on exactly eight, and not one grant further.** That is
+  what `every_frame_can_be_walked_to_the_old_size` is for, and the second half
+  of it is the half worth having: `board_rows` clamps at `MAX_ROWS`, so a tree
+  that over-grants breaks nothing — it quietly sells a point for nothing, which
+  is precisely the failure eight nodes shipped with for two milestones. **A
+  grant past the ceiling is a promise that reaches nothing.**
+- **The escalation is read off the tree, not listed in a test.** A row node
+  deeper than another may never cost less, and depth is what the prerequisites
+  already say — a second copy of the order would go stale the first time a tier
+  was re-parented.
+- **The whole ladder is twenty-eight points**, against a `MAX_LEVEL` of 32 and
+  a demo that ends around level fourteen. So the last two courses are an
+  endgame the shipped content does not reach, which is what *progressively more
+  expensive* buys and is worth saying out loud rather than discovering.
+- **The capstone grants no row, because there are none left**, and says so.
+  Five tiers were asked for and four carry the rows; a fifth that granted a
+  sixth row on a five-row ceiling would be the exact thing the test above
+  refuses.
+- **A node that grows every frame says so once.** Listing the five separately
+  came to a hundred and thirty-three characters, half again over what
+  `a_mechanical_line_stays_short_enough_to_read_at_a_glance` allows — and a line
+  nobody reads is a line that is not there. `Node::line` collapses it to *"+1
+  row on every grid"*, derived, so a tier that stops covering all five goes back
+  to naming them and cannot quietly claim the set.
+- **The blurb still names every frame it grants**, which is
+  `a_row_granting_skill_names_its_frame` and is not negotiable: a blurb that
+  overstates its effect is the worst kind, because the player finds out by not
+  getting it.
+
+## The tree's wires were drawn on a screen nobody had laid out yet
+
+Reported from play: *"there is also a bug in the way the lines are drawn in the
+skill tree between connecting skills; they only appear after you make a skill
+purchase"*, which is the whole diagnosis.
+
+`openTree` called `paintTree()` and *then* set `$('tree').hidden = false`. The
+wires are **measured** — the rows are flex and wrap, so where a node actually
+is is the only thing that can be trusted — and a hidden screen is
+`display: none`, where every rectangle is zero. So the first open drew all
+seventeen wires as `M 0 0 V 0 H 0 V 0` on an svg zero wide. Taking a node
+repaints while the screen is up, which is why the lines turned up on the first
+purchase and never before.
+
+- **You cannot measure an element that is not laid out.** The fix is the order:
+  show it, then paint it.
+- **The gate was green through it, and that is the finding.** Its tree check
+  counted `#nodes .wires path` against the number of prerequisites and got
+  seventeen for seventeen. **A check that counts elements is not asking whether
+  they are drawn** — the "compares zero with zero" shape, one level along. It
+  measures now: the svg has a width, and no path is at the origin, asked before
+  anything on that screen has been clicked.
+
 ## The tree is a tree
 
 It was one flat rack of buttons, which told you what existed and nothing about
@@ -3371,6 +3439,7 @@ Every figure below was re-measured for M12.6 rather than carried forward.
 | A locked choice was a wall, and is a target now | **703 passing** |
 | A bank, a door that survives a reload, and a sheet on the screen that changes it | **710 passing** |
 | An instrument has a frame of its own | **715 passing** |
+| A row is bought all the way up to the old size | **717 passing** |
 
 Note M12.4 adds none, and neither did M11.0 or M11.8 — all three are honest.
 M12.4 is a playthrough, a triage and a brief; its deliverable is
@@ -3407,16 +3476,16 @@ content*, and one check now measures what a range used to guess at.
 | The counters | shelf **×5** of catalogue, order book **×10**, barrel **×1**. The barrel holds nothing dearer than 60 and the book nothing cheaper than 65, so the three tiers cannot overlap |
 | A reroll | `n*n` Fnorp for the nth, counted **per type**, wiped every ten levels in every town. The line you have on order is never rerolled out from under you |
 | Board pressure | fill **43%** at level five and **37%** at eight before M12 — *down*, because rows arrived on a clock and components did not. `pressure::of` is the measurement and `pressure::target` is what it is aimed at |
-| Boards | **Six frames**: five worn, 6×3 at level 1 with a 6×8 ceiling, and the instrument's, 6×3 for ever.  **A row is no longer a thing a level hands you** — it is a skill point or a finished errand, **7 nodes and 2 errands**, and M12.0's measurement of why is in *A row is earned, not scheduled* |
+| Boards | **Six frames**: five worn, 6×3 at level 1 and 6×8 once the tree has been walked all the way up, and the instrument's, 6×3 for ever.  **A row is no longer a thing a level hands you** — it is a skill point or a finished errand, **7 nodes and 2 errands**, and M12.0's measurement of why is in *A row is earned, not scheduled* |
 | Level 5 | ~27 fights, mean of nine seeded walks |
 | The Treyway | brackets levels **12–16**, not the plan's 5–9 — the door behind it is behind a crossing that asks for 9 |
 | A whole playthrough | **342 wins, 170 losses, level 14, 4,406 steps** to the door under the lake |
-| Skill trees | **17 base nodes** + gorillathon 8, funnel-sergeant 8, worm-fact-keeper 10, kaklon-patent 8, top-of-the-bill 8. **7 of the base's grow a row**, one for each of the five frames, because M12.3 made a row a thing you buy |
+| Skill trees | **22 base nodes over nine tiers** + gorillathon 8, funnel-sergeant 8, worm-fact-keeper 10, kaklon-patent 8, top-of-the-bill 8. **11 of the base's grow a row** — M12.3's seven, plus a five-tier spine at 3/4/5/6/7 points that walks every frame to the original **six by eight**. Twenty-eight points for the whole ladder, against a `MAX_LEVEL` of 32 |
 | Classes offered | 5, and every one of their powers reaches something — a lint says so |
 | Figures | 27 `.tex` → **81 SVGs** (13 family drawings, 4 drawn for themselves, 5 classes, 3 towns, you) |
 | Art coverage | **58 of 58 creatures**, 3 of 3 towns, 5 of 5 classes, and you. The set pieces, the instruments and the enchs have no art and want none — a component has never had a figure |
 | Browser gate | **55 checks**, 3 engines, pointed at the live page for M12's deploy. The newest is the Reach's own frame: the door opens it, a compass built there is read, and the weapon grid is untouched |
-| The suite | **715 passing, and 14 seconds warm.** `[profile.test] opt-level = 2` since M12.6: `drops.rs` alone ran 66s at `opt-level 0`, more than the other 57 files together, and is 6.7s now. Debug assertions and overflow checks stay on — this is the `test` profile, not `--release` |
+| The suite | **717 passing, and 14 seconds warm.** `[profile.test] opt-level = 2` since M12.6: `drops.rs` alone ran 66s at `opt-level 0`, more than the other 57 files together, and is 6.7s now. Debug assertions and overflow checks stay on — this is the `test` profile, not `--release` |
 
 Note the catalogue is **568**, not the 374 the retheme document counts — it
 grew upstream after that document was written, and three times here. Any

@@ -240,6 +240,181 @@
               "rows": 1
             }
           }
+        },
+        {
+          "id": "the-fourth-course",
+          "name": "The Fourth Course",
+          "blurb": "A row on the helmet, the gloves and the greaves. The weapon and the chest were let out years ago and nobody went back for the other three.",
+          "cost": 3,
+          "requires": [
+            "room-for-the-second",
+            "let-the-seams-out"
+          ],
+          "effect": [
+            {
+              "grow_slot_rows": {
+                "slot": "helmet",
+                "rows": 1
+              }
+            },
+            {
+              "grow_slot_rows": {
+                "slot": "gloves",
+                "rows": 1
+              }
+            },
+            {
+              "grow_slot_rows": {
+                "slot": "greaves",
+                "rows": 1
+              }
+            }
+          ]
+        },
+        {
+          "id": "the-fifth-course",
+          "name": "The Fifth Course",
+          "blurb": "A row on the helmet, the chest, the gloves, the greaves and the weapon. A course is a course; you do not lay one down on half a wall and call it a morning.",
+          "cost": 4,
+          "requires": [
+            "the-fourth-course"
+          ],
+          "effect": [
+            {
+              "grow_slot_rows": {
+                "slot": "helmet",
+                "rows": 1
+              }
+            },
+            {
+              "grow_slot_rows": {
+                "slot": "chest",
+                "rows": 1
+              }
+            },
+            {
+              "grow_slot_rows": {
+                "slot": "gloves",
+                "rows": 1
+              }
+            },
+            {
+              "grow_slot_rows": {
+                "slot": "greaves",
+                "rows": 1
+              }
+            },
+            {
+              "grow_slot_rows": {
+                "slot": "weapon",
+                "rows": 1
+              }
+            }
+          ]
+        },
+        {
+          "id": "head-height",
+          "name": "Head Height",
+          "blurb": "Another row on the helmet, the chest, the gloves, the greaves and the weapon. This is the height at which a man stops kneeling to work and starts telling you about his back.",
+          "cost": 5,
+          "requires": [
+            "the-fifth-course"
+          ],
+          "effect": [
+            {
+              "grow_slot_rows": {
+                "slot": "helmet",
+                "rows": 1
+              }
+            },
+            {
+              "grow_slot_rows": {
+                "slot": "chest",
+                "rows": 1
+              }
+            },
+            {
+              "grow_slot_rows": {
+                "slot": "gloves",
+                "rows": 1
+              }
+            },
+            {
+              "grow_slot_rows": {
+                "slot": "greaves",
+                "rows": 1
+              }
+            },
+            {
+              "grow_slot_rows": {
+                "slot": "weapon",
+                "rows": 1
+              }
+            }
+          ]
+        },
+        {
+          "id": "the-last-course",
+          "name": "The Last Course",
+          "blurb": "One more row on the helmet, the chest, the gloves, the greaves and the weapon. Past this the frames do not take another. Eight is what the old shop built and nobody has improved on it since.",
+          "cost": 6,
+          "requires": [
+            "head-height"
+          ],
+          "effect": [
+            {
+              "grow_slot_rows": {
+                "slot": "helmet",
+                "rows": 1
+              }
+            },
+            {
+              "grow_slot_rows": {
+                "slot": "chest",
+                "rows": 1
+              }
+            },
+            {
+              "grow_slot_rows": {
+                "slot": "gloves",
+                "rows": 1
+              }
+            },
+            {
+              "grow_slot_rows": {
+                "slot": "greaves",
+                "rows": 1
+              }
+            },
+            {
+              "grow_slot_rows": {
+                "slot": "weapon",
+                "rows": 1
+              }
+            }
+          ]
+        },
+        {
+          "id": "nothing-left-to-let-out",
+          "name": "Nothing Left To Let Out",
+          "blurb": "There is no more room in any frame to give you. What is left is what the room was worth: everything already on it, packed tighter, and the shoulders to carry the result.",
+          "cost": 7,
+          "requires": [
+            "the-last-course"
+          ],
+          "effect": [
+            {
+              "assembly_pct": {
+                "pct": 15
+              }
+            },
+            {
+              "stat": {
+                "strength": 8,
+                "health": 80
+              }
+            }
+          ]
         }
       ]
     },
@@ -635,7 +810,7 @@
         {
           "id": "w-roast",
           "name": "Filed Under The Roast",
-          "blurb": "Two hundred and nine helmets are in the Keeper’s book, filed by what was still coming off them when they were handed back. Yours goes down as two hundred and ten, under the Roast.",
+          "blurb": "Two hundred and nine helmets are in the Keeper\u2019s book, filed by what was still coming off them when they were handed back. Yours goes down as two hundred and ten, under the Roast.",
           "requires": [
             "w-ledger"
           ],
@@ -671,7 +846,7 @@
         {
           "id": "k-licence",
           "name": "The Licence",
-          "blurb": "Nine pages, and eight of them are the list of what the licence does not cover. Page one is a drawing of a hand holding a thing, and under it, in Kaklon’s own writing, the words BOLT IT ON.",
+          "blurb": "Nine pages, and eight of them are the list of what the licence does not cover. Page one is a drawing of a hand holding a thing, and under it, in Kaklon\u2019s own writing, the words BOLT IT ON.",
           "requires": [],
           "effect": {
             "assembly_pct": {

@@ -121,11 +121,11 @@ pub fn piece_lines(def: &PieceDef) -> Vec<(&'static str, String)> {
     if crate::piece::is_survey(def.kind) {
         out.push((
             "survey",
-            "a survey instrument's part. It goes in the weapon grid and the grid then \
-             holds no weapon"
+            "a survey instrument's part. It goes on the instrument frame, which is \
+             its own grid and not the weapon's"
                 .into(),
         ));
-        for way in crate::piece::recipe_parts(crate::piece::SlotKind::Weapon)
+        for way in crate::piece::recipe_parts(crate::piece::SlotKind::Instrument)
             .into_iter()
             .filter(|w| w.required.iter().any(|r| r.contains(&def.kind.name())))
         {

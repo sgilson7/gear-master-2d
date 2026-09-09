@@ -18,6 +18,7 @@ import init, {
   errand_marks_json, go_home,
   ench_rack_json, attach_ench, detach_ench, toggle_ench,
   bank_json, bank_put, bank_take,
+  kit_json, kit_reading_json,
 } from './pkg/gm2d_wasm.js';
 import { Board } from './board.js';
 import { Theirs } from './theirs.js';
@@ -2233,12 +2234,92 @@ function closeTown() {
   $('map').focus();
 }
 
+// ------------------------------------------------------- the instrument frame
+
+/// The board on the Reach's own screen. Built once, on the same class and the
+/// same exports as the packing board — it is handed one grid instead of five,
+/// which is the whole of the difference.
+let kit = null;
+/// The map through the door, so the screen can say what the instrument reads.
+let kitMap = '';
+
+/// Open it at a gate that wanted an instrument.
+///
+/// **A gate that wants an instrument is not a wall, it is a bench.** It is the
+/// only shut door in the game whose answer the player may already be carrying
+/// the parts for, so the refusal opens the frame rather than printing a
+/// sentence and stopping.
+function openKit(mapId, shut) {
+  kitMap = mapId || '';
+  $('instrument-shut').textContent = shut || '';
+  $('instrument').hidden = false;
+  if (!kit) {
+    kit = new Board($('instrument-board'), {
+      boardJson: kit_json,
+      legalAnchors: legal_anchors,
+      place, pickUp: pick_up, rotate, toggleLock: toggle_lock,
+      look: look_json, lookOver: look_over,
+    });
+    kit.onchange = () => paintKit();
+    kit.onhold = (name) => {
+      $('instrument-holding').textContent = name
+        ? `Holding ${name}. Click a cell to seat it, right-click to turn it.` : '';
+    };
+    kit.onpiece = (p, box, px, py) => {
+      if (!p) { hidePiece(); return; }
+      showPiece({ left: box.left + px + 14, right: box.left + px + 14,
+                  top: box.top + py, bottom: box.top + py + 8 }, p);
+    };
+  }
+  kit.refresh();
+  paintKit();
+  $('instrument-go').focus();
+}
+
+function closeKit() {
+  hidePiece();
+  $('instrument').hidden = true;
+  paintPanel(); draw(); autosave();
+  $('map').focus();
+}
+
+/// What is on the frame, and what it will do to the map through the door.
+///
+/// **Both numbers are core's.** `kit_reading_json` runs `survey::mods_for`
+/// against that map, so the screen states the trade in the figures the map
+/// will actually be read with rather than in a sentence somebody wrote once.
+/// And it names the instrument, because the frame holds two small ones at a
+/// squeeze and only the first is read — silence there would be a player
+/// carrying two and never learning which one answered.
+function paintKit() {
+  const r = JSON.parse(kit_reading_json(kitMap));
+  $('instrument-go').disabled = !r.kind;
+  $('instrument-reading').textContent = r.kind
+    ? `A ${r.kind}. That is what the ground will answer to.`
+    : `Nothing finished. The edge stays where it is.`;
+  const rows = [];
+  if (r.kind) {
+    const m = r.reads ?? {};
+    if (m.encounter_pct) rows.push(`<li><b>${m.encounter_pct}%</b> on how often the ground stops you</li>`);
+    if (m.drops_per_mille) rows.push(`<li><b>+${m.drops_per_mille}‰</b> on what falls off it</li>`);
+    if (m.xp_pct) rows.push(`<li><b>+${m.xp_pct}%</b> on what a win pays</li>`);
+    if (m.golem) rows.push(`<li>a golem walks in with you and takes the first fight</li>`);
+  }
+  $('instrument-reads').innerHTML = rows.join('') || `<li class="none">nothing yet</li>`;
+  // Derived in core and unthemed, TONE 13a — the same box the packing screen's
+  // `?` opens, because what a grid takes is one answer wherever it is asked.
+  // The slot is the payload's, so the three recipes come off `recipe_parts`
+  // rather than being written out again here.
+  const frame = (JSON.parse(kit_json()).slots ?? [])[0];
+  $('instrument-recipes').innerHTML = frame ? recipeBox(frame) : '';
+}
+
 // ---------------------------------------------------------------- walking
 
 function walk(dir) {
   if (!$('card').hidden || !$('fight').hidden || !$('town').hidden ||
       !$('tree').hidden || !$('fork').hidden || !$('log').hidden ||
-      !$('history').hidden ||
+      !$('history').hidden || !$('instrument').hidden ||
       !$('ending').hidden || !$('vendor').hidden) return;
   const r = JSON.parse(try_step(dir));
   blocked = r.moved ? null : r.blocked;
@@ -2271,7 +2352,12 @@ function walk(dir) {
       showCard((r.went.name || 'the way through').toUpperCase(), r.went.prose, [], null);
     }
   }
-  if (r.shut) log(r.shut, true);
+  // **A gate that wants an instrument opens the frame.** Every other refusal
+  // is a fact to print; this one is a thing to do, and the parts may already
+  // be in the bag. The sentence is still said — the screen carries it — so a
+  // player who backs out has read why the edge is where it is.
+  if (r.wants_instrument) openKit(r.wants_instrument, r.shut);
+  else if (r.shut) log(r.shut, true);
   if (r.ending) openEnding(r.ending);
   if (r.mended > 0) log(`Somebody puts a chair out. ${r.mended}% of you comes back.`);
   // **A creature that gave up.** No fight screen and no replay, because there
@@ -2423,6 +2509,14 @@ async function main() {
       if (e.key === 'Escape') closeTree();
       return;
     }
+    if (!$('instrument').hidden) {
+      // `r` turns a held piece here the way it does on the packing board: the
+      // Iron Blade's lesson is that a frame three rows tall is a frame you
+      // have to turn things for, and a magnet is one by two.
+      if (e.key === 'r' || e.key === 'R') { e.preventDefault(); kit?.rotateHeld(); return; }
+      if (e.key === 'Escape') closeKit();
+      return;
+    }
     if (!$('log').hidden) {
       if (e.key === 'Escape') closeLog();
       return;
@@ -2539,6 +2633,10 @@ async function main() {
   // is exactly what core said was legal. Two references rather than one, so the
   // check compares the page's answer against core's rather than against itself.
   window.__board = board;
+  // The Reach's frame, for the gate: the board itself, so a check drives the
+  // same api the screen does rather than a privileged export of its own.
+  window.__kitBoard = () => kit;
+  window.__kitJson = () => kit_json();
   window.__legalAnchors = legal_anchors;
   window.__replay = replay;
   window.__classOffer = () => JSON.parse(class_offer_json());
@@ -2590,6 +2688,20 @@ async function main() {
   window.__errandMarks = () => JSON.parse(errand_marks_json()).places;
 
   $('skills').onclick = openTree;
+  $('instrument-done').onclick = closeKit;
+  // **Go in takes the step that was refused.** The gate is answered by walking
+  // into it, so this is the same gesture rather than a second way through —
+  // and if the instrument came apart in the meantime, core refuses it again.
+  $('instrument-go').onclick = () => {
+    // **Stand still and let the door answer again.** The refusal left you on
+    // the gate's own tile, so repeating the step you were turned away from
+    // would walk you past it along the row. `"here"` is the same gate code
+    // path with no movement, no roll and no tile counted.
+    $('instrument').hidden = true;
+    hidePiece();
+    walk('here');
+    if ($('instrument').hidden) { paintPanel(); draw(); autosave(); $('map').focus(); }
+  };
   $('tree-done').onclick = closeTree;
   $('vendor-close').onclick = closeVendor;
   $('errands-open').onclick = openLog;

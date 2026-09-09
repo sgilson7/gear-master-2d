@@ -52,6 +52,18 @@ pub fn slot_hue(slot: SlotKind) -> f32 {
         SlotKind::Chest => 0.443,
         SlotKind::Gloves => 0.912,
         SlotKind::Greaves => 0.156,
+        // **The widest gap left on the wheel**, rather than an Okabe-Ito
+        // colour. The five gear hues use vermillion, sky blue, bluish green,
+        // reddish purple and yellow; the palette's two remaining entries are
+        // orange (0.108) and blue (0.567), which sit three hundredths from
+        // greaves and fifteen thousandths from helmet. Neither is a channel.
+        //
+        // So the instrument takes the middle of the largest arc nobody is
+        // using, between reddish purple and sky blue. It is the one grid that
+        // is never drawn beside the other five — it has its own screen — but
+        // separating it properly costs nothing and the next person to put it
+        // on the packing screen should not have to discover this.
+        SlotKind::Instrument => 0.732,
     }
 }
 
@@ -66,6 +78,7 @@ pub fn slot_sat(slot: SlotKind) -> f32 {
         SlotKind::Chest => 0.72,
         SlotKind::Gloves => 0.44,
         SlotKind::Greaves => 0.74,
+        SlotKind::Instrument => 0.60,
     }
 }
 
@@ -146,6 +159,9 @@ pub enum Motif {
     Weave,
     /// The straps of a greave.
     Straps,
+    /// A compass rose. The instrument frame's, and the only mark on a grid
+    /// that is a tool rather than a thing worn.
+    Rose,
     /// Not any one grid's mark: the component fits more than one and is in
     /// none of them yet.
     Shared,
@@ -160,6 +176,7 @@ impl Motif {
             Motif::Bands => "bands",
             Motif::Weave => "weave",
             Motif::Straps => "straps",
+            Motif::Rose => "rose",
             Motif::Shared => "shared",
         }
     }
@@ -172,6 +189,7 @@ pub fn motif(slot: SlotKind) -> Motif {
         SlotKind::Chest => Motif::Bands,
         SlotKind::Gloves => Motif::Weave,
         SlotKind::Greaves => Motif::Straps,
+        SlotKind::Instrument => Motif::Rose,
     }
 }
 

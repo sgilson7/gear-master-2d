@@ -667,6 +667,46 @@ def main():
                     page.wait_for_selector("#vendor", state="hidden", timeout=5000)
                     phase = ""
                     continue
+                if page.is_visible("#instrument"):
+                    # **The Reach's frame.** M13 turned the edge's refusal into
+                    # a screen, and a screen is a `.screen`: `walk()` refuses
+                    # every keypress while one is up, which is exactly how the
+                    # van wedged this walk one block ago. The symptom would be
+                    # a run that stopped dead at the edge and reported the
+                    # whole north as unreachable.
+                    head("the edge of the Reach")
+                    say(f"  {page.text_content('#instrument-reading')}")
+                    # Try to build one, the way a player would: seat whatever
+                    # the frame's own bag will take, best-rated first, and see
+                    # whether core calls it an instrument.
+                    try:
+                        bag = json.loads(
+                            page.evaluate("() => window.__kitBoard().api.boardJson()"))["bag"]
+                        for piece in bag:
+                            for x, y in json.loads(page.evaluate(
+                                    "(id) => window.__kitBoard().api.legalAnchors(id, 'instrument')",
+                                    piece["id"])):
+                                if not page.evaluate(
+                                        "([i,x,y]) => window.__kitBoard().api.place(i,'instrument',x,y)",
+                                        [piece["id"], x, y]):
+                                    break
+                        page.evaluate("() => window.__kitBoard().refresh()")
+                        page.wait_for_timeout(60)
+                    except Exception as e:
+                        say(f"  could not build on the frame: {e}")
+                    say(f"  {page.text_content('#instrument-reading')}")
+                    if not page.is_disabled("#instrument-go"):
+                        page.click("#instrument-go")
+                        say(f"  went in — {panel(page)}")
+                    else:
+                        # Nothing to read it with. Back out; the road is shut
+                        # and the walk gives up on a shut road like any other.
+                        page.keyboard.press("Escape")
+                        page.wait_for_selector("#instrument", state="hidden", timeout=5000)
+                        say("  nothing to read it with")
+                    page.wait_for_timeout(80)
+                    phase = ""
+                    continue
                 if page.is_visible("#town"):
                     if page.evaluate("() => window.__world().id") == "kettleworks-field":
                         seen_kettleworks = True

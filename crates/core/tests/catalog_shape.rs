@@ -245,6 +245,9 @@ fn axes(slot: SlotKind) -> (fn(&PieceDef) -> bool, fn(&PieceDef) -> bool) {
         SlotKind::Greaves => (tempo, reserve),
         SlotKind::Chest => (reserve, economy),
         SlotKind::Helmet => (economy, conversion),
+        // The instrument frame has no axis and is never asked for one: the
+        // five-axis cycle is a statement about gear, and `quotas` walks `ALL`.
+        SlotKind::Instrument => unreachable!("the axis cycle is the five a character wears"),
     }
 }
 

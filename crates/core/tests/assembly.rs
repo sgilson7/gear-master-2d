@@ -961,26 +961,35 @@ fn only_roles_that_do_not_interchange_are_qualified_by_slot() {
 fn a_slot_with_several_recipes_describes_each_one() {
     use gm2d_core::piece::recipe_parts;
 
+    // **Three ways since M13, not six.** The three instruments moved off this
+    // grid onto one of their own: an instrument used to cost your sword arm,
+    // and what is through the Reach is a map you have to fight on.
     let ways = recipe_parts(SlotKind::Weapon);
-    assert_eq!(ways.len(), 6, "weapon builds six ways");
+    assert_eq!(ways.len(), 3, "weapon builds three ways");
     let titles: Vec<&str> = ways.iter().map(|w| w.title).collect();
     assert_eq!(
         titles,
-        vec!["Martial weapon", "Book spell", "Crystal ball", "Compass", "Atlas", "Survey golem"],
-        "the weapon grid builds three weapons and three instruments"
+        vec!["Martial weapon", "Book spell", "Crystal ball"],
+        "the weapon grid builds weapons"
     );
 
-    // **The three instruments, and every bound exact.** What separates a
-    // compass from an atlas from a golem is the count of shards, so there is no
-    // optional half to any of them: a compass with no magnet is not a worse
-    // compass, it is not a compass.
-    assert_eq!(ways[3].required, vec!["1 map shard", "1 lens", "1 magnet"]);
+    // **The three instruments, on their own frame, and every bound exact.**
+    // What separates a compass from an atlas from a golem is the count of
+    // shards, so there is no optional half to any of them: a compass with no
+    // magnet is not a worse compass, it is not a compass.
+    let kit = recipe_parts(SlotKind::Instrument);
     assert_eq!(
-        ways[4].required,
+        kit.iter().map(|w| w.title).collect::<Vec<_>>(),
+        vec!["Compass", "Atlas", "Survey golem"],
+        "the instrument frame builds the three instruments"
+    );
+    assert_eq!(kit[0].required, vec!["1 map shard", "1 lens", "1 magnet"]);
+    assert_eq!(
+        kit[1].required,
         vec!["2 map shards", "1 lens", "1 crystal ball", "1 alignment"]
     );
-    assert_eq!(ways[5].required, vec!["3 map shards", "2 living earths"]);
-    for w in &ways[3..] {
+    assert_eq!(kit[2].required, vec!["3 map shards", "2 living earths"]);
+    for w in &kit {
         assert!(w.optional.is_empty(), "{}: an instrument has an optional half", w.title);
     }
 

@@ -58,6 +58,10 @@ export function paintMotif(g, x, y, cell, kind, ink, alpha) {
   g.restore();
 }
 
+/// The order grids are drawn in when a payload carries them. A preference, not
+/// a list of what exists — see `Board#slotOrder`.
+const SLOT_ORDER = ['weapon', 'helmet', 'chest', 'gloves', 'greaves', 'instrument'];
+
 export class Board {
   constructor(canvas, api) {
     this.c = canvas;
@@ -79,7 +83,15 @@ export class Board {
     /// took it, and the board does nothing further with that press.
     this.onclaim = null;
     this.pointed = null;   // pieces of the item under the cursor
-    this.slotOrder = ['weapon', 'helmet', 'chest', 'gloves', 'greaves'];
+    /// Which grids this board draws, in the order it draws them.
+    ///
+    /// **Taken from the payload, not from a list here.** It was five names
+    /// written out, which is a second copy of what grids exist — and M13 added
+    /// a sixth that this board is handed on its own, at the Reach. `SLOT_ORDER`
+    /// below is a *preference* rather than a source of truth: anything the
+    /// payload carries and it does not know about is drawn after, so a new
+    /// grid is at worst in the wrong place and never missing.
+    this.slotOrder = [];
 
     canvas.addEventListener('mousemove', (e) => this.move(e));
     canvas.addEventListener('mouseleave', () => {
@@ -102,6 +114,11 @@ export class Board {
 
   refresh() {
     this.state = JSON.parse(this.api.boardJson());
+    const have = (this.state.slots ?? []).map((s) => s.slot);
+    this.slotOrder = [
+      ...SLOT_ORDER.filter((n) => have.includes(n)),
+      ...have.filter((n) => !SLOT_ORDER.includes(n)),
+    ];
     this.fit();
     this.draw();
     this.onchange(this.state);

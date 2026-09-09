@@ -71,17 +71,6 @@ pub enum RuleError {
     NotEquipped,
     /// Tried to wear a quest item. They are carried and never worn.
     NotWearable,
-    /// **The weapon grid holds gear or an instrument, and never both.**
-    ///
-    /// `PLAN-M11.md` §8 row 4: the three survey instruments are built on the
-    /// weapon board, and *surveying costs your sword arm* is the decision that
-    /// buys — a sixth board would have been UI and no decision at all.
-    ///
-    /// Refused here rather than in a recipe, because a recipe governs one
-    /// *item* and a grid holds several. A compass and a blade in the same
-    /// weapon grid satisfy two recipes perfectly well and are exactly the thing
-    /// this is meant to stop.
-    MixedGrid { instrument: bool },
 }
 
 impl std::fmt::Display for RuleError {
@@ -92,17 +81,6 @@ impl std::fmt::Display for RuleError {
             RuleError::NotWearable => {
                 write!(f, "that is a quest item - it is carried, not worn")
             }
-            // TONE rule 12: a refusal names the thing that is in the way.
-            RuleError::MixedGrid { instrument: true } => write!(
-                f,
-                "there is an instrument in that grid, and an instrument is what the grid is \
-                 doing - take it apart if you want a weapon back"
-            ),
-            RuleError::MixedGrid { instrument: false } => write!(
-                f,
-                "there is gear in that grid. An instrument wants the whole of it, which is \
-                 what surveying costs you"
-            ),
         }
     }
 }
@@ -292,7 +270,11 @@ impl Character {
         // seats gear as low as row 6 — and shrinking it globally would put
         // every monster in a frame it does not fit. The player grows into
         // theirs; that asymmetry is the early game.
-        for k in SlotKind::ALL {
+        // **EVERY**, so the instrument frame starts three rows like the rest.
+        // It never grows after that — `resize_boards` walks `ALL`, and no node
+        // or errand names it — which is what makes "one instrument" the shape
+        // of the frame rather than a rule somebody has to remember.
+        for k in SlotKind::EVERY {
             *c.loadout.slot_mut(k) =
                 crate::slot::Slot::with_rows(k, crate::progression::STARTING_ROWS);
         }
@@ -428,31 +410,13 @@ impl Character {
         if self.registry.def(id).kind == crate::piece::PieceKind::Quest {
             return Err(RuleError::NotWearable);
         }
-        // **Gear or an instrument, never both.** See `RuleError::MixedGrid`.
-        //
-        // The line has a gap in it and the gap is the point: an orb and an
-        // alignment are in neither list, because a cosmic orb is a crystal
-        // ball's core *and* an atlas's. What is refused is a blade beside a
-        // shard, which is what `PLAN-M11.md` asks for in as many words.
-        if kind == SlotKind::Weapon {
-            let here = self.registry.def(id).kind;
-            let others: Vec<_> = self
-                .loadout
-                .slot(kind)
-                .pieces()
-                .into_iter()
-                .filter(|&p| p != id)
-                .map(|p| self.registry.def(p).kind)
-                .collect();
-            if crate::piece::is_survey(here) && others.iter().copied().any(crate::piece::is_weapon_gear)
-            {
-                return Err(RuleError::MixedGrid { instrument: false });
-            }
-            if crate::piece::is_weapon_gear(here) && others.iter().copied().any(crate::piece::is_survey)
-            {
-                return Err(RuleError::MixedGrid { instrument: true });
-            }
-        }
+        // **The grids do not mix, because they are two grids.** Until M13 an
+        // instrument was built in the weapon frame and `RuleError::MixedGrid`
+        // refused a blade beside a shard; the instrument has its own frame
+        // now, so what may go where is `PieceDef::fits` and there is nothing
+        // left here to enforce. The trade that rule existed to charge —
+        // surveying costs your sword arm — was the thing that made the far
+        // side of the Reach unwinnable, and it is gone with it.
         // A piece being moved within its own slot must not collide with
         // itself; `Slot::can_place` already allows that.
         Ok(self.loadout.slot(kind).can_place_shape(&self.registry, id, shape, ax, ay)?)
@@ -509,6 +473,44 @@ impl Character {
         self.loadout.slot_mut(kind).place(&self.registry, id, ax, ay);
         Ok(())
     }
+    /// Lift out anything sitting in a grid it does not belong in.
+    ///
+    /// **A save is written by one build and opened by another**, and M13 moved
+    /// four component kinds out of the weapon grid onto a frame of their own.
+    /// `Slot::place` does not validate — the loader hands it what the file
+    /// says — so a character who had built a compass would open with map shards
+    /// stranded among their blades: cells taken, no instrument granted, and
+    /// nothing on any screen to say why.
+    ///
+    /// This is the board's `World::repair`, and it is the same rule written
+    /// down there: **a field carried across a build change is a field that will
+    /// arrive wrong, and the loader is where that is caught.** What comes out
+    /// goes back to the bag rather than to another grid — where a component
+    /// belongs is the packing screen's question, and it is still owned.
+    ///
+    /// Returns what it lifted, so a caller can say so.
+    pub fn repair_boards(&mut self) -> Vec<&'static str> {
+        let mut lifted = Vec::new();
+        for kind in SlotKind::EVERY {
+            let strays: Vec<PieceId> = self
+                .loadout
+                .slot(kind)
+                .pieces()
+                .into_iter()
+                .filter(|&p| !self.registry.def(p).fits(kind))
+                .collect();
+            for p in strays {
+                // Straight off the grid: `unequip` refuses a locked piece, and
+                // a lock is exactly the state that would keep a stray where it
+                // is. The lock goes with it.
+                self.loadout.locks.retain(|l| !l.pieces.contains(&p));
+                self.loadout.slot_mut(kind).remove(p);
+                lifted.push(self.registry.def(p).name);
+            }
+        }
+        lifted
+    }
+
 
     /// Take `id` off and return it to the bag.
     pub fn unequip(&mut self, id: PieceId) -> Result<(), RuleError> {
@@ -1484,8 +1486,39 @@ impl Character {
             crate::data::skills().rules_from(&self.skills_taken)
         };
         out.extend(self.item_rules());
+        // **And the instrument, off its own frame.** `item_rules` walks
+        // `reports`, which walks `ALL`, which is the five grids a character
+        // wears — so the frame that is not gear has to be asked separately.
+        // That is the same division everywhere else in this change: what a
+        // board is *worth* never counts the instrument, and what you can
+        // *read a map with* is only ever the instrument.
+        if let Some(kind) = self.instrument() {
+            out.push(crate::rule::Rule::Survey { kind: kind.into() });
+        }
         out
     }
+    /// Which instrument is on the instrument frame, if one is finished.
+    ///
+    /// **One reading, whatever is on the frame.** The frame is six by three and
+    /// a golem is twelve cells, so one instrument is what it is for — but two
+    /// compasses would fit, and geometry cannot be the rule when the largest
+    /// instrument is bigger than two of the smallest. So this is the rule: the
+    /// first assembled instrument is the one you are reading with, and the
+    /// screen at the Reach says which. Silence would be a player carrying two
+    /// and never learning which one the map answered to.
+    ///
+    /// Read off the shard count by `loadout::instrument_of`, which is where
+    /// "what separates the three recipes" lives — so retuning a recipe retunes
+    /// this and the two cannot disagree.
+    pub fn instrument(&self) -> Option<&'static str> {
+        self.loadout
+            .report(&self.registry, SlotKind::Instrument)
+            .items
+            .iter()
+            .filter(|i| i.assembled)
+            .find_map(|i| crate::loadout::instrument_of(&self.registry, &i.pieces))
+    }
+
 
     /// The board's half of [`rules`](Self::rules).
     ///
@@ -1497,15 +1530,6 @@ impl Character {
         let mut out = Vec::new();
         for report in self.loadout.reports(&self.registry) {
             for item in report.items.iter().filter(|i| i.assembled) {
-                // **An instrument grants its own rule, and it is not a set.**
-                // A set is agreement and completeness across a recipe somebody
-                // wrote in `piece.rs`; an instrument is a *recipe*, so what it
-                // grants is decided by which recipe it satisfied. Read off the
-                // shard count, which is the whole of what separates the three.
-                if let Some(kind) = crate::loadout::instrument_of(&self.registry, &item.pieces) {
-                    out.push(crate::rule::Rule::Survey { kind: kind.into() });
-                    continue;
-                }
                 // **The set or nothing.** A rule off one component would be a
                 // rule off one component, and the whole ask was that a set
                 // bonus applies when the assembled item is recombined.

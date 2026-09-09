@@ -319,7 +319,8 @@ fn the_mirror_names_every_field() {
     assert_eq!(f.state.character.name_seed, g.character.loadout.name_seed);
     assert_eq!(f.state.character.registry.len(), g.character.registry.count());
     assert_eq!(f.state.character.owned.len(), g.character.owned.len());
-    assert_eq!(f.state.character.boards.len(), 5);
+    // Six since M13: the five a character wears plus the instrument frame.
+    assert_eq!(f.state.character.boards.len(), 6);
     assert_eq!(f.state.character.locks.len(), g.character.loadout.locks.len());
 }
 

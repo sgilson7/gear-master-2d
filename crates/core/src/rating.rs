@@ -250,10 +250,15 @@ pub const FULL_MARKS: i32 = 200;
 /// and the slot's own recipe. Computed once and cached: it is a pure function
 /// of `CATALOG`, but not a cheap one.
 fn slot_ceiling(slot: SlotKind) -> f32 {
-    static CEILINGS: OnceLock<[f32; 5]> = OnceLock::new();
+    static CEILINGS: OnceLock<[f32; 6]> = OnceLock::new();
     let all = CEILINGS.get_or_init(|| {
-        let mut out = [1.0f32; 5];
-        for s in SlotKind::ALL {
+        // **`EVERY`, and sized for it.** An instrument is rated the same way
+        // anything else on a grid is — it is an assembled item with a rating,
+        // and the shop's comparison and the item card both ask for one. The
+        // array is indexed by `SlotKind::index`, so a five-wide array and a
+        // sixth slot is an out-of-bounds panic rather than a wrong answer.
+        let mut out = [1.0f32; 6];
+        for s in SlotKind::EVERY {
             // Across every recipe the slot offers, not just the first. The
             // weapon slot builds martial weapons and spells, and rating a
             // spell against a ceiling made of handles and blades would scale

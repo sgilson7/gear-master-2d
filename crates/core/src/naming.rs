@@ -403,7 +403,11 @@ pub struct Naming {
 impl Naming {
     pub fn bases(&self, kind: SlotKind) -> &'static [&'static str] {
         match kind {
-            SlotKind::Weapon => self.weapon_bases,
+            // **An instrument borrows the weapon's words**, which is not a
+            // shrug: instruments were built in the weapon grid until M13, so
+            // these are the names every compass in every existing save already
+            // has. A table of its own would rename them all.
+            SlotKind::Weapon | SlotKind::Instrument => self.weapon_bases,
             SlotKind::Helmet => self.helmet_bases,
             SlotKind::Chest => self.chest_bases,
             SlotKind::Gloves => self.glove_bases,
@@ -728,6 +732,7 @@ mod rarity_names {
                 SlotKind::Chest => built(kind, &[("Sackcloth Base", 0, 0), ("Rag Layer", 0, 2)]),
                 SlotKind::Gloves => built(kind, &[("Leather Material", 0, 0), ("Gripping Mold", 2, 0)]),
                 SlotKind::Greaves => built(kind, &[("Leather Material", 0, 0), ("Greave Mold", 2, 0)]),
+                SlotKind::Instrument => unreachable!("ALL is the five a character wears"),
             };
             for seed in 0..96u64 {
                 for rarity in [Rarity::Common, Rarity::Rare, Rarity::Epic, Rarity::Legendary] {

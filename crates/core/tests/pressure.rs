@@ -134,7 +134,14 @@ fn a_piece_with_no_room_is_on_the_bench() {
 
     // And every one of them is a chest component: nothing else lost a home.
     for id in ch.inventory() {
-        if !ch.fits_anywhere(id) && ch.registry.def(id).kind != gm2d_core::piece::PieceKind::Quest {
+        // The same two exclusions `pressure::of` makes, because this loop is
+        // re-deriving its number: a quest item is carried rather than worn, and
+        // an instrument's parts go on a frame `fits_anywhere` does not walk.
+        let d = ch.registry.def(id);
+        if d.slots().iter().all(|&s| s == SlotKind::Instrument) {
+            continue;
+        }
+        if !ch.fits_anywhere(id) && d.kind != gm2d_core::piece::PieceKind::Quest {
             assert_eq!(
                 ch.registry.def(id).slot,
                 SlotKind::Chest,

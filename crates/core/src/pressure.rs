@@ -112,6 +112,12 @@ pub fn of(c: &Character) -> Pressure {
         .inventory()
         .into_iter()
         .filter(|&id| c.registry.def(id).kind != crate::piece::PieceKind::Quest)
+        // **And an instrument's parts, for the same reason one line up.** A
+        // map shard is not gear either: it goes in the instrument frame, which
+        // `fits_anywhere` does not walk because it walks `ALL`. Left in, every
+        // shard a player picked up would report as a component waiting for a
+        // cell that no amount of packing could ever give it.
+        .filter(|&id| !c.registry.def(id).slots().iter().all(|&s| s == crate::piece::SlotKind::Instrument))
         .filter(|&id| !c.fits_anywhere(id))
         .count() as u32;
     Pressure { slots, used, total, bench }

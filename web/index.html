@@ -169,6 +169,53 @@
       </div>
     </div>
 
+    <!-- **The instrument frame.** Its own screen, at the door it is for: an
+         instrument used to be built in the weapon grid, and the trade — a
+         survey costs your sword arm — made the far side of the Reach a map
+         you could read and could not fight on.
+
+         It is a board like any other, so it is the same `Board` class driven
+         by the same exports, handed one grid instead of five. Tier 30: it is
+         something you opened from where you are, and it takes Escape. -->
+    <div id="instrument" class="screen" hidden>
+      <div class="screenbox">
+        <header class="fighthead">
+          <div>
+            <p class="eyebrow">the edge of it</p>
+            <h2 id="instrument-where">the Wextreen Reach</h2>
+          </div>
+          <p class="note" id="instrument-shut"></p>
+        </header>
+        <div class="stages">
+          <p class="note">Nothing here will hold a footprint, and what you read it
+            with is the only thing that decides what is in front of you. Build an
+            instrument on this frame. It is not your weapon grid and it never was
+            — whatever you fight with on the other side stays where you packed it.</p>
+          <div class="packing">
+            <div>
+              <div class="boardwrap">
+                <canvas id="instrument-board" width="900" height="200"></canvas>
+              </div>
+              <p id="instrument-holding" class="holding"></p>
+              <p id="instrument-says" class="says" hidden></p>
+            </div>
+            <aside class="made">
+              <h4 class="sub-h">What you are reading with</h4>
+              <p id="instrument-reading" class="note"></p>
+              <ul id="instrument-reads" class="stats"></ul>
+              <!-- No heading of its own: `recipeBox` brings one, and two said
+                   "what it takes" one above the other. -->
+              <div id="instrument-recipes"></div>
+            </aside>
+          </div>
+        </div>
+        <div class="actionbar">
+          <button id="instrument-go" type="button" class="primary advance">Go in</button>
+          <button id="instrument-done" type="button">Back out</button>
+        </div>
+      </div>
+    </div>
+
     <div id="tree" class="screen" hidden>
       <div class="screenbox">
         <header class="fighthead">

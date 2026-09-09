@@ -427,13 +427,21 @@ pub fn position() -> String {
 /// which creature it is are all answered here.
 #[wasm_bindgen]
 pub fn try_step(dir: &str) -> String {
+    // **`"here"` is standing still and letting the door answer again.** The
+    // Reach turns you away for want of an instrument and leaves you on its
+    // tile; building one there has to open the same door, and repeating the
+    // step would walk you past it along the row. `world::here` reports the
+    // gate and nothing else, so everything below — the key, the survey, the
+    // map change, the bookkeeping — is the one code path a gate has ever had.
     let d = match dir {
         "n" => Dir::North,
         "s" => Dir::South,
         "e" => Dir::East,
         "w" => Dir::West,
+        "here" => Dir::North,
         _ => return serde_json::json!({ "moved": false, "blocked": "no such direction" }).to_string(),
     };
+    let standing = dir == "here";
     with_mut(|g| {
         let here = g.world.map_id();
         let marks = seen_by(g);
@@ -452,7 +460,11 @@ pub fn try_step(dir: &str) -> String {
             // Where the step started. A gate is walked *onto*, so this is the
             // tile the far side should remember — see `remember_at`.
             let stepped_from = g.world.at;
-            let s = world::step(w, &mut g.world, &mut g.rng, DIFFICULTY, d, &allowed);
+            let s = if standing {
+                world::here(w, &g.world, &allowed)
+            } else {
+                world::step(w, &mut g.world, &mut g.rng, DIFFICULTY, d, &allowed)
+            };
             // An encounter becomes state the moment it is rolled. Holding it
             // only in the page would mean a player who saved while a creature
             // was on screen came back with no creature and a free step.
@@ -496,6 +508,9 @@ pub fn try_step(dir: &str) -> String {
             // lock wants.
             let mut went = None;
             let mut shut = None;
+            // Which map is through a gate that refused for want of an
+            // instrument. `None` for every other kind of refusal.
+            let mut wants_instrument: Option<String> = None;
             // The key that turned just now, if one did, in the player's words.
             let mut turned = None;
             if let Some(id) = &s.gate {
@@ -592,6 +607,16 @@ pub fn try_step(dir: &str) -> String {
                         } else {
                             p.shut.clone()
                         });
+                        // **A gate that wants an instrument is not a wall, it
+                        // is a bench.** It is the one kind of shut door whose
+                        // answer the player is carrying the parts for, so the
+                        // page opens the instrument frame on it rather than
+                        // printing a refusal and stopping. Core says which map
+                        // is through it, because what an instrument *reads* is
+                        // a question about the map on the far side.
+                        if p.needs_survey {
+                            wants_instrument = p.to.clone();
+                        }
                     }
                 }
             }
@@ -663,6 +688,7 @@ pub fn try_step(dir: &str) -> String {
                     "prose": prose,
                 })),
                 "shut": shut,
+                "wants_instrument": wants_instrument,
                 // **The key that turned, and left the bag doing it.** A thing
                 // that disappears out of your inventory without a word reads
                 // as a bug, which is this project's oldest rule wearing a new
@@ -802,6 +828,7 @@ fn slot_of(name: &str) -> Option<gm2d_core::piece::SlotKind> {
         "chest" => Chest,
         "gloves" => Gloves,
         "greaves" => Greaves,
+        "instrument" => Instrument,
         _ => return None,
     })
 }
@@ -1120,6 +1147,26 @@ fn loose_entry(
 #[wasm_bindgen]
 pub fn board_json() -> String {
     use gm2d_core::piece::SlotKind;
+    boards_json(&SlotKind::ALL)
+}
+
+/// The instrument frame, on its own, in exactly the shape `board_json` returns.
+///
+/// **One payload builder, two screens.** The Reach's screen is a board like any
+/// other — pick a piece up, turn it, seat it — so it is the same `Board` on the
+/// page driven by the same exports, and the only difference is which grids it
+/// was handed. A second builder would be a second answer to *what is on a grid*,
+/// which is the thing the packing screen already asks core rather than working
+/// out for itself.
+#[wasm_bindgen]
+pub fn kit_json() -> String {
+    use gm2d_core::piece::SlotKind;
+    boards_json(&[SlotKind::Instrument])
+}
+
+fn boards_json(kinds: &[gm2d_core::piece::SlotKind]) -> String {
+    use gm2d_core::piece::SlotKind;
+    let _ = SlotKind::ALL;
     with(|g| {
         let ch = &g.character;
         // The profiles the fight runs on, so a card quotes the cadence and the
@@ -1131,7 +1178,7 @@ pub fn board_json() -> String {
         // because everything it decides depends on that name meaning one thing.
         let theme = gm2d_core::theme::by_id(&g.theme);
         let enchs = gm2d_core::data::enchs();
-        let slots: Vec<_> = SlotKind::ALL
+        let slots: Vec<_> = kinds
             .iter()
             .map(|&k| {
                 let slot = ch.loadout.slot(k);
@@ -1198,9 +1245,17 @@ pub fn board_json() -> String {
             })
             .collect();
 
+        // **The bag this screen can use.** The packing screen is handed the
+        // five a character wears and shows everything loose; the Reach's screen
+        // is handed one grid, and a bag full of blades on it would be a list of
+        // things that cannot be put down.
         let bag: Vec<_> = ch
             .inventory()
             .into_iter()
+            .filter(|&p| {
+                kinds.len() == SlotKind::ALL.len()
+                    || ch.registry.def(p).slots().iter().any(|s| kinds.contains(s))
+            })
             .map(|p| loose_entry(ch, theme, &enchs, p))
             .collect();
 
@@ -1212,6 +1267,44 @@ pub fn board_json() -> String {
             "stats": {
                 "health": stats.health, "strength": stats.strength,
                 "armor": stats.armor, "mana": stats.mana, "regen": stats.regen,
+            },
+        })
+        .to_string()
+    })
+}
+
+/// What the Reach's screen has to say: the instrument, and what it will do.
+///
+/// **Named, because two would otherwise be silent.** The frame holds one
+/// instrument comfortably and two small ones at a squeeze, and
+/// `Character::instrument` answers with the first — so a player who built two
+/// has to be told which one the map will answer to. A derived answer needs
+/// somewhere it is shown, or it cannot be told from a bug.
+///
+/// `reads` is `survey::mods_for` against the map through the door, so the
+/// screen states the trade in the numbers the map will actually use rather
+/// than in a sentence somebody wrote once and did not retune.
+#[wasm_bindgen]
+pub fn kit_reading_json(map: &str) -> String {
+    with(|g| {
+        let Some(kind) = g.character.instrument() else {
+            return serde_json::json!({ "kind": null }).to_string();
+        };
+        let items = g
+            .character
+            .loadout
+            .reports(&g.character.registry)
+            .iter()
+            .map(|r| r.assembled_count())
+            .sum::<usize>();
+        let m = gm2d_core::survey::mods_for(map, kind, items);
+        serde_json::json!({
+            "kind": kind,
+            "reads": {
+                "encounter_pct": m.encounter_pct,
+                "drops_per_mille": m.drops_per_mille,
+                "xp_pct": m.xp_pct,
+                "golem": m.golem,
             },
         })
         .to_string()

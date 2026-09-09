@@ -14,15 +14,50 @@ pub enum SlotKind {
     Gloves,
     Greaves,
     Weapon,
+    /// The frame a survey instrument is built on, and **not one of `ALL`**.
+    ///
+    /// An instrument used to be built in the weapon grid, which made surveying
+    /// cost your sword arm — the trade was deliberate and it was wrong, because
+    /// what is through the Reach is a map you have to fight on. Reported as
+    /// *"it makes any fight you would reach on the other side impossible"*.
+    ///
+    /// **It is outside `SlotKind::ALL` on purpose, and that is the whole
+    /// design.** `ALL` is the gear a character wears, and thirty-one places
+    /// walk it to ask what the boards are worth: `combat_items`, `total_stats`,
+    /// `pressure::of`, Auto-pack, the packing screen. An instrument is a tool
+    /// rather than gear, so every one of those is right without being touched.
+    /// [`SlotKind::EVERY`] is for the few that mean all six — building a
+    /// loadout, and writing one down.
+    Instrument,
 }
 
 impl SlotKind {
+    /// The five grids a character wears.
+    ///
+    /// **Not every grid**, since M13 gave an instrument its own — see
+    /// [`SlotKind::Instrument`] for why that exclusion is load-bearing rather
+    /// than an oversight.
     pub const ALL: [SlotKind; 5] = [
         SlotKind::Helmet,
         SlotKind::Chest,
         SlotKind::Gloves,
         SlotKind::Greaves,
         SlotKind::Weapon,
+    ];
+
+    /// Every grid there is, gear or not.
+    ///
+    /// Two callers, and both are about a loadout's *storage* rather than about
+    /// what a character is worth: `Loadout::new` builds one slot per entry, and
+    /// the save writes and reads one board per entry. Anything asking what the
+    /// boards *do* wants [`SlotKind::ALL`].
+    pub const EVERY: [SlotKind; 6] = [
+        SlotKind::Helmet,
+        SlotKind::Chest,
+        SlotKind::Gloves,
+        SlotKind::Greaves,
+        SlotKind::Weapon,
+        SlotKind::Instrument,
     ];
 
     pub fn index(self) -> usize {
@@ -32,6 +67,7 @@ impl SlotKind {
             SlotKind::Gloves => 2,
             SlotKind::Greaves => 3,
             SlotKind::Weapon => 4,
+            SlotKind::Instrument => 5,
         }
     }
 
@@ -42,6 +78,7 @@ impl SlotKind {
             SlotKind::Gloves => "Gloves",
             SlotKind::Greaves => "Greaves",
             SlotKind::Weapon => "Weapon",
+            SlotKind::Instrument => "Instrument",
         }
     }
 
@@ -1317,6 +1354,13 @@ impl PieceDef {
         match self.kind {
             PieceKind::Material => matches!(slot, SlotKind::Gloves | SlotKind::Greaves),
             PieceKind::Plating => matches!(slot, SlotKind::Helmet | SlotKind::Greaves),
+            // **The atlas's two cosmic pieces are a crystal ball's as well.**
+            // They live in the weapon grid, which `self.slot == slot` above
+            // already answers; this is the other half, and it is the reason
+            // `Orb` and `Alignment` were reused rather than invented — a
+            // cosmic orb in a ball is a perfectly good crystal ball, and one
+            // in an atlas is an atlas.
+            PieceKind::Orb | PieceKind::Alignment => slot == SlotKind::Instrument,
             _ => false,
         }
     }
@@ -1330,8 +1374,13 @@ impl PieceDef {
     }
 
     /// Every grid this component may go in, in slot order.
+    ///
+    /// **`EVERY`, so an instrument's parts report the frame they belong to.**
+    /// `shared` above stays on `ALL` deliberately: it decides whether a piece
+    /// is drawn without a grid's colour, and that is a question about the five
+    /// a character wears. A map shard has exactly one home and is not shared.
     pub fn slots(&self) -> Vec<SlotKind> {
-        SlotKind::ALL.iter().copied().filter(|&s| self.fits(s)).collect()
+        SlotKind::EVERY.iter().copied().filter(|&s| self.fits(s)).collect()
     }
 }
 
@@ -1386,19 +1435,24 @@ pub fn recipes(kind: SlotKind) -> &'static [&'static [(PieceKind, usize, usize)]
                 (PieceKind::Spell, 2, 3),
                 (PieceKind::Alignment, 0, 1),
             ],
-            // ---- the three instruments -----------------------------------
-            //
-            // On the weapon board and not a weapon, which is the trade: an
-            // instrument in the grid is a grid with no blade in it, and
-            // `Character::can_equip` refuses the mixture outright rather than
-            // leaving it to a recipe that would happily allow two items.
-            //
-            // Every bound is exact. A compass is one of each and an atlas is
-            // two shards; there is no "up to", because the difference between
-            // the three *is* the count and a range would blur it.
-            //
-            // **The compass.** A shard, something to look through, and
-            // something that points.
+        ],
+        // ---- the three instruments -----------------------------------
+        //
+        // **Their own frame since M13, and not the weapon's.** They were built
+        // in the weapon grid, and the trade — surveying costs your sword arm —
+        // was deliberate and was wrong: what is through the Reach is a map you
+        // have to fight on, so the cost was not a cost, it was a wall.
+        // Reported as *"it makes any fight you would reach on the other side
+        // impossible"*. What replaces it is the frame's own size: one
+        // instrument is what you can carry, so which one is the decision.
+        //
+        // Every bound is exact. A compass is one of each and an atlas is two
+        // shards; there is no "up to", because the difference between the
+        // three *is* the count and a range would blur it.
+        //
+        // **The compass.** A shard, something to look through, and something
+        // that points.
+        SlotKind::Instrument => &[
             &[
                 (PieceKind::Shard, 1, 1),
                 (PieceKind::Lens, 1, 1),
@@ -1449,6 +1503,10 @@ pub fn recipe(kind: SlotKind) -> &'static [(PieceKind, usize, usize)] {
 pub fn default_cooldown_ms(slot: SlotKind) -> u32 {
     match slot {
         SlotKind::Weapon => 1500,
+        // An instrument does not swing at anything. It never reaches a fight —
+        // `combat_items` walks `ALL` and the instrument frame is not in it — so
+        // this is the number a cadence must have rather than one that is used.
+        SlotKind::Instrument => 1500,
         SlotKind::Gloves => 3000,
         SlotKind::Greaves => 3500,
         SlotKind::Helmet => 4000,
@@ -12118,7 +12176,7 @@ pub static CATALOG: &[PieceDef] = &[
     // ("surveying costs your sword arm") not a trade at all.
     PieceDef {
         name: "Map Shard",
-        slot: SlotKind::Weapon,
+        slot: SlotKind::Instrument,
         kind: PieceKind::Shard,
         // Two cells, and an awkward two: an instrument is three to five pieces
         // in a grid that also wants to hold a weapon, and the whole decision is
@@ -12136,7 +12194,7 @@ pub static CATALOG: &[PieceDef] = &[
     },
     PieceDef {
         name: "Glass Lens",
-        slot: SlotKind::Weapon,
+        slot: SlotKind::Instrument,
         kind: PieceKind::Lens,
         cells: &[(0, 0)],
         base: Stats { mind: 4, magic_pierce: 4, ..Stats::ZERO },
@@ -12151,7 +12209,7 @@ pub static CATALOG: &[PieceDef] = &[
     },
     PieceDef {
         name: "Magnet",
-        slot: SlotKind::Weapon,
+        slot: SlotKind::Instrument,
         kind: PieceKind::Magnet,
         cells: &[(0, 0), (0, 1)],
         base: Stats { physical_pierce: 6, ..Stats::ZERO },
@@ -12207,7 +12265,7 @@ pub static CATALOG: &[PieceDef] = &[
     },
     PieceDef {
         name: "Living Earth",
-        slot: SlotKind::Weapon,
+        slot: SlotKind::Instrument,
         kind: PieceKind::Earth,
         cells: &[(0, 0), (1, 0), (0, 1)],
         base: Stats { health: 40, armor: 4, ..Stats::ZERO },

@@ -1121,6 +1121,119 @@ def check_the_bank_is_one_vault_in_every_town(page, name, fails):
         # further down.
         plant(page, base, lambda body: None, stem="bank-restore")
 
+
+def check_an_instrument_has_its_own_frame(page, name, fails):
+    """The Reach's door opens a frame, and building on it costs no gear.
+
+    Reported from play: *"the implementation for the surveying should not
+    require a weapon; when you try to go on the diamond that represents the
+    wextreen reach, you are shown a screen with a single gear slot, which you
+    must build the compass and other mapping based items within, not in your
+    weapon slot, as it makes any fight you would reach on the other side
+    impossible"*.
+
+    Three things only a browser can answer, and the third is the report:
+
+    1. the refusal opens the frame rather than printing a sentence,
+    2. what is built on it is read — the panel names the instrument,
+    3. **the weapon grid is untouched**, so what you walk in with is what you
+       packed. That is the whole of the complaint and it is the last assertion.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+
+    def at_the_edge(body):
+        body["world"]["map"] = "the-treyway"
+        body["world"]["at"] = [5, 1]
+        ch = body["character"]
+        # The parts, given rather than farmed: what is under test is the frame.
+        for n in ["Map Shard", "Glass Lens", "Magnet"]:
+            ch["registry"].append({"def": n})
+            ch["owned"].append(len(ch["registry"]) - 1)
+
+    try:
+        plant(page, base, at_the_edge, stem="reach-frame")
+        # Off the payload rather than the board's cached state: this check can
+        # run before the packing screen has ever been opened, and a board that
+        # has not refreshed is holding null.
+        weapon = """() => (JSON.parse(window.__board.api.boardJson()).slots
+            .find(s => s.slot === 'weapon')?.placed ?? []).length"""
+        weapon_before = page.evaluate(weapon)
+
+        page.click("#map")
+        page.keyboard.press("ArrowRight")
+        page.wait_for_timeout(500)
+        if not page.is_visible("#instrument"):
+            fails.append(f"{name}: the Reach refused and opened no frame")
+            return
+        # The refusal is still said, on the screen, so backing out explains why.
+        if not (page.text_content("#instrument-shut") or "").strip():
+            fails.append(f"{name}: the frame does not say why the edge is shut")
+        if not page.is_disabled("#instrument-go"):
+            fails.append(f"{name}: Go in is offered with nothing built")
+
+        # One grid, and it is the instrument's — asked of **the board on the
+        # screen**, not of the export. Reading `__kitJson` here would prove the
+        # shim can build a one-grid payload and say nothing about which payload
+        # the screen was handed, which is the thing that was wrong.
+        kit = page.evaluate("() => JSON.parse(window.__kitBoard().api.boardJson())")
+        got = [s["slot"] for s in kit.get("slots", [])]
+        if got != ["instrument"]:
+            fails.append(f"{name}: the Reach's screen draws {got}")
+            return
+        # And a bag of things that can go on it, rather than every blade owned.
+        elsewhere = [p["canonical"] for p in kit.get("bag", [])
+                     if "instrument" not in p.get("slots", [])]
+        if elsewhere:
+            fails.append(f"{name}: the frame's bag offers {elsewhere}, which cannot go on it")
+
+        # Build the compass through the page's own board api.
+        for canon, x, y in [("Map Shard", 0, 0), ("Glass Lens", 0, 1), ("Magnet", 1, 1)]:
+            pid = next((p["id"] for p in page.evaluate(
+                            "() => JSON.parse(window.__kitBoard().api.boardJson()).bag")
+                        if p["canonical"] == canon), None)
+            if pid is None:
+                fails.append(f"{name}: {canon} is not in the frame's bag")
+                return
+            why = page.evaluate(
+                "([id, x, y]) => window.__kitBoard().api.place(id, 'instrument', x, y)",
+                [pid, x, y])
+            if why:
+                fails.append(f"{name}: {canon} would not seat on the frame: {why}")
+                return
+        page.evaluate("() => window.__kitBoard().refresh()")
+        page.wait_for_timeout(150)
+
+        reading = page.text_content("#instrument-reading") or ""
+        if "compass" not in reading.lower():
+            fails.append(f"{name}: three parts on the frame and it reads {reading!r}")
+        if page.is_disabled("#instrument-go"):
+            fails.append(f"{name}: a compass is built and Go in is still refused")
+            return
+
+        # **The report, as one assertion.** Nothing came off the weapon grid.
+        weapon_after = page.evaluate(weapon)
+        if weapon_after != weapon_before:
+            fails.append(f"{name}: building an instrument changed the weapon grid "
+                         f"from {weapon_before} pieces to {weapon_after}")
+
+        # And it opens the door you were turned away from, without walking past it.
+        page.click("#instrument-go")
+        page.wait_for_timeout(700)
+        where = page.evaluate("() => window.__world().id")
+        if where != "the-reach":
+            fails.append(f"{name}: Go in with a compass built left you on {where}")
+        elif "compass" not in (page.text_content("#survey") or "").lower():
+            fails.append(f"{name}: on the Reach and the panel reads "
+                         f"{page.text_content('#survey')!r}")
+    finally:
+        if page.is_visible("#instrument"):
+            page.keyboard.press("Escape")
+        # The walk is one long walk and this one crosses a map.
+        plant(page, base, lambda body: None, stem="reach-restore")
+
+
 def check_a_chain_errand_can_be_handed_in(page, name, fails):
     """A chain errand can be finished where it came from.
 
@@ -2454,20 +2567,25 @@ def check_the_lake_drains_and_the_demo_ends_under_it(page, name, fails):
 
 
 def check_an_instrument_takes_the_grid(page, name, fails):
-    """A compass in the weapon grid grants a rule, and the grid takes no blade.
+    """A compass on the instrument frame grants a rule, and the sheet says so.
 
-    **M11.5**, the block's first save seam. What a browser has to prove is the
-    half no engine test can: that the refusal reaches a player where they will
-    read it. "Does not fit there" belongs on the board and clears in two and a
-    half seconds; *the grid is doing something else* is a rule about what you
-    may be, it happens twice in a playthrough, and it goes in the log.
+    **M11.5** built this against the weapon grid, where an instrument used to
+    live, and asserted the refusal a blade got beside a shard. M13 gave the
+    instrument a frame of its own — *"it makes any fight you would reach on the
+    other side impossible"* — so the refusal is gone and what is left is the
+    half that still matters: a rule moves no bar and prints no number of its
+    own, so a screen that says nothing about it is a rule that cannot be told
+    from a bug.
+
+    The weapon grid keeping its blade is asserted next door, in
+    `check_an_instrument_has_its_own_frame`, which is where the report is.
     """
     with page.expect_download(timeout=20000) as dl:
         page.click("#download")
     base = dl.value.path()
 
     def with_a_compass(body):
-        seat_a_set(body, COMPASS, "weapon")
+        seat_a_set(body, COMPASS, "instrument")
         # And a handle in the bag, unworn, to try to seat beside it.
         reg = body["character"]["registry"]
         reg.append({"def": "Oak Handle", "rot": 0})
@@ -2512,7 +2630,7 @@ def check_the_reach_reads_through_what_you_carry(page, name, fails):
         # `seat_a_set` strips too.
         strip_the_boards(body)
         if instrument:
-            seat_a_set(body, instrument, "weapon")
+            seat_a_set(body, instrument, "instrument")
         w = body.setdefault("world", {})
         w["map"] = "the-treyway"
         # **From the east, not the south.** The tile below the edge is a
@@ -2531,9 +2649,17 @@ def check_the_reach_reads_through_what_you_carry(page, name, fails):
     if page.evaluate("() => window.__world().id") != "the-treyway":
         fails.append(f"{name}: the reach opened with nothing to read it with")
     else:
-        said = last_said(page)
-        if not said:
+        # **The refusal is a screen now, not a line on the strip.** A gate that
+        # wants an instrument is the one shut door whose answer the player may
+        # be carrying the parts for, so it opens the frame — and the sentence
+        # that used to go to the log is on it.
+        if not page.is_visible("#instrument"):
+            fails.append(f"{name}: the reach refused and opened no frame")
+        elif not (page.text_content("#instrument-shut") or "").strip():
             fails.append(f"{name}: the reach refused in silence")
+        if page.is_visible("#instrument"):
+            page.keyboard.press("Escape")
+            page.wait_for_selector("#instrument", state="hidden", timeout=5000)
 
     # --- with a compass -------------------------------------------------------
     plant(page, base, lambda b: at_the_edge(b, COMPASS), stem="reach-compass")
@@ -4625,6 +4751,7 @@ def walk_the_gate(browser, name, fails=None):
     check_the_replay_can_be_slowed_and_read(page, name, fails)
     check_a_chain_errand_can_be_handed_in(page, name, fails)
     check_the_bank_is_one_vault_in_every_town(page, name, fails)
+    check_an_instrument_has_its_own_frame(page, name, fails)
     check_a_card_can_always_be_left(page, name, fails)
     check_a_defeat_costs_you_your_place(page, name, fails)
     check_an_instrument_takes_the_grid(page, name, fails)

@@ -1489,6 +1489,42 @@ impl Step {
     }
 }
 
+/// The place under your feet, reported as if you had just walked onto it —
+/// without walking, without a roll, and without a tile counted.
+///
+/// **For a door you were turned away from and have since answered.** The Reach
+/// refuses a gate you have nothing to read the map with, and you are left
+/// standing on it; building the instrument there has to be able to open the
+/// same door, and repeating the step would walk you *past* it along the row.
+///
+/// It reports the gate and nothing else. A town, an event, a boss and a bench
+/// all *happen* on arrival and have already happened — re-running them would
+/// reopen a card you dismissed, re-mend you, or put a creature in front of you
+/// for standing still. A gate is the one place whose answer can change while
+/// you stand on it, because the answer is a question about you.
+pub fn here(world: &World, state: &WorldState, allowed: &Allowances) -> Step {
+    let (x, y) = (state.at[0], state.at[1]);
+    let mut out = Step {
+        moved: false,
+        blocked: None,
+        event: None,
+        spent: false,
+        town: None,
+        gate: None,
+        door: None,
+        boss: None,
+        bench: None,
+        crossing: None,
+        encounter: None,
+    };
+    if let Some(p) = world.place_now(state, x, y, allowed) {
+        if p.kind == PlaceKind::Gate {
+            out.gate = Some(p.id.clone());
+        }
+    }
+    out
+}
+
 /// Take one step, rolling for an encounter on arrival.
 ///
 /// **Order matters and is fixed:** the move, then the place, then the roll. A

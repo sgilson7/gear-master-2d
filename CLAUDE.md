@@ -73,11 +73,16 @@ it was walked on the live page:
 | `98ff7cf` | a card you cannot leave, and a card carrying somebody else's errands |
 | `3d5c059` | a chain errand you can finish, and a fight you can slow down and read |
 | `eabc973` | a locked choice names the chain, a bank, a door that survives a reload, and a page that notices a new build |
+| *(this one)* | an instrument has a frame of its own, and surveying no longer costs your sword arm |
 
-**One of them touched the save and none of them the catalogue.** The bank adds
-`Character::banked`, which defaults empty and is skipped when it is — so the
-catalogue is still 568, there is still no seam, and every file that opened on
-M12 opens on this. The stamp a deploy leaves is a record of that deploy and not
+**Two of them touched the save and none of them the catalogue.** The bank adds
+`Character::banked`, which defaults empty and is skipped when it is; the
+instrument frame adds a sixth board, and a file naming five gets one at the
+height a player's frames are. A component changing which grid it goes in does
+not change its name and `catalog_fingerprint` hashes names, so the catalogue is
+still 568, there is still no seam, and every file that opened on M12 opens on
+this — `Character::repair_boards` lifts an old build's instrument out of the
+weapon grid on the way in. The stamp a deploy leaves is a record of that deploy and not
 a claim about now, the same way the two M12 stamps below are; **what has to
 agree is the pair**, `index.html` asking for `app.js?v=X` and that `app.js`
 carrying `BUILD='X'`.
@@ -870,23 +875,110 @@ whole of that lives in `crates/core/src/survey.rs`:
   quiet scales with how much of a board you gave up to carry an instrument,
   which is the trade the whole system is about.
 
-## An instrument takes the sword arm
+## An instrument has a frame of its own
 
-**A weapon grid holds gear or an instrument and never both.** Three recipes —
-compass, atlas, survey golem — are appended to the Weapon slot, built out of
-map shards the Stack and the lake leave behind plus lenses, magnets and living
-earth off things in the Stack's shadow.
+**It used to take the sword arm, and that was the wrong trade.** Three recipes
+— compass, atlas, survey golem — were appended to the Weapon slot, and a weapon
+grid held gear or an instrument and never both. The cost was deliberate,
+written down in `PLAN-M11.md` §8 row 4 and defended here for two blocks.
+Reported from play:
 
-- `RuleError::MixedGrid { instrument: bool }` is the refusal, and it carries
-  which side it is refusing so the sentence can name the thing you are actually
-  holding rather than saying *no*.
-- **`PieceKind::Shard` is deliberately not a core.** `is_core` is the
-  *item-split anchor*, and a shard that anchored a split would let a weapon
-  grid quietly assemble an instrument and a sword at once — which is the rule
-  above, defeated by a type. The exclusion is commented where it is made,
+> *"the implementation for the surveying should not require a weapon ... it
+> makes any fight you would reach on the other side impossible"*
+
+Which is the answer. **What is through the Reach is a map you have to fight
+on**, so a cost paid in your only weapon is not a cost, it is a wall — and the
+one thing this project keeps learning is that a wall and a price look identical
+from a chair until you are standing at it.
+
+- **`SlotKind::Instrument` is a sixth grid and is deliberately not in
+  `SlotKind::ALL`.** That exclusion is the whole design. `ALL` is the gear a
+  character wears, and thirty-one places walk it to ask what the boards are
+  worth — `combat_items`, `total_stats`, `pressure::of`, Auto-pack, the packing
+  screen. Every one of them is right about an instrument **without being
+  touched**, because an instrument is a tool and not gear. `SlotKind::EVERY` is
+  for the two callers that mean all six: building a loadout, and writing one
+  down.
+- **So `Character::instrument` is asked separately**, and `rules()` adds its
+  `Rule::Survey` from there. `item_rules` walks `reports`, which walks `ALL`,
+  which no longer reaches the frame — the same division everywhere else in the
+  change: what a board is *worth* never counts the instrument, and what reads a
+  map is only ever the instrument.
+- **`RuleError::MixedGrid` is gone**, along with the sentence about what
+  surveying costs you. The grids do not mix because they are two grids;
+  `PieceDef::fits` is the whole rule now.
+- **One instrument, and it is stated rather than drawn.** The frame is six by
+  three and a golem is twelve cells, so one is what it holds comfortably — but
+  two compasses are ten cells, and geometry cannot enforce a rule when the
+  largest instrument is bigger than two of the smallest. `Character::instrument`
+  answers with the first, **and the screen prints which**, because a player
+  carrying two must not be left to guess. Nothing grows the frame:
+  `resize_boards` walks `ALL`, and no node or errand names it.
+- **`PieceKind::Shard` is still deliberately not a core.** `is_core` is the
+  *item-split anchor*, and it mattered more when the two shared a grid — but it
+  is still what keeps a frame holding two instruments from splitting on a shard
+  in a way nobody authored. The exclusion is commented where it is made,
   because the next person to add a `PieceKind` will read that list.
-- The cost is the point: surveying costs your sword arm, and the compass's own
-  effect scales with what you gave up.
+- **`Orb` and `Alignment` fit both grids**, which is the reason they were
+  reused rather than invented: a cosmic orb in a ball is a crystal ball and one
+  in an atlas is an atlas. `shared()` still walks `ALL`, so they keep the
+  weapon's hue and a map shard is not "shared" — it has exactly one home.
+- **The hue is the widest gap left on the wheel, not an Okabe-Ito colour.** The
+  palette's two unused entries are orange and blue, three hundredths from
+  greaves and fifteen thousandths from helmet; neither is a channel. The
+  instrument takes 0.732, the middle of the largest unused arc, and its own
+  motif — a compass rose. It is the one grid never drawn beside the other five,
+  and separating it properly cost nothing.
+
+### A save written before the frame existed
+
+**`Slot::place` does not validate**, because the loader hands it what the file
+says — so a character who had built a compass would have opened with map shards
+stranded among their blades: cells taken, no instrument granted, and no screen
+saying why.
+
+`Character::repair_boards` lifts anything out of a grid it does not belong in
+and returns it to the bag. It is the board's `World::repair`, and it is the
+same rule: **a field carried across a build change is a field that will arrive
+wrong, and the loader is where that is caught.** What comes out goes to the bag
+rather than to another grid, because where a component belongs is the packing
+screen's question and it is still owned.
+
+**No seam.** Nothing moved the catalogue — a component changing which grid it
+goes in does not change its name, and `catalog_fingerprint` hashes names. A
+file that names five boards gets a sixth at the height a player's frames are.
+
+### The door is a bench, not a wall
+
+**A gate that wants an instrument is the only shut door in the game whose
+answer the player may already be carrying the parts for.** So it opens the
+frame instead of printing a refusal — asked for in as many words: *"you are
+shown a screen with a single gear slot, which you must build the compass and
+other mapping based items within"*.
+
+- **It is a board like any other**, so it is the same `Board` class driven by
+  the same exports, handed one grid instead of five. `boards_json(kinds)` is
+  one payload builder for both screens, because a second would be a second
+  answer to *what is on a grid*.
+- **`Board#slotOrder` is derived from the payload now.** It was five names
+  written out, which is a second copy of what grids exist; `SLOT_ORDER` is a
+  display *preference*, and anything the payload carries that it does not know
+  about is drawn after rather than dropped.
+- **`world::here` is standing still and letting the door answer again.** The
+  refusal leaves you on the gate's own tile, so repeating the step you were
+  turned away from walks you *past* it along the row. `here` reports the gate
+  and nothing else — no roll, no tile counted, and no town, event, boss or
+  bench re-running, because those happen on arrival and have already happened.
+  A gate is the one place whose answer can change while you stand on it,
+  because the answer is a question about you.
+- **The screen states the trade in core's numbers.** `kit_reading_json` runs
+  `survey::mods_for` against the map through the door, so what it promises is
+  what that map will actually be read with.
+- **`id="kit"` was already taken.** The pack in the map panel has it, and the
+  new screen took it too — so `walk()` saw a screen that was not hidden and
+  refused every keypress, which reads exactly like a frozen game. *Do not reuse
+  a name* has cost this project a `.card` collision, a `.tabs` collision and
+  now an id; the screen is `#instrument`.
 
 ---
 
@@ -3159,6 +3251,7 @@ about a string. Every one caught something on its first run:
 
 | 12.3 | **No ledger for a granted row, and two MVP pillar tests retired.** `PLAN-M12.md` asks for granted rows to be banked in the save; `BoardSave::rows` already is, and `resize_boards` only ever grows, so an old file keeps what it earned without a migration. What a row came *from* stays derived from `skills_taken` and `quests_done`. The two tests asserting *level N implies board B* are gone rather than repaired — that guarantee is what the milestone removes. | `crates/core/src/progression.rs` |
 | 12.5 | **Every root choice hands over its own errand**, which the plan does not ask for. §M12.5 asks events to pay something and say what they pay; that was built and was still not a decision, because both branches of a root opened invisible content. The errand is the visibility, and it is why chain errands had to become `granted` — an unoffered kind of errand the plan has no row for. | `crates/core/src/quest.rs`, `Quest::granted` |
+| 11.6a | **An instrument has a frame of its own, and `PLAN-M11.md` §8 row 4 is reversed.** That row asked for the instrument to live in the weapon grid — *surveying costs your sword arm* — and it was taken, defended and shipped. It was wrong, and the report is the argument: what is through the Reach is a map you have to fight on, so a cost paid in your only weapon is a wall rather than a price. `SlotKind::Instrument` is a sixth grid, deliberately outside `SlotKind::ALL` so that nothing which asks what a board is *worth* ever counts it. `RuleError::MixedGrid` is gone with the rule it enforced. | `crates/core/src/piece.rs`, `SlotKind::Instrument` |
 | 12.6 | **Rerolls, which `PLAN-M12.md` §0 declines by name.** The block's founding decision was no reroll, on the grounds that a shelf which changes every visit is not a place. That still holds and the *shelf* still never rolls; what turns over is the barrel and the order book, which are rolled to begin with. The reversal is the human's, narrowed to the two tiers where "give me a different one" is not the same as "give me a different town". | `crates/core/src/shop.rs` |
 
 Also true, and not in the brief because it could not have been:
@@ -3258,6 +3351,7 @@ Every figure below was re-measured for M12.6 rather than carried forward.
 | The speed of a fight, and a log you can read | **701 passing** |
 | A locked choice was a wall, and is a target now | **703 passing** |
 | A bank, a door that survives a reload, and a sheet on the screen that changes it | **710 passing** |
+| An instrument has a frame of its own | **715 passing** |
 
 Note M12.4 adds none, and neither did M11.0 or M11.8 — all three are honest.
 M12.4 is a playthrough, a triage and a brief; its deliverable is
@@ -3276,7 +3370,7 @@ content*, and one check now measures what a range used to guess at.
 | Ladder | **58 creatures**, rated 16 to 2958. Six are stepped down: the Kettleworks field's five and The Gearwright, at `gear_offset: -2` plus a body trim where the footprint families ran out — 12 to 16% each |
 | `crates/core` | **~43.9k lines**, down from ~50k at the fork — `wc -l` over every `.rs` under `crates/core/src`. The method is named because the figure carried here through M12.6 was 42.4k and no Rust has moved since |
 | wasm | **1439 KB**, up from 1178 KB at M10.3 — `dist/web/pkg/gm2d_wasm_bg.wasm` after `make web`. CI builds its own and the two are not bit-identical, which is why the *stamp* is checked against itself and never against a number |
-| Save format | v1. **No seam, still.** `banked` — the bank — is the newest field and defaults empty, so a save from before there was one opens without a vault, which is what those characters had. **No seam in M12** either: Every field it added defaults — `commissions`, `rolled_barrel`, `rolled_ledgers`, `rerolls`, `bought_licence` — so an older file opens on the authored barrel with no orders and no licence, which is what those characters had |
+| Save format | v1. **No seam, still.** A save now carries **six boards**; one naming five gets an instrument frame at the base height, and `repair_boards` lifts an old build's instrument out of the weapon grid on the way in — the loader is where a field carried across a build change is caught. `banked` — the bank — defaults empty, so a save from before there was one opens without a vault, which is what those characters had. **No seam in M12** either: Every field it added defaults — `commissions`, `rolled_barrel`, `rolled_ledgers`, `rerolls`, `bought_licence` — so an older file opens on the authored barrel with no orders and no licence, which is what those characters had |
 | Maps | **11**, in `data/maps/*.tiles.json` — west-bambulon 20×20, the-great-gear-cave 9×5, the-treyway 16×16, kettleworks-field 20×20, five Drambus Stack floors 10×10, under-the-lake 13×9, the-reach 20×20 |
 | Places | 2 towns, 56 events, 11 gates, 7 bosses, 2 crossings, 1 bench, 1 door — 41 of the events are the Kettleworks field alone |
 | Events | 56 placed: **43 ask something and 13 are notes**, over **73 choices**. **21 chains from 10 roots**, every root choice handing over an errand. Was 9 asking and 0 chains before M12.5 |
@@ -3284,7 +3378,7 @@ content*, and one check now measures what a range used to guess at.
 | Effect kinds | 6: stat, start_with, grow_slot_rows, assembly_pct, grants, gives_ench — **unchanged** |
 | Ench effect kinds | 4: power, haste, spin, fragile — **unchanged** |
 | `Rule` kinds | **9**: curse_on_activate, spin_extra, spin_keep, spin_every, scout, rout, wade, **survey**, **homeward** |
-| Instruments | 3 — compass, atlas, survey golem; all three build on the **weapon** grid, and a weapon grid holds gear or an instrument and never both |
+| Instruments | 3 — compass, atlas, survey golem, all three on **their own frame**: `SlotKind::Instrument`, six by three, outside `SlotKind::ALL` so nothing that asks what a board is worth ever counts it. It never grows, and one instrument is what it holds |
 | Data files | **23** — 12 in `data/` and 11 in `data/maps/`; `data::FILES` is the list `data_is_current` walks |
 | Starting kit | 2 components, **140 Fnorp**, 1 assembled weapon. The purse moved ×5 with the prices; at 28 a beginner could afford three of thirteen barrel lines and no helmet, and both M4 soft-lock guards said so |
 | Towns | **2 placed** (the pit and Kettleworks), 1 staged; fixed shelves of 11 / 15 / 17 that **still never reroll**; none sells an ench. Under each counter: a **13-line barrel** and an **order book** (8 lines over 3 towns), and those two *do* turn over |
@@ -3294,7 +3388,7 @@ content*, and one check now measures what a range used to guess at.
 | The counters | shelf **×5** of catalogue, order book **×10**, barrel **×1**. The barrel holds nothing dearer than 60 and the book nothing cheaper than 65, so the three tiers cannot overlap |
 | A reroll | `n*n` Fnorp for the nth, counted **per type**, wiped every ten levels in every town. The line you have on order is never rerolled out from under you |
 | Board pressure | fill **43%** at level five and **37%** at eight before M12 — *down*, because rows arrived on a clock and components did not. `pressure::of` is the measurement and `pressure::target` is what it is aimed at |
-| Boards | 6×3 on every frame at level 1, 6×8 ceiling. **A row is no longer a thing a level hands you** — it is a skill point or a finished errand, **7 nodes and 2 errands**, and M12.0's measurement of why is in *A row is earned, not scheduled* |
+| Boards | **Six frames**: five worn, 6×3 at level 1 with a 6×8 ceiling, and the instrument's, 6×3 for ever.  **A row is no longer a thing a level hands you** — it is a skill point or a finished errand, **7 nodes and 2 errands**, and M12.0's measurement of why is in *A row is earned, not scheduled* |
 | Level 5 | ~27 fights, mean of nine seeded walks |
 | The Treyway | brackets levels **12–16**, not the plan's 5–9 — the door behind it is behind a crossing that asks for 9 |
 | A whole playthrough | **342 wins, 170 losses, level 14, 4,406 steps** to the door under the lake |
@@ -3302,8 +3396,8 @@ content*, and one check now measures what a range used to guess at.
 | Classes offered | 5, and every one of their powers reaches something — a lint says so |
 | Figures | 27 `.tex` → **81 SVGs** (13 family drawings, 4 drawn for themselves, 5 classes, 3 towns, you) |
 | Art coverage | **58 of 58 creatures**, 3 of 3 towns, 5 of 5 classes, and you. The set pieces, the instruments and the enchs have no art and want none — a component has never had a figure |
-| Browser gate | **54 checks**, 3 engines, pointed at the live page for M12's deploy. The two newest are the bank across two towns and a door that survives a reload |
-| The suite | **710 passing, and 14 seconds warm.** `[profile.test] opt-level = 2` since M12.6: `drops.rs` alone ran 66s at `opt-level 0`, more than the other 57 files together, and is 6.7s now. Debug assertions and overflow checks stay on — this is the `test` profile, not `--release` |
+| Browser gate | **55 checks**, 3 engines, pointed at the live page for M12's deploy. The newest is the Reach's own frame: the door opens it, a compass built there is read, and the weapon grid is untouched |
+| The suite | **715 passing, and 14 seconds warm.** `[profile.test] opt-level = 2` since M12.6: `drops.rs` alone ran 66s at `opt-level 0`, more than the other 57 files together, and is 6.7s now. Debug assertions and overflow checks stay on — this is the `test` profile, not `--release` |
 
 Note the catalogue is **568**, not the 374 the retheme document counts — it
 grew upstream after that document was written, and three times here. Any

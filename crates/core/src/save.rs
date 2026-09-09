@@ -480,6 +480,16 @@ impl SaveFile {
         loadout.name_seed = name_seed;
         loadout.assembly_pct = assembly_pct;
 
+        // **A save from before there was an instrument frame gets one.**
+        // `Loadout::new` builds it at the engine's full height, which is what a
+        // creature wears; a player's is three rows. The boards loop below
+        // overwrites whatever it finds a board for, so this only has to answer
+        // for the file that names five.
+        if !boards.iter().any(|(n, _)| n == "instrument") {
+            *loadout.slot_mut(SlotKind::Instrument) =
+                Slot::with_rows(SlotKind::Instrument, crate::progression::STARTING_ROWS);
+        }
+
         for (name, board) in &boards {
             let kind = slot_kind(name)
                 .ok_or_else(|| format!("this save is damaged: it names a slot called {name:?}."))?;
@@ -557,6 +567,10 @@ impl SaveFile {
         // meaning moved is a field that will arrive wrong, and the loader is
         // where that is caught, exactly as `World::repair` is.
         game.character.repair_enchs();
+        // **And anything sitting in a grid it does not belong in**, which since
+        // M13 means the instrument parts a file written before there was an
+        // instrument frame left among the blades. See `repair_boards`.
+        game.character.repair_boards();
         // **What the nodes and the class imply, re-derived.** The save carries
         // which nodes were taken and which class was chosen, not what they did,
         // so `assembly_pct` was whatever was banked when the file was written —
@@ -602,6 +616,7 @@ fn slot_name(k: SlotKind) -> &'static str {
         SlotKind::Chest => "chest",
         SlotKind::Gloves => "gloves",
         SlotKind::Greaves => "greaves",
+        SlotKind::Instrument => "instrument",
     }
 }
 
@@ -612,6 +627,7 @@ fn slot_kind(name: &str) -> Option<SlotKind> {
         "chest" => SlotKind::Chest,
         "gloves" => SlotKind::Gloves,
         "greaves" => SlotKind::Greaves,
+        "instrument" => SlotKind::Instrument,
         _ => return None,
     })
 }

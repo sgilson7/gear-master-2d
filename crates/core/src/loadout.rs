@@ -568,7 +568,11 @@ impl Loadout {
     pub fn new() -> Self {
         Loadout {
             locks: Vec::new(),
-            slots: SlotKind::ALL.iter().map(|&k| Slot::new(k)).collect(),
+            // **EVERY, not ALL.** A loadout stores six grids; five of them
+            // are gear and the sixth is the instrument frame, which nothing
+            // that asks what a board is *worth* should walk. See
+            // `SlotKind::Instrument`.
+            slots: SlotKind::EVERY.iter().map(|&k| Slot::new(k)).collect(),
             name_seed: 0,
             naming: &crate::naming::PLAIN_NAMING,
             assembly_pct: 0,

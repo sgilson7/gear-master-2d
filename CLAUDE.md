@@ -74,6 +74,7 @@ it was walked on the live page:
 | `3d5c059` | a chain errand you can finish, and a fight you can slow down and read |
 | `eabc973` | a locked choice names the chain, a bank, a door that survives a reload, and a page that notices a new build |
 | `5ff7eb4` | an instrument has a frame of its own, and surveying no longer costs your sword arm |
+| `f439274` | a row is bought all the way up to the old size, and the tree's wires are drawn where they are |
 
 **Two of them touched the save and none of them the catalogue.** The bank adds
 `Character::banked`, which defaults empty and is skipped when it is; the
@@ -285,7 +286,7 @@ something cost a day.
 
 ## Commands
 
-    make test          # the engine suite, native, 687 tests, ~14s warm
+    make test          # the engine suite, native, 717 tests, ~14s warm
     make check         # fast type-check
     make web           # build dist/web/
     make test-ui       # drive the built page in three real browsers
@@ -312,7 +313,7 @@ one directory was one directory too few.
 `GM2D_ORIGIN` skips the local server entirely and walks a page that is already
 up, which in practice means **the live one**. That is the *verify against the
 live page* step this file has demanded since M8, done by the thing that already
-holds all forty-six questions instead of by a person remembering four.
+holds all fifty-five questions instead of by a person remembering four.
 
 **`make test-ui` and `make play` are different tools.** The first walks a route
 chosen to exercise checks and asserts; the second starts a new game and plays
@@ -1416,9 +1417,12 @@ So a scheduled row is dilution on a timer, and the rotation is gone.
 `progression::rows_for` and `grows_at` are retired; there is `base_rows()`,
 which is three for every frame for ever, and `board_rows(granted)`.
 
-- **A row is a thing you buy or a thing you finish.** Seven skill nodes grant
-  one — one for each of the five frames, and a second for the weapon and the
-  chest — and two errands do. Every level now poses the game's own question with
+- **A row is a thing you buy or a thing you finish.** Eleven skill nodes grant
+  one and two errands do. M12.3 wrote seven of the eleven — one for each of the
+  five frames, and a second for the weapon and the chest — and M13 added the
+  four that carry a frame the rest of the way to the original six by eight, on
+  a spine that costs more the deeper you go. See *A row is bought all the way
+  up to the old size*. Every level now poses the game's own question with
   the player's hands on it — power on the board you have, or a bigger board —
   which is the pressure the whole block is about.
 - **Nothing is banked, and the save needed no migration**, which is a
@@ -3164,6 +3168,22 @@ live build 502ea52d
 **The zero is the report.** Building an instrument took nothing off the board
 you fight with, which is the whole of what was asked for.
 
+And the one after it is the tree, whose interesting line is *seventeen*:
+
+```
+live build a418bea0
+  index.html asks app.js?v=a418bea0   app.js carries BUILD='a418bea0'
+  chromium walked the gate    ok      firefox  walked the gate    ok
+  webkit   walked the gate    ok      55 checks, no failures
+  the tree                    22 nodes over nine tiers
+  its wires, on first open    17 drawn, 17 with real coordinates
+  the new tiers read          "+1 row on every grid", collapsed by Node::line
+  console errors: none                off-origin requests: none
+```
+
+**Seventeen with real coordinates is the whole of the wire fix**, and the
+number the old gate could not tell from seventeen at the origin.
+
 **A stamp is not a commit and this block moved it twice.** M12.6 deployed
 `ccfeb16d`; deleting `STARTER`, `seat` and `ROTATION` a commit later rebuilt
 the wasm and the stamp became `d8965cf7` — *dead code is still bytes the
@@ -3204,7 +3224,7 @@ live build 43804e49
 **The hand-written table is not obsolete and should still be written**, because
 the gate asks the questions somebody already thought to encode and a deploy
 note should also record what you went and looked at. What changed is that the
-floor is now forty-six rather than zero.
+floor is now fifty-five rather than zero.
 
 M9's was:
 
@@ -3456,8 +3476,8 @@ content*, and one check now measures what a range used to guess at.
 | Pieces that apply a curse | 59 of 568, 4 kinds, 2 on the starting shelf |
 | Sets | **9**, of three components each bar the Toad Frame's two — every piece `EVENT_ONLY`, off one creature **or one stack of floors**, in one grid |
 | Ladder | **58 creatures**, rated 16 to 2958. Six are stepped down: the Kettleworks field's five and The Gearwright, at `gear_offset: -2` plus a body trim where the footprint families ran out — 12 to 16% each |
-| `crates/core` | **~43.9k lines**, down from ~50k at the fork — `wc -l` over every `.rs` under `crates/core/src`. The method is named because the figure carried here through M12.6 was 42.4k and no Rust has moved since |
-| wasm | **1439 KB**, up from 1178 KB at M10.3 — `dist/web/pkg/gm2d_wasm_bg.wasm` after `make web`. CI builds its own and the two are not bit-identical, which is why the *stamp* is checked against itself and never against a number |
+| `crates/core` | **~44.4k lines**, down from ~50k at the fork — `wc -l` over every `.rs` under `crates/core/src`. The method is named because the figure carried here through M12.6 was 42.4k while the code had moved under it |
+| wasm | **1470 KB**, up from 1178 KB at M10.3 — `dist/web/pkg/gm2d_wasm_bg.wasm` after `make web`. CI builds its own and the two are not bit-identical, which is why the *stamp* is checked against itself and never against a number |
 | Save format | v1. **No seam, still.** A save now carries **six boards**; one naming five gets an instrument frame at the base height, and `repair_boards` lifts an old build's instrument out of the weapon grid on the way in — the loader is where a field carried across a build change is caught. `banked` — the bank — defaults empty, so a save from before there was one opens without a vault, which is what those characters had. **No seam in M12** either: Every field it added defaults — `commissions`, `rolled_barrel`, `rolled_ledgers`, `rerolls`, `bought_licence` — so an older file opens on the authored barrel with no orders and no licence, which is what those characters had |
 | Maps | **11**, in `data/maps/*.tiles.json` — west-bambulon 20×20, the-great-gear-cave 9×5, the-treyway 16×16, kettleworks-field 20×20, five Drambus Stack floors 10×10, under-the-lake 13×9, the-reach 20×20 |
 | Places | 2 towns, 56 events, 11 gates, 7 bosses, 2 crossings, 1 bench, 1 door — 41 of the events are the Kettleworks field alone |
@@ -3476,7 +3496,7 @@ content*, and one check now measures what a range used to guess at.
 | The counters | shelf **×5** of catalogue, order book **×10**, barrel **×1**. The barrel holds nothing dearer than 60 and the book nothing cheaper than 65, so the three tiers cannot overlap |
 | A reroll | `n*n` Fnorp for the nth, counted **per type**, wiped every ten levels in every town. The line you have on order is never rerolled out from under you |
 | Board pressure | fill **43%** at level five and **37%** at eight before M12 — *down*, because rows arrived on a clock and components did not. `pressure::of` is the measurement and `pressure::target` is what it is aimed at |
-| Boards | **Six frames**: five worn, 6×3 at level 1 and 6×8 once the tree has been walked all the way up, and the instrument's, 6×3 for ever.  **A row is no longer a thing a level hands you** — it is a skill point or a finished errand, **7 nodes and 2 errands**, and M12.0's measurement of why is in *A row is earned, not scheduled* |
+| Boards | **Six frames**: five worn, 6×3 at level 1 and 6×8 once the tree has been walked all the way up, and the instrument's, 6×3 for ever.  **A row is no longer a thing a level hands you** — it is a skill point or a finished errand, **11 nodes and 2 errands**, and M12.0's measurement of why is in *A row is earned, not scheduled* |
 | Level 5 | ~27 fights, mean of nine seeded walks |
 | The Treyway | brackets levels **12–16**, not the plan's 5–9 — the door behind it is behind a crossing that asks for 9 |
 | A whole playthrough | **342 wins, 170 losses, level 14, 4,406 steps** to the door under the lake |

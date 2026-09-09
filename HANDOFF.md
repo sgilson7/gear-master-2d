@@ -75,7 +75,7 @@ web/                   vanilla ES modules, no bundler
   shape.js             a component's shape, small
 data/*.json            all the content
 data/maps/*.tiles.json one file per map, named for its id — eleven of them
-testing/drive.py       the deploy gate: 46 checks, three browsers, and it can
+testing/drive.py       the deploy gate: 55 checks, three browsers, and it can
                        be pointed at the live page with GM2D_ORIGIN
 testing/playthrough.py `make play` — a walker somebody who built it wrote
 testing/agent_driver.py one command per turn, for an agent that may not read
@@ -186,8 +186,11 @@ REBASELINE_GOLDEN_COMBAT=1 cargo test -p gm2d-core
   is the only place it becomes a level; a defeat takes everything unbanked and
   nothing you had spent.
 - **A row is earned, not scheduled** — M12.3, and the biggest change to how the
-  game plays since the MVP. Every frame is 6×3 for ever, ceiling 6×8, and a
-  level hands out **nothing**: seven skill nodes grant a row and two errands do.
+  game plays since the MVP. Every frame starts 6×3, ceiling 6×8, and a level
+  hands out **nothing**: eleven skill nodes grant a row and two errands do.
+  M13 added four of the eleven, on a spine that costs more the deeper you go
+  and walks every frame the whole way to the old game's eight — twenty-eight
+  points for the ladder, against a `MAX_LEVEL` of 32.
   So every level poses the game's own question with your hands on it — power on
   the board you have, or a bigger board. Anything you remember about a fixed
   weapon/chest/helmet/gloves/greaves rotation is gone with `ROTATION`.
@@ -240,13 +243,16 @@ REBASELINE_GOLDEN_COMBAT=1 cargo test -p gm2d-core
   whole lake rather than its rim, and entered before the tower falls the way
   down is twenty-one tiles of slag against eleven of road. Fatigue is what the
   early way costs, because fatigue is the only currency a dungeon here has.
-- **Three instruments, and they take your sword arm.** A compass, an atlas and a
-  survey golem build on the **weapon** grid out of map shards the Stack and the
-  lake leave behind — and a weapon grid holds gear or an instrument and never
-  both. With one assembled you can enter **the Wextreen Reach** at the north
-  edge of the Treyway; without one there is nothing to read it with. It is the
-  same map every time and what changes is the instrument: the compass quiets it,
-  the atlas pays more and is louder, the golem fights one fight for you.
+- **Three instruments, on a frame of their own.** A compass, an atlas and a
+  survey golem, built out of map shards the Stack and the lake leave behind.
+  They took the **weapon** grid until M13 — *surveying costs your sword arm* —
+  and that made the map through the door one you could read and could not fight
+  on, so `SlotKind::Instrument` is a sixth grid and is deliberately outside
+  `SlotKind::ALL`. Walk into **the Wextreen Reach** at the north edge of the
+  Treyway and the refusal opens that frame for you to build on; without an
+  instrument there is nothing to read it with. It is the same map every time
+  and what changes is the instrument: the compass quiets it, the atlas pays
+  more and is louder, the golem fights one fight for you.
 - **The north is gated.** Two crossings: the Burnwarp Shallows want level 5 and
   the Bengulon Verge wants 9, and West Bambulon — and therefore the Cave — is
   behind the Verge. A crossing guards a *region*, not its own tile.
@@ -309,31 +315,35 @@ REBASELINE_GOLDEN_COMBAT=1 cargo test -p gm2d-core
 
 ## 9. What is being built next
 
-**Nothing.** The tree is between blocks: M12 is done and live, two reported
-faults have been fixed and deployed since, and the next block is a spec
-somebody writes. If you are picking this up to execute one, read §9 to the end
+**Nothing.** The tree is between blocks: M12 is done and live, eleven reported
+faults and asks have been fixed and deployed since, and the next block is a
+spec somebody writes. If you are picking this up to execute one, read §9 to the end
 — the four lists below are what is already known to be worth doing, and three
 things are outstanding rather than open (the two `TRIAGE-M12.md` rows that are
 not the builder's, and `PLAN-M12-EXEC.md` §8 row 13).
 
-**Since the block closed**, both reported from play and both on `main`:
+**Since the block closed**, all of it reported from play, all on `main`, all
+walked on the live page:
 
 | | |
 |---|---|
 | `d45643e` | pointing at an item no longer scrolls the board off the screen — `scrollIntoView` moves *every* scrollable ancestor. And what a grid takes moved out of the right-hand list onto a `?` beside the frame's own name |
 | `2cfb8f6` | the frozen-save gate check waited for any tape line reading *Loaded*, which the walk's own upload had already printed. It waits for the position now |
+| `9f7ef4c` | `Event::Hit` carries `by_item`, so the replay's per-item number is the swing that item just threw rather than the estimate its card made before the bell. And `Combatant::pool_pays` finally has a screen |
+| `b3b296f` | that check drove an animation it did not own, and raced it |
+| `d03d8c1` | the Kettleworks was a wall. **The body numbers are not the lever** — health, strength and regen at 70% changed not one outcome; almost all of what those creatures do is the gear they wear, so `gear_offset` is the dial |
+| `f114cdf` | a defeat forgets your place on the map you fell on, so a door is the door again |
+| `98ff7cf` | an event card can always be left, and carries nothing but its own errands |
+| `3d5c059` | all twenty-one chain errands could be taken and none handed in. And the replay can be slowed, paused, stepped and read as a log |
+| `eabc973` | a locked choice names the event that opens it; a bank, one vault every town; the page notices a newer build while a tab stays open; and the world the page draws is re-read after a save is restored |
+| `5ff7eb4` | **an instrument has a frame of its own.** `SlotKind::Instrument`, outside `SlotKind::ALL`, so nothing that asks what a board is worth ever counts it — surveying used to cost your sword arm and that made the far side of the Reach unwinnable |
+| `f439274` | the Sprocketman's craft grows five more tiers that walk every frame up to the original six by eight, costing more the deeper you go. And the tree's wires are drawn where they are: `openTree` painted before it un-hid the screen, and you cannot measure `display: none` |
 
-Neither of those two touched the engine: still catalogue **568**, no save seam.
-The page they left up is `07a29306`, asked for and carried — and the *pair* is
-what has to agree, never the number.
-
-**The third does touch it, in one field.** `Event::Hit` now carries `by_item`,
-the index of the item that threw the swing, because the replay's per-item
-number was the estimate the card made before the bell and never moved — while
-held fury is added to every swing and a spin lifts an item's own power. And
-`Combatant::pool_pays` finally has a screen: *what a banked pool pays, per
-point*, on the standing panel, ported from the original's reference shelf and
-drawn from the same function. **691 tests, 48 gate checks.**
+**Two of them touched the save and none the catalogue.** `Character::banked` is
+the bank and defaults empty; the instrument frame is a sixth board, and a file
+naming five gets one at the base height. Still catalogue **568**, still no
+seam, and `repair_boards` lifts an old build's instrument out of the weapon
+grid on the way in. **717 tests, 55 gate checks.**
 
 **M12 is done and live**, at build stamp `d8965cf7`. Eight milestones — M12.B (a player's
 save that could not be played), M12.0 (the measure), M12.1 and M12.1a (the

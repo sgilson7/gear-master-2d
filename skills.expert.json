@@ -1,0 +1,1049 @@
+{
+ "format": "gm2d-skills",
+ "version": 1,
+ "_note": "Expert trees, M13. Every node moves its own class's power and nothing else: `tunes` names a knob the power declares, `grants` names a rule the power is kin to, `gives_ench` names an ench inside the licence. `expert_nodes_touch_only_the_expert` is the lint. Six nodes a tree, two points a node, ten trees, sixty nodes.",
+ "trees": [
+  {
+   "id": "loud-calculation",
+   "name": "Loud Calculation",
+   "class": "LoudCalculation",
+   "nodes": [
+    {
+     "id": "lc-rate-card",
+     "name": "The Rate Card",
+     "blurb": "Pinned inside the funnel where the light is worst. Two figures, one crossed out, and the crossing-out is the older of the two.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "rate",
+       "by": -4
+      }
+     }
+    },
+    {
+     "id": "lc-standing-order",
+     "name": "Standing Order",
+     "blurb": "Thirty points a fight, drawn whether you need them. Twenty-two fights in, nobody has needed all thirty and nobody has cancelled it.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "cap",
+       "by": 30
+      }
+     }
+    },
+    {
+     "id": "lc-overdraft",
+     "name": "The Overdraft",
+     "blurb": "You may go twenty past empty. You may not go to nothing; the last point of you is not for sale and the clerk has that in writing.",
+     "cost": 2,
+     "requires": [
+      "lc-rate-card"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "floor",
+       "by": 20
+      }
+     }
+    },
+    {
+     "id": "lc-rebate",
+     "name": "The Rebate",
+     "blurb": "A kill inside the fight refunds half the bill, paid at the bell, in strength, in front of whoever is left.",
+     "cost": 2,
+     "requires": [
+      "lc-standing-order"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "rebate",
+       "by": 50
+      }
+     }
+    },
+    {
+     "id": "lc-shouted-figures",
+     "name": "Shouted Figures",
+     "blurb": "He shouts the exchange rate over the noise and the rate improves each time he shouts it. Four shouts is where it stops improving.",
+     "cost": 2,
+     "requires": [
+      "lc-overdraft"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "rate",
+       "by": -4
+      }
+     }
+    },
+    {
+     "id": "lc-both-books-open",
+     "name": "Both Books Open",
+     "blurb": "One for one. The Sergeant stops arguing at one for one, which took eleven years and a funnel.",
+     "cost": 2,
+     "requires": [
+      "lc-shouted-figures",
+      "lc-rebate"
+     ],
+     "effect": [
+      {
+       "tunes": {
+        "knob": "rate",
+        "by": -2
+       }
+      },
+      {
+       "tunes": {
+        "knob": "cap",
+        "by": 30
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "standing-fact",
+   "name": "Standing Fact",
+   "class": "StandingFact",
+   "nodes": [
+    {
+     "id": "sf-the-count",
+     "name": "The Count",
+     "blurb": "Three items. The fourth is what makes a fact an opinion, and nobody has explained why.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "worn",
+       "by": 1
+      }
+     }
+    },
+    {
+     "id": "sf-first-fact",
+     "name": "The First Fact",
+     "blurb": "One fact, held open, for as long as you are carrying little enough to hold it.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "carry",
+       "by": 1
+      }
+     }
+    },
+    {
+     "id": "sf-margin",
+     "name": "Writ in the Margin",
+     "blurb": "A fact that cannot expire is read more often, and reading it costs the reader.",
+     "cost": 2,
+     "requires": [
+      "sf-the-count"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "bite",
+       "by": 20
+      }
+     }
+    },
+    {
+     "id": "sf-second-fact",
+     "name": "The Second Fact",
+     "blurb": "Two at once. The Keeper kept nine at once for a season and was asked to stop by six people who had all been counted.",
+     "cost": 2,
+     "requires": [
+      "sf-first-fact"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "carry",
+       "by": 1
+      }
+     }
+    },
+    {
+     "id": "sf-bare-armed",
+     "name": "Bare-Armed",
+     "blurb": "Four items and the fact still stands. Past four it sits down.",
+     "cost": 2,
+     "requires": [
+      "sf-margin"
+     ],
+     "effect": [
+      {
+       "tunes": {
+        "knob": "worn",
+        "by": 1
+       }
+      },
+      {
+       "tunes": {
+        "knob": "bite",
+        "by": 10
+       }
+      }
+     ]
+    },
+    {
+     "id": "sf-told-again",
+     "name": "Told Again",
+     "blurb": "A fact that outlives the fight is told to the next thing you meet, once, before it has said anything.",
+     "cost": 2,
+     "requires": [
+      "sf-bare-armed",
+      "sf-second-fact"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "told",
+       "by": 1
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "overwound-arm",
+   "name": "Overwound Arm",
+   "class": "OverwoundArm",
+   "nodes": [
+    {
+     "id": "oa-dry-bearing",
+     "name": "Dry Bearing",
+     "blurb": "An empty frame has nothing in it to slow down. Kaklon called this obvious in 1911 and nobody has built on it since.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "half",
+       "by": 3
+      }
+     }
+    },
+    {
+     "id": "oa-empty-bench",
+     "name": "The Empty Bench",
+     "blurb": "Six more turns of nothing, banked. The bench does not know it is empty.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "ceiling",
+       "by": 6
+      }
+     }
+    },
+    {
+     "id": "oa-clearing",
+     "name": "The Clearing",
+     "blurb": "Every second turn, the bare cell next to worked ground becomes worked ground. Four turns is four cells and the frame is not empty any more, only unpacked.",
+     "cost": 2,
+     "requires": [
+      "oa-dry-bearing"
+     ],
+     "effect": {
+      "grants": {
+       "rule": {
+        "spread": {
+         "every_turns": 2
+        }
+       }
+      }
+     }
+    },
+    {
+     "id": "oa-counterspin",
+     "name": "Counterspin",
+     "blurb": "Two stacks survive an activation. The arm does not stop; it is asked to pause and it declines twice.",
+     "cost": 2,
+     "requires": [
+      "oa-empty-bench"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "carry",
+       "by": 2
+      }
+     }
+    },
+    {
+     "id": "oa-both-arms",
+     "name": "Both Arms",
+     "blurb": "A whole stack a turn off a frame with nothing in it. Twelve turns is twelve, which is more than most people manage with gear on.",
+     "cost": 2,
+     "requires": [
+      "oa-clearing"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "half",
+       "by": 5
+      }
+     }
+    },
+    {
+     "id": "oa-overwound",
+     "name": "Overwound",
+     "blurb": "Sixteen over the old ceiling and it turns faster than that. The recall notice for this one is printed under the tap.",
+     "cost": 2,
+     "requires": [
+      "oa-both-arms",
+      "oa-counterspin"
+     ],
+     "effect": [
+      {
+       "tunes": {
+        "knob": "ceiling",
+        "by": 10
+       }
+      },
+      {
+       "tunes": {
+        "knob": "half",
+        "by": 2
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "short-programme",
+   "name": "Short Programme",
+   "class": "ShortProgramme",
+   "nodes": [
+    {
+     "id": "sp-the-poster",
+     "name": "The Poster",
+     "blurb": "Sixty percent, printed. The printer got it wrong and the house honoured the print, and has honoured it every night since.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "pct",
+       "by": 10
+      }
+     }
+    },
+    {
+     "id": "sp-quick-change",
+     "name": "Quick Change",
+     "blurb": "Two seconds an empty frame. Five empty frames is ten seconds, which is the whole of the original window and the reason the window was ten.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "per_slot",
+       "by": 1
+      }
+     }
+    },
+    {
+     "id": "sp-house-clock",
+     "name": "The House Clock",
+     "blurb": "Two seconds slow since 1904. Every act in the building is paid off it and no act has complained.",
+     "cost": 2,
+     "requires": [
+      "sp-the-poster"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "floor_ms",
+       "by": 2000
+      }
+     }
+    },
+    {
+     "id": "sp-second-house",
+     "name": "The Second House",
+     "blurb": "Each paid win adds a second to the next window, up to five. A win outside the window puts it back to nothing.",
+     "cost": 2,
+     "requires": [
+      "sp-quick-change"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "streak",
+       "by": 1
+      }
+     }
+    },
+    {
+     "id": "sp-no-encore",
+     "name": "No Encore",
+     "blurb": "Fifteen points more for the act that does not come back out. The house has counted eleven encores in nine seasons and paid for none of them.",
+     "cost": 2,
+     "requires": [
+      "sp-house-clock"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "pct",
+       "by": 15
+      }
+     }
+    },
+    {
+     "id": "sp-short-programme",
+     "name": "The Short Programme Itself",
+     "blurb": "Twice the bill on a fast win with nothing on. The judges gave it a five, a two and a minus seven, and the box office does not read scores.",
+     "cost": 2,
+     "requires": [
+      "sp-no-encore",
+      "sp-second-house"
+     ],
+     "effect": [
+      {
+       "tunes": {
+        "knob": "per_slot",
+        "by": 1
+       }
+      },
+      {
+       "tunes": {
+        "knob": "pct",
+        "by": 25
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "curse-requisition",
+   "name": "Curse Requisition",
+   "class": "CurseRequisition",
+   "nodes": [
+    {
+     "id": "cr-the-form",
+     "name": "The Form",
+     "blurb": "Five a fight. There is a box for a sixth and the box has never been filled in by anyone the Keeper will name.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "per_fight",
+       "by": 2
+      }
+     }
+    },
+    {
+     "id": "cr-ripest-first",
+     "name": "Ripest First",
+     "blurb": "Spend the one with the least time left rather than the cheapest. The clerk fought this for two years on the grounds that it was sensible.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "pick",
+       "by": 1
+      }
+     }
+    },
+    {
+     "id": "cr-countersigned",
+     "name": "Countersigned",
+     "blurb": "Every third requisition puts the curse back where it was found, signed twice, still running.",
+     "cost": 2,
+     "requires": [
+      "cr-the-form"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "relist",
+       "by": 1
+      }
+     }
+    },
+    {
+     "id": "cr-two-signatures",
+     "name": "Two Signatures",
+     "blurb": "A spent curse covers half again what a cast costs, and the half again is banked rather than lost.",
+     "cost": 2,
+     "requires": [
+      "cr-ripest-first"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "worth",
+       "by": 50
+      }
+     }
+    },
+    {
+     "id": "cr-standing-requisition",
+     "name": "Standing Requisition",
+     "blurb": "Eight a fight. The Sergeant signs the whole book at the start and hands it over open.",
+     "cost": 2,
+     "requires": [
+      "cr-countersigned"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "per_fight",
+       "by": 3
+      }
+     }
+    },
+    {
+     "id": "cr-whole-book",
+     "name": "The Whole Book",
+     "blurb": "Every second one comes back, and each covers double. The requisition is now cheaper than the cast, which the Sergeant says is how requisitions are meant to work.",
+     "cost": 2,
+     "requires": [
+      "cr-standing-requisition",
+      "cr-two-signatures"
+     ],
+     "effect": [
+      {
+       "tunes": {
+        "knob": "relist",
+        "by": 1
+       }
+      },
+      {
+       "tunes": {
+        "knob": "worth",
+        "by": 50
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "patented-funnel",
+   "name": "Patented Funnel",
+   "class": "PatentedFunnel",
+   "nodes": [
+    {
+     "id": "pf-the-tap",
+     "name": "The Tap",
+     "blurb": "Eight a stack a turn. The tap is on the side of the funnel and the side of the funnel is the patent's, so the eight is licensed.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "per_stack",
+       "by": 3
+      }
+     }
+    },
+    {
+     "id": "pf-second-licence",
+     "name": "The Second Licence",
+     "blurb": "It turns every eight hundred milliseconds instead of every thousand. Two hundred milliseconds, bought and paid for, twelve times a fight.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "grants": {
+       "rule": {
+        "spin_every": {
+         "ms": 800
+        }
+       }
+      }
+     }
+    },
+    {
+     "id": "pf-full-rows",
+     "name": "Full Rows",
+     "blurb": "A row with no gap in it pays four a cell at the bell, and stays exactly where it is. Nothing clears; the row is the machine and clearing it would be taking the machine apart.",
+     "cost": 2,
+     "requires": [
+      "pf-the-tap"
+     ],
+     "effect": {
+      "grants": {
+       "rule": {
+        "row_harvest": {
+         "per_cell": 4
+        }
+       }
+      }
+     }
+    },
+    {
+     "id": "pf-flywheel-brake",
+     "name": "The Flywheel Brake",
+     "blurb": "Two stacks survive the activation. A brake that keeps the wheel turning is what the patent office queried and what the patent says.",
+     "cost": 2,
+     "requires": [
+      "pf-second-licence"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "bleed",
+       "by": 2
+      }
+     }
+    },
+    {
+     "id": "pf-overflow-pipe",
+     "name": "The Overflow Pipe",
+     "blurb": "Funny past the top of the funnel comes out as armour, one for one, down a pipe added in 1912 by somebody who was tired of mopping.",
+     "cost": 2,
+     "requires": [
+      "pf-full-rows"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "overflow",
+       "by": 1
+      }
+     }
+    },
+    {
+     "id": "pf-funnel-patented",
+     "name": "The Funnel, Patented",
+     "blurb": "Twelve a stack a turn and the rows pay half again. Spike Kaklon has offered nine hundred Fnorp for the drawings on four occasions.",
+     "cost": 2,
+     "requires": [
+      "pf-overflow-pipe",
+      "pf-flywheel-brake"
+     ],
+     "effect": [
+      {
+       "tunes": {
+        "knob": "per_stack",
+        "by": 4
+       }
+      },
+      {
+       "tunes": {
+        "knob": "harvest",
+        "by": 2
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "opening-number",
+   "name": "Opening Number",
+   "class": "OpeningNumber",
+   "nodes": [
+    {
+     "id": "on-longer-overture",
+     "name": "Longer Overture",
+     "blurb": "Thirteen seconds. Three of them are the conductor deciding whether to start.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "window_ms",
+       "by": 3000
+      }
+     }
+    },
+    {
+     "id": "on-standing-discount",
+     "name": "The Standing Discount",
+     "blurb": "Twenty percent off after the window closes, on the grounds that the house is already warm.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "after",
+       "by": 20
+      }
+     }
+    },
+    {
+     "id": "on-encore",
+     "name": "Encore",
+     "blurb": "A kill inside the window starts the window again. Once. The house has a rule about twice and the rule is the number two.",
+     "cost": 2,
+     "requires": [
+      "on-longer-overture"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "encore",
+       "by": 1
+      }
+     }
+    },
+    {
+     "id": "on-unspent",
+     "name": "Unspent",
+     "blurb": "Funny left over when the lights come up lands as armour. Nobody at the house can explain the mechanism and the armour is on you regardless.",
+     "cost": 2,
+     "requires": [
+      "on-standing-discount"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "bank",
+       "by": 1
+      }
+     }
+    },
+    {
+     "id": "on-second-overture",
+     "name": "Second Overture",
+     "blurb": "Seventeen seconds. The programme lists it as four minutes and the programme is not the clock.",
+     "cost": 2,
+     "requires": [
+      "on-encore"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "window_ms",
+       "by": 4000
+      }
+     }
+    },
+    {
+     "id": "on-whole-first-act",
+     "name": "The Whole First Act",
+     "blurb": "Two encores and half price after. Eleven seasons of first acts and the second act has been performed nine times.",
+     "cost": 2,
+     "requires": [
+      "on-second-overture",
+      "on-unspent"
+     ],
+     "effect": [
+      {
+       "tunes": {
+        "knob": "encore",
+        "by": 1
+       }
+      },
+      {
+       "tunes": {
+        "knob": "after",
+        "by": 30
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "cursed-licence",
+   "name": "Cursed Licence",
+   "class": "CursedLicence",
+   "nodes": [
+    {
+     "id": "cl-searing-clause",
+     "name": "The Searing Clause",
+     "blurb": "Clause four. The weapon frame, every time it goes off, and the ench does not have to be told which weapon.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "grants": {
+       "rule": {
+        "curse_on_activate": {
+         "slot": "weapon",
+         "curse": "searing"
+        }
+       }
+      }
+     }
+    },
+    {
+     "id": "cl-frost-clause",
+     "name": "The Frost Clause",
+     "blurb": "Clause seven, added when a licensee held both hands out and asked what the gloves were for.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "grants": {
+       "rule": {
+        "curse_on_activate": {
+         "slot": "gloves",
+         "curse": "frost"
+        }
+       }
+      }
+     }
+    },
+    {
+     "id": "cl-second-reading",
+     "name": "Second Reading",
+     "blurb": "Every third activation of an enched item lands its curse twice, and the item runs fifteen percent slower for the privilege. The office reads everything twice and takes longer.",
+     "cost": 2,
+     "requires": [
+      "cl-searing-clause"
+     ],
+     "effect": {
+      "grants": {
+       "rule": {
+        "productivity": {
+         "every": 3,
+         "slower_pct": 15
+        }
+       }
+      }
+     }
+    },
+    {
+     "id": "cl-stun-rider",
+     "name": "The Stun Rider",
+     "blurb": "A rider on the helmet, in a hand nobody at the office recognises, initialled by three people who have all left.",
+     "cost": 2,
+     "requires": [
+      "cl-frost-clause"
+     ],
+     "effect": {
+      "grants": {
+       "rule": {
+        "curse_on_activate": {
+         "slot": "helmet",
+         "curse": "stun"
+        }
+       }
+      }
+     }
+    },
+    {
+     "id": "cl-misfire-schedule",
+     "name": "The Misfire Schedule",
+     "blurb": "Schedule two, the greaves. Every third act of theirs does nothing, which the schedule describes as an administrative outcome.",
+     "cost": 2,
+     "requires": [
+      "cl-second-reading"
+     ],
+     "effect": {
+      "grants": {
+       "rule": {
+        "curse_on_activate": {
+         "slot": "greaves",
+         "curse": "misfire"
+        }
+       }
+      }
+     }
+    },
+    {
+     "id": "cl-licence-entire",
+     "name": "The Licence Entire",
+     "blurb": "Twice a curse on every enched activation, every clause, every frame. It is nine pages and eight of them are the list.",
+     "cost": 2,
+     "requires": [
+      "cl-misfire-schedule",
+      "cl-stun-rider"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "stack",
+       "by": 1
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "eleventh-season",
+   "name": "Eleventh Season",
+   "class": "EleventhSeason",
+   "nodes": [
+    {
+     "id": "es-ledger-column",
+     "name": "The Ledger Column",
+     "blurb": "Fifteen percent a curse, in a column the Keeper added and the box office has never queried.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "pct",
+       "by": 5
+      }
+     }
+    },
+    {
+     "id": "es-house-count",
+     "name": "The House Count",
+     "blurb": "Six counted instead of four. The two extra were being landed anyway and now they are being paid for.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "count_cap",
+       "by": 2
+      }
+     }
+    },
+    {
+     "id": "es-four-kinds",
+     "name": "Four Kinds",
+     "blurb": "Four different kinds on one fallen creature pays double. Three kinds pays what three kinds pays, which is the point of the number four.",
+     "cost": 2,
+     "requires": [
+      "es-ledger-column"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "distinct",
+       "by": 1
+      }
+     }
+    },
+    {
+     "id": "es-long-run",
+     "name": "The Long Run",
+     "blurb": "A curse that ran out before the bell counts for half. It was on them for most of it and the ledger says so.",
+     "cost": 2,
+     "requires": [
+      "es-house-count"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "posthumous",
+       "by": 5
+      }
+     }
+    },
+    {
+     "id": "es-billing-review",
+     "name": "The Billing Review",
+     "blurb": "Twenty percent a curse. Reviewed in the eighth season, upheld in the ninth, reviewed again out of habit.",
+     "cost": 2,
+     "requires": [
+      "es-four-kinds"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "pct",
+       "by": 5
+      }
+     }
+    },
+    {
+     "id": "es-eleven-seasons",
+     "name": "Eleven Seasons of It",
+     "blurb": "Thirty percent a curse and nine of them counted. The act has not changed since the second season and the money has changed eleven times.",
+     "cost": 2,
+     "requires": [
+      "es-billing-review",
+      "es-long-run"
+     ],
+     "effect": [
+      {
+       "tunes": {
+        "knob": "pct",
+        "by": 10
+       }
+      },
+      {
+       "tunes": {
+        "knob": "count_cap",
+        "by": 3
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "full-bill",
+   "name": "Full Bill",
+   "class": "FullBill",
+   "nodes": [
+    {
+     "id": "fb-second-rack",
+     "name": "The Second Rack",
+     "blurb": "Three a component. The rack was built for two and has four slots, which is the sort of thing the workshop did.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "racks",
+       "by": 1
+      }
+     }
+    },
+    {
+     "id": "fb-standing-order",
+     "name": "The Standing Order",
+     "blurb": "The Index, off the house list, no charge. It has been on the list since the list was one item long.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "gives_ench": {
+       "ench": "the-yodregar-index"
+      }
+     }
+    },
+    {
+     "id": "fb-ponkey-broadcast",
+     "name": "Ponkey Broadcast",
+     "blurb": "An enched component lends forty percent of what it is carrying to every finished item touching it. The lending is not noticed by the lender.",
+     "cost": 2,
+     "requires": [
+      "fb-second-rack"
+     ],
+     "effect": {
+      "grants": {
+       "rule": {
+        "beacon": {
+         "pct": 40
+        }
+       }
+      }
+     }
+    },
+    {
+     "id": "fb-house-list",
+     "name": "The House List",
+     "blurb": "The Allowance, which the house has never charged for and has twice tried to stop giving away.",
+     "cost": 2,
+     "requires": [
+      "fb-standing-order"
+     ],
+     "effect": {
+      "gives_ench": {
+       "ench": "the-hooper-s-allowance"
+      }
+     }
+    },
+    {
+     "id": "fb-wider-broadcast",
+     "name": "Wider Broadcast",
+     "blurb": "Sixty-five percent, and it reaches diagonally now, which the workshop insists is the same thing.",
+     "cost": 2,
+     "requires": [
+      "fb-ponkey-broadcast"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "beacon_pct",
+       "by": 25
+      }
+     }
+    },
+    {
+     "id": "fb-bill-in-full",
+     "name": "The Bill in Full",
+     "blurb": "Four a component and eighty percent lent out. Two licences, one rack, and a bill that runs to a second page.",
+     "cost": 2,
+     "requires": [
+      "fb-wider-broadcast",
+      "fb-house-list"
+     ],
+     "effect": [
+      {
+       "tunes": {
+        "knob": "racks",
+        "by": 1
+       }
+      },
+      {
+       "tunes": {
+        "knob": "beacon_pct",
+        "by": 15
+       }
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

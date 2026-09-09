@@ -879,12 +879,20 @@ fn piece_payload(
 }
 
 /// What is bolted to one component, as the page needs it. `Null` for nothing.
+///
+/// **The first of them, and a Full Bill's rack holds up to four.** M13.6 wired
+/// `ExpertPower::FullBill`'s `racks` into `Character::attach_ench`, so a
+/// component can carry more than one — and this reads `ench_on`, which is the
+/// first. The whole rack is `Character::enchs_on`; drawing it is M13.7's, and
+/// until then a Full Bill's second ench works and cannot be seen, which is the
+/// failure this file's own notes keep finding.
 fn ench_json(
     ch: &gm2d_core::character::Character,
     data: &gm2d_core::ench::EnchsData,
     p: gm2d_core::piece::PieceId,
 ) -> serde_json::Value {
-    let Some(e) = ch.ench_on(p) else { return serde_json::Value::Null };
+    let on = ch.enchs_on(p);
+    let Some(e) = on.first() else { return serde_json::Value::Null };
     let Some(d) = data.get(&e.id) else { return serde_json::Value::Null };
     serde_json::json!({
         "id": d.id, "name": d.name, "blurb": d.blurb,
@@ -892,6 +900,20 @@ fn ench_json(
         // line is written in. TONE 13a.
         "spec": d.effect.line(), "detail": d.effect.detail(),
         "active": e.active,
+        // **And whatever else is on it.** A Full Bill's component holds up to
+        // four, and a card naming one of them is a card that is wrong about the
+        // item it is describing.
+        "more": on
+            .iter()
+            .skip(1)
+            .filter_map(|o| {
+                let d = data.get(&o.id)?;
+                Some(serde_json::json!({
+                    "id": d.id, "name": d.name, "spec": d.effect.line(),
+                    "active": o.active,
+                }))
+            })
+            .collect::<Vec<_>>(),
     })
 }
 
@@ -2095,12 +2117,32 @@ pub fn bench_json() -> String {
             // **The way round the fork.** Two of the five classes are licensed
             // by being what they are; everybody else can buy the same paper
             // here, once, and the fork does not come off.
+            //
+            // **Kept as it was, and it is now one of three.** `papers` below is
+            // the whole counter — the Patent included — and this is the one
+            // line the screen had before there were three. Both are drawn off
+            // `Game::papers`, so there is no second answer to what the Patent
+            // costs or whether you have it.
             "licence": {
                 "price": gm2d_core::ench::LICENCE_PRICE,
                 "afford": g.character.gold >= gm2d_core::ench::LICENCE_PRICE,
                 "needed": !g.character.licensed(),
                 "bought": g.character.bought_licence,
             },
+            // **Three papers, all drawn, and the refused ones say why.**
+            // `Game::papers` drops the ones already answered and fills `why`
+            // for the ones the counter will not sell yet — *a locked line on a
+            // shelf you can read is a goal; an absent line is a secret*. The
+            // refusal has the count in it, which is TONE 12 and is why the
+            // sentence is core's rather than assembled here.
+            "papers": g.papers().into_iter().map(|l| serde_json::json!({
+                "id": l.paper.id(),
+                "name": l.name,
+                "says": l.says,
+                "price": l.price,
+                "afford": l.afford,
+                "why": l.why,
+            })).collect::<Vec<_>>(),
             "stock": rows,
         })
         .to_string()
@@ -2359,7 +2401,36 @@ pub fn reroll_ledger() -> String {
     })
 }
 
+/// Take one of the three papers off Spike's counter. Empty string, or why not.
+///
+/// **One door for all three**, because they are one counter: `Game::buy_paper`
+/// already knows what each costs, what it wants first and what it hands over,
+/// and a second arm here per paper would be three answers to a question core
+/// answers once.
+#[wasm_bindgen]
+pub fn buy_paper(id: &str) -> String {
+    let Some(which) = gm2d_core::shop::Paper::ALL.into_iter().find(|p| p.id() == id) else {
+        return "he has nothing of that kind".to_string();
+    };
+    with_mut(|g| {
+        if bench_here(g).is_none() {
+            return "there is nobody selling here".to_string();
+        }
+        match g.buy_paper(which) {
+            // **Nothing is drawn from here.** What a paper *does* — a licence,
+            // a fork reopened, a class taken — is core's, and the page re-reads
+            // the screens afterwards rather than being told what changed.
+            Ok(_) => String::new(),
+            Err(why) => why,
+        }
+    })
+}
+
 /// Buy a licence off the man in the van.
+///
+/// The Patent's paper, which is `buy_paper("licence")` with an older signature
+/// and an older shape of answer. Kept because the licence line on the bench
+/// predates the counter and the gate walks it by name.
 #[wasm_bindgen]
 pub fn buy_licence() -> String {
     with_mut(|g| {
@@ -2816,21 +2887,47 @@ pub fn ench_rack_json() -> String {
                 }))
             })
             .collect();
+        // **Where in its component's rack each one sits.** A Full Bill's
+        // component holds up to four, and `detach_ench` and `toggle_ench` take
+        // a piece *and* an `nth` — a screen drawing four rows whose buttons all
+        // reached the same one would be three controls doing somebody else's
+        // job.
+        let mut nth: Vec<(gm2d_core::piece::PieceId, usize)> = Vec::new();
         let on: Vec<_> = ch
             .enchanted
             .iter()
             .filter_map(|e| {
                 let d = data.get(&e.id)?;
                 let def = ch.registry.def(e.on);
+                let n = match nth.iter_mut().find(|(p, _)| *p == e.on) {
+                    Some((_, n)) => {
+                        *n += 1;
+                        *n
+                    }
+                    None => {
+                        nth.push((e.on, 0));
+                        0
+                    }
+                };
                 Some(serde_json::json!({
                     "id": d.id, "name": d.name, "spec": d.effect.line(),
                     "piece": e.on.0,
+                    "nth": n,
                     "on": gm2d_core::theme::by_id(&g.theme).piece(def.name),
                     "active": e.active,
                 }))
             })
             .collect();
-        serde_json::json!({ "licensed": ch.licensed(), "loose": loose, "on": on }).to_string()
+        serde_json::json!({
+            "licensed": ch.licensed(),
+            // **How many a component holds**, so the note on the screen is the
+            // engine's number rather than a sentence somebody typed. It said
+            // *"One ench a component"* while a Full Bill's held four.
+            "racks": ch.ench_racks(),
+            "loose": loose,
+            "on": on,
+        })
+        .to_string()
     })
 }
 
@@ -2846,16 +2943,16 @@ pub fn attach_ench(id: &str, piece: u32) -> String {
 
 /// Take one off. It goes back in the rack.
 #[wasm_bindgen]
-pub fn detach_ench(piece: u32) -> String {
+pub fn detach_ench(piece: u32, nth: u32) -> String {
     use gm2d_core::piece::PieceId;
-    with_mut(|g| g.character.detach_ench(PieceId(piece)).unwrap_or_default())
+    with_mut(|g| g.character.detach_ench(PieceId(piece), nth as usize).unwrap_or_default())
 }
 
 /// Switch one on or off where it is. Returns whether it is now on.
 #[wasm_bindgen]
-pub fn toggle_ench(piece: u32) -> bool {
+pub fn toggle_ench(piece: u32, nth: u32) -> bool {
     use gm2d_core::piece::PieceId;
-    with_mut(|g| g.character.toggle_ench(PieceId(piece)).unwrap_or(false))
+    with_mut(|g| g.character.toggle_ench(PieceId(piece), nth as usize).unwrap_or(false))
 }
 
 /// The bank: what is in your bag, and what is in the vault.
@@ -2965,6 +3062,23 @@ pub fn character_json() -> String {
                 { "n": stats.physical_resist, "label": "physical resist", "unit": "%" },
                 { "n": stats.magic_resist, "label": "magic resist", "unit": "%" },
             ],
+            // **What you are, all of it.** Up to three since M13, and the
+            // sheet is the one screen that says so — `class_name` answers the
+            // first and answered it alone, so a second class and an expert
+            // both worked and could not be seen, which is the failure this
+            // repository has now written down five times.
+            "classes": c.class_defs().iter().map(|d| serde_json::json!({
+                "canonical": d.name,
+                "name": gm2d_core::theme::by_id(&g.theme).class(d.name),
+                // The tuned promise, so a knob a point moved reads back here.
+                "promise": d.power.describe(),
+            })).collect::<Vec<_>>(),
+            // **A paper bought and not yet answered.** It is spent on the
+            // choice rather than on the purchase, so it sits in the pack — and
+            // a thing in your pack that no screen mentions is a thing you have
+            // forgotten you own.
+            "second_paper": c.second_paper,
+            "finished_trees": c.finished_trees(),
             // How worn out, and what the character would be if they were not.
             // Both, because "160, and 24 of it is missing" is two facts and a
             // player needs the pair to decide whether to turn round.
@@ -3058,7 +3172,7 @@ pub fn skills_json() -> String {
                     &n.id,
                     &g.character.skills_taken,
                     g.character.skill_points,
-                    g.character.class.as_deref(),
+                    &g.character.classes().collect::<Vec<_>>(),
                 );
                 serde_json::json!({
                     "id": n.id,
@@ -3095,11 +3209,27 @@ pub fn take_skill(id: &str) -> String {
 
 // ---------------------------------------------------------------- the fork
 
-/// The three classes on offer, or `null` when none is owed.
+/// The classes on offer, or `null` when none is owed.
 ///
 /// Named by the theme, promising in the engine's own words: `ClassPower` can
 /// describe itself, so the mechanical line beside each is the rule rather than
 /// a sentence about the rule.
+///
+/// # Two forks, one screen
+///
+/// **The same screen answers both**, which is `PLAN-M13-2.md` §1.3 and is a
+/// decision rather than a saving: the question is the same question, and a
+/// second screen would be a second place the roster, the promise and the
+/// figures were drawn.
+///
+/// | | `kind` | offered | Escape |
+/// |---|---|---|---|
+/// | level five | `"first"` | all five | **refused** — an unanswered question keeps being asked |
+/// | the paper | `"second"` | four, the roster minus what you are | **taken** — you bought this and may sleep on it |
+///
+/// The second fork's cards each name **which expert that pairing reaches**,
+/// and that is the whole reason the screen is worth having rather than a menu:
+/// the pair is the decision, and it is made here, in daylight.
 #[wasm_bindgen]
 pub fn class_offer_json() -> String {
     // **The roster is core's.** It was a `const` here and a second copy in
@@ -3107,19 +3237,45 @@ pub fn class_offer_json() -> String {
     // twice — see `class::OFFERED`.
     let offered = gm2d_core::class::OFFERED;
     with(|g| {
-        if !g.character.owed_a_class() {
+        let first = g.character.owed_a_class();
+        // **Bought, and not yet spent.** `second_paper` is cleared by the
+        // choice rather than by the purchase, so the screen keeps coming back
+        // until it is answered — the same posture the level-five fork takes,
+        // for a different reason.
+        let second = g.character.second_paper && g.character.second_class.is_none();
+        if !first && !second {
             return "null".into();
         }
         let theme = gm2d_core::theme::by_id(&g.theme);
         let tree = gm2d_core::data::skills();
+        let already = g.character.class.as_deref();
         let offer: Vec<_> = offered
             .iter()
+            // The four you are not. On the first fork nothing is filtered,
+            // because there is nothing yet to be.
+            .filter(|canonical| first || Some(**canonical) != already)
             .filter_map(|canonical| {
                 let def = gm2d_core::class::CLASSES.iter().find(|c| c.name == *canonical)?;
                 let t = tree.tree_for_class(canonical);
+                // **What this pairing eventually reaches**, named and promised.
+                // Only on the second fork, because on the first there is no
+                // pair to name and a card claiming one would be inventing the
+                // other half.
+                let reaches = (!first)
+                    .then(|| already.and_then(|a| gm2d_core::expert::for_pair(a, canonical)))
+                    .flatten()
+                    .map(|e| {
+                        serde_json::json!({
+                            "canonical": e.name,
+                            "name": theme.class(e.name),
+                            "promise": e.power.describe(),
+                        })
+                    })
+                    .unwrap_or(serde_json::Value::Null);
                 Some(serde_json::json!({
                     "canonical": def.name,
                     "name": theme.class(def.name),
+                    "reaches": reaches,
                     // The blurb is the world's: `retell` swaps the engine's
                     // words for the theme's, whole word at a time, so a line
                     // about curses arrives talking about the Roast and the Nut
@@ -3138,7 +3294,16 @@ pub fn class_offer_json() -> String {
                 }))
             })
             .collect();
-        serde_json::json!({ "level": g.character.level(), "classes": offer }).to_string()
+        serde_json::json!({
+            "level": g.character.level(),
+            // Which fork this is, and whether it comes off. The page reads
+            // both rather than working out for itself which question it is
+            // showing — *a rule with two homes is a rule with two answers.*
+            "kind": if first { "first" } else { "second" },
+            "escapable": !first,
+            "classes": offer,
+        })
+        .to_string()
     })
 }
 
@@ -3146,6 +3311,21 @@ pub fn class_offer_json() -> String {
 #[wasm_bindgen]
 pub fn choose_class(canonical: &str) -> String {
     with_mut(|g| match g.character.choose_class(canonical) {
+        Ok(_) => String::new(),
+        Err(why) => why,
+    })
+}
+
+/// Take the second fork, off the paper. Permanent, and it spends the paper.
+///
+/// **Its own door rather than a mode on `choose_class`**, because the two
+/// refuse for different reasons and each says so: one is *you already have a
+/// class* and the other is *the paper is Spike's and you have not bought it*.
+/// The page knows which fork it is showing — `class_offer_json` tells it — so
+/// asking it to name the door costs nothing and keeps both refusals honest.
+#[wasm_bindgen]
+pub fn choose_second_class(canonical: &str) -> String {
+    with_mut(|g| match g.character.choose_second_class(canonical) {
         Ok(_) => String::new(),
         Err(why) => why,
     })
@@ -3164,15 +3344,26 @@ pub fn class_name() -> String {
 }
 
 /// Every tree the character may spend in: the base one, plus their own.
+///
+/// **However many that is**, which was already the design and is now three:
+/// *"a character has the base tree plus whichever class trees they have
+/// unlocked, and there will be more than one of the second kind."* The tabs
+/// are however many this returns, so the sixth tab needed no new export.
 #[wasm_bindgen]
 pub fn all_trees_json() -> String {
     with(|g| {
         let tree = gm2d_core::data::skills();
-        let mine = g.character.class.as_deref();
+        let mine: Vec<&str> = g.character.classes().collect();
+        // The definitions **with the expert's knobs turned**, which is what a
+        // tab's promise has to be printed from: `CLASSES` is the roster before
+        // any point was spent.
+        let worn = g.character.class_defs();
         let trees: Vec<_> = tree
             .trees
             .iter()
-            .filter(|t| t.class.is_none() || t.class.as_deref() == mine)
+            .filter(|t| {
+                t.class.is_none() || t.class.as_deref().is_some_and(|c| mine.contains(&c))
+            })
             .map(|t| {
                 let nodes: Vec<_> = t
                     .nodes
@@ -3183,7 +3374,7 @@ pub fn all_trees_json() -> String {
                             &n.id,
                             &g.character.skills_taken,
                             g.character.skill_points,
-                            mine,
+                            &mine,
                         );
                         serde_json::json!({
                             "id": n.id, "name": n.name, "blurb": n.blurb, "cost": n.cost,
@@ -3209,8 +3400,19 @@ pub fn all_trees_json() -> String {
                         })
                     })
                     .collect();
+                // **The promise at the tab's head**, read off `class_defs`
+                // — which is the tuned list — so a knob a point moved changes
+                // the sentence over the tree that moved it. `PLAN-M13-2.md`
+                // §1.7 asks for it on the expert tab; every class tree gets it,
+                // because *every node under it is a footnote to that line* is
+                // as true of the Gorillathon's tree as of Full Bill's, and one
+                // rule is cheaper to keep true than two.
+                let promise = t.class.as_deref().and_then(|c| {
+                    worn.iter().find(|d| d.name == c).map(|d| d.power.describe())
+                });
                 serde_json::json!({
                     "id": t.id, "name": t.name, "class": t.class,
+                    "promise": promise,
                     "rows": t.rows().len(),
                     "nodes": nodes,
                 })

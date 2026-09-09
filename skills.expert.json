@@ -586,7 +586,7 @@
     {
      "id": "pf-overflow-pipe",
      "name": "The Overflow Pipe",
-     "blurb": "Funny past the top of the funnel comes out as armour, one for one, down a pipe added in 1912 by somebody who was tired of mopping.",
+     "blurb": "Funny past the top of the funnel comes out as Cork, one for one, down a pipe added in 1912 by somebody who was tired of mopping.",
      "cost": 2,
      "requires": [
       "pf-full-rows"
@@ -616,7 +616,7 @@
       },
       {
        "tunes": {
-        "knob": "harvest",
+        "knob": "per_cell",
         "by": 2
        }
       }
@@ -673,7 +673,7 @@
     {
      "id": "on-unspent",
      "name": "Unspent",
-     "blurb": "Funny left over when the lights come up lands as armour. Nobody at the house can explain the mechanism and the armour is on you regardless.",
+     "blurb": "Funny left over when the lights come up lands as Cork. Nobody at the house can explain the mechanism and the Cork is on you regardless.",
      "cost": 2,
      "requires": [
       "on-standing-discount"

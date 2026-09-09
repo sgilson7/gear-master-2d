@@ -69,7 +69,7 @@ fn nothing_may_be_enched_twice() {
     c.attach_ench("plug-energy-tap", b).expect("the first one goes on");
     let second = c.attach_ench("grungo-elastic-band", b);
     assert!(
-        matches!(second, Err(Refusal::AlreadyEnched(_))),
+        matches!(second, Err(Refusal::AlreadyEnched(..))),
         "a second ench went onto the same component: {second:?}"
     );
     // And it did not quietly spend the ench that was refused.
@@ -106,11 +106,11 @@ fn an_ench_toggled_off_changes_nothing() {
     let on: Vec<i32> = c.combat_items().iter().map(|i| i.power).collect();
     assert_ne!(on, plain, "bolted on and nothing changed");
 
-    assert_eq!(c.toggle_ench(b), Some(false));
+    assert_eq!(c.toggle_ench(b, usize::MAX), Some(false));
     let off: Vec<i32> = c.combat_items().iter().map(|i| i.power).collect();
     assert_eq!(off, plain, "switched off and it is still doing something");
 
-    assert_eq!(c.toggle_ench(b), Some(true));
+    assert_eq!(c.toggle_ench(b, usize::MAX), Some(true));
     assert_eq!(c.combat_items().iter().map(|i| i.power).collect::<Vec<_>>(), on);
 }
 
@@ -195,7 +195,7 @@ fn an_ench_survives_a_round_trip() {
     g.character = licensee();
     let b = blade(&g.character);
     g.character.attach_ench("plug-energy-tap", b).expect("it goes on");
-    g.character.toggle_ench(b);
+    g.character.toggle_ench(b, usize::MAX);
 
     let text = save::save(&g);
     let back = save::load(&text).expect("a save with an ench on it loads");

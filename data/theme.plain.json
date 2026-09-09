@@ -282,7 +282,48 @@
   },
   "pieces": [],
   "monsters": [],
-  "classes": [],
+  "classes": [
+    [
+      "LoudCalculation",
+      "Loud Calculation"
+    ],
+    [
+      "StandingFact",
+      "Standing Fact"
+    ],
+    [
+      "OverwoundArm",
+      "Overwound Arm"
+    ],
+    [
+      "ShortProgramme",
+      "Short Programme"
+    ],
+    [
+      "CurseRequisition",
+      "Curse Requisition"
+    ],
+    [
+      "PatentedFunnel",
+      "Patented Funnel"
+    ],
+    [
+      "OpeningNumber",
+      "Opening Number"
+    ],
+    [
+      "CursedLicence",
+      "Cursed Licence"
+    ],
+    [
+      "EleventhSeason",
+      "Eleventh Season"
+    ],
+    [
+      "FullBill",
+      "Full Bill"
+    ]
+  ],
   "words": [],
   "vocabulary": [],
   "notes": [],

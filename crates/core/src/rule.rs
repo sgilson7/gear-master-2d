@@ -118,6 +118,80 @@ pub enum Rule {
     /// from under the lake — a dungeon you can post yourself out of is not
     /// under a lake.
     Homeward,
+    /// A spinning empty frame turns one bare underlay cell into the kind
+    /// beside it, once every `every_turns` turns of the fight.
+    ///
+    /// **The first rule that changes the board**, and it is deliberately the
+    /// slowest thing in the game: one cell, every other turn, on a frame with
+    /// nothing in it. `PieceKind::Enchantment` is an underlay laid *beneath*
+    /// the grid and `EffectKind::PerOverlappingCore` already pays for what is
+    /// built on top of it — the layer has been readable since it shipped and
+    /// nothing has ever written to it. Now an empty frame does, so an empty
+    /// frame is ground being prepared rather than dead space.
+    ///
+    /// **Settled at the bell, not during the fight**, which is a divergence
+    /// from `PLAN-M13.md` §4.2 and the reason is the project's own: a fight
+    /// that wrote to the character is a fight a mid-fight save could not carry
+    /// a creature name and a tile for. `ItemProfile` is flat because combat
+    /// has no board, and `Effect::Fragile` breaks an item *for the fight*
+    /// rather than for good for exactly this reason. How many turns a fight
+    /// had is knowable when it ends, so the conversion happens where the game
+    /// is in hand and combat stays a pure function of what it was handed.
+    ///
+    /// Bounded by the frame — it never crosses a grid — and by needing a
+    /// worked neighbour to copy, so a frame whose underlay is bare throughout
+    /// spreads nothing.
+    Spread { every_turns: u32 },
+    /// Every completely filled row, in every worn grid, is worth `per_cell`.
+    ///
+    /// **The row is not cleared.** That is the whole borrowed idea: a filled
+    /// row is a machine, and clearing it would be taking the machine apart.
+    /// GM2D packs five grids and has never once rewarded a row for being
+    /// whole; M12.3 made a row a thing you *buy*, and this is what pays that
+    /// purchase back.
+    ///
+    /// **Paid at the bell, which in this engine means when the fight starts.**
+    /// A `RunningItem` is rebuilt at every bell and `Held` is translated into
+    /// the fighter at the bell; mana is spent inside a fight and is gone when
+    /// it ends, so paying it *after* one would be paying a pool that no longer
+    /// exists. `PLAN-M13.md` §4.3 says `fight::settle`; that is the one place
+    /// the number could not be spent, and the divergence is recorded.
+    ///
+    /// Counted off the loadout rather than off the packing screen — a row is
+    /// full or it is not, and the screen has no opinion.
+    RowHarvest { per_cell: u32 },
+    /// An enched component lends `pct` of each ench it carries to every
+    /// finished item orthogonally touching it, in the same grid.
+    ///
+    /// Lending is not spending: the lender keeps what it has. Adjacency is
+    /// edge-sharing between *finished items*, which `ItemProfile::adjacent_items`
+    /// already carries — `loadout.rs` walks it for its groups and `Axis::Weave`
+    /// already scores it — so this adds a reader and not a geometry.
+    ///
+    /// **It does not chain.** A lent ench is not an ench for the purpose of
+    /// lending it on, or a packed chest would broadcast itself to a fixed
+    /// point and the fixed point would be the game.
+    ///
+    /// **Only the two enchs that are numbers lend.** `Spin` and `Fragile` are
+    /// switches, and forty percent of a switch is not a thing; lending
+    /// `Fragile` would also *break* your neighbours, which is a beacon that
+    /// punishes packing rather than paying for it.
+    Beacon { pct: u32 },
+    /// Every `every`th activation of an enched item does its thing twice, and
+    /// that item runs `slower_pct` slower for the rest of the fight.
+    ///
+    /// The trade is the point: output bought with speed, so it is the one
+    /// upgrade you have to think about rather than take. This engine has
+    /// `power` enchs and `haste` enchs and has never made anybody choose
+    /// between them; this is the first thing that spends one to buy the other.
+    ///
+    /// **Deterministic**, like `Misfire` and for the same reason: every test
+    /// in the suite replays a fight and expects the same answer. It counts
+    /// activations of the item rather than rolling for them.
+    ///
+    /// **For the fight, not for good**, like `Fragile`: `RunningItem` is
+    /// rebuilt at every bell, so the slowdown is gone next time.
+    Productivity { every: u32, slower_pct: u32 },
 }
 
 /// The three instruments, by name, in the order their recipes are written.
@@ -174,6 +248,33 @@ impl Rule {
                 .map(|_| ())
                 .ok_or_else(|| format!("nothing in the ladder is called {creature:?}")),
             Rule::Wade => Ok(()),
+            // Every one of these four refuses the value that would make it a
+            // node costing a point and doing nothing — the same guard the
+            // three spin tunings above get, and the failure this file exists
+            // to stop shipping a fourth time.
+            Rule::Spread { every_turns } => (*every_turns > 0)
+                .then_some(())
+                .ok_or_else(|| "spreads every no turns at all".into()),
+            Rule::RowHarvest { per_cell } => {
+                (*per_cell > 0).then_some(()).ok_or_else(|| "a full row pays nothing".into())
+            }
+            Rule::Beacon { pct } => {
+                (*pct > 0).then_some(()).ok_or_else(|| "lends nothing to anybody".into())
+            }
+            // Twice as often as never is still never; and an upgrade with no
+            // cost is not the trade this rule is entirely about.
+            Rule::Productivity { every, slower_pct } => {
+                if *every == 0 {
+                    return Err("every no activations at all".into());
+                }
+                if *slower_pct == 0 {
+                    return Err("costs no speed, which is the whole of the bargain".into());
+                }
+                if *slower_pct >= 100 {
+                    return Err(format!("{slower_pct}% slower is stopped"));
+                }
+                Ok(())
+            }
         }
     }
 
@@ -220,6 +321,19 @@ impl Rule {
             Rule::Homeward => {
                 "go back to your last town from anywhere, for 1 restorative".to_string()
             }
+            Rule::Spread { every_turns } => format!(
+                "an empty frame works 1 cell of its own underlay every {every_turns} turns"
+            ),
+            Rule::RowHarvest { per_cell } => {
+                format!("every full row starts a fight with {per_cell} mana a cell")
+            }
+            Rule::Beacon { pct } => {
+                format!("an enched component lends {pct}% of it to every item it touches")
+            }
+            Rule::Productivity { every, slower_pct } => format!(
+                "every {every}rd act of an enched item runs twice, and it runs {slower_pct}% \
+                 slower after"
+            ),
         }
     }
 
@@ -288,6 +402,46 @@ impl Rule {
                 "One restorative, spent on departure. With nothing in the bag it \
                  refuses, because the fare is the whole of what makes it a decision."
                     .into(),
+            ],
+            Rule::Spread { .. } => vec![
+                "An enchantment is laid under a grid, so gear sits on top of it and it \
+                 takes no cell away from anything. This is the only thing in the game \
+                 that changes one."
+                    .into(),
+                "It works on a frame with nothing seated in it, and only where a bare \
+                 cell touches a worked one — so a frame whose underlay is empty \
+                 throughout spreads nothing at all. It never crosses into another grid."
+                    .into(),
+            ],
+            Rule::RowHarvest { .. } => vec![
+                "A row is full when every one of its cells is under something. The row \
+                 is not disturbed: a filled row is a machine, and clearing it would be \
+                 taking the machine apart."
+                    .into(),
+                format!(
+                    "Mana is what a casting item spends, {} a cast, and everybody else \
+                     starts a fight with none.",
+                    crate::combat::SPELL_MANA_COST
+                ),
+            ],
+            Rule::Beacon { .. } => vec![
+                "Touching means sharing an edge with a *finished* item in the same \
+                 grid — the same adjacency an assembly bonus counts. A corner is not a \
+                 touch."
+                    .into(),
+                "It does not chain: what a neighbour is lent is not itself lent on. \
+                 Only the enchs that are a number lend; a spin and a one-shot are \
+                 switches, and part of a switch is not a thing."
+                    .into(),
+            ],
+            Rule::Productivity { slower_pct, .. } => vec![
+                "Only an item with an ench bolted to one of its components. Counting \
+                 rather than rolling, so the fight replays the same way twice."
+                    .into(),
+                format!(
+                    "The {slower_pct}% is paid for the rest of the fight and comes back at \
+                     the next bell, like everything else about a running item."
+                ),
             ],
         }
     }

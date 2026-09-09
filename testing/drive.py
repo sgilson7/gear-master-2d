@@ -4284,6 +4284,342 @@ def check_a_door_survives_a_reload(browser, name):
             fails.append(f"{name}: core has it and the page is drawing an older world")
     ctx.close()
     return fails
+# ------------------------------------------------------------------ M13: three
+# papers, a second fork, a sixth tab and a rack that holds more than one.
+
+
+def tree_nodes(cls):
+    """Every node id in one class's tree, off the data file.
+
+    **Read, not listed.** A gate that carried its own copy of a tree would go
+    stale the first time a node was re-parented — the same fault as the barrel
+    check's hardcoded `12` and the `EVENT_ONLY` regex, which this project has
+    now written down three times.
+    """
+    data = json.loads((ROOT / "data" / "skills.json").read_text())
+    return [n["id"] for t in data["trees"] if t.get("class") == cls for n in t["nodes"]]
+
+
+def stand_at_the_van(page):
+    """Below the van, then one step up onto it.
+
+    **A placement and a step, not off-the-tile-and-back.** Stepping away and
+    returning rolls the stream twice and lands in a fight about half the time,
+    and from a fight screen the arrows belong to the fight. `__standAt` draws
+    nothing.
+    """
+    for sel in ("#vendor-close", "#tree-done", "#leave", "#card-close"):
+        if page.is_visible(sel):
+            page.click(sel)
+            page.wait_for_timeout(200)
+    page.evaluate("() => document.getElementById('map').focus()")
+    page.evaluate("() => window.__standAt([4, 7])")
+    page.keyboard.press("ArrowUp")
+    page.wait_for_timeout(300)
+    dismiss_card(page)
+    if page.is_visible("#fight"):
+        close_fight(page)
+        page.evaluate("() => window.__standAt([4, 7])")
+        page.keyboard.press("ArrowUp")
+        page.wait_for_timeout(300)
+    page.wait_for_selector("#vendor", state="visible", timeout=8000)
+
+
+def papers_on_the_counter(page):
+    return page.evaluate("""() => [...document.querySelectorAll('#vendor-stock [data-paper]')]
+        .map(b => ({ id: b.dataset.paper, off: b.disabled, text: b.textContent }))""")
+
+
+def check_the_papers_are_drawn_and_refused(page, name, fails):
+    """Three papers on Spike's counter, and the locked one says what it wants.
+
+    *A locked line on a shelf you can read is a goal; an absent line is a
+    secret*, which is `PLAN-M13-2.md` §1.2 and the reason the expert paper is
+    drawn from the first visit rather than appearing when it unlocks.
+
+    **The refusal has to have the count in it.** `StockGate::refusal` writes
+    *"2 finished class trees, and you have finished 1 of the 1 you are"*,
+    because a button that greys with no reason is a button a player reports as a
+    bug — a sentence this project has written down four times and shipped
+    against three.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+    bers = tree_nodes("Berserker")
+
+    def one_tree_finished(body):
+        c = body["character"]
+        c["gold"] = 50_000
+        c["xp"] = 400_000               # well past the level the van wants
+        c["class"] = "Berserker"
+        c["skills_taken"] = list(bers)
+        c["skill_points"] = 20
+        body["world"]["at"] = [4, 6]
+        body["world"]["map"] = "west-bambulon"
+        body.pop("encounter", None)
+
+    try:
+        plant(page, base, one_tree_finished, stem="papers-one")
+        stand_at_the_van(page)
+        drawn = papers_on_the_counter(page)
+        by_id = {p["id"]: p for p in drawn}
+        for want in ("licence", "second-paper", "expert-paper"):
+            if want not in by_id:
+                fails.append(f"{name}: {want} is not on the counter with one tree finished")
+        if "expert-paper" in by_id:
+            row = by_id["expert-paper"]
+            if not row["off"]:
+                fails.append(f"{name}: the expert paper sold with one tree finished")
+            # The count, in the sentence, off `StockGate::refusal`.
+            if "1 of the 1" not in row["text"]:
+                fails.append(
+                    f"{name}: the expert paper's refusal does not count: {row['text'][:120]!r}")
+        if "second-paper" in by_id and by_id["second-paper"]["off"]:
+            fails.append(f"{name}: the second paper is refused with a tree finished and 50,000 Fnorp")
+    finally:
+        for sel in ("#vendor-close", "#leave"):
+            if page.is_visible(sel):
+                page.click(sel)
+
+
+def check_the_second_fork_can_be_slept_on(page, name, fails):
+    """Four cards, each naming what the pair reaches, and a way out of it.
+
+    Three things, and the third is the one that only a browser can answer:
+
+    - **Four cards, not five.** The roster minus what you already are.
+    - **Each names its expert.** *"with what you are, this eventually reaches
+      Standing Fact — …"*. The pairing is the whole decision and §1.2 asks for
+      it to be made in daylight.
+    - **It takes Escape and it does not nag.** The level-five fork refuses
+      Escape because an unanswered question keeps being asked; this one was
+      bought, so it closes, the paper stays in the pack, and it does **not**
+      come back after the next fight. A screen that reopened every time would
+      be the game refusing to let you sleep on it — which is what the first
+      draft did, because `offerClass` is called from three places.
+    """
+    if not page.is_visible("#vendor"):
+        stand_at_the_van(page)
+    try:
+        page.click('[data-paper="second-paper"]')
+        page.wait_for_selector("#fork", state="visible", timeout=8000)
+        cards = page.evaluate(
+            "() => [...document.querySelectorAll('#fork-choices .wares')].map(b => b.textContent)")
+        if len(cards) != 4:
+            fails.append(f"{name}: the second fork offered {len(cards)} cards, not four")
+        blind = [c[:40] for c in cards if "eventually reaches" not in c]
+        if blind:
+            fails.append(f"{name}: a second-fork card names no expert: {blind}")
+        if not page.is_visible("#fork-close"):
+            fails.append(f"{name}: the second fork has no way out on the screen")
+
+        page.keyboard.press("Escape")
+        page.wait_for_selector("#fork", state="hidden", timeout=5000)
+        if not page.evaluate("() => window.__character().second_paper"):
+            fails.append(f"{name}: sleeping on the paper spent it")
+
+        # It must not come back on its own. A reload is the strongest version of
+        # "on its own": `offerClass` runs on every load.
+        page.reload(wait_until="networkidle")
+        page.wait_for_function(
+            "document.getElementById('coords').textContent !== '—'", timeout=20000)
+        page.wait_for_timeout(300)
+        if page.is_visible("#fork"):
+            fails.append(f"{name}: the second fork re-raised itself after a reload")
+        # And it must be reachable again, or sleeping on it would be losing it.
+        if not page.is_visible("[data-open-paper]"):
+            fails.append(f"{name}: nothing on the sheet says the paper is in the pack")
+            return
+        page.click("[data-open-paper]")
+        page.wait_for_selector("#fork", state="visible", timeout=5000)
+        page.click("#fork-choices .wares")
+        page.wait_for_selector("#fork", state="hidden", timeout=8000)
+        worn = page.evaluate("() => window.__character().classes.map(c => c.canonical)")
+        if len(worn) != 2:
+            fails.append(f"{name}: after the second fork the character is {worn}")
+    finally:
+        for sel in ("#tree-done", "#vendor-close", "#leave"):
+            if page.is_visible(sel):
+                page.click(sel)
+                page.wait_for_timeout(150)
+
+
+def check_the_expert_tab_says_what_a_point_bought(page, name, fails):
+    """Two trees finished takes the expert, and its tab reads the tuned promise.
+
+    **The promise at the tab's head is `class_defs`, which is the tuned list.**
+    That is the whole of what M13.6 fixed one layer down: `CLASSES` is the
+    roster before any point was spent, and a tab printing it would say the same
+    sentence after twelve points as before them. So this spends one point and
+    watches the sentence move — which is the only way to tell a promise that is
+    read from one that is typed.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+
+    def both_trees(body):
+        c = body["character"]
+        second = c.get("second_class")
+        if not second:
+            return
+        c["skills_taken"] = tree_nodes(c["class"]) + tree_nodes(second)
+        c["skill_points"] = 20
+        c["gold"] = 50_000
+        body["world"]["at"] = [4, 6]
+        body["world"]["map"] = "west-bambulon"
+        body.pop("encounter", None)
+
+    try:
+        plant(page, base, both_trees, stem="papers-two")
+        stand_at_the_van(page)
+        by_id = {p["id"]: p for p in papers_on_the_counter(page)}
+        if "expert-paper" not in by_id:
+            fails.append(f"{name}: the expert paper is gone with two trees finished")
+            return
+        if by_id["expert-paper"]["off"]:
+            fails.append(f"{name}: two trees finished and the expert paper is still refused")
+            return
+        # **The line prints the expert's own promise**, so a player choosing a
+        # second class can see what the pairing reaches.
+        if "paper" not in by_id["expert-paper"]["text"]:
+            fails.append(f"{name}: the expert paper does not name itself")
+
+        page.click('[data-paper="expert-paper"]')
+        page.wait_for_selector("#tree", state="visible", timeout=8000)
+        tabs = page.evaluate(
+            "() => [...document.querySelectorAll('#tree-tabs button')].map(b => b.textContent)")
+        if len(tabs) != 4:
+            fails.append(f"{name}: taking the expert gave {len(tabs)} tabs, not four: {tabs}")
+        page.evaluate("() => [...document.querySelectorAll('#tree-tabs button')].at(-1).click()")
+        page.wait_for_timeout(200)
+        before = page.text_content("#tree-promise")
+        if not before:
+            fails.append(f"{name}: the expert tab prints no promise at its head")
+            return
+        took = page.evaluate("""() => {
+          const b = [...document.querySelectorAll('#nodes .wares')].find(b => !b.disabled);
+          if (!b) return null;
+          b.click();
+          return b.dataset.node; }""")
+        if not took:
+            fails.append(f"{name}: no node of the expert tree could be taken")
+            return
+        page.wait_for_timeout(300)
+        after = page.text_content("#tree-promise")
+        if after == before:
+            fails.append(
+                f"{name}: a point on {took} changed nothing the tab's promise says: {before[:90]!r}")
+    finally:
+        for sel in ("#tree-done", "#vendor-close", "#leave"):
+            if page.is_visible(sel):
+                page.click(sel)
+                page.wait_for_timeout(150)
+
+
+def check_a_full_bill_holds_two_enchs(page, name, fails):
+    """One component, two enchs, and everybody else is refused the second.
+
+    `racks` was a knob two nodes sold and `attach_ench` had never heard of:
+    *"one ench a component"* was written into the refusal as a rule, so the
+    expert whose whole promise is the second rack promised a rack the engine
+    would not give. Both halves are checked, because deleting the rule outright
+    would have given everybody four.
+
+    **Through the same door the screen uses.** `window.__attachEnch` is
+    `attach_ench`, not a privileged export — a check that reached past the shim
+    would be asking core a question the page never asks.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+    two = [e["id"] for e in
+           json.loads((ROOT / "data" / "enchs.json").read_text())["enchs"][:2]]
+
+    def a_licensee(expert):
+        def edit(body):
+            c = body["character"]
+            c["class"] = "Recycler"
+            c["second_class"] = "Showstopper"
+            c["expert"] = expert
+            c["skills_taken"] = []
+            c["skill_points"] = 20
+            c["bought_licence"] = True
+            c["enchs_owned"] = list(two)
+            c["enchanted"] = []
+            # The rack is on the packing board, and a fight is what opens it.
+            body["encounter"] = {"enemy": "Cave Rat", "at": body["world"]["at"]}
+        return edit
+
+    def bolt_both():
+        piece = page.evaluate("""() => {
+          const st = window.__board?.state; if (!st) return null;
+          for (const s of (st.slots ?? [])) for (const it of (s.items ?? []))
+            if (it.pieces?.length) return it.pieces[0];
+          // Nothing seated is fine: an ench is bolted to a component, not a
+          // cell, so a loose one in the bag answers the same question.
+          const b = (st.bag ?? [])[0];
+          return b ? (b.id ?? null) : null; }""")
+        if piece is None:
+            return None, None
+        said = [page.evaluate("([id, p]) => window.__attachEnch(id, p)", [e, piece])
+                for e in two]
+        page.evaluate("() => window.__board.refresh()")
+        page.wait_for_timeout(250)
+        return piece, said
+
+    try:
+        plant(page, base, a_licensee("FullBill"), stem="rack-bill")
+        page.wait_for_selector("#fight", state="visible", timeout=8000)
+        page.wait_for_timeout(300)
+        note = page.text_content("#rack-note") or ""
+        if "Two enchs a component" not in note:
+            fails.append(f"{name}: a Full Bill's rack still says {note.strip()[-30:]!r}")
+        piece, said = bolt_both()
+        if piece is None:
+            fails.append(f"{name}: nothing to bolt an ench to")
+            return
+        if any(said):
+            fails.append(f"{name}: a Full Bill was refused a rack: {said}")
+        rows = page.evaluate(
+            "() => [...document.querySelectorAll('#rack-on .wares')].length")
+        if rows != 2:
+            fails.append(f"{name}: the rack drew {rows} of the two bolted on")
+
+        # And one rack for everybody else, refused by name.
+        plant(page, base, a_licensee(None), stem="rack-plain")
+        page.wait_for_selector("#fight", state="visible", timeout=8000)
+        page.wait_for_timeout(300)
+        piece, said = bolt_both()
+        if piece is None:
+            fails.append(f"{name}: nothing to bolt an ench to without an expert")
+            return
+        if said[0]:
+            fails.append(f"{name}: the first ench was refused: {said[0]!r}")
+        if not said[1]:
+            fails.append(f"{name}: a second ench went onto a single rack")
+        elif "holds one" not in said[1]:
+            fails.append(f"{name}: the refusal does not say what the rack holds: {said[1]!r}")
+    finally:
+        close_fight(page)
+
+
+def check_the_sheet_says_every_class(page, name, fails):
+    """Up to three, and the sheet is the one screen that says so.
+
+    `class_name` answers the first and answered it alone, so a second class and
+    an expert both worked and could not be seen — *a thing that works and cannot
+    be seen is a thing that does not work*, which is the fifth time this
+    repository has found that shape.
+    """
+    said = page.text_content("#sheet") or ""
+    worn = page.evaluate("() => window.__character().classes")
+    missing = [c["name"] for c in worn if c["name"] not in said]
+    if missing:
+        fails.append(f"{name}: the sheet does not say the character is {missing}")
+
+
 def walk_the_gate(browser, name, fails=None):
     """Returns a list of failures; empty means the gate is passed.
 
@@ -4805,6 +5141,19 @@ def walk_the_gate(browser, name, fails=None):
     # --- scouting ------------------------------------------------------------
     check_scouting_is_earned(page, name, fails)
 
+    # --- three papers, three classes -----------------------------------------
+    #
+    # In order and sharing a character: the second paper is bought on the first
+    # check's save, the expert is taken on what the second one leaves, and the
+    # sheet is read of what the third made. A check that planted its own
+    # character for each would be three characters and would never once ask
+    # what a player asks, which is *what happens next*.
+    check_the_papers_are_drawn_and_refused(page, name, fails)
+    check_the_second_fork_can_be_slept_on(page, name, fails)
+    check_the_expert_tab_says_what_a_point_bought(page, name, fails)
+    check_the_sheet_says_every_class(page, name, fails)
+    check_a_full_bill_holds_two_enchs(page, name, fails)
+
     # --- the log ---------------------------------------------------------------
     check_the_panel_says_what_a_pool_pays(page, name, fails)
     check_the_game_talks_in_one_place(page, name, fails)
@@ -4919,6 +5268,10 @@ def main():
     print("ok: a defeat costs you your place, and the door is the door again")
     print("ok: a banked pool says what it pays, and the rates are core's")
     print("ok: what an item hits for climbs as fury banks, and the row says so")
+    print("ok: three papers are drawn from the first visit, and the locked one counts")
+    print("ok: the second fork offers four, names what each pair reaches, and can be slept on")
+    print("ok: two finished trees take the expert, and a point moves the promise at its tab")
+    print("ok: a Full Bill's component holds two enchs, and everybody else's holds one")
     print("ok: the game talks in one place, and the history holds the sitting")
     print("ok: no console errors, no off-origin requests")
 

@@ -258,3 +258,73 @@ pub fn geared_from(towns: &[&str]) -> Character {
     ch.apply_preset();
     ch
 }
+
+/// **Finished items in a row, each touching the next**, in the gloves, and
+/// nothing else on the board.
+///
+/// The repository had no such fixture and needed one the moment `Rule::Beacon`
+/// landed: `build_full_loadout` makes eight items and **no two of them share an
+/// edge**, because that preset spaces them out on purpose — so anything
+/// measured against it about *neighbours* is measured against a board with
+/// none. The only board in the suite with adjacency was Auto-pack's over the
+/// whole catalogue, which is nineteen items and a second and a half of packing
+/// every time a test asks for one.
+///
+/// A row rather than a cluster, because the two questions a lending rule has
+/// are *does it reach my neighbour* and *does it reach my neighbour's
+/// neighbour* — and three in a line is the smallest board that can ask the
+/// second.
+///
+/// **Seated through `seat`, which locks each item as it completes.** Two items
+/// that touch and are not locked are one item: `loadout` groups by adjacency
+/// and a lock is the only thing that says otherwise. That is upstream's
+/// expensive lesson — nineteen weapon pieces came back as one — and it is the
+/// whole reason this cannot be written as six `equip` calls.
+///
+/// Returns nothing: the items are `ch.combat_items()` in seating order, which
+/// is the order they were laid, so item `i` touches `i - 1` and `i + 1`.
+pub fn items_in_a_row(ch: &mut Character, n: usize) {
+    // A glove is a Material and a Mold that touch. Four two-by-two materials
+    // and four two-wide molds, none of which is anything else's — `with_all_
+    // pieces` owns one of each name, so a row of four needs four of each.
+    const MATERIALS: &[&str] =
+        &["Leather Material", "Scaled Material", "Waxed Material", "Hide Material"];
+    const MOLDS: &[&str] = &["Padded Mold", "Braced Mold", "Vicegrip Mold", "Gripping Mold"];
+    assert!(n >= 2 && n <= MATERIALS.len(), "a row of {n} is not one this fixture can lay");
+
+    for k in SlotKind::ALL {
+        ch.loadout.slot_mut(k).clear();
+    }
+    ch.loadout.slot_mut(SlotKind::Gloves).grow(2 * n as u8);
+    let rows: Vec<(&str, SlotKind, u8, u8, u8)> = (0..n)
+        .flat_map(|i| {
+            let y = (i * 2) as u8;
+            [
+                (MATERIALS[i], SlotKind::Gloves, 0, y, 0),
+                (MOLDS[i], SlotKind::Gloves, 2, y, 0),
+            ]
+        })
+        .collect();
+    seat(ch, &rows);
+
+    let made = ch.combat_items();
+    assert_eq!(made.len(), n, "the fixture made {} items, not {n}", made.len());
+    for i in 0..n {
+        for j in [i.wrapping_sub(1), i + 1] {
+            if j >= n {
+                continue;
+            }
+            assert!(
+                made[i].adjacent_items.contains(&j),
+                "item {i} does not touch {j}: {:?}",
+                made[i].adjacent_items,
+            );
+        }
+    }
+}
+
+/// Two finished items that touch, which is the smallest board with a neighbour
+/// on it. See [`items_in_a_row`].
+pub fn two_items_that_touch(ch: &mut Character) {
+    items_in_a_row(ch, 2);
+}

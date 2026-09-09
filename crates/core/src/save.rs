@@ -131,7 +131,22 @@ pub struct CharacterSave {
     /// Seeds the item-name hash. Without it every stat survives a round trip
     /// and every item is renamed.
     pub name_seed: u64,
-    #[serde(default, skip_serializing_if = "is_zero_i32")]
+    /// **Not written any more, and read only to be thrown away.**
+    ///
+    /// It was banked, and it never had to be: the loader has always re-derived
+    /// it off `skills_taken` and the class the moment the file is open, so what
+    /// the file said was overwritten a hundred lines later. A number that is
+    /// stored and ignored is a number somebody will one day believe — and
+    /// `the_three_fields_round_trip` caught exactly that shape in M13.0, where
+    /// a class taken without the re-derivation came back from a round trip
+    /// carrying a figure it did not go in with.
+    ///
+    /// **Derived, never banked**, which is the rule this project holds
+    /// everywhere else: the level off experience, a node's effect off the node,
+    /// the tower's fallen floors off `answered`. Kept in the struct with a
+    /// default so a file written before this still opens, and skipped on the
+    /// way out so nothing new carries it.
+    #[serde(default, skip_serializing)]
     pub assembly_pct: i32,
     /// Experience banked, ever. The level is derived from it and is **not**
     /// stored: two numbers that could disagree is two answers to one question.
@@ -173,9 +188,39 @@ pub struct CharacterSave {
     /// The class, by canonical name. Absent until level 5 and permanent after.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub class: Option<String>,
+    /// The second class, off Spike's paper. `default`, so a file written before
+    /// M13 opens with no second class, no expert and no paper — which is what
+    /// those characters had.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub second_class: Option<String>,
+    /// The expert class, taken free once two trees are finished.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub expert: Option<String>,
+    /// A second paper bought and not yet answered.
+    ///
+    /// **Spent on the choice rather than on the purchase**, so it sits in the
+    /// file until the fork is answered — which is what lets a player sleep on
+    /// it.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub second_paper: bool,
+    /// Short Programme's streak: how many fast wins are behind you.
+    ///
+    /// One of the two things in this block that carry a fact about a *fight*
+    /// rather than about a character, and neither is derivable — see
+    /// `Character::carry_out_of`.
+    #[serde(default, skip_serializing_if = "is_zero_u32")]
+    pub fast_wins: u32,
+    /// Standing Fact's curses: the ones that followed you out of the last
+    /// fight and land before the next one acts.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub told_curses: Vec<String>,
 }
 
 fn is_zero_i32(n: &i32) -> bool {
+    *n == 0
+}
+
+fn is_zero_u32(n: &u32) -> bool {
     *n == 0
 }
 
@@ -254,12 +299,19 @@ impl SaveFile {
             skill_points,
             skills_taken,
             class,
+            second_class,
+            expert,
+            second_paper,
+            fast_wins,
+            told_curses,
             enchs_owned,
             enchanted,
             bought_licence,
             undo_stack: _,
         } = character;
-        let Loadout { slots, locks, name_seed, naming: _, assembly_pct } = loadout;
+        // `assembly_pct` is destructured and dropped: it is derived on load and
+        // is no longer written. See the field's own note.
+        let Loadout { slots, locks, name_seed, naming: _, assembly_pct: _ } = loadout;
 
         // `naming` is skipped on purpose: it is a pointer into a theme's word
         // tables and `theme` above is how it comes back. `undo_stack` is
@@ -279,8 +331,14 @@ impl SaveFile {
         let boards = slots
             .iter()
             .map(|slot| {
+                // **`worn()`, which is the gear layer.** `pieces()` walks
+                // both, and `enchanted` below writes the underlay again — so
+                // every enchantment went into the file twice, at the same
+                // anchor, and only `Slot::place` routing by kind kept that from
+                // being a bug. A file that says a thing twice is a file whose
+                // two copies can one day disagree.
                 let placed = slot
-                    .pieces()
+                    .worn()
                     .into_iter()
                     .filter_map(|p| slot.anchor_of(p).map(|(x, y)| [p.0, x as u32, y as u32]))
                     .collect();
@@ -325,11 +383,19 @@ impl SaveFile {
                         })
                         .collect(),
                     name_seed: *name_seed,
-                    assembly_pct: *assembly_pct,
+                    // **Zero on the way out, and skipped by serde.** It is
+                    // derived on the way in; writing it would be writing a
+                    // number nothing reads.
+                    assembly_pct: 0,
                     xp: *xp,
                     skill_points: *skill_points,
                     skills_taken: skills_taken.clone(),
                     class: class.clone(),
+                    second_class: second_class.clone(),
+                    expert: expert.clone(),
+                    second_paper: *second_paper,
+                    fast_wins: *fast_wins,
+                    told_curses: told_curses.clone(),
                     enchs_owned: enchs_owned.clone(),
                     bought_licence: *bought_licence,
                     enchanted: enchanted
@@ -441,7 +507,8 @@ impl SaveFile {
             boards,
             locks,
             name_seed,
-            assembly_pct,
+            // Read to be dropped: the loader derives it below. See the field.
+            assembly_pct: _,
             xp,
             carried,
             fatigue,
@@ -449,6 +516,11 @@ impl SaveFile {
             skill_points,
             skills_taken,
             class,
+            second_class,
+            expert,
+            second_paper,
+            fast_wins,
+            told_curses,
             enchs_owned,
             enchanted,
         } = character;
@@ -478,7 +550,10 @@ impl SaveFile {
 
         let mut loadout = Loadout::new();
         loadout.name_seed = name_seed;
-        loadout.assembly_pct = assembly_pct;
+        // **Nothing sets `assembly_pct` here.** `refresh_assembly_pct` at the
+        // end of this function is the one thing that fills it, rather than the
+        // second of two — which is how a stale figure used to get as far as
+        // being compared.
 
         // **A save from before there was an instrument frame gets one.**
         // `Loadout::new` builds it at the engine's full height, which is what a
@@ -540,6 +615,16 @@ impl SaveFile {
         character.skill_points = skill_points;
         character.skills_taken = skills_taken;
         character.class = class;
+        // **All three, and the paper.** A character holds up to three classes
+        // since M13; a file written before it defaults to one, which is what
+        // those characters had.
+        character.second_class = second_class;
+        character.expert = expert;
+        character.second_paper = second_paper;
+        // The two things a fight leaves behind. Neither is derivable — see
+        // `Character::carry_out_of`.
+        character.fast_wins = fast_wins;
+        character.told_curses = told_curses;
         character.enchs_owned = enchs_owned;
         character.bought_licence = bought_licence;
         // Checked like every other index into the registry. An ench bolted to
@@ -571,12 +656,12 @@ impl SaveFile {
         // M13 means the instrument parts a file written before there was an
         // instrument frame left among the blades. See `repair_boards`.
         game.character.repair_boards();
-        // **What the nodes and the class imply, re-derived.** The save carries
-        // which nodes were taken and which class was chosen, not what they did,
-        // so `assembly_pct` was whatever was banked when the file was written —
-        // and the class's half of it was zero for every file ever saved,
-        // because nothing added it. The frames are deliberately left alone:
-        // they are in the file and resizing on load is a different decision.
+        // **What the nodes and the classes imply, derived.** The save carries
+        // which nodes were taken and which classes were chosen, not what they
+        // did — and since M13.9 it does not carry `assembly_pct` at all, so
+        // this is the only thing that ever sets it on the way in rather than
+        // the second of two. The frames are deliberately left alone: they are
+        // in the file and resizing on load is a different decision.
         game.character.refresh_assembly_pct();
         Ok(game)
     }

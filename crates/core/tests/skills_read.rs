@@ -61,6 +61,98 @@ fn no_mechanical_line_speaks_the_theme() {
     assert!(bad.is_empty(), "themed words in a spec:\n  {}", bad.join("\n  "));
 }
 
+/// **The same question as `no_mechanical_line_speaks_the_theme`, asked of the
+/// theme rather than of a list somebody typed** — and asked of the knob names
+/// as well, which is what `SECOND-ORDER-M13.md` row 7 is for.
+///
+/// The lint above carries six words written by hand, and a list of words
+/// written by hand is the failure this project has found four times: the
+/// modules in `package-web.sh`, the `EVENT_ONLY` regex twice, and the gate's
+/// own `12` for the barrel's ceiling. What a themed word *is* is the right-hand
+/// side of `Theme::vocabulary`, and this reads it.
+///
+/// **The right-hand side, not the left.** A mechanical line is meant to say
+/// `armor` and `mana` — TONE 13a, and the whole job of the line is to let
+/// somebody confirm they got what a node promised, which they cannot do
+/// against a joke. What it must never say is the *theme's* word for one:
+/// `armor` is right and `cork` is the failure.
+///
+/// **And a knob name is one of these strings.** `Effect::Tunes::line` prints
+/// the bare knob, so the moment the expert trees landed a knob called
+/// `harvest` — the theme's word for the nature pool — promised a pool the
+/// class does not touch. It was renamed `per_cell`; nothing was watching for
+/// the next one.
+///
+/// Whole words, matched the way `retell` matches them, or `power` would fire
+/// on `powerful` and every line in the game would be a failure.
+#[test]
+fn no_knob_or_line_speaks_a_word_a_theme_would_produce() {
+    // **The whole phrase, not its words.** A theme renders `mana` as *the
+    // Funny*, and splitting that into words puts `the` on the list — which
+    // fails every sentence in the game and is a lint nobody can read. A
+    // replacement is one string and it arrives as one string.
+    let mut said_by_a_theme: Vec<String> = Vec::new();
+    for t in gm2d_core::theme::THEMES {
+        for (from, to) in t.vocabulary {
+            let to = to.to_lowercase();
+            // A theme that renders a word as itself has not renamed anything.
+            if to != from.to_lowercase() && !said_by_a_theme.contains(&to) {
+                said_by_a_theme.push(to);
+            }
+        }
+    }
+    assert!(
+        said_by_a_theme.len() > 5,
+        "no theme renames more than five words, so this lint is asleep"
+    );
+
+    /// Does `hay` contain `needle` as a whole phrase?
+    ///
+    /// Boundaries on both ends, or `cork` fires on `corkscrew` and `power` on
+    /// `powerful`, and every line in the game is a failure.
+    fn says(hay: &str, needle: &str) -> bool {
+        let hay = hay.to_lowercase();
+        let mut from = 0;
+        while let Some(i) = hay[from..].find(needle) {
+            let at = from + i;
+            let before = hay[..at].chars().next_back();
+            let after = hay[at + needle.len()..].chars().next();
+            let edge = |c: Option<char>| c.is_none_or(|c| !c.is_ascii_alphabetic());
+            if edge(before) && edge(after) {
+                return true;
+            }
+            from = at + needle.len();
+        }
+        false
+    }
+
+    let mut bad = Vec::new();
+    for t in &data::skills().trees {
+        for n in &t.nodes {
+            for said in [n.line()].into_iter().chain(n.detail()) {
+                for w in &said_by_a_theme {
+                    if says(&said, w) {
+                        bad.push(format!("{}: {said:?} says {w:?}, which is a theme's word", n.id));
+                    }
+                }
+            }
+        }
+    }
+    // The knob names themselves, which is where this came from: a knob is
+    // printed bare, so its *name* is a player-facing string whether or not any
+    // node currently spends a point on it.
+    for e in gm2d_core::expert::EXPERTS {
+        for knob in e.power.knobs() {
+            for w in &said_by_a_theme {
+                if says(knob, w) {
+                    bad.push(format!("{}: the knob {knob:?} is a theme's word", e.name));
+                }
+            }
+        }
+    }
+    assert!(bad.is_empty(), "a spec written in a joke:\n  {}", bad.join("\n  "));
+}
+
 /// The line is short enough to sit under the name without wrapping twice.
 #[test]
 fn a_mechanical_line_stays_short_enough_to_read_at_a_glance() {
@@ -91,6 +183,11 @@ fn every_effect_key_is_one_the_engine_actually_reads() {
         ("assembly_pct", &["pct"]),
         ("grants", &["rule"]),
         ("gives_ench", &["ench"]),
+        // M13's seventh. `knob` is checked further, against the knobs the
+        // tree's own class declares — `every_expert_knob_is_declared` — because
+        // this list can only say the *field* is read, and a knob name nothing
+        // has got would pass here and move nothing.
+        ("tunes", &["knob", "by"]),
     ];
     let raw: serde_json::Value =
         serde_json::from_str(include_str!("../../../data/skills.json")).unwrap();
@@ -161,7 +258,7 @@ fn armour_the_tree_grants_is_armour_the_fight_starts_with() {
     };
     assert_eq!(soaked(Held::default()), 0, "nobody starts a fight wearing armour");
     assert_eq!(
-        soaked(Held { armor: 40, mana: 0, rules: Vec::new() }),
+        soaked(Held { armor: 40, mana: 0, rules: Vec::new(), empty_frames: 0, told: Vec::new() }),
         40,
         "all forty points should be spent soaking, and no more than forty"
     );
@@ -172,7 +269,7 @@ fn armour_the_tree_grants_is_armour_the_fight_starts_with() {
 fn the_shipped_tree_still_hands_out_what_it_promises() {
     let tree = data::skills();
     let held = tree.start_with(&["corked".into(), "funnel-drill".into()]);
-    assert_eq!(held, Held { armor: 12, mana: 20, rules: Vec::new() }, "the two base nodes that grant them");
+    assert_eq!(held, Held { armor: 12, mana: 20, rules: Vec::new(), empty_frames: 0, told: Vec::new() }, "the two base nodes that grant them");
 
     // And the mixed node keeps both halves: strength through `stats_from`,
     // armour through `start_with`.
@@ -310,7 +407,16 @@ fn the_log_opens_holding_what_the_tree_granted() {
         c.take_skill(&data::skills(), id).expect("a base node with a point in hand");
     }
     let held = c.start_with();
-    assert_eq!(held, Held { armor: 12, mana: 20, rules: Vec::new() }, "the two nodes as shipped");
+    // **Four, and it is a measurement worth having.** Auto-pack seats the two
+    // components of the starting kit and both are weapon parts, so a level-one
+    // character walks out of the pit with four bare frames — which is what two
+    // of the ten M13 experts are priced against, and the reason the number is
+    // asserted here rather than ignored.
+    assert_eq!(
+        held,
+        Held { armor: 12, mana: 20, rules: Vec::new(), empty_frames: 4, told: Vec::new() },
+        "the two nodes as shipped"
+    );
 
     let spec: &MonsterSpec =
         gm2d_core::combat::LADDER.iter().find(|s| s.name == "Bog Toad").expect("a toad");
@@ -352,7 +458,16 @@ fn the_four_nodes_a_player_took_all_do_something() {
     let after = c.player_stats();
     assert_eq!(after.health - before.health, 60, "Cave Lungs");
     assert_eq!(after.strength - before.strength, 6, "Handspan");
-    assert_eq!(c.start_with(), Held { armor: 12, mana: 20, rules: Vec::new() }, "Corked and Funnel Drill");
+    // **Five, because `Character::starting` seats nothing.** The kit is given
+    // into the bag and Auto-pack is what turns the blade; a character who has
+    // not pressed it has five bare frames, and two of the ten experts are
+    // priced against exactly that. It is asserted rather than ignored because
+    // a fixture whose board silently filled would change what this measures.
+    assert_eq!(
+        c.start_with(),
+        Held { armor: 12, mana: 20, rules: Vec::new(), empty_frames: 5, told: Vec::new() },
+        "Corked and Funnel Drill"
+    );
 }
 
 // ------------------------------------------------- what an item does to them

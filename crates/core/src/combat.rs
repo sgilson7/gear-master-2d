@@ -3371,6 +3371,33 @@ pub struct RunningItem {
     pub spins: bool,
     /// This item fires once and is finished.
     pub fragile: bool,
+    /// Something is bolted to one of this item's components.
+    ///
+    /// Off the profile, which took it from the character. The two rules that
+    /// read it — `Productivity` and `Beacon` — are about the ench rather than
+    /// about the gear, and a fight has no way to ask which is which otherwise.
+    pub enched: bool,
+    /// How many times this item has activated this fight.
+    ///
+    /// **Per item, not per fighter.** `Combatant::activations` counts the whole
+    /// side and is what `Echo` reads; `Productivity` is a property of the
+    /// *item* — a board with two enched items gets two schedules, which is what
+    /// enching two of them is for.
+    pub fires: u32,
+    /// The cooldown this item started the fight with.
+    ///
+    /// Kept so `Productivity`'s slowdown is applied to the original rather than
+    /// compounded onto the running value: scaling a cooldown that has already
+    /// been scaled is the same fault as a replay subtracting damage from a
+    /// health total it keeps itself, and ten procs would stop the item.
+    pub base_cooldown_ms: u32,
+    /// How much slower this item has become, in percent, for the rest of the
+    /// fight.
+    ///
+    /// Accumulated by `Productivity`, which is the only thing that writes it.
+    /// **For the fight and not for good**, like `broken`: a `RunningItem` is
+    /// rebuilt at every bell.
+    pub slowed_pct: u32,
     /// And it has. Its bar does not advance, it does not turn, and it does not
     /// fire again this fight.
     ///
@@ -3460,6 +3487,10 @@ impl RunningItem {
             // board says whether there is anywhere to turn to. One entry in
             // the cycle is an item that lands on itself or is boxed in.
             spins: p.spins && p.turn_cycle.len() > 1,
+            enched: p.enched,
+            fires: 0,
+            slowed_pct: 0,
+            base_cooldown_ms: p.cooldown_ms,
             spin_stacks: 0,
             spin_ms: 0,
             turn_index: 0,
@@ -3508,6 +3539,11 @@ impl RunningItem {
             fragile: false,
             broken: false,
             unshakable: false,
+            // A bite stands on no component, so nothing can be bolted to it.
+            enched: false,
+            fires: 0,
+            slowed_pct: 0,
+            base_cooldown_ms: a.cooldown_ms.max(TICK_MS),
             spins: false,
             spin_stacks: 0,
             spin_ms: 0,
@@ -3718,6 +3754,70 @@ pub struct Combatant {
     /// Wellspring: spending a pool refunds this percent of it to each of the
     /// other three.
     pub confluence: i32,
+    /// The expert class in play, with its knobs already tuned by the tree.
+    ///
+    /// **One `Option` rather than a field a knob**, and the difference is that
+    /// there is no sentinel. Ten experts carrying thirty-one knobs between
+    /// them would be thirty-one fields on this struct, every one of which has
+    /// to mean *off* at some value — and `rate: 0` meaning "not a Loud
+    /// Calculation" is exactly the kind of number a screen cannot tell from a
+    /// bug. A character holds at most one expert, so `None` is the whole of
+    /// what "not one" means.
+    ///
+    /// It arrives through [`Held`] like every other fight input, and is
+    /// translated at the bell the way a `ClassPower` is — so combat stays a
+    /// pure function of what it was handed.
+    pub expert: Option<crate::expert::ExpertPower>,
+    /// Every this-many-th activation of an **enched** item runs twice, and
+    /// that item is this much slower for the rest of the fight.
+    ///
+    /// `None` for everybody who has not granted it. An `Option` rather than a
+    /// zero, for the reason `expert` is one: `every: 0` would have to mean
+    /// *never*, and a zero standing in for absence is a number a screen cannot
+    /// tell from a bug.
+    pub productivity: Option<(u32, u32)>,
+    /// Funny bought with strength this fight, and what is still free.
+    ///
+    /// Loud Calculation's ledger. Two numbers because the class has two
+    /// budgets: `cap` is how much may be bought at all, and `floor` is how
+    /// much of it costs no strength — *you may buy this many past empty*.
+    pub loud_bought: i32,
+    pub loud_free_left: i32,
+    /// Strength borrowed so far, for the rebate a kill pays back.
+    pub loud_owed: i32,
+    /// Curses standing on the other side that will never expire.
+    ///
+    /// Counted on the **lander**, not the sufferer: `carry` is how many this
+    /// fighter may keep standing, and a brawl must not let three foes share
+    /// one allowance or divide it.
+    pub facts_standing: u32,
+    /// Requisitions left this fight, and how many have been made.
+    ///
+    /// `reqs_done` is what `relist` counts against, and it is separate from
+    /// `reqs_left` because *how many are gone* and *how many were made* stop
+    /// being the same number the first time one is refunded.
+    pub reqs_left: i32,
+    pub reqs_done: u32,
+    /// When the Opening Number's free window closes, and how many restarts of
+    /// it are left.
+    pub opening_until_ms: u32,
+    pub opening_encores: i32,
+    /// Whether the window's leftover Funny has already been banked as armour.
+    /// Once a fight, at the moment it closes — a second payout would make the
+    /// window worth reopening for its own sake.
+    pub opening_banked: bool,
+    /// The empty frames' spin: how far round they are, and what they hold.
+    pub overwound_ms: u32,
+    pub overwound_stacks: i32,
+    /// How many of the five worn frames have nothing seated in them.
+    ///
+    /// **A board fact the fight has to be told**, because a fight has never
+    /// had a board — `ItemProfile` is a flat snapshot, which is why a
+    /// mid-fight save carries a creature name and a tile and nothing else.
+    /// Two experts read it and neither could work it out from the profiles: an
+    /// empty frame produces no profile at all, so *nothing* and *five of
+    /// nothing* look identical from in here.
+    pub empty_frames: u32,
     /// Extra stacks a turning item banks each turn, on top of the one.
     pub spin_extra: u32,
     /// Stacks a turning item keeps through an activation.
@@ -3756,6 +3856,23 @@ impl Combatant {
     pub fn player(stats: Stats, profiles: &[ItemProfile]) -> Self {
         Combatant {
             name: "You".to_string(),
+            // Both are set at the bell by `apply_held`, off what the character
+            // handed in. Nothing is one here, which is what a fighter with no
+            // expert and no board is.
+            expert: None,
+            productivity: None,
+            loud_bought: 0,
+            loud_free_left: 0,
+            loud_owed: 0,
+            facts_standing: 0,
+            reqs_left: 0,
+            reqs_done: 0,
+            opening_until_ms: 0,
+            opening_encores: 0,
+            opening_banked: false,
+            overwound_ms: 0,
+            overwound_stacks: 0,
+            empty_frames: 0,
             max_health: stats.health,
             health: stats.health,
             armor: 0,
@@ -3877,6 +3994,24 @@ impl Combatant {
         }
         Combatant {
             name: spec.name.to_string(),
+            // **A creature is never an expert.** Classes are applied to the
+            // player only — `simulate_with_class` says so — and an empty frame
+            // is a thing a *player* left empty; a creature's board is what the
+            // dresser wrote and has no bearing on either.
+            expert: None,
+            productivity: None,
+            loud_bought: 0,
+            loud_free_left: 0,
+            loud_owed: 0,
+            facts_standing: 0,
+            reqs_left: 0,
+            reqs_done: 0,
+            opening_until_ms: 0,
+            opening_encores: 0,
+            opening_banked: false,
+            overwound_ms: 0,
+            overwound_stacks: 0,
+            empty_frames: 0,
             max_health: stats.health,
             health: stats.health,
             armor: 0,
@@ -4451,6 +4586,42 @@ pub struct CombatLog {
     /// Run gold the player spent during the fight. The run deducts it when
     /// the fight settles - the simulation never touches `Run::gold` itself.
     pub gold_spent: i32,
+    /// What was standing on the other side when it went down.
+    ///
+    /// **Written where the truth is.** `player` and `enemies` are the fighters
+    /// *as the bell went* — that is what makes a replay replayable — so the
+    /// live curse state at the end is nowhere in this log unless it is put
+    /// here. Settlement needs it (Eleventh Season bills by the curse), and the
+    /// alternative was `fight::settle` walking `entries` and re-deriving which
+    /// curses had expired by the last timestamp, which is a second copy of
+    /// what the simulation already knew and would have gone stale the first
+    /// time a curse changed how it ends.
+    pub curse_bill: CurseBill,
+}
+
+/// Curses landed on the other side, and how they stood at the end.
+///
+/// One struct rather than three fields on the log, because they are one fact
+/// asked from one place, and the next settlement rule that wants a fourth
+/// should find them together.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct CurseBill {
+    /// Stacks still running on the fallen when the fight ended.
+    pub standing: u32,
+    /// **Which** kinds were still running, each once.
+    ///
+    /// The list rather than the count, because two things read it and they
+    /// want different halves: Eleventh Season wants *how many different*, and
+    /// Standing Fact's `told` wants *which*. `log.enemies` cannot answer either
+    /// — those are the fighters as the bell went, which is what makes a replay
+    /// replayable — so this is the only place the ending state exists.
+    pub kinds: Vec<crate::curse::CurseKind>,
+    /// Curses that landed on it and had burned off before the bell.
+    ///
+    /// Landings minus what is still standing, floored at zero — so a long
+    /// fight where everything expired reads high and a short one reads zero,
+    /// which is the shape the rule that reads it is rescuing.
+    pub expired: u32,
 }
 
 impl CombatLog {
@@ -4473,6 +4644,10 @@ impl CombatLog {
     /// what is under test is the settlement rather than the simulation.
     pub fn won_by_default(spec: &MonsterSpec) -> CombatLog {
         CombatLog {
+            // Nothing was fought, so nothing was cursed. A rout pays what a
+            // win pays and this is the honest bill for a fight that did not
+            // happen — not a zero standing in for one nobody counted.
+            curse_bill: CurseBill::default(),
             player: Combatant::player(Stats::base_character(), &[]),
             enemies: vec![Combatant::monster_at(spec, Difficulty::Medium)],
             specs: vec![*spec],
@@ -4797,6 +4972,64 @@ impl CombatLog {
 /// door for the same reason: **a granted rule is a fight input, like a class
 /// power, and not a mutable global.** Combat stays a pure function of what it
 /// was handed. It costs this type its `Copy`, which is the whole of the price.
+/// How slow `Rule::Productivity` may ever make one item.
+///
+/// **A cap, because the rule stacks with itself.** Every proc adds, and an
+/// item a hundred percent slower is a stopped item — which is a stun the player
+/// bought for themselves and cannot take off. Seventy-five is three procs of
+/// the shipped twenty-five and five of the shipped fifteen, which is a long
+/// fight, and past it the trade stops being one.
+pub const MAX_PRODUCTIVITY_SLOW_PCT: u32 = 75;
+
+/// What a funnel will hold before it spills, in Funny.
+///
+/// **Ten casts' worth**, because the pool it fills is the one a cast spends
+/// and the number a player can hold in their head about mana is *how many
+/// casts is that*. Only `PatentedFunnel`'s `overflow` reads it — mana has no
+/// cap anywhere else in this engine and must not grow one, because every
+/// casting item in the game is priced against a pool that only goes up.
+pub const FUNNEL_HOLD: i32 = SPELL_MANA_COST * 10;
+
+/// Turn a fighter's empty frames, once a tick's worth of time.
+///
+/// **Overwound Arm, and it is the only thing in the game that reads
+/// `empty_frames`.** A frame with nothing in it produces no `ItemProfile`, so
+/// there is no item to hang a spin on and no cooldown for it to ride; it turns
+/// on the fighter's own clock instead, at the rate the fighter's spin runs at,
+/// and what it banks goes straight into bare strength.
+///
+/// `half` is tenths of a stack a turn, so the arithmetic is integer the whole
+/// way down — the same reason every roll in this game is per-mille.
+fn overwind(c: &mut Combatant, every_ms: u32) {
+    use crate::expert::ExpertPower::OverwoundArm;
+    let Some(OverwoundArm { half, ceiling, carry }) = c.expert else { return };
+    if c.empty_frames == 0 || half <= 0 {
+        return;
+    }
+    c.overwound_ms += TICK_MS;
+    while c.overwound_ms >= every_ms {
+        c.overwound_ms -= every_ms;
+        // Every bare frame turns, so five of them wind five times as fast —
+        // which is the joke the class is making and the reason it is priced
+        // against a board you did not fill.
+        let gained = half * c.empty_frames as i32;
+        let before = c.overwound_stacks;
+        c.overwound_stacks = (c.overwound_stacks + gained).min(ceiling.max(0) * 10);
+        // Tenths in, whole points of strength out: the pile is kept in tenths
+        // and only the crossings are paid, so nothing is lost to rounding and
+        // nothing is paid twice.
+        let paid = c.overwound_stacks / 10 - before / 10;
+        c.strength += paid;
+        // `carry` is what survives an activation, and an empty frame has no
+        // activation — so it is what survives the *ceiling*: stacks past the
+        // top are kept rather than thrown away, which is what keeps a long
+        // fight paying.
+        if c.overwound_stacks >= ceiling.max(0) * 10 && carry > 0 {
+            c.overwound_stacks -= carry.min(ceiling.max(0)) * 10;
+        }
+    }
+}
+
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Held {
     pub armor: i32,
@@ -4804,6 +5037,70 @@ pub struct Held {
     /// Rules the skill tree granted. Translated into combatant fields below,
     /// the same way a `ClassPower` is.
     pub rules: Vec<crate::skills::Rule>,
+    /// Curses that outlived the last fight and land on whatever you meet next.
+    ///
+    /// **The one thing in this block that reaches past the bell**, and it is
+    /// Standing Fact's capstone doing it — the pair in one sentence: the
+    /// Keeper's permanence and the Gorillathon's opening. It rides in `Held`
+    /// like every other fight input, so combat stays a pure function of what it
+    /// was handed; what fills it is `Character::told_curses`, which is the only
+    /// new save field this block needed.
+    pub told: Vec<crate::curse::CurseKind>,
+    /// How many worn frames the player left empty.
+    ///
+    /// **Counted where the board is and carried in, never derived here.** See
+    /// [`Combatant::empty_frames`] for why the fight cannot answer it itself.
+    /// `Character::start_with` fills it; everything that builds a `Held` by
+    /// hand gets zero, which is the honest answer for a fixture with no board.
+    pub empty_frames: u32,
+}
+
+/// Put an expert's power onto the fighter at the bell.
+///
+/// **Six of the ten are the fight's and four are not**, and every one of them
+/// says which here rather than being left out — the same posture every arm of
+/// the rule loop above takes, and the reason adding an expert is a decision
+/// about combat rather than a silence.
+///
+/// The six that are combat's all land in the one `expert` field: what each
+/// does with its knobs is read where the mechanic is, because a knob copied
+/// into a second field here would be a second answer to what the tree tuned.
+fn apply_expert(c: &mut Combatant, e: crate::expert::ExpertPower) {
+    use crate::expert::ExpertPower::*;
+    match e {
+        // The fight's. Read at the tick, off `Combatant::expert`.
+        LoudCalculation { .. }
+        | StandingFact { .. }
+        | OverwoundArm { .. }
+        | CurseRequisition { .. }
+        | PatentedFunnel { .. }
+        | OpeningNumber { .. }
+        | CursedLicence { .. } => {
+            c.expert = Some(e);
+            // **The budgets a fight starts with, seeded once at the bell.**
+            // Read off the tuned power rather than kept beside it, so a knob
+            // the tree moved is the number the fight actually runs on — which
+            // is the same reason the promise is printed from the tuned value.
+            match e {
+                LoudCalculation { floor, .. } => c.loud_free_left = floor.max(0),
+                CurseRequisition { per_fight, .. } => c.reqs_left = per_fight.max(0),
+                OpeningNumber { window_ms, encore, .. } => {
+                    c.opening_until_ms = window_ms.max(0) as u32;
+                    c.opening_encores = encore.max(0);
+                }
+                _ => {}
+            }
+        }
+        // **The purse's**, settled by `reward::bounty_with_class` where the
+        // argument about what a fight pays already lives. `Showstopper` is the
+        // precedent and the reason that file exists.
+        ShortProgramme { .. } | EleventhSeason { .. } => {}
+        // **The board's.** How many enchs fit on a component, and what an
+        // enched component lends its neighbours, are packing-screen facts —
+        // already in the profiles this fight was handed, the same way
+        // `Recycler`'s assembly bonus is.
+        FullBill { .. } => {}
+    }
 }
 
 pub fn simulate(player_stats: Stats, profiles: &[ItemProfile], spec: &MonsterSpec) -> CombatLog {
@@ -4907,6 +5204,13 @@ pub fn simulate_party_holding(
     // add to and subtract from what the tree granted rather than replacing it.
     start_player.armor += held.armor;
     start_player.mana += held.mana;
+    // A board fact, carried in rather than derived, because an empty frame
+    // produces no `ItemProfile` and so is invisible from in here.
+    start_player.empty_frames = held.empty_frames;
+    // **What followed you here.** Landed before the first tick, on whatever is
+    // in front of you, which is what *before it acts* means when a fight is
+    // fifty-millisecond slices: there is no earlier moment than this one.
+    let told = held.told.clone();
     // **Rules the tree granted.** Translated here rather than read as `Rule`s
     // in the tick, so combat goes on speaking its own vocabulary and a new
     // rule is one arm in one place. Exhaustive, so a rule nobody wires up is a
@@ -4948,7 +5252,26 @@ pub fn simulate_party_holding(
             | crate::skills::Rule::Survey { .. }
             // And a travel rule, which is a fourth kind again: it is a gesture
             // the player makes on the map screen and a fight has never had one.
-            | crate::skills::Rule::Homeward => {}
+            | crate::skills::Rule::Homeward
+            // **Two board rules, and a fifth kind.** A filled row is paid into
+            // `Held::mana` before this runs, and an ench lent to a neighbour is
+            // already in the profiles this fight was handed — both are answered
+            // where the board is, which is the same division `Recycler`'s
+            // assembly bonus has always made. `Spread` is the board's too and
+            // is settled when the fight ends, because a fight that wrote to the
+            // character is a fight a mid-fight save could not carry.
+            | crate::skills::Rule::RowHarvest { .. }
+            | crate::skills::Rule::Beacon { .. }
+            | crate::skills::Rule::Spread { .. } => {}
+            // The fight's, and the first new thing in a fight since the Chonga
+            // Swing. Held on the fighter rather than folded into a profile: a
+            // profile is the *board's* answer and this is the *character's*, so
+            // two players with the identical board do not have the identical
+            // fight — the same reason `CurseOnActivate` fires beside an item's
+            // own triggers rather than inside them.
+            crate::skills::Rule::Productivity { every, slower_pct } => {
+                start_player.productivity = Some((*every, *slower_pct));
+            }
         }
     }
     // Every class you hold applies at once. The fountains hand out different
@@ -4984,6 +5307,14 @@ pub fn simulate_party_holding(
             // bonuses, which are already in the stats and the item profiles
             // this fight was handed. See `Loadout::assembly_pct`.
             crate::class::ClassPower::Recycler { .. } => {}
+            // **The ten experts.** Six of them are the fight's and land in
+            // `Combatant` fields below; four are the purse's or the board's
+            // and say so here, so that adding an expert is a decision about
+            // combat rather than a silence — the same posture every arm above
+            // takes. M13.6 is where each of them was wired, and
+            // `every_offered_class_reaches_something` over all fifteen is what
+            // proves none of them is a promise reaching nothing.
+            crate::class::ClassPower::Expert(e) => apply_expert(&mut start_player, e),
             crate::class::ClassPower::Piety { faith } => start_player.faith += faith,
             crate::class::ClassPower::Tired { mana } => start_player.mana -= mana,
             crate::class::ClassPower::Ticket { nth } => start_player.warded_every = nth,
@@ -5027,6 +5358,22 @@ pub fn simulate_party_holding(
     let mut log: Vec<LogEntry> = Vec::new();
     // Reported once each, as they go down.
     let mut fallen: Vec<usize> = Vec::new();
+    // How many quarters each foe has already been reported as having lost.
+    // See `the_fight_turned`, which is the only milestone a fight in this game
+    // has that is not its own last tick.
+    let mut turned: Vec<u32> = vec![0; foes.len()];
+
+    // **What followed you out of the last fight lands before this one starts.**
+    // At `t = 0`, on the first thing in front of you, and logged like any other
+    // curse so the replay draws it — a chip that appeared with no entry behind
+    // it would be the page inventing a number, which is the one thing it must
+    // never do. Landed on `foes` and not on `start_enemies`, because the
+    // starting fighters are the ones a replay is rebuilt from.
+    for kind in &told {
+        if let Some(f) = foes.first_mut() {
+            land_curse(f, Ref::foe(0), *kind, StunAim::Unaimed, 0, &mut log);
+        }
+    }
 
     // Everyone in the fight, player first, so the loops below read the same
     // whether there is one thing across the table or three.
@@ -5149,6 +5496,14 @@ pub fn simulate_party_holding(
             }
         }
 
+        // **The two experts that pay when the fight turns.** Beside the check
+        // that reports a corpse rather than inside it, because `check_down`
+        // takes the fighters by reference on purpose — it reports and decides
+        // and changes nothing — and a settlement that wrote through it would
+        // be the one exception somebody has to remember.
+        let turn = the_fight_turned(&foes, &mut turned);
+        rebate_when_it_turns(&mut p, turn);
+        encore_when_it_turns(&mut p, t, turn);
         if check_down(&p, &foes, t, &mut log, &mut outcome, &mut fallen) {
             break 'fight;
         }
@@ -5169,9 +5524,20 @@ pub fn simulate_party_holding(
             if pick(&mut p, &mut foes, me).is_down() {
                 continue;
             }
+            // **The empty frames turn too, once a tick.** Overwound Arm is
+            // the one thing in the game that gets anything out of a frame with
+            // nothing in it, and it rides the *fighter's* clock rather than an
+            // item's for the obvious reason: there is no item. Here rather
+            // than inside the item loop below, because a fighter with four
+            // items must not wind its bare frames four times.
+            {
+                let c = pick(&mut p, &mut foes, me);
+                let every = c.spin_every_ms.max(TICK_MS);
+                overwind(c, every);
+            }
             let count = pick(&mut p, &mut foes, me).items.len();
             for idx in 0..count {
-                let (ready, turned) = {
+                let (ready, turned, banked) = {
                     let c = pick(&mut p, &mut foes, me);
                     // Frost stretches the cooldown by slowing how fast the
                     // bar fills, rather than by rewriting the cooldown. It is
@@ -5184,6 +5550,12 @@ pub fn simulate_party_holding(
                     // The spin's tuning is the fighter's, like the slow above
                     // it: a node is taken by a person, not by a blade.
                     let (spin_extra, spin_every) = (c.spin_extra, c.spin_every_ms.max(TICK_MS));
+                    let per_stack = match c.expert {
+                        Some(crate::expert::ExpertPower::PatentedFunnel { per_stack, .. }) => {
+                            per_stack.max(0)
+                        }
+                        _ => 0,
+                    };
                     let item = &mut c.items[idx];
                     // **Broken is finished.** Beside the stun rather than
                     // folded into it: a stun is a curse somebody put on you and
@@ -5191,13 +5563,13 @@ pub fn simulate_party_holding(
                     // moves either — a broken bar does not turn, for the same
                     // reason a stopped one does not.
                     if item.broken {
-                        (false, None)
+                        (false, None, 0)
                     } else if item.stun_ms > 0 {
                         item.stun_ms = item.stun_ms.saturating_sub(TICK_MS);
                         // A stopped bar does not turn either. The spin rides
                         // the item's own clock, and a stunned item's clock is
                         // exactly what a stun stops.
-                        (false, None)
+                        (false, None, 0)
                     } else {
                         let step = (TICK_MS as i32 * (100 - slow) / 100 * (100 - slower) / 100
                             * (100 + haste)
@@ -5221,6 +5593,7 @@ pub fn simulate_party_holding(
                         // does not turn at all — the spin is a property of the
                         // item's own clock rather than of the wall.
                         let mut turns = 0u32;
+                        let mut banked = 0i32;
                         if item.spins {
                             item.spin_ms += step;
                             while item.spin_ms >= spin_every {
@@ -5228,6 +5601,12 @@ pub fn simulate_party_holding(
                                 item.spin_stacks += 1 + spin_extra;
                                 item.turn_index = (item.turn_index + 1) % item.turn_cycle_len;
                                 turns += 1;
+                                // **The Patented Funnel: the spin banks Funny.**
+                                // Per stack per turn, so a slow item that has
+                                // been turning a while pays more than a fast
+                                // one that just started — which is what makes
+                                // it worth leaving room to turn.
+                                banked += per_stack * item.spin_stacks as i32;
                             }
                         }
                         let turned = (turns > 0).then(|| {
@@ -5240,9 +5619,29 @@ pub fn simulate_party_holding(
                         } else {
                             false
                         };
-                        (ready, turned)
+                        (ready, turned, banked)
                     }
                 };
+                // **What the funnel banked, paid once the item's borrow is
+                // done.** Into `mana`, which is the pool the theme calls the
+                // Funny — the same pool a cast spends, which is what makes a
+                // spinning board and a casting board the same build.
+                if banked > 0 {
+                    let me_c = pick(&mut p, &mut foes, me);
+                    me_c.mana += banked;
+                    // Funny past what a funnel will hold spills as armour,
+                    // 1 for 1 — the only sink for a class that will otherwise
+                    // bank more than it can ever spend.
+                    if let Some(crate::expert::ExpertPower::PatentedFunnel { overflow, .. }) =
+                        me_c.expert
+                    {
+                        if overflow > 0 && me_c.mana > FUNNEL_HOLD {
+                            let spill = me_c.mana - FUNNEL_HOLD;
+                            me_c.mana = FUNNEL_HOLD;
+                            me_c.armor += spill;
+                        }
+                    }
+                }
                 // Logged outside the borrow above, in the slice it happened
                 // in. Every turn gets an entry, so the replay reads the
                 // orientation rather than dividing the playback head by a
@@ -5325,10 +5724,27 @@ pub fn simulate_party_holding(
     log.push(LogEntry { who: 0, at_ms: t, event: Event::End { outcome } });
     // What the purse lost over the fight, for the run to charge afterwards.
     let spent_from_purse = purse - p.purse;
+    // **Counted off the live foes, not off the entries.** `foes` is what the
+    // fight actually ended holding; walking the log for it would be re-deriving
+    // a fact three lines from the thing that knows it.
+    let standing: u32 = foes.iter().flat_map(|f| f.curses.iter()).map(|c| c.stacks).sum();
+    let mut kinds: Vec<crate::curse::CurseKind> = Vec::new();
+    for f in &foes {
+        for c in f.curses.iter() {
+            if c.stacks > 0 && !kinds.contains(&c.kind) {
+                kinds.push(c.kind);
+            }
+        }
+    }
+    let landed: u32 = log
+        .iter()
+        .filter(|e| matches!(e.event, Event::Cursed { on, .. } if on != Side::Player))
+        .count() as u32;
     CombatLog {
         player: start_player,
         enemies: start_enemies,
         specs: specs.to_vec(),
+        curse_bill: CurseBill { standing, kinds, expired: landed.saturating_sub(standing) },
         entries: log,
         outcome,
         duration_ms: t,
@@ -5470,6 +5886,242 @@ pub enum StunAim {
 /// Nothing lands on an item that is already stopped for longer than this stun
 /// would stop it, when there is a live one to hit instead: a chain of stuns
 /// should spread across the kit, not bury one item.
+/// Hand back a share of the strength Loud Calculation borrowed, once a kill.
+///
+/// Has anything opposite just lost another quarter of itself?
+///
+/// **The only milestone a fight in this game has that is not its own last
+/// tick**, and the reason it had to be invented. Two knobs — Loud Calculation's
+/// `rebate` and Opening Number's `encore` — were written against *a kill inside
+/// the fight*, which is what `PLAN-M13-2.md` §3.1 D and §3.7 C both say. A
+/// brawl has those; **GM2D does not deal one.** `fight::run` builds a single
+/// `MonsterSpec` from a single `Encounter`, and `check_down` breaks the loop on
+/// the same tick the last foe falls — so strength refunded when a foe goes down
+/// is refunded onto the final tick of the fight, and a free-cast window
+/// reopened after the only foe is dead is a window nobody casts in. Both knobs
+/// parsed, cost two points each, and paid nothing, which is the *eight skill
+/// nodes* failure wearing a plan's own words.
+///
+/// So both are re-aimed at the fight **turning**, and each keeps what it was
+/// for: the rebate still rewards spending the whole standing order on a fight
+/// you are winning, and the encore still buys *time* rather than money.
+///
+/// **Quarters, not halves, and that is `encore` deciding it.** An encore is a
+/// *count* — the tree sells two of them — and a milestone that can happen once
+/// is a count that can only ever be one, which is the same dead knob one step
+/// along. Three quarters, a half and a quarter left is three turns a fight can
+/// have, and the fourth is the corpse, which is the end and pays nothing.
+///
+/// `turned` is how many each foe has already been reported for, so a threshold
+/// fires on the tick it is crossed and never again — the same guard `fallen`
+/// gives `check_down`.
+fn the_fight_turned(foes: &[Combatant], turned: &mut [u32]) -> bool {
+    let mut any = false;
+    for (i, f) in foes.iter().enumerate() {
+        if f.max_health <= 0 {
+            continue;
+        }
+        let lost = (f.max_health - f.health).max(0);
+        // Capped at three: a foe that has lost the fourth quarter is a foe that
+        // is down, and the fight ends on that tick.
+        let quarters = ((lost as i64 * 4) / f.max_health as i64).min(3) as u32;
+        while turned[i] < quarters {
+            turned[i] += 1;
+            any = true;
+        }
+    }
+    any
+}
+
+/// **Every turn refunds a share of the bill**, which rewards spending the whole
+/// standing order on a fight you are winning — the Gorillathon half of the pair
+/// talking. Paid while there is still a fight to spend it in; see
+/// [`the_fight_turned`] for why it is not paid on a corpse.
+fn rebate_when_it_turns(p: &mut Combatant, turned: bool) {
+    use crate::expert::ExpertPower::LoudCalculation;
+    let Some(LoudCalculation { rebate, .. }) = p.expert else { return };
+    if !turned || rebate <= 0 || p.loud_owed <= 0 {
+        return;
+    }
+    let back = p.loud_owed * rebate.clamp(0, 100) / 100;
+    p.strength += back;
+    // The bill is settled, so a second turn does not refund the same borrowing
+    // twice. What is borrowed after this is a new bill.
+    p.loud_owed -= back;
+}
+
+/// **The overture is played again**, once for every encore bought.
+///
+/// The window reopens for its full length from the moment the fight turns —
+/// which is deliberately *not* "and again immediately", because a window that
+/// reopened the instant it shut would be indistinguishable from a longer
+/// `window_ms`, and a knob that duplicates the knob beside it is a knob nobody
+/// can spend a point on knowingly.
+fn encore_when_it_turns(p: &mut Combatant, t: u32, turned: bool) {
+    use crate::expert::ExpertPower::OpeningNumber;
+    let Some(OpeningNumber { window_ms, .. }) = p.expert else { return };
+    if !turned || p.opening_encores <= 0 {
+        return;
+    }
+    p.opening_encores -= 1;
+    p.opening_until_ms = t + window_ms.max(0) as u32;
+}
+
+/// Has this fighter room to make another curse permanent, and how hard does
+/// it bite?
+///
+/// **The condition is the lander's board**, which is the whole of Standing
+/// Fact: *how few finished items are you carrying*. `items` is the finished
+/// items a fight was handed, so a bare build reads low and a packed one does
+/// not — and there is nothing to look up, because that is already the list a
+/// fight runs on.
+fn standing_fact_room(who: &Combatant) -> Permanence {
+    match who.expert {
+        Some(crate::expert::ExpertPower::StandingFact { worn, carry, bite, .. })
+            if who.items.len() as i32 <= worn && (who.facts_standing as i32) < carry =>
+        {
+            Some(bite)
+        }
+        _ => None,
+    }
+}
+
+/// Spend a curse standing on the other side to pay for a cast.
+///
+/// **The cheapest goes first, or the ripest once `pick` is bought** — the one
+/// knob in the block that changes a decision rather than a number, and worth a
+/// point precisely because it is free value afterwards: a requisition that
+/// spends something about to be lost anyway costs nothing at all.
+///
+/// A relisted curse comes back **still running**, which the engine can do
+/// because a curse is a duration and re-landing one is a thing `land_curse`
+/// already does.
+fn requisition(
+    p: &mut Combatant,
+    foes: &mut [Combatant],
+    me: Ref,
+    t: u32,
+    log: &mut Vec<LogEntry>,
+) -> bool {
+    use crate::expert::ExpertPower::CurseRequisition;
+    let Some(CurseRequisition { worth, relist, pick: ripest, .. }) = pick(p, foes, me).expert else {
+        return false;
+    };
+    if pick(p, foes, me).reqs_left <= 0 {
+        return false;
+    }
+    // Whoever is standing opposite. In a brawl the first one carrying anything
+    // — a requisition is a form, not a search.
+    let victim = if me.side == Side::Player { Side::Enemy } else { Side::Player };
+    let found = if victim == Side::Enemy {
+        foes.iter().position(|f| !f.curses.is_empty())
+    } else {
+        (!p.curses.is_empty()).then_some(0)
+    };
+    let Some(vi) = found else { return false };
+    let target: &mut Combatant = if victim == Side::Enemy { &mut foes[vi] } else { p };
+    let Some(kind) = target.curses.spend_one(ripest > 0) else { return false };
+
+    let me_c = pick(p, foes, me);
+    me_c.reqs_left -= 1;
+    me_c.reqs_done += 1;
+    // A spent curse covers `worth` percent of a cast; the excess banks as Funny
+    // rather than evaporating, which is the Sergeant's ledger and the Keeper's
+    // feeding each other.
+    let covered = SPELL_MANA_COST * worth.max(0) / 100;
+    me_c.mana += (covered - SPELL_MANA_COST).max(0);
+    let done = me_c.reqs_done;
+    let back = crate::expert::ExpertPower::relist_every(relist).is_some_and(|n| done % n == 0);
+    if back {
+        let on = if victim == Side::Enemy { Ref { side: Side::Enemy, who: vi } } else { Ref { side: Side::Player, who: 0 } };
+        // Unaimed: a curse coming *back* was never aimed in the first place,
+        // and paying for the pick a second time would be paying twice for one
+        // landing.
+        let target: &mut Combatant = if victim == Side::Enemy { &mut foes[vi] } else { p };
+        land_curse(target, on, kind, StunAim::Unaimed, t, log);
+    }
+    covered >= SPELL_MANA_COST
+}
+
+/// Can this fighter afford the cast it is about to make?
+///
+/// **One door, and three of the ten experts argue at it.** Mana is what a
+/// casting item spends and everybody starts a fight with none, so *what
+/// happens when you cannot pay* is the one question the Funnel Sergeant's half
+/// of the roster is all about — and putting the three of them in three places
+/// would have been three answers to it.
+///
+/// The order is the argument. A free window costs nothing, so it is asked
+/// first; a discount only matters once you are paying; and buying the shortfall
+/// is the last resort, because it is the only one that costs you something
+/// other than Funny.
+fn pay_for_a_cast(me: &mut Combatant, t: u32) -> bool {
+    use crate::expert::ExpertPower::*;
+    // **Opening Number: the first seconds are free**, and what is left when
+    // the window shuts may land as armour.
+    if let Some(OpeningNumber { after, bank, .. }) = me.expert {
+        if t < me.opening_until_ms {
+            return true;
+        }
+        // The window has closed. Once, and only once, the unspent Funny is
+        // banked — a second payout would make reopening the window worth
+        // something for its own sake, which is not what an encore is for.
+        if bank > 0 && !me.opening_banked {
+            me.opening_banked = true;
+            me.armor += me.mana.max(0);
+            me.mana = 0;
+        }
+        // **The price is the power's**, worked out in one place and printed
+        // from the same one — see `ExpertPower::cast_price`, and why a discount
+        // that rounds down is a node that sells nothing.
+        let cost = crate::expert::ExpertPower::cast_price(after);
+        if me.mana >= cost {
+            me.mana -= cost;
+            return true;
+        }
+        return false;
+    }
+    // **Curse Requisition: a curse you landed pays for a cast.** The curse is
+    // consumed off whoever is holding it, which is why the caller passes the
+    // whole fighter: the pool being spent is not on this side of the fight.
+    if me.mana >= SPELL_MANA_COST {
+        me.mana -= SPELL_MANA_COST;
+        return true;
+    }
+    // **Loud Calculation: pay the shortfall in strength.** Everything above
+    // this line spends Funny; this is the only one that spends you.
+    if let Some(LoudCalculation { rate, cap, .. }) = me.expert {
+        let short = SPELL_MANA_COST - me.mana.max(0);
+        let room = (cap - me.loud_bought).max(0);
+        let mut want = short.min(room);
+        if want > 0 {
+            // The free points first — that is what buying "past empty" means —
+            // then whatever strength can still afford, never below 1.
+            let free = want.min(me.loud_free_left);
+            let mut charged = want - free;
+            let rate = rate.max(1);
+            let affordable = ((me.strength - 1).max(0) * 10) / rate;
+            if charged > affordable {
+                charged = affordable;
+                want = free + charged;
+            }
+            if want > 0 {
+                let cost = charged * rate / 10;
+                me.loud_free_left -= free;
+                me.loud_bought += want;
+                me.loud_owed += cost;
+                me.strength -= cost;
+                me.mana += want;
+            }
+        }
+        if me.mana >= SPELL_MANA_COST {
+            me.mana -= SPELL_MANA_COST;
+            return true;
+        }
+    }
+    false
+}
+
 fn land_curse(
     victim: &mut Combatant,
     on: Ref,
@@ -5478,6 +6130,33 @@ fn land_curse(
     t: u32,
     log: &mut Vec<LogEntry>,
 ) {
+    land_curse_for(victim, on, kind, aim, t, log, None);
+}
+
+/// The same, told who landed it.
+///
+/// **Standing Fact is the only rule in the game about the *lander* of a
+/// curse**, and every other curse in the engine is a fact about the sufferer —
+/// which is why `Curses` holds no author and this takes one instead. `None` is
+/// every existing caller: a curse whose author nobody asked about behaves
+/// exactly as it always has, which is what makes this safe to add to a path
+/// four other things already use.
+/// `Some(bite)` when the fighter landing this curse is a Standing Fact with
+/// room to hold another. A plain value rather than the author's own
+/// `&mut Combatant`, because the author and the victim are two fighters in one
+/// vector and the borrow checker is right to refuse both at once — the caller
+/// decides, this lands it, and the caller books it.
+type Permanence = Option<i32>;
+
+fn land_curse_for(
+    victim: &mut Combatant,
+    on: Ref,
+    kind: CurseKind,
+    aim: StunAim,
+    t: u32,
+    log: &mut Vec<LogEntry>,
+    by: Permanence,
+) -> bool {
     let who = on.who as u8;
     let on = on.side;
     if kind == CurseKind::Stun {
@@ -5490,9 +6169,25 @@ fn land_curse(
                 event: Event::Stunned { on, index, item, duration_ms: ms, aimed },
             });
         }
-        return;
+        // **A stun is never a standing fact.** It rides on one item and ends;
+        // making one permanent would stop a piece of gear for the whole fight
+        // with no way to answer it, which is the outcome `STUN_CAP_MS` exists
+        // to prevent one tenth as badly.
+        return false;
     }
-    let ms = victim.curses.apply(kind, victim.curse_resist);
+    // **Standing Fact: a curse landed by somebody wearing little enough does
+    // not expire.** The condition is on the lander's board — *how few finished
+    // items are you carrying* — and the allowance is counted on the lander too,
+    // so a brawl does not let three foes share it or divide it.
+    let standing = by.is_some();
+    if let Some(bite) = by.filter(|b| *b > 0) {
+        victim.curses.bite_harder(bite);
+    }
+    let ms = if standing {
+        victim.curses.apply_standing(kind)
+    } else {
+        victim.curses.apply(kind, victim.curse_resist)
+    };
     if ms > 0 {
         let stacks = victim.curses.stacks_of(kind);
         log.push(LogEntry {
@@ -5501,6 +6196,7 @@ fn land_curse(
             event: Event::Cursed { on, kind, duration_ms: ms, stacks },
         });
     }
+    standing && ms > 0
 }
 
 /// `land_stun`, for a test that wants to put two items in front of it and see
@@ -5622,7 +6318,21 @@ fn activate(
     // item. An overtake runs the whole activation twice and the second run
     // finds nothing banked, which is right: one spend a spin.
     let spun = {
-        let keep = pick(p, foes, me).spin_keep;
+        // **`bleed` is the Patented Funnel's half of `spin_keep`.** The rule
+        // and the knob add rather than one replacing the other, which is the
+        // division this whole block makes: the rule is the switch and the knob
+        // is the tuning, and there are not two answers to how much a turning
+        // item keeps.
+        let keep = {
+            let me = pick(p, foes, me);
+            me.spin_keep
+                + match me.expert {
+                    Some(crate::expert::ExpertPower::PatentedFunnel { bleed, .. }) => {
+                        bleed.max(0) as u32
+                    }
+                    _ => 0,
+                }
+        };
         let it = &mut pick(p, foes, me).items[idx];
         let n = it.spin_stacks;
         // Everything banked is spent; what `keep` buys is starting again from
@@ -5650,6 +6360,34 @@ fn activate(
         let me = pick(p, foes, me);
         me.activations += 1;
         me.echo_every > 0 && me.activations % me.echo_every == 0
+    };
+    // **Productivity: every nth act of an enched item runs twice, and the item
+    // is slower afterwards for the rest of the fight.** Counted on the item,
+    // like `has_fired` below and unlike `Echo` above, because two enched items
+    // deserve two schedules — which is what bolting an ench onto both is for.
+    //
+    // The slowdown is written *after* the double is decided and lands on the
+    // item's own cooldown, so the swing that earned it lands in full and
+    // everything after it is dearer. Same bargain as `Fragile`, and the same
+    // ordering argument.
+    let doubles = {
+        let sched = pick(p, foes, me).productivity;
+        let it = &mut pick(p, foes, me).items[idx];
+        it.fires += 1;
+        match sched {
+            Some((every, slower)) if it.enched && every > 0 && it.fires % every == 0 => {
+                it.slowed_pct = (it.slowed_pct + slower).min(MAX_PRODUCTIVITY_SLOW_PCT);
+                // Recomputed off the slowdown total rather than multiplied in
+                // place, so ten procs do not compound into a stopped item — a
+                // running cooldown scaled repeatedly is the same fault as a
+                // replay subtracting damage from its own total.
+                it.cooldown_ms = (it.base_cooldown_ms as i64 * 100
+                    / (100 - it.slowed_pct as i64).max(1))
+                    as u32;
+                true
+            }
+            _ => false,
+        }
     };
     // Overtake: the first firing of the fight runs a second time.
     //
@@ -5727,12 +6465,15 @@ fn activate(
         // be the committed choice, and charging it twice for being one would
         // undo that.
         let paid = {
-            let me = pick(p, foes, me);
-            if me.mana >= SPELL_MANA_COST {
-                me.mana -= SPELL_MANA_COST;
+            if pay_for_a_cast(pick(p, foes, me), t) {
                 true
             } else {
-                false
+                // **Curse Requisition, and it is the one payment that cannot
+                // be made from inside one fighter.** The pool being spent is a
+                // curse standing on somebody *else*, so it is asked here,
+                // where both sides are in hand, rather than in `pay_for_a_cast`
+                // — which is the same reason `land_curse` takes the victim.
+                requisition(p, foes, me, t, log)
             }
         };
         let scale = if paid { EMPOWERED_CAST_PCT } else { WEAK_CAST_PCT };
@@ -5811,7 +6552,7 @@ fn activate(
         // A fork copies the cast, and only a cast: a blade swings once
         // however many stacks are up.
         let forks = if item.casts.is_empty() { 0 } else { pick(p, foes, me).forking };
-        let reps: u32 = if echoes { 2 } else { 1 } * (1 + forks);
+        let reps: u32 = if echoes { 2 } else { 1 } * if doubles { 2 } else { 1 } * (1 + forks);
 
         // **The wrong sense.** Everything the blow was about to be is
         // surrendered here, before a single point of it crosses - which is
@@ -6022,8 +6763,27 @@ fn activate(
             None => Vec::new(),
         }
     };
+    // **Cursed Licence: an enched item lands its frame's curse `stack` times.**
+    // The rule says *which* curse a frame lands and the class says *how many*,
+    // which is the same division `SpinExtra` makes over a spin an ench granted
+    // — and the reason the licence is that node's licence rather than a new
+    // mechanic. An item with nothing bolted to it lands one, like everybody
+    // else's.
+    let times = {
+        let me = pick(p, foes, me);
+        match me.expert {
+            Some(crate::expert::ExpertPower::CursedLicence { stack })
+                if me.items[idx].enched =>
+            {
+                stack.max(1) as u32
+            }
+            _ => 1,
+        }
+    };
     for kind in granted {
-        apply(p, foes, me, Action::Curse { kind, target: Target::Enemy }, t, log, Some(idx));
+        for _ in 0..times {
+            apply(p, foes, me, Action::Curse { kind, target: Target::Enemy }, t, log, Some(idx));
+        }
     }
 
     for trigger in &firing {
@@ -6582,8 +7342,14 @@ fn apply(
                 land_curse(victim, me.other(front), other, StunAim::Unaimed, t, log);
             }
             let on = resolve(target);
+            // **Decided before the victim is borrowed, booked after.** The
+            // author and the victim are two entries in one vector.
+            let permanent = standing_fact_room(pick(p, foes, me));
             let c = pick(p, foes, on);
-            land_curse(c, on, kind, StunAim::Unaimed, t, log);
+            let stood = land_curse_for(c, on, kind, StunAim::Unaimed, t, log, permanent);
+            if stood {
+                pick(p, foes, me).facts_standing += 1;
+            }
             // A curse is the one thing a watcher counts that nobody activated,
             // and it is watched from both sides: the gear that landed it and
             // the gear wearing it both saw the same event.

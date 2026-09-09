@@ -105,11 +105,29 @@ impl Slot {
     }
 
     /// Every cell `id` occupies on the enchantment layer.
+    /// Every distinct piece worn on this grid — the **gear layer only**.
+    ///
+    /// The counterpart to [`Slot::enchantments`], and the answer to *is there
+    /// anything on this frame*: an enchantment is laid under the grid and
+    /// takes no cell away from gear, so a frame holding nothing but underlay
+    /// is a frame with nothing on it. Two M13 rules are priced against exactly
+    /// that, and both asked `pieces()` first and got the wrong answer.
+    pub fn worn(&self) -> Vec<PieceId> {
+        let mut seen = Vec::new();
+        for cell in self.cells.iter().flatten() {
+            if !seen.contains(cell) {
+                seen.push(*cell);
+            }
+        }
+        seen
+    }
+
     /// Every distinct piece sitting in the enchantment layer.
     ///
-    /// `pieces()` walks the gear layer only — that separation is what stops an
-    /// enchantment joining an item — so anything that needs the whole board,
-    /// the save file included, has to ask for both.
+    /// The separation between the layers is what stops an enchantment joining
+    /// an item. **This comment used to claim `pieces()` walks the gear layer
+    /// only, and it never has** — it walks both, which is what the save file
+    /// and the packing screen want. [`Slot::worn`] is the gear-only half.
     pub fn enchantments(&self) -> Vec<PieceId> {
         let mut out: Vec<PieceId> = Vec::new();
         for cell in self.enchant.iter().flatten() {
@@ -196,6 +214,14 @@ impl Slot {
     }
 
     /// Every piece currently in this slot, in a stable (row-major) order.
+    /// Every distinct piece on this grid, **in both layers**.
+    ///
+    /// Gear *and* enchantments. The name does not say so and for a long time
+    /// the comment on [`Slot::enchantments`] said the opposite — *"`pieces()`
+    /// walks the gear layer only"* — which is how M13's `Rule::Spread` came to
+    /// ask "is this frame empty" and be told no by an underlay lying under an
+    /// empty frame. [`Slot::worn`] is the gear-only answer, and anything asking
+    /// *is there gear here* wants that one.
     pub fn pieces(&self) -> Vec<PieceId> {
         let mut seen = Vec::new();
         for cell in self.cells.iter().chain(self.enchant.iter()) {

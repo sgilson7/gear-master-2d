@@ -1,1119 +1,2161 @@
 {
-  "format": "gm2d-skills",
-  "version": 1,
-  "trees": [
+ "format": "gm2d-skills",
+ "version": 1,
+ "trees": [
+  {
+   "id": "base",
+   "name": "A Sprocketman's craft",
+   "class": null,
+   "nodes": [
     {
-      "id": "base",
-      "name": "A Sprocketman's craft",
-      "class": null,
-      "nodes": [
-        {
-          "id": "frame-sense",
-          "name": "Frame Sense",
-          "blurb": "One more row on the weapon frame. Nothing else hands you one.",
-          "cost": 1,
-          "requires": [],
-          "effect": {
-            "grow_slot_rows": {
-              "slot": "weapon",
-              "rows": 1
-            }
-          }
-        },
-        {
-          "id": "second-frame",
-          "name": "The Second Frame",
-          "blurb": "And one on the chest. Your people cut brackets before they cut anything else.",
-          "cost": 1,
-          "requires": [
-            "frame-sense"
-          ],
-          "effect": {
-            "grow_slot_rows": {
-              "slot": "chest",
-              "rows": 1
-            }
-          }
-        },
-        {
-          "id": "flush-fit",
-          "name": "Flush Fit",
-          "blurb": "Every finished item pays a tenth more. Nothing is wasted at the joins.",
-          "cost": 1,
-          "requires": [
-            "frame-sense"
-          ],
-          "effect": {
-            "assembly_pct": {
-              "pct": 10
-            }
-          }
-        },
-        {
-          "id": "tighter-still",
-          "name": "Tighter Still",
-          "blurb": "Another tenth. There is a point past which it stops being packing and starts being pride.",
-          "cost": 2,
-          "requires": [
-            "flush-fit"
-          ],
-          "effect": {
-            "assembly_pct": {
-              "pct": 10
-            }
-          }
-        },
-        {
-          "id": "thick-skull",
-          "name": "Thick Skull",
-          "blurb": "Songil is survivable. Barely, and not twice in a week.",
-          "cost": 1,
-          "requires": [],
-          "effect": {
-            "stat": {
-              "mind_resist": 8
-            }
-          }
-        },
-        {
-          "id": "corked",
-          "name": "Corked",
-          "blurb": "A strip of it, wedged where a blow lands. It comes back every fight.",
-          "cost": 1,
-          "requires": [],
-          "effect": {
-            "start_with": {
-              "armor": 12
-            }
-          }
-        },
-        {
-          "id": "cave-lungs",
-          "name": "Cave Lungs",
-          "blurb": "Nine hundred feet of Deep Chocolate mine, and you never once came up early.",
-          "cost": 1,
-          "requires": [],
-          "effect": {
-            "stat": {
-              "health": 60
-            }
-          }
-        },
-        {
-          "id": "the-long-shift",
-          "name": "The Long Shift",
-          "blurb": "Fourteen hours is a shift. Sixteen is a shift somebody is counting.",
-          "cost": 2,
-          "requires": [
-            "cave-lungs"
-          ],
-          "effect": {
-            "stat": {
-              "health": 120,
-              "regen": 2
-            }
-          }
-        },
-        {
-          "id": "handspan",
-          "name": "Handspan",
-          "blurb": "You can still judge a gear by putting a hand across it. It is not a skill anybody taught you.",
-          "cost": 1,
-          "requires": [],
-          "effect": {
-            "stat": {
-              "strength": 6
-            }
-          }
-        },
-        {
-          "id": "anvil-armed",
-          "name": "Anvil-Armed",
-          "blurb": "The pit had one anvil and four hundred of you. You got your turn at it.",
-          "cost": 2,
-          "requires": [
-            "handspan"
-          ],
-          "effect": {
-            "stat": {
-              "strength": 10
-            }
-          }
-        },
-        {
-          "id": "funnel-drill",
-          "name": "Funnel Drill",
-          "blurb": "Army-issue, and it has somebody else's name filed off the side of it.",
-          "cost": 1,
-          "requires": [],
-          "effect": {
-            "start_with": {
-              "mana": 20
-            }
-          }
-        },
-        {
-          "id": "jinx-read",
-          "name": "Jinx Read",
-          "blurb": "You can tell which of the four it is before it lands. Knowing does not stop it.",
-          "cost": 1,
-          "requires": [
-            "thick-skull"
-          ],
-          "effect": {
-            "stat": {
-              "curse_resist": 15
-            }
-          }
-        },
-        {
-          "id": "the-fifth-frame",
-          "name": "The Fifth Frame",
-          "blurb": "A row on the greaves. You walked out of the pit; you may as well arrive.",
-          "cost": 2,
-          "requires": [
-            "second-frame"
-          ],
-          "effect": {
-            "grow_slot_rows": {
-              "slot": "greaves",
-              "rows": 1
-            }
-          }
-        },
-        {
-          "id": "the-hat-band",
-          "name": "The Hat Band",
-          "blurb": "A row on the helmet. The band is what a hat is; the rest of it is weather.",
-          "cost": 1,
-          "requires": [
-            "frame-sense"
-          ],
-          "effect": {
-            "grow_slot_rows": {
-              "slot": "helmet",
-              "rows": 1
-            }
-          }
-        },
-        {
-          "id": "the-glovers-word",
-          "name": "The Glover's Word",
-          "blurb": "A row on the gloves. She measures both hands and cuts for the larger one.",
-          "cost": 1,
-          "requires": [
-            "frame-sense"
-          ],
-          "effect": {
-            "grow_slot_rows": {
-              "slot": "gloves",
-              "rows": 1
-            }
-          }
-        },
-        {
-          "id": "room-for-the-second",
-          "name": "Room For The Second",
-          "blurb": "Another row on the weapon frame. Two blades is a different argument from one.",
-          "cost": 2,
-          "requires": [
-            "the-fifth-frame"
-          ],
-          "effect": {
-            "grow_slot_rows": {
-              "slot": "weapon",
-              "rows": 1
-            }
-          }
-        },
-        {
-          "id": "let-the-seams-out",
-          "name": "Let The Seams Out",
-          "blurb": "One more row on the chest. Somebody let them out and did not write down who.",
-          "cost": 2,
-          "requires": [
-            "the-fifth-frame"
-          ],
-          "effect": {
-            "grow_slot_rows": {
-              "slot": "chest",
-              "rows": 1
-            }
-          }
-        },
-        {
-          "id": "the-fourth-course",
-          "name": "The Fourth Course",
-          "blurb": "A row on the helmet, the gloves and the greaves. The weapon and the chest were let out years ago and nobody went back for the other three.",
-          "cost": 3,
-          "requires": [
-            "room-for-the-second",
-            "let-the-seams-out"
-          ],
-          "effect": [
-            {
-              "grow_slot_rows": {
-                "slot": "helmet",
-                "rows": 1
-              }
-            },
-            {
-              "grow_slot_rows": {
-                "slot": "gloves",
-                "rows": 1
-              }
-            },
-            {
-              "grow_slot_rows": {
-                "slot": "greaves",
-                "rows": 1
-              }
-            }
-          ]
-        },
-        {
-          "id": "the-fifth-course",
-          "name": "The Fifth Course",
-          "blurb": "A row on the helmet, the chest, the gloves, the greaves and the weapon. A course is a course; you do not lay one down on half a wall and call it a morning.",
-          "cost": 4,
-          "requires": [
-            "the-fourth-course"
-          ],
-          "effect": [
-            {
-              "grow_slot_rows": {
-                "slot": "helmet",
-                "rows": 1
-              }
-            },
-            {
-              "grow_slot_rows": {
-                "slot": "chest",
-                "rows": 1
-              }
-            },
-            {
-              "grow_slot_rows": {
-                "slot": "gloves",
-                "rows": 1
-              }
-            },
-            {
-              "grow_slot_rows": {
-                "slot": "greaves",
-                "rows": 1
-              }
-            },
-            {
-              "grow_slot_rows": {
-                "slot": "weapon",
-                "rows": 1
-              }
-            }
-          ]
-        },
-        {
-          "id": "head-height",
-          "name": "Head Height",
-          "blurb": "Another row on the helmet, the chest, the gloves, the greaves and the weapon. This is the height at which a man stops kneeling to work and starts telling you about his back.",
-          "cost": 5,
-          "requires": [
-            "the-fifth-course"
-          ],
-          "effect": [
-            {
-              "grow_slot_rows": {
-                "slot": "helmet",
-                "rows": 1
-              }
-            },
-            {
-              "grow_slot_rows": {
-                "slot": "chest",
-                "rows": 1
-              }
-            },
-            {
-              "grow_slot_rows": {
-                "slot": "gloves",
-                "rows": 1
-              }
-            },
-            {
-              "grow_slot_rows": {
-                "slot": "greaves",
-                "rows": 1
-              }
-            },
-            {
-              "grow_slot_rows": {
-                "slot": "weapon",
-                "rows": 1
-              }
-            }
-          ]
-        },
-        {
-          "id": "the-last-course",
-          "name": "The Last Course",
-          "blurb": "One more row on the helmet, the chest, the gloves, the greaves and the weapon. Past this the frames do not take another. Eight is what the old shop built and nobody has improved on it since.",
-          "cost": 6,
-          "requires": [
-            "head-height"
-          ],
-          "effect": [
-            {
-              "grow_slot_rows": {
-                "slot": "helmet",
-                "rows": 1
-              }
-            },
-            {
-              "grow_slot_rows": {
-                "slot": "chest",
-                "rows": 1
-              }
-            },
-            {
-              "grow_slot_rows": {
-                "slot": "gloves",
-                "rows": 1
-              }
-            },
-            {
-              "grow_slot_rows": {
-                "slot": "greaves",
-                "rows": 1
-              }
-            },
-            {
-              "grow_slot_rows": {
-                "slot": "weapon",
-                "rows": 1
-              }
-            }
-          ]
-        },
-        {
-          "id": "nothing-left-to-let-out",
-          "name": "Nothing Left To Let Out",
-          "blurb": "There is no more room in any frame to give you. What is left is what the room was worth: everything already on it, packed tighter, and the shoulders to carry the result.",
-          "cost": 7,
-          "requires": [
-            "the-last-course"
-          ],
-          "effect": [
-            {
-              "assembly_pct": {
-                "pct": 15
-              }
-            },
-            {
-              "stat": {
-                "strength": 8,
-                "health": 80
-              }
-            }
-          ]
-        }
-      ]
+     "id": "frame-sense",
+     "name": "Frame Sense",
+     "blurb": "One more row on the weapon frame. Nothing else hands you one.",
+     "cost": 1,
+     "requires": [],
+     "effect": {
+      "grow_slot_rows": {
+       "slot": "weapon",
+       "rows": 1
+      }
+     }
     },
     {
-      "id": "gorillathon",
-      "name": "Gorillathon",
-      "class": "Berserker",
-      "nodes": [
-        {
-          "id": "g-deadlift",
-          "name": "Deadlift",
-          "blurb": "A gorilla in a bedazzled plaid suit does not warm up. Neither do you.",
-          "cost": 1,
-          "requires": [],
-          "effect": {
-            "stat": {
-              "strength": 12
-            }
-          }
-        },
-        {
-          "id": "g-figure-eight",
-          "name": "The Figure Eight",
-          "blurb": "Nobody scored it. Everybody saw it.",
-          "cost": 1,
-          "requires": [
-            "g-deadlift"
-          ],
-          "effect": {
-            "stat": {
-              "health": 140,
-              "regen": 2
-            }
-          }
-        },
-        {
-          "id": "g-the-five",
-          "name": "The Five",
-          "blurb": "One judge gave it a five. The others gave it a two and a minus seven.",
-          "cost": 2,
-          "requires": [
-            "g-figure-eight"
-          ],
-          "effect": [
-            {
-              "stat": {
-                "strength": 16
-              }
-            },
-            {
-              "start_with": {
-                "armor": 10
-              }
-            }
-          ]
-        },
-        {
-          "id": "g-plaid",
-          "name": "Bedazzled Plaid",
-          "blurb": "Four thousand sequins, and a plate under them nobody has asked about.",
-          "cost": 1,
-          "requires": [],
-          "effect": {
-            "start_with": {
-              "armor": 22
-            }
-          }
-        },
-        {
-          "id": "g-wider-frames",
-          "name": "Wider Frames",
-          "blurb": "A row on the weapon frame. Your arms had to go somewhere.",
-          "cost": 2,
-          "requires": [
-            "g-plaid"
-          ],
-          "effect": {
-            "grow_slot_rows": {
-              "slot": "weapon",
-              "rows": 1
-            }
-          }
-        },
-        {
-          "id": "g-second-wider",
-          "name": "Wider Still",
-          "blurb": "And the chest, which is where the rest of you is.",
-          "cost": 2,
-          "requires": [
-            "g-wider-frames"
-          ],
-          "effect": {
-            "grow_slot_rows": {
-              "slot": "chest",
-              "rows": 1
-            }
-          }
-        },
-        {
-          "id": "g-full-lift",
-          "name": "The Full Lift",
-          "blurb": "Four hundred and eleven pounds, held for nine seconds, on skates.",
-          "cost": 2,
-          "requires": [
-            "g-the-five"
-          ],
-          "effect": {
-            "stat": {
-              "strength": 20,
-              "health": 180
-            }
-          }
-        },
-        {
-          "id": "g-crowd",
-          "name": "The Crowd",
-          "blurb": "They are not cheering for the lift. They have never been cheering for the lift.",
-          "cost": 2,
-          "requires": [
-            "g-full-lift"
-          ],
-          "effect": {
-            "assembly_pct": {
-              "pct": 15
-            }
-          }
-        }
-      ]
+     "id": "second-frame",
+     "name": "The Second Frame",
+     "blurb": "And one on the chest. Your people cut brackets before they cut anything else.",
+     "cost": 1,
+     "requires": [
+      "frame-sense"
+     ],
+     "effect": {
+      "grow_slot_rows": {
+       "slot": "chest",
+       "rows": 1
+      }
+     }
     },
     {
-      "id": "funnel-sergeant",
-      "name": "Funnel Sergeant",
-      "class": "Hexweaver",
-      "nodes": [
-        {
-          "id": "f-issue",
-          "name": "Army Issue",
-          "blurb": "The funnel has somebody else's name filed off it. Everyone's does.",
-          "cost": 1,
-          "requires": [],
-          "effect": {
-            "start_with": {
-              "mana": 30
-            }
-          }
-        },
-        {
-          "id": "f-drillbook",
-          "name": "The Drillbook",
-          "blurb": "Low-level goofs often go horribly wrong. Yours will not, because you read it.",
-          "cost": 1,
-          "requires": [
-            "f-issue"
-          ],
-          "effect": {
-            "stat": {
-              "mind_resist": 12,
-              "curse_resist": 12
-            }
-          }
-        },
-        {
-          "id": "f-wider-mouth",
-          "name": "A Wider Mouth",
-          "blurb": "A row on the helmet. The funnel has to sit on something.",
-          "cost": 2,
-          "requires": [
-            "f-issue"
-          ],
-          "effect": {
-            "grow_slot_rows": {
-              "slot": "helmet",
-              "rows": 1
-            }
-          }
-        },
-        {
-          "id": "f-banana",
-          "name": "The Banana Standard",
-          "blurb": "Regulation peel, regulation placement, regulation nine feet of skid.",
-          "cost": 1,
-          "requires": [
-            "f-drillbook"
-          ],
-          "effect": [
-            {
-              "stat": {
-                "strength": 6
-              }
-            },
-            {
-              "start_with": {
-                "mana": 25
-              }
-            }
-          ]
-        },
-        {
-          "id": "f-anvil",
-          "name": "Anvil, Own Foot",
-          "blurb": "Self-deprecation is a supply line. The Jester dropped a moon with it.",
-          "cost": 2,
-          "requires": [
-            "f-banana"
-          ],
-          "effect": [
-            {
-              "stat": {
-                "health": 80
-              }
-            },
-            {
-              "start_with": {
-                "mana": 40
-              }
-            }
-          ]
-        },
-        {
-          "id": "f-pie",
-          "name": "Pie, Own Face",
-          "blurb": "Held in reserve. Deployed once, at the correct moment, by a sergeant.",
-          "cost": 2,
-          "requires": [
-            "f-anvil"
-          ],
-          "effect": {
-            "assembly_pct": {
-              "pct": 15
-            }
-          }
-        },
-        {
-          "id": "f-concentrate",
-          "name": "Concentrating Funnel",
-          "blurb": "A row on the gloves. You cannot aim a funnel one-handed.",
-          "cost": 2,
-          "requires": [
-            "f-wider-mouth"
-          ],
-          "effect": {
-            "grow_slot_rows": {
-              "slot": "gloves",
-              "rows": 1
-            }
-          }
-        },
-        {
-          "id": "f-undone",
-          "name": "A Funny Undone",
-          "blurb": "There is a version of every goof that does not land. You have met it.",
-          "cost": 2,
-          "requires": [
-            "f-pie"
-          ],
-          "effect": [
-            {
-              "stat": {
-                "mind_resist": 15
-              }
-            },
-            {
-              "start_with": {
-                "mana": 60
-              }
-            }
-          ]
-        }
-      ]
+     "id": "flush-fit",
+     "name": "Flush Fit",
+     "blurb": "Every finished item pays a tenth more. Nothing is wasted at the joins.",
+     "cost": 1,
+     "requires": [
+      "frame-sense"
+     ],
+     "effect": {
+      "assembly_pct": {
+       "pct": 10
+      }
+     }
     },
     {
-      "id": "worm-fact-keeper",
-      "name": "Worm-Fact Keeper",
-      "class": "Bloodletter",
-      "nodes": [
-        {
-          "id": "w-the-fact",
-          "name": "The Worm Fact",
-          "blurb": "THE WORM FACT REMAINS LAW. It is not a threat. It is a filing.",
-          "cost": 1,
-          "requires": [],
-          "effect": {
-            "stat": {
-              "curse_resist": 20
-            }
-          }
-        },
-        {
-          "id": "w-throne",
-          "name": "The Flesh Throne",
-          "blurb": "Somebody sat in it before LETO. Nobody has asked who.",
-          "cost": 1,
-          "requires": [
-            "w-the-fact"
-          ],
-          "effect": {
-            "stat": {
-              "health": 150,
-              "regen": 3
-            }
-          }
-        },
-        {
-          "id": "w-ledger",
-          "name": "The Ledger",
-          "blurb": "Every name, every date, and a column nobody will explain.",
-          "cost": 2,
-          "requires": [
-            "w-the-fact"
-          ],
-          "effect": {
-            "stat": {
-              "mind_resist": 18,
-              "curse_resist": 15
-            }
-          }
-        },
-        {
-          "id": "w-long-body",
-          "name": "A Longer Body",
-          "blurb": "A row on the chest. There is more of you than there was.",
-          "cost": 2,
-          "requires": [
-            "w-throne"
-          ],
-          "effect": {
-            "grow_slot_rows": {
-              "slot": "chest",
-              "rows": 1
-            }
-          }
-        },
-        {
-          "id": "w-patience",
-          "name": "Worm's Patience",
-          "blurb": "Death is not in a hurry. Death has never once been in a hurry.",
-          "cost": 2,
-          "requires": [
-            "w-throne"
-          ],
-          "effect": {
-            "stat": {
-              "regen": 6,
-              "health": 200
-            }
-          }
-        },
-        {
-          "id": "w-rot",
-          "name": "Something Rotting",
-          "blurb": "On the other side of it, and getting closer to your side of it.",
-          "cost": 2,
-          "requires": [
-            "w-ledger"
-          ],
-          "effect": {
-            "stat": {
-              "strength": 14,
-              "curse_resist": 10
-            }
-          }
-        },
-        {
-          "id": "w-greaves",
-          "name": "The Slow Approach",
-          "blurb": "A row on the greaves. Death arrives on foot.",
-          "cost": 2,
-          "requires": [
-            "w-long-body"
-          ],
-          "effect": {
-            "grow_slot_rows": {
-              "slot": "greaves",
-              "rows": 1
-            }
-          }
-        },
-        {
-          "id": "w-law",
-          "name": "Remains Law",
-          "blurb": "Francis condensed Death's plane to a point once. The filing survived.",
-          "cost": 2,
-          "requires": [
-            "w-patience",
-            "w-rot"
-          ],
-          "effect": {
-            "assembly_pct": {
-              "pct": 15
-            }
-          }
-        },
-        {
-          "id": "w-roast",
-          "name": "Filed Under The Roast",
-          "blurb": "Two hundred and nine helmets are in the Keeper\u2019s book, filed by what was still coming off them when they were handed back. Yours goes down as two hundred and ten, under the Roast.",
-          "requires": [
-            "w-ledger"
-          ],
-          "effect": {
-            "grants": {
-              "rule": {
-                "curse_on_activate": {
-                  "slot": "helmet",
-                  "curse": "searing"
-                }
-              }
-            }
-          }
-        },
-        {
-          "id": "w-survey",
-          "name": "The Standing Count",
-          "blurb": "The Keeper counts what is out there twice a day and has never once gone out to look. The second count is the one filed. The first is kept for the difference, which is the part worth knowing.",
-          "requires": [],
-          "effect": {
-            "grants": {
-              "rule": "scout"
-            }
-          }
-        }
-      ]
+     "id": "tighter-still",
+     "name": "Tighter Still",
+     "blurb": "Another tenth. There is a point past which it stops being packing and starts being pride.",
+     "cost": 2,
+     "requires": [
+      "flush-fit"
+     ],
+     "effect": {
+      "assembly_pct": {
+       "pct": 10
+      }
+     }
     },
     {
-      "id": "kaklon-patent",
-      "name": "The Kaklon Patent",
-      "class": "Recycler",
-      "nodes": [
-        {
-          "id": "k-licence",
-          "name": "The Licence",
-          "blurb": "Nine pages, and eight of them are the list of what the licence does not cover. Page one is a drawing of a hand holding a thing, and under it, in Kaklon\u2019s own writing, the words BOLT IT ON.",
-          "requires": [],
-          "effect": {
-            "assembly_pct": {
-              "pct": 12
-            }
-          }
-        },
-        {
-          "id": "k-tolerances",
-          "name": "Kaklon Tolerances",
-          "blurb": "Three hundred and twelve of the four hundred came back. The note that came back with them is the same note every time, and it is a compliment.",
-          "requires": [
-            "k-licence"
-          ],
-          "effect": {
-            "stat": {
-              "health": 120,
-              "strength": 8
-            }
-          }
-        },
-        {
-          "id": "k-second-bench",
-          "name": "The Second Bench",
-          "blurb": "The first bench is where the work is done. The second is where the gloves go while somebody decides whether it was done. Four hundred went onto the second bench and nothing has ever come off it.",
-          "requires": [
-            "k-licence"
-          ],
-          "effect": {
-            "grow_slot_rows": {
-              "slot": "gloves",
-              "rows": 1
-            }
-          }
-        },
-        {
-          "id": "k-bench-rights",
-          "name": "Bench Rights",
-          "blurb": "Signed on the back of a form for something else. Two hundred and six of these were issued in one afternoon and the afternoon has not been explained. Yours is the two hundred and seventh, and it comes with the turn already in the envelope.",
-          "requires": [],
-          "effect": [
-            {
-              "stat": {
-                "health": 100,
-                "curse_resist": 8
-              }
-            },
-            {
-              "gives_ench": {
-                "ench": "the-ponkey-turn"
-              }
-            }
-          ]
-        },
-        {
-          "id": "k-overwind",
-          "name": "Overwind",
-          "blurb": "The instruction is to wind it until it stops and then give it one more. Nobody at the bench has ever needed the instruction twice.",
-          "requires": [
-            "k-bench-rights"
-          ],
-          "effect": {
-            "grants": {
-              "rule": {
-                "spin_extra": {
-                  "per_turn": 1
-                }
-              }
-            }
-          }
-        },
-        {
-          "id": "k-flywheel",
-          "name": "The Flywheel",
-          "blurb": "Kaklon's own drawing has the wheel at four inches and a note beside it reading FIVE. Every flywheel on every bench is five inches and nobody has changed the drawing.",
-          "requires": [
-            "k-overwind"
-          ],
-          "effect": {
-            "grants": {
-              "rule": {
-                "spin_every": {
-                  "ms": 800
-                }
-              }
-            }
-          }
-        },
-        {
-          "id": "k-counterweight",
-          "name": "The Counterweight",
-          "blurb": "Eleven pounds of something the invoice calls BALLAST and the customs form calls the same thing in a different hand. It is on the outside of the work and it is what stops the work coming off.",
-          "requires": [
-            "k-tolerances"
-          ],
-          "effect": {
-            "start_with": {
-              "armor": 18
-            }
-          }
-        },
-        {
-          "id": "k-patent-pending",
-          "name": "Patent Pending",
-          "blurb": "Filed in the ninth year and pending ever since. The office that would grant it was reflected into the Archive in the fourth year and has been answering letters from in there, at a rate of two a decade.",
-          "requires": [
-            "k-flywheel",
-            "k-counterweight"
-          ],
-          "effect": [
-            {
-              "grants": {
-                "rule": {
-                  "spin_keep": {
-                    "stacks": 2
-                  }
-                }
-              }
-            },
-            {
-              "assembly_pct": {
-                "pct": 10
-              }
-            }
-          ]
-        }
-      ]
+     "id": "thick-skull",
+     "name": "Thick Skull",
+     "blurb": "Songil is survivable. Barely, and not twice in a week.",
+     "cost": 1,
+     "requires": [],
+     "effect": {
+      "stat": {
+       "mind_resist": 8
+      }
+     }
     },
     {
-      "id": "top-of-the-bill",
-      "name": "Top of the Bill",
-      "class": "Showstopper",
-      "nodes": [
-        {
-          "id": "b-billing",
-          "name": "Top Billing",
-          "blurb": "Eleven seasons of it, and the poster is the same poster with a new date pasted over the old one. They have run out of room and started pasting over the eleven.",
-          "cost": 1,
-          "requires": [],
-          "effect": {
-            "gives_ench": {
-              "ench": "the-chonga-swing"
-            }
-          }
-        },
-        {
-          "id": "b-follow-through",
-          "name": "The Follow-Through",
-          "blurb": "The bat leaves your hands at the top of it and nobody in the ground looks at where it lands. They are all still looking at you.",
-          "cost": 1,
-          "requires": [
-            "b-billing"
-          ],
-          "effect": {
-            "stat": {
-              "strength": 9
-            }
-          }
-        },
-        {
-          "id": "b-ninth",
-          "name": "In the Ninth",
-          "blurb": "Chonga hit one thing in the ninth and it was the ninth for eleven years afterwards. Nobody says which season.",
-          "cost": 2,
-          "requires": [
-            "b-follow-through"
-          ],
-          "effect": [
-            {
-              "stat": {
-                "strength": 7
-              }
-            },
-            {
-              "assembly_pct": {
-                "pct": 14
-              }
-            }
-          ]
-        },
-        {
-          "id": "b-warm-house",
-          "name": "A Warm House",
-          "blurb": "Six thousand of them and every one already standing. The two who sat down are discussed afterwards and at length.",
-          "cost": 1,
-          "requires": [],
-          "effect": {
-            "start_with": {
-              "armor": 22
-            }
-          }
-        },
-        {
-          "id": "b-first-bell",
-          "name": "First Bell",
-          "blurb": "He is out of the tunnel before the bell finishes. The stewards have written to him about it four times.",
-          "cost": 2,
-          "requires": [
-            "b-warm-house"
-          ],
-          "effect": {
-            "start_with": {
-              "mana": 12
-            }
-          }
-        },
-        {
-          "id": "b-house-lights",
-          "name": "House Lights",
-          "blurb": "One lamp over the whole ground and it is pointed at one man. The other nine lamps were taken down in a season nobody will name.",
-          "cost": 2,
-          "requires": [
-            "b-warm-house"
-          ],
-          "effect": {
-            "stat": {
-              "health": 140
-            }
-          }
-        },
-        {
-          "id": "b-the-incident",
-          "name": "The Incident",
-          "blurb": "It is on the record as an incident because the word they wanted was not available to the clerk writing it down.",
-          "cost": 2,
-          "requires": [
-            "b-ninth",
-            "b-house-lights"
-          ],
-          "effect": [
-            {
-              "stat": {
-                "strength": 6,
-                "curse_resist": 10
-              }
-            },
-            {
-              "assembly_pct": {
-                "pct": 10
-              }
-            }
-          ]
-        },
-        {
-          "id": "b-eleven-seasons",
-          "name": "Eleven Seasons",
-          "blurb": "They gave him a rack with eleven hooks on it and he has used one. The weapon frame that came with it has a row on it nobody has filled either.",
-          "cost": 2,
-          "requires": [
-            "b-the-incident"
-          ],
-          "effect": [
-            {
-              "stat": {
-                "health": 180,
-                "strength": 5
-              }
-            },
-            {
-              "grow_slot_rows": {
-                "slot": "weapon",
-                "rows": 1
-              }
-            }
-          ]
-        }
-      ]
+     "id": "corked",
+     "name": "Corked",
+     "blurb": "A strip of it, wedged where a blow lands. It comes back every fight.",
+     "cost": 1,
+     "requires": [],
+     "effect": {
+      "start_with": {
+       "armor": 12
+      }
+     }
+    },
+    {
+     "id": "cave-lungs",
+     "name": "Cave Lungs",
+     "blurb": "Nine hundred feet of Deep Chocolate mine, and you never once came up early.",
+     "cost": 1,
+     "requires": [],
+     "effect": {
+      "stat": {
+       "health": 60
+      }
+     }
+    },
+    {
+     "id": "the-long-shift",
+     "name": "The Long Shift",
+     "blurb": "Fourteen hours is a shift. Sixteen is a shift somebody is counting.",
+     "cost": 2,
+     "requires": [
+      "cave-lungs"
+     ],
+     "effect": {
+      "stat": {
+       "health": 120,
+       "regen": 2
+      }
+     }
+    },
+    {
+     "id": "handspan",
+     "name": "Handspan",
+     "blurb": "You can still judge a gear by putting a hand across it. It is not a skill anybody taught you.",
+     "cost": 1,
+     "requires": [],
+     "effect": {
+      "stat": {
+       "strength": 6
+      }
+     }
+    },
+    {
+     "id": "anvil-armed",
+     "name": "Anvil-Armed",
+     "blurb": "The pit had one anvil and four hundred of you. You got your turn at it.",
+     "cost": 2,
+     "requires": [
+      "handspan"
+     ],
+     "effect": {
+      "stat": {
+       "strength": 10
+      }
+     }
+    },
+    {
+     "id": "funnel-drill",
+     "name": "Funnel Drill",
+     "blurb": "Army-issue, and it has somebody else's name filed off the side of it.",
+     "cost": 1,
+     "requires": [],
+     "effect": {
+      "start_with": {
+       "mana": 20
+      }
+     }
+    },
+    {
+     "id": "jinx-read",
+     "name": "Jinx Read",
+     "blurb": "You can tell which of the four it is before it lands. Knowing does not stop it.",
+     "cost": 1,
+     "requires": [
+      "thick-skull"
+     ],
+     "effect": {
+      "stat": {
+       "curse_resist": 15
+      }
+     }
+    },
+    {
+     "id": "the-fifth-frame",
+     "name": "The Fifth Frame",
+     "blurb": "A row on the greaves. You walked out of the pit; you may as well arrive.",
+     "cost": 2,
+     "requires": [
+      "second-frame"
+     ],
+     "effect": {
+      "grow_slot_rows": {
+       "slot": "greaves",
+       "rows": 1
+      }
+     }
+    },
+    {
+     "id": "the-hat-band",
+     "name": "The Hat Band",
+     "blurb": "A row on the helmet. The band is what a hat is; the rest of it is weather.",
+     "cost": 1,
+     "requires": [
+      "frame-sense"
+     ],
+     "effect": {
+      "grow_slot_rows": {
+       "slot": "helmet",
+       "rows": 1
+      }
+     }
+    },
+    {
+     "id": "the-glovers-word",
+     "name": "The Glover's Word",
+     "blurb": "A row on the gloves. She measures both hands and cuts for the larger one.",
+     "cost": 1,
+     "requires": [
+      "frame-sense"
+     ],
+     "effect": {
+      "grow_slot_rows": {
+       "slot": "gloves",
+       "rows": 1
+      }
+     }
+    },
+    {
+     "id": "room-for-the-second",
+     "name": "Room For The Second",
+     "blurb": "Another row on the weapon frame. Two blades is a different argument from one.",
+     "cost": 2,
+     "requires": [
+      "the-fifth-frame"
+     ],
+     "effect": {
+      "grow_slot_rows": {
+       "slot": "weapon",
+       "rows": 1
+      }
+     }
+    },
+    {
+     "id": "let-the-seams-out",
+     "name": "Let The Seams Out",
+     "blurb": "One more row on the chest. Somebody let them out and did not write down who.",
+     "cost": 2,
+     "requires": [
+      "the-fifth-frame"
+     ],
+     "effect": {
+      "grow_slot_rows": {
+       "slot": "chest",
+       "rows": 1
+      }
+     }
+    },
+    {
+     "id": "the-fourth-course",
+     "name": "The Fourth Course",
+     "blurb": "A row on the helmet, the gloves and the greaves. The weapon and the chest were let out years ago and nobody went back for the other three.",
+     "cost": 3,
+     "requires": [
+      "room-for-the-second",
+      "let-the-seams-out"
+     ],
+     "effect": [
+      {
+       "grow_slot_rows": {
+        "slot": "helmet",
+        "rows": 1
+       }
+      },
+      {
+       "grow_slot_rows": {
+        "slot": "gloves",
+        "rows": 1
+       }
+      },
+      {
+       "grow_slot_rows": {
+        "slot": "greaves",
+        "rows": 1
+       }
+      }
+     ]
+    },
+    {
+     "id": "the-fifth-course",
+     "name": "The Fifth Course",
+     "blurb": "A row on the helmet, the chest, the gloves, the greaves and the weapon. A course is a course; you do not lay one down on half a wall and call it a morning.",
+     "cost": 4,
+     "requires": [
+      "the-fourth-course"
+     ],
+     "effect": [
+      {
+       "grow_slot_rows": {
+        "slot": "helmet",
+        "rows": 1
+       }
+      },
+      {
+       "grow_slot_rows": {
+        "slot": "chest",
+        "rows": 1
+       }
+      },
+      {
+       "grow_slot_rows": {
+        "slot": "gloves",
+        "rows": 1
+       }
+      },
+      {
+       "grow_slot_rows": {
+        "slot": "greaves",
+        "rows": 1
+       }
+      },
+      {
+       "grow_slot_rows": {
+        "slot": "weapon",
+        "rows": 1
+       }
+      }
+     ]
+    },
+    {
+     "id": "head-height",
+     "name": "Head Height",
+     "blurb": "Another row on the helmet, the chest, the gloves, the greaves and the weapon. This is the height at which a man stops kneeling to work and starts telling you about his back.",
+     "cost": 5,
+     "requires": [
+      "the-fifth-course"
+     ],
+     "effect": [
+      {
+       "grow_slot_rows": {
+        "slot": "helmet",
+        "rows": 1
+       }
+      },
+      {
+       "grow_slot_rows": {
+        "slot": "chest",
+        "rows": 1
+       }
+      },
+      {
+       "grow_slot_rows": {
+        "slot": "gloves",
+        "rows": 1
+       }
+      },
+      {
+       "grow_slot_rows": {
+        "slot": "greaves",
+        "rows": 1
+       }
+      },
+      {
+       "grow_slot_rows": {
+        "slot": "weapon",
+        "rows": 1
+       }
+      }
+     ]
+    },
+    {
+     "id": "the-last-course",
+     "name": "The Last Course",
+     "blurb": "One more row on the helmet, the chest, the gloves, the greaves and the weapon. Past this the frames do not take another. Eight is what the old shop built and nobody has improved on it since.",
+     "cost": 6,
+     "requires": [
+      "head-height"
+     ],
+     "effect": [
+      {
+       "grow_slot_rows": {
+        "slot": "helmet",
+        "rows": 1
+       }
+      },
+      {
+       "grow_slot_rows": {
+        "slot": "chest",
+        "rows": 1
+       }
+      },
+      {
+       "grow_slot_rows": {
+        "slot": "gloves",
+        "rows": 1
+       }
+      },
+      {
+       "grow_slot_rows": {
+        "slot": "greaves",
+        "rows": 1
+       }
+      },
+      {
+       "grow_slot_rows": {
+        "slot": "weapon",
+        "rows": 1
+       }
+      }
+     ]
+    },
+    {
+     "id": "nothing-left-to-let-out",
+     "name": "Nothing Left To Let Out",
+     "blurb": "There is no more room in any frame to give you. What is left is what the room was worth: everything already on it, packed tighter, and the shoulders to carry the result.",
+     "cost": 7,
+     "requires": [
+      "the-last-course"
+     ],
+     "effect": [
+      {
+       "assembly_pct": {
+        "pct": 15
+       }
+      },
+      {
+       "stat": {
+        "strength": 8,
+        "health": 80
+       }
+      }
+     ]
     }
-  ]
+   ]
+  },
+  {
+   "id": "gorillathon",
+   "name": "Gorillathon",
+   "class": "Berserker",
+   "nodes": [
+    {
+     "id": "g-deadlift",
+     "name": "Deadlift",
+     "blurb": "A gorilla in a bedazzled plaid suit does not warm up. Neither do you.",
+     "cost": 1,
+     "requires": [],
+     "effect": {
+      "stat": {
+       "strength": 12
+      }
+     }
+    },
+    {
+     "id": "g-figure-eight",
+     "name": "The Figure Eight",
+     "blurb": "Nobody scored it. Everybody saw it.",
+     "cost": 1,
+     "requires": [
+      "g-deadlift"
+     ],
+     "effect": {
+      "stat": {
+       "health": 140,
+       "regen": 2
+      }
+     }
+    },
+    {
+     "id": "g-the-five",
+     "name": "The Five",
+     "blurb": "One judge gave it a five. The others gave it a two and a minus seven.",
+     "cost": 2,
+     "requires": [
+      "g-figure-eight"
+     ],
+     "effect": [
+      {
+       "stat": {
+        "strength": 16
+       }
+      },
+      {
+       "start_with": {
+        "armor": 10
+       }
+      }
+     ]
+    },
+    {
+     "id": "g-plaid",
+     "name": "Bedazzled Plaid",
+     "blurb": "Four thousand sequins, and a plate under them nobody has asked about.",
+     "cost": 1,
+     "requires": [],
+     "effect": {
+      "start_with": {
+       "armor": 22
+      }
+     }
+    },
+    {
+     "id": "g-wider-frames",
+     "name": "Wider Frames",
+     "blurb": "A row on the weapon frame. Your arms had to go somewhere.",
+     "cost": 2,
+     "requires": [
+      "g-plaid"
+     ],
+     "effect": {
+      "grow_slot_rows": {
+       "slot": "weapon",
+       "rows": 1
+      }
+     }
+    },
+    {
+     "id": "g-second-wider",
+     "name": "Wider Still",
+     "blurb": "And the chest, which is where the rest of you is.",
+     "cost": 2,
+     "requires": [
+      "g-wider-frames"
+     ],
+     "effect": {
+      "grow_slot_rows": {
+       "slot": "chest",
+       "rows": 1
+      }
+     }
+    },
+    {
+     "id": "g-full-lift",
+     "name": "The Full Lift",
+     "blurb": "Four hundred and eleven pounds, held for nine seconds, on skates.",
+     "cost": 2,
+     "requires": [
+      "g-the-five"
+     ],
+     "effect": {
+      "stat": {
+       "strength": 20,
+       "health": 180
+      }
+     }
+    },
+    {
+     "id": "g-crowd",
+     "name": "The Crowd",
+     "blurb": "They are not cheering for the lift. They have never been cheering for the lift.",
+     "cost": 2,
+     "requires": [
+      "g-full-lift"
+     ],
+     "effect": {
+      "assembly_pct": {
+       "pct": 15
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "funnel-sergeant",
+   "name": "Funnel Sergeant",
+   "class": "Hexweaver",
+   "nodes": [
+    {
+     "id": "f-issue",
+     "name": "Army Issue",
+     "blurb": "The funnel has somebody else's name filed off it. Everyone's does.",
+     "cost": 1,
+     "requires": [],
+     "effect": {
+      "start_with": {
+       "mana": 30
+      }
+     }
+    },
+    {
+     "id": "f-drillbook",
+     "name": "The Drillbook",
+     "blurb": "Low-level goofs often go horribly wrong. Yours will not, because you read it.",
+     "cost": 1,
+     "requires": [
+      "f-issue"
+     ],
+     "effect": {
+      "stat": {
+       "mind_resist": 12,
+       "curse_resist": 12
+      }
+     }
+    },
+    {
+     "id": "f-wider-mouth",
+     "name": "A Wider Mouth",
+     "blurb": "A row on the helmet. The funnel has to sit on something.",
+     "cost": 2,
+     "requires": [
+      "f-issue"
+     ],
+     "effect": {
+      "grow_slot_rows": {
+       "slot": "helmet",
+       "rows": 1
+      }
+     }
+    },
+    {
+     "id": "f-banana",
+     "name": "The Banana Standard",
+     "blurb": "Regulation peel, regulation placement, regulation nine feet of skid.",
+     "cost": 1,
+     "requires": [
+      "f-drillbook"
+     ],
+     "effect": [
+      {
+       "stat": {
+        "strength": 6
+       }
+      },
+      {
+       "start_with": {
+        "mana": 25
+       }
+      }
+     ]
+    },
+    {
+     "id": "f-anvil",
+     "name": "Anvil, Own Foot",
+     "blurb": "Self-deprecation is a supply line. The Jester dropped a moon with it.",
+     "cost": 2,
+     "requires": [
+      "f-banana"
+     ],
+     "effect": [
+      {
+       "stat": {
+        "health": 80
+       }
+      },
+      {
+       "start_with": {
+        "mana": 40
+       }
+      }
+     ]
+    },
+    {
+     "id": "f-pie",
+     "name": "Pie, Own Face",
+     "blurb": "Held in reserve. Deployed once, at the correct moment, by a sergeant.",
+     "cost": 2,
+     "requires": [
+      "f-anvil"
+     ],
+     "effect": {
+      "assembly_pct": {
+       "pct": 15
+      }
+     }
+    },
+    {
+     "id": "f-concentrate",
+     "name": "Concentrating Funnel",
+     "blurb": "A row on the gloves. You cannot aim a funnel one-handed.",
+     "cost": 2,
+     "requires": [
+      "f-wider-mouth"
+     ],
+     "effect": {
+      "grow_slot_rows": {
+       "slot": "gloves",
+       "rows": 1
+      }
+     }
+    },
+    {
+     "id": "f-undone",
+     "name": "A Funny Undone",
+     "blurb": "There is a version of every goof that does not land. You have met it.",
+     "cost": 2,
+     "requires": [
+      "f-pie"
+     ],
+     "effect": [
+      {
+       "stat": {
+        "mind_resist": 15
+       }
+      },
+      {
+       "start_with": {
+        "mana": 60
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "worm-fact-keeper",
+   "name": "Worm-Fact Keeper",
+   "class": "Bloodletter",
+   "nodes": [
+    {
+     "id": "w-the-fact",
+     "name": "The Worm Fact",
+     "blurb": "THE WORM FACT REMAINS LAW. It is not a threat. It is a filing.",
+     "cost": 1,
+     "requires": [],
+     "effect": {
+      "stat": {
+       "curse_resist": 20
+      }
+     }
+    },
+    {
+     "id": "w-throne",
+     "name": "The Flesh Throne",
+     "blurb": "Somebody sat in it before LETO. Nobody has asked who.",
+     "cost": 1,
+     "requires": [
+      "w-the-fact"
+     ],
+     "effect": {
+      "stat": {
+       "health": 150,
+       "regen": 3
+      }
+     }
+    },
+    {
+     "id": "w-ledger",
+     "name": "The Ledger",
+     "blurb": "Every name, every date, and a column nobody will explain.",
+     "cost": 2,
+     "requires": [
+      "w-the-fact"
+     ],
+     "effect": {
+      "stat": {
+       "mind_resist": 18,
+       "curse_resist": 15
+      }
+     }
+    },
+    {
+     "id": "w-long-body",
+     "name": "A Longer Body",
+     "blurb": "A row on the chest. There is more of you than there was.",
+     "cost": 2,
+     "requires": [
+      "w-throne"
+     ],
+     "effect": {
+      "grow_slot_rows": {
+       "slot": "chest",
+       "rows": 1
+      }
+     }
+    },
+    {
+     "id": "w-patience",
+     "name": "Worm's Patience",
+     "blurb": "Death is not in a hurry. Death has never once been in a hurry.",
+     "cost": 2,
+     "requires": [
+      "w-throne"
+     ],
+     "effect": {
+      "stat": {
+       "regen": 6,
+       "health": 200
+      }
+     }
+    },
+    {
+     "id": "w-rot",
+     "name": "Something Rotting",
+     "blurb": "On the other side of it, and getting closer to your side of it.",
+     "cost": 2,
+     "requires": [
+      "w-ledger"
+     ],
+     "effect": {
+      "stat": {
+       "strength": 14,
+       "curse_resist": 10
+      }
+     }
+    },
+    {
+     "id": "w-greaves",
+     "name": "The Slow Approach",
+     "blurb": "A row on the greaves. Death arrives on foot.",
+     "cost": 2,
+     "requires": [
+      "w-long-body"
+     ],
+     "effect": {
+      "grow_slot_rows": {
+       "slot": "greaves",
+       "rows": 1
+      }
+     }
+    },
+    {
+     "id": "w-law",
+     "name": "Remains Law",
+     "blurb": "Francis condensed Death's plane to a point once. The filing survived.",
+     "cost": 2,
+     "requires": [
+      "w-patience",
+      "w-rot"
+     ],
+     "effect": {
+      "assembly_pct": {
+       "pct": 15
+      }
+     }
+    },
+    {
+     "id": "w-roast",
+     "name": "Filed Under The Roast",
+     "blurb": "Two hundred and nine helmets are in the Keeper’s book, filed by what was still coming off them when they were handed back. Yours goes down as two hundred and ten, under the Roast.",
+     "requires": [
+      "w-ledger"
+     ],
+     "effect": {
+      "grants": {
+       "rule": {
+        "curse_on_activate": {
+         "slot": "helmet",
+         "curse": "searing"
+        }
+       }
+      }
+     }
+    },
+    {
+     "id": "w-survey",
+     "name": "The Standing Count",
+     "blurb": "The Keeper counts what is out there twice a day and has never once gone out to look. The second count is the one filed. The first is kept for the difference, which is the part worth knowing.",
+     "requires": [],
+     "effect": {
+      "grants": {
+       "rule": "scout"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "kaklon-patent",
+   "name": "The Kaklon Patent",
+   "class": "Recycler",
+   "nodes": [
+    {
+     "id": "k-licence",
+     "name": "The Licence",
+     "blurb": "Nine pages, and eight of them are the list of what the licence does not cover. Page one is a drawing of a hand holding a thing, and under it, in Kaklon’s own writing, the words BOLT IT ON.",
+     "requires": [],
+     "effect": {
+      "assembly_pct": {
+       "pct": 12
+      }
+     }
+    },
+    {
+     "id": "k-tolerances",
+     "name": "Kaklon Tolerances",
+     "blurb": "Three hundred and twelve of the four hundred came back. The note that came back with them is the same note every time, and it is a compliment.",
+     "requires": [
+      "k-licence"
+     ],
+     "effect": {
+      "stat": {
+       "health": 120,
+       "strength": 8
+      }
+     }
+    },
+    {
+     "id": "k-second-bench",
+     "name": "The Second Bench",
+     "blurb": "The first bench is where the work is done. The second is where the gloves go while somebody decides whether it was done. Four hundred went onto the second bench and nothing has ever come off it.",
+     "requires": [
+      "k-licence"
+     ],
+     "effect": {
+      "grow_slot_rows": {
+       "slot": "gloves",
+       "rows": 1
+      }
+     }
+    },
+    {
+     "id": "k-bench-rights",
+     "name": "Bench Rights",
+     "blurb": "Signed on the back of a form for something else. Two hundred and six of these were issued in one afternoon and the afternoon has not been explained. Yours is the two hundred and seventh, and it comes with the turn already in the envelope.",
+     "requires": [],
+     "effect": [
+      {
+       "stat": {
+        "health": 100,
+        "curse_resist": 8
+       }
+      },
+      {
+       "gives_ench": {
+        "ench": "the-ponkey-turn"
+       }
+      }
+     ]
+    },
+    {
+     "id": "k-overwind",
+     "name": "Overwind",
+     "blurb": "The instruction is to wind it until it stops and then give it one more. Nobody at the bench has ever needed the instruction twice.",
+     "requires": [
+      "k-bench-rights"
+     ],
+     "effect": {
+      "grants": {
+       "rule": {
+        "spin_extra": {
+         "per_turn": 1
+        }
+       }
+      }
+     }
+    },
+    {
+     "id": "k-flywheel",
+     "name": "The Flywheel",
+     "blurb": "Kaklon's own drawing has the wheel at four inches and a note beside it reading FIVE. Every flywheel on every bench is five inches and nobody has changed the drawing.",
+     "requires": [
+      "k-overwind"
+     ],
+     "effect": {
+      "grants": {
+       "rule": {
+        "spin_every": {
+         "ms": 800
+        }
+       }
+      }
+     }
+    },
+    {
+     "id": "k-counterweight",
+     "name": "The Counterweight",
+     "blurb": "Eleven pounds of something the invoice calls BALLAST and the customs form calls the same thing in a different hand. It is on the outside of the work and it is what stops the work coming off.",
+     "requires": [
+      "k-tolerances"
+     ],
+     "effect": {
+      "start_with": {
+       "armor": 18
+      }
+     }
+    },
+    {
+     "id": "k-patent-pending",
+     "name": "Patent Pending",
+     "blurb": "Filed in the ninth year and pending ever since. The office that would grant it was reflected into the Archive in the fourth year and has been answering letters from in there, at a rate of two a decade.",
+     "requires": [
+      "k-flywheel",
+      "k-counterweight"
+     ],
+     "effect": [
+      {
+       "grants": {
+        "rule": {
+         "spin_keep": {
+          "stacks": 2
+         }
+        }
+       }
+      },
+      {
+       "assembly_pct": {
+        "pct": 10
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "top-of-the-bill",
+   "name": "Top of the Bill",
+   "class": "Showstopper",
+   "nodes": [
+    {
+     "id": "b-billing",
+     "name": "Top Billing",
+     "blurb": "Eleven seasons of it, and the poster is the same poster with a new date pasted over the old one. They have run out of room and started pasting over the eleven.",
+     "cost": 1,
+     "requires": [],
+     "effect": {
+      "gives_ench": {
+       "ench": "the-chonga-swing"
+      }
+     }
+    },
+    {
+     "id": "b-follow-through",
+     "name": "The Follow-Through",
+     "blurb": "The bat leaves your hands at the top of it and nobody in the ground looks at where it lands. They are all still looking at you.",
+     "cost": 1,
+     "requires": [
+      "b-billing"
+     ],
+     "effect": {
+      "stat": {
+       "strength": 9
+      }
+     }
+    },
+    {
+     "id": "b-ninth",
+     "name": "In the Ninth",
+     "blurb": "Chonga hit one thing in the ninth and it was the ninth for eleven years afterwards. Nobody says which season.",
+     "cost": 2,
+     "requires": [
+      "b-follow-through"
+     ],
+     "effect": [
+      {
+       "stat": {
+        "strength": 7
+       }
+      },
+      {
+       "assembly_pct": {
+        "pct": 14
+       }
+      }
+     ]
+    },
+    {
+     "id": "b-warm-house",
+     "name": "A Warm House",
+     "blurb": "Six thousand of them and every one already standing. The two who sat down are discussed afterwards and at length.",
+     "cost": 1,
+     "requires": [],
+     "effect": {
+      "start_with": {
+       "armor": 22
+      }
+     }
+    },
+    {
+     "id": "b-first-bell",
+     "name": "First Bell",
+     "blurb": "He is out of the tunnel before the bell finishes. The stewards have written to him about it four times.",
+     "cost": 2,
+     "requires": [
+      "b-warm-house"
+     ],
+     "effect": {
+      "start_with": {
+       "mana": 12
+      }
+     }
+    },
+    {
+     "id": "b-house-lights",
+     "name": "House Lights",
+     "blurb": "One lamp over the whole ground and it is pointed at one man. The other nine lamps were taken down in a season nobody will name.",
+     "cost": 2,
+     "requires": [
+      "b-warm-house"
+     ],
+     "effect": {
+      "stat": {
+       "health": 140
+      }
+     }
+    },
+    {
+     "id": "b-the-incident",
+     "name": "The Incident",
+     "blurb": "It is on the record as an incident because the word they wanted was not available to the clerk writing it down.",
+     "cost": 2,
+     "requires": [
+      "b-ninth",
+      "b-house-lights"
+     ],
+     "effect": [
+      {
+       "stat": {
+        "strength": 6,
+        "curse_resist": 10
+       }
+      },
+      {
+       "assembly_pct": {
+        "pct": 10
+       }
+      }
+     ]
+    },
+    {
+     "id": "b-eleven-seasons",
+     "name": "Eleven Seasons",
+     "blurb": "They gave him a rack with eleven hooks on it and he has used one. The weapon frame that came with it has a row on it nobody has filled either.",
+     "cost": 2,
+     "requires": [
+      "b-the-incident"
+     ],
+     "effect": [
+      {
+       "stat": {
+        "health": 180,
+        "strength": 5
+       }
+      },
+      {
+       "grow_slot_rows": {
+        "slot": "weapon",
+        "rows": 1
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "loud-calculation",
+   "name": "Loud Calculation",
+   "class": "LoudCalculation",
+   "nodes": [
+    {
+     "id": "lc-rate-card",
+     "name": "The Rate Card",
+     "blurb": "Pinned inside the funnel where the light is worst. Two figures, one crossed out, and the crossing-out is the older of the two.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "rate",
+       "by": -4
+      }
+     }
+    },
+    {
+     "id": "lc-standing-order",
+     "name": "Standing Order",
+     "blurb": "Thirty points a fight, drawn whether you need them. Twenty-two fights in, nobody has needed all thirty and nobody has cancelled it.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "cap",
+       "by": 30
+      }
+     }
+    },
+    {
+     "id": "lc-overdraft",
+     "name": "The Overdraft",
+     "blurb": "You may go twenty past empty. You may not go to nothing; the last point of you is not for sale and the clerk has that in writing.",
+     "cost": 2,
+     "requires": [
+      "lc-rate-card"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "floor",
+       "by": 20
+      }
+     }
+    },
+    {
+     "id": "lc-rebate",
+     "name": "The Rebate",
+     "blurb": "A kill inside the fight refunds half the bill, paid at the bell, in strength, in front of whoever is left.",
+     "cost": 2,
+     "requires": [
+      "lc-standing-order"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "rebate",
+       "by": 50
+      }
+     }
+    },
+    {
+     "id": "lc-shouted-figures",
+     "name": "Shouted Figures",
+     "blurb": "He shouts the exchange rate over the noise and the rate improves each time he shouts it. Four shouts is where it stops improving.",
+     "cost": 2,
+     "requires": [
+      "lc-overdraft"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "rate",
+       "by": -4
+      }
+     }
+    },
+    {
+     "id": "lc-both-books-open",
+     "name": "Both Books Open",
+     "blurb": "One for one. The Sergeant stops arguing at one for one, which took eleven years and a funnel.",
+     "cost": 2,
+     "requires": [
+      "lc-shouted-figures",
+      "lc-rebate"
+     ],
+     "effect": [
+      {
+       "tunes": {
+        "knob": "rate",
+        "by": -2
+       }
+      },
+      {
+       "tunes": {
+        "knob": "cap",
+        "by": 30
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "standing-fact",
+   "name": "Standing Fact",
+   "class": "StandingFact",
+   "nodes": [
+    {
+     "id": "sf-the-count",
+     "name": "The Count",
+     "blurb": "Three items. The fourth is what makes a fact an opinion, and nobody has explained why.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "worn",
+       "by": 1
+      }
+     }
+    },
+    {
+     "id": "sf-first-fact",
+     "name": "The First Fact",
+     "blurb": "One fact, held open, for as long as you are carrying little enough to hold it.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "carry",
+       "by": 1
+      }
+     }
+    },
+    {
+     "id": "sf-margin",
+     "name": "Writ in the Margin",
+     "blurb": "A fact that cannot expire is read more often, and reading it costs the reader.",
+     "cost": 2,
+     "requires": [
+      "sf-the-count"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "bite",
+       "by": 20
+      }
+     }
+    },
+    {
+     "id": "sf-second-fact",
+     "name": "The Second Fact",
+     "blurb": "Two at once. The Keeper kept nine at once for a season and was asked to stop by six people who had all been counted.",
+     "cost": 2,
+     "requires": [
+      "sf-first-fact"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "carry",
+       "by": 1
+      }
+     }
+    },
+    {
+     "id": "sf-bare-armed",
+     "name": "Bare-Armed",
+     "blurb": "Four items and the fact still stands. Past four it sits down.",
+     "cost": 2,
+     "requires": [
+      "sf-margin"
+     ],
+     "effect": [
+      {
+       "tunes": {
+        "knob": "worn",
+        "by": 1
+       }
+      },
+      {
+       "tunes": {
+        "knob": "bite",
+        "by": 10
+       }
+      }
+     ]
+    },
+    {
+     "id": "sf-told-again",
+     "name": "Told Again",
+     "blurb": "A fact that outlives the fight is told to the next thing you meet, once, before it has said anything.",
+     "cost": 2,
+     "requires": [
+      "sf-bare-armed",
+      "sf-second-fact"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "told",
+       "by": 1
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "overwound-arm",
+   "name": "Overwound Arm",
+   "class": "OverwoundArm",
+   "nodes": [
+    {
+     "id": "oa-dry-bearing",
+     "name": "Dry Bearing",
+     "blurb": "An empty frame has nothing in it to slow down. Kaklon called this obvious in 1911 and nobody has built on it since.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "half",
+       "by": 3
+      }
+     }
+    },
+    {
+     "id": "oa-empty-bench",
+     "name": "The Empty Bench",
+     "blurb": "Six more turns of nothing, banked. The bench does not know it is empty.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "ceiling",
+       "by": 6
+      }
+     }
+    },
+    {
+     "id": "oa-clearing",
+     "name": "The Clearing",
+     "blurb": "Every second turn, the bare cell next to worked ground becomes worked ground. Four turns is four cells and the frame is not empty any more, only unpacked.",
+     "cost": 2,
+     "requires": [
+      "oa-dry-bearing"
+     ],
+     "effect": {
+      "grants": {
+       "rule": {
+        "spread": {
+         "every_turns": 2
+        }
+       }
+      }
+     }
+    },
+    {
+     "id": "oa-counterspin",
+     "name": "Counterspin",
+     "blurb": "Two stacks survive an activation. The arm does not stop; it is asked to pause and it declines twice.",
+     "cost": 2,
+     "requires": [
+      "oa-empty-bench"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "carry",
+       "by": 2
+      }
+     }
+    },
+    {
+     "id": "oa-both-arms",
+     "name": "Both Arms",
+     "blurb": "A whole stack a turn off a frame with nothing in it. Twelve turns is twelve, which is more than most people manage with gear on.",
+     "cost": 2,
+     "requires": [
+      "oa-clearing"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "half",
+       "by": 5
+      }
+     }
+    },
+    {
+     "id": "oa-overwound",
+     "name": "Overwound",
+     "blurb": "Sixteen over the old ceiling and it turns faster than that. The recall notice for this one is printed under the tap.",
+     "cost": 2,
+     "requires": [
+      "oa-both-arms",
+      "oa-counterspin"
+     ],
+     "effect": [
+      {
+       "tunes": {
+        "knob": "ceiling",
+        "by": 10
+       }
+      },
+      {
+       "tunes": {
+        "knob": "half",
+        "by": 2
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "short-programme",
+   "name": "Short Programme",
+   "class": "ShortProgramme",
+   "nodes": [
+    {
+     "id": "sp-the-poster",
+     "name": "The Poster",
+     "blurb": "Sixty percent, printed. The printer got it wrong and the house honoured the print, and has honoured it every night since.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "pct",
+       "by": 10
+      }
+     }
+    },
+    {
+     "id": "sp-quick-change",
+     "name": "Quick Change",
+     "blurb": "Two seconds an empty frame. Five empty frames is ten seconds, which is the whole of the original window and the reason the window was ten.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "per_slot",
+       "by": 1
+      }
+     }
+    },
+    {
+     "id": "sp-house-clock",
+     "name": "The House Clock",
+     "blurb": "Two seconds slow since 1904. Every act in the building is paid off it and no act has complained.",
+     "cost": 2,
+     "requires": [
+      "sp-the-poster"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "floor_ms",
+       "by": 2000
+      }
+     }
+    },
+    {
+     "id": "sp-second-house",
+     "name": "The Second House",
+     "blurb": "Each paid win adds a second to the next window, up to five. A win outside the window puts it back to nothing.",
+     "cost": 2,
+     "requires": [
+      "sp-quick-change"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "streak",
+       "by": 1
+      }
+     }
+    },
+    {
+     "id": "sp-no-encore",
+     "name": "No Encore",
+     "blurb": "Fifteen points more for the act that does not come back out. The house has counted eleven encores in nine seasons and paid for none of them.",
+     "cost": 2,
+     "requires": [
+      "sp-house-clock"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "pct",
+       "by": 15
+      }
+     }
+    },
+    {
+     "id": "sp-short-programme",
+     "name": "The Short Programme Itself",
+     "blurb": "Twice the bill on a fast win with nothing on. The judges gave it a five, a two and a minus seven, and the box office does not read scores.",
+     "cost": 2,
+     "requires": [
+      "sp-no-encore",
+      "sp-second-house"
+     ],
+     "effect": [
+      {
+       "tunes": {
+        "knob": "per_slot",
+        "by": 1
+       }
+      },
+      {
+       "tunes": {
+        "knob": "pct",
+        "by": 25
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "curse-requisition",
+   "name": "Curse Requisition",
+   "class": "CurseRequisition",
+   "nodes": [
+    {
+     "id": "cr-the-form",
+     "name": "The Form",
+     "blurb": "Five a fight. There is a box for a sixth and the box has never been filled in by anyone the Keeper will name.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "per_fight",
+       "by": 2
+      }
+     }
+    },
+    {
+     "id": "cr-ripest-first",
+     "name": "Ripest First",
+     "blurb": "Spend the one with the least time left rather than the cheapest. The clerk fought this for two years on the grounds that it was sensible.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "pick",
+       "by": 1
+      }
+     }
+    },
+    {
+     "id": "cr-countersigned",
+     "name": "Countersigned",
+     "blurb": "Every third requisition puts the curse back where it was found, signed twice, still running.",
+     "cost": 2,
+     "requires": [
+      "cr-the-form"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "relist",
+       "by": 1
+      }
+     }
+    },
+    {
+     "id": "cr-two-signatures",
+     "name": "Two Signatures",
+     "blurb": "A spent curse covers half again what a cast costs, and the half again is banked rather than lost.",
+     "cost": 2,
+     "requires": [
+      "cr-ripest-first"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "worth",
+       "by": 50
+      }
+     }
+    },
+    {
+     "id": "cr-standing-requisition",
+     "name": "Standing Requisition",
+     "blurb": "Eight a fight. The Sergeant signs the whole book at the start and hands it over open.",
+     "cost": 2,
+     "requires": [
+      "cr-countersigned"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "per_fight",
+       "by": 3
+      }
+     }
+    },
+    {
+     "id": "cr-whole-book",
+     "name": "The Whole Book",
+     "blurb": "Every second one comes back, and each covers double. The requisition is now cheaper than the cast, which the Sergeant says is how requisitions are meant to work.",
+     "cost": 2,
+     "requires": [
+      "cr-standing-requisition",
+      "cr-two-signatures"
+     ],
+     "effect": [
+      {
+       "tunes": {
+        "knob": "relist",
+        "by": 1
+       }
+      },
+      {
+       "tunes": {
+        "knob": "worth",
+        "by": 50
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "patented-funnel",
+   "name": "Patented Funnel",
+   "class": "PatentedFunnel",
+   "nodes": [
+    {
+     "id": "pf-the-tap",
+     "name": "The Tap",
+     "blurb": "Eight a stack a turn. The tap is on the side of the funnel and the side of the funnel is the patent's, so the eight is licensed.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "per_stack",
+       "by": 3
+      }
+     }
+    },
+    {
+     "id": "pf-second-licence",
+     "name": "The Second Licence",
+     "blurb": "It turns every eight hundred milliseconds instead of every thousand. Two hundred milliseconds, bought and paid for, twelve times a fight.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "grants": {
+       "rule": {
+        "spin_every": {
+         "ms": 800
+        }
+       }
+      }
+     }
+    },
+    {
+     "id": "pf-full-rows",
+     "name": "Full Rows",
+     "blurb": "A row with no gap in it pays four a cell at the bell, and stays exactly where it is. Nothing clears; the row is the machine and clearing it would be taking the machine apart.",
+     "cost": 2,
+     "requires": [
+      "pf-the-tap"
+     ],
+     "effect": {
+      "grants": {
+       "rule": {
+        "row_harvest": {
+         "per_cell": 4
+        }
+       }
+      }
+     }
+    },
+    {
+     "id": "pf-flywheel-brake",
+     "name": "The Flywheel Brake",
+     "blurb": "Two stacks survive the activation. A brake that keeps the wheel turning is what the patent office queried and what the patent says.",
+     "cost": 2,
+     "requires": [
+      "pf-second-licence"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "bleed",
+       "by": 2
+      }
+     }
+    },
+    {
+     "id": "pf-overflow-pipe",
+     "name": "The Overflow Pipe",
+     "blurb": "Funny past the top of the funnel comes out as Cork, one for one, down a pipe added in 1912 by somebody who was tired of mopping.",
+     "cost": 2,
+     "requires": [
+      "pf-full-rows"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "overflow",
+       "by": 1
+      }
+     }
+    },
+    {
+     "id": "pf-funnel-patented",
+     "name": "The Funnel, Patented",
+     "blurb": "Twelve a stack a turn and the rows pay half again. Spike Kaklon has offered nine hundred Fnorp for the drawings on four occasions.",
+     "cost": 2,
+     "requires": [
+      "pf-overflow-pipe",
+      "pf-flywheel-brake"
+     ],
+     "effect": [
+      {
+       "tunes": {
+        "knob": "per_stack",
+        "by": 4
+       }
+      },
+      {
+       "tunes": {
+        "knob": "per_cell",
+        "by": 2
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "opening-number",
+   "name": "Opening Number",
+   "class": "OpeningNumber",
+   "nodes": [
+    {
+     "id": "on-longer-overture",
+     "name": "Longer Overture",
+     "blurb": "Thirteen seconds. Three of them are the conductor deciding whether to start.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "window_ms",
+       "by": 3000
+      }
+     }
+    },
+    {
+     "id": "on-standing-discount",
+     "name": "The Standing Discount",
+     "blurb": "Twenty percent off after the window closes, on the grounds that the house is already warm.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "after",
+       "by": 20
+      }
+     }
+    },
+    {
+     "id": "on-encore",
+     "name": "Encore",
+     "blurb": "A kill inside the window starts the window again. Once. The house has a rule about twice and the rule is the number two.",
+     "cost": 2,
+     "requires": [
+      "on-longer-overture"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "encore",
+       "by": 1
+      }
+     }
+    },
+    {
+     "id": "on-unspent",
+     "name": "Unspent",
+     "blurb": "Funny left over when the lights come up lands as Cork. Nobody at the house can explain the mechanism and the Cork is on you regardless.",
+     "cost": 2,
+     "requires": [
+      "on-standing-discount"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "bank",
+       "by": 1
+      }
+     }
+    },
+    {
+     "id": "on-second-overture",
+     "name": "Second Overture",
+     "blurb": "Seventeen seconds. The programme lists it as four minutes and the programme is not the clock.",
+     "cost": 2,
+     "requires": [
+      "on-encore"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "window_ms",
+       "by": 4000
+      }
+     }
+    },
+    {
+     "id": "on-whole-first-act",
+     "name": "The Whole First Act",
+     "blurb": "Two encores and half price after. Eleven seasons of first acts and the second act has been performed nine times.",
+     "cost": 2,
+     "requires": [
+      "on-second-overture",
+      "on-unspent"
+     ],
+     "effect": [
+      {
+       "tunes": {
+        "knob": "encore",
+        "by": 1
+       }
+      },
+      {
+       "tunes": {
+        "knob": "after",
+        "by": 30
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "cursed-licence",
+   "name": "Cursed Licence",
+   "class": "CursedLicence",
+   "nodes": [
+    {
+     "id": "cl-searing-clause",
+     "name": "The Searing Clause",
+     "blurb": "Clause four. The weapon frame, every time it goes off, and the ench does not have to be told which weapon.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "grants": {
+       "rule": {
+        "curse_on_activate": {
+         "slot": "weapon",
+         "curse": "searing"
+        }
+       }
+      }
+     }
+    },
+    {
+     "id": "cl-frost-clause",
+     "name": "The Frost Clause",
+     "blurb": "Clause seven, added when a licensee held both hands out and asked what the gloves were for.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "grants": {
+       "rule": {
+        "curse_on_activate": {
+         "slot": "gloves",
+         "curse": "frost"
+        }
+       }
+      }
+     }
+    },
+    {
+     "id": "cl-second-reading",
+     "name": "Second Reading",
+     "blurb": "Every third activation of an enched item lands its curse twice, and the item runs fifteen percent slower for the privilege. The office reads everything twice and takes longer.",
+     "cost": 2,
+     "requires": [
+      "cl-searing-clause"
+     ],
+     "effect": {
+      "grants": {
+       "rule": {
+        "productivity": {
+         "every": 3,
+         "slower_pct": 15
+        }
+       }
+      }
+     }
+    },
+    {
+     "id": "cl-stun-rider",
+     "name": "The Stun Rider",
+     "blurb": "A rider on the helmet, in a hand nobody at the office recognises, initialled by three people who have all left.",
+     "cost": 2,
+     "requires": [
+      "cl-frost-clause"
+     ],
+     "effect": {
+      "grants": {
+       "rule": {
+        "curse_on_activate": {
+         "slot": "helmet",
+         "curse": "stun"
+        }
+       }
+      }
+     }
+    },
+    {
+     "id": "cl-misfire-schedule",
+     "name": "The Misfire Schedule",
+     "blurb": "Schedule two, the greaves. Every third act of theirs does nothing, which the schedule describes as an administrative outcome.",
+     "cost": 2,
+     "requires": [
+      "cl-second-reading"
+     ],
+     "effect": {
+      "grants": {
+       "rule": {
+        "curse_on_activate": {
+         "slot": "greaves",
+         "curse": "misfire"
+        }
+       }
+      }
+     }
+    },
+    {
+     "id": "cl-licence-entire",
+     "name": "The Licence Entire",
+     "blurb": "Twice a curse on every enched activation, every clause, every frame. It is nine pages and eight of them are the list.",
+     "cost": 2,
+     "requires": [
+      "cl-misfire-schedule",
+      "cl-stun-rider"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "stack",
+       "by": 1
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "eleventh-season",
+   "name": "Eleventh Season",
+   "class": "EleventhSeason",
+   "nodes": [
+    {
+     "id": "es-ledger-column",
+     "name": "The Ledger Column",
+     "blurb": "Fifteen percent a curse, in a column the Keeper added and the box office has never queried.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "pct",
+       "by": 5
+      }
+     }
+    },
+    {
+     "id": "es-house-count",
+     "name": "The House Count",
+     "blurb": "Six counted instead of four. The two extra were being landed anyway and now they are being paid for.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "count_cap",
+       "by": 2
+      }
+     }
+    },
+    {
+     "id": "es-four-kinds",
+     "name": "Four Kinds",
+     "blurb": "Four different kinds on one fallen creature pays double. Three kinds pays what three kinds pays, which is the point of the number four.",
+     "cost": 2,
+     "requires": [
+      "es-ledger-column"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "distinct",
+       "by": 1
+      }
+     }
+    },
+    {
+     "id": "es-long-run",
+     "name": "The Long Run",
+     "blurb": "A curse that ran out before the bell counts for half. It was on them for most of it and the ledger says so.",
+     "cost": 2,
+     "requires": [
+      "es-house-count"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "posthumous",
+       "by": 5
+      }
+     }
+    },
+    {
+     "id": "es-billing-review",
+     "name": "The Billing Review",
+     "blurb": "Twenty percent a curse. Reviewed in the eighth season, upheld in the ninth, reviewed again out of habit.",
+     "cost": 2,
+     "requires": [
+      "es-four-kinds"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "pct",
+       "by": 5
+      }
+     }
+    },
+    {
+     "id": "es-eleven-seasons",
+     "name": "Eleven Seasons of It",
+     "blurb": "Thirty percent a curse and nine of them counted. The act has not changed since the second season and the money has changed eleven times.",
+     "cost": 2,
+     "requires": [
+      "es-billing-review",
+      "es-long-run"
+     ],
+     "effect": [
+      {
+       "tunes": {
+        "knob": "pct",
+        "by": 10
+       }
+      },
+      {
+       "tunes": {
+        "knob": "count_cap",
+        "by": 3
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "full-bill",
+   "name": "Full Bill",
+   "class": "FullBill",
+   "nodes": [
+    {
+     "id": "fb-second-rack",
+     "name": "The Second Rack",
+     "blurb": "Three a component. The rack was built for two and has four slots, which is the sort of thing the workshop did.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "racks",
+       "by": 1
+      }
+     }
+    },
+    {
+     "id": "fb-standing-order",
+     "name": "The Standing Order",
+     "blurb": "The Index, off the house list, no charge. It has been on the list since the list was one item long.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "gives_ench": {
+       "ench": "the-yodregar-index"
+      }
+     }
+    },
+    {
+     "id": "fb-ponkey-broadcast",
+     "name": "Ponkey Broadcast",
+     "blurb": "An enched component lends forty percent of what it is carrying to every finished item touching it. The lending is not noticed by the lender.",
+     "cost": 2,
+     "requires": [
+      "fb-second-rack"
+     ],
+     "effect": {
+      "grants": {
+       "rule": {
+        "beacon": {
+         "pct": 40
+        }
+       }
+      }
+     }
+    },
+    {
+     "id": "fb-house-list",
+     "name": "The House List",
+     "blurb": "The Allowance, which the house has never charged for and has twice tried to stop giving away.",
+     "cost": 2,
+     "requires": [
+      "fb-standing-order"
+     ],
+     "effect": {
+      "gives_ench": {
+       "ench": "the-hooper-s-allowance"
+      }
+     }
+    },
+    {
+     "id": "fb-wider-broadcast",
+     "name": "Wider Broadcast",
+     "blurb": "Sixty-five percent, and it reaches diagonally now, which the workshop insists is the same thing.",
+     "cost": 2,
+     "requires": [
+      "fb-ponkey-broadcast"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "beacon_pct",
+       "by": 25
+      }
+     }
+    },
+    {
+     "id": "fb-bill-in-full",
+     "name": "The Bill in Full",
+     "blurb": "Four a component and eighty percent lent out. Two licences, one rack, and a bill that runs to a second page.",
+     "cost": 2,
+     "requires": [
+      "fb-wider-broadcast",
+      "fb-house-list"
+     ],
+     "effect": [
+      {
+       "tunes": {
+        "knob": "racks",
+        "by": 1
+       }
+      },
+      {
+       "tunes": {
+        "knob": "beacon_pct",
+        "by": 15
+       }
+      }
+     ]
+    }
+   ]
+  }
+ ]
 }

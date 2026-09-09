@@ -117,6 +117,20 @@ pub struct Character {
     pub gold: i32,
     /// Maximum health earned outside the boards — the one stat a reward can
     /// add to the character rather than to a grid.
+    /// Health earned off the boards rather than from what is seated on them.
+    ///
+    /// **Nothing in the shipped game ever writes it.** `rested_stats` adds it,
+    /// `save.rs` round-trips it, `Game::eq` compares it and `tests/save.rs`
+    /// plants a twelve in it to prove the trip — and no line anywhere sets it
+    /// to anything but zero. It is inherited: upstream grew a run's health as
+    /// the campaign went, and GM2D's levels grow a *board* instead.
+    ///
+    /// Left standing rather than deleted, and the reason is that deleting it is
+    /// a design decision and this is a note: if health-per-level is ever wanted
+    /// this is the field it goes in, and it costs nothing where it is —
+    /// `#[serde(skip_serializing_if)]` keeps it out of every file. What it must
+    /// not do is be mistaken for a live number. **The decision is the
+    /// human's**; see `SECOND-ORDER-M13.md`.
     pub grown_health: i32,
     /// Experience **spent on levels**, ever. **Not per level**: the level is
     /// derived from this, so the two cannot disagree, and a save carrying both
@@ -191,6 +205,62 @@ pub struct Character {
     ///
     /// `None` until level 5, and permanent after. See [`Character::choose_class`].
     pub class: Option<String>,
+    /// The **second** class, by canonical name.
+    ///
+    /// Bought rather than reached: the Second Paper is 5,000 Fnorp on Spike's
+    /// counter and unlocks when the first class's tree is finished. Permanent
+    /// the same way the first is — there is no path that clears either.
+    ///
+    /// `#[serde(default)]`, so every M12 save opens with `None`, which is what
+    /// those characters were.
+    #[serde(default)]
+    pub second_class: Option<String>,
+    /// The **expert** class, by canonical name.
+    ///
+    /// One of ten, decided by which pair of classes you hold rather than
+    /// chosen off a list — so it is taken rather than picked, and the paper is
+    /// free because you have already paid twice.
+    ///
+    /// **It replaces nothing.** Both parent powers stay on and the expert's is
+    /// a third; `classes()` is the list, and the three places a power is
+    /// honoured fold over it.
+    #[serde(default)]
+    pub expert: Option<String>,
+    /// A Second Paper bought and not yet spent on a choice.
+    ///
+    /// **Consumed on choice, not on purchase.** The second fork takes Escape —
+    /// it was bought, and a player with a paper in their pack is allowed to
+    /// sleep on it — so the paper has to outlive the screen being dismissed.
+    /// The first fork refuses Escape and needs no such field, because an
+    /// unanswered question keeps being asked.
+    #[serde(default)]
+    pub second_paper: bool,
+    /// Fast wins in a row, for Short Programme's streak.
+    ///
+    /// **The only counter in this block that reaches past the bell**, along
+    /// with Standing Fact's `told`. Everything else about an expert is derived
+    /// — the knobs off `skills_taken`, the power off `expert` — and this is
+    /// not derivable from anything: *how many quick fights in a row* is a fact
+    /// about your afternoon that nothing else records.
+    ///
+    /// It is a `u32` rather than a bool-and-a-count because the cap is the
+    /// knob's, not the field's: `ExpertPower::STREAK_CAP` clamps what it is
+    /// *worth*, and the number itself just counts.
+    #[serde(default)]
+    pub fast_wins: u32,
+    /// Curses that outlived the last fight and land on the next thing you meet.
+    ///
+    /// **The only save field in this block that carries a fact about a fight**,
+    /// and `PLAN-M13.md` §8 row 2 named it in advance as the one thing that
+    /// would want one. Curse kinds by name, like every other vocabulary this
+    /// engine writes down: `CurseKind::by_name` is the one reader, and a name
+    /// this build has not got is dropped rather than refused — a save is not
+    /// worth losing over a curse.
+    ///
+    /// Empty for everybody who is not a finished Standing Fact, which is why
+    /// it is skipped when it is and why no older save was refused for it.
+    #[serde(default)]
+    pub told_curses: Vec<String>,
     /// **Not serialised.** Undo is a session's history of its own edits, not
     /// part of the character: a save that restored forty snapshots would be a
     /// save that let you undo your way back into a previous session's board.
@@ -230,6 +300,11 @@ impl Character {
             skill_points: 0,
             skills_taken: Vec::new(),
             class: None,
+            second_class: None,
+            expert: None,
+            second_paper: false,
+            fast_wins: 0,
+            told_curses: Vec::new(),
             undo_stack: Vec::new(),
         }
     }
@@ -902,7 +977,12 @@ impl Character {
         id: &str,
     ) -> Result<(), crate::skills::Refusal> {
         let cost = tree
-            .can_take(id, &self.skills_taken, self.skill_points, self.class.as_deref())?
+            .can_take(
+                id,
+                &self.skills_taken,
+                self.skill_points,
+                &self.classes().collect::<Vec<_>>(),
+            )?
             .cost;
         self.skill_points -= cost;
         self.skills_taken.push(id.to_string());
@@ -917,8 +997,7 @@ impl Character {
     /// worked out from the tree every time. A save that stored the consequences
     /// would go stale the first time a node was retuned.
     pub fn apply_skills(&mut self, tree: &crate::skills::SkillsData) {
-        self.loadout.assembly_pct =
-            tree.assembly_pct(&self.skills_taken) + self.class_assembly_pct();
+        self.loadout.assembly_pct = self.assembly_pct_of(tree);
         let granted = tree.granted_rows(&self.skills_taken);
         self.resize_boards(granted);
     }
@@ -936,23 +1015,45 @@ impl Character {
     /// wrote for `Showstopper` and which caught this on its first run — which is
     /// the second time this project has shipped a promise with nothing behind
     /// it, after the eight skill nodes.
-    /// Re-derive the one number the tree and the class both move.
+    /// Re-derive the one number the tree and the classes both move.
     ///
     /// Split from `apply_skills` because that one also resizes the frames, and
     /// the two other places this is needed — taking a class, and loading a save
     /// — must not do that.
     pub fn refresh_assembly_pct(&mut self) {
-        self.loadout.assembly_pct =
-            crate::data::skills().assembly_pct(&self.skills_taken) + self.class_assembly_pct();
+        self.loadout.assembly_pct = self.assembly_pct_of(&crate::data::skills());
+    }
+
+    /// What the taken nodes and the classes come to.
+    ///
+    /// **The one place the sum is done**, and the reason it is worth its own
+    /// function: `Loadout::assembly_pct` is the last banked derived number in
+    /// the game, kept on the loadout because `report` is called from a hundred
+    /// and eight places and every one of them has to see the same figure. It is
+    /// no longer *saved* — the loader derives it — and what is left is a field
+    /// that four mutators have to remember to refresh.
+    ///
+    /// So `a_class_taken_any_way_re_derives_the_bonus` calls this and compares,
+    /// which is the guard `SECOND-ORDER-M13.md` row 1 asks for: a class field
+    /// cannot be set without the re-derivation, because a test walks every door
+    /// that sets one.
+    pub fn assembly_pct_of(&self, tree: &crate::skills::SkillsData) -> i32 {
+        tree.assembly_pct(&self.skills_taken) + self.class_assembly_pct()
     }
 
     fn class_assembly_pct(&self) -> i32 {
-        self.class_def()
+        // **Every class, not the first.** A second paper can reach the Kaklon
+        // Licensee, and a power honoured only for whoever took it at level
+        // five would be the `Recycler`-reaches-nothing failure with an extra
+        // step. `sum` rather than `max` because `class::stacks` already says
+        // Recycler accumulates.
+        self.class_defs()
+            .into_iter()
             .map(|c| match c.power {
                 crate::class::ClassPower::Recycler { pct } => pct,
                 _ => 0,
             })
-            .unwrap_or(0)
+            .sum()
     }
 
     /// The level a class may be chosen at.
@@ -1001,9 +1102,195 @@ impl Character {
     }
 
     /// The chosen class, resolved.
+    ///
+    /// **The first one.** A character may hold three since M13, and the two
+    /// callers that mean *all of them* ask [`Character::class_defs`]. This one
+    /// answers "what did you fork into at level five", which is still a
+    /// question with one answer.
     pub fn class_def(&self) -> Option<&'static crate::class::ClassDef> {
         let name = self.class.as_ref()?;
         crate::class::CLASSES.iter().find(|c| c.name == *name)
+    }
+
+    // -------------------------------------------------------- three classes
+    //
+    // **Three, all live, and no arbitration invented.** The five shipped
+    // powers touch five different rules and no pair of them collides; the ten
+    // experts are written to the same constraint, and
+    // `no_pair_of_live_powers_disagrees` is what keeps it true. So the three
+    // places a power is honoured — the purse, the fighter at the bell, the
+    // board — each fold over a slice where they used to read an option, and
+    // nothing had to decide which class wins.
+
+    /// Every class this character is, canonical, in the order they were taken.
+    ///
+    /// Zero, one, two or three. The order is first, second, expert, which is
+    /// also the order they were paid for.
+    pub fn classes(&self) -> impl Iterator<Item = &str> {
+        [self.class.as_deref(), self.second_class.as_deref(), self.expert.as_deref()]
+            .into_iter()
+            .flatten()
+    }
+
+    /// The same, resolved to definitions — **and the expert's knobs turned.**
+    ///
+    /// **This is the list the purse and the bell read.** A class named in the
+    /// save that this build has not got is skipped rather than refused — the
+    /// same posture `World::repair` takes about a map that moved — because a
+    /// character who cannot fight is worse than one missing a power.
+    ///
+    /// **It returns owned definitions and not `&'static` ones, and that is the
+    /// whole reason it exists in this shape.** `CLASSES` is a table of
+    /// *untuned* powers — the expert as the roster wrote it, before any point
+    /// was spent — and every caller of this used to clone out of it into a
+    /// `Vec<ClassDef>` anyway. So the tuned power had nowhere to go, and
+    /// thirty-eight nodes across nine expert trees parsed, cost points, showed
+    /// as taken and changed nothing: the *eight skill nodes that did nothing*
+    /// failure, one block later and thirty numbers wider. Found by
+    /// `every_point_in_an_expert_tree_buys_something`, which is the guard M13.6
+    /// was written to be.
+    ///
+    /// A static reference could not carry a tuning, so there is exactly one
+    /// answer to *which classes am I, with everything I bought applied* and no
+    /// way for a caller to reach the untuned one by accident. The fork's own
+    /// screen still reads `CLASSES` directly, and should: nobody choosing a
+    /// class has spent a point in its tree yet.
+    pub fn class_defs(&self) -> Vec<crate::class::ClassDef> {
+        let tuned = self.expert_power();
+        self.classes()
+            .filter_map(|n| crate::class::CLASSES.iter().find(|c| c.name == n))
+            .map(|d| match tuned {
+                Some(p) if Some(d.name) == self.expert.as_deref() => {
+                    crate::class::ClassDef { power: crate::class::ClassPower::Expert(p), ..*d }
+                }
+                _ => *d,
+            })
+            .collect()
+    }
+
+    /// How many of the five worn frames have nothing seated in them.
+    ///
+    /// **A board fact two experts are priced against**, and the reason it is
+    /// on the character rather than worked out inside a fight: an empty frame
+    /// produces no `ItemProfile`, so from inside `combat.rs` *no gear* and
+    /// *five empty grids* are the same picture.
+    ///
+    /// `SlotKind::ALL` and not `EVERY`, so the instrument frame is not one of
+    /// them. An instrument is a tool and not gear — every one of the thirty-one
+    /// places that asks what a board is *worth* walks `ALL` for that reason —
+    /// and a player who built a compass has not thereby left a frame bare.
+    pub fn empty_frames(&self) -> u32 {
+        SlotKind::ALL.iter().filter(|&&k| self.loadout.slot(k).worn().is_empty()).count() as u32
+    }
+
+    /// The expert power in play, **with every taken node's tuning applied**.
+    ///
+    /// Derived, never banked, exactly like a node's effect and the tower's
+    /// fallen floors: the save carries which expert and which nodes, and this
+    /// reads them fresh — so retuning what a node moves retunes every
+    /// character who took it.
+    pub fn expert_power(&self) -> Option<crate::expert::ExpertPower> {
+        let name = self.expert.as_deref()?;
+        let mut power = crate::expert::by_name(name)?.power;
+        if !self.skills_taken.is_empty() {
+            for (knob, by) in crate::data::skills().tunings_from(&self.skills_taken) {
+                power.tune(&knob, by);
+            }
+        }
+        Some(power)
+    }
+
+    /// The expert this character's pair reaches, if they hold a pair.
+    ///
+    /// **Derived from the pair, never chosen off a list.** Which two classes
+    /// you hold is the whole of the decision, and it was made in daylight at
+    /// the second fork — which is why the second fork's cards print what each
+    /// pairing eventually reaches.
+    pub fn expert_on_offer(&self) -> Option<&'static crate::expert::ExpertDef> {
+        crate::expert::for_pair(self.class.as_deref()?, self.second_class.as_deref()?)
+    }
+
+    /// Take the expert. **Permanent, like the other two.**
+    ///
+    /// Refuses in four named ways, TONE 12: you have one, you hold no pair,
+    /// two trees are not finished, or that is not the expert your pair
+    /// reaches.
+    pub fn take_expert(&mut self) -> Result<&'static crate::expert::ExpertDef, String> {
+        if let Some(have) = &self.expert {
+            return Err(format!("you are already a {have}, and that does not come off"));
+        }
+        let def = self
+            .expert_on_offer()
+            .ok_or("an expert is what a pair of classes reaches, and you hold one at most")?;
+        let finished = self.finished_trees();
+        if finished < 2 {
+            return Err(format!(
+                "two finished class trees, and you have finished {finished} of the 2 you are"
+            ));
+        }
+        self.expert = Some(def.name.to_string());
+        // **The same re-derivation the other two forks pay**, and the only one
+        // of the three that no test can see. `a_class_taken_any_way_re_derives
+        // _the_bonus` breaks the other two and watches them fail; this one
+        // cannot move the number, because no `ExpertPower` is a `Recycler` and
+        // `expert_nodes_touch_only_the_expert` refuses a bare `assembly_pct` in
+        // an expert tree. What holds it is that lint rather than this line — so
+        // if an expert is ever given the number, that lint is the thing that
+        // has to be argued with first.
+        self.refresh_assembly_pct();
+        Ok(def)
+    }
+
+    /// How many of this character's class trees are finished.
+    ///
+    /// **Derived, never banked**, like a level, like the tower's fallen floors
+    /// and like what a node awards. The trees are in `data/skills.json` and
+    /// `skills_taken` is in the save; a counter beside them would be a second
+    /// answer to a question the save already answers, and the two would part
+    /// the first time a tree gained a node.
+    pub fn finished_trees(&self) -> u8 {
+        let tree = crate::data::skills();
+        self.classes().filter(|c| tree.tree_finished(c, &self.skills_taken)).count() as u8
+    }
+
+    /// Is a second class owed — bought, and not yet spent on a choice?
+    pub fn owed_a_second_class(&self) -> bool {
+        self.second_paper && self.second_class.is_none()
+    }
+
+    /// Take the second class. **Permanent, like the first.**
+    ///
+    /// Refuses in four named ways, TONE 12, and every one of them is a
+    /// different rule: no paper, already taken, no such class, or the class
+    /// you already are. A button that greys out with no sentence reads as
+    /// broken.
+    pub fn choose_second_class(
+        &mut self,
+        canonical: &str,
+    ) -> Result<&'static crate::class::ClassDef, String> {
+        if let Some(have) = &self.second_class {
+            return Err(format!("you are already a {have} as well, and that does not come off"));
+        }
+        if !self.second_paper {
+            return Err("the second paper is Spike's, and you have not bought it".into());
+        }
+        if self.class.as_deref() == Some(canonical) {
+            return Err(format!("you are already a {canonical}; the paper is for a second"));
+        }
+        let def = crate::class::CLASSES
+            .iter()
+            .find(|c| c.name == canonical)
+            .ok_or_else(|| format!("there is no such class as {canonical}"))?;
+        self.second_class = Some(def.name.to_string());
+        // **Spent on the choice, not on the purchase.** Until here the paper
+        // is in the pack and re-raises the screen, which is what makes the
+        // second fork a thing you may sleep on.
+        self.second_paper = false;
+        // A class can change what a board is worth — `Recycler` is one of the
+        // four a second paper can reach — so the same re-derivation the first
+        // fork does, for the same reason and no more than it.
+        self.refresh_assembly_pct();
+        Ok(def)
     }
 
     // ------------------------------------------------------------ growth
@@ -1437,6 +1724,16 @@ impl Character {
     /// thresholds, a ranking. GM2D chooses a class at level 5 from a tree in
     /// data (M5), so what survives here is the reading itself, which is a
     /// property of the board and belongs with the board.
+    /// **Nothing calls this, and nothing calls `class::rank` either.** They are
+    /// upstream's *suggest a class from the shape of your board*, which GM2D
+    /// replaced with the level-five fork — a question the player answers rather
+    /// than one the board answers for them. Left standing because deleting a
+    /// subsystem is a decision and this is a note; see `SECOND-ORDER-M13.md`.
+    ///
+    /// Its `pieces()` walks both layers, so `filled` counts the underlay —
+    /// which `pressure::of` deliberately does not, on the grounds that gear
+    /// sits on top of an enchantment and takes no cell from it. Two answers to
+    /// *how full is this board*, and only one of them is read.
     pub fn fingerprint(&self) -> crate::class::Fingerprint {
         let filled: usize = SlotKind::ALL
             .iter()
@@ -1452,6 +1749,59 @@ impl Character {
     /// Armour and mana the skill tree says you begin a fight already holding.
     ///
     /// Read every time rather than banked when the node is bought, for the same
+    /// Write down the two things that outlive a fight.
+    ///
+    /// **Both are counters and neither is derivable**, which is why they are
+    /// the only save fields M13 added that carry a fact about a fight rather
+    /// than about a character. Everything else in the block is derived: the
+    /// knobs off `skills_taken`, the power off `expert`, the finished trees off
+    /// the tree.
+    ///
+    /// **On the character rather than in `fight.rs`**, where it was written,
+    /// because it reads and writes nothing else — and because the only
+    /// measurement that can see `told` is one that runs a second fight holding
+    /// what the first left, which should not have to build a `Game` around a
+    /// board to do it.
+    pub fn carry_out_of(&mut self, log: &crate::combat::CombatLog) {
+        use crate::combat::Outcome;
+        // Short Programme's streak. A fast win adds one; anything else — a slow
+        // win, a loss, a stalemate — puts it back to nothing, which is the
+        // cap's other half and the reason it is not a runaway.
+        let window = self
+            .class_defs()
+            .iter()
+            .find_map(|c| match c.power {
+                crate::class::ClassPower::Expert(
+                    crate::expert::ExpertPower::ShortProgramme { floor_ms, per_slot, .. },
+                ) => Some(floor_ms + per_slot * 1000 * self.empty_frames() as i32),
+                crate::class::ClassPower::Showstopper { under_ms, .. } => Some(under_ms as i32),
+                _ => None,
+            })
+            .unwrap_or(0);
+        let quick = log.outcome == Outcome::Victory && (log.duration_ms as i32) < window;
+        self.fast_wins = if quick { self.fast_wins + 1 } else { 0 };
+
+        // Standing Fact's `told`: up to that many permanent curses follow you
+        // out.
+        //
+        // **Off the bill the log already carries**, not off a second walk of
+        // the entries — the simulation counted what was standing when it ended,
+        // and re-deriving it here would be a second answer to what happened.
+        let told = self
+            .expert_power()
+            .and_then(|e| match e {
+                crate::expert::ExpertPower::StandingFact { told, .. } => Some(told.max(0)),
+                _ => None,
+            })
+            .unwrap_or(0);
+        self.told_curses.clear();
+        if told > 0 {
+            for kind in log.curse_bill.kinds.iter().take(told as usize) {
+                self.told_curses.push(kind.name().to_string());
+            }
+        }
+    }
+
     /// reason `player_stats` reads the tree: a bought node's *effect* is not
     /// state, the node is.
     pub fn start_with(&self) -> crate::combat::Held {
@@ -1465,6 +1815,21 @@ impl Character {
         // here, because `Held` is what a fight is handed and this is the one
         // place that has both.
         held.rules.extend(self.item_rules());
+        // **A board fact, counted where the board is.** See
+        // `combat::Held::empty_frames` for why the fight cannot answer it.
+        held.empty_frames = self.empty_frames();
+        // **And what every full row is worth.** Into the same field the tree's
+        // starting mana goes, because it is the same thing: what the player is
+        // already holding when the bell goes.
+        held.mana += self.row_harvest();
+        // **And whatever followed you out of the last fight.** A name this
+        // build has not got is dropped rather than refused: a save is not worth
+        // losing over a curse.
+        held.told = self
+            .told_curses
+            .iter()
+            .filter_map(|n| crate::curse::CurseKind::by_name(n))
+            .collect();
         held
     }
 
@@ -1592,9 +1957,192 @@ impl Character {
         // and a loadout that knew about them would be a loadout that knew
         // about a licence.
         if !self.enchanted.is_empty() {
-            crate::ench::apply(&mut out, &self.enchanted, &crate::data::enchs());
+            let data = crate::data::enchs();
+            crate::ench::apply(&mut out, &self.enchanted, &data);
+            // **Which items are enched, for the two rules that ask.** Set here
+            // and not on the board, exactly as `spins` and `fragile` are: the
+            // cells are the board's answer and the ench is the character's.
+            for p in out.iter_mut() {
+                p.enched = self
+                    .enchanted
+                    .iter()
+                    .any(|e| e.active && p.pieces.contains(&e.on) && data.get(&e.id).is_some());
+            }
+            // **And what an enched component lends its neighbours.** After the
+            // enchs themselves, and reading the *unlent* list, which is what
+            // makes `Beacon` not chain: a lent ench is not an ench for the
+            // purpose of lending it on.
+            if let Some(pct) = self.beacon_pct() {
+                crate::ench::broadcast(&mut out, &self.enchanted, &data, pct);
+            }
         }
         out
+    }
+
+    /// How much an enched component lends each neighbour, if anything.
+    ///
+    /// **The rule's number plus the expert's knob**, summed rather than
+    /// replaced: the rule is the switch and the knob is the tuning, the same
+    /// division `SpinExtra` makes over a spin an ench granted. Without the
+    /// rule there is no beacon at all, however far the knob was turned — a
+    /// node that tuned a switch nobody had thrown would be a point spent on
+    /// nothing.
+    fn beacon_pct(&self) -> Option<u32> {
+        let base: u32 = self
+            .rules()
+            .iter()
+            .filter_map(|r| match r {
+                crate::rule::Rule::Beacon { pct } => Some(*pct),
+                _ => None,
+            })
+            .sum();
+        if base == 0 {
+            return None;
+        }
+        let extra = match self.expert_power() {
+            Some(crate::expert::ExpertPower::FullBill { beacon_pct, .. }) => beacon_pct.max(0),
+            _ => 0,
+        };
+        Some(base + extra as u32)
+    }
+
+    /// What every full row on the board is worth at the bell, in mana.
+    ///
+    /// **The row is not cleared.** A filled row is a machine; clearing it
+    /// would be taking the machine apart, which is the whole of the idea this
+    /// is borrowed from. Counted off the loadout rather than off the packing
+    /// screen — a row is full or it is not, and the screen has no opinion.
+    ///
+    /// Read at the start of every fight through [`Character::start_with`],
+    /// because *the bell* in this engine is when a fight begins: mana is spent
+    /// inside a fight and gone when it ends, so paying it afterwards would be
+    /// paying into a pool that no longer exists.
+    fn row_harvest(&self) -> i32 {
+        let per_cell: u32 = self
+            .rules()
+            .iter()
+            .filter_map(|r| match r {
+                crate::rule::Rule::RowHarvest { per_cell } => Some(*per_cell),
+                _ => None,
+            })
+            .sum();
+        if per_cell == 0 {
+            return 0;
+        }
+        // And the expert's knob on top of the rule's own number.
+        let extra = match self.expert_power() {
+            Some(crate::expert::ExpertPower::PatentedFunnel { per_cell, .. }) => per_cell.max(0),
+            _ => 0,
+        };
+        let per_cell = per_cell as i32 + extra;
+        let w = crate::slot::SLOT_W;
+        let mut rows = 0i32;
+        for k in SlotKind::ALL {
+            let slot = self.loadout.slot(k);
+            for y in 0..slot.rows() {
+                if (0..w).all(|x| slot.get(x, y).is_some()) {
+                    rows += 1;
+                }
+            }
+        }
+        rows * w as i32 * per_cell
+    }
+
+    /// Work one bare underlay cell per call, `times` times, on empty frames.
+    ///
+    /// **The only thing in the game that changes the underlay**, and it is
+    /// deliberately the slowest: one cell, on a frame with nothing seated in
+    /// it, once every few turns of a fight that has already happened.
+    ///
+    /// # It spreads on the diagonal, and that is not a detail
+    ///
+    /// `PLAN-M13.md` §4.2 says *the kind orthogonally next to it*. That would
+    /// **destroy** the thing it copied: `Slot::enchant_is_live` pays an
+    /// enchantment nothing at all while another touches it edge-on, so a copy
+    /// laid beside its source kills both, and the node would be a point spent
+    /// on making yourself worse. The engine's own sentence is *"enchantments
+    /// have to be spread out to be live, and gear has to be packed tight on
+    /// top of one to bond with it"* — so working outward a **corner** at a time
+    /// is the tightest spread this board allows, and the borrowed idea survives
+    /// intact: what is next to what still decides what you get.
+    ///
+    /// Returns how many cells were worked, which may be fewer than asked —
+    /// a frame whose underlay is bare throughout has nothing to copy, and one
+    /// with no room left spreads nothing and says so by returning less.
+    pub fn spread_underlay(&mut self, times: u32) -> u32 {
+        let mut done = 0;
+        for _ in 0..times {
+            if !self.spread_one() {
+                break;
+            }
+            done += 1;
+        }
+        done
+    }
+
+    /// One cell. `false` when there is nowhere left to work.
+    fn spread_one(&mut self) -> bool {
+        const CORNERS: [(i32, i32); 4] = [(-1, -1), (1, -1), (-1, 1), (1, 1)];
+        for k in SlotKind::ALL {
+            // **Only a frame with nothing in it.** An empty frame is what this
+            // whole class is about, and a frame you are wearing gear on is one
+            // whose underlay you arranged on purpose.
+            if !self.loadout.slot(k).worn().is_empty() {
+                continue;
+            }
+            let w = crate::slot::SLOT_W;
+            let rows = self.loadout.slot(k).rows();
+            for y in 0..rows {
+                for x in 0..w {
+                    if self.loadout.slot(k).enchant_at(x, y).is_some() {
+                        continue;
+                    }
+                    // A source at a corner, and nothing at an edge — the second
+                    // half is what keeps both live.
+                    let orth = [(0i32, -1i32), (0, 1), (-1, 0), (1, 0)].iter().any(|&(dx, dy)| {
+                        let (nx, ny) = (x as i32 + dx, y as i32 + dy);
+                        nx >= 0
+                            && ny >= 0
+                            && nx < w as i32
+                            && ny < rows as i32
+                            && self.loadout.slot(k).enchant_at(nx as u8, ny as u8).is_some()
+                    });
+                    if orth {
+                        continue;
+                    }
+                    let Some(source) = CORNERS.iter().find_map(|&(dx, dy)| {
+                        let (nx, ny) = (x as i32 + dx, y as i32 + dy);
+                        (nx >= 0 && ny >= 0 && nx < w as i32 && ny < rows as i32)
+                            .then(|| self.loadout.slot(k).enchant_at(nx as u8, ny as u8))
+                            .flatten()
+                    }) else {
+                        continue;
+                    };
+                    // A copy of that kind, in its own rotation, laid where it
+                    // fits. `can_place` is asked rather than assumed, because
+                    // an enchantment may be more than one cell.
+                    let def = self.registry.def_index(source);
+                    let rot = self.registry.rotation(source);
+                    let id = self.registry.alloc(def);
+                    self.registry.set_rotation(id, rot);
+                    let slot = self.loadout.slot_mut(k);
+                    if slot.can_place(&self.registry, id, x, y).is_ok() {
+                        slot.place(&self.registry, id, x, y);
+                        // **Undone if it killed anything.** The check above is
+                        // about the anchor cell; a multi-cell enchantment can
+                        // still land an edge against a neighbour, and a rule
+                        // that made the board worse is the failure this whole
+                        // divergence exists to avoid.
+                        let live = slot.enchant_is_live(id) && slot.enchant_is_live(source);
+                        if live {
+                            return true;
+                        }
+                        slot.remove(id);
+                    }
+                }
+            }
+        }
+        false
     }
 
     // ---------------------------------------------------------------- enchs
@@ -1617,8 +2165,32 @@ impl Character {
     }
 
     /// What is bolted to this component, if anything.
+    ///
+    /// **The first of them.** A component holds one for fourteen of the fifteen
+    /// classes; a Full Bill's holds up to four, and everything that wants the
+    /// whole rack asks [`Character::enchs_on`].
     pub fn ench_on(&self, piece: PieceId) -> Option<&crate::ench::Ench> {
         self.enchanted.iter().find(|e| e.on == piece)
+    }
+
+    /// Everything bolted to this component, in the order it went on.
+    pub fn enchs_on(&self, piece: PieceId) -> Vec<&crate::ench::Ench> {
+        self.enchanted.iter().filter(|e| e.on == piece).collect()
+    }
+
+    /// How many enchs one component will hold.
+    ///
+    /// **One, unless you are the expert whose promise is the second rack.**
+    /// Full Bill is *both licences on one counter*, and `racks` is the number
+    /// it sells points to move — so this is the one place the rule is answered
+    /// and `attach_ench` is the one place it is enforced. Derived off
+    /// `expert_power`, so a point spent on `fb-second-rack` is a rack the next
+    /// time anything asks, without a field anywhere saying so.
+    pub fn ench_racks(&self) -> usize {
+        match self.expert_power() {
+            Some(crate::expert::ExpertPower::FullBill { racks, .. }) => racks.max(1) as usize,
+            _ => 1,
+        }
     }
 
     /// Buy the paper. Idempotent: nobody sells you a second one.
@@ -1709,12 +2281,27 @@ impl Character {
         if !self.owned.contains(&piece) {
             return Err(Refusal::NoSuchPiece);
         }
-        // **One ench a component.** Two is a bigger space and a bigger screen,
-        // and neither has earned its place. Enforced here rather than assumed
-        // by whatever is drawing the rack.
-        if let Some(there) = self.ench_on(piece) {
-            let what = data.get(&there.id).map(|d| d.name.clone()).unwrap_or_else(|| there.id.clone());
-            return Err(Refusal::AlreadyEnched(what));
+        // **As many as the rack holds**, which is one for everybody but a Full
+        // Bill. Enforced here rather than assumed by whatever is drawing the
+        // rack, and counted rather than asked-whether-any: `racks` was a knob
+        // two nodes sold and nothing read until M13.6, which is the whole of
+        // what that milestone is for.
+        //
+        // Nothing refuses a second copy of the *same* ench by name, and that is
+        // not an oversight: `enchs_loose` has already refused unless you own
+        // two of them, and owning two is exactly what Full Bill's own tree
+        // hands over.
+        let racks = self.ench_racks();
+        let on = self.enchs_on(piece);
+        if on.len() >= racks {
+            let what = on
+                .iter()
+                .map(|e| {
+                    data.get(&e.id).map(|d| d.name.clone()).unwrap_or_else(|| e.id.clone())
+                })
+                .collect::<Vec<_>>()
+                .join(" and ");
+            return Err(Refusal::AlreadyEnched(what, racks));
         }
         // **Nothing comes out of `enchs_owned`.** It is what you have rather
         // than what is loose, and `enchs_loose` subtracts what is bolted on —
@@ -1729,8 +2316,15 @@ impl Character {
     }
 
     /// Take one off. It goes back in the rack. Returns which, or nothing.
-    pub fn detach_ench(&mut self, piece: PieceId) -> Option<String> {
-        let at = self.enchanted.iter().position(|e| e.on == piece)?;
+    ///
+    /// **`nth` is its place in that component's rack**, not in `enchanted`, and
+    /// it exists because a Full Bill's component holds up to four — a screen
+    /// showing four rows and a function that could only reach one of them would
+    /// be three buttons that do somebody else's job. `nth` past the end is the
+    /// last one on, so the ordinary caller passes `usize::MAX` and gets the
+    /// stack's answer: taking one off takes off the one you just put on.
+    pub fn detach_ench(&mut self, piece: PieceId, nth: usize) -> Option<String> {
+        let at = self.nth_ench(piece, nth)?;
         let e = self.enchanted.remove(at);
         // **And nothing goes back into `enchs_owned`.** It never left: taking
         // one off is one fewer entry in `enchanted`, and `enchs_loose` reads
@@ -1739,9 +2333,29 @@ impl Character {
         Some(e.id)
     }
 
+    /// Where in `enchanted` the `nth` ench on this component is.
+    ///
+    /// **One walk, two callers**, because *which of the four did they click*
+    /// is one question and two answers to it would part the first time a rack
+    /// was reordered. Past the end is the last one, which is the stack answer
+    /// every caller but the rack screen wants.
+    fn nth_ench(&self, piece: PieceId, nth: usize) -> Option<usize> {
+        let mine: Vec<usize> = self
+            .enchanted
+            .iter()
+            .enumerate()
+            .filter(|(_, e)| e.on == piece)
+            .map(|(i, _)| i)
+            .collect();
+        mine.get(nth).copied().or_else(|| mine.last().copied())
+    }
+
     /// Switch one on or off where it is. Returns the new state.
-    pub fn toggle_ench(&mut self, piece: PieceId) -> Option<bool> {
-        let e = self.enchanted.iter_mut().find(|e| e.on == piece)?;
+    ///
+    /// `nth` is read the way [`Character::detach_ench`] reads it.
+    pub fn toggle_ench(&mut self, piece: PieceId, nth: usize) -> Option<bool> {
+        let at = self.nth_ench(piece, nth)?;
+        let e = &mut self.enchanted[at];
         e.active = !e.active;
         Some(e.active)
     }
@@ -1752,14 +2366,9 @@ impl Character {
     /// it back to the rack rather than leaving an attachment pointing at
     /// something the character has not got.
     pub fn tidy_enchs(&mut self) {
-        let gone: Vec<PieceId> = self
-            .enchanted
-            .iter()
-            .map(|e| e.on)
-            .filter(|p| !self.owned.contains(p))
-            .collect();
-        for p in gone {
-            self.detach_ench(p);
-        }
+        // **Every attachment, not one a component**: a Full Bill's rack holds
+        // more than one, and dropping the first would leave the rest pointing
+        // at a component that is gone.
+        self.enchanted.retain(|e| self.owned.contains(&e.on));
     }
 }

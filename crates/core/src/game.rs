@@ -345,6 +345,109 @@ impl Game {
         Ok(price)
     }
 
+    /// The three papers on Spike's counter, refused ones included.
+    ///
+    /// **A refused line is drawn, priced and reasoned.** That is the whole of
+    /// what `StockGate` is for: a locked line you can read is a goal, and an
+    /// absent one is a secret. Returns `(paper, name, what it says, price,
+    /// why not)` — `None` for a paper this character has already answered, so
+    /// the counter shortens as you buy rather than keeping a sold line
+    /// forever. That is a deliberate difference from the shelf, where the gap
+    /// **is** the memory of what you took: a paper is not a thing you might
+    /// have bought a second of.
+    pub fn papers(&self) -> Vec<PaperLine> {
+        use crate::shop::Paper;
+        let level = self.character.level();
+        let finished = self.character.finished_trees();
+        let of = self.character.classes().count() as u8;
+        let mut out = Vec::new();
+        for p in Paper::ALL {
+            // What each paper is *for*, and whether it is already answered.
+            let (name, says, answered) = match p {
+                Paper::Patent => (
+                    "A licence of your own".to_string(),
+                    "bolt an ench onto a component, which your class does not let you do"
+                        .to_string(),
+                    self.character.licensed(),
+                ),
+                Paper::Second => (
+                    "The Second Paper".to_string(),
+                    "a second class, off the four you did not take. Its nodes cost 2 a point"
+                        .to_string(),
+                    self.character.second_class.is_some() || self.character.second_paper,
+                ),
+                Paper::Expert => {
+                    // **The line prints the expert's own promise**, so a player
+                    // choosing a second class can see what that pairing
+                    // eventually reaches. That is the pairing decision made in
+                    // daylight, which is what a fork screen is for and this one
+                    // has no screen.
+                    let reach = self.character.expert_on_offer();
+                    (
+                        match reach {
+                            Some(e) => format!("The {} paper", e.name),
+                            None => "The expert paper".to_string(),
+                        },
+                        match reach {
+                            Some(e) => e.power.describe(),
+                            None => "whichever expert the two classes you hold reach"
+                                .to_string(),
+                        },
+                        self.character.expert.is_some(),
+                    )
+                }
+            };
+            if answered {
+                continue;
+            }
+            let why = p
+                .gate()
+                .filter(|g| !g.met(level, finished))
+                .map(|g| g.refusal(level, finished, of));
+            out.push(PaperLine {
+                paper: p,
+                name,
+                says,
+                price: p.price(),
+                afford: self.character.gold >= p.price(),
+                why,
+            });
+        }
+        out
+    }
+
+    /// Buy — or take — one of the three papers.
+    ///
+    /// **Refuses in named ways and spends nothing when it does**, which is the
+    /// reroll's rule and the bank's: the first thing anybody does with a
+    /// refused button is press it again.
+    pub fn buy_paper(&mut self, which: crate::shop::Paper) -> Result<i32, String> {
+        use crate::shop::Paper;
+        let line = self
+            .papers()
+            .into_iter()
+            .find(|l| l.paper == which)
+            .ok_or("he has nothing else to sell you of that kind")?;
+        if let Some(why) = line.why {
+            return Err(format!("He wants {why}."));
+        }
+        if self.character.gold < line.price {
+            return Err(format!("{} Fnorp, and you have {}.", line.price, self.character.gold));
+        }
+        match which {
+            Paper::Patent => self.character.buy_licence(),
+            Paper::Second => self.character.second_paper = true,
+            // **Taken rather than bought, and answered on the spot.** The other
+            // two hand over a permission; this one hands over the class,
+            // because there is nothing to choose — the pair already chose.
+            Paper::Expert => {
+                self.character.take_expert()?;
+            }
+        }
+        self.character.gold -= line.price;
+        Ok(line.price)
+    }
+
     // ----------------------------------------------------------- rerolls
 
     /// Wipe the reroll counters if the character has crossed a ten-level band.
@@ -637,6 +740,23 @@ impl Default for Game {
 ///
 /// This is the equality M1's round-trip property is stated in, so what it
 /// counts is exactly what a save is required to preserve.
+/// One line of Spike's paper counter, as a screen needs it.
+///
+/// `why` is `Some` for a line that is drawn and refused — which is most of
+/// them, most of the time, and is the point.
+#[derive(Clone, Debug)]
+pub struct PaperLine {
+    pub paper: crate::shop::Paper,
+    pub name: String,
+    /// What it does, in the engine's own words. TONE 13a: somebody comparing
+    /// two papers is comparing what they buy.
+    pub says: String,
+    pub price: i32,
+    pub afford: bool,
+    /// Why he will not sell it yet, with the count in it.
+    pub why: Option<String>,
+}
+
 impl PartialEq for Game {
     fn eq(&self, other: &Self) -> bool {
         let a = &self.character;
@@ -664,6 +784,16 @@ impl PartialEq for Game {
             && a.skill_points == b.skill_points
             && a.skills_taken == b.skills_taken
             && a.class == b.class
+            // **The other two classes and the unspent paper.** This operator
+            // lists fields by name, so a field the save carries and this does
+            // not is a field that round-trips green and is quietly lost —
+            // which is what the comment one field down warns about, and what
+            // `banked` had to learn.
+            && a.second_class == b.second_class
+            && a.expert == b.expert
+            && a.second_paper == b.second_paper
+            && a.fast_wins == b.fast_wins
+            && a.told_curses == b.told_curses
             && a.enchs_owned == b.enchs_owned
             // What is in the bank, which is not in `owned` and so is compared
             // nowhere above. A save that dropped it would round-trip green

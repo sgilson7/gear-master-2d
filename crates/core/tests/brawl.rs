@@ -271,6 +271,7 @@ fn derail_reads_the_front_foe_and_not_the_others() {
         turn_cycle: Vec::new(),
         spins: false,
         fragile: false,
+        enched: false,
         attracts_curses: false,
         steady: false,
         overtakes: false,

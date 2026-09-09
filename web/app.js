@@ -7,10 +7,10 @@ import init, {
   world_json, position, try_step, event_json, answer,
   save_json, load_json, new_game, apply_preset,
   shop_json, bench_json, buy, buy_barrel, order, collect_order, buy_supply, buy_ench,
-  reroll_barrel, reroll_ledger, buy_licence, use_supply, quests_json, take_quest, hand_in_quest, bank_xp,
+  reroll_barrel, reroll_ledger, buy_paper, use_supply, quests_json, take_quest, hand_in_quest, bank_xp,
   quest_log_json, guide_json, pin_quest,
   character_json, skills_json, take_skill, pressure_json, pools_json,
-  class_offer_json, choose_class, class_name, all_trees_json,
+  class_offer_json, choose_class, choose_second_class, class_name, all_trees_json,
   gold, piece_count, version, save_version,
   board_json, legal_anchors, place, pick_up, rotate, toggle_lock, undo, clear_board,
   look_json, look_over,
@@ -461,6 +461,24 @@ function paintSheet(c) {
   const rows = (c.stats ?? [])
     .filter((s) => s.n)
     .map((s) => `<li><b>${s.n}${s.unit}</b> ${s.label}</li>`);
+  // **What you are, all of it.** Up to three since M13 — a class, a second off
+  // Spike's paper, and the expert the pair reaches — and the sheet is the one
+  // screen that says so. The promise is the engine's own sentence and is the
+  // *tuned* one, so a point spent on a knob reads back here; the name is the
+  // theme's, like every other name.
+  for (const k of c.classes ?? []) {
+    rows.push(`<li class="rule" title="${k.promise}">you are a <b>${k.name}</b> — ${k.promise}</li>`);
+  }
+  // **A paper bought and not yet answered**, because it is spent on the choice
+  // rather than on the purchase and a thing in your pack that no screen
+  // mentions is a thing you have forgotten you own.
+  if (c.second_paper) {
+    // **Clickable, because that is what "in your pack" means.** The paper is
+    // spent on the choice rather than on the purchase, so it has to be openable
+    // — and this is the only line in the game that names it.
+    rows.push(`<li class="rule"><button type="button" class="linky" data-open-paper>` +
+              `Spike's second paper is in your pack — say what else you are</button></li>`);
+  }
   // Both numbers, because "160, and 24 of it is missing" is the pair a player
   // decides on.
   if (c.fatigue > 0) {
@@ -497,6 +515,11 @@ function paintSheet(c) {
   for (const id of ['sheet', 'pack-sheet']) {
     const el = $(id);
     if (el) el.innerHTML = html;
+    // Both copies of the list, because both are painted from the same string
+    // and a handler bound to one of them would work on one screen only.
+    el?.querySelector('[data-open-paper]')?.addEventListener('click', () => {
+      offerClass({ paper: true });
+    });
   }
 }
 
@@ -989,6 +1012,12 @@ function runFight() {
 /// picked up.
 let holdingEnch = null;
 
+/// Small numbers, as words. The house style spells them out — `tests/tone.rs`
+/// had to learn to read them, and the same rule applies on this side of the
+/// wire.
+const WORDS = ['no', 'one', 'two', 'three', 'four', 'five'];
+const ORDINALS = ['first', 'second', 'third', 'fourth', 'fifth'];
+
 /// What you own loose, and what is already bolted to something.
 ///
 /// **Only for a licensee.** Enching is what the Kaklon Patent is, so the rack
@@ -1013,9 +1042,16 @@ function paintRack() {
   // of nothing on a screen you cannot use is noise.
   const shelved = (r.loose ?? []).length || (r.on ?? []).length;
   $('rack').hidden = !r.licensed && !shelved;
+  // **How many a component holds is core's number**, off `Character::ench_racks`
+  // — which is Full Bill's `racks` knob. This line read "One ench a component"
+  // while that expert's held four, which is the sentence its whole promise is.
+  const holds = r.racks ?? 1;
   $('rack-note').textContent = r.licensed
     ? `Click an ench, then click the component you want it on. Click a bolted ` +
-      `one to switch it off; click it again to take it back. One ench a component.`
+      `one to switch it off; click it again to take it back. ` +
+      (holds === 1
+        ? 'One ench a component.'
+        : `${(WORDS[holds] ?? String(holds)).replace(/^./, (c) => c.toUpperCase())} enchs a component.`)
     : `Yours, and nothing you can do with one yet — bolting an ench to a ` +
       `component is the Kaklon Patent's, and you are not a licensee.`;
   if (!r.licensed) {
@@ -1070,21 +1106,26 @@ function paintRack() {
     const b = document.createElement('button');
     b.type = 'button';
     b.className = 'wares ench' + (e.active ? '' : ' sold');
+    // **The piece *and* where in its rack**, because a Full Bill's component
+    // holds up to four and `detach_ench` takes both. A row keyed on the
+    // component alone would give four buttons that all reached the same ench.
     b.dataset.enchOn = String(e.piece);
+    b.dataset.enchNth = String(e.nth ?? 0);
     b.innerHTML = `<b>${e.name}</b>` +
       `<span class="spec">${e.spec}</span>` +
-      `<span class="meta">on ${e.on}</span>` +
+      `<span class="meta">on ${e.on}${holds > 1 ? ` · ${ORDINALS[e.nth] ?? `#${e.nth + 1}`} of its rack` : ''}</span>` +
       `<span class="cost">${e.active ? 'switched on — click to switch off'
                                      : 'switched off — click to take it back'}</span>`;
     // One button, two steps, and in that order on purpose: switching off is
     // the reversible half and is what somebody trying an arrangement wants,
     // so it is the first click rather than the second.
     b.onclick = () => {
+      const nth = e.nth ?? 0;
       if (e.active) {
-        toggle_ench(e.piece);
+        toggle_ench(e.piece, nth);
         boardSays(`${e.name} switched off.`);
       } else {
-        detach_ench(e.piece);
+        detach_ench(e.piece, nth);
         boardSays(`${e.name} back in the rack.`);
       }
       $('board-says').classList.remove('bad');
@@ -1362,9 +1403,37 @@ function boardSays(text) {
 // Offered the moment the level lands, and offered again on every load until it
 // is answered — a save made before five is still asked, and so is one made at
 // nine by somebody who closed the tab.
-function offerClass() {
+//
+// **And the same screen answers the second fork**, which is the paper's rather
+// than the level's. `class_offer_json` says which of the two it is handing
+// over; nothing here works that out, because *a rule with two homes is a rule
+// with two answers* and this one has been in core since M13.0.
+function offerClass({ paper = false } = {}) {
   const o = JSON.parse(class_offer_json());
   if (!o) return false;
+  const second = o.kind === 'second';
+  // **The level-five fork is raised at every opportunity and the second one is
+  // not**, and that is the whole difference between them. An unanswered
+  // question keeps being asked; a paper you bought and are sleeping on is a
+  // decision you already made once, and a screen that came back after every
+  // fight would be the game refusing to let you sleep on it. So the second
+  // fork opens where a player asks for it: when they buy the paper, and from
+  // the line on the sheet that says it is in their pack.
+  if (second && !paper) return false;
+  $('fork-eyebrow').textContent = second ? "Spike's paper" : 'level five';
+  $('fork-title').textContent = second ? 'What else you are' : 'What you are';
+  $('fork-note').textContent = second
+    ? 'The paper is in your pack and stays there until you answer. Whichever you take, ' +
+      'the pair of you reaches somebody eventually — each of these says who. It does not come off.'
+    : 'You have been out of the pit long enough that people have started deciding what you ' +
+      'are. This is the one time you get a say in it, and it does not come off.';
+  // **The way out exists only on the second one**, and it is on the screen
+  // rather than only on Escape: a thing that works and cannot be seen is a
+  // thing that does not work, which this project has now written down five
+  // times. The level-five fork has no way out but through.
+  const out = $('fork-close');
+  out.hidden = !o.escapable;
+  out.onclick = () => closeFork();
   const box = $('fork-choices');
   box.replaceChildren();
   for (const c of o.classes) {
@@ -1384,16 +1453,29 @@ function offerClass() {
                   // the compact version only repeated the first clause of it.
                   `<span class="promise">${c.promise}</span>` +
                   `<span class="flavour">${c.blurb}</span>` +
+                  // **What the pair reaches, named on the card.** This is the
+                  // whole reason the second fork is a screen rather than a
+                  // menu: the pairing is the decision, and `PLAN-M13-2.md` §1.2
+                  // asks for it to be made in daylight. The expert's promise is
+                  // the engine's own sentence, like the class's above it.
+                  (c.reaches
+                    ? `<span class="meta">with what you are, this eventually reaches ` +
+                      `<b>${c.reaches.name}</b> — ${c.reaches.promise}</span>`
+                    : '') +
                   `<span class="meta">${c.nodes} skills of its own to spend points on</span>`;
     b.onclick = () => {
-      const why = choose_class(c.canonical);
+      // Two doors, and the page knows which it is standing at. Each refuses
+      // for its own reasons and says so in its own words.
+      const why = second ? choose_second_class(c.canonical) : choose_class(c.canonical);
       if (why) {
         const el = $('fork-says');
         el.textContent = why; el.hidden = false; el.classList.add('bad');
         return;
       }
       $('fork').hidden = true;
-      paintYou(c.canonical);
+      // The figure is the *first* class's and stays that way: a second class
+      // is a thing you also are, not a thing you became instead.
+      if (!second) paintYou(c.canonical);
       paintPanel(); draw(); autosave();
       openTree();
     };
@@ -1401,6 +1483,18 @@ function offerClass() {
   }
   $('fork').hidden = false;
   return true;
+}
+
+/// Put the second fork down without answering it.
+///
+/// **Only the second one closes**, and the paper is still in the pack — it is
+/// spent on the choice rather than on the purchase, so the screen comes back
+/// on the next load and on the next visit to the counter.
+function closeFork() {
+  $('fork').hidden = true;
+  $('fork-says').hidden = true;
+  log('The paper is still in your pack.');
+  paintPanel();
 }
 
 // ---------------------------------------------------------------- the tree
@@ -1466,6 +1560,13 @@ function paintTree() {
 
   const tree = trees.find((t) => t.id === openTreeId);
   $('tree-which').textContent = tree?.name ?? '';
+  // **The promise at the head of a class tree**, and it is the *tuned* one —
+  // `all_trees_json` reads it off `class_defs`, so a knob a point in this tree
+  // moved changes the sentence over the tree that moved it. Every node under it
+  // is a footnote to that line. The base tree has no class and no promise.
+  const says = $('tree-promise');
+  says.textContent = tree?.promise ?? '';
+  says.hidden = !tree?.promise;
   const box = $('nodes');
   box.replaceChildren();
   if (!tree) return;
@@ -2018,6 +2119,14 @@ function paintTins() {
   }
 }
 
+/// What he says when he hands one over. One line each, because the three do
+/// three different things and "bought" tells nobody which.
+const SIGNED = {
+  'licence': 'Signed, dated next year, and yours. You may bolt things on now.',
+  'second-paper': 'Signed, and folded into your pack. It stays there until you say what else you are.',
+  'expert-paper': 'He does not charge you. He writes the name down twice and keeps the carbon.',
+};
+
 /// What the van has on the table.
 ///
 /// **No town sells an ench.** Every trading town kept a bench until M10, which
@@ -2039,26 +2148,40 @@ function paintVendor() {
   }));
   const box = $('vendor-stock');
   box.replaceChildren();
-  // **The paper, before the things it lets you bolt on.** He sells the licence
-  // to anybody whose class did not come with one, once, and the fork does not
-  // come off — so without this a character who took Gorillathon at five can be
-  // paid an ench by an errand for the rest of the game and never use one.
-  if (v.licence && v.licence.needed) {
+  // **The papers, before the things they let you bolt on.** Three of them now,
+  // all drawn from the first visit and the refused ones greyed with the reason
+  // on the line: *a locked line on a shelf you can read is a goal; an absent
+  // line is a secret.* The Patent is one of the three — this used to draw it by
+  // itself, off `v.licence`, and both halves would have had to be kept in step.
+  //
+  // Every sentence on a refused line is core's: `StockGate::refusal` has the
+  // count in it, because a button that greys with no reason is a button a
+  // player reports as a bug — which this project has now written down four
+  // times.
+  for (const p of v.papers ?? []) {
     const l = document.createElement('button');
     l.type = 'button';
-    l.className = 'wares ench licence';
-    l.id = 'buy-licence';
-    l.disabled = !v.licence.afford;
-    l.innerHTML = '<b>A licence of your own</b>' +
-      '<span class="spec">lets you bolt an ench to a component</span>' +
-      '<span class="flavour">He turns the paper round again. There is a second sheet under it ' +
-      'with a space on it, and he has a pen.</span>' +
-      `<span class="cost">${v.licence.price} Fnorp</span>`;
+    l.className = 'wares ench licence' + (p.why ? ' sold' : '');
+    l.dataset.paper = p.id;
+    // The gate's own line keeps its old id, because the browser gate reaches
+    // for it by name and it is still the same purchase.
+    if (p.id === 'licence') l.id = 'buy-licence';
+    l.disabled = !!p.why || !p.afford;
+    l.innerHTML = `<b>${p.name}</b>` +
+      `<span class="spec">${p.says}</span>` +
+      (p.why ? `<span class="flavour">He wants ${p.why}.</span>` : '') +
+      `<span class="cost">${p.price > 0 ? `${p.price} Fnorp` : 'nothing — you have paid twice already'}` +
+      `${p.why ? ' · not yet' : ''}</span>`;
     l.onclick = () => {
-      const r = JSON.parse(buy_licence());
-      vendorSays(r.error || 'Signed, dated next year, and yours. You may bolt things on now.',
-                 !!r.error);
+      const why = buy_paper(p.id);
+      vendorSays(why || SIGNED[p.id] || 'Signed, dated next year, and yours.', !!why);
       paintVendor(); paintPanel(); autosave();
+      // **Two of the three open a screen the moment they are taken.** The
+      // second paper re-raises the fork — it is spent on the choice, not on
+      // the purchase — and the expert paper *is* the class, so the tree it
+      // unlocks is where a player wants to be standing.
+      if (!why && p.id === 'second-paper') offerClass({ paper: true });
+      if (!why && p.id === 'expert-paper') openTree();
     };
     box.appendChild(l);
   }
@@ -2539,10 +2662,18 @@ async function main() {
       if (e.key === 'Escape') closeEnding();
       return;
     }
-    // The fork has no way out but through. It is the one screen in the game
-    // that does not take Escape, because it is the one decision that does not
-    // come off.
-    if (!$('fork').hidden) return;
+    // The level-five fork has no way out but through. It is the one screen in
+    // the game that does not take Escape, because it is the one decision that
+    // does not come off and has not been paid for.
+    //
+    // **The second fork does take it**, and the difference is who asked: that
+    // one was bought, the paper stays in the pack until it is answered, and a
+    // player with a receipt is allowed to sleep on it. Which of the two is on
+    // screen is core's answer, carried on the button's own visibility.
+    if (!$('fork').hidden) {
+      if (e.key === 'Escape' && !$('fork-close').hidden) closeFork();
+      return;
+    }
     if (e.key === 'Escape' && !$('combat').hidden) { closeCombatLog(); return; }
     // **The original's keys**, and they are only live while a replay is on
     // screen: space pauses, right steps to the next thing that happened, up
@@ -2660,6 +2791,11 @@ async function main() {
   // answer rather than against a list written twice.
   window.__pools = () => JSON.parse(pools_json());
   window.__shopJson = () => shop_json();
+  // The rack, for the gate: a Full Bill's component holds more than one, and
+  // what proves it is bolting a second one on through the same door the screen
+  // uses rather than a privileged export of its own.
+  window.__attachEnch = (id, piece) => attach_ench(id, piece);
+  window.__benchJson = () => JSON.parse(bench_json());
   window.__trees = () => JSON.parse(all_trees_json());
   window.__places = () => world.places;
   window.__world = () => world;

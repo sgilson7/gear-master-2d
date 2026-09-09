@@ -121,7 +121,15 @@ impl Allowances {
                 // goes down on it.
                 | Rule::Survey { .. }
                 // A gesture, not a step. Nothing about walking reads it.
-                | Rule::Homeward => {}
+                | Rule::Homeward
+                // M13's four. Two are the board's, read when a fight starts or
+                // when one ends; two are the fight's own. None of the four is
+                // about whether a tile can be stood on, and this arm is where
+                // that is decided rather than left silent.
+                | Rule::Spread { .. }
+                | Rule::RowHarvest { .. }
+                | Rule::Beacon { .. }
+                | Rule::Productivity { .. } => {}
             }
         }
         out

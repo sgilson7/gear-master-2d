@@ -13,11 +13,15 @@
 //! one: **no shape, no grid, and it is attached rather than worn**. Forcing it
 //! into `PieceDef` would make each of those a special case.
 //!
-//! # One ench a component
+//! # One ench a component, and two for a Full Bill
 //!
-//! Deliberately. Two is a bigger design space and a much bigger interface, and
-//! neither has earned its place yet. The rule is enforced in [`attach`] rather
-//! than assumed by the screens.
+//! One, deliberately: two is a bigger design space and a much bigger interface,
+//! and for fourteen of the fifteen classes neither has earned its place. The
+//! exception is the expert whose whole promise *is* the second rack — Full
+//! Bill, both licences on one counter — and it moves the number rather than the
+//! rule. `Character::ench_racks` is the one answer to *how many does a
+//! component hold*, and `Character::attach_ench` is where it is enforced, so
+//! the screens still assume nothing.
 //!
 //! # The attachment is to the piece, not to the cell
 //!
@@ -165,6 +169,29 @@ impl Effect {
     ///
     /// Exhaustive on purpose: a new effect is a compile error here until
     /// somebody has said what the fight does with it.
+    /// This effect at `pct` of its strength, or `None` for one that cannot be
+    /// had in part.
+    ///
+    /// **A switch has no fraction.** `Spin` is on or off and `Fragile` is a
+    /// bargain — power bought with firing once — so neither can be lent at
+    /// forty percent, and lending `Fragile` would hand a neighbour the cost
+    /// without the power. Returning `None` says so where the type can enforce
+    /// it, rather than leaving a caller to remember.
+    pub fn scaled(&self, pct: u32) -> Option<Effect> {
+        let share = |n: i32| n * pct as i32 / 100;
+        match self {
+            Effect::Power { pct: p } => {
+                let n = share(*p);
+                (n != 0).then_some(Effect::Power { pct: n })
+            }
+            Effect::Haste { pct: p } => {
+                let n = share(*p);
+                (n != 0).then_some(Effect::Haste { pct: n })
+            }
+            Effect::Spin | Effect::Fragile { .. } => None,
+        }
+    }
+
     pub fn apply(&self, p: &mut ItemProfile) {
         match self {
             Effect::Power { pct } => p.power += pct,
@@ -261,8 +288,11 @@ pub enum Refusal {
     NotYours,
     /// This character is not licensed to bolt anything to anything.
     NoLicence,
-    /// Something is already on that component.
-    AlreadyEnched(String),
+    /// The component's rack is full. Carries what is on it, and how many it
+    /// holds — **both**, because *"the Ponkey Turn is already on that"* and
+    /// *"that component holds one"* are two different pieces of news and a
+    /// player with a second rack needs the second one.
+    AlreadyEnched(String, usize),
     /// This ench is already on something else.
     AlreadyPlaced,
     NoSuchPiece,
@@ -274,7 +304,22 @@ impl std::fmt::Display for Refusal {
             Refusal::NoSuchEnch => write!(f, "there is no such ench"),
             Refusal::NotYours => write!(f, "you have not got one of those"),
             Refusal::NoLicence => write!(f, "you are not licensed to bolt anything to anything"),
-            Refusal::AlreadyEnched(what) => write!(f, "{what} is already on that component"),
+            // Spelled out, because a small number in prose is a word — the
+            // house style `tests/tone.rs` had to learn to read.
+            Refusal::AlreadyEnched(what, racks) => {
+                let n = match racks {
+                    1 => "one".into(),
+                    2 => "two".into(),
+                    3 => "three".into(),
+                    4 => "four".into(),
+                    n => n.to_string(),
+                };
+                write!(
+                    f,
+                    "that component holds {n}, and {what} {} on it",
+                    if *racks == 1 { "is" } else { "are" }
+                )
+            }
             Refusal::AlreadyPlaced => write!(f, "that one is already bolted to something"),
             Refusal::NoSuchPiece => write!(f, "you do not own that component"),
         }
@@ -299,6 +344,56 @@ pub fn apply(profiles: &mut [ItemProfile], enchanted: &[Ench], data: &EnchsData)
         for p in profiles.iter_mut() {
             if p.pieces.contains(&e.on) {
                 def.effect.apply(p);
+            }
+        }
+    }
+}
+
+/// `Rule::Beacon`: an enched component lends `pct` of each ench it carries to
+/// every finished item touching it in the same grid.
+///
+/// **Lending is not spending** — the lender keeps what it has — and **it does
+/// not chain**: the lenders are worked out from `enchanted`, which is the list
+/// of enchs somebody actually bolted on, so what a neighbour is lent is never
+/// itself lent onward. A packed chest that broadcast its own broadcast would
+/// reach a fixed point, and the fixed point would be the game.
+///
+/// Adjacency is `ItemProfile::adjacent_items` — edge-sharing between *finished
+/// items* in one grid, which `loadout.rs` already walks for its groups and
+/// `Axis::Weave` already scores. This adds a reader and not a geometry, and a
+/// corner is not a touch.
+///
+/// **Only the two enchs that are a number lend.** `Spin` and `Fragile` are
+/// switches: forty percent of a switch is not a thing, and lending `Fragile`
+/// would *break* every neighbour — a beacon that punished packing rather than
+/// paying for it.
+pub fn broadcast(profiles: &mut [ItemProfile], enchanted: &[Ench], data: &EnchsData, pct: u32) {
+    if pct == 0 {
+        return;
+    }
+    // Gathered before anything is written, so a lend can never be lent on: the
+    // list is what was bolted on, in full, before the first neighbour moved.
+    let mut lends: Vec<(usize, Effect)> = Vec::new();
+    for e in enchanted {
+        if !e.active {
+            continue;
+        }
+        let Some(def) = data.get(&e.id) else { continue };
+        let Some(scaled) = def.effect.scaled(pct) else { continue };
+        for (i, p) in profiles.iter().enumerate() {
+            if p.pieces.contains(&e.on) {
+                lends.push((i, scaled.clone()));
+            }
+        }
+    }
+    for (lender, effect) in lends {
+        let neighbours = profiles[lender].adjacent_items.clone();
+        for n in neighbours {
+            // A grid holds its own items, so an index out of range is a
+            // profile list that was rebuilt under us. Skipped rather than
+            // panicked on, because a lend is a bonus and not a rule of walking.
+            if let Some(p) = profiles.get_mut(n) {
+                effect.apply(p);
             }
         }
     }

@@ -301,7 +301,26 @@ pub static PLAIN: Theme = Theme {
     ],
     pieces: &[],
     monsters: &[],
-    classes: &[],
+    // **Ten entries in a table that is otherwise empty on purpose.** Every
+    // other canonical class name reads as a name — "Berserker", "Ticket to
+    // Ride" — so the plain theme falls through to it and pays nothing. M13's
+    // ten are keyed on the `class` field of their tree, which is written
+    // `LoudCalculation`, and falling through would put that on a screen. They
+    // are here rather than renamed in the data because the canonical is what
+    // a save carries and what `tree_for_class` matches on, and a name is not
+    // worth a seam.
+    classes: &[
+        ("LoudCalculation", "Loud Calculation"),
+        ("StandingFact", "Standing Fact"),
+        ("OverwoundArm", "Overwound Arm"),
+        ("ShortProgramme", "Short Programme"),
+        ("CurseRequisition", "Curse Requisition"),
+        ("PatentedFunnel", "Patented Funnel"),
+        ("OpeningNumber", "Opening Number"),
+        ("CursedLicence", "Cursed Licence"),
+        ("EleventhSeason", "Eleventh Season"),
+        ("FullBill", "Full Bill"),
+    ],
     words: &[],
     vocabulary: &[],
     glossary: &[],
@@ -391,6 +410,26 @@ pub static TURTLE_DICK: Theme = Theme {
         ("Wanderer", "Plane Tourist"),          // half-tourist, half-catastrophe
         ("Warpriest", "Acolyte of Dobira"),     // the Master and Baylon, pp. 46-50
         ("Wellspring", "Soda Tycoon"),          // Skink Brink, pp. 4, 7-8, 53
+        // ---- M13's ten experts, one per pair of the five the fork deals ---
+        //
+        // **Spaced, and the canonical is not.** Every other canonical name in
+        // this game is display-safe English, so the plain theme's empty table
+        // has always been a safe fall-through. These ten are not: their
+        // canonical is the `class` key of a tree in `data/skills.json` and it
+        // is written `LoudCalculation`, so a theme with no entry would put
+        // `LoudCalculation` on a screen. Both themes carry all ten for that
+        // reason — see `PLAIN`, where the ten are the only entries in a table
+        // that is otherwise deliberately empty.
+        ("LoudCalculation", "Loud Calculation"),
+        ("StandingFact", "Standing Fact"),
+        ("OverwoundArm", "Overwound Arm"),
+        ("ShortProgramme", "Short Programme"),
+        ("CurseRequisition", "Curse Requisition"),
+        ("PatentedFunnel", "Patented Funnel"),
+        ("OpeningNumber", "Opening Number"),
+        ("CursedLicence", "Cursed Licence"),
+        ("EleventhSeason", "Eleventh Season"),
+        ("FullBill", "Full Bill"),
     ],
     pieces: &[
         // The catalogue, re-cast from the book. Grades are kept as grades: the

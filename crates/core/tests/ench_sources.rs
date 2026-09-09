@@ -63,16 +63,32 @@ fn every_ench_comes_from_somewhere() {
     let tree = data::skills();
     let quests = data::quests();
     let sold: Vec<String> = benches().iter().flat_map(|p| p.sells.clone()).collect();
-    let granted: Vec<String> = tree
-        .trees
-        .iter()
-        .flat_map(|t| &t.nodes)
-        .flat_map(|n| &n.effects)
-        .filter_map(|e| match e {
-            gm2d_core::skills::Effect::GivesEnch { ench } => Some(ench.clone()),
-            _ => None,
-        })
-        .collect();
+    // **Split by which kind of tree granted it, and the split is the point.**
+    // The no-duplicates rule below was written when there were three sources
+    // and all three were early; an expert tree is a fourth and is reached at
+    // the far end of a character, after two whole class trees are finished.
+    // Every ench in the game already has an owner, so an expert tree can only
+    // ever hand over a second copy of one — and for Full Bill, whose entire
+    // promise is *how many enchs fit on one component*, a second copy is the
+    // promise rather than a redundant source. `enchs_owned` is a list and says
+    // so where it is declared: two of the same ench are two things you can
+    // bolt to two components.
+    let ench_of = |n: &gm2d_core::skills::Node| -> Vec<String> {
+        n.effects
+            .iter()
+            .filter_map(|e| match e {
+                gm2d_core::skills::Effect::GivesEnch { ench } => Some(ench.clone()),
+                _ => None,
+            })
+            .collect()
+    };
+    let is_expert = |t: &gm2d_core::skills::Tree| {
+        t.class.as_deref().is_some_and(gm2d_core::expert::is_expert)
+    };
+    let granted: Vec<String> =
+        tree.trees.iter().filter(|t| !is_expert(t)).flat_map(|t| &t.nodes).flat_map(ench_of).collect();
+    let by_expert: Vec<String> =
+        tree.trees.iter().filter(|t| is_expert(t)).flat_map(|t| &t.nodes).flat_map(ench_of).collect();
     let paid: Vec<String> = quests.quests.iter().flat_map(|q| q.enchs.clone()).collect();
 
     for e in &enchs.enchs {
@@ -80,6 +96,7 @@ fn every_ench_comes_from_somewhere() {
             sold.contains(&e.id).then_some("a bench"),
             granted.contains(&e.id).then_some("a node"),
             paid.contains(&e.id).then_some("an errand"),
+            by_expert.contains(&e.id).then_some("an expert tree"),
         ]
         .into_iter()
         .flatten()
@@ -94,6 +111,17 @@ fn every_ench_comes_from_somewhere() {
     }
     for id in &paid {
         assert!(!sold.contains(id), "{id} is both paid and for sale");
+    }
+    // **And an expert tree may only ever hand over a second copy.** The other
+    // direction of the exemption above, and the half that keeps it honest: an
+    // expert node granting an ench nothing else in the game hands out would be
+    // a source hidden behind two finished trees, which is worse than a
+    // duplicate and is exactly what the orphan rule exists to stop.
+    for id in &by_expert {
+        assert!(
+            sold.contains(id) || granted.contains(id) || paid.contains(id),
+            "{id} comes only from an expert tree, which is the far end of the game"
+        );
     }
 }
 
@@ -309,7 +337,7 @@ fn attaching_does_not_spend_the_ench() {
     assert_eq!(c.enchs_loose(&id), 0, "it is on something");
     assert_eq!(c.enchs().iter().filter(|e| **e == id).count(), 1, "and it is still yours");
 
-    c.detach_ench(piece);
+    c.detach_ench(piece, usize::MAX);
     assert_eq!(c.enchs_loose(&id), 1, "taking it off gives it back");
     assert_eq!(
         c.enchs().iter().filter(|e| **e == id).count(),
@@ -339,7 +367,7 @@ fn a_save_from_before_the_benches_closed_still_opens() {
     );
     assert_eq!(back.character.enchs_loose(&id), 0, "and it is still on the component");
     let mut after = back;
-    after.character.detach_ench(piece);
+    after.character.detach_ench(piece, usize::MAX);
     assert_eq!(after.character.enchs_loose(&id), 1, "taking it off would have lost it");
 }
 

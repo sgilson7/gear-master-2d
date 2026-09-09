@@ -164,6 +164,17 @@ pub struct Curse {
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Curses {
     active: Vec<Curse>,
+    /// How much harder every curse on this fighter bites, in percent.
+    ///
+    /// **Set by whoever landed them, never by the sufferer.** Standing Fact is
+    /// the only thing that moves it: a curse that cannot expire is one that has
+    /// time to be worth tuning, and the tuning is a percentage on what the
+    /// curse *does* rather than on how long it lasts, because a permanent curse
+    /// has no duration left to lengthen.
+    ///
+    /// It scales the two readers below — the burn and the slow — and nothing
+    /// else, because those are the two numbers a curse's effect is made of.
+    bite_pct: i32,
 }
 
 impl Curses {
@@ -222,6 +233,70 @@ impl Curses {
     }
 
     /// Advance every curse by one tick and drop the expired ones.
+    /// How much harder every curse here bites. See the field.
+    pub fn bite_pct(&self) -> i32 {
+        self.bite_pct
+    }
+
+    /// Raise the bite. Additive, so two sources of it add rather than one
+    /// replacing the other — the same rule `Unionized`'s plate follows.
+    pub fn bite_harder(&mut self, pct: i32) {
+        self.bite_pct += pct;
+    }
+
+    /// Take one curse off, and say which it was.
+    ///
+    /// **Curse Requisition's, and nothing else spends a curse.** `ripest`
+    /// picks the one with the least time left rather than the cheapest, which
+    /// is the knob that turns a requisition into free value: what is about to
+    /// be lost anyway costs nothing to spend.
+    ///
+    /// A stack is spent before the curse is: three stacks of searing is three
+    /// requisitions, not one, because that is what a stack is worth to
+    /// everything else in this file.
+    pub fn spend_one(&mut self, ripest: bool) -> Option<CurseKind> {
+        let i = if ripest {
+            self.active.iter().enumerate().min_by_key(|(_, c)| c.remaining_ms).map(|(i, _)| i)
+        } else {
+            // Cheapest: the fewest stacks standing, which is the least of a
+            // curse you have.
+            self.active.iter().enumerate().min_by_key(|(_, c)| c.stacks).map(|(i, _)| i)
+        }?;
+        let kind = self.active[i].kind;
+        if self.active[i].stacks > 1 {
+            self.active[i].stacks -= 1;
+        } else {
+            self.active.remove(i);
+        }
+        Some(kind)
+    }
+
+    /// Land a curse that does not expire.
+    ///
+    /// **A separate door from [`Curses::apply`], and deliberately so.** The
+    /// ordinary one asks the kind how long it lands for and lets resistance cut
+    /// it; this one is Standing Fact's, where *how long* stopped being a
+    /// question. Returns the running total, which is what the log prints.
+    ///
+    /// `u32::MAX / 2` rather than a flag: the tick subtracts and the retain
+    /// drops at zero, so a very large number is a curse that outlives any
+    /// fight without a second code path deciding what "for ever" means — and
+    /// the halving is what keeps `remaining_ms.max(duration)` from wrapping.
+    pub fn apply_standing(&mut self, kind: CurseKind) -> u32 {
+        const FOR_EVER: u32 = u32::MAX / 2;
+        match self.active.iter_mut().find(|c| c.kind == kind) {
+            Some(existing) => {
+                existing.stacks += 1;
+                existing.remaining_ms = FOR_EVER;
+                FOR_EVER
+            }
+            None => {
+                self.active.push(Curse { kind, remaining_ms: FOR_EVER, stacks: 1 });
+                FOR_EVER
+            }
+        }
+    }
+
     pub fn tick(&mut self) {
         for c in &mut self.active {
             c.remaining_ms = c.remaining_ms.saturating_sub(TICK_MS);
@@ -235,13 +310,15 @@ impl Curses {
     /// doesn't divide evenly, so the fractional part is carried in
     /// `dot_remainder` by the caller rather than being rounded away.
     pub fn dot_millidamage_per_tick(&self) -> i32 {
-        self.active
+        let raw: i32 = self
+            .active
             .iter()
             .map(|c| match c.kind {
                 CurseKind::Searing => SEARING_DPS * c.stacks as i32 * TICK_MS as i32,
                 CurseKind::Frost | CurseKind::Stun | CurseKind::Misfire => 0,
             })
-            .sum()
+            .sum();
+        raw + raw * self.bite_pct / 100
     }
 
     /// How much slower this combatant's items run, as a percentage.
@@ -251,7 +328,12 @@ impl Curses {
     /// up, capped so the gear is never stopped outright - a stun is the thing
     /// that stops gear, and the two should not be able to become each other.
     pub fn slow_pct(&self) -> i32 {
-        frost_slow_pct(self.stacks_of(CurseKind::Frost))
+        // The bite scales the slow the same way it scales the burn — the two
+        // numbers a curse's effect is made of — and clamps below 95 for the
+        // reason resistance does: a hundred percent slower is stopped, and a
+        // stop is a stun, which is a different curse with a cap of its own.
+        let raw = frost_slow_pct(self.stacks_of(CurseKind::Frost));
+        (raw + raw * self.bite_pct / 100).min(95)
     }
 
     /// One activation in how many does a misfire eat? Zero when none is up.

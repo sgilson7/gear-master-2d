@@ -252,7 +252,7 @@ fn a_whole_run_reaches_the_fork() {
                     .nodes
                     .iter()
                     .find(|n| {
-                        tree.can_take(&n.id, &g.character.skills_taken, g.character.skill_points, None)
+                        tree.can_take(&n.id, &g.character.skills_taken, g.character.skill_points, &[])
                             .is_ok()
                     })
                     .map(|n| n.id.clone());

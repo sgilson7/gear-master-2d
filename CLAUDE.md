@@ -19,7 +19,7 @@ from `sgilson7/gear-master`. `PLANNING-BRIEF.md` is the brief; `PLAN.md` is the
 plan and **wins where the two disagree**; `TONE.md` governs every string a
 player reads.
 
-**Every milestone is done, M0 through M12.** M0–M5 shipped the MVP, tagged
+**Every milestone is done, M0 through M13.** M0–M5 shipped the MVP, tagged
 `v0.1.0-mvp`; the board was rebuilt against the original's colourblind design;
 M6 added the art and the tone pass; M7 the shops, errands and the first
 dungeon; M8 curses made visible, a quest log, enchs, a fourth class, and a door
@@ -30,7 +30,9 @@ through the door** — nine new maps, a tower that comes down, a lake that
 empties, and three instruments that read a map you cannot otherwise enter;
 **M12 board pressure** — a save that could not be played, three counters where
 there was one, events that pay something and say what they pay, and a row you
-earn instead of one a level hands you.
+earn instead of one a level hands you; **M13 what two classes reach** — a
+second paper on Spike's counter, ten experts one for each pair, a tree apiece
+that moves nothing but its own promise, and four new rules to move it with.
 <https://sgilson7.github.io/gear-master-2d/>
 
 **M11 is live**, deployed at `43804e49` on the human's word. Its live check is
@@ -58,9 +60,9 @@ events that pay something and say what they pay — added on the human's ask.
 `PLAN-M9.md`, `PLAN-M10.md` and `PLAN-M11.md` are done; `PLAN.md` §6d is what
 M11 left open, §6c is M10.3's, §6b is M9.4's and §6a is M8.8's.
 
-**Nothing is in flight, and everything below has shipped since the block
-closed.** All of it was reported from play, all of it is on `main`, and all of
-it was walked on the live page:
+**Nothing is in flight.** Everything below shipped between M12 closing and M13
+opening — all of it reported from play, all of it on `main`, all of it walked on
+the live page:
 
 | | |
 |---|---|
@@ -76,10 +78,10 @@ it was walked on the live page:
 | `5ff7eb4` | an instrument has a frame of its own, and surveying no longer costs your sword arm |
 | `f439274` | a row is bought all the way up to the old size, and the tree's wires are drawn where they are |
 
-**Two of them touched the save and none of them the catalogue.** The bank adds
-`Character::banked`, which defaults empty and is skipped when it is; the
-instrument frame adds a sixth board, and a file naming five gets one at the
-height a player's frames are. A component changing which grid it goes in does
+**Two of them touched the save and none of them the catalogue**, and neither did
+M13. The bank adds `Character::banked`, which defaults empty and is skipped when
+it is; the instrument frame adds a sixth board, and a file naming five gets one
+at the height a player's frames are. A component changing which grid it goes in does
 not change its name and `catalog_fingerprint` hashes names, so the catalogue is
 still 568, there is still no seam, and every file that opened on M12 opens on
 this — `Character::repair_boards` lifts an old build's instrument out of the
@@ -88,19 +90,29 @@ a claim about now, the same way the two M12 stamps below are; **what has to
 agree is the pair**, `index.html` asking for `app.js?v=X` and that `app.js`
 carrying `BUILD='X'`.
 
-**The tree is between blocks.** The next one is a spec somebody writes; what is
-already written down as worth doing is in *Open questions the human has not
-answered* at the bottom of this file, and `HANDOFF.md` §9 ranks the four lists
-by what they are worth. **Where it goes is a convention and worth keeping:** a
-block's frame is `PLAN-M13.md`, and if the frame turns out to be a different
-document from the one you execute, `PLAN-M13-EXEC.md` **wins where the two
-disagree** — the same relationship `PLAN.md` has with `PLANNING-BRIEF.md` and
-`PLAN-M12-EXEC.md` had with its frame. Divergences from a plan go in the table
-at the bottom of this file with their reasons, in the commit that makes them,
-because a divergence nobody wrote down is indistinguishable from a mistake. Three things are outstanding rather than open: the two
-rows of `TRIAGE-M12.md` that are not the builder's — an agent spot-run against
-a deployed build, and the friend — and `PLAN-M12-EXEC.md` §8 row 13, which is
-the block's own biggest miss written down as a decision.
+**M13 is done and live**, ten milestones, and the block's frame is
+`PLAN-M13-2.md` — there is no `PLAN-M13.md`; the file on disk is the `-2`.
+`HANDOFF-M13.md` is the block's own door in and `SECOND-ORDER-M13.md` is its
+notebook: **twenty-three rows, one a consequence the plan did not ask for and
+the work made true anyway**, written when noticed rather than at the end, and
+read by the last milestone as its own worklist. That convention paid for itself
+— seven of the rows were marked as candidates and all seven were executed in
+M13.9, and three of them turned up something that was actually wrong.
+
+**Where the next block goes is a convention and worth keeping:** a block's frame
+is `PLAN-M14.md`, and if the frame turns out to be a different document from the
+one you execute, `PLAN-M14-EXEC.md` **wins where the two disagree** — the same
+relationship `PLAN.md` has with `PLANNING-BRIEF.md` and `PLAN-M12-EXEC.md` had
+with its frame. Divergences from a plan go in the table at the bottom of this
+file with their reasons, in the commit that makes them, because a divergence
+nobody wrote down is indistinguishable from a mistake. **And keep the
+notebook**: it is the cheapest thing in this block and it is what made the last
+milestone a worklist rather than a guess.
+
+Three things are outstanding rather than open: the two rows of `TRIAGE-M12.md`
+that are not the builder's — an agent spot-run against a deployed build, and the
+friend — and `PLAN-M12-EXEC.md` §8 row 13, which is M12's own biggest miss
+written down as a decision.
 
 **M12's thesis is board pressure.** Cells outnumber pieces, so a board reads
 as inventory space rather than a puzzle, and there is no moment where putting
@@ -134,13 +146,29 @@ later — and the ending screen says so in as many words. The game's overall
 structure past that point is still the human's to decide; `PLAN-M8.md` §5.6 is
 where the question was first written down and it is still the live one.
 
-**M11 was two seams and M12 is none.** M11.5 moved the catalogue 544 → 550 and
+**M13's thesis is that a class is a thing you finish.** Five classes have been
+a fork at level five since M5 and nothing else; finishing one has meant nothing,
+because there was nothing past it. Now **a finished tree is a countable fact**
+— `SkillsData::tree_finished` — one finished tree buys a second class off
+Spike's counter and two finished trees hand over the **expert** that pair
+reaches, free, because the twenty-four points were the price. Ten pairs, ten
+experts, `C(5,2)` and no more: `every_pair_of_offered_classes_reaches_an_expert`
+is what says the table is complete, because a list of ten written by hand is a
+list that can be nine.
+
+**A character holds up to three classes and all three are live.** The five
+shipped powers touch five different rules and no pair of them collides; the ten
+experts are written to the same constraint and `no_pair_of_live_powers_disagrees`
+is what keeps it true. Nothing arbitrates, because nothing has to.
+
+**M11 was two seams and M12 and M13 are none.** M11.5 moved the catalogue 544 → 550 and
 M11.9 moved it 550 → 568, so a save written before *that* block is refused by
 name — the design, said out loud in both commits, with the number living in
-`a_save_from_before_this_block_is_refused_by_name`. **Nothing M12 added moved
-it.** Every field the block introduced defaults, and the fivefold price rise is
-seam-free because `catalog_fingerprint` hashes names and not prices. A save that
-opened on M11 opens on M12.
+`a_save_from_before_this_block_is_refused_by_name`. **Nothing M12 or M13 added moved
+it.** Every field either block introduced defaults, and the fivefold price rise
+is seam-free because `catalog_fingerprint` hashes names and not prices. A save
+that opened on M11 opens on M13 — and it opens **lighter**, because M13.9 took a
+field back out: see *Derived, never banked, and that includes the last one*.
 
 **No rest point, and there still should not be one.** Combat health resets
 every fight, so a rest would restore something that was never spent. What a
@@ -265,7 +293,30 @@ something cost a day.
   the node. `Character::enchs` reads it fresh, the same way `player_stats` reads
   the tree, so retuning what a node awards retunes every character who took it.
   M11 extends it to a *place*: how many floors of the Drambus Stack are gone is
-  how many of its boss ids are in `answered`, and there is no counter.
+  how many of its boss ids are in `answered`, and there is no counter. **M13.9
+  finished the job**: `Loadout::assembly_pct` was the last banked derived number
+  in the game, written into every save and then thrown away on the way in — a
+  number that is stored and ignored is a number somebody will one day believe.
+  It is derived on load and nothing writes it to a file. See *Derived, never
+  banked, and that includes the last one*.
+- **A knob is a player-facing string, and so is a canonical name.** An expert's
+  tuning prints the bare knob — `Effect::Tunes::line` — so a knob called
+  `harvest` promises the nature pool, which is the theme's word for it and not
+  the class's. Two lints, and both read the theme rather than a list somebody
+  typed: `no_knob_or_line_speaks_a_word_a_theme_would_produce` walks the
+  **right-hand side** of `Theme::vocabulary` over every node line and every
+  knob, and `every_class_name_is_one_a_player_could_read` refuses a canonical
+  that reaches a screen as a squashed variant name unless every theme renames
+  it. The first found the ten expert promises saying *Funny* where they meant
+  mana, on the sentence somebody reads before an irreversible choice.
+- **A promise is printed from the tuned power, never from the roster.**
+  `class::CLASSES` is the classes as written, before a point is spent;
+  `Character::class_defs` is the classes you *are*, with the expert's knobs
+  turned, and it returns owned definitions for exactly that reason — a
+  `&'static` cannot carry a tuning. Thirty-eight of the sixty expert nodes cost
+  points and changed nothing until M13.6 found it. The one place that still
+  reads `CLASSES` directly is the fork screen, and it should: nobody choosing a
+  class has spent a point in its tree yet.
 - **A map file is content and so is a map file's terrain, but which map file
   you are reading is the game's.** M11 needed a lake that is water until a
   tower falls and lakebed after. That is not a second map and it is not a grid
@@ -1502,10 +1553,187 @@ Two failures worth keeping, because both were the walk telling the truth:
   `ClassPower::describe()` put through `theme.retell`, so it cannot go stale and
   it speaks the game's language rather than the engine's.
 - **The fork is permanent and offered until answered.** There is no path that
-  clears a class; the screen is the only one in the game that does not take
-  Escape. A save made at level three arrives at five and is asked, and one made
-  at nine without a class is still asked — the question was never answered
-  rather than declined.
+  clears a class; the level-five screen is the only one in the game that does
+  not take Escape. A save made at level three arrives at five and is asked, and
+  one made at nine without a class is still asked — the question was never
+  answered rather than declined.
+- **Three, since M13, and all three are live.** `Character::classes` yields
+  zero, one, two or three in the order they were paid for — the fork, Spike's
+  second paper, and the expert the pair reaches. The three places a power is
+  honoured each fold over a slice where they used to read an option, and
+  **nothing arbitrates**: the five shipped powers touch five different rules,
+  the ten experts are written to the same constraint, and
+  `no_pair_of_live_powers_disagrees` is what says it stays true.
+
+## What two classes reach
+
+Five classes were a fork at level five and nothing else. Finishing one meant
+nothing, because there was nothing past it. M13 is what is past it, and the
+whole block hangs off one countable fact:
+
+    SkillsData::tree_finished(class, taken) -> bool
+
+- **Finished is every node, not most of them.** Nine of ten does not unlock a
+  thing — `a_finished_tree_is_every_node`. And it is derived off `skills_taken`
+  like everything else, so nothing is banked and retuning a tree retunes who has
+  finished it.
+- **One finished tree buys a second class. Two hand over an expert.** The
+  second paper is 5,000 Fnorp, matching the Patent, because Spike does not price
+  by what a thing is worth to you. The expert paper is **free**: the
+  twenty-four points were the price.
+- **Ten experts, `C(5,2)` and no more.** `expert::EXPERTS` pairs them and
+  `for_pair` is order-insensitive, because which class you took first is a fact
+  about your afternoon and not about what the pair is. A list of ten written by
+  hand is a list that can be nine, so
+  `every_pair_of_offered_classes_reaches_an_expert` counts.
+- **`ClassPower::Expert(ExpertPower)` is one arm, not ten.** Ten variants on
+  `ClassPower` is ten new arms in every exhaustive match in the engine, and
+  there are three of those with thirty arms already. Matching `Expert(e)` and
+  then matching `e` is still two exhaustive matches.
+- **Nothing new was invented in combat for a class, and that finally broke.**
+  Six of the ten experts are read at the tick and four of the new knobs needed
+  code that was not there — see *Four rules for a class to move*. What did not
+  break is the older half of the rule: no expert is a new `ClassPower`, and no
+  expert tree grants a stat.
+
+### An expert tree moves its own promise and nothing else
+
+The constraint that gives the block its shape, and it is enforced rather than
+intended: **every node of an expert tree must reach that expert's power.** A
+`tunes` of a knob the power declares, a `grants` of a rule the power is kin to,
+or a `gives_ench` inside the power's licence. No flat stats, no `start_with`, no
+`grow_slot_rows`, no bare `assembly_pct`.
+
+- A `+12 strength` node would be a node you could take without noticing which
+  class you were in. The five base trees are allowed to be a mix because they
+  are the character's first shape; an expert tree is the argument for its own
+  promise, six nodes long. `expert_nodes_touch_only_the_expert` is the lint.
+- **`Effect::Tunes` is the seventh effect kind**, and the knob it names is
+  checked at parse time **against the tree's own class** — a tree cannot tune a
+  knob its class has not got, and `SkillsData::parse` refuses a tuning of zero
+  and a tuning finer than the knob is printed at. `ExpertPower::step` declares
+  the granularity off the knob's name: a node moving `window_ms` by 500 would
+  cost two points and change no sentence, which is the *eight skill nodes*
+  failure with a decimal point in it.
+- **The promise is re-read from the tuned value**, so twelve points of tuning
+  cannot go stale — and the tab prints it at its head, which is where every node
+  under it is a footnote to that line.
+
+### Every expert reaches something, and thirty-eight of them did not
+
+`every_offered_class_reaches_something` has been a lint since M10.2 and it holds
+five classes to *called, not declared*. M13.6 is the same question asked of
+sixty **knobs**, and it is the most expensive check in the block for a reason:
+on its first honest run it reported **thirty-eight of the sixty expert nodes as
+points the tree sells and the engine never reads**. Four of the causes were the
+engine.
+
+1. **The fight was handed the untuned power.** `class_defs` returned
+   `&'static ClassDef` off `CLASSES`, which is the roster before a point is
+   spent — so the tunings reached `start_with` and `combat_items` and reached
+   neither `combat.rs` nor `reward.rs`. See the rule in *Rules*.
+2. **Two knobs were aimed at a kill, and this game deals one foe.**
+   `PLAN-M13-2.md` §3.1 D and §3.7 C both write *a kill inside the fight*; a
+   brawl has those and `fight::run` builds a single `MonsterSpec`, with
+   `check_down` breaking the loop on the tick it falls. So strength refunded on
+   a corpse and a free-cast window reopened after the only foe is dead both
+   bought nothing. `combat::the_fight_turned` is what replaced it: **every
+   quarter the enemy loses**, capped at three so the corpse is not one.
+   **Quarters and not halves is `encore` deciding it** — an encore is a *count*
+   and the tree sells two, so a milestone that can happen once is a count that
+   can only ever be one.
+3. **A percentage off three rounds to nothing.** A cast costs
+   `SPELL_MANA_COST = 3`, so *twenty percent less* is nought point six and
+   integer division makes that nought. `ExpertPower::cast_price` is the one
+   place the sum is done, rounded the payer's way, and `describe` prints **the
+   price** rather than the percentage — the two are different sums and only one
+   of them is the one the fight does.
+4. **`racks` was Full Bill's whole promise and `attach_ench` had never heard of
+   it.** See *One ench a component, and two for a Full Bill*.
+
+**The fixture is most of the work, and it has to be.** The first draft asked all
+ten against one Auto-packed board and reported that seven reached nothing: it
+has no empty frame for an Overwound Arm to turn, fifty-eight finished items
+where a Standing Fact wants four, nothing that spins, and every one of its casts
+was the enemy's. There are five boards now and each poses the question its
+experts are about — *a check that needs something to happen has to make sure it
+can* — and **a `put` whose answer is ignored is a fixture that silently does
+nothing**, which is why every seating in that file is asserted.
+
+**And the question the check asks is *what does this point buy*, asked where a
+player buys it.** The primary comparison is the node's own prerequisite chain
+against that chain plus the node, which is a build somebody can be standing in —
+and it asks a threshold at the bottom of its range, where it is legible. Forty
+against seventy is a different fight; seventy against a hundred is the same
+fight twice when nothing in the game can spend seventy. The whole tree minus one
+node is the second look, asked only of what the first cannot see.
+
+### Four rules for a class to move
+
+`Rule` kinds went 9 → 13, and these are the first since M9 that needed code in
+the fight rather than a translation at the bell.
+
+| rule | what it is | read by |
+|---|---|---|
+| `Spread { every_turns }` | an enchantment copies itself onto a bare frame | `fight::settle` → `Character::spread_underlay` |
+| `RowHarvest { per_cell }` | a filled row pays mana at the bell | `Character::row_harvest` → `Held::mana` |
+| `Beacon { pct }` | an ench lends a share of itself to what touches it | `Character::combat_items` → `ench::broadcast` |
+| `Productivity { every, slower_pct }` | every nth activation of an enched item runs twice, and it is slower for the rest of the fight | `combat::activate` |
+
+- **Spread works on the diagonal, and the plan said orthogonally.**
+  `Slot::enchant_is_live` pays an enchantment nothing while another touches it
+  edge-on, so a copy laid beside its source **kills both** and the node would be
+  a point spent on making yourself worse. A corner is the tightest spread this
+  board allows and the borrowed idea survives: what is next to what still
+  decides what you get.
+- **Spread is settled at the end of a fight, not during one.** Combat is a pure
+  function of what it was handed — that is why a mid-fight save carries a
+  creature name and a tile, and why `Effect::Fragile` breaks an item *for the
+  fight*. A rule writing to the loadout mid-tick would undo that.
+- **`RowHarvest` pays at the *start*.** *At the bell* means the start
+  everywhere in this engine: `RunningItem` is rebuilt at every bell, `Held` is
+  translated at the bell, `CombatLog::player` is the fighter as the bell went.
+  The plan put it in `fight::settle`, which is the one place its mana could not
+  be spent.
+- **A beacon never chains.** The lends are gathered before the first one is
+  written, so what a neighbour is given is never given onward — a packed chest
+  broadcasting its own broadcast would reach a fixed point, and the fixed point
+  would be the game. And **only the two enchs that are a number lend**: forty
+  percent of a switch is not a thing, and lending `Fragile` would break every
+  neighbour, which is a beacon that punished packing rather than paying for it.
+
+## Derived, never banked, and that includes the last one
+
+`Loadout::assembly_pct` is the extra percent every assembly bonus counts for,
+which is the Kaklon Licensee's whole power and four of the base tree's nodes. It
+lives on the loadout rather than being passed in because `report` is called from
+a hundred and eight places — the sheet, each item card, the shop's comparison,
+the fight — and every one of them has to see the same number; a parameter
+through all of them is a parameter somebody forgets in one place, and the bug
+that makes is an item card that disagrees with the fight.
+
+**It was also written into every save and thrown away on the way in.** The
+loader has re-derived it since M10.2, so what the file said was overwritten a
+hundred lines later — and *a number that is stored and ignored is a number
+somebody will one day believe.* M13.0 caught the shape from the other side: an
+expert taken without the re-derivation came back from a round trip carrying a
+figure it did not go in with.
+
+- **The file does not carry it.** `#[serde(default, skip_serializing)]`, so
+  every older file still opens and nothing new writes one.
+  `the_assembly_bonus_is_not_in_the_file` plants a nine-thousand into an older
+  file and watches it be ignored.
+- **`Character::assembly_pct_of` is the one place the sum is done**, and
+  `a_class_taken_any_way_re_derives_the_bonus` walks every door that sets a
+  class and compares against it.
+- **With the Kaklon Licensee on both sides of the pairing.** It is the only
+  class whose power moves the number, so a door it is not standing at is a door
+  that can forget the re-derivation and change nothing — a check that would pass
+  on a game that was broken. The run is done twice for that reason alone.
+- **One door the check cannot see, and it says so.** `take_expert` refreshes
+  too, and no `ExpertPower` is a `Recycler` — `expert_nodes_touch_only_the_expert`
+  refuses a bare `assembly_pct` in an expert tree. What holds that line is the
+  lint rather than the call, and the comment beside the call names it.
 
 ## Eight skill nodes that cost a point and did nothing
 
@@ -1811,6 +2039,13 @@ price nobody charges.
   `Character::enchs()` is what was bought or paid over *plus* what the taken
   nodes grant, read fresh — so retuning which ench a node hands over retunes
   every save that took it.
+- **An expert tree is the one place a *second* source is right**, which is the
+  exception M13.5 had to write. All eight enchs already have an owner, so any
+  `gives_ench` in an expert tree duplicates one — and for Full Bill, whose
+  promise *is* rack count, a second copy **is** the promise. So the lint exempts
+  expert trees and asserts the opposite for them: an expert node may only hand
+  over an ench something else already gives, because **a source hidden behind
+  two finished trees is worse than a duplicate.**
 - **`enchs_owned` changed meaning, and the loader carries old saves across.** It
   was *loose*, and `attach` moved an entry out of it — which cannot work once a
   derived list can grant one, because there is nothing to take an entry out of.
@@ -1931,6 +2166,34 @@ one: no shape, no grid, attached rather than worn.
 - **A priceless ench is on nobody's bench.** `price` is optional, and
   `QuestsData::parse` refuses an errand that pays one that has a price — a
   reward you could have bought makes the errand a slow way to shop.
+
+### One ench a component, and two for a Full Bill
+
+One, deliberately: two is a bigger design space and a much bigger interface, and
+for fourteen of the fifteen classes neither has earned its place. The exception
+is the expert whose whole promise **is** the second rack — Full Bill, both
+licences on one counter — and it moves the number rather than the rule.
+
+- **`Character::ench_racks` is the one answer and `attach_ench` is the one place
+  it is enforced**, so the screens still assume nothing. *"One ench a
+  component"* had been written into the refusal **as a rule**, so the expert
+  selling two points of a second rack sold a rack the engine would not give —
+  found by M13.6, which is the milestone that exists to find exactly this.
+- **Nothing refuses a second copy of the same ench by name**, and that is not an
+  oversight: `enchs_loose` has already refused unless you own two, and owning
+  two is what Full Bill's own tree hands over. Which is also why
+  `every_ench_comes_from_somewhere` had to learn an exception — see *Where an
+  ench comes from*.
+- **A rack is a stack.** `detach_ench` and `toggle_ench` take a piece **and an
+  `nth`**, resolved once by `Character::nth_ench`, and past the end is the last
+  one on. A screen drawing four rows whose buttons all reached the same ench
+  would be three controls doing somebody else's job.
+- **The card names all of them.** `ench_json` carries `more`, because a card
+  naming the first of two is a card that is wrong about the item it is
+  describing.
+- **`tidy_enchs` retains rather than detaching once.** It used to drop *an*
+  attachment to a component that was gone; a rack holds more than one, and the
+  rest would have been left pointing at nothing.
 
 ### The spin
 
@@ -2075,6 +2338,56 @@ whose class did not come with it, and each ench on his table is **2,000**.
   gets the rack and the bench. Five thousand is priced against that gap
   deliberately — it is late money, and what it buys is the ability to use what
   the game already paid you.
+
+### Three papers, and two of them are refused
+
+Since M13 the van sells three, **all visible from the first time you walk in**
+and refused until their condition is met.
+
+| paper | price | wants |
+|---|---|---|
+| the Kaklon Patent's licence | 5,000 | — |
+| **the Second Paper** | 5,000 | one finished class tree |
+| **the expert paper** | **nothing** | two finished class trees |
+
+- **Visible-but-refused is the whole point.** *A locked line on a shelf you can
+  read is a goal; an absent line is a secret* — the same argument the Reach's
+  door makes when it opens the instrument frame instead of printing a refusal.
+- **The refusal counts.** `StockGate::refusal` writes *"2 finished class trees,
+  and you have finished 1 of the 1 you are"*, because a button that greys with
+  no reason is a button a player reports as a bug — a sentence this file has
+  now written down five times.
+- **`StockGate` is one field with two arms.** The van already gated its stock on
+  a level; this gates on a fact about the trees, and the *line stays drawn*
+  either way.
+- **The third line prints the expert's own promise**, so a player choosing a
+  second class at level twelve can see what that pairing eventually reaches.
+  That is the pairing decision made in daylight, which is what a fork screen is
+  for — and the second fork's own cards say it too.
+- **Two of the three are bought and the third is taken.** `Game::buy_paper`
+  refuses in named ways and **spends nothing when it does**, which is the
+  reroll's rule and the bank's: the first thing anybody does with a refused
+  button is press it again.
+
+### The second fork is the same screen, and it can be slept on
+
+The level-five fork is reused rather than rebuilt, with two changes and no
+others: it offers **four** cards — the roster minus what you already are — and
+**it takes Escape**.
+
+- **The paper is spent on the choice, not on the purchase.** Until it is
+  answered it sits in the pack, and `class_offer_json` keeps offering it.
+- **And it must not nag.** `offerClass` is called after every fight, after every
+  banking and on every load, because that is what an unanswered question needs.
+  Wired to the same three, the second fork came back after every single
+  fight — which is the game refusing to let you sleep on it. It opens where a
+  player asks for it: on the purchase, and from the line on the character sheet
+  that says the paper is in the pack. **That line is the other half** — a thing
+  in your pack that no screen mentions is a thing you have forgotten you own.
+- **Each card names the expert that pairing reaches**, with its promise. The
+  pairing is the whole of the decision and this is the only screen where it is
+  made.
+- **Choice is permanent, same as the first.** No path clears either.
 
 ## The bank, and what "banked" costs you
 
@@ -3360,6 +3673,15 @@ about a string. Every one caught something on its first run:
 | 12.5 | **Every root choice hands over its own errand**, which the plan does not ask for. §M12.5 asks events to pay something and say what they pay; that was built and was still not a decision, because both branches of a root opened invisible content. The errand is the visibility, and it is why chain errands had to become `granted` — an unoffered kind of errand the plan has no row for. | `crates/core/src/quest.rs`, `Quest::granted` |
 | 11.6a | **An instrument has a frame of its own, and `PLAN-M11.md` §8 row 4 is reversed.** That row asked for the instrument to live in the weapon grid — *surveying costs your sword arm* — and it was taken, defended and shipped. It was wrong, and the report is the argument: what is through the Reach is a map you have to fight on, so a cost paid in your only weapon is a wall rather than a price. `SlotKind::Instrument` is a sixth grid, deliberately outside `SlotKind::ALL` so that nothing which asks what a board is *worth* ever counts it. `RuleError::MixedGrid` is gone with the rule it enforced. | `crates/core/src/piece.rs`, `SlotKind::Instrument` |
 | 12.6 | **Rerolls, which `PLAN-M12.md` §0 declines by name.** The block's founding decision was no reroll, on the grounds that a shelf which changes every visit is not a place. That still holds and the *shelf* still never rolls; what turns over is the barrel and the order book, which are rolled to begin with. The reversal is the human's, narrowed to the two tiers where "give me a different one" is not the same as "give me a different town". | `crates/core/src/shop.rs` |
+| 13.1 | **`Rule::Spread` works on the diagonal, and `PLAN-M13-2.md` §4.2 writes it orthogonally.** `Slot::enchant_is_live` pays an enchantment nothing while another touches it edge-on, so a copy laid beside its source destroys what it copied and the node is a point spent on making yourself worse. A corner is the tightest spread this board allows and the borrowed idea survives: what is next to what still decides what you get. | `crates/core/src/rule.rs`, `Rule::Spread` |
+| 13.2 | **Spread is settled at the end of a fight, not during one.** Combat is a pure function of what it was handed — that is why a mid-fight save carries a creature name and a tile, and why `Effect::Fragile` breaks an item *for the fight* rather than for good. A rule writing to the loadout mid-tick would undo the property the whole save format rests on. Turns are `duration_ms / SPIN_EVERY_MS`. | `crates/core/src/fight.rs`, `settle` |
+| 13.3 | **`RowHarvest` pays at the *start* of a fight.** §4.3 puts it in `fight::settle`, which is the one place its mana could not be spent — mana is spent inside a fight and gone when it ends. *At the bell* means the start everywhere else in this engine. | `Character::row_harvest` → `Held::mana` |
+| 13.4 | **`rebate` and `encore` fire on the fight *turning*, not on a kill.** §3.1 D and §3.7 C are both written against a kill inside the fight, and **GM2D deals one foe**: `fight::run` builds a single `MonsterSpec` and `check_down` breaks the loop on the tick it falls, so strength refunded on a corpse and a free-cast window reopened after the only foe is dead both bought nothing. `the_fight_turned` reports **every quarter the enemy loses**, capped at three so the corpse is not one — quarters rather than halves because an encore is a *count* the tree sells two of, and a milestone that can happen once is a count that can only ever be one. | `crates/core/src/combat.rs`, `the_fight_turned` |
+| 13.5 | **`after` prints the price, not the percentage.** A cast costs three, so a fifth off it is nought point six and integer division makes that nought — `on-standing-discount` sold *twenty percent less* and took nothing off. `ExpertPower::cast_price` rounds the payer's way and is the one place the sum is done; `describe` reads it, so the promise cannot be a different sum from the one the fight does. | `crates/core/src/expert.rs`, `cast_price` |
+| 13.6 | **An expert tree *may* hand over an ench something else already gives**, which §1.6 does not allow for. All eight enchs have an owner, so any `gives_ench` in an expert tree duplicates one — and for Full Bill a second copy **is** the promise. `every_ench_comes_from_somewhere` exempts expert trees and asserts the opposite for them: a source hidden behind two finished trees is worse than a duplicate. | `crates/core/tests/ench_sources.rs` |
+| 13.7 | **The papers stand on Spike's van**, `the-kaklon-van` at `[4, 6]` on west-bambulon, behind `hidden_until_level: 10`, which §8.1 leaves open. The van is already the counter the Patent's paper is sold from, and a second counter would be a second place to remember. | `data/maps/west-bambulon.tiles.json` |
+| 13.8 | **The second fork does not re-raise itself.** §1.3 says the paper is spent on the choice and a player may sleep on it; `offerClass` is called after every fight, after every banking and on every load, because that is what the level-five fork needs. Wired to the same three, the second fork came back after every fight — the game refusing to let you sleep on it. It opens on the purchase and from the line on the sheet that says the paper is in your pack, which is what §1.3's *"opening it in the pack re-raises the screen"* means on a page with no pack. | `web/app.js`, `offerClass` |
+| 13.9 | **`Loadout::assembly_pct` came out of the save**, which the plan does not mention because it is older than the plan. It was written into every file and thrown away on the way in, so what the file said was a number nothing read and anything could believe. Derived on load, and guarded at every door that sets a class. | `crates/core/src/save.rs` |
 
 Also true, and not in the brief because it could not have been:
 
@@ -3460,6 +3782,24 @@ Every figure below was re-measured for M12.6 rather than carried forward.
 | A bank, a door that survives a reload, and a sheet on the screen that changes it | **710 passing** |
 | An instrument has a frame of its own | **715 passing** |
 | A row is bought all the way up to the old size | **717 passing** |
+| M13.0: a finished tree is a countable fact | 728 passing |
+| M13.1: ten experts, thirty-one knobs, one `ClassPower` arm | 742 passing |
+| M13.2: `Effect::Tunes`, checked against the tree's own class | 745 passing |
+| M13.3: four rules a class can move | 760 passing |
+| M13.5: the ten trees land — 16 trees, 124 nodes | 760 passing |
+| M13.4: three papers, and two of them refused | 775 passing |
+| **M13.6: every expert reaches something — and thirty-eight did not** | **781 passing** |
+| M13.7: the screens — a second fork, a sixth tab, a rack that holds more than one | 781 passing |
+| M13.8: five browser checks, all five negative-tested | 781 passing |
+| **M13.9: the notebook executed, and the suite from a minute to 34 seconds** | **785 passing** |
+
+**M13.5 adds none and M13.7 and M13.8 add none, and all three are honest.**
+M13.5 lands ten trees into a data file and the three lints it needed were
+written in M13.2 and M13.1; M13.7 is the screens, and a screen is checked in a
+browser rather than in `cargo test`; M13.8 *is* that browser check, five of
+them, which the count below has as sixty-three `ok:` lines rather than as tests.
+**M13.6 adds five and is the block's largest milestone by a distance** — the
+five are what found thirty-eight dead nodes and four engine faults.
 
 Note M12.4 adds none, and neither did M11.0 or M11.8 — all three are honest.
 M12.4 is a playthrough, a triage and a brief; its deliverable is
@@ -3472,20 +3812,20 @@ content*, and one check now measures what a range used to guess at.
 
 | | |
 |---|---|
-| Catalogue | **568 components, and M12 did not move it** — every save that opened on M11 opens on M12. M11's two seams (544 → 550 → 568) are the last there have been. **Prices are ×5 as of M12.6** and that is seam-free: `catalog_fingerprint` hashes names only |
+| Catalogue | **568 components, and neither M12 nor M13 moved it** — every save that opened on M11 opens on M13. M11's two seams (544 → 550 → 568) are the last there have been. **Prices are ×5 as of M12.6** and that is seam-free: `catalog_fingerprint` hashes names only |
 | Pieces that apply a curse | 59 of 568, 4 kinds, 2 on the starting shelf |
 | Sets | **9**, of three components each bar the Toad Frame's two — every piece `EVENT_ONLY`, off one creature **or one stack of floors**, in one grid |
 | Ladder | **58 creatures**, rated 16 to 2958. Six are stepped down: the Kettleworks field's five and The Gearwright, at `gear_offset: -2` plus a body trim where the footprint families ran out — 12 to 16% each |
-| `crates/core` | **~44.4k lines**, down from ~50k at the fork — `wc -l` over every `.rs` under `crates/core/src`. The method is named because the figure carried here through M12.6 was 42.4k while the code had moved under it |
-| wasm | **1470 KB**, up from 1178 KB at M10.3 — `dist/web/pkg/gm2d_wasm_bg.wasm` after `make web`. CI builds its own and the two are not bit-identical, which is why the *stamp* is checked against itself and never against a number |
-| Save format | v1. **No seam, still.** A save now carries **six boards**; one naming five gets an instrument frame at the base height, and `repair_boards` lifts an old build's instrument out of the weapon grid on the way in — the loader is where a field carried across a build change is caught. `banked` — the bank — defaults empty, so a save from before there was one opens without a vault, which is what those characters had. **No seam in M12** either: Every field it added defaults — `commissions`, `rolled_barrel`, `rolled_ledgers`, `rerolls`, `bought_licence` — so an older file opens on the authored barrel with no orders and no licence, which is what those characters had |
+| `crates/core` | **~47.5k lines**, down from ~50k at the fork and up 3.1k over M13 — `wc -l` over every `.rs` under `crates/core/src`. The method is named because the figure carried here through M12.6 was 42.4k while the code had moved under it |
+| wasm | **1539 KB**, up from 1470 KB at M12 — `dist/web/pkg/gm2d_wasm_bg.wasm` after `make web`. CI builds its own and the two are not bit-identical, which is why the *stamp* is checked against itself and never against a number |
+| Save format | v1. **No seam, still, and M13 is the first block to take a field *out*.** Five new `Character` fields, every one `#[serde(default)]` and skipped when empty — `second_class`, `expert`, `second_paper`, `fast_wins`, `told_curses` — so an older file opens as one class with no paper and nothing following it out of the last fight, which is what those characters had. **`assembly_pct` is gone from the file**: it was written and then thrown away on the way in, and *a number that is stored and ignored is a number somebody will one day believe*. A save now carries **six boards**; one naming five gets an instrument frame at the base height, and `repair_boards` lifts an old build's instrument out of the weapon grid on the way in — the loader is where a field carried across a build change is caught. `banked`, `commissions`, `rolled_barrel`, `rolled_ledgers`, `rerolls` and `bought_licence` all default the same way |
 | Maps | **11**, in `data/maps/*.tiles.json` — west-bambulon 20×20, the-great-gear-cave 9×5, the-treyway 16×16, kettleworks-field 20×20, five Drambus Stack floors 10×10, under-the-lake 13×9, the-reach 20×20 |
 | Places | 2 towns, 56 events, 11 gates, 7 bosses, 2 crossings, 1 bench, 1 door — 41 of the events are the Kettleworks field alone |
 | Events | 56 placed: **43 ask something and 13 are notes**, over **73 choices**. **21 chains from 10 roots**, every root choice handing over an errand. Was 9 asking and 0 chains before M12.5 |
 | `PlaceKind` | 7: town, event, gate, boss, door, crossing, bench — **unchanged**; the Stack is `PlaceDef::floors` on a gate, not an eighth kind |
-| Effect kinds | 6: stat, start_with, grow_slot_rows, assembly_pct, grants, gives_ench — **unchanged** |
+| Effect kinds | **7**: stat, start_with, grow_slot_rows, assembly_pct, grants, gives_ench, **tunes** — the seventh is M13.2's, and the knob it names is checked at parse time against the tree's own class |
 | Ench effect kinds | 4: power, haste, spin, fragile — **unchanged** |
-| `Rule` kinds | **9**: curse_on_activate, spin_extra, spin_keep, spin_every, scout, rout, wade, **survey**, **homeward** |
+| `Rule` kinds | **13**: curse_on_activate, spin_extra, spin_keep, spin_every, scout, rout, wade, survey, homeward, **spread**, **row_harvest**, **beacon**, **productivity**. The four new ones are M13.3's and are the first since M9 that needed code in the fight rather than a translation at the bell |
 | Instruments | 3 — compass, atlas, survey golem, all three on **their own frame**: `SlotKind::Instrument`, six by three, outside `SlotKind::ALL` so nothing that asks what a board is worth ever counts it. It never grows, and one instrument is what it holds |
 | Data files | **23** — 12 in `data/` and 11 in `data/maps/`; `data::FILES` is the list `data_is_current` walks |
 | Starting kit | 2 components, **140 Fnorp**, 1 assembled weapon. The purse moved ×5 with the prices; at 28 a beginner could afford three of thirteen barrel lines and no helmet, and both M4 soft-lock guards said so |
@@ -3500,12 +3840,14 @@ content*, and one check now measures what a range used to guess at.
 | Level 5 | ~27 fights, mean of nine seeded walks |
 | The Treyway | brackets levels **12–16**, not the plan's 5–9 — the door behind it is behind a crossing that asks for 9 |
 | A whole playthrough | **342 wins, 170 losses, level 14, 4,406 steps** to the door under the lake |
-| Skill trees | **22 base nodes over nine tiers** + gorillathon 8, funnel-sergeant 8, worm-fact-keeper 10, kaklon-patent 8, top-of-the-bill 8. **11 of the base's grow a row** — M12.3's seven, plus a five-tier spine at 3/4/5/6/7 points that walks every frame to the original **six by eight**. Twenty-eight points for the whole ladder, against a `MAX_LEVEL` of 32 |
-| Classes offered | 5, and every one of their powers reaches something — a lint says so |
+| Skill trees | **16 trees, 124 nodes.** The base's **22 over nine tiers**, the five classes' 8 / 8 / 10 / 8 / 8, and **ten expert trees of six each** — two roots, three, and a capstone, every node of which must reach that expert's own power. **11 of the base's grow a row** — M12.3's seven, plus a five-tier spine at 3/4/5/6/7 points that walks every frame to the original **six by eight**. Twenty-eight points for that ladder alone, against a `MAX_LEVEL` of 32. An expert node costs **2** |
+| Classes offered | **5 on the fork, 15 in the game.** The ten experts are `C(5,2)`, one a pair, and none is on any list a player picks from — you finish two trees and the pair decides. **Every one of the fifteen reaches something and so does every one of the sixty expert nodes**, and both are lints that *call* rather than declare |
+| Experts | **10**, carrying **31 knobs**. Six are read at the tick, two settle in the purse, one is the board's, one crosses a fight boundary. A character holds **up to three classes** and all three are live |
+| The papers | **3** on Spike's van, all drawn from the first visit: the Patent's licence at 5,000, the Second Paper at 5,000 behind one finished tree, and the expert paper at **nothing** behind two — the twenty-four points were the price |
 | Figures | 27 `.tex` → **81 SVGs** (13 family drawings, 4 drawn for themselves, 5 classes, 3 towns, you) |
 | Art coverage | **58 of 58 creatures**, 3 of 3 towns, 5 of 5 classes, and you. The set pieces, the instruments and the enchs have no art and want none — a component has never had a figure |
-| Browser gate | **55 checks**, 3 engines, pointed at the live page for M12's deploy. The newest is the Reach's own frame: the door opens it, a compass built there is read, and the weapon grid is untouched |
-| The suite | **717 passing, and 14 seconds warm.** `[profile.test] opt-level = 2` since M12.6: `drops.rs` alone ran 66s at `opt-level 0`, more than the other 57 files together, and is 6.7s now. Debug assertions and overflow checks stay on — this is the `test` profile, not `--release` |
+| Browser gate | **63 `ok:` lines**, 3 engines. The newest five are M13.8's: the papers are drawn and the locked one counts, the second fork offers four and can be slept on, two finished trees take the expert and a point moves the promise at its tab, a Full Bill's component holds two enchs and everybody else's holds one, and the sheet says every class you are. **All five were negative-tested** |
+| The suite | **785 passing, and 34 seconds warm.** It was a minute through most of M13 and `rules_m13.rs` was 29.6s of it: `beacon_board` ran Auto-pack over the whole catalogue on twenty-row grids, four times, because it was the only fixture in the repository with two items that touch. `common::items_in_a_row` is what replaced it — **0.03s** — and `experts_reach.rs` went 9.6s → 6.5s by measuring once per *set* of nodes rather than once per question. `drops.rs` at 11.3s is now the slowest file and is untouched. `[profile.test] opt-level = 2` since M12.6, with debug assertions and overflow checks still on — this is the `test` profile, not `--release` |
 
 Note the catalogue is **568**, not the 374 the retheme document counts — it
 grew upstream after that document was written, and three times here. Any
@@ -3587,7 +3929,28 @@ adjacent numbers — the loss rate is up a fifth since the shelf went ×5, and
 whether `pressure::target`'s 70% at level three was ever the right number is a
 question the block never asked.
 
+**Answered by the human for `PLAN-M13-2.md`**, or taken as proposed where the
+plan proposed. The nine the block *diverged* on are in the divergence table
+above with their reasons rather than here, and every one of them was a case
+where the plan described a game this one is not: a brawl it does not deal, an
+orthogonal neighbour that would have killed what it copied, a percentage of
+three that rounds to nothing.
+
+**M13 leaves one live question, and the code asks it rather than a person.**
+`Character::grown_health` is a save field **nothing in the shipped game ever
+writes**. `rested_stats` adds it, `save.rs` round-trips it, `Game::eq` compares
+it and `tests/save.rs` plants a twelve in it to prove the trip — and no line
+anywhere sets it to anything but zero. It is inherited: upstream grew a run's
+health as the campaign went, and GM2D's levels grow a *board* instead. Deleting
+it is a design decision — if health-per-level is ever wanted, that is the field
+it goes in — and it costs nothing where it is. **What it must not do is be
+mistaken for a live number**, and the field now says all of that where it lives.
+
 **No longer open:** errands exist, as `crates/core/src/quest.rs` — a new module
 rather than upstream's, which was a chain of receipts along a road. `town.rs`
 stays dropped: a town is a place on the map plus a shelf in `shops.json`, and
 does not need a module.
+
+**And no longer open: what finishing a class tree is for.** It was nothing for
+eight blocks. It is a second class and then an expert, and the countable fact
+underneath it — `SkillsData::tree_finished` — is one function.

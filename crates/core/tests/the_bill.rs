@@ -86,7 +86,7 @@ fn every_offered_class_reaches_something() {
             // payout passed cleanly. A lint that reads a list rather than the
             // behaviour is the failure it exists to catch, one level up.
             ClassPower::Showstopper { .. } => {
-                let quick = reward::bounty_with_class(Outcome::Victory, 40, &worn, 1);
+                let quick = reward::bounty_with_class(Outcome::Victory, 40, &worn, 1, reward::AtTheBell::default());
                 assert_ne!(
                     quick,
                     reward::bounty_for(Outcome::Victory, 40),
@@ -135,16 +135,16 @@ fn a_fast_win_pays_more_and_a_slow_one_does_not() {
     let plain = reward::bounty_for(Outcome::Victory, 40);
     assert_eq!(plain, 40);
 
-    let quick = reward::bounty_with_class(Outcome::Victory, 40, &bill, under_ms - 1);
+    let quick = reward::bounty_with_class(Outcome::Victory, 40, &bill, under_ms - 1, reward::AtTheBell::default());
     assert_eq!(quick, 40 + 40 * pct / 100, "a quick win paid the plain bounty");
-    let slow = reward::bounty_with_class(Outcome::Victory, 40, &bill, under_ms + 1);
+    let slow = reward::bounty_with_class(Outcome::Victory, 40, &bill, under_ms + 1, reward::AtTheBell::default());
     assert_eq!(slow, plain, "a slow win paid the bonus anyway");
 
     // And nobody else is paid for being quick.
     for name in OFFERED.iter().filter(|n| **n != "Showstopper") {
         let other = vec![def(name).clone()];
         assert_eq!(
-            reward::bounty_with_class(Outcome::Victory, 40, &other, 1),
+            reward::bounty_with_class(Outcome::Victory, 40, &other, 1, reward::AtTheBell::default()),
             plain,
             "{name} is being paid for speed and its promise says nothing about it"
         );
@@ -160,12 +160,12 @@ fn a_fast_win_pays_more_and_a_slow_one_does_not() {
 fn losing_quickly_is_still_losing() {
     let bill = vec![def("Showstopper").clone()];
     for outcome in [Outcome::Defeat, Outcome::Stalemate] {
-        assert_eq!(reward::bounty_with_class(outcome, 40, &bill, 1), 0, "{outcome:?} paid");
+        assert_eq!(reward::bounty_with_class(outcome, 40, &bill, 1, reward::AtTheBell::default()), 0, "{outcome:?} paid");
     }
     // And a lose/win cycle still pays exactly one win, quick or not.
-    let cycle = reward::bounty_with_class(Outcome::Defeat, 40, &bill, 1)
-        + reward::bounty_with_class(Outcome::Victory, 40, &bill, 1);
-    assert_eq!(cycle, reward::bounty_with_class(Outcome::Victory, 40, &bill, 1));
+    let cycle = reward::bounty_with_class(Outcome::Defeat, 40, &bill, 1, reward::AtTheBell::default())
+        + reward::bounty_with_class(Outcome::Victory, 40, &bill, 1, reward::AtTheBell::default());
+    assert_eq!(cycle, reward::bounty_with_class(Outcome::Victory, 40, &bill, 1, reward::AtTheBell::default()));
 }
 
 /// **A rout is not quick, it is nothing**, so it pays the plain bounty.

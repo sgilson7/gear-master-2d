@@ -157,12 +157,22 @@
       <div class="screenbox">
         <header class="fighthead">
           <div>
-            <p class="eyebrow">level five</p>
-            <h2>What you are</h2>
-            <p class="note">You have been out of the pit long enough that people have started
-              deciding what you are. This is the one time you get a say in it, and it does not
-              come off.</p>
+            <p class="eyebrow" id="fork-eyebrow">level five</p>
+            <h2 id="fork-title">What you are</h2>
+            <!-- **Two forks, one screen**, so the prose is written by
+                 `offerClass` rather than sitting here in two copies. The
+                 level-five question and the one the second paper buys are the
+                 same question asked twice, and the only differences are the
+                 count of cards and whether Escape works. -->
+            <p class="note" id="fork-note">You have been out of the pit long enough that people
+              have started deciding what you are. This is the one time you get a say in it, and
+              it does not come off.</p>
           </div>
+          <!-- The way out of the second fork, and there is none out of the
+               first. A plain button, because that is what every other "back
+               out" on this page is — `.ghost` was invented here and inherited
+               nothing, which is the `.made .tabs` lesson in a new coat. -->
+          <button type="button" id="fork-close" hidden>Sleep on it</button>
         </header>
         <div id="fork-choices" class="shelf"></div>
         <p id="fork-says" class="says" hidden></p>
@@ -221,6 +231,9 @@
         <header class="fighthead">
           <div>
             <p class="eyebrow" id="tree-which">a Sprocketman's craft</p>
+            <!-- What the class on this tab promises, in the engine's own
+                 words, re-read from the tuned power every repaint. -->
+            <p class="promise" id="tree-promise" hidden></p>
             <h2>The tree</h2>
             <!-- Generic, because there is a tab a tree now and this line used
                  to describe the base one on all of them. -->

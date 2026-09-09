@@ -490,6 +490,15 @@ pub enum ClassPower {
     WrongSense(i32),
     /// Start every fight already holding `n` rage. You came in angry.
     Avenged(i32),
+    /// One of the ten M13 experts, carrying its own tuned knobs.
+    ///
+    /// **One arm, not ten.** There are three exhaustive matches on this enum
+    /// with thirty arms each, and ten variants would be thirty new arms to
+    /// write and thirty places for the eleventh to be forgotten. The nesting
+    /// costs nothing the guard cares about: matching `Expert(e)` and then
+    /// matching `e` is still two exhaustive matches, and
+    /// [`crate::expert::ExpertPower`] is where the ten live with their knobs.
+    Expert(crate::expert::ExpertPower),
 }
 
 impl ClassPower {
@@ -508,6 +517,12 @@ impl ClassPower {
         }
         Some(match self {
             Guilt => return None,
+            // **An expert is not something a fountain has in front of it.**
+            // It is taken off a paper for two finished trees, and the fountain
+            // ranking cannot pour one — `is_earned` says so. Doubling twelve
+            // points of somebody's tuning is also not a thing a fountain
+            // could mean.
+            Expert(_) => return None,
             // A town class is not something a fountain has in front of it, so
             // there is nothing for the doubling fountain to double.
             Piety { .. } | Tired { .. } | Ticket { .. } | Recycler { .. } => return None,
@@ -608,6 +623,7 @@ impl ClassPower {
                 format!("every item shares {}% of the best", pct)
             }
             ClassPower::Avenged(n) => format!("start every fight with {} fury", n),
+            ClassPower::Expert(e) => e.short(),
             ClassPower::Adaptable(n) => format!("every act banks {} of all four pools", n),
         }
     }
@@ -789,6 +805,10 @@ impl ClassPower {
                  {} mana, {} rage, {} faith, {} nature",
                 n, n, n, n, n
             ),
+            // **Read off the tuned knobs**, so the promise re-reads itself
+            // after every point spent. That was already the rule for the five
+            // base classes; it is now the rule for twelve points of tuning.
+            ClassPower::Expert(e) => e.describe(),
         }
     }
 }
@@ -1007,7 +1027,55 @@ pub static CLASSES: &[ClassDef] = &[
         requires: &[],
         power: ClassPower::Showstopper { pct: 50, under_ms: 10_000 },
     },
+    // ---- M13's ten, one per pair of the five the fork deals ---------------
+    //
+    // **Appended, and every one of them `is_earned`.** They ask for nothing
+    // because nothing you build points at one: you finish two class trees and
+    // take the paper. `expert::EXPERTS` is where the pair and the knobs live,
+    // and this is the roster entry that lets every screen already asking
+    // `CLASSES` for a name and a blurb find one without being told about a
+    // second list. `the_roster_carries_every_expert` is what keeps the two in
+    // step, because a hand-written list of ten is a list that can be nine.
+    EXPERT_DEFS[0],
+    EXPERT_DEFS[1],
+    EXPERT_DEFS[2],
+    EXPERT_DEFS[3],
+    EXPERT_DEFS[4],
+    EXPERT_DEFS[5],
+    EXPERT_DEFS[6],
+    EXPERT_DEFS[7],
+    EXPERT_DEFS[8],
+    EXPERT_DEFS[9],
 ];
+
+/// The ten experts as `ClassDef`s, derived from `expert::EXPERTS`.
+///
+/// **Derived rather than typed twice.** A `const fn` over the table, so the
+/// name, the blurb and the power come from the one place they are written and
+/// a change there cannot leave this behind. It is spelled out index by index
+/// above because `CLASSES` is a slice literal and Rust has no splat.
+const EXPERT_DEFS: [ClassDef; 10] = {
+    let mut out = [ClassDef {
+        name: "",
+        blurb: "",
+        requires: &[],
+        power: ClassPower::Guilt,
+    }; 10];
+    let mut i = 0;
+    while i < 10 {
+        let e = crate::expert::EXPERTS[i];
+        out[i] = ClassDef {
+            name: e.name,
+            blurb: e.blurb,
+            // Nothing you wear points at an expert, so it asks for nothing —
+            // and `is_earned` is what keeps that from making it the floor.
+            requires: &[],
+            power: ClassPower::Expert(e.power),
+        };
+        i += 1;
+    }
+    out
+};
 
 /// How well a build matches one class.
 #[derive(Clone, Debug)]
@@ -1086,6 +1154,9 @@ pub fn how_you_get_it(name: &str) -> Option<&'static str> {
     if !is_earned(name) {
         return None;
     }
+    if crate::expert::is_expert(name) {
+        return Some("taken off Spike's counter, for two finished class trees");
+    }
     Some(match name {
         "Piety" => "prayed for, at a town chapel",
         "Ticket to Ride" => "five prayers, at a town chapel",
@@ -1111,6 +1182,14 @@ pub fn how_you_get_it(name: &str) -> Option<&'static str> {
 
 pub fn is_earned(name: &str) -> bool {
     if TOWN_CLASSES.contains(&name) {
+        return true;
+    }
+    // **An expert is handed over, never qualified for.** Nothing you wear
+    // points at one: you finish two trees and take the paper. That is exactly
+    // what `is_earned` means, so the ten fall out of `rank` and `classify` for
+    // free — and `a_fountain_can_never_pour_an_earned_class`, which is older
+    // than this block, is what proves it rather than a new check.
+    if crate::expert::is_expert(name) {
         return true;
     }
     crate::event::EVENTS

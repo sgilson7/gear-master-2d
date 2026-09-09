@@ -452,6 +452,37 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
    face — and it is the last thing on this screen that comes off, so it is not
    behind a hover. */
 .wares .promise { font-size: 13.5px; line-height: 1.5; color: var(--ink); }
+
+/* A line in a list that is also a button.
+   The sheet is a list of facts and one of them — the unanswered paper — is a
+   thing you can act on. Styled as the sentence it is rather than as a control,
+   because a button in a run of facts reads as a mistake. */
+.linky {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+.linky:hover, .linky:focus-visible { color: var(--gold, #c8a24a); }
+
+/* The promise at the head of a class tree.
+   **Its own rule, because `.promise` was scoped to `.wares`** and a `<p>` in a
+   `fighthead` is not inside one. A style scoped to a container is a style the
+   next user of that class name will not get — which cost this project a
+   `.made .tabs` and an evening. */
+#tree-promise {
+  margin: 2px 0 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--ink);
+  max-width: 62ch;
+}
 /* **Five classes, in two rows.** Three were offered and `auto-fill` left the
    row padded out with empty track; `auto-fit` collapsed it and the three shared
    the width. Four still fitted a 1280x720 viewport, measured — and `PLAN.md`

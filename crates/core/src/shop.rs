@@ -107,6 +107,108 @@ pub fn commission_price(def: &PieceDef) -> i32 {
     at_pct(def.price, COMMISSION_PCT)
 }
 
+// ------------------------------------------------------------------- papers
+//
+// M13. Three papers on one counter, two of them refused when you first see
+// them, and the refusal names what is in the way.
+
+/// What a shelf wants before it will sell.
+///
+/// **The van at [4, 6] already gates its whole stock on a level**, through
+/// `PlaceDef::hidden_until_level`; this gates one *line* of it, and on a fact
+/// about the trees rather than about walking. One field, two readers, and the
+/// **line stays drawn** — a refused entry is priced, described and greyed,
+/// because a shelf you cannot see is not a shelf, it is a secret.
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+pub enum StockGate {
+    /// Not before this level.
+    Level(u32),
+    /// Not before this many of your class trees are finished.
+    TreesFinished(u8),
+}
+
+impl StockGate {
+    pub fn met(self, level: u32, finished: u8) -> bool {
+        match self {
+            StockGate::Level(n) => level >= n,
+            StockGate::TreesFinished(n) => finished >= n,
+        }
+    }
+
+    /// Why not, with the count in it.
+    ///
+    /// **TONE rule 12: he can count.** A line that greys out saying only "not
+    /// yet" reads as broken, and this project has written that sentence down
+    /// four times — a button that greys with no reason is a button a player
+    /// reports as a bug.
+    pub fn refusal(self, level: u32, finished: u8, of: u8) -> String {
+        match self {
+            StockGate::Level(n) => format!("level {n}, and you are level {level}"),
+            StockGate::TreesFinished(n) if of == 0 => {
+                format!("{n} finished class trees, and you have no class yet")
+            }
+            StockGate::TreesFinished(n) => format!(
+                "{n} finished class {}, and you have finished {finished} of the {of} you are",
+                if n == 1 { "tree" } else { "trees" }
+            ),
+        }
+    }
+}
+
+/// The three things on Spike's counter that are not enchs.
+///
+/// **All three are visible from the first time you walk in.** A locked line on
+/// a shelf you can read is a goal; an absent line is a secret, and this game
+/// has one shut door whose answer the player may already be carrying — the
+/// Reach's frame — and that door opens rather than refusing for the same
+/// reason.
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+pub enum Paper {
+    /// The Kaklon Patent's licence, which the van has sold since M10.
+    Patent,
+    /// A second class, reopening the level-five fork with the four you did not
+    /// take.
+    Second,
+    /// The expert your pair reaches. Free, because you have already paid twice.
+    Expert,
+}
+
+impl Paper {
+    pub const ALL: [Paper; 3] = [Paper::Patent, Paper::Second, Paper::Expert];
+
+    pub fn id(self) -> &'static str {
+        match self {
+            Paper::Patent => "licence",
+            Paper::Second => "second-paper",
+            Paper::Expert => "expert-paper",
+        }
+    }
+
+    /// **5,000 for the second class, matching the Patent.** The two cost the
+    /// same on purpose: one buys a licence and one buys a class, and Spike
+    /// does not price by what a thing is worth to you. The expert paper is
+    /// free because the twenty-four points that reached it were the price.
+    pub fn price(self) -> i32 {
+        match self {
+            Paper::Patent | Paper::Second => crate::ench::LICENCE_PRICE,
+            Paper::Expert => 0,
+        }
+    }
+
+    /// What has to be true before he will sell it.
+    ///
+    /// The Patent has never had one — it is the way round the fork for anybody
+    /// whose class did not come with it, and gating that on anything would be
+    /// gating the exception.
+    pub fn gate(self) -> Option<StockGate> {
+        match self {
+            Paper::Patent => None,
+            Paper::Second => Some(StockGate::TreesFinished(1)),
+            Paper::Expert => Some(StockGate::TreesFinished(2)),
+        }
+    }
+}
+
 pub const FORMAT: &str = "gm2d-shops";
 pub const VERSION: u32 = 1;
 

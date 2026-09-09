@@ -70,6 +70,14 @@ pub struct ItemProfile {
     /// which is what a mid-fight save carrying a creature name and a tile rests
     /// on.
     pub fragile: bool,
+    /// Whether any component of this item has an ench bolted to it.
+    ///
+    /// **Set in `Character::combat_items`, never by the board**, exactly the
+    /// way `spins` and `fragile` are: the cells are the board's answer and an
+    /// ench is the character's. Two rules read it — `Productivity` doubles an
+    /// enched item's every-nth act, and `Beacon` lends off one — and both would
+    /// otherwise have to carry a `PieceId` list into a fight that has no board.
+    pub enched: bool,
     /// **Overtake**: the first time this item fires in a fight, it fires
     /// again immediately. Read off the pieces here so combat does not have to
     /// walk a registry it does not have.
@@ -859,11 +867,14 @@ impl Loadout {
         //    layer and an enchantment is under it - so it contributes here, on
         //    its own, as the permanently-loose thing it is. Its stats reach the
         //    wearer the same way any unassembled piece's do.
-        for id in slot.pieces() {
+        // **`enchantments()`, not `pieces()` filtered by kind.** They cannot
+        // differ — `Slot::place` routes by kind, so an enchantment is never in
+        // the gear layer — and walking both layers to find one is a sentence
+        // that says the wrong thing about what it is looking for. The comment
+        // beside `pieces()` claimed for two blocks that it walks the gear layer
+        // only; `Slot::worn` is that half, and this is the other.
+        for id in slot.enchantments() {
             let def = reg.def(id);
-            if !def.kind.is_enchantment() {
-                continue;
-            }
             // Dead enchantments give nothing at all, stats included. An
             // enchantment with another one touching it is not a weaker
             // enchantment, it is a smothered one.
@@ -1105,10 +1116,9 @@ impl Loadout {
             // grids rather than only in the one that swings.
             let mut raw_triggers = raw_triggers;
             let mut attracts_curses = false;
-            for eid in slot.pieces() {
-                if !reg.def(eid).kind.is_enchantment() {
-                    continue;
-                }
+            // The underlay, asked for by name. See the note on the other
+            // enchantment walk above.
+            for eid in slot.enchantments() {
                 if !slot.enchant_is_live(eid) {
                     continue;
                 }
@@ -1202,6 +1212,7 @@ impl Loadout {
                 // profiles afterwards, because a profile is the board's answer
                 // and an ench is the character's.
                 fragile: false,
+                enched: false,
                 attracts_curses,
                 steady: item
                     .pieces

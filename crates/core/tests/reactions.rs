@@ -45,6 +45,7 @@ fn item(name: &str, slot: SlotKind, cooldown_ms: u32, stats: Stats) -> ItemProfi
         turn_cycle: Vec::new(),
         spins: false,
         fragile: false,
+        enched: false,
         attracts_curses: false,
         steady: false,
         overtakes: false,

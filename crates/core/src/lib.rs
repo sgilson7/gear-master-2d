@@ -16,6 +16,7 @@ pub mod class;
 pub mod combat;
 pub mod enemy_data;
 pub mod event;
+pub mod expert;
 pub mod curse;
 pub mod ench;
 pub mod data;

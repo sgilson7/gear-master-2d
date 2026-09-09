@@ -92,9 +92,17 @@ export function pieceCardHtml(p) {
   if (!parts.length) parts.push(`<ul class="stats"><li class="none">it takes up room, and that is all</li></ul>`);
   // What is bolted to this one. Its own group, because it is not something the
   // component does — it is something somebody did to the component.
+  //
+  // **All of them, and there can be up to four.** A Full Bill's rack holds more
+  // than one, and a card naming the first of two is a card that is wrong about
+  // the item it is describing — which is the failure this file exists to stop.
   if (p.ench) {
-    parts.push(`<span class="head">bolted on${p.ench.active ? '' : ' — switched off'}</span>`);
-    parts.push(`<ul class="stats"><li><b>${p.ench.name}</b> — ${p.ench.spec}</li></ul>`);
+    const all = [p.ench, ...(p.ench.more ?? [])];
+    const off = all.filter((e) => !e.active).length;
+    parts.push(`<span class="head">bolted on${
+      off === all.length ? ' — switched off' : off ? ` — ${off} switched off` : ''}</span>`);
+    parts.push(`<ul class="stats">${all.map((e) =>
+      `<li><b>${e.name}</b> — ${e.spec}${e.active ? '' : ' (off)'}</li>`).join('')}</ul>`);
   }
   const where = (p.slots ?? []).join(' or ');
   // Wrapped in `.made-item`, because that is what the card CSS is written

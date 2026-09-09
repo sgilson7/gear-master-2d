@@ -72,12 +72,16 @@ pub fn run(game: &Game, difficulty: Difficulty) -> Option<CombatLog> {
     let e = game.encounter.as_ref()?;
     let spec = spec(e)?;
     // The class is a rule the fight has to know about, not a stat bundle, so it
-    // goes in here rather than being folded into `player_stats`. A character
+    // goes in here rather than being folded into `player_stats`.
+    //
+    // **Every class since M13, not the first.** A character holds up to three,
+    // and a fight that read only the level-five fork would honour two thirds
+    // of what a player paid for — which is the `Showstopper`-reaches-nothing
+    // failure with an extra step. A character
     // with no class passes an empty slice, which is exactly what
     // `simulate_at` does — so an unclassed fight is the same fight it was
     // before M5, and the golden fixture says so.
-    let worn: Vec<crate::class::ClassDef> =
-        game.character.class_def().into_iter().cloned().collect();
+    let worn: Vec<crate::class::ClassDef> = game.character.class_defs();
     Some(combat::simulate_holding(
         game.character.player_stats(),
         &game.character.combat_items(),
@@ -274,6 +278,30 @@ fn pay_a_win(game: &mut Game, creature: &'static str, receipt: &mut Vec<String>)
 ///
 /// Idempotent in the sense that matters: with no encounter it does nothing and
 /// says so, so a page that settles twice does not pay twice.
+/// How many cells `Rule::Spread` works after a fight this long.
+///
+/// A turn is `combat::SPIN_EVERY_MS`, which is the clock every spinning item
+/// in the game runs on — read rather than restated, so a rule that retuned the
+/// spin retunes this. Zero without the rule, and zero for a fight shorter than
+/// one turn.
+fn spread_turns(game: &Game, log: &CombatLog) -> u32 {
+    let every: u32 = game
+        .character
+        .rules()
+        .iter()
+        .filter_map(|r| match r {
+            crate::rule::Rule::Spread { every_turns } => Some(*every_turns),
+            _ => None,
+        })
+        .min()
+        .unwrap_or(0);
+    if every == 0 {
+        return 0;
+    }
+    let turns = log.duration_ms / crate::combat::SPIN_EVERY_MS.max(1);
+    turns / every
+}
+
 pub fn settle(game: &mut Game, log: &CombatLog, difficulty: Difficulty) -> Option<Settlement> {
     let e = game.encounter.take()?;
     let spec = spec(&e)?;
@@ -281,10 +309,20 @@ pub fn settle(game: &mut Game, log: &CombatLog, difficulty: Difficulty) -> Optio
     // **What the class adds, if it adds anything.** A settlement rule is read
     // where a settlement happens; `combat` ignores these on purpose and would
     // have gone on ignoring them for ever.
-    let worn: Vec<crate::class::ClassDef> =
-        game.character.class_def().into_iter().cloned().collect();
+    let worn: Vec<crate::class::ClassDef> = game.character.class_defs();
     let plain = reward::bounty_for(log.outcome, spec.bounty);
-    let gold = reward::bounty_with_class(log.outcome, spec.bounty, &worn, log.duration_ms);
+    // **What the board and the corpse looked like at the bell.** Two of the
+    // ten experts settle here and neither can be answered from the outcome and
+    // the clock alone; see `reward::AtTheBell`, whose `Default` is a packed
+    // board and an uncursed corpse.
+    let at = reward::AtTheBell {
+        empty_frames: game.character.empty_frames(),
+        curses_standing: log.curse_bill.standing,
+        curse_kinds: log.curse_bill.kinds.len() as u32,
+        curses_expired: log.curse_bill.expired,
+        streak: game.character.fast_wins,
+    };
+    let gold = reward::bounty_with_class(log.outcome, spec.bounty, &worn, log.duration_ms, at);
     let rating = crate::rating::creature_rating(spec, difficulty);
     // **And what an atlas pays.** On the experience only: the purse is the
     // class's argument and a survey has no business in it.
@@ -321,6 +359,40 @@ pub fn settle(game: &mut Game, log: &CombatLog, difficulty: Difficulty) -> Optio
     // fights over steps to avoid, arriving through a different door.
     for c in &mut game.world.commissions {
         c.fights_left = c.fights_left.saturating_sub(1);
+    }
+
+    // **The underlay is worked, once the fight is over.** `Rule::Spread` is
+    // the only thing in the game that changes an enchantment layer, and it
+    // happens here rather than in the tick because a fight that wrote to the
+    // character is a fight a mid-fight save could not carry a creature name
+    // and a tile for. How many turns it had is `duration_ms` over the spin's
+    // own second, so nothing about the count is invented here either.
+    //
+    // Won or lost, like the tiredness two lines above and for the same reason:
+    // the frame turned for as long as the fight lasted, whatever it ended in.
+    // **What crosses out of this fight and into the next.** Two things do, and
+    // they are the only two in the block: how many fast wins are behind you,
+    // and which permanent curses followed you. Both are written here, beside
+    // the tiredness, because this is the one line in the game that means *a
+    // fight happened, won or lost* — which is the argument M12.2's order clock
+    // already made and the reason it sits in the same place.
+    //
+    // **The rule is the character's.** It was written here and touches nothing
+    // but them, and a test asking *what does this fight leave behind* must not
+    // have to build a `Game` around a board to find out — `told` is the one
+    // knob in the block that crosses a fight boundary, so the only measurement
+    // that can see it is one that crosses the same boundary.
+    game.character.carry_out_of(log);
+
+    let spread = spread_turns(game, log);
+    if spread > 0 {
+        let worked = game.character.spread_underlay(spread);
+        if worked > 0 {
+            receipt.push(format!(
+                "{worked} cell{} of bare frame worked over",
+                if worked == 1 { "" } else { "s" }
+            ));
+        }
     }
 
     match log.outcome {

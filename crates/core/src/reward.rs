@@ -71,11 +71,42 @@ pub fn bounty_for(outcome: Outcome, bounty: i32) -> i32 {
 /// **Exhaustive**, so a class added to the game is a class somebody has decided
 /// does not pay, rather than one that quietly does not.
 /// `every_offered_class_reaches_something` is the other half of that guard.
+/// What a settlement rule needs to know beyond the outcome and the clock.
+///
+/// **The board and the corpse, carried in.** `bounty_with_class` had two
+/// arguments and could answer everything `Showstopper` asked; the two purse
+/// experts ask about things it has never been told — how much of the board you
+/// left empty, and what was still standing on the creature when it went down.
+///
+/// A struct rather than four more parameters, because the next settlement rule
+/// will want a fifth and a five-argument call at three sites is a call nobody
+/// can read. `Default` is *a packed board, an uncursed corpse and no streak*,
+/// which is the honest answer for every caller that has no board — and it
+/// makes every existing test compile unchanged while measuring the same game.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct AtTheBell {
+    /// Worn frames with nothing seated in them, 0 to 5.
+    pub empty_frames: u32,
+    /// Curses still standing on what you beat when it went down.
+    pub curses_standing: u32,
+    /// How many *different* kinds those were. There are four kinds.
+    pub curse_kinds: u32,
+    /// Curses you landed on it that had expired before the bell.
+    pub curses_expired: u32,
+    /// Fast wins in a row **before** this one.
+    ///
+    /// Carried on the character, because it outlives the fight — see
+    /// `Character::fast_wins`. The only other thing in this block that reaches
+    /// past the bell is Standing Fact's `told`.
+    pub streak: u32,
+}
+
 pub fn bounty_with_class(
     outcome: Outcome,
     bounty: i32,
     classes: &[crate::class::ClassDef],
     duration_ms: u32,
+    at: AtTheBell,
 ) -> i32 {
     use crate::class::ClassPower;
     let base = bounty_for(outcome, bounty);
@@ -127,9 +158,71 @@ pub fn bounty_with_class(
             | ClassPower::FirstBlood
             | ClassPower::WrongSense(_)
             | ClassPower::Avenged(_) => {}
+            // **Two of the ten experts argue here and eight do not.** Short
+            // Programme is Showstopper's window widened by what you left
+            // empty, and Eleventh Season bills the fallen by the curse; both
+            // are settlement rules and neither is a fight rule, which is the
+            // same division `Showstopper` itself makes. The other eight are
+            // the fight's or the board's and say so, so that adding an expert
+            // is a decision about the purse rather than a silence.
+            ClassPower::Expert(e) => pct += expert_pct(e, duration_ms, at),
         }
     }
     base + base * pct / 100
+}
+
+/// What one expert adds to a purse, in percentage points.
+///
+/// **Exhaustive over all ten**, for the reason the match above is: an expert
+/// added to the game is one somebody decided does not pay, rather than one
+/// that quietly does not.
+fn expert_pct(e: crate::expert::ExpertPower, duration_ms: u32, at: AtTheBell) -> i32 {
+    use crate::expert::ExpertPower::*;
+    match e {
+        // **Showstopper's window, widened by what you left empty.** The base
+        // is a floor rather than the whole answer, which is the class in one
+        // line: a packed build gets the floor and a bare one gets the floor
+        // plus a second a frame. The streak adds to the *window*, not to the
+        // purse — a class that paid more for being on a run would be paying
+        // twice for one fast fight.
+        ShortProgramme { per_slot, floor_ms, pct, streak } => {
+            let window = floor_ms
+                + per_slot * 1000 * at.empty_frames as i32
+                + streak * 1000 * (at.streak as i32).min(crate::expert::ExpertPower::STREAK_CAP);
+            if (duration_ms as i32) < window {
+                pct
+            } else {
+                0
+            }
+        }
+        // **Billed by the curse.** What was standing when it went down, capped;
+        // plus tenths of a curse for each one that had already expired, which
+        // is what rescues the long fight this class otherwise pays least for.
+        // Four *different* kinds doubles the column — there are exactly four
+        // kinds, so it is the only thing in the game that asks for all of them.
+        EleventhSeason { pct, count_cap, distinct, posthumous } => {
+            let counted = at.curses_standing.min(count_cap.max(0) as u32) as i32;
+            // Tenths, so half a curse is `5` and the arithmetic stays integer
+            // — the same reason every roll in this game is per-mille.
+            let ghosts = at.curses_expired as i32 * posthumous / 10;
+            let mut column = (counted + ghosts) * pct;
+            if distinct > 0 && at.curse_kinds >= crate::curse::CurseKind::ALL.len() as u32 {
+                column *= 2;
+            }
+            column
+        }
+        // The fight's, read off `Combatant::expert` at the tick.
+        LoudCalculation { .. }
+        | StandingFact { .. }
+        | OverwoundArm { .. }
+        | CurseRequisition { .. }
+        | PatentedFunnel { .. }
+        | OpeningNumber { .. }
+        | CursedLicence { .. } => 0,
+        // The board's: how many enchs fit on a component and what an enched
+        // component lends its neighbours are already in the profiles.
+        FullBill { .. } => 0,
+    }
 }
 
 /// XP for a finished fight, before the level curve is consulted.

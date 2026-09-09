@@ -87,6 +87,28 @@ pub enum Effect {
     /// this enum that wrote to the save, and `Character::enchs` is what makes
     /// that unnecessary.
     GivesEnch { ench: String },
+    /// A named integer on the live power, moved by `by`.
+    ///
+    /// **The seventh effect kind, and the first that cannot be read without
+    /// knowing which class you are in.** Every other effect changes the
+    /// character; this one changes *the class's own sentence*, which is what
+    /// an expert tree is for and what stops it becoming a second base tree.
+    ///
+    /// The knob is a plain name for the reason `Rule::CurseOnActivate`'s slot
+    /// is one: the vocabulary lives with the power that declares it —
+    /// [`crate::expert::ExpertPower::knobs`] — and a second enum listing
+    /// rate-cap-floor-rebate would be two lists to keep in step.
+    /// `SkillsData::parse` checks a tree's knobs against the power its class
+    /// declares, so **a tree naming a knob its own class has not got does not
+    /// load**. That guard is what makes
+    /// [`crate::expert::ExpertPower::tune`] safe to no-op on an unknown name.
+    ///
+    /// Tenths where a knob is fractional: `rate: 20` is 2.0 strength a point.
+    /// Everything a player reads is printed by `describe()` from the *tuned*
+    /// value, so the promise re-reads itself after every point and cannot go
+    /// stale — which was already the rule for the five base classes and is now
+    /// the rule for twelve points of tuning.
+    Tunes { knob: String, by: i32 },
 }
 
 /// What a node can grant that is not a number.
@@ -133,6 +155,22 @@ impl Effect {
             Effect::GivesEnch { ench } => match crate::data::enchs().get(ench) {
                 Some(e) => format!("+1 {} in the rack", e.name),
                 None => format!("+1 {ench} in the rack"),
+            },
+            // **The knob's own name and the signed number, and nothing else.**
+            // What the knob *means* is the class's promise, which the expert
+            // tab prints at its head and `detail` repeats on the hover — so a
+            // line here that re-explained the class would be the promise
+            // written down sixty times, once a node, going stale sixty ways.
+            // **Milliseconds are printed as seconds**, because that is what
+            // the class's own promise prints and a line that disagreed with
+            // the sentence it changes would be two answers to one question.
+            // Everything else is the knob's own word with its underscores
+            // opened out — engine words, unthemed, TONE 13a.
+            Effect::Tunes { knob, by } => match knob.strip_suffix("_ms") {
+                Some(name) => {
+                    format!("{:+.1}s {}", *by as f32 / 1000.0, name.replace('_', " "))
+                }
+                None => format!("{by:+} {}", knob.replace('_', " ")),
             },
         }
     }
@@ -205,6 +243,21 @@ impl Effect {
                      not."
                         .into(),
                 );
+            }
+            // The class's whole promise, **after this node is taken**, which
+            // is the only way to say what moving a knob does: the number is
+            // meaningless and the sentence it changes is not. Written by
+            // `ExpertPower::describe` off the tuned value, so it cannot
+            // disagree with what the node actually does.
+            Effect::Tunes { knob, by } => {
+                if let Some(e) = crate::expert::EXPERTS
+                    .iter()
+                    .find(|e| e.power.knobs().contains(&knob.as_str()))
+                {
+                    let mut after = e.power;
+                    after.tune(knob, *by);
+                    out.push(format!("{}: {}", e.name, after.describe()));
+                }
             }
             Effect::AssemblyPct { .. } => out.push(
                 "An assembly bonus is the lump a component pays only when the item it is part                  of is complete. This raises every one of them, on all five grids — so it pays                  a board that finishes what it seats and nothing at all to one that does not."
@@ -314,6 +367,21 @@ impl Node {
     /// Every effect's [`Effect::detail`], for the hover.
     pub fn detail(&self) -> Vec<String> {
         self.effects.iter().flat_map(|e| e.detail()).collect()
+    }
+
+    /// Every knob this node moves, and by how much.
+    ///
+    /// On the node rather than only on `SkillsData`, because the lints ask a
+    /// node directly and a second walk over `effects` in a test file would be
+    /// the "second copy of a list" this project keeps paying for.
+    pub fn tunings(&self) -> Vec<(String, i32)> {
+        self.effects
+            .iter()
+            .filter_map(|e| match e {
+                Effect::Tunes { knob, by } => Some((knob.clone(), *by)),
+                _ => None,
+            })
+            .collect()
     }
 }
 
@@ -445,6 +513,43 @@ impl SkillsData {
                             return Err(format!("{}: there is no ench called {ench:?}", n.id));
                         }
                     }
+                    // **A knob is checked against the power its own tree
+                    // belongs to.** Not against every knob in the game: `carry`
+                    // is Standing Fact's *and* Overwound Arm's, so a global
+                    // vocabulary would let a Standing Fact node tune a knob it
+                    // has not got and `ExpertPower::tune` would silently do
+                    // nothing — which is the serde-drops-a-key failure
+                    // wearing a new coat. This is what makes that no-op safe.
+                    if let Effect::Tunes { knob, by } = e {
+                        let owner = t.class.as_deref().unwrap_or("");
+                        let Some(power) = crate::expert::by_name(owner).map(|e| e.power) else {
+                            return Err(format!(
+                                "{}: {:?} tunes {knob:?}, and only an expert class has knobs",
+                                n.id, t.id
+                            ));
+                        };
+                        if !power.knobs().contains(&knob.as_str()) {
+                            return Err(format!(
+                                "{}: there is no {knob:?} on {owner} — it has {:?}",
+                                n.id,
+                                power.knobs()
+                            ));
+                        }
+                        // A tuning that tunes nothing is a point spent on
+                        // nothing, exactly as `Rule::check` refuses a spin
+                        // that banks no stacks.
+                        let step = crate::expert::ExpertPower::step(knob);
+                        if *by == 0 {
+                            return Err(format!("{}: moves {knob:?} by nothing at all", n.id));
+                        }
+                        if by.rem_euclid(step) != 0 {
+                            return Err(format!(
+                                "{}: moves {knob:?} by {by}, which is less than the {step} it \
+                                 takes to change what the class says",
+                                n.id
+                            ));
+                        }
+                    }
                 }
             }
         }
@@ -470,35 +575,73 @@ impl SkillsData {
         self.trees.iter().find(|t| t.class.is_none())
     }
 
+    /// Is this class's tree **finished** — every node of it taken?
+    ///
+    /// **Every node, not most of them, and not the base tree.** The base is
+    /// nobody's class; the class trees are eight to ten nodes, so a player can
+    /// count them and the game may too. M13 hangs the second paper off this,
+    /// and a threshold like "most of it" would be a number nobody could check
+    /// from inside the game — TONE rule 4.
+    ///
+    /// *Why not a level gate.* Levels measure walking and a tree measures the
+    /// class. A level-forty save that hoarded its points has mastered nothing,
+    /// and would be handed a second class for having walked about.
+    ///
+    /// **A class with no tree is never finished.** That is deliberate rather
+    /// than an oversight: the five offered classes all have one, and a sixth
+    /// added without a tree would otherwise unlock the second paper the moment
+    /// it was taken — a class finished by having no work in it.
+    pub fn tree_finished(&self, class: &str, taken: &[String]) -> bool {
+        let Some(t) = self.tree_for_class(class) else { return false };
+        !t.nodes.is_empty() && t.nodes.iter().all(|n| taken.iter().any(|x| x == &n.id))
+    }
+
+    /// How much of a class's tree is taken, out of how much there is.
+    ///
+    /// **The refusal names the count.** *"You have finished six of the eight,
+    /// and he can count"* — a shelf line that greys out saying only "not yet"
+    /// is a line that reads as broken, which is TONE rule 12 and the reason
+    /// this returns a pair rather than a bool the caller has to phrase around.
+    pub fn tree_progress(&self, class: &str, taken: &[String]) -> (usize, usize) {
+        let Some(t) = self.tree_for_class(class) else { return (0, 0) };
+        let have = t.nodes.iter().filter(|n| taken.iter().any(|x| x == &n.id)).count();
+        (have, t.nodes.len())
+    }
+
     /// Can this node be taken right now?
     ///
     /// The three refusals the plan names, in one place: bought twice, without
     /// its prerequisite, or without a point. A screen that greyed a button out
     /// for its own reasons would be a fourth rule nobody tested.
+    /// **`classes` is every class the character is, not the first one.** It
+    /// was `Option<&str>` and that was right while a character could only be
+    /// one thing; M13 gives them up to three, and a ledger that read only the
+    /// level-five fork refused every node of a tree somebody had *bought* —
+    /// which is the shape of failure this file exists to stop, arriving from
+    /// the other side. Found by the first M13.3 test that tried to take one.
     pub fn can_take(
         &self,
         id: &str,
         taken: &[String],
         points: u32,
-        class: Option<&str>,
+        classes: &[&str],
     ) -> Result<&Node, Refusal> {
         let node = self.node(id).ok_or(Refusal::NoSuchNode)?;
         // A class tree is shut to everybody but its class. Checked before
         // anything else, because "you would need X first" about a node you can
         // never take is a worse answer than "that is not yours".
         if let Some(owner) = self.tree_of(id).and_then(|t| t.class.clone()) {
-            match class {
-                None => return Err(Refusal::NoClassYet),
-                Some(c) if c != owner => {
-                    let name = self
-                        .trees
-                        .iter()
-                        .find(|t| t.class.as_deref() == Some(owner.as_str()))
-                        .map(|t| t.name.clone())
-                        .unwrap_or(owner);
-                    return Err(Refusal::WrongClass(name));
-                }
-                Some(_) => {}
+            if classes.is_empty() {
+                return Err(Refusal::NoClassYet);
+            }
+            if !classes.iter().any(|c| *c == owner) {
+                let name = self
+                    .trees
+                    .iter()
+                    .find(|t| t.class.as_deref() == Some(owner.as_str()))
+                    .map(|t| t.name.clone())
+                    .unwrap_or(owner);
+                return Err(Refusal::WrongClass(name));
             }
         }
         if taken.iter().any(|t| t == id) {
@@ -603,6 +746,25 @@ impl SkillsData {
             .flat_map(|n| &n.effects)
             .filter_map(|e| match e {
                 Effect::GivesEnch { ench } => Some(ench.clone()),
+                _ => None,
+            })
+            .collect()
+    }
+
+    /// Every knob a set of taken nodes moves, and by how much.
+    ///
+    /// A list of `(knob, by)` rather than a resolved power, because *which*
+    /// power is the character's question and this file only knows about trees.
+    /// `Character::expert_power` folds it over the right one, and a tuning
+    /// naming a knob that power has not got moves nothing — which is safe only
+    /// because `parse` refuses that tree outright.
+    pub fn tunings_from(&self, taken: &[String]) -> Vec<(String, i32)> {
+        taken
+            .iter()
+            .filter_map(|id| self.node(id))
+            .flat_map(|n| &n.effects)
+            .filter_map(|e| match e {
+                Effect::Tunes { knob, by } => Some((knob.clone(), *by)),
                 _ => None,
             })
             .collect()

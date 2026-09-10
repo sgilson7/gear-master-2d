@@ -64,8 +64,9 @@ events that pay something and say what they pay — added on the human's ask.
 `PLAN-M9.md`, `PLAN-M10.md` and `PLAN-M11.md` are done; `PLAN.md` §6d is what
 M11 left open, §6c is M10.3's, §6b is M9.4's and §6a is M8.8's.
 
-**M14 is live**, at `7d9a9bad`. Eight milestones and one reported fault,
-`402d89f` through `255fd55`, walked against the deployed page in three engines.
+**M14 is live**, at `4d065d1d`. Nine milestones and two faults reported from
+play, `402d89f` through `ff9ba52`, walked against the deployed page in three
+engines.
 `PLAN-M14.md` is the frame, `HANDOFF-M14.md` is the block's own record and
 `SECOND-ORDER-M14.md` is its notebook — **twenty-one rows, four of them
 worklist, and M14.6 is that worklist executed.**
@@ -124,12 +125,13 @@ agree is the pair**, `index.html` asking for `app.js?v=X` and that `app.js`
 carrying `BUILD='X'`. The live one as this was written is `5fb93594`, and it
 will be wrong by the next deploy whatever that deploy is for.
 
-**M14 is done and live**, deployed at `7d9a9bad` on the human's word and
+**M14 is done and live**, deployed at `4d065d1d` on the human's word and
 verified the way this file has demanded since M8: `GM2D_ORIGIN=… drive.py`
 walked **all seventy-eight checks in three engines against the deployed page**,
-and the pair agrees — `index.html` asks for `app.js?v=7d9a9bad` and that
-`app.js` carries `BUILD='7d9a9bad'`. Eight milestones, `402d89f` through
-`255fd55`, plus one fault reported from play mid-block. The suite is **832
+and the pair agrees — `index.html` asks for `app.js?v=4d065d1d` and that
+`app.js` carries `BUILD='4d065d1d'`. Nine milestones, `402d89f` through
+`ff9ba52`, plus **two faults reported from play** — the barrel that showed one
+thing and sold another, and the map that came out the wrong shape. The suite is **832
 passing** and the browser gate walks **all three engines at 78 `ok:` lines**,
 five of them M14.5's and every one negative-tested — **two of those five found
 faults on a green build**, which is the reason the gate exists. `PLAN-M14.md` is
@@ -3968,8 +3970,8 @@ the deployed page, so what a person went and looked at is the thing a gate
 cannot be: whether the two new dungeons can be *played*.
 
 ```
-live build 7d9a9bad
-  index.html asks app.js?v=7d9a9bad   app.js carries BUILD='7d9a9bad'
+live build 4d065d1d
+  index.html asks app.js?v=4d065d1d   app.js carries BUILD='4d065d1d'
   chromium walked the gate    ok      firefox  walked the gate    ok
   webkit   walked the gate    ok      78 ok lines, no failures
   the Wextreen Sump           walked end to end by `make play`:
@@ -3983,6 +3985,12 @@ live build 7d9a9bad
                               goes face, four, back and the north wall opens;
                               chain A floods it and chain B brings it back
                               WHAT SHE FACED AWAY FROM, 2123, three drops
+  the shore                   its own map since the report; the bar of shingle
+                              is drawn from the first visit, is a wall until
+                              the tenth cairn, and crosses to `the-low-water`
+  the canvas                  the same shape as the map it is drawing, on a
+                              square one and on one that is not — which it has
+                              not been since the Great Gear Cave
   console errors: none                off-origin requests: none
 ```
 

@@ -32,7 +32,11 @@ empties, and three instruments that read a map you cannot otherwise enter;
 there was one, events that pay something and say what they pay, and a row you
 earn instead of one a level hands you; **M13 what two classes reach** — a
 second paper on Spike's counter, ten experts one for each pair, a tree apiece
-that moves nothing but its own promise, and four new rules to move it with.
+that moves nothing but its own promise, and four new rules to move it with; and
+**M14 down twice, and the country under the country** — the Treyway grew a
+south, two four-floor dungeons with a puzzle on every floor went into it and
+under the lake, and behind both of them is a country with one town on it that is
+empty and says so.
 <https://sgilson7.github.io/gear-master-2d/>
 
 **M11 is live**, deployed at `43804e49` on the human's word. Its live check is
@@ -60,8 +64,22 @@ events that pay something and say what they pay — added on the human's ask.
 `PLAN-M9.md`, `PLAN-M10.md` and `PLAN-M11.md` are done; `PLAN.md` §6d is what
 M11 left open, §6c is M10.3's, §6b is M9.4's and §6a is M8.8's.
 
-**Nothing is in flight.** The most recent thing on `main` is `0aae36b`, live at
-`5fb93594`: **spells, books, crystal balls, inks and alignments are buyable.**
+**M14 is on `main` and is not deployed.** Seven milestones and one reported
+fault, `402d89f` through `07b2923`, and `git log origin/main..HEAD` is the check
+this file has demanded since M8.0 through M8.8 sat local for a whole block.
+`PLAN-M14.md` is the frame, `HANDOFF-M14.md` is the block's own record and
+`SECOND-ORDER-M14.md` is its notebook — **twenty-one rows, four of them
+worklist, and M14.6 is that worklist executed.**
+
+**The block's thesis is that this game's puzzle is the board.** Its real locks
+are `LooseItemOfSize`, `AssembledOfRarity` and the survey instruments — things a
+player opens by *packing* and by *reading* — and eight floors are eight of those
+two things. Every one is **monotone**: flags only grow, so no move on any floor
+can make the way on unreachable, and every floor has a blind solution the
+harness counts rather than the plan asserting it.
+
+Before it, and still live: the most recent thing deployed is `0aae36b`, at
+`5fb93594` — **spells, books, crystal balls, inks and alignments are buyable.**
 106 casting components, six of them reachable and all six errand rewards —
 because `roll_barrel` named its kinds by hand and covered one of the weapon's
 three recipes, and because the arcane shelf is on a map that does not exist. See
@@ -107,6 +125,21 @@ agree is the pair**, `index.html` asking for `app.js?v=X` and that `app.js`
 carrying `BUILD='X'`. The live one as this was written is `5fb93594`, and it
 will be wrong by the next deploy whatever that deploy is for.
 
+**M14 is done and is not deployed.** Seven milestones, `402d89f` through
+`07b2923`, plus one fault reported from play mid-block. The suite is **831
+passing** and the browser gate walks **all three engines at 78 `ok:` lines**,
+five of them M14.5's and every one negative-tested — **two of those five found
+faults on a green build**, which is the reason the gate exists. `PLAN-M14.md` is
+the frame, `HANDOFF-M14.md` is the block's own record, and `SECOND-ORDER-M14.md`
+is its notebook: **twenty-one rows, four of them worklist, and M14.6 is that
+worklist executed.**
+
+**Nine of `PLAN-M14.md`'s decisions came out differently and every one is in the
+divergence table**, because the floors were drawn before anybody walked them —
+and the largest is that §1.1 is written against the *cut campaign's*
+`Requirement`, which is `CLAUDE.md`'s own *grep for it, and then check which of
+the two you found* arriving on schedule.
+
 **M13 is done and live**, deployed at `ac2256c7` on the human's word, verified
 the way this file has demanded since M8: `GM2D_ORIGIN=… drive.py` walked all
 sixty-three checks in three engines against the deployed page, and every screen
@@ -121,8 +154,8 @@ read by the last milestone as its own worklist. That convention paid for itself
 M13.9, and three of them turned up something that was actually wrong.
 
 **Where the next block goes is a convention and worth keeping:** a block's frame
-is `PLAN-M14.md`, and if the frame turns out to be a different document from the
-one you execute, `PLAN-M14-EXEC.md` **wins where the two disagree** — the same
+is `PLAN-M15.md`, and if the frame turns out to be a different document from the
+one you execute, `PLAN-M15-EXEC.md` **wins where the two disagree** — the same
 relationship `PLAN.md` has with `PLANNING-BRIEF.md` and `PLAN-M12-EXEC.md` had
 with its frame. Divergences from a plan go in the table at the bottom of this
 file with their reasons, in the commit that makes them, because a divergence
@@ -134,6 +167,12 @@ Three things are outstanding rather than open: the two rows of `TRIAGE-M12.md`
 that are not the builder's — an agent spot-run against a deployed build, and the
 friend — and `PLAN-M12-EXEC.md` §8 row 13, which is M12's own biggest miss
 written down as a decision.
+
+**And one is M14's, and it is the human's**: `PLAN-M14.md` §9 decision 1, the
+third town's name. It ships as *a town with no name on the post yet*, which is
+what the plan says to do if unanswered and is true and in register.
+`common::UNWRITTEN` is where the emptiness is declared, and the day somebody
+names it, the name goes in the map file and nothing else moves.
 
 **M12's thesis is board pressure.** Cells outnumber pieces, so a board reads
 as inventory space rather than a puzzle, and there is no moment where putting
@@ -267,6 +306,14 @@ something cost a day.
   page*, which is a separate step and has its own section below.
 - Do not start a milestone before the previous gate is live and the human has
   seen it.
+- **A page that draws a world has to be told which world, every time it can
+  have changed.** Three instances now and one rule: a defeat carrying you to
+  another map (M11), a save being restored (M12), and — M14 — **a choice being
+  taken.** Answering an event raises a flag, a flag is what a `hidden_until`
+  reads, so the third turn of the chair opens the door in the north wall, and
+  the page went on drawing an empty room because `paintPanel` re-reads only when
+  the *map id* moves. Found by the browser gate, and it could only be: nothing
+  in `cargo test` can see a place that is there and not drawn.
 - **The page draws numbers core sent it, and never recomputes one.** Violated
   three times and invisible every time: the replay once subtracted damage from
   a health total it kept itself and ignored `absorbed`; it once opened every
@@ -284,6 +331,39 @@ something cost a day.
   the character — and never the character. Same division a gate's key makes.
   `Allowances::of` matches `Rule` exhaustively, so a new rule is a decision
   about walking rather than a silence.
+- **A puzzle is monotone, because flags are.** `WorldState.flags` and
+  `answered` only ever grow, so a puzzle whose wrong move locks the right one is
+  a puzzle the save cannot come back from. Every one in this game is solved by
+  *discovering* something and never by avoiding something — and that is not a
+  limit, it is what kind of puzzles this game has. `puzzle::solvable_blind` is
+  the proof and `every_floor_in_the_game_can_be_solved_blind` runs it over every
+  floor there is, because a list of six written by hand is a list that can be
+  five. **The corollary bit in M14**: nine moves in an order over three
+  always-offered labels is not expressible, because a choice carries one
+  requirement and one outcome. See *The Silt Stair*.
+- **A drain may take ground away only if a later one gives it back.** Every
+  drain before M14 opened something — a lake into bed, a tide into coast, a
+  channel into silt — and one into a wall would be a lake that empties into
+  rock. The Drowned Gallery floods a road on purpose, and what makes that safe
+  is that the chain after it in the same list turns the water it made into silt:
+  flags only grow, so somebody who pulled A can always pull B. **The pairing is
+  the monotone rule written where it can be checked.**
+- **A repeating event may never pay.** `TileEvent::repeats` is the third kind of
+  event, after the card that is answered once and the note that is only read,
+  and it exists because a *sequence* is not a decision — the chair at the bottom
+  of the Silt Stair is three moves at one object. What stops it being a faucet
+  is at load: a repeating event may raise a flag, cost you fatigue, or nothing,
+  and gold, a component, experience, a tin, an errand and a warp are all
+  refused. That list is what a puzzle is made of.
+- **Two lints asking one question is how they drift.** M14 hid a stair behind a
+  flag in a game that had only ever gated on `answered`, and **three** separate
+  checks went red, each for the right reason and the wrong question, each
+  counting only place ids. Two were retired into
+  `no_flag_is_waited_on_forever`, which asks it over every mark and every reader
+  at once. The third —
+  `every_flag_an_event_sets_is_read_by_something` — asks the *other* direction
+  and stayed, and once it learned about `hidden_until_all`, `needs_all`,
+  `floors[].cleared` and drains it was still right about two live faults.
 - **Before adding a system, grep for it.** `explain.rs` was written with a
   duplicate `Action::describe` and `Trigger::describe` already in `piece.rs`,
   and M8 opened with a request to add curses to a game that has had 59
@@ -369,7 +449,8 @@ something cost a day.
   `passable || (wade && shallow)` and M11.4 widened it to the whole body of
   water. The check that made that safe is older than the change:
   `an_allowance_never_shuts_anything`, over every tile of every map — which is
-  what let eleven maps be added without re-deriving reachability by hand.
+  what let eleven maps be added without re-deriving reachability by hand — and
+  another nine in M14 on top of that.
 
 ## Commands
 
@@ -790,10 +871,14 @@ The ending screen does **not** take the fork's treatment. You can back out of
 it, because the world is still there behind you and there is an errand about
 the door to hand in. What it must not do is pretend there is more.
 
-## Eleven maps, and where they live
+## Twenty maps, and where they live
 
 M11 took the map count from two to eleven, and the first thing it had to do was
-move the two. `data/tiles.json` and `data/dungeon.json` are
+move the two. **M14 took it to twenty** and had to move nothing, which is the
+return on that: nine new files in the same directory, nine lines in
+`data::MAPS`, and the only map that changed shape is the Treyway, which grew a
+south **in its own file** — one country, one file, for the reason there were not
+two of it in the first place. `data/tiles.json` and `data/dungeon.json` are
 `data/maps/west-bambulon.tiles.json` and
 `data/maps/the-great-gear-cave.tiles.json`; every map is one file in one
 directory named for the id it registers under, and `data::MAPS` is still the
@@ -809,6 +894,9 @@ the rename was cheaper before the nine than after.
 | **the-drambus-stack-5 … -1** | 10×10 each | five floors, one boss each, one sitting each |
 | **under-the-lake** | 13×9 | what the lake was on top of, and the door the demo ends at |
 | **the-reach** | 20×20 | the same map every time; what changes is the instrument |
+| **the-sump-1 … -4** | 12×12 each | the Wextreen Sump: three puzzles and the Ninth Surveyor |
+| **the-silt-stair-1 … -4** | 12×12 each | the Silt Stair: three puzzles and what Marbulon faced away from |
+| **the-undercountry** | 20×20 | the country under the country, and one town with nothing in it |
 
 - **The Treyway brackets levels twelve to sixteen, not five to nine.** The plan
   asked for five to nine and that number was written before anybody counted the
@@ -935,6 +1023,191 @@ there is a ring of cut stone in the middle of it with a grating in it.
 - **`walkable` widened and nothing had to be re-derived**, because
   `an_allowance_never_shuts_anything` has held over every tile of every map
   since M9.2. An allowance that only ever adds is an allowance you can widen.
+
+## Down twice, and the country under the country
+
+M14 is eight floors with a puzzle on each, and the whole block hangs off one
+sentence that is a property of the engine rather than a taste:
+
+> **`WorldState.flags` and `answered` only ever grow**, so a puzzle whose wrong
+> move locks the right one is a puzzle the save cannot come back from.
+
+So every puzzle in the game is solved by **discovering** something and never by
+avoiding something. That is not a limit on the puzzles, it is what kind of
+puzzles this game has — and what it has instead is the board:
+`LooseItemOfSize`, `AssembledOfRarity` and the three survey instruments are
+locks a player opens by *packing* and by *reading*, which is the thing the whole
+game is already about.
+
+### `puzzle::solvable_blind`, and why it is in core
+
+A floor only a person can solve is a floor `make play` cannot walk, and a walker
+that stops at floor two is a gate that never sees floor four. So every floor has
+a **blind solution** and this counts it — in core rather than in `tests/`, for
+the reason `pressure.rs` is: *a number a design stakes itself on that is worked
+out by the thing measuring it is the page recomputing a total, one level up.*
+
+**A visit is one card read**, and the model is a sweep against an adversary that
+arranges the floor as badly as it can be arranged: everything that could still
+raise a flag is *remaining*, the solver walks all of them, the one that opens is
+visited **last**. Nine cairns is `9 + 8 + … + 1`, which is **45** — the number
+`PLAN-M14.md` §1.2 builds its whole ceiling out of, reproduced by the model
+rather than assumed by it.
+
+Two things it learned the expensive way, and both changed a floor's number:
+
+- **A card on the far side of a channel is not a card yet.** The first version
+  counted every event whether or not the solver could reach it, which measures
+  the flag chain and not the floor. It re-drains the world at every position and
+  floods from the arrival tile now — and on a floor drawn slightly worse that is
+  the difference between *solvable* and *the wheel that drains the channel is
+  behind the channel*.
+- **A card this floor can never open is read once.** The Cairnfield's slab wants
+  a golem, or nine heights off a clipboard two hundred paces away on the shore.
+  Counting it as remaining nine times over made the field 54.
+
+**And `solvable_blind_with` was written and then deleted**, which is worth
+knowing because the idea is obvious and wrong: a blind sweep carrying a golem
+comes out at **54** against 45 without one, because the instrument puts a tenth
+card on the floor worth walking to. True, and a number that moves the wrong way
+is a number somebody will one day quote. The comparison in one unit is
+`solvable_knowing(None)` against `solvable_knowing(Some(k))` — nine moves across
+the field, or one on the slab.
+
+### An instrument makes a floor short, and it charges in three currencies
+
+`PLAN-M14.md` §1.2 promises *short, never possible*, and the second half is a
+lint: `an_instrument_is_never_the_only_way_through` walks the flag graph with
+every `Surveying` choice deleted and asks whether every hidden place is still
+reachable. **Stated over the place rather than over the choice**, because that
+is where it matters — the lintel on the Shelf wants an atlas and nothing else,
+and the lintel is not a door.
+
+The first half does not survive as the plan wrote it, and the reason is the
+finding: **the three floors charge in three different currencies.**
+
+| floor | blind | what it charges | what the instrument takes off |
+|---|---|---|---|
+| the Lip | 8 | **12 fatigue** | the compass reads the bearing off the plate |
+| the Shelf | 1 | **a component** | the atlas reads the shorthand and sets the catch |
+| the Cairnfield | 45 | **forty-four extra card reads** | the golem stands on the slab |
+
+Only the third moves the count. The plan's *1 / 1 / 9* survives there and
+nowhere else.
+
+### The Wextreen Sump
+
+Four floors down a hole eleven feet across on the Treyway's new southern shore,
+behind a gate that wants an instrument the way the Reach's edge does.
+
+- **The Lip.** Three channels, three wheels, and the wheels sit *below* the
+  channels they open in the order you meet them. **One of the three is not
+  needed**: channel C is walked round at its dry east end, so the wheel that
+  opens it buys a crossing that is already there — and it is the only wheel in
+  the game that keeps what you feed it. The floor is a tax on not looking.
+- **The Shelf.** One door on a counterweight, three ways through: leave a
+  three-by-two in the slot, read the lintel with an atlas, or stand something
+  **epic** in it. Epic and not rare because the board a player actually has
+  holds exactly one epic item and twenty commons.
+- **The Cairnfield.** Nine heaps, **one title between them**, and the digit is
+  on neither the map nor the place ids: which surveyor's heap a cairn is, is the
+  puzzle. The nine heights are distinct and the ninth clipboard on the shore
+  lists them in surveyor order, so a person can solve it by hand. **A cairn's
+  refusal names a cairn and never which one** — TONE rule 12 and the block's own
+  *a cairn does not say which cairn is under it* meeting in the same sentence.
+- **The Sump Floor.** The Ninth Surveyor, on an island in the water.
+
+### The Silt Stair
+
+Behind the door under the lake, which is a **way on** now: *nothing is behind
+the door* was true and is not, and the two paragraphs saying nobody had decided
+went with the writing, one map further down.
+
+- **The Landing.** The stair is cut one wide and four long. Lay something that
+  shape in it and it keeps it, or carry down The Cracked Lens — which is
+  Sootmother's own drop, so somebody who came through the lake the intended way
+  is already holding the key, and the manifest on the wall says so in a hand
+  that stops after *a lens, cracked*.
+- **The Chair Room.** One chair facing a door, and **the only repeating event in
+  the game**. Three moves in an order: face, four, back — which is what Marbulon
+  does in front of her own door on the first map, and has done since M8.
+- **The Drowned Gallery.** Two chains: A floods it and B drains what A made, and
+  B will not move in a dry room and says so. **The first drain in the game that
+  takes ground away**, and what makes that safe is that the one after it in the
+  same list gives it back — flags only grow, so somebody who pulled A can always
+  pull B. The stair was under the floor the whole time.
+- **The Bottom of the Bottom.** What Marbulon Faced Away From, on silt.
+
+**`no_homeward` on all four**, for the lake's own reason one map further down:
+it is the one place where the walk *is* the content, and a set that posted you
+out of it would delete what the two hundred and six steps cost.
+
+### Neither is one sitting, and that is a different budget
+
+The Drambus Stack is one sitting because its budget is **fatigue**. These two
+are not, because their budget is **what you brought**: no floor names an
+`outside`, every floor has a stair back up, and a save taken on one reopens on
+it. A player who needs a three-by-two from the van can go and get it, and what
+that costs is the walk.
+
+`PlaceDef::floors` is what makes going back in land on the first *unsolved*
+floor — and `Floor::cleared` reads `marks()` rather than `answered` now, because
+three of the Sump's four floors have no boss at all and are done when their
+puzzle is solved, which is a flag.
+
+### A rating predicts nothing about whether a fight is winnable
+
+The recon both new bosses were dressed against, measured against
+`common::geared_from` — this repository's answer to *the board a player actually
+has* since M11.7:
+
+| it beats | it loses to |
+|---|---|
+| Sootmother 1670, Anvilheart 1803, The Last Light 2031, **Francis 2958** | **Cairn Chorus 1141**, The Tallow Saint 1223, The Ground Floor 1507, Gilt 2489 |
+
+It beats a 2958 and loses to a 1141. What decides it is **damage per second**:
+Cairn Chorus deals 206 and kills it in thirteen seconds, Sootmother deals 19.7
+and loses at the buzzer.
+
+**And what a creature deals is mostly how many items its board makes.** Two
+drafts of two bosses were wrong the same way and neither was about a number:
+
+- The Ninth Surveyor's first weapon grid was a hilt and two accessories, which
+  **assemble nothing**. She dealt 7.8 damage a second — and exactly 7.8 at
+  strength 152 and at 320, because strength pays a swing and there was no swing
+  to pay. A sweep of seven healths against four strengths came back Victory in
+  all twenty-eight, which is the Kettleworks finding again: *the body numbers
+  are not the lever.*
+- What Marbulon Faced Away From's first board made **three** items where the
+  other makes eight, because a hilt, a key and a charm in one row touch and
+  merge.
+
+**The coordinates are the dial and the piece names are the costume**, which is
+upstream's *monsters wear the catalogue* arriving from the other side.
+
+### The Undercountry, and a town drawn honestly
+
+Twenty by twenty, three ways in, one town, and the town is **empty**: no shelf,
+no errands, and a screen one tile south of it that says the writing stops here.
+It is not a placeholder drawn as a town; it is a town drawn honestly, and what
+goes in it is the next plan's.
+
+Three lints refused it, all correctly — a town on a map sells something, wants
+something, and is not the same shop as another. `common::UNWRITTEN` is the
+mirror of `avail.rs`'s `STAGED`: **a shelf with no ground under it and ground
+with no shelf on it, and both are fine only because somebody wrote the name
+down.** Every one of the three exceptions is *asserted* rather than skipped — an
+unwritten town that quietly grew a shelf is a list that has gone stale.
+
+**The two doors at the two bottoms are `needs_all` and Marbulon's is
+`hidden_until_all`**, and the difference is which side you are standing on. A
+door at the bottom of a dungeon that is not there is a room you walk out of
+thinking the dungeon ended; a door in a shallows on the starting map that is
+there from the first afternoon is a secret with a signpost on it. So the first
+one you finish shows you a sealed door with the other dungeon's name in the
+refusal — `Game::sealed_because`, two registers on one line, `shut` from the
+map file and *which dungeon is still standing* derived off the places so it
+cannot go stale when a boss is renamed.
 
 ## The Wextreen Reach, and reading a map through what you carry
 
@@ -3850,6 +4123,15 @@ about a string. Every one caught something on its first run:
 | 13.7 | **The papers stand on Spike's van**, `the-kaklon-van` at `[4, 6]` on west-bambulon, behind `hidden_until_level: 10`, which §8.1 leaves open. The van is already the counter the Patent's paper is sold from, and a second counter would be a second place to remember. | `data/maps/west-bambulon.tiles.json` |
 | 13.8 | **The second fork does not re-raise itself.** §1.3 says the paper is spent on the choice and a player may sleep on it; `offerClass` is called after every fight, after every banking and on every load, because that is what the level-five fork needs. Wired to the same three, the second fork came back after every fight — the game refusing to let you sleep on it. It opens on the purchase and from the line on the sheet that says the paper is in your pack, which is what §1.3's *"opening it in the pack re-raises the screen"* means on a page with no pack. | `web/app.js`, `offerClass` |
 | 13.9 | **`Loadout::assembly_pct` came out of the save**, which the plan does not mention because it is older than the plan. It was written into every file and thrown away on the way in, so what the file said was a number nothing read and anything could believe. Derived on load, and guarded at every door that sets a class. | `crates/core/src/save.rs` |
+| 14.1 | **`PLAN-M14.md` §1.1 is written against `event::Requirement`, which is the cut campaign's type.** It names `LooseItemOfSize`, `AlignedItems` and `AssembledOfRarity` as the locks a player opens by packing, and §4.1, §4.2 and §5.1 hang three doors on them; all three are `Copy`, `&'static str` and unreachable from a data file. Two were ported. **`AlignedItems` could not be**: its doc means *assembled items sharing one alignment word*, which is upstream's naming system and did not survive the fork — `PieceKind::Alignment` is a *component kind* wearing the same noun. `AssembledOfRarity` is the plan's own third named lock and reads the same live board. | `crates/core/src/tile_event.rs` |
+| 14.2 | **Three of six blind counts moved, and one did not.** Measured rather than asserted: the Lip is 8 against 10, the Shelf 1 against 11, the Landing 1 against 2, the Chair Room 3 against 27, the Gallery 3 against 3 — and **the Cairnfield is 45 against 45**, which is the number §1.2 builds its whole design on and the reason to believe the other five. The Shelf's eleven is *"a player cycles their tray"*; there is no cycling, a footprint requirement is met or it is not, and what that floor charges is a component. | `crates/core/src/puzzle.rs` |
+| 14.3 | **The chair is three moves and §5.2 asks for nine.** Nine rungs is not expressible in monotone flags over three always-offered labels, and §1.1 is what says so: a choice carries one requirement and one outcome, so *"Turn it to face the door"* raises one flag and cannot be the first, fourth and seventh move. Nine choices puts the answer on the card as a list of labels; a counter with a modulus in it is a flag that goes down. The sequence is Marbulon's and she does it three times because she is nervous. | `data/events.json`, `the-chair` |
+| 14.4 | **`needs_all` rather than `hidden_until_all` at the two bottoms.** §4.4 and §5.4 hide the doors and §1.6 says finishing the first dungeon shows *"a sealed door with the other dungeon's name in the refusal"* — which a hidden door cannot do. Two fields, two jobs: one decides whether a place is *there* and the other whether it *opens*. | `crates/core/src/world.rs`, `PlaceDef::needs_all` |
+| 14.5 | **`Outcome::Counter` is cut and the low-water marker is an examinable.** §3 asks for it explicitly *"nothing reads it this block; it is the watcher pattern, planted"*. `Outcome::Xp` wrote into a counter nothing consulted for four blocks and nine events printed a receipt for experience that never existed; planting one deliberately is that bug with a note beside it, and `every_flag_an_event_sets_is_read_by_something` refuses it by name. | `data/events.json`, `the-low-water-mark` |
+| 14.6 | **The stop-line is on a `Door`, not on the town.** §1.5 says the third town's prose says the writing stops here; a `TownShelf` is an id, a stock list and a commission list and has never had prose. So it is on the one kind the game already has for a screen that is not a loop, one tile south of the counter — which also gives `PlaceKind::Door` back the user M14.3 took off it when the door under the lake became a gate. | `data/maps/the-undercountry.tiles.json` |
+| 14.7 | **Marbulon's third answer is the gate's own paragraph, not a third choice on her card.** §6 asks for the choice; her event is spent the moment you take either of her errands, and her errands are the questline that unlocks the Cave — so a third choice on it is a choice nobody can reach. | `data/maps/west-bambulon.tiles.json`, `the-door-in-the-shallows` |
+| 14.8 | **`the_ninth_surveyor_is_a_fight_the_board_wins`**, not `..._beatable_by_the_walker_at_22`. A level-22 board is not one this game produces — the shipped transcript ends at fourteen — and `common::geared_from` is what M11.7 established as *the board a player actually has*. **Both bosses were dressed by damage a second and not by rating**, which is what §4.4 asks for and which the recon justifies: that board beats Francis at 2958 and loses to Cairn Chorus at 1141. | `crates/core/tests/sump.rs` |
+| 14.9 | **The wading shortcut on the Gallery is drawn, and saves eight tiles.** §9 decision 4 leaves it to the recon — *"if it saves nothing it is cut"*. The chains are in opposite walls, so a flooded gallery is seventeen tiles round and nine across. **Flooding the room makes the walk worse**, which is the design rather than an accident: chain A costs you the crossing you had and the Toad's Own Frame is what gives it back. | `data/maps/the-silt-stair-3.tiles.json` |
 
 Also true, and not in the brief because it could not have been:
 
@@ -3960,6 +4242,14 @@ Every figure below was re-measured for M12.6 rather than carried forward.
 | M13.7: the screens — a second fork, a sixth tab, a rack that holds more than one | 781 passing |
 | M13.8: five browser checks, all five negative-tested | 781 passing |
 | **M13.9: the notebook executed, and the suite from a minute to 34 seconds** | **785 passing** |
+| M14.0: five small things, and the plan was written against the dead type | 802 passing |
+| M14.1: the Treyway grows a south, and three narrow lints were one lint | 806 passing |
+| M14.2: the Wextreen Sump — four floors, three puzzles, the Ninth Surveyor | 814 passing |
+| The barrel showed you one thing and sold you another | 815 passing |
+| M14.3: the Silt Stair, and the chair is three moves because nine is not monotone | 823 passing |
+| M14.4: the Undercountry, and a requirement is two things now | 828 passing |
+| M14.5: five browser checks, and both of the things they found were real | 828 passing |
+| **M14.6: the notebook executed, and six floors became every floor** | **831 passing** |
 
 **M13.5 adds none and M13.7 and M13.8 add none, and all three are honest.**
 M13.5 lands ten trees into a data file and the three lints it needed were
@@ -3983,21 +4273,21 @@ content*, and one check now measures what a range used to guess at.
 | Catalogue | **568 components, and neither M12 nor M13 moved it** — every save that opened on M11 opens on M13. M11's two seams (544 → 550 → 568) are the last there have been. **Prices are ×5 as of M12.6** and that is seam-free: `catalog_fingerprint` hashes names only |
 | Pieces that apply a curse | 59 of 568, 4 kinds, 2 on the starting shelf |
 | Sets | **9**, of three components each bar the Toad Frame's two — every piece `EVENT_ONLY`, off one creature **or one stack of floors**, in one grid |
-| Ladder | **58 creatures**, rated 16 to 2958. Six are stepped down: the Kettleworks field's five and The Gearwright, at `gear_offset: -2` plus a body trim where the footprint families ran out — 12 to 16% each |
-| `crates/core` | **~47.5k lines**, down from ~50k at the fork and up 3.1k over M13 — `wc -l` over every `.rs` under `crates/core/src`. The method is named because the figure carried here through M12.6 was 42.4k while the code had moved under it |
-| wasm | **1539 KB**, up from 1470 KB at M12 — `dist/web/pkg/gm2d_wasm_bg.wasm` after `make web`. CI builds its own and the two are not bit-identical, which is why the *stamp* is checked against itself and never against a number |
-| Save format | v1. **No seam, still, and M13 is the first block to take a field *out*.** Five new `Character` fields, every one `#[serde(default)]` and skipped when empty — `second_class`, `expert`, `second_paper`, `fast_wins`, `told_curses` — so an older file opens as one class with no paper and nothing following it out of the last fight, which is what those characters had. **`assembly_pct` is gone from the file**: it was written and then thrown away on the way in, and *a number that is stored and ignored is a number somebody will one day believe*. A save now carries **six boards**; one naming five gets an instrument frame at the base height, and `repair_boards` lifts an old build's instrument out of the weapon grid on the way in — the loader is where a field carried across a build change is caught. `banked`, `commissions`, `rolled_barrel`, `rolled_ledgers`, `rerolls` and `bought_licence` all default the same way |
-| Maps | **11**, in `data/maps/*.tiles.json` — west-bambulon 20×20, the-great-gear-cave 9×5, the-treyway 16×16, kettleworks-field 20×20, five Drambus Stack floors 10×10, under-the-lake 13×9, the-reach 20×20 |
-| Places | 2 towns, 56 events, 11 gates, 7 bosses, 2 crossings, 1 bench, 1 door — 41 of the events are the Kettleworks field alone |
-| Events | 56 placed: **43 ask something and 13 are notes**, over **73 choices**. **21 chains from 10 roots**, every root choice handing over an errand. Was 9 asking and 0 chains before M12.5 |
+| Ladder | **60 creatures**, rated 16 to 2958, and the two new ones are the deepest fights in the game — the Ninth Surveyor at 2053 and What Marbulon Faced Away From at 2123. **Both were dressed by damage a second against `common::geared_from` and not by rating**, because that board beats a 2958 and loses to a 1141; see *A rating predicts nothing*. Six are stepped down: the Kettleworks field's five and The Gearwright, at `gear_offset: -2` plus a body trim where the footprint families ran out — 12 to 16% each |
+| `crates/core` | **~49k lines**, down from ~50k at the fork and up 1.5k over M14 — `wc -l` over every `.rs` under `crates/core/src`. The method is named because the figure carried here through M12.6 was 42.4k while the code had moved under it |
+| wasm | **1660 KB**, up from 1539 KB at M13 — `dist/web/pkg/gm2d_wasm_bg.wasm` after `make web`. CI builds its own and the two are not bit-identical, which is why the *stamp* is checked against itself and never against a number |
+| Save format | v1. **No seam, still, and M14 adds no field at all** — nine maps, eight floors, two creatures, two terrains and four new `Requirement`/`Outcome` arms, and not one of them is in the save: a map is content, an event's shape is content, and what a run has done was already `answered` and `flags`. Every save that opened on M11 opens on this. Before it: **M13 is the first block to take a field *out*.** Five new `Character` fields, every one `#[serde(default)]` and skipped when empty — `second_class`, `expert`, `second_paper`, `fast_wins`, `told_curses` — so an older file opens as one class with no paper and nothing following it out of the last fight, which is what those characters had. **`assembly_pct` is gone from the file**: it was written and then thrown away on the way in, and *a number that is stored and ignored is a number somebody will one day believe*. A save now carries **six boards**; one naming five gets an instrument frame at the base height, and `repair_boards` lifts an old build's instrument out of the weapon grid on the way in — the loader is where a field carried across a build change is caught. `banked`, `commissions`, `rolled_barrel`, `rolled_ledgers`, `rerolls` and `bought_licence` all default the same way |
+| Maps | **20**, in `data/maps/*.tiles.json` — west-bambulon 20×20, the-great-gear-cave 9×5, **the-treyway 16×26**, kettleworks-field 20×20, five Drambus Stack floors 10×10, under-the-lake 13×9, the-reach 20×20, **four Wextreen Sump floors 12×12, four Silt Stair floors 12×12, the-undercountry 20×20** |
+| Places | **129 over twenty maps**: 3 towns, 80 events, 33 gates, 9 bosses, 2 crossings, 1 bench, **1 door** — 41 of the events are the Kettleworks field alone, and the one door is the last screen in the game, on the Undercountry |
+| Events | **80 placed: 64 ask something and 16 are notes, over 102 choices.** **21 chains from 10 roots**, every root choice handing over an errand. **One of the eighty repeats** — the chair at the bottom of the Silt Stair, which is three moves at one object and the only event in the game that is not spent when it is answered |
 | `PlaceKind` | 7: town, event, gate, boss, door, crossing, bench — **unchanged**; the Stack is `PlaceDef::floors` on a gate, not an eighth kind |
 | Effect kinds | **7**: stat, start_with, grow_slot_rows, assembly_pct, grants, gives_ench, **tunes** — the seventh is M13.2's, and the knob it names is checked at parse time against the tree's own class |
 | Ench effect kinds | 4: power, haste, spin, fragile — **unchanged** |
 | `Rule` kinds | **13**: curse_on_activate, spin_extra, spin_keep, spin_every, scout, rout, wade, survey, homeward, **spread**, **row_harvest**, **beacon**, **productivity**. The four new ones are M13.3's and are the first since M9 that needed code in the fight rather than a translation at the bell |
 | Instruments | 3 — compass, atlas, survey golem, all three on **their own frame**: `SlotKind::Instrument`, six by three, outside `SlotKind::ALL` so nothing that asks what a board is worth ever counts it. It never grows, and one instrument is what it holds |
-| Data files | **23** — 12 in `data/` and 11 in `data/maps/`; `data::FILES` is the list `data_is_current` walks |
+| Data files | **29** — 9 in `data/` and 20 in `data/maps/`; `data::FILES` is the list `data_is_current` walks, and adding a file to it is the second half of adding one to `data::MAPS` |
 | Starting kit | 2 components, **140 Fnorp**, 1 assembled weapon. The purse moved ×5 with the prices; at 28 a beginner could afford three of thirteen barrel lines and no helmet, and both M4 soft-lock guards said so |
-| Towns | **2 placed** (the pit and Kettleworks), 1 staged; fixed shelves of 11 / 15 / 17 that **still never reroll**; none sells an ench, and neither placed one sells arcana — a town is its character. Under each counter: a **16-line barrel** and an **order book** (8 lines over 3 towns), and those two *do* turn over. **High Wick is the arcane shelf and it is the staged one**, which is why the barrel had to be what carries the casting family |
+| Towns | **3 placed** (the pit, Kettleworks and the third town) and 1 staged, and **the third one is empty on purpose** — `common::UNWRITTEN` is where that is declared, the mirror of `avail.rs`'s `STAGED`: a shelf with no ground under it and ground with no shelf on it, and both are fine only because somebody wrote the name down. Of the two that sell anything: fixed shelves of 11 / 15 / 17 that **still never reroll**; none sells an ench, and neither placed one sells arcana — a town is its character. Under each counter: a **16-line barrel** and an **order book** (8 lines over 3 towns), and those two *do* turn over. **High Wick is the arcane shelf and it is the staged one**, which is why the barrel had to be what carries the casting family |
 | Errands | **40** — 19 authored, and **21 chain errands a choice hands over**. A chain errand is `granted`: never offered at a counter, because the branch you did not take must not be sitting on the tile a moment later |
 | Enchs | **8** — 3 on the van's table at **2,000 each**, 2 awarded by a class tree, 1 off an errand, and **2 written for the ends of chains**. The van also sells **a licence for 5,000** to anybody whose class did not come with one |
 | Restoratives | 3, at **20 / 55 / 140** Fnorp — and one of them is now also a bus fare |
@@ -4014,10 +4304,16 @@ content*, and one check now measures what a range used to guess at.
 | Classes offered | **5 on the fork, 15 in the game.** The ten experts are `C(5,2)`, one a pair, and none is on any list a player picks from — you finish two trees and the pair decides. **Every one of the fifteen reaches something and so does every one of the sixty expert nodes**, and both are lints that *call* rather than declare |
 | Experts | **10**, carrying **31 knobs**. Six are read at the tick, two settle in the purse, one is the board's, one crosses a fight boundary. A character holds **up to three classes** and all three are live |
 | The papers | **3** on Spike's van, all drawn from the first visit: the Patent's licence at 5,000, the Second Paper at 5,000 behind one finished tree, and the expert paper at **nothing** behind two — the twenty-four points were the price |
-| Figures | 27 `.tex` → **81 SVGs** (13 family drawings, 4 drawn for themselves, 5 classes, 3 towns, you) |
-| Art coverage | **58 of 58 creatures**, 3 of 3 towns, 5 of 5 classes, and you. The set pieces, the instruments and the enchs have no art and want none — a component has never had a figure |
-| Browser gate | **63 `ok:` lines**, 3 engines. The newest five are M13.8's: the papers are drawn and the locked one counts, the second fork offers four and can be slept on, two finished trees take the expert and a point moves the promise at its tab, a Full Bill's component holds two enchs and everybody else's holds one, and the sheet says every class you are. **All five were negative-tested** |
-| The suite | **788 passing, and 34 seconds warm.** It was a minute through most of M13 and `rules_m13.rs` was 29.6s of it: `beacon_board` ran Auto-pack over the whole catalogue on twenty-row grids, four times, because it was the only fixture in the repository with two items that touch. `common::items_in_a_row` is what replaced it — **0.03s** — and `experts_reach.rs` went 9.6s → 6.5s by measuring once per *set* of nodes rather than once per question. `drops.rs` at 11.3s is now the slowest file and is untouched. `[profile.test] opt-level = 2` since M12.6, with debug assertions and overflow checks still on — this is the `test` profile, not `--release` |
+| Figures | 27 `.tex` → **83 SVGs** (13 family drawings, 4 drawn for themselves, 5 classes, 3 towns, you) |
+| Art coverage | **60 of 60 creatures**, 3 of 3 towns, 5 of 5 classes, and you. The set pieces, the instruments and the enchs have no art and want none — a component has never had a figure |
+| Browser gate | **78 `ok:` lines**, 3 engines. The newest five are M14.5's: the tide is drawn before it goes out and walkable after, the lip of the Sump refuses in the Reach's words and opens the frame, a wheel that keeps what you feed it says what shape it wants, the chair is three moves in an order **and comes back**, and the third town is empty with the screen after it saying so. **All five were negative-tested, and two of the five found faults on a green build** — see *A stack gate that wants an instrument* |
+| The suite | **831 passing, and 27.5 seconds warm** — measured after M14, and the ten slowest files are the ten that were slow at M13: `drops.rs` at 11.0s and `experts_reach.rs` at 6.3s, neither of them M14's, and nothing this block added is above 0.4s. **`SECOND-ORDER-M14.md` row 17 was written claiming it had slowed to minutes and is corrected there**: what is minutes is rebuilding sixty test binaries after a change to `combat.rs`, which is a fact about editing the engine. Before M14 it was **788 passing, and 34 seconds warm.** It was a minute through most of M13 and `rules_m13.rs` was 29.6s of it: `beacon_board` ran Auto-pack over the whole catalogue on twenty-row grids, four times, because it was the only fixture in the repository with two items that touch. `common::items_in_a_row` is what replaced it — **0.03s** — and `experts_reach.rs` went 9.6s → 6.5s by measuring once per *set* of nodes rather than once per question. `drops.rs` at 11.3s is now the slowest file and is untouched. `[profile.test] opt-level = 2` since M12.6, with debug assertions and overflow checks still on — this is the `test` profile, not `--release` |
+| Floors with a puzzle | **6**, and floors with a boss **2**. Every one is monotone — flags only grow, so no move can make the way on unreachable — and `puzzle::solvable_blind` counts the worst case rather than the plan asserting it |
+| Blind-solution ceilings | Sump **8 / 1 / 45**, Stair **1 / 3 / 3**. The plan guessed 10 / 11 / 45 and 2 / 27 / 3; **the Cairnfield's forty-five came back exactly**, which is the reason to believe the other five. `every_floor_in_the_game_can_be_solved_blind` holds every floor there is under 45 |
+| `Requirement` kinds | **8**: none, gold, flag, holding, **loose_item_of_size**, **assembled_of_rarity**, **surveying**, **all**. Three of them are ported from `event::Requirement`, which is the cut campaign's type — `PLAN-M14.md` §1.1 names them and they were unreachable from a data file |
+| `Outcome` kinds | **11**, the newest being **give_up** — the other half of `LooseItemOfSize`, and a separate arm because a requirement is a question and an outcome is what happened |
+| Terrains | **17**, the newest two being **`tide`** (sea that goes out, drawn only where something drains it) and **`silt`** (what a room is floored with after it has been under water). `silt` is not `lakebed`, and the difference is eleven inches |
+| New components | **0**. Every key, every drop and every thing a door wants in M14 is in the catalogue already, so the fingerprint is untouched and every save that opened on M11 opens on this |
 
 Note the catalogue is **568**, not the 374 the retheme document counts — it
 grew upstream after that document was written, and three times here. Any

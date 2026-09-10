@@ -1,0 +1,198 @@
+# HANDOFF-M14.md — down twice, and the country under the country
+
+*`PLAN-M14.md` is the frame. This is the block's own record: what each milestone
+found, and why the divergences are what they are. `SECOND-ORDER-M14.md` is the
+notebook — twenty-one rows, written when noticed — and M14.6 is that notebook
+executed.*
+
+*`CLAUDE.md` is the current account of the repo. Read that first if you have
+never seen this.*
+
+---
+
+## 0. State in one paragraph
+
+**All seven milestones are done.** The suite is green at **831 passing**, and
+the browser gate walks **all three engines** with five new checks in it —
+**63 `ok:` lines to 78**. Twenty maps, nine of them new. Nothing is deployed:
+this block has not been pushed, and `git log origin/main..HEAD` is the check.
+
+**Every number in `PLAN-M14.md` that could be measured was, and most of them
+moved.** Three of the six blind-solution ceilings were guesses written before
+anybody walked the floors; one — the Cairnfield's forty-five — came back exactly
+right, which is the reason to believe the other five.
+
+---
+
+## 1. The milestones
+
+| # | Milestone | Status |
+|---|---|---|
+| M14.0 | **The primitives** — `Requirement::Surveying`, `LooseItemOfSize` and `AssembledOfRarity` **ported from the dead type**, `Outcome::GiveUp`, `TileEvent::repeats`, `Drain.tiles`, `PlaceDef::hidden_until_all` and `needs_all`, `tide` and `silt`, `puzzle::solvable_blind`, `no_flag_is_waited_on_forever` **written rather than extended** | ✅ 802 |
+| M14.1 | **The Low Water** — the Treyway 16×16 → 16×26, four places, the tide, four stubs; **three narrow lints were one lint** | ✅ 806 |
+| M14.2 | **The Wextreen Sump** — four floors, three puzzles, the Ninth Surveyor; the plan's three counts were three fictions | ✅ 814 |
+| — | **The barrel showed one thing and sold another** — reported from play mid-block | ✅ |
+| M14.3 | **The Silt Stair** — four floors, the chair, the two chains, What Marbulon Faced Away From | ✅ 823 |
+| M14.4 | **The Undercountry** — one town, empty and declared; `Requirement::All`; `Flag` reads `marks` | ✅ 828 |
+| M14.5 | **The gate** — five checks, three engines, and **both of the things they found were real** | ✅ 78 `ok:` |
+| M14.6 | **The notebook executed** — six floors became every floor | ✅ 831 |
+
+---
+
+## 2. What the plan got wrong, in order of what it cost
+
+### 2.1 It is written against the dead `Requirement` — the largest one
+
+`PLAN-M14.md` §1.1 names `LooseItemOfSize`, `AlignedItems` and
+`AssembledOfRarity` as *"locks a player opens by packing"*, and §4.1, §4.2 and
+§5.1 hang three doors on them. **All three are on `event::Requirement`**, which
+is the cut campaign's type: `Copy`, `&'static str`, not deserialisable. The type
+the game uses has four arms.
+
+This is `CLAUDE.md`'s own warning arriving on schedule — *grep for it, and then
+check which of the two you found* — and M14.0 grew by two ported arms and an
+outcome because of it.
+
+**`AlignedItems` could not be ported at all.** Its doc says *"assembled items
+sharing one alignment word"* — upstream's naming system, where a generated item
+name carried a word other items could share. The fork kept `naming.rs` and
+nothing exposes an alignment word on an assembled item, and `PieceKind::Alignment`
+is a *component kind* wearing the same noun. `AssembledOfRarity` is the plan's
+own third named lock and reads the same live board.
+
+### 2.2 Three of six blind counts, and the reason each moved
+
+| floor | plan | measured | what it actually charges |
+|---|---|---|---|
+| the Lip | 10 | **8** | 12 fatigue, or a compass |
+| the Shelf | 11 | **1** | a component, or an atlas, or an epic item |
+| the Cairnfield | 45 | **45** | forty-four extra card reads, or a golem |
+| the Landing | 2 | **1** | a 1×4, or the lens you were given |
+| the Chair Room | 27 | **3** | three moves in an order |
+| the Gallery | 3 | **3** | the walk round, or a wading set |
+
+The Shelf's eleven is *"a player cycles their tray"* — **there is no cycling**.
+A footprint requirement is met or it is not and the card says which.
+
+### 2.3 The chair cannot be nine
+
+§5.2 asks for nine flags — face, four, back, three times — and **nine rungs is
+not expressible in monotone flags over three always-offered labels**, which §1.1
+is what says. A choice carries one requirement and one outcome, so *"Turn it to
+face the door"* raises one flag; to be the first, fourth and seventh move it
+would need three. Nine choices puts the answer on the card as a list of labels;
+a counter with a modulus is a flag that goes down.
+
+Three moves, and the fiction survives: the sequence is already written on
+Marbulon's own door on the first map, and she does it three times because she is
+nervous.
+
+### 2.4 `hidden_until_all` cannot show you a refusal
+
+§4.4 and §5.4 put the two bottom doors behind `hidden_until_all` and §1.6 says
+finishing the first dungeon shows *"a sealed door with the other dungeon's name
+in the refusal"*. Those are two different fields. `needs_all` is the second one,
+and `Game::sealed_because` is the sentence.
+
+### 2.5 Two things §3 and §1.5 ask for that the engine has no shape for
+
+- **`Outcome::Counter`**, planted for nothing to read: that is `Outcome::Xp`
+  deliberately. Cut.
+- **the town's prose**: a `TownShelf` is an id, a stock list and a commission
+  list. The stop-line is on a `Door` one tile south of the counter.
+
+### 2.6 A third choice on Marbulon's card would reach nobody
+
+Her event is spent the moment you take either of her errands, and her errands
+are the questline that unlocks the Cave. The answer is the gate's own paragraph.
+
+### 2.7 `the_ninth_surveyor_is_beatable_by_the_walker_at_22`
+
+**A level-22 board is not a board this game produces** — the shipped transcript
+ends at fourteen. `common::geared_from` is what M11.7 established as *the board
+a player actually has*.
+
+---
+
+## 3. What was measured, and the two findings worth keeping
+
+### 3.1 A rating predicts nothing about whether a fight is winnable
+
+Measured against `common::geared_from`:
+
+| it beats | it loses to |
+|---|---|
+| Sootmother 1670, Anvilheart 1803, The Last Light 2031, **Francis 2958** | **Cairn Chorus 1141**, The Tallow Saint 1223, The Ground Floor 1507, Gilt 2489 |
+
+It beats a 2958 and loses to a 1141. What decides it is **damage per second** —
+Cairn Chorus deals 206 and kills it in thirteen seconds; Sootmother deals 19.7
+and loses. §4.4's *by DPS bracket, never by adding to Sootmother's* is right and
+this is the measurement behind it.
+
+### 3.2 What a creature rates is mostly how many items its board makes
+
+Two bosses, two drafts, both wrong the same way and neither about a number:
+
+- The Ninth Surveyor's first weapon grid was a hilt and two accessories, which
+  **assemble nothing**. 7.8 damage a second — and exactly 7.8 at strength 152
+  and at 320, because strength pays a swing and there was no swing to pay. A
+  sweep of seven healths against four strengths came back Victory in all
+  twenty-eight.
+- What Marbulon Faced Away From's first board made **three** items where the
+  other makes eight, because a hilt, a key and a charm in one row touch and
+  merge.
+
+**The coordinates are the dial and the piece names are the costume.**
+
+---
+
+## 4. What the browser gate found, and neither was findable in `cargo test`
+
+1. **A stack gate that wants an instrument never opened the frame.**
+   `wants_instrument = p.to.clone()` — right while the only survey gate opened
+   onto one map, and the lip of the Sump is a stack with no `to` at all. The one
+   shut door in the game whose answer you may be carrying the parts for printed
+   a refusal and stopped.
+2. **The world the page is holding, one step along.** Answering an event raises
+   a flag, a flag is what a `hidden_until` reads, so the third turn of the chair
+   opens the door — and the page went on drawing an empty room. Third instance
+   of one rule: *a page that draws a world has to be told which world, every
+   time it can have changed.*
+
+---
+
+## 5. The divergences, for `CLAUDE.md`'s table
+
+| § | Divergence | Why |
+|---|---|---|
+| 1.1 | **`AlignedItems` is `AssembledOfRarity`.** | The alignment-word machinery was the campaign's naming system and did not survive the fork. |
+| 1.2 | **The counts are 8 / 1 / 45 and 1 / 3 / 3.** | Measured. The Cairnfield agrees exactly. |
+| 3 | **`Outcome::Counter` is cut and the marker is an examinable.** | A flag nothing reads is `Outcome::Xp` planted on purpose. |
+| 4.1 | **The wheels sit below the channels they open, and wheel C is the redundant one.** | The first draft put wheel B one step from the arrival tile and hung the stair behind all three. |
+| 4.2 | **The Shelf's third way is an epic assembled item, not `AlignedItems(2)`.** | Epic and not rare because the board a player actually has holds exactly one epic item — measured. |
+| 4.4 | **`needs_all`, not `hidden_until_all`, at the two bottoms.** | §1.6 wants a refusal, and a hidden door cannot show one. |
+| 5.2 | **The chair is three moves.** | Nine is not monotone over three always-offered labels. |
+| 5.3 | **The wading shortcut is drawn and saves eight tiles.** | §9 decision 4, answered by measurement: seventeen round, nine across. |
+| 6 | **Marbulon's third answer is the gate's paragraph, not a choice on her card.** | Her card is spent the moment you take either errand. |
+| 1.5 | **The stop-line is on a `Door`, not on the town.** | A town has no prose field. |
+| M14.2 | **`the_ninth_surveyor_is_a_fight_the_board_wins`.** | A level-22 board is not one this game produces. |
+
+---
+
+## 6. What is left
+
+**Nothing in the block.** Seven milestones, the suite green, the gate green in
+three engines, and the walker's transcript in `testing/transcripts/`.
+
+One thing is the human's and is not the builder's:
+
+1. **`PLAN-M14.md` §9 decision 1 — the third town's name.** It ships as *a town
+   with no name on the post yet*, which is what the plan says to do if
+   unanswered, and it is true and in register. `common::UNWRITTEN` is where the
+   emptiness is declared.
+
+And `PLAN-M14.md` §9 decisions 2, 3, 4 and 5 are answered in the commits that
+answered them: the Undercountry is drawn plainly and §9.2 is left where it was
+found, `built-the-tenth` is the tide's flag as recommended, the wading shortcut
+is drawn and saves eight tiles, and the two bottoms make a golem out of
+certainties.

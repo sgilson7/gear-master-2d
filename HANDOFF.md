@@ -226,7 +226,7 @@ REBASELINE_GOLDEN_COMBAT=1 cargo test -p gm2d-core
   something, seventy-three choices, and **ten of them are chain roots** whose
   every branch opens a different errand. Before M12.5 nine asked anything at
   all and forty-one were prose that paid nothing.
-- **Eleven maps and two towns.** West Bambulon is where you start; the Great
+- **Twenty maps and three towns.** West Bambulon is where you start; the Great
   Gear Cave is a short dungeon behind a gate that wants Marbulon's key, and its
   boss drops the key to **a door in the western wall**. Behind that door is
   **the Treyway**, a 16×16 country of which West Bambulon is one tile, and the
@@ -243,6 +243,20 @@ REBASELINE_GOLDEN_COMBAT=1 cargo test -p gm2d-core
   whole lake rather than its rim, and entered before the tower falls the way
   down is twenty-one tiles of slag against eleven of road. Fatigue is what the
   early way costs, because fatigue is the only currency a dungeon here has.
+- **And behind that door is the Silt Stair**, since M14: four floors cut for
+  people carrying something, with a puzzle on each. Its twin is **the Wextreen
+  Sump**, four more, down a hole on the Treyway's southern shore — which is
+  itself new, and behind two tiles of sea that go out on the day the tenth cairn
+  goes up on the Reach. Behind both is **the Undercountry**, twenty by twenty,
+  with one town on it that is **empty and says so**: what goes in it is the next
+  plan's.
+- **Six of those eight floors have a puzzle rather than a boss**, and every one
+  is **monotone** — flags only grow, so no move on any floor can make the way on
+  unreachable. `puzzle::solvable_blind` counts the worst case a solver who does
+  not know the answer would take, and `every_floor_in_the_game_can_be_solved_
+  blind` runs it over every floor there is. **Neither dungeon is one sitting**:
+  the Stack's budget is fatigue and theirs is *what you brought*, so every floor
+  has a stair back up and a save taken on one reopens on it.
 - **Three instruments, on a frame of their own.** A compass, an atlas and a
   survey golem, built out of map shards the Stack and the lake leave behind.
   They took the **weapon** grid until M13 — *surveying costs your sword arm* —
@@ -428,9 +442,12 @@ quest log. `git log origin/main..HEAD` is the check and it costs nothing.
 
 ### Six things M11 established, so you do not re-derive them
 
-1. **Eleven maps live in `data/maps/`, one file per id.** `data/tiles.json` and
+1. **Twenty maps live in `data/maps/`, one file per id.** `data/tiles.json` and
    `data/dungeon.json` are gone as names; two maps could be two nouns in a data
-   directory and eleven cannot.
+   directory and eleven cannot. **M14 took it to twenty and had to move
+   nothing**, which is the return on having done it: nine new files, nine lines
+   in `data::MAPS`, and the only map that changed shape is the Treyway, which
+   grew a south *in its own file*.
 2. **`data::map_at` is the file and `data::map_now` is the game** — the same
    split `place_at` and `place_now` made. A lake that is water until a tower
    falls is `TilesData::drains`, not a second map file and not a grid in the

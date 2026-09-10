@@ -431,9 +431,19 @@ def in_town(page, buy=True, probe=None):
     page.wait_for_selector("#town", state="hidden", timeout=5000)
 
 
+# Which choice has been taken at which card, by title and label.
+#
+# **A card that comes back needs a memory**, and M14's chair is the first one in
+# the game that does. See the note where it is read.
+TAKEN: set = set()
+
+
 def card(page, probe=None):
-    """Read an event card, take the first choice, take any errand."""
+    """Read an event card, take a choice it has not taken here, take any errand."""
     title = page.text_content("#card-title")
+    # The title rather than the id, because the id is not on the screen — and a
+    # card is identified to a player by what it says at the top of it.
+    event_id = title
     prose = page.locator("#card-prose p").all_text_contents()
     say(f"  card: {title}")
     for p in prose[:1]:
@@ -456,8 +466,32 @@ def card(page, probe=None):
     if probe is not None:
         probe.took("quest")
     if page.is_visible("#card-choices button:not(:disabled)"):
-        pick = page.locator("#card-choices button:not(:disabled)").first
-        say(f"        chose: {pick.locator('b').text_content()}")
+        # **The one this card has not been given before.**
+        #
+        # Taking the first enabled choice was right while every event in the
+        # game was answered once. M14's chair is three moves at one object, and
+        # its first move has **no requirement** — monotone flags cannot un-set a
+        # flag, so the first move of a cycle stays live for ever. A walker that
+        # always takes the first enabled choice turns the chair to face the door
+        # for the rest of the run, which is a room it can never leave and is not
+        # the room's fault.
+        #
+        # Remembering what has already been pressed *here* is what a person does
+        # at a card that comes back, and it changes nothing anywhere else:
+        # every other event in the game is spent the moment it is answered.
+        n = page.locator("#card-choices button:not(:disabled)").count()
+        pick = None
+        for i in range(n):
+            b = page.locator("#card-choices button:not(:disabled)").nth(i)
+            label = b.locator("b").text_content()
+            if (event_id, label) not in TAKEN:
+                pick, chosen = b, label
+                break
+        if pick is None:
+            pick = page.locator("#card-choices button:not(:disabled)").first
+            chosen = pick.locator("b").text_content()
+        TAKEN.add((event_id, chosen))
+        say(f"        chose: {chosen}")
         pick.click()
         page.wait_for_timeout(80)
         got = page.locator("#card-receipt p").all_text_contents()
@@ -587,6 +621,8 @@ def main():
             seen_kettleworks = False
             on_floor = None
             seen_under = False
+            seen_under_country = False
+            seen_sump = False
             came_back = False
             floors_down = 0
             answered = set()
@@ -810,23 +846,91 @@ def main():
                 want = None
                 grate = place_by_id("the-way-under-the-lake")
                 reach_edge = place_by_id("the-reach-edge")
+                lip = place_by_id("the-lip-of-the-sump")
+                # **The tide, read off the page's own grid.** The lip is on the
+                # map from the first visit and is two tiles of sea away until
+                # the tenth cairn goes up; a walk that heads for it before then
+                # bounces off the water three times and bars the tile, which is
+                # the right behaviour and a waste of a hundred presses.
+                tide_out = (world["id"] == "the-treyway"
+                            and len(world.get("rows") or []) > 16
+                            and world["rows"][15][8] != "tide")
                 if world["id"] == "under-the-lake":
                     if not seen_under:
                         seen_under = True
                         head("under the lake")
                         say(f"  {panel(page)}")
                         phase = "under the lake"
-                    down = next((p for p in world["places"] if p["kind"] == "door"), None)
+                    # **The door is a way on since M14.3**, not the screen that
+                    # said nobody had decided — so it is a `gate` and this
+                    # looked for a `door`, found none, and stood at the bottom
+                    # of the lake with nothing to walk to.
+                    down = place_by_id("the-door-under-the-lake")
                     boss_here = next((p for p in world["places"] if p["kind"] == "boss"), None)
                     up = place_by_id("the-way-back-up-the-steps")
                     if c["fatigue"] >= 40 and up:
                         want, why = up["at"], "back up the steps"
-                    elif down:
-                        want, why = down["at"], "under the lake"
                     elif boss_here:
                         want, why = boss_here["at"], "under the lake"
+                    elif down:
+                        want, why = down["at"], "the silt stair"
                     else:
                         want, why = None, "under the lake"
+                elif (world["id"].startswith("the-sump-")
+                      or world["id"].startswith("the-silt-stair-")):
+                    # **A floor with a puzzle on it, which is new in M14 and is
+                    # the first thing this walker has been asked to *solve*
+                    # rather than survive.**
+                    #
+                    # One rule for all eight of them and none of it is a list:
+                    # read whatever is unread, then take the way down, and if
+                    # there is no way down take the way back up. That is exactly
+                    # the order a person does it in, and it is why the floors
+                    # are drawn with the stair `hidden_until` the puzzle's own
+                    # flag — the way down being *absent* is what tells anybody,
+                    # walker or player, that there is still something to read.
+                    if world["id"] != on_floor:
+                        on_floor = world["id"]
+                        head(world["id"].replace("-", " "))
+                        say(f"  {panel(page)}")
+                        phase = world["id"].replace("-", " ")
+                    unread = [tuple(p["at"]) for p in world["places"]
+                              if p["kind"] == "event"
+                              and (world["id"], tuple(p["at"])) not in read_over]
+                    down = next((p for p in world["places"]
+                                 if p["kind"] == "gate" and p["id"].endswith("-stair")), None)
+                    up = next((p for p in world["places"]
+                               if p["kind"] == "gate" and p["id"].endswith("-up")), None)
+                    floor_boss = next(
+                        (p for p in world["places"] if p["kind"] == "boss"), None)
+                    if c["fatigue"] >= 44 and up:
+                        # Worn through four floors from a town. The way back up
+                        # is a target like any other — M9.4's lesson, and the
+                        # reason these floors have one at all: their budget is
+                        # what you brought, not how tired you are.
+                        want, why = up["at"], "back up"
+                    elif floor_boss:
+                        want, why = floor_boss["at"], phase
+                    elif down:
+                        want, why = down["at"], phase
+                    elif unread:
+                        unread.sort(key=lambda a: abs(a[0] - here[0]) + abs(a[1] - here[1]))
+                        want, why = list(unread[0]), phase
+                    elif up:
+                        want, why = up["at"], "back up"
+                    else:
+                        want, why = None, phase
+                elif world["id"] == "the-undercountry":
+                    if not seen_under_country:
+                        seen_under_country = True
+                        head("the undercountry")
+                        say(f"  {panel(page)}")
+                        say(f"  {world['width']}x{world['height']}, "
+                            f"{len(world['regions'])} regions: "
+                            + ", ".join(r["name"] for r in world["regions"]))
+                        phase = "the undercountry"
+                    third = next((p for p in world["places"] if p["kind"] == "town"), None)
+                    want, why = (third["at"], phase) if third else (None, phase)
                 elif world["id"].startswith("the-drambus-stack-"):
                     # Inside a floor. One thing to do and one way out of it.
                     if world["id"] != on_floor:
@@ -921,6 +1025,18 @@ def main():
                     elif promises:
                         promises.sort(key=lambda a: abs(a[0] - here[0]) + abs(a[1] - here[1]))
                         want, why = list(promises[0]), "the treyway"
+                    elif (lip and tide_out and surveyed and c["fatigue"] < 30
+                          and (len(recent) < 6 or sum(recent) * 2 >= len(recent))):
+                        # **The lip of the Wextreen Sump**, which is only there
+                        # to walk to once the tide has gone out and only opens
+                        # for somebody carrying an instrument. Rested and
+                        # winning, the same two guards the Stack's door has and
+                        # for the same reason: what is down it is four floors
+                        # from a town.
+                        if not seen_sump:
+                            seen_sump = True
+                            say("  the tide is out and the lip is open")
+                        want, why = lip["at"], "the sump"
                     elif reach_edge and floors_down >= 5 and lake_done and not surveyed:
                         # **Last of all.** The edge refuses without an
                         # instrument and says so, which is a road being shut —

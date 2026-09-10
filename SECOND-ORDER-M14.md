@@ -305,3 +305,29 @@ had just left without a user.
 
 Row 15's question is answered by the content rather than by deleting a variant:
 the ending screen is a `Door`, there is exactly one, and it is on the last map.
+
+---
+
+## M14.6 — the notebook, executed
+
+The last milestone reads the rows above and turns the ones that are worklist
+into work. This is the convention M13.9 established and the reason `CLAUDE.md`
+says to keep the notebook: seven of that block's rows were candidates, all seven
+were executed, and three of them turned up something that was actually wrong.
+
+**Four rows are candidates here**, and they are the four that name something
+still true rather than something already fixed:
+
+| row | what it asks | milestone |
+|---|---|---|
+| 15 | `PlaceKind::Door` has one user — does it earn a variant? | M14.6a |
+| 17 | the suite's runtime, and the row was wrong about it | M14.6b |
+| 6 | the instrument set off certainties — count it end to end | M14.6c |
+| 20 | two checks read the right thing off the wrong element | M14.6d |
+
+And two the block found and did not have a place to put:
+
+| | what it asks | milestone |
+|---|---|---|
+| new | **`solvable_blind` is not run over every floor in the game** — six floors are checked by hand in two files, and the seventh, eighth and any future one are checked by nobody | M14.6e |
+| new | **the walker takes the first enabled choice**, which is a trap at any card that comes back | M14.6f — done in M14.5's walker work |

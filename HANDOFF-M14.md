@@ -14,8 +14,12 @@ never seen this.*
 
 **All seven milestones are done.** The suite is green at **831 passing**, and
 the browser gate walks **all three engines** with five new checks in it —
-**63 `ok:` lines to 78**. Twenty maps, nine of them new. Nothing is deployed:
-this block has not been pushed, and `git log origin/main..HEAD` is the check.
+**63 `ok:` lines to 78**. Twenty maps, nine of them new.
+
+**It is committed, pushed and live.** `255fd55` on `main`, deployed at build
+`7d9a9bad`, and verified against the deployed page: **seventy-eight gate checks
+in three engines**, and both dungeons walked end to end by `make play` from a
+start line.
 
 **Every number in `PLAN-M14.md` that could be measured was, and most of them
 moved.** Three of the six blind-solution ceilings were guesses written before

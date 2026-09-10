@@ -64,9 +64,8 @@ events that pay something and say what they pay — added on the human's ask.
 `PLAN-M9.md`, `PLAN-M10.md` and `PLAN-M11.md` are done; `PLAN.md` §6d is what
 M11 left open, §6c is M10.3's, §6b is M9.4's and §6a is M8.8's.
 
-**M14 is on `main` and is not deployed.** Seven milestones and one reported
-fault, `402d89f` through `07b2923`, and `git log origin/main..HEAD` is the check
-this file has demanded since M8.0 through M8.8 sat local for a whole block.
+**M14 is live**, at `7d9a9bad`. Eight milestones and one reported fault,
+`402d89f` through `255fd55`, walked against the deployed page in three engines.
 `PLAN-M14.md` is the frame, `HANDOFF-M14.md` is the block's own record and
 `SECOND-ORDER-M14.md` is its notebook — **twenty-one rows, four of them
 worklist, and M14.6 is that worklist executed.**
@@ -78,8 +77,8 @@ two things. Every one is **monotone**: flags only grow, so no move on any floor
 can make the way on unreachable, and every floor has a blind solution the
 harness counts rather than the plan asserting it.
 
-Before it, and still live: the most recent thing deployed is `0aae36b`, at
-`5fb93594` — **spells, books, crystal balls, inks and alignments are buyable.**
+Before it: `0aae36b` at `5fb93594` — **spells, books, crystal balls, inks and
+alignments are buyable.**
 106 casting components, six of them reachable and all six errand rewards —
 because `roll_barrel` named its kinds by hand and covered one of the weapon's
 three recipes, and because the arcane shelf is on a map that does not exist. See
@@ -125,8 +124,12 @@ agree is the pair**, `index.html` asking for `app.js?v=X` and that `app.js`
 carrying `BUILD='X'`. The live one as this was written is `5fb93594`, and it
 will be wrong by the next deploy whatever that deploy is for.
 
-**M14 is done and is not deployed.** Seven milestones, `402d89f` through
-`07b2923`, plus one fault reported from play mid-block. The suite is **832
+**M14 is done and live**, deployed at `7d9a9bad` on the human's word and
+verified the way this file has demanded since M8: `GM2D_ORIGIN=… drive.py`
+walked **all seventy-eight checks in three engines against the deployed page**,
+and the pair agrees — `index.html` asks for `app.js?v=7d9a9bad` and that
+`app.js` carries `BUILD='7d9a9bad'`. Eight milestones, `402d89f` through
+`255fd55`, plus one fault reported from play mid-block. The suite is **832
 passing** and the browser gate walks **all three engines at 78 `ok:` lines**,
 five of them M14.5's and every one negative-tested — **two of those five found
 faults on a green build**, which is the reason the gate exists. `PLAN-M14.md` is
@@ -3906,6 +3909,36 @@ live build 5fb93594
 table; a browser cannot say anything about that a hundred and fifty milliseconds
 of `cargo test` does not say better. What only the live page can answer is
 whether the counter is carrying them, which is what the list above is.
+
+**M14's is the first table here whose hand-written half is a walk rather than a
+list.** Seventy-eight of the questions are the gate's, in three engines against
+the deployed page, so what a person went and looked at is the thing a gate
+cannot be: whether the two new dungeons can be *played*.
+
+```
+live build 7d9a9bad
+  index.html asks app.js?v=7d9a9bad   app.js carries BUILD='7d9a9bad'
+  chromium walked the gate    ok      firefox  walked the gate    ok
+  webkit   walked the gate    ok      78 ok lines, no failures
+  the Wextreen Sump           walked end to end by `make play`:
+                              wheel C jammed with a Morning-Rush Mold — the
+                              wheel that is not needed — then wheel A, the
+                              bearing off the plate with a compass, wheel B;
+                              the weighed door taken with an epic item; the
+                              cairnfield walked once with the clipboard
+                              THE ONE WHO WENT DOWN, 2053, three drops
+  the Silt Stair              the groove takes a 1x4 and keeps it; the chair
+                              goes face, four, back and the north wall opens;
+                              chain A floods it and chain B brings it back
+                              WHAT SHE FACED AWAY FROM, 2123, three drops
+  console errors: none                off-origin requests: none
+```
+
+**The transcripts are the deliverable and they are checked in** —
+`testing/transcripts/m14-*.txt`, three of them, and the first is the finding:
+`make play` from a new game **plateaus at level eleven against the Drambus
+Stack's fourth floor** and never reaches a thing this block added. That is
+`PLAN.md` §6d row 3 and it is a fact about the walker.
 
 **M13's is the shortest table here and the most of it is not in the table.**
 Sixty-three of the questions are the gate's, walked against the deployed page in

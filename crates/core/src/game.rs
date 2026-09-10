@@ -865,6 +865,111 @@ impl Game {
             _ => None,
         })
     }
+
+    // -------------------------------------------------- a fight you have had
+
+    /// How many times this creature has gone down, fought or routed.
+    ///
+    /// **Derived, never banked.** The counter is written in one place —
+    /// `fight::pay_a_win`, which is the one place a win is paid — and read
+    /// here. There is no second list of "creatures you have beaten enough
+    /// times", because a second list is a second answer.
+    pub fn beaten(&self, creature: &str) -> u32 {
+        self.world.count(&crate::fight::beat_key(creature))
+    }
+
+    /// Whether this creature is set to settle where it stands.
+    pub fn is_instant(&self, creature: &str) -> bool {
+        self.world.instant.iter().any(|c| c == creature)
+    }
+
+    /// Every creature the menu may list, with its count and its switch.
+    ///
+    /// **Eligibility is the count and nothing else.** It is worked out fresh
+    /// from `beat:<canonical>` rather than kept, so a save edited to say you
+    /// beat a thing six times gets a consistent character rather than a
+    /// contradictory one — the same rule the level obeys.
+    ///
+    /// Ordered by canonical name so the screen is stable between openings: a
+    /// list that reorders itself as you fight is a list where the switch you
+    /// were reaching for moves.
+    pub fn instant_candidates(&self) -> Vec<InstantLine> {
+        let mut out: Vec<InstantLine> = self
+            .world
+            .counters
+            .iter()
+            .filter_map(|(k, n)| {
+                let canonical = k.strip_prefix("beat:")?;
+                if *n < crate::fight::INSTANT_AFTER {
+                    return None;
+                }
+                // A counter naming a creature this build has not got is a save
+                // from another build, and it is dropped rather than listed:
+                // there is nothing to fight and nothing to theme it with.
+                let m = crate::combat::creature(canonical)?;
+                Some(InstantLine {
+                    canonical: m.name.to_string(),
+                    name: self.theme_name(m.name),
+                    beaten: *n,
+                    marked: self.is_instant(m.name),
+                })
+            })
+            .collect();
+        out.sort_by(|a, b| a.canonical.cmp(&b.canonical));
+        out
+    }
+
+    /// Set a creature to settle where it stands.
+    ///
+    /// **The rule is core's**, and it is one rule: nothing may be marked that
+    /// has not been beaten [`fight::INSTANT_AFTER`] times. A shim that decided
+    /// it would be a second rulebook, and a screen that greyed the button and
+    /// said nothing would be a button reported as a bug — so the refusal counts
+    /// and names the count.
+    ///
+    /// **It does not refuse a boss by name, and the plan said it would.** Eight
+    /// of the nine creatures that stand on a boss tile also stand in a region
+    /// pool, so a refusal at the name would take seven ordinary field
+    /// encounters off the menu on behalf of a tile the player has not reached.
+    /// The refusal is the **tile's**, in `fight::instant`, which is exactly
+    /// where `fight::rout` puts the identical rule.
+    pub fn mark_instant(&mut self, creature: &str) -> Result<(), String> {
+        let m = crate::combat::creature(creature)
+            .ok_or_else(|| "nothing by that name fights here".to_string())?;
+        let beaten = self.beaten(m.name);
+        if beaten < crate::fight::INSTANT_AFTER {
+            return Err(format!(
+                "You have beaten the {} {} time{} of {}.",
+                self.theme_name(m.name),
+                beaten,
+                if beaten == 1 { "" } else { "s" },
+                crate::fight::INSTANT_AFTER
+            ));
+        }
+        if !self.is_instant(m.name) {
+            self.world.instant.push(m.name.to_string());
+        }
+        Ok(())
+    }
+
+    /// Take the mark off. Never refuses — putting a fight back on the screen
+    /// is the one direction that cannot cost anybody anything.
+    pub fn unmark_instant(&mut self, creature: &str) {
+        let name = crate::combat::creature(creature).map(|m| m.name).unwrap_or(creature);
+        self.world.instant.retain(|c| c != name);
+    }
+}
+
+/// One line of the Instant Battle menu.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct InstantLine {
+    /// What the engine matches on.
+    pub canonical: String,
+    /// What the player reads. Themed, because a creature's name is the
+    /// world's word — TONE 13.
+    pub name: String,
+    pub beaten: u32,
+    pub marked: bool,
 }
 
 /// What the way home cost and what it gave back.

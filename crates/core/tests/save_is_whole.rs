@@ -50,6 +50,13 @@ fn a_used_game() -> Game {
         fights_left: 2,
     });
 
+    // **A creature set to settle where it stands.** Same argument as the order
+    // above and the same only thing standing between M15's mark and a save
+    // that drops it: `WorldState` is written whole, so a new field on it is not
+    // a compile error anywhere.
+    g.world.add(&gm2d_core::fight::beat_key("Cave Rat"), 6);
+    g.world.instant.push("Cave Rat".into());
+
     // An event answered, and a flag off it.
     g.world.answered.push("the-cork-boundary".into());
     g.world.flags.push("has-cork".into());

@@ -238,6 +238,21 @@ pub fn rout(game: &mut Game) -> Option<Rout> {
     })
 }
 
+/// How many wins over one creature buy the right to stop watching.
+///
+/// The human's number, and it is a threshold rather than a curve: *"after
+/// defeating a specific enemy 5 times, you can set them to instant battle"*.
+pub const INSTANT_AFTER: u32 = 5;
+
+/// The counter a creature's wins are kept under.
+///
+/// One function so the writer and every reader spell it the same way. A
+/// `format!` at each end is two copies of a key, and a key that is two copies
+/// is a counter that silently splits in half the day one of them is retyped.
+pub fn beat_key(creature: &str) -> String {
+    format!("beat:{creature}")
+}
+
 /// What a beaten creature leaves, whether it was fought or routed.
 ///
 /// One function rather than two lists, because a rout pays what a win pays and
@@ -252,6 +267,18 @@ pub fn rout(game: &mut Game) -> Option<Rout> {
 ///   draw would make the stream a function of what the player is carrying
 ///   rather than of the fights they had.
 fn pay_a_win(game: &mut Game, creature: &'static str, receipt: &mut Vec<String>) {
+    // **How many times this creature has gone down, and it is counted here
+    // because here is the one place a win is paid.** `settle` and `rout` both
+    // arrive through this function, which is why it exists — and a rout counts
+    // on purpose: it is a win, and somebody who has routed a rat five times
+    // has met the rat five times.
+    //
+    // A counter rather than a list, and read rather than mirrored: which
+    // creatures are *eligible* to be marked is `count(beat:…) >= FIVE`, worked
+    // out fresh. **And it is read by something** — `Game::beaten` feeds the
+    // menu, which is what keeps it from being `Outcome::Xp`'s counter, written
+    // for four blocks into a total nothing ever consulted.
+    game.world.bump(&beat_key(creature));
     for name in crate::quest::on_victory(game, creature) {
         receipt.push(format!("Took a {}.", game.theme_piece(&name)));
     }

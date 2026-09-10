@@ -1436,6 +1436,24 @@ pub struct WorldState {
     /// the grind and the instrument is the achievement.
     #[serde(default)]
     pub active_survey: Option<(String, String)>,
+    /// Creatures set to settle where they stand, by canonical name.
+    ///
+    /// **Only the mark is state.** Which creatures are *eligible* — every one
+    /// beaten five times — is [`count`](Self::count) read fresh off
+    /// `beat:<canonical>`, the same way a tower's fallen floors are how many
+    /// boss ids are in `answered`. A second list beside the first would be two
+    /// answers to one question and they would part the first time a save was
+    /// edited.
+    ///
+    /// **On the world rather than on the character**, which is the division
+    /// `bought_licence` makes in the other direction: a licence is a thing
+    /// about you and this is a standing instruction about what happens when
+    /// you meet something out there.
+    ///
+    /// Empty by default, so **no seam**: every save that opened on M14 opens
+    /// on this.
+    #[serde(default)]
+    pub instant: Vec<String>,
 }
 
 impl WorldState {

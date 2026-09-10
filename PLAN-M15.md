@@ -170,24 +170,76 @@ state rather than discover:
   Flattening the curve moves that band. **The band is the contract**; if the new
   curve puts level five at nineteen fights, the divisor moves, not the test.
 
-### 2.3 The shape
+### 2.3 The anchor, which is the human's and is answered
+
+> level 20 should be about 150 fights, and it should be less than it is now by
+> about half. take whichever is lower
+
+**Two bounds, and both are checkable.** They are stated separately because one
+needs a walk and the other does not:
+
+| bound | value | how it is checked |
+|---|---|---|
+| **the half** | `xp_to_reach(20) ≤ 8,526` | arithmetic, against the recorded 17,053. `cargo test`. |
+| **the hundred and fifty** | level 20 in **130–170 wins** on the shipped map | `make play`, the way level 5's 25–35 already is |
+
+*Take whichever is lower* means both are asserted and the design must satisfy
+both — if the walk lands 150 fights above the half, the half wins; if the half
+still leaves 150 out of reach, go under it.
+
+### 2.4 Measured, so the milestone does not start from nothing
+
+**Today, on the shipped map**, from `testing/transcripts/m14-a-new-game.txt`:
+
+| level | wins to reach it | banked |
+|---|---|---|
+| 5 | 32 | 132 |
+| 10 | 67 | 793 |
+| 11 | 74 | 1,091 |
+| **20** | **never reached** | **17,053** |
+
+The walk plateaus at eleven. Level 20 today is somewhere between three and five
+hundred fights depending where they are had, which is the thing the ask is
+about.
+
+### 2.5 The shape
 
 Quadratic to 50, joined so the curve does not step:
 
     xp_to_next(L)  =  A · L²  +  B · L  +  C            for L < 50
                    =  xp_to_next(50) · G^(L − 50)       for L ≥ 50
 
-The three coefficients and `G` are the milestone's own recon. What is **not**
-negotiable is the joint: `xp_to_next(50)` computed both ways must agree, or the
-curve has a cliff in it at the one level a player will be watching for.
+What is **not** negotiable is the joint: `xp_to_next(50)` computed both ways
+must agree, or the curve has a cliff at the one level a player will be watching
+for.
 
-**Anchor it against play rather than against taste.** The measurements that
-exist: level 5 at ~27 fights (a test), the walk reaching level 14 in 4,406
-steps, and `geared_from` standing at 20. A defensible target is *level 20 within
-reach of the shipped content and level 32 no longer a wall*, and the way to
-check it is `make play` — not arithmetic.
+**Three constraints fix A, B and C**, and the third is the human's number:
 
-### 2.4 The trap
+    xp_to_next(1) = 20        the first level costs what it always has
+    xp_to_reach(5) = 132      the one measured contract, kept exactly
+    xp_to_reach(20) = target  the ask
+
+Solved, with `reach(5)` held at 132 so **`XP_DIVISOR` need not move and
+`level_five_lands_where_the_plan_says` should still pass untouched** — which is
+the reason to pin the first two rather than fit freely:
+
+| target | A | B | C | first ten levels | reach(10) |
+|---|---|---|---|---|---|
+| 5,500 | 2.127 | −0.552 | 18.425 | 20 26 36 50 69 92 119 150 186 226 | 748 |
+| **6,000** | **2.420** | **−1.819** | **19.400** | **20 25 36 51 71 96 125 160 199 243** | **783** |
+| 7,000 | 3.005 | −4.354 | 21.349 | 20 25 35 52 75 103 138 179 226 278 | 853 |
+| 8,526 | 3.897 | −8.221 | 24.324 | 20 23 35 54 81 115 158 208 266 332 | 960 |
+
+All four are monotone with positive terms, and all four hold `reach(5) = 132`.
+
+**6,000 is the recommendation and not the answer.** It clears the half-bound
+with room, and it puts 150 fights at forty experience a win — which is a
+plausible average over a climb that starts in the pit at three and ends in the
+Treyway at two hundred, and is exactly the sort of plausible that a walk
+disproves. **The walk settles it**, and if 150 fights overshoots twenty, the
+target comes down rather than the band moving.
+
+### 2.6 The trap
 
 `XP_TO_NEXT` is `[i32; MAX_LEVEL]`. Exponential growth past fifty overflows an
 `i32` quickly: `20 · 1.35^49` is already 2.3 billion. **Pick the base against
@@ -238,7 +290,7 @@ from the sheet rather than after every fight.
 | **M15.0** | **The tally** | `pay_a_win` counts by creature; `Game::beaten`; `WorldState::instant`; `Game::mark_instant`/`unmark`, refusing a boss and anything under five. **Nothing a player can see.** | `a_win_is_counted_by_creature` (and a rout counts); `nothing_under_five_can_be_marked`; `a_boss_is_never_instant`; the save round-trips an empty and a non-empty `instant`; **no seam** | no |
 | **M15.1** | **The battle nobody watches** | `fight::instant` or the `walk` arm that runs `run` + `settle` and draws nothing; the shim's fourth shape; `app.js` logging it through `log()`. | `an_instant_battle_pays_what_a_fought_one_pays` (bounty, experience, drops, errand tally — compared against a fought fight, not against constants); `an_instant_battle_costs_what_a_fight_costs`; `an_instant_defeat_still_walks_you_home` | no |
 | **M15.2** | **The menu** | The screen, its tier in the z-index table, the switch, and the sentence saying what a mark costs. | Browser: the menu lists what is eligible and nothing else; marking one and walking into it **does not open `#fight`** and does put the result on `#tape` and in `#history`; unmarking it opens the screen again | **yes** |
-| **M15.3** | **The curve** | `MAX_LEVEL`, the piecewise `xp_to_next`, the regenerated table, `XP_DIVISOR` re-anchored. | `the_table_matches_the_formula` over both pieces; `the_curve_has_no_step_at_fifty`; `the_curve_never_overflows`; `level_five_lands_where_the_plan_says` still passes **or the divisor moved and the commit says by how much**; a `make play` transcript with the new curve | no |
+| **M15.3** | **The curve** | `MAX_LEVEL`, the piecewise `xp_to_next`, the regenerated table, `XP_DIVISOR` re-anchored only if it has to be. | `the_table_matches_the_formula` over both pieces; `the_curve_has_no_step_at_fifty`; `the_curve_never_overflows`; **`the_climb_to_twenty_is_at_most_half_what_it_was`** (≤ 8,526, arithmetic); `level_five_lands_where_the_plan_says` still passes **untouched** — the curve is fitted to hold it, so a divisor that moved means the fit is wrong; and a `make play` transcript putting **level 20 in 130–170 wins** | no |
 | **M15.4** | **The second paper** | The gate comes off; the strings and the tests follow. | `the_second_paper_wants_five_thousand_and_nothing_else`; `a_gate_counts_and_says_so` still has a user; the browser check reads the new line | **yes** |
 | **M15.5** | **The notebook executed** | `SECOND-ORDER-M15.md` turned into milestones and run, `HANDOFF-M15.md`, `CLAUDE.md`. | The transcript's numbers written into `CLAUDE.md` | no |
 
@@ -248,9 +300,11 @@ from the sheet rather than after every fight.
 
 1. **How far past fifty?** `MAX_LEVEL` has to reach at least 50 for the ask to
    mean anything. 60 is a suggestion and not an answer.
-2. **What a level twenty should cost**, in fights, on the shipped map. The
-   existing contract is *level 5 in 25–35 fights* and there is no second anchor.
-   Without one, "less steep" is unfalsifiable.
+2. ~~**What a level twenty should cost**, in fights, on the shipped map.~~
+   **Answered:** *about 150 fights, and less than it is now by about half —
+   whichever is lower.* Both are bounds and both are asserted; see §2.3. The
+   half is arithmetic (≤ 8,526) and the 150 is a band on the walk (130–170), the
+   way level 5's 25–35 already is.
 3. **Whether Spike's van stays behind level ten.** With the tree gate gone it is
    the only thing left besides five thousand Fnorp.
 4. **Whether an instant battle may be *lost*.** The plan says yes — it is what

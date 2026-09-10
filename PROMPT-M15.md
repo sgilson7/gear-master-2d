@@ -90,13 +90,23 @@ Six standing constraints for this block:
   says nothing is a button reported as a bug — this file has written that
   sentence six times.
 
-`PLAN-M15.md` §5 lists four decisions that are the human's. Where a row records
-a recommendation and the work cannot start without an answer, take the
-recommendation, say in the commit that you took it, and flag it. Where it does
-not, ask. **The curve's anchor is the one you must not invent**: there is
-exactly one measured contract today — level 5 in 25–35 fights — and "less steep"
-is unfalsifiable without a second. Ask for one before M15.3, and if none comes,
-propose one from a `make play` transcript and say that is what you did.
+`PLAN-M15.md` §5 lists four decisions that are the human's, and **the curve's
+anchor is answered**: *level 20 in about 150 fights, and less than it is now by
+about half — whichever is lower.* Both are bounds and you assert both. The half
+is arithmetic — `xp_to_reach(20) ≤ 8,526` against today's 17,053 — and the 150
+is a band on the walk, 130–170 wins, exactly the way level 5's 25–35 already is.
+If the walk lands 150 above the half, the half wins; if the half still leaves
+150 out of reach, go under it.
+
+§2.5 hands you four solved candidates and recommends `reach(20) = 6,000`. **It
+is a recommendation and the walk settles it.** All four hold `xp_to_reach(5)` at
+132 exactly, which is deliberate: the curve is fitted to keep the one existing
+contract, so **`level_five_lands_where_the_plan_says` should pass untouched — a
+divisor that had to move means the fit is wrong**, not that the test is.
+
+For the other three decisions: where a row records a recommendation and the work
+cannot start without an answer, take the recommendation, say in the commit that
+you took it, and flag it. Where it does not, ask.
 
 If you find something the plan got wrong — and you will, because the curve was
 drawn before anybody solved for it — say so, propose the change, and record it

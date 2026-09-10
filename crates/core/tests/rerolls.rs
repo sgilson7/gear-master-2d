@@ -271,3 +271,66 @@ fn an_older_save_opens_on_the_authored_barrel() {
     let now: Vec<&str> = g.barrel_now().into_iter().map(|o| o.def.name).collect();
     assert_eq!(authored, now, "an unrolled barrel is not the authored one");
 }
+
+/// **You get the line you were shown, and a reroll moves what you are buying.**
+///
+/// Reported from play: *"when you reroll the barrel, and you purchase a piece
+/// of gear from the rerolled set of gear, you get a piece of gear from the
+/// first version of the barrel gear items. So essentially the item you get is
+/// not the item you buy and it seemingly never changes."*
+///
+/// Exactly that. The screen drew `Game::barrel_now` — rolled if it has been
+/// rolled — and the shim's `buy_barrel` looked the index up in `shop::barrel`,
+/// which is the authored list out of `shops.json`. **Two answers to what is in
+/// the barrel, one drawn and one charged for.**
+///
+/// `Game::order` had the same question right from the day it was written and
+/// says so in a comment; the ledger's buy went into core with the reroll and
+/// the barrel's stayed in the shim. A rule decided in the shim is a rule the
+/// fast suite cannot reach, and this is what that costs.
+///
+/// Negative-tested by putting `shop::barrel(&data::shops())` back in
+/// `Game::buy_barrel`: the second assertion printed the authored name against
+/// the rolled one.
+#[test]
+fn buying_out_of_the_barrel_hands_over_the_line_you_are_looking_at() {
+    let mut g = Game::default();
+    g.character.gold = 100_000;
+
+    // Before any reroll, the authored barrel and what you are charged agree.
+    let authored: Vec<String> =
+        g.barrel_now().iter().map(|o| o.def.name.to_string()).collect();
+    assert!(authored.len() >= 8, "the barrel is too short to prove anything");
+    let (_, got) = g.buy_barrel(3).expect("the fourth line");
+    assert_eq!(got, authored[3], "the authored barrel sold the wrong line");
+
+    // Turn it over until the fourth line is a different component. It is
+    // rolled, so one turn is not guaranteed to move any given line.
+    let mut turns = 0;
+    while g.barrel_now()[3].def.name == authored[3] && turns < 20 {
+        g.reroll_barrel().expect("the purse is deep");
+        turns += 1;
+    }
+    let rolled: Vec<String> = g.barrel_now().iter().map(|o| o.def.name.to_string()).collect();
+    assert_ne!(rolled[3], authored[3], "twenty turns and the fourth line never moved");
+
+    // **The line you are looking at.** This is the report, in one assertion.
+    let (_, got) = g.buy_barrel(3).expect("the fourth line of the rolled barrel");
+    assert_eq!(
+        got, rolled[3],
+        "the barrel showed {} and handed over {got}, which is the authored line at that index",
+        rolled[3]
+    );
+    assert!(g.character.holds(&rolled[3]), "it is not in the bag");
+
+    // And every line of it, because an off-by-one would pass the one above.
+    for (i, want) in rolled.iter().enumerate() {
+        let (_, got) = g.buy_barrel(i).unwrap_or_else(|why| panic!("line {i}: {why}"));
+        assert_eq!(&got, want, "line {i} showed {want} and handed over {got}");
+    }
+
+    // A refusal spends nothing, and an index the barrel has not got is one.
+    let purse = g.character.gold;
+    assert!(g.buy_barrel(999).is_err());
+    assert_eq!(g.character.gold, purse, "a refused line took the money anyway");
+}

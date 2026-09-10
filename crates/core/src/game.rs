@@ -564,6 +564,46 @@ impl Game {
         crate::shop::barrel_of(&self.world.rolled_barrel)
     }
 
+    /// Buy the entry at `index` out of the barrel. What it cost and what it
+    /// was, or why not.
+    ///
+    /// **This is core's now, and it was the shim's, and that is the whole of
+    /// the bug.** Reported from play: *"when you reroll the barrel, and you
+    /// purchase a piece of gear from the rerolled set, you get a piece of gear
+    /// from the first version of the barrel."* The screen drew
+    /// [`Game::barrel_now`] — rolled if it has been rolled — and the shim's
+    /// `buy_barrel` looked the index up in `shop::barrel`, which is the
+    /// **authored** list out of `shops.json`. Two answers to *what is in the
+    /// barrel*, one drawn and one charged for, and the second one never moved
+    /// however many times you paid to turn it over.
+    ///
+    /// `Game::order` had this right from the day it was written and says so in
+    /// a comment — *the book as this run has it, rolled or authored* — which is
+    /// the tell: the ledger's buy went into core with the reroll and the
+    /// barrel's stayed behind. **A rule decided in the shim is a rule the fast
+    /// suite cannot reach**, and this one sat one function away from its own
+    /// twin for a whole block.
+    ///
+    /// **The barrel never runs out**, so nothing is written to the save — which
+    /// is the one thing the old version had right and is kept: a bin of junk
+    /// under the counter is not a shelf, and the shelf's index rule is about
+    /// entries that get greyed out.
+    pub fn buy_barrel(&mut self, index: usize) -> Result<(i32, String), String> {
+        // **The barrel as this run has it**, rolled or authored — the same
+        // sentence `order` opens with, and now the same list.
+        let barrel = self.barrel_now();
+        let Some(o) = barrel.iter().find(|o| o.index == index) else {
+            return Err("There is nothing like that in the barrel.".into());
+        };
+        if self.character.gold < o.price {
+            return Err(format!("{} Fnorp, and you have {}.", o.price, self.character.gold));
+        }
+        let (price, name) = (o.price, o.def.name.to_string());
+        self.character.gold -= price;
+        self.character.give(&name);
+        Ok((price, name))
+    }
+
     /// A town's order book as this run has it.
     pub fn ledger_at(&self, town: &str) -> Vec<crate::shop::CommissionOffer> {
         if let Some((_, rolled)) = self.world.rolled_ledgers.iter().find(|(t, _)| t == town) {

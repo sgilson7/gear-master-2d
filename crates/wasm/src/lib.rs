@@ -2332,18 +2332,14 @@ pub fn buy_barrel(index: usize) -> String {
         if town_here(g).is_none() {
             return "you are not in a town".into();
         }
-        let shops = gm2d_core::data::shops();
-        let barrel = gm2d_core::shop::barrel(&shops);
-        let Some(o) = barrel.iter().find(|o| o.index == index) else {
-            return "there is nothing like that in the barrel".into();
-        };
-        if g.character.gold < o.price {
-            return format!("{} Fnorp, and you have {}.", o.price, g.character.gold);
+        // **The whole answer is core's**, and it was not: this looked the index
+        // up in the *authored* barrel while the screen drew the rolled one, so
+        // a rerolled barrel sold you the line the file had at that index and
+        // went on doing it however many times you paid. See `Game::buy_barrel`.
+        match g.buy_barrel(index) {
+            Ok(_) => String::new(),
+            Err(why) => why,
         }
-        let (price, name) = (o.price, o.def.name);
-        g.character.gold -= price;
-        g.character.give(name);
-        String::new()
     })
 }
 

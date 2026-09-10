@@ -82,7 +82,26 @@ fn every_drain_names_terrain_that_exists() {
             let to = w
                 .terrain_named(&d.to)
                 .unwrap_or_else(|| panic!("{id}: into {:?}, which is not terrain", d.to));
-            assert!(to.passable, "{id}: {:?} drains into something you cannot walk on", d.from);
+            // **A drain may take ground away, and only if a later one gives it
+            // back.** Every drain in the game before M14 opened something: a
+            // lake into bed, a tide into coast, a channel into silt, and a
+            // drain into a wall would have been a lake that empties into rock.
+            // The Drowned Gallery is the other kind — chain A floods a road on
+            // purpose, and what makes that safe is that chain B is in the same
+            // list and turns the water it made into silt. Flags only grow, so a
+            // player who pulled A can always pull B; the pairing is the
+            // monotone half of `PLAN-M14.md` §1.1 written where it can be
+            // checked.
+            let given_back = w.drains.iter().skip_while(|x| *x != d).skip(1).any(|later| {
+                later.from == d.to
+                    && w.terrain_named(&later.to).is_some_and(|t| t.passable)
+            });
+            assert!(
+                to.passable || given_back,
+                "{id}: {:?} drains into something you cannot walk on, and nothing after it \
+                 turns that back into ground",
+                d.from
+            );
             assert!(
                 w.terrain_name(0, 0) != d.from.as_str(),
                 "{id}: the corner of the map drains, which is a whole-map rewrite"
@@ -214,21 +233,31 @@ fn there_is_one_boss_under_the_lake_and_one_door_behind_it() {
         .expect("the Stack's bottom floor");
     assert!(here > rated(&tower), "the lake is easier than the tower it drained");
 
-    // The door behind it is not there until it is down, and it is the one
-    // screen in the game that is not a loop.
+    // **The door behind it is a way on, and until M14.3 it was a screen that
+    // said nobody had decided.** *Nothing is behind the door* was true and is
+    // not; it is a gate onto the Silt Stair, still not there until the boss is
+    // down, and still wanting no key — the whole of what it wants is that the
+    // thing in front of it has stopped.
     let door = w
         .places
         .iter()
-        .find(|p| p.kind == PlaceKind::Door)
+        .find(|p| p.id == "the-door-under-the-lake")
         .expect("nothing behind it at all");
+    assert_eq!(door.kind, PlaceKind::Gate, "the door under the lake still ends the writing");
+    assert_eq!(door.to.as_deref(), Some("the-silt-stair-1"));
     assert_eq!(door.hidden_until.as_deref(), Some("the-bottom-of-the-lake"));
     assert!(door.needs.is_none(), "the last door in the game wants a key");
     assert!(!door.prose.is_empty(), "it opens onto nothing and says nothing");
+    // **And the sentence that said nobody had decided is gone from here**,
+    // because somebody has: it is four floors and a country. What it said
+    // moved one map down onto the third town, which is the thing that has
+    // nothing in it now — `the_third_town_has_no_shelves_and_says_so`.
     let said = door.prose.join(" ").to_lowercase();
     assert!(
-        said.contains("nobody has decided") || said.contains("not saved for later"),
-        "the ending does not say what it is: {said:?}"
+        !said.contains("nobody has decided") && !said.contains("saved for later"),
+        "the door is a way on and still says the writing stops at it: {said:?}"
     );
+    assert!(said.contains("stair"), "it opens onto a stair and does not say so: {said:?}");
 }
 
 /// **Under the lake is a dungeon, not a sitting.**

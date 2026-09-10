@@ -1,0 +1,86 @@
+{
+  "format": "gm2d-tiles",
+  "version": 1,
+  "id": "the-silt-stair-2",
+  "_note": "Floor two of the Silt Stair. An empty room with a kitchen chair in it facing a door, and the chair is the lock. **`repeats` is on this event**, because three moves in an order is three answers to one object and every other event in this game is a decision that is spent the moment it is made. **No `outside` and `no_homeward`**: the budget here is what you brought, so a save taken on a floor reopens on it — and the gear cannot post you out of a stair under a lake, which is the lake's own reason one map further down.",
+  "width": 12,
+  "height": 12,
+  "start": [
+    5,
+    10
+  ],
+  "rows": [
+    "^^^^^^^^^^^^",
+    "^,,,,,,,,,,^",
+    "^,,,,,,,,,,^",
+    "^,,,,,,,,,,^",
+    "^,,,,,,,,,,^",
+    "^,,,,,,,,,,^",
+    "^,,,,,,,,,,^",
+    "^,,,,,,,,,,^",
+    "^,,,,,,,,,,^",
+    "^,,,,,,,,,,^",
+    "^,,,,,,,,,,^",
+    "^^^^^^^^^^^^"
+  ],
+  "no_homeward": true,
+  "regions": [
+    {
+      "id": "the-silt-stair-2-floor",
+      "name": "The Chair Room",
+      "bounds": [
+        [
+          0,
+          0,
+          11,
+          11
+        ]
+      ],
+      "enemies": [
+        "Obsidian Colossus",
+        "Rimefather",
+        "The Rust Parliament",
+        "Hollowmarch"
+      ]
+    }
+  ],
+  "places": [
+    {
+      "at": [
+        5,
+        10
+      ],
+      "kind": "gate",
+      "id": "the-silt-stair-2-up",
+      "name": "the steps back up",
+      "to": "the-silt-stair-1",
+      "at_to": [
+        5,
+        8
+      ]
+    },
+    {
+      "at": [
+        5,
+        6
+      ],
+      "kind": "event",
+      "id": "the-chair"
+    },
+    {
+      "at": [
+        5,
+        4
+      ],
+      "kind": "gate",
+      "id": "the-silt-stair-2-stair",
+      "name": "the door it is facing",
+      "to": "the-silt-stair-3",
+      "at_to": [
+        5,
+        10
+      ],
+      "hidden_until": "chair-done"
+    }
+  ]
+}

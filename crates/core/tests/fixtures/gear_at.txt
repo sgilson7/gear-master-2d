@@ -8894,6 +8894,230 @@ LADDER[58] The Ninth Surveyor INSANE Greaves 4,0 r0
     Sevenleague Sole
 LADDER[58] The Ninth Surveyor INSANE Greaves 2,1 r0
     Overflow Plate
+LADDER[59] What Marbulon Faced Away From EASY Weapon 0,0 r0
+    Sunderer
+LADDER[59] What Marbulon Faced Away From EASY Weapon 2,0 r0
+    Sunderer
+LADDER[59] What Marbulon Faced Away From EASY Weapon 0,3 r0
+    Kingmaker Hilt
+LADDER[59] What Marbulon Faced Away From EASY Weapon 4,0 r0
+    Balance Weight
+LADDER[59] What Marbulon Faced Away From EASY Weapon 4,1 r0
+    Whetstone
+LADDER[59] What Marbulon Faced Away From EASY Helmet 0,0 r0
+    Anvil Frame
+LADDER[59] What Marbulon Faced Away From EASY Helmet 3,0 r0
+    Mana Ward
+LADDER[59] What Marbulon Faced Away From EASY Helmet 0,2 r0
+    Bulwark Plating
+LADDER[59] What Marbulon Faced Away From EASY Helmet 3,1 r0
+    Martyr's Crest
+LADDER[59] What Marbulon Faced Away From EASY Helmet 2,3 r0
+    Stormcaught Frame
+LADDER[59] What Marbulon Faced Away From EASY Helmet 0,4 r0
+    Mana Ward
+LADDER[59] What Marbulon Faced Away From EASY Helmet 4,4 r0
+    Braced Plating
+LADDER[59] What Marbulon Faced Away From EASY Helmet 0,6 r0
+    Archon's Crest
+LADDER[59] What Marbulon Faced Away From EASY Chest 0,0 r0
+    Adamant Carapace
+LADDER[59] What Marbulon Faced Away From EASY Chest 0,2 r0
+    Aegis Weave
+LADDER[59] What Marbulon Faced Away From EASY Chest 3,2 r0
+    Aegis Weave
+LADDER[59] What Marbulon Faced Away From EASY Chest 0,4 r0
+    Bulwark Base
+LADDER[59] What Marbulon Faced Away From EASY Chest 3,4 r0
+    Warlord's Pauldron
+LADDER[59] What Marbulon Faced Away From EASY Chest 0,6 r0
+    Heartwood Base
+LADDER[59] What Marbulon Faced Away From EASY Chest 3,6 r0
+    Aegis Weave
+LADDER[59] What Marbulon Faced Away From EASY Gloves 0,0 r0
+    Bulwark Material
+LADDER[59] What Marbulon Faced Away From EASY Gloves 3,0 r0
+    Twinning Mold
+LADDER[59] What Marbulon Faced Away From EASY Gloves 0,2 r0
+    Ring of Hours
+LADDER[59] What Marbulon Faced Away From EASY Gloves 2,2 r0
+    Storm Signet
+LADDER[59] What Marbulon Faced Away From EASY Greaves 0,0 r0
+    Sevenleague Boots
+LADDER[59] What Marbulon Faced Away From EASY Greaves 2,0 r0
+    Sevenleague Sole
+LADDER[59] What Marbulon Faced Away From EASY Greaves 4,0 r0
+    Ridge Runner
+LADDER[59] What Marbulon Faced Away From EASY Greaves 2,1 r0
+    Overflow Plate
+LADDER[59] What Marbulon Faced Away From MEDIUM Weapon 0,0 r0
+    Sunderer
+LADDER[59] What Marbulon Faced Away From MEDIUM Weapon 2,0 r0
+    Sunderer
+LADDER[59] What Marbulon Faced Away From MEDIUM Weapon 0,3 r0
+    Kingmaker Hilt
+LADDER[59] What Marbulon Faced Away From MEDIUM Weapon 4,0 r0
+    Clockwork Key
+LADDER[59] What Marbulon Faced Away From MEDIUM Weapon 4,1 r0
+    Silver Charm
+LADDER[59] What Marbulon Faced Away From MEDIUM Helmet 0,0 r0
+    Stonewall Frame
+LADDER[59] What Marbulon Faced Away From MEDIUM Helmet 3,0 r0
+    Mirrored Visor
+LADDER[59] What Marbulon Faced Away From MEDIUM Helmet 0,2 r0
+    Consecrated Plating
+LADDER[59] What Marbulon Faced Away From MEDIUM Helmet 3,1 r0
+    Martyr's Crest
+LADDER[59] What Marbulon Faced Away From MEDIUM Helmet 2,3 r0
+    Anvil Frame
+LADDER[59] What Marbulon Faced Away From MEDIUM Helmet 0,4 r0
+    Mana Ward
+LADDER[59] What Marbulon Faced Away From MEDIUM Helmet 4,4 r0
+    Bulwark Plating
+LADDER[59] What Marbulon Faced Away From MEDIUM Helmet 0,6 r0
+    Archon's Crest
+LADDER[59] What Marbulon Faced Away From MEDIUM Chest 0,0 r0
+    Adamant Carapace
+LADDER[59] What Marbulon Faced Away From MEDIUM Chest 0,2 r0
+    Aegis Weave
+LADDER[59] What Marbulon Faced Away From MEDIUM Chest 3,2 r0
+    Aegis Weave
+LADDER[59] What Marbulon Faced Away From MEDIUM Chest 0,4 r0
+    Bulwark Base
+LADDER[59] What Marbulon Faced Away From MEDIUM Chest 3,4 r0
+    Warlord's Pauldron
+LADDER[59] What Marbulon Faced Away From MEDIUM Chest 0,6 r0
+    Adamant Base
+LADDER[59] What Marbulon Faced Away From MEDIUM Chest 3,6 r0
+    Godsheet Layer
+LADDER[59] What Marbulon Faced Away From MEDIUM Gloves 0,0 r0
+    Bulwark Material
+LADDER[59] What Marbulon Faced Away From MEDIUM Gloves 3,0 r0
+    Twinning Mold
+LADDER[59] What Marbulon Faced Away From MEDIUM Gloves 0,2 r0
+    Storm Signet
+LADDER[59] What Marbulon Faced Away From MEDIUM Gloves 2,2 r0
+    Seal of the Deep
+LADDER[59] What Marbulon Faced Away From MEDIUM Greaves 0,0 r0
+    Sevenleague Boots
+LADDER[59] What Marbulon Faced Away From MEDIUM Greaves 2,0 r0
+    Sevenleague Sole
+LADDER[59] What Marbulon Faced Away From MEDIUM Greaves 4,0 r0
+    Ridge Runner
+LADDER[59] What Marbulon Faced Away From MEDIUM Greaves 2,1 r0
+    Overflow Plate
+LADDER[59] What Marbulon Faced Away From HARD Weapon 0,0 r0
+    Sunderer
+LADDER[59] What Marbulon Faced Away From HARD Weapon 2,0 r0
+    Sunderer
+LADDER[59] What Marbulon Faced Away From HARD Weapon 0,3 r0
+    Kingmaker Hilt
+LADDER[59] What Marbulon Faced Away From HARD Weapon 4,0 r0
+    Bileglass Vial
+LADDER[59] What Marbulon Faced Away From HARD Weapon 4,1 r0
+    Duelist's Fob
+LADDER[59] What Marbulon Faced Away From HARD Helmet 0,0 r0
+    Overseer's Circlet
+LADDER[59] What Marbulon Faced Away From HARD Helmet 3,0 r0
+    Godsteel Plating
+LADDER[59] What Marbulon Faced Away From HARD Helmet 0,2 r0
+    Consecrated Plating
+LADDER[59] What Marbulon Faced Away From HARD Helmet 3,1 r0
+    Martyr's Crest
+LADDER[59] What Marbulon Faced Away From HARD Helmet 2,3 r0
+    Stonewall Frame
+LADDER[59] What Marbulon Faced Away From HARD Helmet 0,4 r0
+    Mirrored Visor
+LADDER[59] What Marbulon Faced Away From HARD Helmet 4,4 r0
+    Consecrated Plating
+LADDER[59] What Marbulon Faced Away From HARD Helmet 0,6 r0
+    Warlord's Crest
+LADDER[59] What Marbulon Faced Away From HARD Chest 0,0 r0
+    Adamant Carapace
+LADDER[59] What Marbulon Faced Away From HARD Chest 0,2 r0
+    Godsheet Layer
+LADDER[59] What Marbulon Faced Away From HARD Chest 3,2 r0
+    Godsheet Layer
+LADDER[59] What Marbulon Faced Away From HARD Chest 0,4 r0
+    Bulwark Base
+LADDER[59] What Marbulon Faced Away From HARD Chest 3,4 r0
+    Warlord's Pauldron
+LADDER[59] What Marbulon Faced Away From HARD Chest 0,6 r0
+    Adamant Base
+LADDER[59] What Marbulon Faced Away From HARD Chest 3,6 r0
+    Godsheet Layer
+LADDER[59] What Marbulon Faced Away From HARD Gloves 0,0 r0
+    Titan's Grip
+LADDER[59] What Marbulon Faced Away From HARD Gloves 3,0 r0
+    Hexer's Tally
+LADDER[59] What Marbulon Faced Away From HARD Gloves 0,2 r0
+    Seal of the Deep
+LADDER[59] What Marbulon Faced Away From HARD Gloves 2,2 r0
+    Seal of Power
+LADDER[59] What Marbulon Faced Away From HARD Greaves 0,0 r0
+    Sevenleague Boots
+LADDER[59] What Marbulon Faced Away From HARD Greaves 2,0 r0
+    Sevenleague Sole
+LADDER[59] What Marbulon Faced Away From HARD Greaves 4,0 r0
+    Ridge Runner
+LADDER[59] What Marbulon Faced Away From HARD Greaves 2,1 r0
+    Overflow Plate
+LADDER[59] What Marbulon Faced Away From INSANE Weapon 0,0 r0
+    Sunderer
+LADDER[59] What Marbulon Faced Away From INSANE Weapon 2,0 r0
+    Sunderer
+LADDER[59] What Marbulon Faced Away From INSANE Weapon 0,3 r0
+    Kingmaker Hilt
+LADDER[59] What Marbulon Faced Away From INSANE Weapon 4,0 r0
+    Bloodstone Bead
+LADDER[59] What Marbulon Faced Away From INSANE Weapon 4,1 r0
+    Forking Bead
+LADDER[59] What Marbulon Faced Away From INSANE Helmet 0,0 r0
+    Overseer's Circlet
+LADDER[59] What Marbulon Faced Away From INSANE Helmet 3,0 r0
+    Godsteel Plating
+LADDER[59] What Marbulon Faced Away From INSANE Helmet 0,2 r0
+    Consecrated Plating
+LADDER[59] What Marbulon Faced Away From INSANE Helmet 3,1 r0
+    Martyr's Crest
+LADDER[59] What Marbulon Faced Away From INSANE Helmet 2,3 r0
+    Overseer's Circlet
+LADDER[59] What Marbulon Faced Away From INSANE Helmet 0,4 r0
+    Godsteel Plating
+LADDER[59] What Marbulon Faced Away From INSANE Helmet 4,4 r0
+    Consecrated Plating
+LADDER[59] What Marbulon Faced Away From INSANE Helmet 0,6 r0
+    Warlord's Crest
+LADDER[59] What Marbulon Faced Away From INSANE Chest 0,0 r0
+    Adamant Carapace
+LADDER[59] What Marbulon Faced Away From INSANE Chest 0,2 r0
+    Godsheet Layer
+LADDER[59] What Marbulon Faced Away From INSANE Chest 3,2 r0
+    Godsheet Layer
+LADDER[59] What Marbulon Faced Away From INSANE Chest 0,4 r0
+    Bulwark Base
+LADDER[59] What Marbulon Faced Away From INSANE Chest 3,4 r0
+    Warlord's Pauldron
+LADDER[59] What Marbulon Faced Away From INSANE Chest 0,6 r0
+    Adamant Base
+LADDER[59] What Marbulon Faced Away From INSANE Chest 3,6 r0
+    Godsheet Layer
+LADDER[59] What Marbulon Faced Away From INSANE Gloves 0,0 r0
+    Titan's Grip
+LADDER[59] What Marbulon Faced Away From INSANE Gloves 3,0 r0
+    Channeling Mold
+LADDER[59] What Marbulon Faced Away From INSANE Gloves 0,2 r0
+    Seal of Power
+LADDER[59] What Marbulon Faced Away From INSANE Gloves 2,2 r0
+    Mirrorplate Ring
+LADDER[59] What Marbulon Faced Away From INSANE Greaves 0,0 r0
+    Sevenleague Boots
+LADDER[59] What Marbulon Faced Away From INSANE Greaves 2,0 r0
+    Sevenleague Sole
+LADDER[59] What Marbulon Faced Away From INSANE Greaves 4,0 r0
+    Ridge Runner
+LADDER[59] What Marbulon Faced Away From INSANE Greaves 2,1 r0
+    Overflow Plate
 ALTERNATES[0] The Dreaming Idiot EASY Helmet 0,0 r0
     Reliquary Frame of Nine
 ALTERNATES[0] The Dreaming Idiot EASY Helmet 3,0 r0

@@ -755,34 +755,53 @@ impl World {
         // tile. Checked against the map as *written*: a file is the only state
         // a file can be checked in, and every drain in this game turns terrain
         // that is there at the start.
+        //
+        // **Checked in sequence, because drains are a sequence.** The Drowned
+        // Gallery floods a road and then drains the water it made, so the
+        // second one's cells are not `water` in the file — they are `road`
+        // until the first has fired. Walking the list in order and carrying the
+        // terrain along is the only way to ask this that does not refuse a
+        // chain, and `drain_by` applies them in exactly this order.
+        let mut so_far: Vec<usize> = world.tiles.clone();
         for d in &world.drains {
-            if world.terrain_index(&d.from).is_none() {
+            let Some(from) = world.terrain_index(&d.from) else {
                 return Err(format!("a drain turns {:?}, which is no terrain", d.from));
-            }
-            if world.terrain_index(&d.to).is_none() {
+            };
+            let Some(to) = world.terrain_index(&d.to) else {
                 return Err(format!("a drain turns something into {:?}, which is no terrain", d.to));
-            }
-            let Some(cells) = &d.tiles else { continue };
-            if cells.is_empty() {
-                return Err(format!(
-                    "the drain on {:?} names no cells at all; leave `tiles` out to mean the whole map",
-                    d.when
-                ));
-            }
-            for &[x, y] in cells {
-                if !world.in_bounds(x as i32, y as i32) {
-                    return Err(format!(
-                        "the drain on {:?} names ({x}, {y}), which is off the map",
-                        d.when
-                    ));
+            };
+            match &d.tiles {
+                None => {
+                    for t in so_far.iter_mut() {
+                        if *t == from {
+                            *t = to;
+                        }
+                    }
                 }
-                if world.terrain_name(x, y) != d.from {
-                    return Err(format!(
-                        "the drain on {:?} names ({x}, {y}), which is {:?} and not the {:?} it drains",
-                        d.when,
-                        world.terrain_name(x, y),
-                        d.from
-                    ));
+                Some(cells) => {
+                    if cells.is_empty() {
+                        return Err(format!(
+                            "the drain on {:?} names no cells at all; leave `tiles` out to \
+                             mean the whole map",
+                            d.when
+                        ));
+                    }
+                    for &[x, y] in cells {
+                        let Some(i) = world.idx(x, y) else {
+                            return Err(format!(
+                                "the drain on {:?} names ({x}, {y}), which is off the map",
+                                d.when
+                            ));
+                        };
+                        if so_far[i] != from {
+                            return Err(format!(
+                                "the drain on {:?} names ({x}, {y}), which is {:?} by the time \
+                                 it fires and not the {:?} it drains",
+                                d.when, world.terrain[so_far[i]].0, d.from
+                            ));
+                        }
+                        so_far[i] = to;
+                    }
                 }
             }
         }

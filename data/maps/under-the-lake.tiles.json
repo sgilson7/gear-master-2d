@@ -85,15 +85,19 @@
         7,
         7
       ],
-      "kind": "door",
+      "kind": "gate",
       "id": "the-door-under-the-lake",
       "name": "the door under the lake",
       "hidden_until": "the-bottom-of-the-lake",
       "prose": [
         "The silt comes away in one piece, the way a thing does when it has been there long enough to have set, and the door opens inwards on four hinges of which two are original.",
         "Behind it is a landing and a stair going down, cut for people carrying something, and the stair does not stop where the light does.",
-        "This is where the writing stops. Not the game — the writing. What is at the bottom of that stair is not hidden and not locked and not saved for later: nobody has decided it yet.",
-        "You dropped a tower, drained a lake and walked two hundred and six steps into the dark, and the last fact this game has for you is that somebody cut them."
+        "There are four floors of it. Somebody counted them on the way down and did not write the number on the way back."
+      ],
+      "to": "the-silt-stair-1",
+      "at_to": [
+        5,
+        10
       ]
     }
   ],

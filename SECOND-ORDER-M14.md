@@ -117,3 +117,128 @@ against, and it is what the test measures against — under a name that says wha
 it measures.
 
 **Status: divergence, recorded in M14.2.**
+
+### 9. A negative-test harness that restores an old mtime measures the fault
+
+The `neg.sh` loop was `cp` the file, break it, run, `mv` it back. `mv` restores
+the **bytes and the old mtime**, so cargo saw nothing newer than the last build
+and did not rebuild — every run after a restore measured the binary with the
+fault still compiled in.
+
+It cost a negative test its meaning before it was noticed:
+`a_door_keeps_the_cheapest_thing_that_fits` was reported as *"still passed with
+the fault in"*, which sent me looking at the test (where there was, separately,
+a real problem — see row 10) rather than at the harness. `touch` after the
+restore.
+
+**Status: fixed, and the two findings it was tangled with are both real.**
+
+### 10. A check that reads its answer off the thing it is checking
+
+`a_door_keeps_the_cheapest_thing_that_fits` asked whether `give_up` took
+`loose_of_size(w, h)[0]` — the same list, in the same order, compared with
+itself. Reversing the sort passed it cleanly.
+
+It works the cheapest out from the ratings now. **This is the
+compares-zero-with-zero failure with an extra step**, and it is the fifth of
+that shape this project has shipped.
+
+**Status: fixed in M14.0.**
+
+### 11. Three narrow lints were one lint, and a fourth was right
+
+Hiding a stair behind a *flag* in a game that had only ever gated on `answered`
+set off three checks, each for the right reason and the wrong question, and
+**each of the three counted only place ids**:
+
+| lint | what happened |
+|---|---|
+| `ending.rs::every_hidden_place_names_something_that_happens` | retired, subsumed by `no_flag_is_waited_on_forever` |
+| `lake.rs::every_drain_names_terrain_that_exists` | its *"waits for something that can happen"* clause went the same way |
+| `events_pay.rs::every_flag_an_event_sets_is_read_by_something` | **the mirror**, and it earned its keep twice |
+
+The third is the one worth keeping: it reads the *other* direction — a flag
+raised and never consulted — and once it learned about `hidden_until_all`,
+`needs_all`, `floors[].cleared` and drains, it was still right about two live
+faults. See rows 5 and 12.
+
+**Status: done in M14.1.**
+
+### 12. `read-the-ninth` was going to be prose
+
+§4.3 has the ninth clipboard *"worded off"* the Cairnfield's golem hint. A
+wording is not a read, and `every_flag_an_event_sets_is_read_by_something`
+refused it.
+
+What information can actually *do* in this engine is open a shorter path. So
+the Cairnfield's slab takes two: stand a golem on it, or walk the field once
+with the sheet in your hand. Nine moves become one either way, and the flag is
+consulted rather than admired.
+
+**Status: done in M14.1 and M14.2.**
+
+### 13. A map file must not name the instrument that reads it
+
+`reach.rs::nothing_in_a_map_file_knows_about_a_survey` refused the Sump's own
+`_note`, which said which instrument reads each floor. It is right, and it is
+M11.6's architecture stated as a lint: a map that knows which lens reads it is
+a map that has to be edited to add a second one.
+
+**Status: fixed in M14.2. Worth knowing that the lint reads the whole file,
+`_note` included — which is what makes it hold.**
+
+### 14. What a creature rates is mostly how many items its board makes
+
+Two drafts of two bosses were dressed and both were wrong in the same way, and
+neither was about a number:
+
+- The Ninth Surveyor's first weapon grid was a hilt and two accessories, which
+  **assemble nothing**. She dealt 7.8 damage a second, and dealt exactly 7.8 at
+  strength 152 and at 320 — a sweep of seven healths against four strengths came
+  back Victory in all twenty-eight.
+- What Marbulon Faced Away From's first board made **three** items where the
+  Surveyor's makes eight, because a hilt, a key and a charm in one row touch and
+  merge. 114 a second, on the creature that is meant to be the deeper of the two.
+
+**The coordinates are the dial and the piece names are the costume.** Both were
+fixed by moving pieces rather than by moving numbers, which is upstream's rule
+— *monsters wear the catalogue* — arriving from the other side.
+
+### 15. `PlaceKind::Door` has one user left, and it is the ending
+
+M14.3 turns the door under the lake into a **gate** onto the Silt Stair, so the
+one `Door` in the game stopped being one. M14.4 puts the ending screen on the
+Undercountry, which gives the kind a user again.
+
+**M14.6 candidate**: if the ending is the only `Door` in the game for ever, the
+kind is a `Gate` with a screen attached and it is worth asking whether it earns
+a variant. Not this block — deleting a `PlaceKind` is a save-format question.
+
+### 16. The barrel showed one thing and sold another
+
+Reported from play mid-block. The screen drew `Game::barrel_now` — rolled if
+rolled — and the shim's `buy_barrel` looked the index up in the **authored**
+list out of `shops.json`. `Game::order` has asked the same question correctly
+since it was written; the ledger's buy went into core with M12.6's rerolls and
+the barrel's stayed in the shim.
+
+**A rule decided in the shim is a rule the fast suite cannot reach**, and this
+one sat one function away from its own twin for a whole block.
+
+**Status: fixed, with the reporter's sentence as the test.**
+
+### 17. The suite has *not* slowed, and measuring said so
+
+Written first as *"`cargo test --workspace` was 34 seconds at M13 and is minutes
+now"*, with twenty maps and `data::map` inside loops as the diagnosis. Measured:
+**823 tests in 27.5 seconds**, and the ten slowest files are the ten that were
+slow at M13 — `drops` at 11.0s and `experts_reach` at 6.3s, neither of them
+M14's. Nothing this block added is above 0.4s.
+
+What is minutes is **rebuilding sixty test binaries after a change to
+`combat.rs`**, which is a fact about editing the engine and not about the suite.
+
+The row is kept rather than deleted because the wrong version of it was about to
+become an M14.6 candidate, and *the fix for a number nobody measured is a day
+spent on the wrong file*. `lake.rs::every_drain_names_terrain_that_exists` does
+load twenty maps per drain and it costs 0.05s.

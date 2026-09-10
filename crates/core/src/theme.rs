@@ -1143,6 +1143,7 @@ pub static TURTLE_DICK: Theme = Theme {
         ("The Rust Parliament", "The Shareholders"),
         ("Sootmother", "Marbulon"),
         ("The Ninth Surveyor", "THE ONE WHO WENT DOWN"),
+        ("What Marbulon Faced Away From", "WHAT SHE FACED AWAY FROM"),
         ("The Quiet Hour", "The Grand Calculation"),
         ("Verdigris", "Gappy Handman"),
         ("The Drowned Court", "The Sea of Cleveland"),

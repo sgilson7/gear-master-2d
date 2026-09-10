@@ -3387,6 +3387,75 @@ pub const LADDER: &[MonsterSpec] = &[
         drops: &[],
         items: &[],
     },
+    // **What Marbulon Faced Away From** — the deeper of the two by one map's
+    // worth of walking, and the last thing between a player and the country
+    // under the country. Dressed the same way the Ninth Surveyor was and
+    // against the same bracket: measured against `common::geared_from`, the
+    // thing that decides a fight here is damage a second, and the ceiling is
+    // whatever Gilt deals — because Gilt beats that board and this must not.
+    //
+    // She did not need to look at it. She needed you to.
+    MonsterSpec {
+        name: "What Marbulon Faced Away From",
+        health: 7600,
+        strength: 214,
+        regen: 15,
+        mind_resist: 90,
+        curse_resist: 90,
+        physical_resist: 68,
+        magic_resist: 64,
+        attacks: &[],
+        gear: &[
+        // **Laid out the way The Last Light's is**, which is the one board in
+        // the ladder measured at this bracket. The first draft put a hilt, a
+        // key and a charm in one row at y=3: they touch, so they merged, and
+        // her whole board came to **three** items against the Ninth Surveyor's
+        // eight — 114 damage a second where she is meant to be the deeper of
+        // the two. What a creature *rates* is mostly what its gear rates, and
+        // what its gear rates is mostly how many items come out of it.
+        ("Sunderer", SlotKind::Weapon, 0, 0, 0),
+        ("Sunderer", SlotKind::Weapon, 2, 0, 0),
+        ("Kingmaker Hilt", SlotKind::Weapon, 0, 3, 0),
+        ("Clockwork Key", SlotKind::Weapon, 4, 0, 0),
+        ("Silver Charm", SlotKind::Weapon, 4, 1, 0),
+        // **The coordinates are the Ninth Surveyor's and the pieces are not.**
+        // What decides how many items a board makes is where the pieces sit,
+        // not what they are called, and her first arrangement made three where
+        // that one makes eight. Two creatures at the bottom of two dungeons cut
+        // by the same people wearing the same *shape* of kit is a fact about
+        // the reach; wearing the same components would be a fact about nobody
+        // having looked.
+        ("Stonewall Frame", SlotKind::Helmet, 0, 0, 0),
+        ("Mirrored Visor", SlotKind::Helmet, 3, 0, 0),
+        ("Consecrated Plating", SlotKind::Helmet, 0, 2, 0),
+        ("Martyr's Crest", SlotKind::Helmet, 3, 1, 0),
+        ("Anvil Frame", SlotKind::Helmet, 2, 3, 0),
+        ("Mana Ward", SlotKind::Helmet, 0, 4, 0),
+        ("Bulwark Plating", SlotKind::Helmet, 4, 4, 0),
+        ("Archon's Crest", SlotKind::Helmet, 0, 6, 0),
+        ("Adamant Carapace", SlotKind::Chest, 0, 0, 0),
+        ("Aegis Weave", SlotKind::Chest, 0, 2, 0),
+        ("Aegis Weave", SlotKind::Chest, 3, 2, 0),
+        ("Bulwark Base", SlotKind::Chest, 0, 4, 0),
+        ("Warlord's Pauldron", SlotKind::Chest, 3, 4, 0),
+        ("Adamant Base", SlotKind::Chest, 0, 6, 0),
+        ("Godsheet Layer", SlotKind::Chest, 3, 6, 0),
+        ("Bulwark Material", SlotKind::Gloves, 0, 0, 0),
+        ("Twinning Mold", SlotKind::Gloves, 3, 0, 0),
+        ("Storm Signet", SlotKind::Gloves, 0, 2, 0),
+        ("Seal of the Deep", SlotKind::Gloves, 2, 2, 0),
+        ("Sevenleague Boots", SlotKind::Greaves, 0, 0, 0),
+        ("Sevenleague Sole", SlotKind::Greaves, 2, 0, 0),
+        ("Ridge Runner", SlotKind::Greaves, 4, 0, 0),
+        ("Overflow Plate", SlotKind::Greaves, 2, 1, 0),
+        ],
+        gear_offset: 0,
+        bounty: 448,
+        sprite: MonsterSprite::Sootmother,
+        rank: Rank::Boss,
+        drops: &[],
+        items: &[],
+    },
 ];
 
 // ----------------------------------------------------------- combatants

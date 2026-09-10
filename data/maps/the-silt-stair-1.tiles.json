@@ -1,0 +1,94 @@
+{
+  "format": "gm2d-tiles",
+  "version": 1,
+  "id": "the-silt-stair-1",
+  "_note": "Floor one of the Silt Stair, and the stair is cut one wide and four long. Lay something that shape in it and it keeps it, or carry down the thing that was carried down once already. The manifest on the wall is a list and not a lock. **No `outside` and `no_homeward`**: the budget here is what you brought, so a save taken on a floor reopens on it — and the gear cannot post you out of a stair under a lake, which is the lake's own reason one map further down.",
+  "width": 12,
+  "height": 12,
+  "start": [
+    5,
+    10
+  ],
+  "rows": [
+    "^^^^^^^^^^^^",
+    "^,,,,,,,,,,^",
+    "^,%%%,,%%%,^",
+    "^,%,,,,,,%,^",
+    "^,%,,,,,,%,^",
+    "^,,,,,,,,,,^",
+    "^,%,,,,,,%,^",
+    "^,%%%,,%%%,^",
+    "^,,,,,,,,,,^",
+    "^,,,,,,,,,,^",
+    "^,,,,,,,,,,^",
+    "^^^^^^^^^^^^"
+  ],
+  "no_homeward": true,
+  "regions": [
+    {
+      "id": "the-silt-stair-1-floor",
+      "name": "The Landing",
+      "bounds": [
+        [
+          0,
+          0,
+          11,
+          11
+        ]
+      ],
+      "enemies": [
+        "Iron Abbot",
+        "Obsidian Colossus",
+        "Rimefather",
+        "Cairn Chorus"
+      ]
+    }
+  ],
+  "places": [
+    {
+      "at": [
+        5,
+        10
+      ],
+      "kind": "gate",
+      "id": "the-silt-stair-1-up",
+      "name": "the steps back up",
+      "to": "under-the-lake",
+      "at_to": [
+        7,
+        7
+      ]
+    },
+    {
+      "at": [
+        4,
+        4
+      ],
+      "kind": "event",
+      "id": "the-manifest"
+    },
+    {
+      "at": [
+        5,
+        7
+      ],
+      "kind": "event",
+      "id": "the-cut-stair"
+    },
+    {
+      "at": [
+        5,
+        8
+      ],
+      "kind": "gate",
+      "id": "the-silt-stair-1-stair",
+      "name": "the steps down",
+      "to": "the-silt-stair-2",
+      "at_to": [
+        5,
+        10
+      ],
+      "hidden_until": "the-stair-takes-it"
+    }
+  ]
+}

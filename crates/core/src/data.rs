@@ -45,6 +45,13 @@ pub const SUMP_1_JSON: &str = include_str!("../../../data/maps/the-sump-1.tiles.
 pub const SUMP_2_JSON: &str = include_str!("../../../data/maps/the-sump-2.tiles.json");
 pub const SUMP_3_JSON: &str = include_str!("../../../data/maps/the-sump-3.tiles.json");
 pub const SUMP_4_JSON: &str = include_str!("../../../data/maps/the-sump-4.tiles.json");
+/// The Silt Stair, behind the door under the lake. Four floors, cut for people
+/// carrying something, and `no_homeward` on every one of them for the lake's
+/// own reason one map further down.
+pub const STAIR_1_JSON: &str = include_str!("../../../data/maps/the-silt-stair-1.tiles.json");
+pub const STAIR_2_JSON: &str = include_str!("../../../data/maps/the-silt-stair-2.tiles.json");
+pub const STAIR_3_JSON: &str = include_str!("../../../data/maps/the-silt-stair-3.tiles.json");
+pub const STAIR_4_JSON: &str = include_str!("../../../data/maps/the-silt-stair-4.tiles.json");
 pub const EVENTS_JSON: &str = include_str!("../../../data/events.json");
 pub const THEME_TD_JSON: &str = include_str!("../../../data/theme.td.json");
 pub const SKILLS_JSON: &str = include_str!("../../../data/skills.json");
@@ -78,6 +85,10 @@ pub const FILES: &[(&str, &str)] = &[
     ("maps/the-sump-2.tiles.json", SUMP_2_JSON),
     ("maps/the-sump-3.tiles.json", SUMP_3_JSON),
     ("maps/the-sump-4.tiles.json", SUMP_4_JSON),
+    ("maps/the-silt-stair-1.tiles.json", STAIR_1_JSON),
+    ("maps/the-silt-stair-2.tiles.json", STAIR_2_JSON),
+    ("maps/the-silt-stair-3.tiles.json", STAIR_3_JSON),
+    ("maps/the-silt-stair-4.tiles.json", STAIR_4_JSON),
     ("events.json", EVENTS_JSON),
     ("theme.td.json", THEME_TD_JSON),
     ("skills.json", SKILLS_JSON),
@@ -114,6 +125,10 @@ pub const MAPS: &[(&str, &str)] = &[
     ("the-sump-2", SUMP_2_JSON),
     ("the-sump-3", SUMP_3_JSON),
     ("the-sump-4", SUMP_4_JSON),
+    ("the-silt-stair-1", STAIR_1_JSON),
+    ("the-silt-stair-2", STAIR_2_JSON),
+    ("the-silt-stair-3", STAIR_3_JSON),
+    ("the-silt-stair-4", STAIR_4_JSON),
 ];
 
 /// One map by id, falling back to the overworld.

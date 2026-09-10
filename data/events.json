@@ -2388,6 +2388,163 @@
           }
         }
       ]
+    },
+    {
+      "id": "the-manifest",
+      "title": "THE MANIFEST",
+      "prose": [
+        "A board on the wall with a sheet pinned to it and the pin gone through the same hole four times, so somebody took it down and put it back three times.",
+        "It is a list of what was carried down, in one hand, and it stops after the eleventh line. Down to the tenth it is timber and rope and a hundredweight of lime.",
+        "The eleventh line is: a lens, cracked."
+      ]
+    },
+    {
+      "id": "the-cut-stair",
+      "title": "THE CUT STAIR",
+      "prose": [
+        "The steps down are cut for something rather than for somebody: a groove one hand wide and four hands long runs down the middle of them, and the stone either side of it is unworn.",
+        "Nothing goes down without something in the groove. Two people have worked that out and one of them wrote it on the wall."
+      ],
+      "choices": [
+        {
+          "label": "Lay it in the stair",
+          "blurb": "Costs the piece. The groove takes it and the groove keeps it.",
+          "requires": {
+            "loose_item_of_size": {
+              "w": 1,
+              "h": 4
+            }
+          },
+          "unmet": "The groove is one by four and nothing loose on you is that shape.",
+          "outcome": {
+            "all": [
+              {
+                "give_up": {
+                  "w": 1,
+                  "h": 4
+                }
+              },
+              {
+                "flag": "the-stair-takes-it"
+              },
+              {
+                "xp": 26
+              }
+            ]
+          }
+        },
+        {
+          "label": "Carry the lens down",
+          "blurb": "Costs nothing. It was carried down once already.",
+          "requires": {
+            "holding": "The Cracked Lens"
+          },
+          "unmet": "The groove wants The Cracked Lens laid in it, and it is not on you.",
+          "outcome": {
+            "all": [
+              {
+                "flag": "the-stair-takes-it"
+              },
+              {
+                "xp": 26
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "the-chair",
+      "title": "THE CHAIR",
+      "prose": [
+        "An empty room with a kitchen chair in the middle of it, and the chair is facing away from the door in the north wall. There is nothing else here at all.",
+        "The seat is worn through in one place and the two front feet are worn and the two back feet are not, which is a chair that has been turned round and back a great many times and never dragged.",
+        "You have seen somebody do this. She did it three times while you stood there and did not once explain it."
+      ],
+      "repeats": true,
+      "choices": [
+        {
+          "label": "Turn it to face the door",
+          "blurb": "Costs nothing. The chair goes round.",
+          "outcome": {
+            "flag": "chair-facing"
+          }
+        },
+        {
+          "label": "Count to four",
+          "blurb": "Costs four seconds, under your breath.",
+          "requires": {
+            "flag": "chair-facing"
+          },
+          "unmet": "The chair is facing away from the door, so counting in front of it counts in front of nothing.",
+          "outcome": {
+            "flag": "chair-counted"
+          }
+        },
+        {
+          "label": "Turn it back",
+          "blurb": "Costs nothing. The chair goes round the other way.",
+          "requires": {
+            "flag": "chair-counted"
+          },
+          "unmet": "Nobody has counted in front of this chair yet, so turning it back turns back nothing.",
+          "outcome": {
+            "flag": "chair-done"
+          }
+        }
+      ]
+    },
+    {
+      "id": "the-chain-marked-a",
+      "title": "THE CHAIN MARKED A",
+      "prose": [
+        "A chain coming out of the west wall at the height of a shoulder with two links worn bright and the rest of it grey. Above it, cut into the stone: A.",
+        "There is a second chain in the east wall and it is marked B, and the two of them do the same job in opposite directions."
+      ],
+      "choices": [
+        {
+          "label": "Pull the chain marked A",
+          "blurb": "Costs the walk back. The gallery fills.",
+          "outcome": {
+            "all": [
+              {
+                "flag": "gallery-flooded"
+              },
+              {
+                "xp": 22
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "the-chain-marked-b",
+      "title": "THE CHAIN MARKED B",
+      "prose": [
+        "The second chain, and this one has four links worn bright rather than two, which is somebody pulling a thing that would not move.",
+        "It takes water out of the gallery. It has nothing to say about a room with no water in it."
+      ],
+      "choices": [
+        {
+          "label": "Pull the chain marked B",
+          "blurb": "Costs the walk. What is under the gallery comes up.",
+          "requires": {
+            "flag": "gallery-flooded"
+          },
+          "unmet": "The gallery is dry, so the chain goes four inches and stops.",
+          "outcome": {
+            "all": [
+              {
+                "flag": "gallery-drained"
+              },
+              {
+                "xp": 30
+              }
+            ]
+          }
+        }
+      ]
     }
   ]
 }

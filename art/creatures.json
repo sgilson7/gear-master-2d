@@ -2,6 +2,7 @@
   "_note": "Canonical creature name -> the family figure it is drawn from, and its own colourway. One .tex per family, compiled once per creature with these three colours defined on the command line, so two creatures in a family share a silhouette and never a palette. `make art` writes web/assets/<slug>.svg and regenerates the creature half of data/art.json from this file — so a creature added to enemies.json without an entry here fails `cargo test`, which is the whole point.",
   "_palette": "Fills are chosen off the Okabe-Ito-adjacent ladder the rest of the game uses. Within a family the hues separate; across the ladder the later rungs run darker and more saturated, so rating reads as weight even in greyscale.",
 
+  "What Marbulon Faced Away From": { "family": "mirror",   "main": "3A3F4E", "dark": "1C2029", "accent": "9FB4D8" },
   "The Ninth Surveyor":  { "family": "wright",   "main": "6B7A62", "dark": "3A4536", "accent": "D9C88A" },
 
   "Cave Rat":            { "family": "a-rat" },

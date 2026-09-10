@@ -1,0 +1,78 @@
+{
+  "format": "gm2d-tiles",
+  "version": 1,
+  "id": "the-silt-stair-4",
+  "_note": "The bottom of the Silt Stair. A silt floor and one thing on it, and the door onto the Undercountry is added in M14.4 with the map it opens onto. **No `outside` and `no_homeward`**: the budget here is what you brought, so a save taken on a floor reopens on it — and the gear cannot post you out of a stair under a lake, which is the lake's own reason one map further down.",
+  "width": 12,
+  "height": 12,
+  "start": [
+    5,
+    10
+  ],
+  "rows": [
+    "^^^^^^^^^^^^",
+    "^ssssssssss^",
+    "^s,,,,,,,,s^",
+    "^s,,,,,,,,s^",
+    "^s,,,,,,,,s^",
+    "^s,,,,,,,,s^",
+    "^s,,,,,,,,s^",
+    "^s,,,,,,,,s^",
+    "^ssssssssss^",
+    "^,,,,,,,,,,^",
+    "^,,,,,,,,,,^",
+    "^^^^^^^^^^^^"
+  ],
+  "no_homeward": true,
+  "regions": [
+    {
+      "id": "the-silt-stair-4-floor",
+      "name": "The Bottom of the Bottom",
+      "bounds": [
+        [
+          0,
+          0,
+          11,
+          11
+        ]
+      ],
+      "enemies": [
+        "The Rust Parliament",
+        "Gallowglass",
+        "Hollowmarch",
+        "The Drowned Court"
+      ]
+    }
+  ],
+  "places": [
+    {
+      "at": [
+        5,
+        10
+      ],
+      "kind": "gate",
+      "id": "the-silt-stair-4-up",
+      "name": "the steps back up",
+      "to": "the-silt-stair-3",
+      "at_to": [
+        5,
+        9
+      ]
+    },
+    {
+      "at": [
+        5,
+        4
+      ],
+      "kind": "boss",
+      "id": "the-bottom-of-the-bottom",
+      "name": "the bottom of the bottom",
+      "creature": "What Marbulon Faced Away From",
+      "drops": [
+        "Cosmic Orb",
+        "Map Shard",
+        "Living Earth"
+      ]
+    }
+  ]
+}

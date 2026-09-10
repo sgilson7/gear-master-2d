@@ -64,6 +64,40 @@ events that pay something and say what they pay — added on the human's ask.
 `PLAN-M9.md`, `PLAN-M10.md` and `PLAN-M11.md` are done; `PLAN.md` §6d is what
 M11 left open, §6c is M10.3's, §6b is M9.4's and §6a is M8.8's.
 
+**M15 is done and not yet deployed** — six milestones and one fault reported
+from play, `745ba01` through the notebook, and **three asks from the human**:
+
+| | |
+|---|---|
+| `745ba01` | the shore said what a cliff says, and two gates stand on water |
+| `b788b98` | M15.0: the tally, and a boss is a tile rather than a name |
+| `7904bee` | M15.1: the battle nobody watches, and one answer to where a defeat puts you |
+| `af4f5c5` | M15.2: the menu |
+| `0519668` | M15.3: the curve is quadratic to fifty, and the plan's target was 40% too high |
+| `b48fb27` | M15.4: the second paper is gated by its price and nothing else |
+
+**Instant Battle** is the block's shape: beat a creature five times and you may
+mark it, and from then on meeting it settles where it stands — simulated in
+full, banked in full, and **never drawn**. It is `fight::run` then
+`fight::settle` with nothing opening, so it costs the four percent and rolls the
+drops because that is what going through the settlement already does. **No new
+settlement code and no save seam.**
+
+**The curve is quadratic to fifty and exponential after it**, and the block's
+largest single finding is that `PLAN-M15.md` §2.5's recommended target was 40%
+too high: it reasoned *150 fights at forty experience a win* and the measured
+mean over a walk's first 150 wins is **28.7**. `xp_to_reach(20)` is **4,298**
+against 17,053, and `xp_to_reach(5)` is **132 exactly** so `XP_DIVISOR` never
+moved and `level_five_lands_where_the_plan_says` passed untouched.
+
+**And the second class comes off the tree.** Spike's second paper is gated by
+five thousand Fnorp and nothing else; the expert paper keeps its two finished
+trees, because that is what makes it free.
+
+`PLAN-M15.md` is the frame, `HANDOFF-M15.md` is the block's own record and
+`SECOND-ORDER-M15.md` is its notebook — **fifteen rows, six of them worklist,
+and M15.5 is that worklist executed.**
+
 **M14 is live**, at `4d065d1d`. Nine milestones and two faults reported from
 play, `402d89f` through `ff9ba52`, walked against the deployed page in three
 engines.
@@ -311,6 +345,31 @@ something cost a day.
   page*, which is a separate step and has its own section below.
 - Do not start a milestone before the previous gate is live and the human has
   seen it.
+- **A refusal names the thing in the way, and a place standing on ground you
+  cannot walk on knows more about it than the terrain does.** `world::step`
+  refuses on `walkable` before anything asks the place, so the two gates in this
+  game that stand on impassable ground — the way under the lake, on water, and
+  the tide crossing, on tide — both answered with the sentence a cliff answers
+  with. Reported from play at the shore: *"the land is pink and it says no way
+  through."* Both have a `shut` now, and
+  `a_place_on_ground_you_cannot_stand_on_says_why` walks every place on every
+  map so the next one cannot be silent.
+- **A slice of a capped list is a comparison that quietly stops being about
+  anything.** `#tape` keeps the last few lines and drops the rest into the
+  history, so a browser check written as `tape(page)[before:]` goes on returning
+  the last one or two however many fights have happened. It is the *compares
+  zero with zero* failure with a scrollback in it — the check would have gone on
+  passing on a build where the receipt landed and then scrolled away.
+- **A sentence nobody proof-reads is a sentence that can say anything.**
+  `no_sentence_has_a_gap_in_the_middle_of_it` was written for a formatting nit —
+  nine engine strings carrying runs of eighteen to twenty-six spaces, the
+  wreckage of a `\` continuation a scripted edit ate — and what it found was
+  `Effect::GrowSlotRows`'s hover telling players a row arrives *"on top of the
+  row that grid gets when the level rotation reaches it."* **M12.3 deleted the
+  rotation three blocks ago.** Same failure as the `STARTER` comment this file
+  quoted as live fact for five blocks and the controls blurb M12.B deleted,
+  except player-facing. The lint's corpus is the maps — **which nothing had ever
+  linted** — plus every sentence the engine composes.
 - **A page that draws a world has to be told which world, every time it can
   have changed.** Three instances now and one rule: a defeat carrying you to
   another map (M11), a save being restored (M12), and — M14 — **a choice being
@@ -319,6 +378,11 @@ something cost a day.
   the page went on drawing an empty room because `paintPanel` re-reads only when
   the *map id* moves. Found by the browser gate, and it could only be: nothing
   in `cargo test` can see a place that is there and not drawn.
+  **Four instances now**, and the fourth is M15's: an **instant battle that is
+  lost** walks you home across maps, and it happens *inside* `walk()` — forty
+  lines after the panel was painted against the map you stepped on. A rout
+  cannot lose and moves nobody, so it has no equivalent hole; that was checked
+  rather than assumed.
 - **The page draws numbers core sent it, and never recomputes one.** Violated
   three times and invisible every time: the replay once subtracted damage from
   a health total it kept itself and ignored `absorbed`; it once opened every
@@ -493,6 +557,19 @@ chosen to exercise checks and asserts; the second starts a new game and plays
 it, and its output is a transcript rather than a verdict. The second is the one
 that found an Auto-pack seating the starting kit for the whole game and a class
 fork opening underneath the town — both of which the first was green through.
+
+**And `make play` is not the instrument the pacing bands are set with**, which
+M15.3 had to find out. `level_five_lands_where_the_plan_says` walks a **fixed
+east-west patrol on the pit road over nine seeds and asserts on the mean** — a
+controlled measurement of the map's pacing. The walker wanders, goes north,
+loses, and drops what it is carrying: it misses that same 25–35 band by three
+fights on its own transcript, and nobody has ever thought that a fault. So a
+band written *"exactly the way level 5's already is"* cannot be handed to
+`make play`. What M15.3 used instead is a **replay of a transcript's own
+payouts** — every `+N experience, carried` summed as though it were all banked —
+which measures the curve against real fights and separates it from the walker's
+banking problem. It reproduces 25–35 on both shipped transcripts, which is how
+it earned the right to answer a question the walker cannot.
 
 **`make test-ui` builds and `testing/drive.py` does not.** Running the driver
 directly walks whatever is in `dist/web`, which is how a new `Event` variant was
@@ -4226,6 +4303,10 @@ about a string. Every one caught something on its first run:
 | 14.8 | **`the_ninth_surveyor_is_a_fight_the_board_wins`**, not `..._beatable_by_the_walker_at_22`. A level-22 board is not one this game produces — the shipped transcript ends at fourteen — and `common::geared_from` is what M11.7 established as *the board a player actually has*. **Both bosses were dressed by damage a second and not by rating**, which is what §4.4 asks for and which the recon justifies: that board beats Francis at 2958 and loses to Cairn Chorus at 1141. | `crates/core/tests/sump.rs` |
 | 14.10 | **The Treyway's south is its own map, and for one milestone it was not.** M14.1 drew it into `the-treyway.tiles.json` at 16x26 on the *one country, one file* principle — the right instinct, and the wrong call for a reason that is not about content: **`#map` has been a fixed square in CSS since the first map**, so a grid half again as tall as it is wide came out squashed. Reported from play. `the-low-water` is 16x11, and the bar of shingle the tide leaves is a **gate** on one tile of `tide` rather than two tiles of the same grid. The CSS is fixed too, because the split alone would have left every non-square map — the Cave, the map under the lake — still stretched. | `data/maps/the-low-water.tiles.json`, `web/styles.css` |
 | 14.11 | **The shore has a road down it and no Cairn Chorus in its pool.** Open scrub at 140 per mille under a pool of mean rating twelve hundred is 350 after the danger multiplier — one step in three — and `common::geared_from` loses to Cairn Chorus at 1141. `make play` crossed the shore twenty-eight times, was beaten on twenty-seven, and never once got down the hole. **A shore you cannot cross is a dungeon gated behind a draw**, and every other approach in this game is a road. | `data/maps/the-low-water.tiles.json` |
+| 15.1 | **A boss is refused by the tile and not by the name**, which `PLAN-M15.md` §1.5 writes the other way — it says `rout` *"refuses one by name (`boss_at`)"* and `boss_at` refuses by tile. The difference is invisible until you count: **eight of the nine creatures standing on a boss tile also stand in a region pool**, so a refusal at the name would take seven ordinary field encounters off the menu on behalf of a room the player has not reached. `fight::instant` puts the rule exactly where `rout` puts it, and `mark_instant` refuses on the count alone. | `crates/core/src/fight.rs`, `instant` |
+| 15.2 | **`reach(20)` is 4,300 and §2.5 recommends 6,000.** The recommendation reasons that 150 fights at forty experience a win is plausible, and says in as many words that this is *"exactly the sort of plausible that a walk disproves"*. Replaying the shipped walk's own payouts, the mean over its first 150 wins is **28.7**, so 6,000 puts level twenty at 184 fights and 5,500 at 175 — both outside the band. The plan's own instruction covers it: *if the half still leaves 150 out of reach, go under it.* | `crates/core/src/progression.rs`, `CURVE_A` |
+| 15.3 | **The 130–170 band is not measurable to the precision it was written at, and `make play` is not the instrument.** §2.3 asks for it *"exactly the way level 5's 25–35 already is"*; that band is set by a **fixed patrol over nine seeds**, not by the walker, and the walker misses it by three fights on its own transcript. Two walks on the shipped curve put level twenty at **150 and 192 wins** — a 28% spread around a ±13% band. The number is kept and the spread is written down rather than tuned away, because `CLAUDE.md` already says the walker is not deterministic and two runs of it disagree. | `SECOND-ORDER-M15.md` rows 9, 13, 14 |
+| 15.4 | **`Step::crossing` is `Step::refused_by`**, which no plan asked for. The field's own doc has always described the class — *"this says which kind of refusal it was, so the page can put it where a player will read it"* — and its name described the one instance it had. Renamed while fixing the shore, because restoring the channel under the old name would have put the tide's sentence in the one-second flash the report says it does not belong in. | `crates/core/src/world.rs`, `Step` |
 | 14.9 | **The wading shortcut on the Gallery is drawn, and saves eight tiles.** §9 decision 4 leaves it to the recon — *"if it saves nothing it is cut"*. The chains are in opposite walls, so a flooded gallery is seventeen tiles round and nine across. **Flooding the room makes the walk worse**, which is the design rather than an accident: chain A costs you the crossing you had and the Toad's Own Frame is what gives it back. | `data/maps/the-silt-stair-3.tiles.json` |
 
 Also true, and not in the brief because it could not have been:
@@ -4395,15 +4476,17 @@ content*, and one check now measures what a range used to guess at.
 | Boards | **Six frames**: five worn, 6×3 at level 1 and 6×8 once the tree has been walked all the way up, and the instrument's, 6×3 for ever.  **A row is no longer a thing a level hands you** — it is a skill point or a finished errand, **11 nodes and 2 errands**, and M12.0's measurement of why is in *A row is earned, not scheduled* |
 | Level 5 | ~27 fights, mean of nine seeded walks |
 | The Treyway | brackets levels **12–16**, not the plan's 5–9 — the door behind it is behind a crossing that asks for 9 |
-| A whole playthrough | **342 wins, 170 losses, level 14, 4,406 steps** to the door under the lake — and **M14's new-game walk does not get past the Drambus Stack's fourth floor at level eleven**, which is a fact about the walker rather than about the maps: `PLAN.md` §6d row 3, since M11.9. `GM2D_FROM` is what walks the rest, and `testing/transcripts/m14-*.txt` is what it walked |
-| Skill trees | **16 trees, 124 nodes.** The base's **22 over nine tiers**, the five classes' 8 / 8 / 10 / 8 / 8, and **ten expert trees of six each** — two roots, three, and a capstone, every node of which must reach that expert's own power. **11 of the base's grow a row** — M12.3's seven, plus a five-tier spine at 3/4/5/6/7 points that walks every frame to the original **six by eight**. Twenty-eight points for that ladder alone, against a `MAX_LEVEL` of 32. An expert node costs **2** |
+| A whole playthrough | **342 wins, 170 losses, level 14, 4,406 steps** to the door under the lake — **on M11's curve, and that number is now about a different game.** M15.3 flattened the curve and the same walker from a new game reaches **level 16 in 210 wins** where M14's reached eleven in 1,151. It still stops at the Drambus Stack, which is a fact about the walker rather than about the maps: `PLAN.md` §6d row 3, since M11.9. `GM2D_FROM` is what walks the rest; `testing/transcripts/m14-*.txt` is the old curve and `m15.3.txt` is this one |
+| The curve | **Quadratic to fifty, exponential after it**, since M15.3 — `xp_to_next(L) = 1.4257·L² + 2.4885·L + 16.0858` up to the joint, and `xp_to_next(50) · 1.35^(L−50)` past it, the two arms agreeing *at* fifty rather than near it. The base is not a new number: it is the `1.35` the whole curve used to run on, taking over where the quadratic stops. **`xp_to_reach(20)` is 4,298 against the old 17,053** — a quarter, not the half the anchor allowed — and `xp_to_reach(5)` is **132 exactly**, because the fit is pinned to it so `XP_DIVISOR` need not move. `MAX_LEVEL` is 60; the first level whose cost will not fit an `i32` is **95** |
+| Instant Battle | **Beat something five times and you may stop watching it.** `fight::instant` is `run` then `settle` with nothing drawn — no new settlement code, because a second answer to what a win pays is the mistake this project has paid for six times. It pays the speed bonus, rolls the drops, ticks the order book and costs the four percent, all of which `fight::rout` deliberately does none of. The tally is one `bump` in `pay_a_win` and the mark is one `#[serde(default)]` field on `WorldState`, so **no seam**. **The boss refusal is the tile's and not the name's**: eight of the nine creatures on a boss tile also stand in a region pool |
+| Skill trees | **16 trees, 124 nodes.** The base's **22 over nine tiers**, the five classes' 8 / 8 / 10 / 8 / 8, and **ten expert trees of six each** — two roots, three, and a capstone, every node of which must reach that expert's own power. **11 of the base's grow a row** — M12.3's seven, plus a five-tier spine at 3/4/5/6/7 points that walks every frame to the original **six by eight**. Twenty-eight points for that ladder alone, against a `MAX_LEVEL` of **60** since M15.3 — it was 32, and a table that stops at 32 stops nine levels before the curve changes shape. An expert node costs **2** |
 | Classes offered | **5 on the fork, 15 in the game.** The ten experts are `C(5,2)`, one a pair, and none is on any list a player picks from — you finish two trees and the pair decides. **Every one of the fifteen reaches something and so does every one of the sixty expert nodes**, and both are lints that *call* rather than declare |
 | Experts | **10**, carrying **31 knobs**. Six are read at the tick, two settle in the purse, one is the board's, one crosses a fight boundary. A character holds **up to three classes** and all three are live |
-| The papers | **3** on Spike's van, all drawn from the first visit: the Patent's licence at 5,000, the Second Paper at 5,000 behind one finished tree, and the expert paper at **nothing** behind two — the twenty-four points were the price |
+| The papers | **3** on Spike's van, all drawn from the first visit: the Patent's licence at 5,000, **the Second Paper at 5,000 behind nothing at all**, and the expert paper at **nothing** behind two finished trees — the twenty-four points are the price, which is what keeps a free paper from being a fourth class on the fork. M15.4 took the tree gate off the second paper on the human's ask; the level that puts the van on the road is what is left |
 | Figures | 27 `.tex` → **83 SVGs** (13 family drawings, 4 drawn for themselves, 5 classes, 3 towns, you) |
 | Art coverage | **60 of 60 creatures**, 3 of 3 towns, 5 of 5 classes, and you. The set pieces, the instruments and the enchs have no art and want none — a component has never had a figure |
-| Browser gate | **78 `ok:` lines**, 3 engines. The newest five are M14.5's: the tide is drawn before it goes out and walkable after, the lip of the Sump refuses in the Reach's words and opens the frame, a wheel that keeps what you feed it says what shape it wants, the chair is three moves in an order **and comes back**, and the third town is empty with the screen after it saying so. **All five were negative-tested, and two of the five found faults on a green build** — see *A stack gate that wants an instrument* |
-| The suite | **832 passing, and 27.5 seconds warm** — measured after M14, and the ten slowest files are the ten that were slow at M13: `drops.rs` at 11.0s and `experts_reach.rs` at 6.3s, neither of them M14's, and nothing this block added is above 0.4s. **`SECOND-ORDER-M14.md` row 17 was written claiming it had slowed to minutes and is corrected there**: what is minutes is rebuilding sixty test binaries after a change to `combat.rs`, which is a fact about editing the engine. Before M14 it was **788 passing, and 34 seconds warm.** It was a minute through most of M13 and `rules_m13.rs` was 29.6s of it: `beacon_board` ran Auto-pack over the whole catalogue on twenty-row grids, four times, because it was the only fixture in the repository with two items that touch. `common::items_in_a_row` is what replaced it — **0.03s** — and `experts_reach.rs` went 9.6s → 6.5s by measuring once per *set* of nodes rather than once per question. `drops.rs` at 11.3s is now the slowest file and is untouched. `[profile.test] opt-level = 2` since M12.6, with debug assertions and overflow checks still on — this is the `test` profile, not `--release` |
+| Browser gate | **81 `ok:` lines over 3 engines** — which is 67 in any one of them, not 81; the count is a total and reading it as per-engine is wrong by fourteen. The newest is M15.2's, and it is the only one that can answer a *negative*: that a fight you have already had is settled and **never drawn**. The newest five are M14.5's: the tide is drawn before it goes out and walkable after, the lip of the Sump refuses in the Reach's words and opens the frame, a wheel that keeps what you feed it says what shape it wants, the chair is three moves in an order **and comes back**, and the third town is empty with the screen after it saying so. **All five were negative-tested, and two of the five found faults on a green build** — see *A stack gate that wants an instrument* |
+| The suite | **854 passing, and 31 seconds warm** after M15; **832 and 27.5s** after M14 — measured after M14, and the ten slowest files are the ten that were slow at M13: `drops.rs` at 11.0s and `experts_reach.rs` at 6.3s, neither of them M14's, and nothing this block added is above 0.4s. **`SECOND-ORDER-M14.md` row 17 was written claiming it had slowed to minutes and is corrected there**: what is minutes is rebuilding sixty test binaries after a change to `combat.rs`, which is a fact about editing the engine. Before M14 it was **788 passing, and 34 seconds warm.** It was a minute through most of M13 and `rules_m13.rs` was 29.6s of it: `beacon_board` ran Auto-pack over the whole catalogue on twenty-row grids, four times, because it was the only fixture in the repository with two items that touch. `common::items_in_a_row` is what replaced it — **0.03s** — and `experts_reach.rs` went 9.6s → 6.5s by measuring once per *set* of nodes rather than once per question. `drops.rs` at 11.3s is now the slowest file and is untouched. `[profile.test] opt-level = 2` since M12.6, with debug assertions and overflow checks still on — this is the `test` profile, not `--release` |
 | Floors with a puzzle | **6**, and floors with a boss **2**. Every one is monotone — flags only grow, so no move can make the way on unreachable — and `puzzle::solvable_blind` counts the worst case rather than the plan asserting it |
 | Blind-solution ceilings | Sump **8 / 1 / 45**, Stair **1 / 3 / 3**. The plan guessed 10 / 11 / 45 and 2 / 27 / 3; **the Cairnfield's forty-five came back exactly**, which is the reason to believe the other five. `every_floor_in_the_game_can_be_solved_blind` holds every floor there is under 45 |
 | `Requirement` kinds | **8**: none, gold, flag, holding, **loose_item_of_size**, **assembled_of_rarity**, **surveying**, **all**. Three of them are ported from `event::Requirement`, which is the cut campaign's type — `PLAN-M14.md` §1.1 names them and they were unreachable from a data file |

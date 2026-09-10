@@ -134,3 +134,166 @@ Rewritten with one string per line. **Candidate: yes** — a tone lint for
 `  ` (two or more spaces) inside a player-facing string would have caught it,
 and `tests/tone.rs` is where the eight machine-checkable TONE rules already
 live.
+
+## 9. `make play` is not the instrument the level-five band was set with — M15.3
+
+`PLAN-M15.md` §2.3 asks for the 150-fight bound to be *"a band on the walk,
+130–170 wins, exactly the way level 5's 25–35 already is."* **It is not the way
+level five's is**, and the live walk proves it in its own first forty lines:
+
+    level  5: 38 wins        <- outside its own 25-35 band
+    level 14: 131 wins
+    level 16: 210 wins
+
+`level_five_lands_where_the_plan_says` does not use `make play`. It walks a
+**fixed east-west patrol on the pit road over nine seeds and asserts on the
+mean** — a controlled measurement of the map's pacing. `make play` wanders, goes
+north, loses, and drops what it is carrying; it misses the level-five band by
+three fights and nobody has ever thought that a fault.
+
+So the 130–170 band has no instrument that can measure it: the pit road cannot
+level anybody to twenty, and the walker banks a fraction of what it earns
+(22,480 earned, 1,439 banked on the M14 run). **What M15.3 used instead** is a
+replay of the recorded walk's own payouts, which measures the curve against real
+fights and separates it from the walker's banking problem.
+
+**Candidate: yes.** Two things worth doing in M15.5: say this in `CLAUDE.md`
+beside the *`make play` and `make test-ui` are different tools* note, and
+consider whether the replay-of-payouts measurement should be a checked-in tool
+rather than a script that lived in one session.
+
+## 10. The curve makes the walker a different animal — M15.3
+
+Under the old curve the M14 walk plateaued at **level 11 after 1,151 wins**.
+Under the new one it is at **level 16 after 210** and still climbing. That is
+the flattening doing exactly what it was asked to do, and it is also a warning:
+every number in `CLAUDE.md`'s table that was measured against a walk — *342
+wins, 170 losses, level 14, 4,406 steps* — is now measured against a different
+game.
+
+**Candidate: yes** — the transcript numbers in `CLAUDE.md` want restating in
+M15.5, with the old ones marked as the old curve's rather than quietly replaced.
+
+## 11. `StockGate::TreesFinished` went from two users to one — M15.4
+
+Not a fault, and worth knowing: the second paper's gate coming off leaves the
+expert paper as the only thing in the shipped game that constructs a
+`TreesFinished`. `a_gate_counts_and_says_so` tests the type directly so it is
+not vacuous, and `the_expert_paper_still_wants_two_finished_trees` asserts both
+halves of the pair at once so they cannot drift.
+
+**Candidate: no.** Handled in the milestone.
+
+## 12. Spike's van is now the only gate on a second class — M15.4
+
+`hidden_until_level: 10`, and with the tree gate gone it is all that stands
+between a new character and a second class besides five thousand Fnorp.
+`PLAN-M15.md` §3.2 flags this as the one place the change could go further than
+the ask. Left as it is and said so in the commit.
+
+**Candidate: no — it is the human's.**
+
+## 13. The replay-of-payouts instrument reproduces the level-five band; the raw walk does not — M15.3/M15.5
+
+Row 9 said `make play` is not the instrument the 25–35 band was set with. Here
+is that stated as evidence rather than as an argument, over both transcripts:
+
+| | level 5, raw walk | level 5, banking what it earned |
+|---|---|---|
+| `m14-a-new-game.txt` | — | **27 wins** |
+| `m15.3.txt` | **38 wins** | **28 wins** |
+
+**The replay lands inside 25–35 on both and the raw walk misses it by three.**
+That is the instrument validating itself against the one band this game already
+had, which is the only way a new instrument earns the right to answer a
+question the old one cannot.
+
+## 14. Two walks disagree about level twenty by 28%, and the band is tighter than that — M15.3
+
+The same replay, asked about twenty:
+
+| route | wins to level 20 | mean xp/win over the first 150 |
+|---|---|---|
+| `m14-a-new-game.txt` | **150** | 28.7 |
+| `m15.3.txt` | **192** | 16.5 |
+
+Both are the shipped map on the shipped curve. What differs is **where the
+fights were had** — the M14 walk pushed north into the Treyway sooner; this one
+spent longer in the pit and then jammed against the Drambus Stack.
+
+So `PLAN-M15.md` §2.3's band of 130–170 is **±13% around a measurement whose own
+run-to-run variance is 28%.** No target satisfies both routes: 4,300 gives 150
+and 192, and dropping to 3,500 would give about 130 and 172. `reach(20) = 4,300`
+is kept because it is the M14 route's 150 exactly, that route is the one the
+plan measured against, and `CLAUDE.md` already says in as many words that **the
+walker is not deterministic and two runs of it disagree** — retuning a shipped
+constant off one stuck run is the thing that sentence exists to stop.
+
+**Candidate: no — it is the human's.** The number is defensible and the band is
+not measurable to the precision it was written at. Flagged in `HANDOFF-M15.md`.
+
+## 15. The new curve took the walker from level 11 to level 16 — M15.3
+
+`make play` from a new game, same walker, same map:
+
+| | old curve | new curve |
+|---|---|---|
+| level reached | **11**, after 1,151 wins | **16**, after 210 wins |
+| where it stops | the Drambus Stack's fourth floor | the Drambus Stack |
+
+Still the Stack, which is `PLAN.md` §6d row 3 unchanged — but five levels deeper
+and five times sooner. Every walk-measured number in `CLAUDE.md` is now a number
+about a different game, and they are restated in M15.5 rather than quietly
+replaced.
+
+---
+
+# M15.5 — the worklist, and what it found
+
+Six rows were marked **candidate: yes**. All six were executed and **two of them
+turned up something that was actually wrong.**
+
+| row | what it asked for | what happened |
+|---|---|---|
+| 2 | the menu's sentence has to say a boss is fought either way | **done in M15.2** — `what_a_mark_costs`'s fourth line, and the browser check reads it |
+| 4 | check the rout path has the same `paintPanel` hole | **it does not.** `rout` touches none of `world.at`, `world.map`, `sent_home`, `forget`, `drop_carried` or `leave_the_sitting` — it cannot move you, so there is nothing to repaint. Confirmed rather than assumed, and `CLAUDE.md`'s rule has a fourth instance rather than a fifth |
+| 5 | `CLAUDE.md` says 78 `ok:` lines and it reads as per-engine | **it was a total.** 67 in any one engine and 81 across three, since M15.2. Said in the row now |
+| 6 | grep `drive.py` for other capped-list slices | **clean.** The one other slice is `tape(page)[-3:]` — the *last* few, which is correct on a capped list, and it is in a failure message rather than an assertion |
+| 8 | a lint for runs of spaces in a player-facing string | **found a three-block-old lie** — see below |
+| 9, 10, 14 | `make play` is not the band's instrument; restate the walk numbers | **done** — the note is in `CLAUDE.md` beside *`make test-ui` and `make play` are different tools*, and every walk-measured number in the table says which curve it is about |
+
+## Row 8 is the one that paid for the milestone
+
+The lint was written for a formatting nit. Nine strings in the engine carried
+runs of eighteen to twenty-six spaces — the wreckage of a `\` line continuation
+that a scripted edit ate at some point before this block. Chasing them meant
+reading the sentences, and one of them was `Effect::GrowSlotRows`'s hover:
+
+> A row is 6 more cells to pack the weapon grid with, granted out of turn — on
+> top of the row that grid gets when **the level rotation reaches it**. No grid
+> goes past 8 rows.
+
+**M12.3 deleted the rotation.** `ROTATION`, `rows_for` and `grows_at` are all
+gone, every frame starts at three rows and stays there, and *"granted out of
+turn"* is meaningless when there is no turn. Eleven skill nodes have been
+describing the previous game, on hover, for three blocks.
+
+It is the same failure as the `STARTER` comment `CLAUDE.md` quoted as live fact
+for five blocks and the controls blurb M12.B deleted for saying *every level
+adds a row to one frame* — **except this one reached a player.**
+
+Two other things came out of writing it:
+
+- **`prose()` had never walked the maps.** Every place `name`, `shut` and
+  `prose` line in twenty-one map files was outside every tone lint this project
+  has. 108 strings.
+- **Nor the sentences the engine composes** — `Node::line`, `Node::detail`,
+  every class and expert promise, `what_a_mark_costs`. 363 strings, and they are
+  precisely the ones nobody proof-reads because nobody typed them.
+
+`every_sentence_a_player_can_read()` is the widened corpus and it is deliberately
+**separate from `prose()`** rather than replacing it: rule 13 says content
+speaks the book's language and rule 13a says a spec does not, so one list run
+through both sets of rules would fail the thing it exists to protect.
+`the_widened_corpus_actually_reaches_the_maps_and_the_engine` is what stops the
+new list going quietly empty.

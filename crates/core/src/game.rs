@@ -705,7 +705,8 @@ impl Game {
         let here = crate::data::map_now(&self.world.map_id(), difficulty, &self.world);
         if here.no_homeward {
             return Err(
-                "not from down here. Whatever it is doing, it is doing it upwards, and                  there are two hundred and six steps of rock in the way"
+                "not from down here. Whatever it is doing, it is doing it upwards, and there are \
+                 two hundred and six steps of rock in the way"
                     .into(),
             );
         }
@@ -722,7 +723,8 @@ impl Game {
             .collect();
         carried.sort_by(|a, b| a.1.cmp(&b.1).then(a.0.cmp(&b.0)));
         let Some((fare, _)) = carried.first().cloned() else {
-            return Err("the gear knows the way home and it does not know it sober.                         One restorative, and you have not got one."
+            return Err("the gear knows the way home and it does not know it sober. One restorative, \
+             and you have not got one."
                 .into());
         };
         let name = supplies.get(&fare).map(|d| d.name.clone()).unwrap_or(fare.clone());

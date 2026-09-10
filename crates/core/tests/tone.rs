@@ -41,6 +41,109 @@ fn prose() -> Vec<(String, String)> {
     out
 }
 
+/// Every player-facing string in the shipped **maps**, and every one the
+/// **engine** composes.
+///
+/// **A second corpus rather than a wider `prose()`**, and the reason is rule
+/// 13a: a map's prose is the world's voice and is held to rule 13, but
+/// `Node::line` is a *spec* — unthemed, with the number in it, and deliberately
+/// speaking the engine's vocabulary. One list run through both sets of rules
+/// would fail the thing it exists to protect.
+///
+/// So this is the corpus for the rules that are about a string being **well
+/// formed** rather than about which register it is in.
+fn every_sentence_a_player_can_read() -> Vec<(String, String)> {
+    let mut out = prose();
+    // The maps, which nothing here has ever walked. `shut` is a refusal, `name`
+    // reaches a label and `prose` is a paragraph, and all three are read.
+    for (id, _) in data::MAPS {
+        let w = data::map(id, gm2d_core::combat::Difficulty::Easy);
+        for p in &w.places {
+            for (what, text) in [("name", &p.name), ("shut", &p.shut)] {
+                if !text.is_empty() {
+                    out.push((format!("{id} {} {what}", p.id), text.clone()));
+                }
+            }
+            for (i, line) in p.prose.iter().enumerate() {
+                out.push((format!("{id} {} prose[{i}]", p.id), line.clone()));
+            }
+        }
+    }
+    // What the engine composes: the specs beside every node, what a rule does,
+    // what a class and an expert promise, and what an Instant Battle mark
+    // costs. Derived rather than authored, and therefore exactly the strings
+    // nobody proof-reads.
+    let skills = data::skills();
+    for t in &skills.trees {
+        for n in &t.nodes {
+            out.push((format!("{} line", n.id), n.line()));
+            for (i, d) in n.detail().into_iter().enumerate() {
+                out.push((format!("{} detail[{i}]", n.id), d));
+            }
+        }
+    }
+    for c in gm2d_core::class::CLASSES {
+        out.push((format!("{} promise", c.name), c.power.describe()));
+    }
+    for e in gm2d_core::expert::EXPERTS {
+        out.push((format!("{} promise", e.name), e.power.describe()));
+    }
+    for (i, l) in gm2d_core::fight::what_a_mark_costs().into_iter().enumerate() {
+        out.push((format!("what a mark costs [{i}]", ), l));
+    }
+    out
+}
+
+/// **A sentence does not have a gap in the middle of it.**
+///
+/// Written for a formatting nit and it found a three-block-old lie, which is
+/// the reason it is kept. Nine strings in the engine carried runs of eighteen
+/// to twenty-six spaces — the wreckage of a `\` line continuation that a
+/// scripted edit ate — and one of them was `Effect::GrowSlotRows`'s hover,
+/// which told players a row arrives *"on top of the row that grid gets when the
+/// level rotation reaches it."* **M12.3 deleted the rotation.** Every frame has
+/// started at three rows and stayed there for three blocks, and eleven skill
+/// nodes went on describing the old game on hover.
+///
+/// Whether HTML collapses the whitespace is not the point and is not checked
+/// here: what the lint is for is that a string nobody proof-reads is a string
+/// that can say anything, and a run of twenty-six spaces is the cheapest
+/// possible signal that nobody has read it since.
+///
+/// **Three or more, not two.** Two spaces around a separator is the house style
+/// — `drag onto a frame  ·  right-click rotates` — and a lint that refused it
+/// would be a lint arguing with `theme.rs`.
+#[test]
+fn no_sentence_has_a_gap_in_the_middle_of_it() {
+    let mut bad = Vec::new();
+    for (what, text) in every_sentence_a_player_can_read() {
+        if text.contains("   ") {
+            bad.push(format!("{what}: {text:?}"));
+        }
+    }
+    assert!(bad.is_empty(), "{} strings have a gap in them:\n{}", bad.len(), bad.join("\n"));
+}
+
+/// And the corpus is not empty, in either half.
+///
+/// A lint over a list somebody forgot to fill is a lint that passes for ever.
+/// The maps and the engine's own sentences are both new here, so both are
+/// counted rather than assumed.
+#[test]
+fn the_widened_corpus_actually_reaches_the_maps_and_the_engine() {
+    let all = every_sentence_a_player_can_read();
+    assert!(all.len() > prose().len() + 300, "the corpus barely grew: {}", all.len());
+    assert!(
+        all.iter().any(|(w, _)| w.contains("the-tide-crossing") && w.ends_with("shut")),
+        "no map refusal is in the corpus"
+    );
+    assert!(
+        all.iter().any(|(w, _)| w.starts_with("what a mark costs")),
+        "no engine-composed sentence is in the corpus"
+    );
+    assert!(all.iter().all(|(_, t)| !t.is_empty()), "an empty string got in");
+}
+
 /// **Rule 13.** The economy speaks the book's language.
 ///
 /// A canonical stat name in a player-facing string is a string that will read

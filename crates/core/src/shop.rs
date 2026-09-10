@@ -351,7 +351,8 @@ impl ShopsData {
                 .find(|t| t.stock.iter().any(|s| s == name))
             {
                 return Err(format!(
-                    "the barrel holds {name:?} and so does {}'s shelf; a shelf entry the                      barrel also carries is a shelf entry nobody takes",
+                    "the barrel holds {name:?} and so does {}'s shelf; a shelf entry the barrel \
+                     also carries is a shelf entry nobody takes",
                     t.id
                 ));
             }

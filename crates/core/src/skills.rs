@@ -190,7 +190,8 @@ impl Effect {
                 }
                 if *strength != 0 {
                     out.push(
-                        "Strength: added to every physical hit you land, then scaled by the                          power of the item landing it — so it is worth more on a strong weapon."
+                        "Strength: added to every physical hit you land, then scaled by the power \
+                         of the item landing it — so it is worth more on a strong weapon."
                             .into(),
                     );
                 }
@@ -199,13 +200,15 @@ impl Effect {
                 }
                 if *mind_resist != 0 {
                     out.push(
-                        "Mind resist: cuts incoming mind damage by that percent. Mind damage                          takes maximum health rather than health, and nothing heals it back."
+                        "Mind resist: cuts incoming mind damage by that percent. Mind damage takes \
+                         maximum health rather than health, and nothing heals it back."
                             .into(),
                     );
                 }
                 if *curse_resist != 0 {
                     out.push(
-                        "Curse resist: cuts how long a curse landed on you lasts by that                          percent. It does not stop the curse landing."
+                        "Curse resist: cuts how long a curse landed on you lasts by that percent. \
+                         It does not stop the curse landing."
                             .into(),
                     );
                 }
@@ -213,7 +216,8 @@ impl Effect {
             Effect::StartWith { armor, mana } => {
                 if *armor != 0 {
                     out.push(
-                        "Armor: absorbs damage before health does. Everybody starts a fight                          with none, and whatever is left is gone when the fight ends."
+                        "Armor: absorbs damage before health does. Everybody starts a fight with \
+                         none, and whatever is left is gone when the fight ends."
                             .into(),
                     );
                 }
@@ -227,8 +231,22 @@ impl Effect {
                     ));
                 }
             }
+            // **There is no level rotation, and this sentence said there was.**
+            // M12.3 retired it — `ROTATION`, `rows_for` and `grows_at` are all
+            // gone, every frame starts at three rows and stays there — and this
+            // hover went on telling players a row was *"granted out of turn, on
+            // top of the row that grid gets when the level rotation reaches
+            // it"* for three blocks after the turn stopped existing.
+            //
+            // The same failure as the `STARTER` comment this project's own
+            // notes quoted as live fact for five blocks, and as the controls
+            // blurb M12.B deleted for saying *every level adds a row to one
+            // frame* — except player-facing, which is worse. Found by a lint
+            // written for a formatting nit; see `SECOND-ORDER-M15.md` row 8.
             Effect::GrowSlotRows { slot, .. } => out.push(format!(
-                "A row is {} more cells to pack the {slot} grid with, granted out of turn — on                  top of the row that grid gets when the level rotation reaches it. No grid goes                  past {} rows.",
+                "A row is {} more cells to pack the {slot} grid with. A level hands out none, so \
+                 every row on every frame is one of these or an errand's. No grid goes past {} \
+                 rows.",
                 crate::slot::SLOT_W,
                 crate::progression::MAX_ROWS,
             )),
@@ -260,7 +278,9 @@ impl Effect {
                 }
             }
             Effect::AssemblyPct { .. } => out.push(
-                "An assembly bonus is the lump a component pays only when the item it is part                  of is complete. This raises every one of them, on all five grids — so it pays                  a board that finishes what it seats and nothing at all to one that does not."
+                "An assembly bonus is the lump a component pays only when the item it is part of is \
+                 complete. This raises every one of them, on all five grids — so it pays a board \
+                 that finishes what it seats and nothing at all to one that does not."
                     .into(),
             ),
         }

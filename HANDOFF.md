@@ -329,8 +329,15 @@ REBASELINE_GOLDEN_COMBAT=1 cargo test -p gm2d-core
 
 ## 9. What is being built next
 
-**Nothing.** The tree is between blocks: M12 is done and live, eleven reported
-faults and asks have been fixed and deployed since, and the next block is a
+**Nothing, and this section is three blocks behind the tree.** M13, M14 and M15
+have all shipped since it was written; `CLAUDE.md` is the current account and
+each block has its own record — `HANDOFF-M13.md`, `HANDOFF-M14.md`,
+`HANDOFF-M15.md`. **M15 is done and not deployed**: Instant Battle, a curve that
+is quadratic to fifty, and a second class that is gated by its price. Everything
+below this line is still true about *how* to pick up a block; the state
+paragraphs in it are M12's.
+
+**Nothing is scheduled.** The tree is between blocks: the next one is a
 spec somebody writes. If you are picking this up to execute one, read §9 to the end
 — the four lists below are what is already known to be worth doing, and three
 things are outstanding rather than open (the two `TRIAGE-M12.md` rows that are

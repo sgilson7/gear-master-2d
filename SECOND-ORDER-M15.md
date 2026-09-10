@@ -297,3 +297,43 @@ speaks the book's language and rule 13a says a spec does not, so one list run
 through both sets of rules would fail the thing it exists to protect.
 `the_widened_corpus_actually_reaches_the_maps_and_the_engine` is what stops the
 new list going quietly empty.
+
+
+## 16. The lint I wrote demanded a sentence nobody can read — found after deploy
+
+**A fault in this block's own work, found while hand-checking the live page.**
+The probe for the lake's refusal planted the character on `[8, 10]` and the page
+put them back at the pit's start — because `[8, 10]` is **water**, and
+`World::repair` moves anybody who loads into scenery.
+
+Measured properly:
+
+    west-bambulon: the-way-under-the-lake at [8, 11] on water -- standable neighbours: []
+    the-treyway:   the-tide-crossing      at [8, 15] on tide  -- standable neighbours: [[8, 14]]
+
+**The grating is in open water in the middle of the lake.** Without `Rule::Wade`
+you cannot reach a tile beside it; with `Rule::Wade` the water is walkable and
+the gate opens. So its `shut` is a sentence no player can ever read — and the
+core test asserting it planted the character on water to produce it, which is
+*a planted check is about what was planted* with the plant itself illegal.
+
+Three things were wrong and all three are corrected:
+
+1. **The lint's condition.** *"On impassable ground"* is the wrong question;
+   *"somewhere a player can be refused"* is the right one.
+   `a_place_you_can_be_refused_at_says_why` asks it, and **asserts the one
+   exception by name** — the `UNWRITTEN` / `STAGED` pattern, because a list that
+   quietly grew is a list that has gone stale.
+2. **The dead sentence**, deleted. It is exactly the thing row 8 had just caught
+   one file away.
+3. **The claim.** The commit and `CLAUDE.md` said *"two gates were silent"* and
+   implied both were the fault. **One was.** Corrected in both.
+
+The deployed build carries the dead sentence and nothing else; it is inert and
+no player can reach it. The correction is a lint precision and a documentation
+accuracy fix, and it ships with the next deploy.
+
+**The general shape, and it is new here:** *a lint that forces content into
+existence has to be sure the content can be reached.* Mine made me write a
+paragraph for a door in the middle of a lake, and then I quoted it in three
+documents as a fix.

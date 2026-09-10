@@ -347,13 +347,21 @@ something cost a day.
   seen it.
 - **A refusal names the thing in the way, and a place standing on ground you
   cannot walk on knows more about it than the terrain does.** `world::step`
-  refuses on `walkable` before anything asks the place, so the two gates in this
-  game that stand on impassable ground — the way under the lake, on water, and
-  the tide crossing, on tide — both answered with the sentence a cliff answers
-  with. Reported from play at the shore: *"the land is pink and it says no way
-  through."* Both have a `shut` now, and
-  `a_place_on_ground_you_cannot_stand_on_says_why` walks every place on every
-  map so the next one cannot be silent.
+  refuses on `walkable` before anything asks the place, so a gate on impassable
+  terrain can never say why it is shut. Reported from play at the shore: *"the
+  land is pink and it says no way through."*
+  **And the condition is not "on impassable ground", it is "somewhere a player
+  can be refused"** — which the first version of the lint got wrong. Two gates
+  stand on ground nobody can walk on and only one of them has a **standable
+  neighbour**: the grating is in open water in the middle of the lake, so
+  without `Rule::Wade` you cannot reach a tile beside it and with it the water
+  is walkable and the gate opens. A `shut` there is a sentence no player can
+  ever read, which is the dead content this block had just caught in a skill
+  node's hover, so it was written and then deleted.
+  `a_place_you_can_be_refused_at_says_why` asks the sharper question over every
+  place on every map, **and asserts the one exception by name** the way
+  `common::UNWRITTEN` does — a list that quietly grew is a list that has gone
+  stale.
 - **A slice of a capped list is a comparison that quietly stops being about
   anything.** `#tape` keeps the last few lines and drops the rest into the
   history, so a browser check written as `tape(page)[before:]` goes on returning
@@ -4040,6 +4048,43 @@ live build 5fb93594
 table; a browser cannot say anything about that a hundred and fifty milliseconds
 of `cargo test` does not say better. What only the live page can answer is
 whether the counter is carrying them, which is what the list above is.
+
+**M15's is the first table here whose hand-written half found a fault in the
+block that had just shipped.** Eighty-one of the questions are the gate's, in
+three engines against the deployed page, so what a person went and looked at is
+the reported fault, the curve, and the one thing a gate cannot ask: whether the
+sentence the report was about actually reaches a player.
+
+```
+live build a0dc7fe0
+  index.html asks app.js?v=a0dc7fe0   app.js carries BUILD='a0dc7fe0'
+  chromium walked the gate    ok      firefox  walked the gate    ok
+  webkit   walked the gate    ok      81 ok lines, no failures
+  the shore, south from       "The water is over the bar and the bar is nine
+  the tideline                 feet down. Eleven years of notches on the post
+                               say it goes out the year somebody cuts the
+                               tenth, and nobody has cut the tenth."
+                              — which is the reported fault, answered
+  the curve, off the page     131 banked -> level 4     4297 -> level 19
+                              132 banked -> level 5     4298 -> level 20
+                              the level-five contract exact, and level twenty
+                              at a quarter of what it cost
+  console errors: none
+```
+
+**And the same sitting found the block's own mistake.** The probe for the
+*lake's* refusal planted the character on `[8, 10]`, the page put them back at
+the pit, and the reason is that `[8, 10]` is water: **the grating is in open
+water and has no standable neighbour**, so a `shut` on it is a sentence nobody
+can ever read. The lint that made it exist was asking *"is this on impassable
+ground"* where the question is *"can a player be refused here"*. Corrected the
+commit after the deploy — the dead sentence is deleted, the lint is sharpened
+and asserts its one exception by name, and the claim that *two* gates were
+silent is corrected to one. **The deployed build carries an inert paragraph in a
+map file and nothing else.**
+
+*A lint that forces content into existence has to be sure the content can be
+reached* is the general form, and it is new here.
 
 **M14's is the first table here whose hand-written half is a walk rather than a
 list.** Seventy-eight of the questions are the gate's, in three engines against

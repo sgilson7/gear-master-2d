@@ -236,7 +236,7 @@ fn the_lip_is_a_stack_and_it_wants_an_instrument() {
 
 // -------------------------------------------- a shut door that says so
 
-/// **A place standing on ground nobody can walk on has to say why.**
+/// **A place you can be refused at has to say why.**
 ///
 /// Reported from play, standing at the shore: *"i cannot go to the southern
 /// area in my save, the land is pink and it says no way through"*. It is one
@@ -244,36 +244,71 @@ fn the_lip_is_a_stack_and_it_wants_an_instrument() {
 /// asks the place, so the sentence a player got was the sentence a cliff gets
 /// — no tide, no cairn, no Reach, and nothing that could be acted on.
 ///
-/// Two gates in the game are like this and both were silent: the tide crossing,
-/// and the way under the lake, which sits on `water` until a five-floor tower
-/// comes down or a toad's frame goes on. So the check is over **every place on
-/// every map** rather than over these two, because a list of two written by
-/// hand is a list that can be one.
+/// **"Standing on impassable ground" is not the condition, and the first
+/// version of this check used it.** Two gates in this game are on ground nobody
+/// can walk on, and only one of them is a place anybody can be *refused* at:
 ///
-/// The refusal is content — `shut`, in the map file, in the world's words,
-/// TONE 12. What the engine owns is only that it is a *place's* refusal and
-/// therefore goes on the strip rather than in the one-second flash.
+/// ```text
+/// west-bambulon: the-way-under-the-lake at [8, 11] on water -- standable neighbours: []
+/// the-treyway:   the-tide-crossing      at [8, 15] on tide  -- standable neighbours: [[8, 14]]
+/// ```
+///
+/// The grating is in **open water in the middle of the lake**: without
+/// `Rule::Wade` you cannot reach a tile beside it, and with `Rule::Wade` the
+/// water is walkable and the gate simply opens. So a `shut` on it is a sentence
+/// no player can ever read — dead content, which is the thing M15.5 had just
+/// caught in a skill node's hover. It was written and is deleted, and this
+/// check is what would notice the day somebody drew land at [8, 12].
+///
+/// The refusal itself is content — `shut`, in the map file, in the world's
+/// words, TONE 12. What the engine owns is only that it is a *place's* refusal
+/// and therefore goes on the strip rather than in the one-second flash.
 #[test]
-fn a_place_on_ground_you_cannot_stand_on_says_why() {
+fn a_place_you_can_be_refused_at_says_why() {
     let plain = Allowances::default();
-    let mut found = 0;
+    let mut refusable = 0;
+    let mut unreachable = Vec::new();
     for (id, _) in data::MAPS {
         let w = data::map(id, D);
         for p in &w.places {
             if w.walkable(p.at[0], p.at[1], &plain) {
                 continue;
             }
-            found += 1;
+            // Somewhere a player could be standing when the step is refused.
+            let (x, y) = (p.at[0] as i32, p.at[1] as i32);
+            let beside = [(0i32, -1i32), (0, 1), (-1, 0), (1, 0)].iter().any(|(dx, dy)| {
+                let (nx, ny) = (x + dx, y + dy);
+                w.in_bounds(nx, ny) && w.walkable(nx as u8, ny as u8, &plain)
+            });
+            if !beside {
+                unreachable.push(format!("{id}: {}", p.id));
+                assert!(
+                    p.shut.is_empty(),
+                    "{id}: {} is in open ground nobody can reach and carries a refusal \
+                     no player can ever read",
+                    p.id
+                );
+                continue;
+            }
+            refusable += 1;
             assert!(
                 !p.shut.is_empty(),
-                "{id}: {} stands on {} and has nothing to say about it, \
-                 so the only sentence a player can get there is the cliff's",
+                "{id}: {} stands on {} with somewhere to be refused from, and has nothing \
+                 to say about it, so the only sentence a player can get there is the cliff's",
                 p.id,
                 w.terrain_name(p.at[0], p.at[1])
             );
         }
     }
-    assert!(found >= 2, "no place stands on impassable ground, so this check is vacuous");
+    assert!(refusable >= 1, "nothing in the game can refuse a step this way, so this is vacuous");
+    // **The exception is asserted rather than skipped**, the same way
+    // `common::UNWRITTEN` and `avail.rs`'s `STAGED` are: a list that quietly
+    // grew is a list that has gone stale.
+    assert_eq!(
+        unreachable,
+        vec!["west-bambulon: the-way-under-the-lake".to_string()],
+        "the set of places nobody can be refused at has changed"
+    );
 }
 
 /// And the sentence actually comes back out of the step, on the strip.
@@ -325,28 +360,38 @@ fn the_tide_says_what_is_over_the_bar() {
     assert_eq!(s.gate.as_deref(), Some("the-tide-crossing"));
 }
 
-/// The lake says what is on top of it, and stops when the tower is down.
+/// **Nobody can be refused at the grating**, which is why it says nothing.
+///
+/// The old version of this test planted the character on `[8, 10]` and stepped
+/// south. That tile is **water** — it is not a position a player can be in, and
+/// `World::repair` moves anybody who loads into it. So the check was asserting a
+/// refusal that only a character standing illegally in a lake could ever
+/// produce, which is the *a planted check is about what was planted* family
+/// with the plant itself wrong.
+///
+/// What is true is stated instead, and it is the reason the sentence came back
+/// out of the map file.
 #[test]
-fn the_lake_says_what_is_on_top_of_it() {
-    let mut g = gm2d_core::game::Game::new(3, "td");
-    g.world = WorldState::at_start(&data::map("west-bambulon", D));
-    g.world.map = "west-bambulon".into();
-    g.world.at = [8, 10];
-    let allowed = g.character.allowances();
-    let live = data::map_now("west-bambulon", D, &g.world);
-    let s = gm2d_core::world::step(
-        &live,
-        &mut g.world,
-        &mut g.rng,
-        D,
-        gm2d_core::world::Dir::South,
-        &allowed,
-    );
-    assert!(!s.moved, "walked onto the lake in a frame");
-    let said = s.blocked.clone().unwrap_or_default();
-    assert!(
-        said.contains("Drambus Stack"),
-        "the refusal does not name what is standing on the tap: {said:?}"
-    );
-    assert_eq!(s.refused_by.as_deref(), Some("the-way-under-the-lake"));
+fn the_grating_is_in_open_water_and_refuses_nobody() {
+    let w = data::map("west-bambulon", D);
+    let gate = w
+        .places
+        .iter()
+        .find(|p| p.id == "the-way-under-the-lake")
+        .expect("the way under the lake is on the map");
+    let plain = Allowances::default();
+    assert!(!w.walkable(gate.at[0], gate.at[1], &plain), "the grating is on dry land now");
+    let (x, y) = (gate.at[0] as i32, gate.at[1] as i32);
+    for (dx, dy) in [(0i32, -1i32), (0, 1), (-1, 0), (1, 0)] {
+        let (nx, ny) = (x + dx, y + dy);
+        if !w.in_bounds(nx, ny) {
+            continue;
+        }
+        assert!(
+            !w.walkable(nx as u8, ny as u8, &plain),
+            "[{nx}, {ny}] is beside the grating and standable, so the refusal is reachable \
+             and the gate needs a `shut` again"
+        );
+    }
+    assert!(gate.shut.is_empty(), "a refusal nobody can read is dead content");
 }

@@ -4056,8 +4056,8 @@ the reported fault, the curve, and the one thing a gate cannot ask: whether the
 sentence the report was about actually reaches a player.
 
 ```
-live build a0dc7fe0
-  index.html asks app.js?v=a0dc7fe0   app.js carries BUILD='a0dc7fe0'
+live build f4db47e5 (and a0dc7fe0 before the correction)
+  index.html asks app.js?v=f4db47e5   app.js carries BUILD='f4db47e5'
   chromium walked the gate    ok      firefox  walked the gate    ok
   webkit   walked the gate    ok      81 ok lines, no failures
   the shore, south from       "The water is over the bar and the bar is nine

@@ -22,6 +22,15 @@
     "Overflow Vial",
     "Tin Band"
   ],
+  "_caravan": "**The cart, and it is the reason instruments stopped being a drop-chase.** Measured before it was written: the cheapest instrument is a compass — one Map Shard, one Glass Lens, one Magnet — and of those three the Lens was off an Ember Wisp and the Magnet off a Slag Warden and nothing else in the game sold either. Twenty wins in the Kolok Downs for a Magnet, and the Kolok Downs is behind the door the instrument opens. This is what the human asked for in as many words: *a traveling caravan ... that sells survey gear like magnets, lenses, etc.* Everything on it fits the instrument frame, it is priced like a shelf because the ask was availability and not power, and it is spent once each — one cart, one list, and moving it is not restocking it.",
+  "caravan": [
+    "Map Shard",
+    "Glass Lens",
+    "Magnet",
+    "Living Earth",
+    "Clouded Orb",
+    "Azure Alignment"
+  ],
   "_commissions": "What each town will make to order. Paid up front, arrives after that many fights, and collected in person at the counter that took it - one open order per town. Priced at COMMISSION_PCT of the catalogue, which is twice the shelf: ordering certainty costs more than finding luck. Nothing here is on a shelf or in the barrel, so an order is a third source and not a slower way to shop.",
   "towns": [
     {

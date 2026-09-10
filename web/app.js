@@ -20,6 +20,7 @@ import init, {
   bank_json, bank_put, bank_take,
   kit_json, kit_reading_json,
   instant_json, set_instant, bestiary_json,
+  caravan_json, buy_caravan,
 } from './pkg/gm2d_wasm.js';
 import { Board } from './board.js';
 import { Theirs } from './theirs.js';
@@ -241,6 +242,21 @@ function draw() {
       g.moveTo(cx + w / 2 - 2, top); g.lineTo(cx + w / 2 - 2, bot);
       g.stroke();
       g.lineWidth = 2;
+    } else if (p.kind === 'caravan') {
+      // **A cart, and it is the only wheel on any map.** A bench is a table
+      // and a town is a filled square; this is neither — it is a thing that
+      // will not be here on Thursday, so it gets the one shape that says
+      // *it moves*. A box on two wheels, in the page's ink.
+      const w = TILE - 12, bed = y * TILE + TILE - 10;
+      g.strokeStyle = ink();
+      g.lineWidth = 2.5;
+      g.strokeRect(cx - w / 2, bed - w * 0.55, w, w * 0.55);
+      g.lineWidth = 2;
+      for (const wx of [cx - w / 4, cx + w / 4]) {
+        g.beginPath();
+        g.arc(wx, bed + 3, 3.2, 0, Math.PI * 2);
+        g.stroke();
+      }
     } else if (p.kind === 'crossing') {
       // **Its own mark, and neither of the two it is nearest.** A gate is a
       // diamond and leads off the map; a door is an arch and leads out of what
@@ -716,6 +732,9 @@ function closeInstant() {
 let bestiaryBoard = null;
 let bestiaryOn = '';
 
+/// The stop the cart was last drawn at, so a teleport re-reads the world.
+let cartAt = null;
+
 /// The index, and whichever entry is open.
 ///
 /// **The list is core's and so is the entry.** `bestiary_json` refuses a
@@ -803,6 +822,54 @@ function openBestiary() {
 
 function closeBestiary() {
   $('bestiary').hidden = true;
+  $('map').focus();
+}
+
+// -------------------------------------------------------------- the caravan
+
+/// The cart's counter.
+///
+/// **Printed, never worked out.** What it carries, what it costs and whether it
+/// is spent are all core's — the page has no idea what a shelf price is and
+/// must not learn, which is the same rule the town's shelf obeys.
+function paintCaravan() {
+  const r = JSON.parse(caravan_json());
+  if (!r) { closeCaravan(); return; }
+  $('caravan-name').textContent = r.name;
+  $('caravan-prose').innerHTML = (r.prose ?? []).map((t) => `<p>${t}</p>`).join('');
+  $('caravan-gold').textContent = r.gold;
+  // **How long it is here**, which is the whole character of the thing: a cart
+  // you can come back to tomorrow is a shop.
+  $('caravan-leaves').textContent = r.moves_left === 1
+    ? `It goes on after one more step of yours.`
+    : `It goes on after ${r.moves_left} more steps of yours.`;
+  $('caravan-stock').replaceChildren(...(r.stock ?? []).map((o) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'wares';
+    b.disabled = o.sold || !o.afford;
+    b.innerHTML = `${shapeCanvas(o.canonical, 14).outerHTML}` +
+      `<span class="ware-name">${o.name}</span>` +
+      `<span class="cost">${o.price} Fnorp</span>`;
+    if (o.sold) b.classList.add('sold');
+    b.onclick = () => {
+      const why = buy_caravan(o.index);
+      if (why) { log(why, true); return; }
+      log(`Took a ${o.name} off the cart.`);
+      paintCaravan(); paintPanel(); autosave();
+    };
+    return b;
+  }));
+}
+
+function openCaravan() {
+  $('caravan').hidden = false;
+  paintCaravan();
+  $('caravan-close').focus();
+}
+
+function closeCaravan() {
+  $('caravan').hidden = true;
   $('map').focus();
 }
 
@@ -2661,7 +2728,7 @@ function walk(dir) {
   if (!$('card').hidden || !$('fight').hidden || !$('town').hidden ||
       !$('tree').hidden || !$('fork').hidden || !$('log').hidden ||
       !$('history').hidden || !$('instrument').hidden ||
-      !$('instant').hidden || !$('bestiary').hidden ||
+      !$('instant').hidden || !$('bestiary').hidden || !$('caravan').hidden ||
       !$('ending').hidden || !$('vendor').hidden) return;
   const r = JSON.parse(try_step(dir));
   blocked = r.moved ? null : r.blocked;
@@ -2678,6 +2745,16 @@ function walk(dir) {
   // Arriving is the doing: an errand that says "go and talk to them" is
   // finished by standing there, and core says so on the step.
   if ((r.spoke ?? []).length) log(`You have been. ${r.spoke.join(', ')}.`);
+  // **The cart moved, so the map is a different map.** `paintPanel` re-reads
+  // only when the map *id* changes, and a caravan teleports between places on
+  // a map you never left — so the page went on drawing the stop it had cached
+  // and the cart was nowhere. Found by the browser check: *0 carts are on the
+  // field, and there is one cart.*
+  if (r.cart_at !== cartAt) {
+    cartAt = r.cart_at ?? null;
+    world = JSON.parse(world_json());
+    paintPanel(); draw();
+  }
   // **Through a gate is a different map.** The ground, the places and the
   // player's own position all changed, so the page reloads the map rather
   // than redrawing the one it had.
@@ -2731,6 +2808,7 @@ function walk(dir) {
   }
   if (r.town) openTown(r.town);
   else if (r.bench) openVendor();
+  else if (r.caravan) openCaravan();
   else if (r.event) openEvent(r.event);
   else if (r.encounter) openFight();
 }
@@ -2897,6 +2975,10 @@ async function main() {
       if (e.key === 'Escape') closeBestiary();
       return;
     }
+    if (!$('caravan').hidden) {
+      if (e.key === 'Escape') closeCaravan();
+      return;
+    }
     if (!$('ending').hidden) {
       if (e.key === 'Escape') closeEnding();
       return;
@@ -2954,6 +3036,7 @@ async function main() {
   $('instant-close').onclick = closeInstant;
   $('bestiary-open').onclick = openBestiary;
   $('bestiary-close').onclick = closeBestiary;
+  $('caravan-close').onclick = closeCaravan;
   paintTape();
 
   board = new Board($('board'), {
@@ -3071,6 +3154,12 @@ async function main() {
     paintPanel(); draw();
   };
   window.__standAt = (at) => standOn(at, '');
+  // How many components are owned, for a check that a purchase landed.
+  // **Off the save**, which is where the bag actually is: `character_json`
+  // has no bag and `board.state.bag` is empty until the packing screen
+  // paints — a trap this project has written down and the key check
+  // shipped vacuous against twice.
+  window.__bag = () => JSON.parse(save_json()).state.character.owned.length;
   window.__standHere = (at) => standOn(at, null);
   // Layout is the one claim reading the source cannot settle, so the gate has
   // to be able to put the fight screen on each stage and measure it.

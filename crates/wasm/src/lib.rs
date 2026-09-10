@@ -749,6 +749,18 @@ pub fn try_step(dir: &str) -> String {
                 "ending": ending,
                 "boss": s.boss,
                 "bench": s.bench,
+                // The cart, if today is a day it is here.
+                "caravan": s.caravan,
+                // **Where the cart is, whether or not you are on it.**
+                // Distinct from the line above, which means *you are standing
+                // on it* — this is what tells the page its copy of the world
+                // has gone stale. `paintPanel` re-reads only when the **map
+                // id** moves, and a cart that teleports changes which places
+                // exist on a map you never left. Fourth instance of *a page
+                // that draws a world has to be told which world, every time it
+                // can have changed*, and the first where the map is the same
+                // one throughout.
+                "cart_at": g.world.caravan.as_ref().map(|c| c.place.clone()),
                 // Which kind of refusal it was. `blocked` already carries the
                 // sentence; this is what lets the page put a *place's* in the
                 // message panel and a cliff's in the flash at the bottom of
@@ -2197,6 +2209,84 @@ pub fn set_instant(creature: &str, on: bool) -> String {
             g.unmark_instant(creature);
             String::new()
         }
+    })
+}
+
+/// What the cart is carrying, and what it says.
+///
+/// **The stock is the cart's and the prose is the stop's.** One list of goods
+/// wherever it is standing — moving it is not restocking it — and each stop has
+/// its own paragraph, because *by the quench pond* and *at the rind wall* are
+/// different places to find the same cart.
+#[wasm_bindgen]
+pub fn caravan_json() -> String {
+    with(|g| {
+        let here = g.world.map_id();
+        let marks = seen_by(g);
+        let allowed = g.character.allowances();
+        // Which stop it is at, if the player is standing on it.
+        let mut stop = None;
+        map_in(&here, &marks, |w| {
+            if let Some(p) = w.place_now(&g.world, g.world.at[0], g.world.at[1], &allowed) {
+                if p.kind == gm2d_core::world::PlaceKind::Caravan {
+                    stop = Some((p.id.clone(), p.name.clone(), p.prose.clone()));
+                }
+            }
+        });
+        let Some((id, name, prose)) = stop else { return "null".to_string() };
+        let shops = gm2d_core::data::shops();
+        let rows: Vec<_> = gm2d_core::shop::caravan_shelf(&shops, &g.world.bought)
+            .into_iter()
+            .map(|o| {
+                serde_json::json!({
+                    "index": o.index,
+                    "name": g.theme_piece(o.def.name),
+                    "canonical": o.def.name,
+                    "price": o.price,
+                    "sold": o.sold,
+                    "afford": g.character.gold >= o.price,
+                    "cells": o.def.cells.len(),
+                    "lines": gm2d_core::explain::piece_lines(o.def),
+                })
+            })
+            .collect();
+        serde_json::json!({
+            "id": id,
+            "name": name,
+            "prose": prose,
+            "gold": g.character.gold,
+            // **How much longer it is here**, which is the whole character of
+            // the thing: a cart you can come back to tomorrow is a shop.
+            "moves_left": g.world.caravan.as_ref().map(|c| c.moves_left).unwrap_or(0),
+            "stock": rows,
+        })
+        .to_string()
+    })
+}
+
+/// Buy a line off the cart.
+///
+/// **Spent once each and keyed by the cart**, so what you bought follows it to
+/// the next stop. `WorldState::bought` is the same list a town shelf writes to
+/// and the index is the identity, exactly as it is there.
+#[wasm_bindgen]
+pub fn buy_caravan(index: usize) -> String {
+    with_mut(|g| {
+        let shops = gm2d_core::data::shops();
+        let rows = gm2d_core::shop::caravan_shelf(&shops, &g.world.bought);
+        let Some(o) = rows.into_iter().find(|o| o.index == index) else {
+            return "he has nothing else of that kind".to_string();
+        };
+        if o.sold {
+            return "you have had that one off him already".to_string();
+        }
+        if g.character.gold < o.price {
+            return format!("{} Fnorp, and you have {}.", o.price, g.character.gold);
+        }
+        g.character.gold -= o.price;
+        g.character.give(o.def.name);
+        g.world.bought.push((gm2d_core::shop::CARAVAN.to_string(), index as u16));
+        String::new()
     })
 }
 

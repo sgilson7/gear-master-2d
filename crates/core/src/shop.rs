@@ -283,6 +283,50 @@ pub struct ShopsData {
     /// entry is spent, and a barrel entry is not.
     #[serde(default)]
     pub barrel: Vec<String>,
+    /// **What the cart is carrying**, by canonical name.
+    ///
+    /// One list, like the barrel, because there is one cart — moving it is not
+    /// restocking it, so what you bought at the quench pond is gone when it
+    /// turns up by the rind wall. Unlike the barrel it **is** spent once each,
+    /// so `WorldState::bought` tracks it under [`CARAVAN`] and the gap is the
+    /// memory of what you took, exactly as a town shelf's is.
+    ///
+    /// Empty by default, so every save and every data file written before there
+    /// was a cart still opens.
+    #[serde(default)]
+    pub caravan: Vec<String>,
+}
+
+/// The id the cart's stock and its purchases are keyed under.
+///
+/// **Not a stop's id.** The cart is at a different stop every five steps and
+/// what you have bought off it has to follow it — a key that was the stop's
+/// would restock the thing every time it moved, which is a shop that never runs
+/// out wearing a shop's clothes.
+pub const CARAVAN: &str = "the-caravan";
+
+/// What the cart has left, priced like a shelf.
+///
+/// **Shelf prices and not a tier of its own.** The ask is availability — *"sells
+/// survey gear like magnets, lenses"* — and this project has been here before:
+/// *the ask was availability, not power*, which is why an ink went onto the
+/// pit's shelf in M14 and came straight back off. A cart that undercut the
+/// authored tier would be a fourth counter with a fifth curve to keep tuned.
+pub fn caravan_shelf(shops: &ShopsData, sold: &[(String, u16)]) -> Vec<Offer> {
+    shops
+        .caravan
+        .iter()
+        .enumerate()
+        .filter_map(|(i, name)| {
+            let def = &CATALOG[def_named(name)?];
+            Some(Offer {
+                index: i,
+                def,
+                price: shelf_price(def),
+                sold: sold.iter().any(|(w, n)| w == CARAVAN && *n as usize == i),
+            })
+        })
+        .collect()
 }
 
 impl ShopsData {

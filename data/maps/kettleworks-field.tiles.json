@@ -466,6 +466,111 @@
       ],
       "kind": "event",
       "id": "the-north-gate"
+    },
+    {
+      "at": [
+        4,
+        4
+      ],
+      "kind": "caravan",
+      "id": "the-caravan-stop-1",
+      "name": "the cart, by the quench pond",
+      "prose": [
+        "A cart with one wheel chocked and a canvas over it, and a person sitting on the tailgate with a ledger they are not reading.",
+        "Everything on it is somebody else's survey, sold by weight. They will not say whose and they will not be here on Thursday."
+      ]
+    },
+    {
+      "at": [
+        15,
+        4
+      ],
+      "kind": "caravan",
+      "id": "the-caravan-stop-2",
+      "name": "the cart, at the rind wall",
+      "prose": [
+        "A cart with one wheel chocked and a canvas over it, and a person sitting on the tailgate with a ledger they are not reading.",
+        "Everything on it is somebody else's survey, sold by weight. They will not say whose and they will not be here on Thursday."
+      ]
+    },
+    {
+      "at": [
+        4,
+        14
+      ],
+      "kind": "caravan",
+      "id": "the-caravan-stop-3",
+      "name": "the cart, on the crumb field",
+      "prose": [
+        "A cart with one wheel chocked and a canvas over it, and a person sitting on the tailgate with a ledger they are not reading.",
+        "Everything on it is somebody else's survey, sold by weight. They will not say whose and they will not be here on Thursday."
+      ]
+    },
+    {
+      "at": [
+        15,
+        15
+      ],
+      "kind": "caravan",
+      "id": "the-caravan-stop-4",
+      "name": "the cart, under the fortieth kettle",
+      "prose": [
+        "A cart with one wheel chocked and a canvas over it, and a person sitting on the tailgate with a ledger they are not reading.",
+        "Everything on it is somebody else's survey, sold by weight. They will not say whose and they will not be here on Thursday."
+      ]
+    },
+    {
+      "at": [
+        10,
+        2
+      ],
+      "kind": "caravan",
+      "id": "the-caravan-stop-5",
+      "name": "the cart, at the scrap line",
+      "prose": [
+        "A cart with one wheel chocked and a canvas over it, and a person sitting on the tailgate with a ledger they are not reading.",
+        "Everything on it is somebody else's survey, sold by weight. They will not say whose and they will not be here on Thursday."
+      ]
+    },
+    {
+      "at": [
+        2,
+        10
+      ],
+      "kind": "caravan",
+      "id": "the-caravan-stop-6",
+      "name": "the cart, by the hooper",
+      "prose": [
+        "A cart with one wheel chocked and a canvas over it, and a person sitting on the tailgate with a ledger they are not reading.",
+        "Everything on it is somebody else's survey, sold by weight. They will not say whose and they will not be here on Thursday."
+      ]
+    },
+    {
+      "at": [
+        17,
+        9
+      ],
+      "kind": "caravan",
+      "id": "the-caravan-stop-7",
+      "name": "the cart, on the slag road",
+      "prose": [
+        "A cart with one wheel chocked and a canvas over it, and a person sitting on the tailgate with a ledger they are not reading.",
+        "Everything on it is somebody else's survey, sold by weight. They will not say whose and they will not be here on Thursday."
+      ]
+    },
+    {
+      "at": [
+        10,
+        17
+      ],
+      "kind": "caravan",
+      "id": "the-caravan-stop-8",
+      "name": "the cart, at the field's south gate",
+      "prose": [
+        "A cart with one wheel chocked and a canvas over it, and a person sitting on the tailgate with a ledger they are not reading.",
+        "Everything on it is somebody else's survey, sold by weight. They will not say whose and they will not be here on Thursday."
+      ]
     }
-  ]
+  ],
+  "_caravan": "**Eight stops and the cart is at one of them.** A place that moves cannot be a place spawned at runtime — *places are content and content is not state* — so every stop it makes is authored here on empty walkable ground, and `WorldState::caravan` says which one has the cart on it today. `place_is_there` hides the other seven. Five of your steps on this field and it goes somewhere else, never to the stop it is already at and never onto the tile you are standing on."
 }

@@ -210,6 +210,20 @@ pub enum PlaceKind {
     /// event id into `answered`, so a card could sell one thing once. A bench
     /// sells each line once, which is the shelf rule the towns already follow.
     Bench,
+    /// A cart that is somewhere else tomorrow.
+    ///
+    /// **Every stop it makes is content and only which one it is at is state.**
+    /// Spawning a place at runtime is the option `PlaceDef::hidden_until`
+    /// rejected — *places are content and content is not state* — so a caravan
+    /// is authored as a handful of stops on empty ground and
+    /// [`WorldState::caravan`] says which of them has the cart on it today.
+    /// `place_is_there` hides the rest.
+    ///
+    /// It sells out of `shops.json` like a shelf does, and what it sells is
+    /// spent once each: `WorldState::bought` is keyed by the **caravan's** id
+    /// rather than by the stop's, because it is one cart and moving it is not
+    /// restocking it.
+    Caravan,
     /// A threshold you may cross only when something is true of you.
     ///
     /// A gate's sibling: a gate is a way onto another map and a crossing is a
@@ -469,6 +483,15 @@ pub fn place_is_there(p: &PlaceDef, state: &WorldState, allowed: &Allowances) ->
     // the only reading of two conditions on one place that cannot surprise
     // somebody reading the file.
     if p.hidden_until.as_ref().is_some_and(|k| !met(k)) {
+        return false;
+    }
+    // **The cart is at one of its stops and the others are bare ground.**
+    // A caravan is authored as several places and at most one of them is
+    // there — which is how a thing that moves stays content. Before it has
+    // been placed at all, none of them is.
+    if p.kind == PlaceKind::Caravan
+        && state.caravan.as_ref().map(|c| c.place.as_str()) != Some(p.id.as_str())
+    {
         return false;
     }
     p.hidden_until_all.iter().all(met)
@@ -1454,6 +1477,28 @@ pub struct WorldState {
     /// on this.
     #[serde(default)]
     pub instant: Vec<String>,
+    /// Where the cart is today, and how much longer it stays.
+    ///
+    /// **The only part of a caravan that is state.** Its stops, its stock and
+    /// its prose are all content; this is which stop, and a countdown.
+    ///
+    /// `None` means it has not been placed yet — a save from before there was
+    /// one, or a run that has not walked onto the field. The first step on a
+    /// map that has stops puts it somewhere, so nothing has to be seeded.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub caravan: Option<CaravanAt>,
+}
+
+/// Where the cart is, and how many more of your steps it stays for.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CaravanAt {
+    /// The id of the stop it is standing on.
+    pub place: String,
+    /// Steps left on this map before it moves on. Counted on the map it is on,
+    /// so *five movements* means five you could have watched — a cart that
+    /// moved while you were two countries away would be a cart that is
+    /// somewhere arbitrary whenever you come back.
+    pub moves_left: u16,
 }
 
 impl WorldState {
@@ -1627,6 +1672,8 @@ pub struct Step {
     pub boss: Option<String>,
     /// A bench you are now standing at.
     pub bench: Option<String>,
+    /// The travelling cart, if it is here today.
+    pub caravan: Option<String>,
     /// The **place** that refused this step, if a place did rather than the
     /// ground.
     ///
@@ -1677,6 +1724,7 @@ impl Step {
             door: None,
             boss: None,
             bench: None,
+        caravan: None,
             refused_by: None,
             encounter: None,
         }
@@ -1708,6 +1756,7 @@ pub fn here(world: &World, state: &WorldState, allowed: &Allowances) -> Step {
         door: None,
         boss: None,
         bench: None,
+        caravan: None,
         refused_by: None,
         encounter: None,
     };
@@ -1732,6 +1781,70 @@ pub fn here(world: &World, state: &WorldState, allowed: &Allowances) -> Step {
 /// draws nothing at all: bumping into a wall must not advance the stream, or
 /// two players walking the same route would see different fights depending on
 /// how often they misjudged a cliff.
+/// How many of your steps the cart stays at a stop.
+///
+/// The human's number: *"appears in a random area for 5 movements then teleports
+/// to another spot."*
+pub const CARAVAN_STAY: u16 = 5;
+
+/// Put the cart somewhere, and move it on when its time is up.
+///
+/// **Called on every step that lands**, beside the line that counts the tile —
+/// which is the placement M12.2's order clock argued for and got right: the one
+/// line in the game that means *a step happened* is the one thing a clock must
+/// sit next to, or the two drift apart.
+///
+/// Three rules, and all three are here rather than in a shim:
+///
+/// - **Only on a map that has stops.** Everywhere else this is a no-op, so the
+///   cart's clock does not run while you are down a hole two countries away.
+/// - **Never onto the stop it is already at.** With one stop authored it simply
+///   stays, which is degenerate rather than wrong; with several it always
+///   moves, because a teleport that lands where it started is a teleport
+///   nobody can tell happened.
+/// - **Never onto a stop you are standing on.** A cart that materialised under
+///   the player would open its screen without being walked to.
+fn tick_caravan(world: &World, state: &mut WorldState, rng: &mut Rng) {
+    let stops: Vec<&PlaceDef> =
+        world.places.iter().filter(|p| p.kind == PlaceKind::Caravan).collect();
+    if stops.is_empty() {
+        return;
+    }
+    let here = state.at;
+    let move_to = |rng: &mut Rng, not: Option<&str>| -> Option<CaravanAt> {
+        let open: Vec<&&PlaceDef> = stops
+            .iter()
+            .filter(|p| Some(p.id.as_str()) != not && p.at != here)
+            .collect();
+        // Every stop is either where it is or under your feet. Leave it.
+        let pick = open.get(rng.below(open.len()))?;
+        Some(CaravanAt { place: pick.id.clone(), moves_left: CARAVAN_STAY })
+    };
+    match state.caravan.clone() {
+        None => {
+            // **Somewhere, on the first step onto the field.** Off `game.rng`
+            // like every other roll, so a seeded walk still replays.
+            if let Some(c) = move_to(rng, None) {
+                state.caravan = Some(c);
+            }
+        }
+        Some(c) if !stops.iter().any(|p| p.id == c.place) => {
+            // A save naming a stop this build has not got. Same answer
+            // `World::repair` gives a position it cannot stand on: put it
+            // somewhere real rather than leaving a dangling name.
+            state.caravan = move_to(rng, None);
+        }
+        Some(mut c) => {
+            c.moves_left = c.moves_left.saturating_sub(1);
+            state.caravan = if c.moves_left == 0 {
+                move_to(rng, Some(&c.place)).or(Some(c))
+            } else {
+                Some(c)
+            };
+        }
+    }
+}
+
 /// The gate **on this map** that leads to wherever an event stands.
 ///
 /// **One hop, and that is deliberate.** A refusal is a keypress, and
@@ -1861,6 +1974,10 @@ pub fn step(
 
     state.at = [nx, ny];
     state.bump("tiles-walked");
+    // **The cart's clock, beside the line that means a step happened.** Same
+    // placement and the same argument as the order book's: a clock that is not
+    // next to that line is a clock that will one day miss a step invisibly.
+    tick_caravan(world, state, rng);
 
     let mut out = Step {
         moved: true,
@@ -1872,6 +1989,7 @@ pub fn step(
         door: None,
         boss: None,
         bench: None,
+        caravan: None,
         refused_by: None,
         encounter: None,
     };
@@ -1942,6 +2060,12 @@ pub fn step(
             // a gate's key makes.
             PlaceKind::Bench => {
                 out.bench = Some(p.id.clone());
+                return out;
+            }
+            // The cart. What it sells and whether you can afford any of it is
+            // not the world's business, the same as a bench's.
+            PlaceKind::Caravan => {
+                out.caravan = Some(p.id.clone());
                 return out;
             }
             // **You walk over it.** A crossing that stopped you on its own tile

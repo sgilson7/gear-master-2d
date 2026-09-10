@@ -183,6 +183,29 @@
          Its own id and its own prefix: `#theirs-*` is the fight panel's and
          reusing it would put two elements on one id, which is the `.card`
          collision in a new coat. Tier 30, *what you opened from the map*. -->
+    <!-- **The cart.** A counter you walk up to, like the van — and it is a
+         `.screen` rather than the town's box because it is not a town: no
+         bank, no banking, no mending, and it will not be here on Thursday. Its
+         own id and its own prefix; `#vendor-*` is the van's. -->
+    <div id="caravan" class="screen" hidden>
+      <div class="screenbox">
+        <header class="fighthead">
+          <div>
+            <p class="eyebrow">it will not be here on Thursday</p>
+            <h2 id="caravan-name">&mdash;</h2>
+            <div id="caravan-prose"></div>
+            <p class="note" id="caravan-leaves"></p>
+          </div>
+          <p class="note"><b id="caravan-gold">0</b> Fnorp</p>
+        </header>
+        <h3 class="sub-h">What it is carrying</h3>
+        <div id="caravan-stock" class="shelf"></div>
+        <div class="actionbar">
+          <button id="caravan-close" type="button" class="primary">Back</button>
+        </div>
+      </div>
+    </div>
+
     <div id="bestiary" class="screen framed" hidden>
       <div class="screenbox">
         <header class="fighthead">

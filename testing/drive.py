@@ -2402,6 +2402,130 @@ def check_the_bestiary_holds_what_you_have_met(page, name, fails, base):
     print("ok: the bestiary holds what you have met, with its board and what it resists")
 
 
+def check_the_cart_is_somewhere_and_then_somewhere_else(page, name, fails, base):
+    """**A shop that is not in the same place twice.**
+
+    Asked for as *"a traveling caravan in the kettleworks that appears in a
+    random area for 5 movements then telepots to another spot ... that sells
+    survey gear like magnets, lenses, etc."*
+
+    `cargo test` proves the movement rule, the stock and that a compass finishes
+    out of it. What only a browser can say is that the cart is **drawn on the
+    map** at one stop and not eight, that walking onto it opens a counter, and
+    that the counter buys — a moving place is the one thing in this game where
+    "is it there" and "is it drawn there" can come apart.
+    """
+    def on_the_field(body):
+        strip_the_boards(body)
+        w = body.setdefault("world", {})
+        w["map"] = "kettleworks-field"
+        w["at"] = [10, 10]
+        w.pop("caravan", None)
+        w["bought"] = [b for b in w.get("bought", []) if b[0] != "the-caravan"]
+        body["character"]["class"] = "Berserker"
+        body["character"]["xp"] = 4000
+        body["character"]["gold"] = 50_000
+
+    plant(page, base, on_the_field, stem="cart")
+    dismiss_card(page)
+    close_fight(page)
+    page.evaluate("() => document.getElementById('map').focus()")
+
+    # **One cart on the map, not eight.** `place_now` hides the other stops,
+    # and the payload the page draws from is what proves it.
+    def carts():
+        return page.evaluate(
+            "() => (window.__world().places ?? []).filter(p => p.kind === 'caravan')")
+
+    page.keyboard.press("ArrowRight")
+    page.wait_for_timeout(200)
+    dismiss_card(page)
+    close_fight(page)
+    drawn = carts()
+    if len(drawn) != 1:
+        fails.append(f"{name}: {len(drawn)} carts are on the field, and there is one cart")
+        return
+    first = drawn[0]
+
+    # **Five of your steps and it is somewhere else.** Walked rather than
+    # planted, because the clock ticking on a step is the whole feature.
+    moved_to = None
+    for i in range(12):
+        page.keyboard.press("ArrowLeft" if i % 2 else "ArrowRight")
+        page.wait_for_timeout(120)
+        dismiss_card(page)
+        close_fight(page)
+        now = carts()
+        if len(now) != 1:
+            fails.append(f"{name}: {len(now)} carts after {i + 1} steps")
+            return
+        if now[0]["id"] != first["id"]:
+            moved_to = (i + 1, now[0])
+            break
+    if not moved_to:
+        fails.append(f"{name}: twelve steps and the cart never moved off {first['id']}")
+        return
+    steps, second = moved_to
+    if second["at"] == first["at"]:
+        fails.append(f"{name}: the cart 'moved' to the tile it was already on")
+
+    # --- and it sells --------------------------------------------------------
+    # **Walked onto, not stood on.** `__standAt` writes the position and the
+    # counter opens on a *step* — which is right: a screen that opened because
+    # somebody moved the player from outside would be a screen that opens
+    # itself. So stand next to it and take one step in.
+    side = page.evaluate("""(at) => {
+        const w = window.__world();
+        const walk = new Set(w.walk ?? []);
+        const ok = (x, y) => x >= 0 && y >= 0 && x < w.width && y < w.height
+            && !['rock', 'water', 'sea', 'range', 'curd', 'tide'].includes(w.rows[y][x]);
+        const tries = [[-1, 0, 'ArrowRight'], [1, 0, 'ArrowLeft'],
+                       [0, -1, 'ArrowDown'], [0, 1, 'ArrowUp']];
+        for (const [dx, dy, key] of tries) {
+            const x = at[0] + dx, y = at[1] + dy;
+            if (ok(x, y)) return { at: [x, y], key };
+        }
+        return null;
+    }""", second["at"])
+    if not side:
+        fails.append(f"{name}: the cart at {second['at']} has no walkable neighbour")
+        return
+    # **`__standHere`, not `__standAt`.** That one writes an empty map and puts
+    # you on west-bambulon — which is documented beside it and is exactly the
+    # thing it warns about. This check is about the Kettleworks field.
+    page.evaluate("(at) => window.__standHere(at)", side["at"])
+    page.wait_for_timeout(250)
+    page.keyboard.press(side["key"])
+    page.wait_for_timeout(350)
+    dismiss_card(page)
+    close_fight(page)
+    if not page.is_visible("#caravan"):
+        fails.append(f"{name}: standing on the cart at {second['at']} opened nothing")
+        return
+    try:
+        stock = page.evaluate(
+            "() => [...document.querySelectorAll('#caravan-stock .wares')].length")
+        if stock < 3:
+            fails.append(f"{name}: the cart is carrying {stock} things")
+        before = page.evaluate("() => window.__bag()")
+        page.click("#caravan-stock .wares:not(:disabled)")
+        page.wait_for_timeout(200)
+        after = page.evaluate("() => window.__bag()")
+        if after <= before:
+            fails.append(f"{name}: bought off the cart and the bag did not grow "
+                         f"({before} -> {after})")
+        # And it is spent: the same line cannot be bought twice.
+        spent = page.evaluate(
+            "() => document.querySelectorAll('#caravan-stock .wares.sold').length")
+        if not spent:
+            fails.append(f"{name}: bought a line off the cart and it is still for sale")
+    finally:
+        if page.is_visible("#caravan-close"):
+            page.click("#caravan-close")
+            page.wait_for_selector("#caravan", state="hidden", timeout=5000)
+    print("ok: the cart is somewhere, sells survey gear, and is somewhere else after five steps")
+
+
 def check_the_sump_refuses_without_an_instrument(page, name, fails, base):
     """**The lip of the Sump is the Reach's door in a second place.**
 
@@ -5600,6 +5724,7 @@ def walk_the_gate(browser, name, fails=None):
     check_the_tide_is_drawn_before_it_goes_out(page, name, fails, path)
     check_a_fight_you_have_had_is_not_drawn(page, name, fails, path)
     check_the_bestiary_holds_what_you_have_met(page, name, fails, path)
+    check_the_cart_is_somewhere_and_then_somewhere_else(page, name, fails, path)
     check_the_sump_refuses_without_an_instrument(page, name, fails, path)
     check_a_wheel_says_what_it_wants(page, name, fails, path)
     check_the_chair_refuses_the_wrong_move(page, name, fails, path)

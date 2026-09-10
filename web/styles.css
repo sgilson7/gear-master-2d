@@ -196,6 +196,10 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
    swallowing clicks, and this. All three were found by `elementFromPoint` and
    none of them by reading. `check_the_fork_is_on_top` is what stops a fourth. */
 #tree, #log, #ending, #history, #combat, #instrument, #instant, #bestiary { z-index: 30; }
+/* The cart is a counter you walked onto, like the town and the van, so it
+   sits on the tier those do — *where you are* rather than *what you
+   opened from there*. */
+#caravan { z-index: 20; }
 /* **`#instant` is not `#instrument`.** Three characters apart, one tier apart
    from nothing, and both on this line — which is the point of the line: the
    stack is written down rather than decided by the order of the file, and a

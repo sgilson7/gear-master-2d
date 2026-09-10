@@ -2515,6 +2515,25 @@ function walk(dir) {
   // the receipt. Printed, never worked out: the page has no idea what a rout
   // pays and must not learn.
   if (r.routed) log(r.routed.receipt.join(' '));
+  // **A fight you have already had.** Marked in the Instant Battle menu, so it
+  // was simulated in full and settled in full and **nothing opened** — the
+  // receipt on the strip is the entire interface, which is what the ask
+  // describes: *"the player is only shown the result through the history /
+  // ongoing event view on the map screen"*.
+  //
+  // Printed, never worked out. The page has no idea what a fight pays and must
+  // not learn — this is the same line the rout gets, for the same reason.
+  //
+  // **`paintPanel` again, because a defeat moved you.** An instant battle that
+  // is lost walks you home across maps, and the panel was painted at the top of
+  // this function against the map you were standing on when you stepped. A page
+  // that draws a world has to be told which world every time it can have
+  // changed, and losing a fight is one of the times.
+  if (r.instant) {
+    log(r.instant.receipt.join(' '));
+    if (r.instant.sent_home) { world = JSON.parse(world_json()); paintPanel(); draw(); }
+    autosave();
+  }
   if (r.town) openTown(r.town);
   else if (r.bench) openVendor();
   else if (r.event) openEvent(r.event);

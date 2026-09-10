@@ -238,6 +238,59 @@ pub fn rout(game: &mut Game) -> Option<Rout> {
     })
 }
 
+/// A fight that happened and that nobody watched.
+///
+/// **The third way an encounter is settled without a screen**, and the one that
+/// is not [`rout`]'s. A rout and a golem are one mechanism because they are one
+/// thing — *something happened that meant the fight did not* — and this is the
+/// opposite: **the fight did happen.** So it pays the speed bonus, rolls the
+/// drops, ticks the order book and costs the four percent, all of which a rout
+/// deliberately does none of.
+///
+/// Which is why it is [`run`] followed by [`settle`] and not a line of new
+/// settlement code. *A second answer to what a win pays* is the mistake this
+/// project has paid for six times, and the whole of what is new here is that
+/// nothing opens.
+///
+/// Returns `None` — the ordinary case, and not an error — when there is no
+/// encounter, when this creature is not marked, or when a boss is standing on
+/// the tile.
+///
+/// **The boss refusal is the tile's and not the name's**, which is a divergence
+/// from `PLAN-M15.md` §1.5 and is measured rather than argued: eight of the
+/// nine creatures that stand on a boss tile also stand in a region pool, so a
+/// refusal at the name would take seven ordinary field encounters off the menu
+/// on behalf of a room the player has not reached. This is exactly where
+/// [`rout`] puts the identical rule, and for the identical reason: the thing
+/// standing at the end of a corridor is the corridor's.
+pub fn instant(game: &mut Game, difficulty: Difficulty) -> Option<Settlement> {
+    let e = game.encounter.as_ref()?;
+    let spec = spec(e)?;
+    if !game.world.instant.iter().any(|c| c == spec.name) {
+        return None;
+    }
+    if boss_at(game, e.at).is_some() {
+        return None;
+    }
+    let log = run(game, difficulty)?;
+    let name = game.theme_name(spec.name);
+    // **The receipt is the whole interface.** There is no screen, no replay and
+    // no card, so the strip is the only place this fight is ever going to be
+    // reported — and it has to carry a defeat as plainly as a win, because a
+    // player who marked something and then out-levelled their own board finds
+    // out here or not at all. TONE 6: the reversal lands flat, in the shortest
+    // sentence available.
+    let head = match log.outcome {
+        Outcome::Victory => {
+            format!("The {name} again. It went the way it goes, and you did not stop to watch.")
+        }
+        _ => format!("The {name} again. It did not go the way it goes, and you were not watching."),
+    };
+    let mut s = settle(game, &log, difficulty)?;
+    s.receipt.insert(0, head);
+    Some(s)
+}
+
 /// How many wins over one creature buy the right to stop watching.
 ///
 /// The human's number, and it is a threshold rather than a curve: *"after

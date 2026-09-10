@@ -44,3 +44,43 @@ it"*.
 
 **Candidate: yes** — check in M15.5 that the sentence actually says it and that
 the browser gate reads it.
+
+## 3. The walk home had one caller and now has two — M15.1
+
+`settle_fight` in the shim held forty lines of *where a defeat puts you*, with a
+comment arguing correctly that it belongs there rather than in `fight::settle`
+because the world owns where the player is. An instant battle loses the same
+way, so a second copy would have been a second answer — and the failure it makes
+is a player losing an unwatched fight and coming back standing on the tile that
+killed them, which is `f114cdf`'s report arriving again through a door nobody
+had built yet.
+
+It is `walk_home(g)` now, one function, two callers.
+
+**Candidate: no.** Done in the milestone that created the second caller.
+
+## 4. `paintPanel` has to be told again, and this is the fourth instance — M15.1
+
+The rule in `CLAUDE.md` reads: *a page that draws a world has to be told which
+world, every time it can have changed.* Three instances were listed — a defeat
+carrying you to another map, a save being restored, a choice being taken. **An
+instant battle that is lost is the fourth**, and it is the first one that
+happens inside `walk()` itself: the panel is painted near the top of that
+function against the map you stepped on, and the settlement afterwards can move
+you two maps away.
+
+Handled where it happens (`if (r.instant.sent_home)`), and the rule's list in
+`CLAUDE.md` wants the fourth row.
+
+**Candidate: yes** — write the row in M15.5, and check whether the *rout* path
+has the same hole. A rout cannot lose, so it should not; worth confirming rather
+than assuming.
+
+## 5. The gate prints 66 `ok:` lines per engine, and `CLAUDE.md` says 78 — M15.0
+
+Not a fault, but `CLAUDE.md`'s *"78 `ok:` lines, 3 engines"* reads as a per-engine
+count and is a **total**: 5 M14.5 lines and 1 per-engine "walked the gate" line
+against 60 shared ones is 66 in one engine and 78 across three. Somebody
+budgeting a check count off that sentence will be wrong by twelve.
+
+**Candidate: yes** — one sentence in `CLAUDE.md` in M15.5.

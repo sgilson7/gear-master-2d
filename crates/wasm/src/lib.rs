@@ -490,6 +490,36 @@ pub fn try_step(dir: &str) -> String {
                     "receipt": r.receipt,
                 })
             });
+            // **A fight you have already had.** The third shape, after a rout
+            // and an encounter, and it differs from the rout in the one respect
+            // that matters: *the fight happened*, so it paid the speed bonus,
+            // rolled the drops, ticked the order book and cost the four
+            // percent — because it went through `fight::settle` like every
+            // other fight, which is the whole of the design and the reason
+            // there is no settlement code here.
+            //
+            // Asked **after** the rout, so a set that talks a creature out of
+            // fighting beats a mark that would have fought it. That is the
+            // cheaper of the two for the player — a rout costs no tiredness —
+            // and it is what they paid three drops for.
+            //
+            // `routed.is_none()` is not a guard: a rout takes the encounter, so
+            // there is nothing left for `instant` to find.
+            let instant = gm2d_core::fight::instant(g, DIFFICULTY).map(|s| {
+                // A defeat walks you home whether or not anybody watched it.
+                // One answer, and it is `walk_home`'s.
+                if s.sent_home.is_some() {
+                    walk_home(g);
+                }
+                serde_json::json!({
+                    "outcome": format!("{:?}", s.outcome).to_lowercase(),
+                    "gold": s.gold,
+                    "xp": s.xp,
+                    "carried": s.carried,
+                    "sent_home": s.sent_home,
+                    "receipt": s.receipt,
+                })
+            });
             // **Arriving is the doing.** An errand that says "go and talk to
             // them" is finished by standing there, so this is where it is
             // noticed — on the step, rather than when some screen opens. A
@@ -721,10 +751,11 @@ pub fn try_step(dir: &str) -> String {
                 // can walk on.
                 "refused_by": s.refused_by,
                 "routed": routed,
-                // **Nothing to fight.** A rout took the encounter, so this is
-                // null and the fight screen never opens — reported off
-                // `g.encounter` rather than off the step, which still
-                // remembers rolling one.
+                "instant": instant,
+                // **Nothing to fight.** A rout or an instant battle took the
+                // encounter, so this is null and the fight screen never opens —
+                // reported off `g.encounter` rather than off the step, which
+                // still remembers rolling one.
                 "encounter": g.encounter.as_ref().and_then(|e| gm2d_core::fight::spec(e))
                     .map(|m| serde_json::json!({
                     "name": g.theme_name(m.name),
@@ -1932,6 +1963,72 @@ pub fn fight_json() -> String {
     })
 }
 
+/// Where a defeat puts you, and it is one answer.
+///
+/// **A loss walks you home. The world owns where the player is**, so the move
+/// happens here rather than inside `fight::settle` — which is the argument the
+/// line this replaced made, and it is still right.
+///
+/// It is a function because there are **two** callers now: a fight that was
+/// watched and one that was not. An instant battle is settled by the same
+/// `settle` and loses the same way, so a second copy of the walk home would be
+/// a second answer to *where a defeat puts you* — and the failure it would make
+/// is a player losing an unwatched fight and coming back standing on the tile
+/// that killed them, which is the report `WorldState::forget` already exists
+/// to answer.
+fn walk_home(g: &mut gm2d_core::game::Game) {
+    // **Home may be on another map.** Dying in the cave used to leave
+    // you standing on the boss's own tile, because the walk home
+    // looked for a town on the map you were on and a dungeon has none.
+    // The town is found across every map, and going home crosses maps
+    // the same way a gate does.
+    let want = g.world.last_town.clone();
+    let marks = seen_by(g);
+    let mut moved = false;
+    // **A defeat costs you your place.** The map you are carried off
+    // forgets you, so walking back in is an arrival: `World::arrival`
+    // falls through to the map's own start, which is the tile the door
+    // put you on the first time.
+    //
+    // This line used to `remember()`, on the argument that coming back
+    // should put you into the fight you lost. Reported as a bug in as
+    // many words — *you appear back exactly where you died, instead of
+    // at the door to the overworld* — and the reporter is right: a
+    // border you re-enter in the middle of is not a border. The rule
+    // is `WorldState::forget` and it is core's, because a rule the
+    // suite cannot reach is a rule with two answers.
+    let fell_on = g.world.map_id();
+    g.world.forget(&fell_on);
+    for (id, _) in gm2d_core::data::MAPS {
+        map_in(id, &marks, |w| {
+            if !moved {
+                if let Some(p) = w.places.iter().find(|p| p.id == want) {
+                    g.world.map = w.id.clone();
+                    g.world.at = p.at;
+                    moved = true;
+                }
+            }
+        });
+        if moved {
+            // You arrived in a town, however you got there. It takes
+            // the tiredness off the same as walking in would — a
+            // defeat costs everything you were carrying, and arriving
+            // wrecked on top of that is the same loss twice.
+            g.arrive_in_town(&want);
+            break;
+        }
+    }
+    if !moved {
+        // No town remembered anywhere. The first map's start is always
+        // somewhere you can stand.
+        let over = gm2d_core::world::overworld();
+        map_in(&over, &marks, |w| {
+            g.world.map = w.id.clone();
+            g.world.at = [w.start.0, w.start.1];
+        });
+    }
+}
+
 /// Bank the fight just watched and clear it.
 #[wasm_bindgen]
 pub fn settle_fight() -> String {
@@ -1942,59 +2039,10 @@ pub fn settle_fight() -> String {
         let Some(s) = gm2d_core::fight::settle(g, &log, DIFFICULTY) else {
             return serde_json::json!({ "error": "nothing to settle" }).to_string();
         };
-        // A loss walks you home. The world owns where the player is, so the
-        // move happens here rather than inside `settle`.
+        // A loss walks you home, and it is `walk_home`'s answer rather than
+        // this function's — an instant battle loses the same way.
         if s.sent_home.is_some() {
-            // **Home may be on another map.** Dying in the cave used to leave
-            // you standing on the boss's own tile, because the walk home
-            // looked for a town on the map you were on and a dungeon has none.
-            // The town is found across every map, and going home crosses maps
-            // the same way a gate does.
-            let want = g.world.last_town.clone();
-            let marks = seen_by(g);
-            let mut moved = false;
-            // **A defeat costs you your place.** The map you are carried off
-            // forgets you, so walking back in is an arrival: `World::arrival`
-            // falls through to the map's own start, which is the tile the door
-            // put you on the first time.
-            //
-            // This line used to `remember()`, on the argument that coming back
-            // should put you into the fight you lost. Reported as a bug in as
-            // many words — *you appear back exactly where you died, instead of
-            // at the door to the overworld* — and the reporter is right: a
-            // border you re-enter in the middle of is not a border. The rule
-            // is `WorldState::forget` and it is core's, because a rule the
-            // suite cannot reach is a rule with two answers.
-            let fell_on = g.world.map_id();
-            g.world.forget(&fell_on);
-            for (id, _) in gm2d_core::data::MAPS {
-                map_in(id, &marks, |w| {
-                    if !moved {
-                        if let Some(p) = w.places.iter().find(|p| p.id == want) {
-                            g.world.map = w.id.clone();
-                            g.world.at = p.at;
-                            moved = true;
-                        }
-                    }
-                });
-                if moved {
-                    // You arrived in a town, however you got there. It takes
-                    // the tiredness off the same as walking in would — a
-                    // defeat costs everything you were carrying, and arriving
-                    // wrecked on top of that is the same loss twice.
-                    g.arrive_in_town(&want);
-                    break;
-                }
-            }
-            if !moved {
-                // No town remembered anywhere. The first map's start is always
-                // somewhere you can stand.
-                let over = gm2d_core::world::overworld();
-                map_in(&over, &marks, |w| {
-                    g.world.map = w.id.clone();
-                    g.world.at = [w.start.0, w.start.1];
-                });
-            }
+            walk_home(g);
         }
         serde_json::json!({
             "outcome": format!("{:?}", s.outcome).to_lowercase(),

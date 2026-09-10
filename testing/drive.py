@@ -2240,7 +2240,10 @@ def check_the_door_opens_on_the_treyway(page, name, fails):
     # A different map: its own size, its own ground, its own regions.
     shape = page.evaluate("() => { const w = window.__world(); "
                           "return [w.width, w.height, (w.places||[]).length]; }")
-    if shape[0] != 16 or shape[1] != 16:
+    # **Sixteen by twenty-six since M14.1**, and the number is pinned rather
+    # than loosened: the point of this line is that the page is drawing a
+    # *different* map from the one it came off, and a range would stop saying so.
+    if shape[0] != 16 or shape[1] != 26:
         fails.append(f"{name}: the Treyway came back {shape[0]}x{shape[1]}")
     here = page.text_content("#region") or ""
     if "Bambulon" in here or not here.strip():

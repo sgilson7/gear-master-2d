@@ -38,6 +38,34 @@
 //! §1.2 builds its ceiling out of, reproduced by the model rather than assumed
 //! by it. That agreement is the reason to trust the other five floors' numbers.
 //!
+//! # A card you cannot walk to is not a card
+//!
+//! **The first version counted every event on the floor whether or not the
+//! solver could get to it**, which measures the flag chain and not the floor.
+//! On the Lip that is the difference between eight and ten, and on a floor
+//! drawn slightly worse it is the difference between *solvable* and *the wheel
+//! that drains the channel is on the far side of the channel* — which is the
+//! classic way to draw a room nobody can leave, and the whole reason this
+//! module exists.
+//!
+//! So a round visits the events the solver can **reach**, on the map as the
+//! flags so far have left it: the world is re-drained at every position and
+//! flooded from the arrival tile. A floor with no drains answers the same
+//! question once and costs nothing.
+//!
+//! # A card that wants something this floor cannot give is read once
+//!
+//! The Cairnfield's slab wants a golem to stand on it, or the nine heights off
+//! a clipboard two hundred paces away on the shore. A solver with neither reads
+//! it, learns that, and does not walk back to it every round — so counting it
+//! as *remaining* nine times over made the field 54 card reads where
+//! `PLAN-M14.md` §1.2 says 45.
+//!
+//! **A choice is ever-possible when this floor could satisfy it**: no
+//! requirement, a flag something on this floor raises, or something the kit
+//! either has or does not and never will. A card with no ever-possible choice
+//! is scenery, and the model counts it the way a player would.
+//!
 //! # What the fixture is for
 //!
 //! Three of the six doors want something off the board — a loose component of a
@@ -186,7 +214,7 @@ fn hidden_places(world: &World) -> Vec<&PlaceDef> {
 }
 
 /// One position in the sweep.
-#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
 struct Position {
     flags: BTreeSet<String>,
     answered: BTreeSet<String>,
@@ -230,6 +258,33 @@ fn spends(o: &Outcome, out: &mut Vec<(u8, u8)>) {
     }
 }
 
+/// Every flag some choice on this floor raises.
+fn raisable_here(all: &[&crate::tile_event::TileEvent]) -> BTreeSet<String> {
+    let mut out = BTreeSet::new();
+    for e in all {
+        for c in &e.choices {
+            let mut fs = Vec::new();
+            flags_of(&c.outcome, &mut fs);
+            out.extend(fs);
+        }
+    }
+    out
+}
+
+/// Could this floor ever satisfy this requirement, for this solver?
+///
+/// A flag raised somewhere else in the world is a flag this floor cannot hand
+/// you, which is exactly what the Cairnfield's slab is about: it wants a golem
+/// or a clipboard from the shore, and a solver with neither reads it once.
+fn ever_possible(r: &Requirement, raisable: &BTreeSet<String>, kit: &Carrying) -> bool {
+    match r {
+        Requirement::Flag(f) => raisable.contains(f),
+        // Everything else is a fact about the solver, and a fact about the
+        // solver does not change while they are on one floor.
+        other => takeable(other, &Position::default(), kit),
+    }
+}
+
 fn takeable(r: &Requirement, pos: &Position, kit: &Carrying) -> bool {
     match r {
         Requirement::None => true,
@@ -237,7 +292,11 @@ fn takeable(r: &Requirement, pos: &Position, kit: &Carrying) -> bool {
         Requirement::Flag(f) => pos.met(f),
         Requirement::Holding(name) => kit.holding.contains(name),
         Requirement::LooseItemOfSize { w, h } => {
-            pos.of_size.get(&key(*w, *h)).copied().unwrap_or(0) > 0
+            // **The kit when the position has nothing to say.** A default
+            // `Position` is what `ever_possible` asks with, and it carries no
+            // tray — so fall through to what the solver walked in with.
+            let tray = if pos.of_size.is_empty() { &kit.of_size } else { &pos.of_size };
+            tray.get(&key(*w, *h)).copied().unwrap_or(0) > 0
         }
         Requirement::AssembledOfRarity(r) => crate::rating::Rarity::by_name(r)
             .is_some_and(|want| kit.best_rarity.is_some_and(|have| have >= want)),
@@ -258,19 +317,37 @@ pub fn solvable_blind(world: &World, events: &EventsData) -> Result<usize, Unsol
     walk(world, events, &kit)
 }
 
-/// The same floor read through an instrument.
+// **`solvable_blind_with` is not here, and it was written first.** The idea was
+// a blind sweep done carrying an instrument, so that *with* and *without* would
+// be the same unit. It measured the Cairnfield at **54** with a golem against
+// **45** without one — which is true and useless: carrying a golem puts a tenth
+// card on the floor worth walking to, and a solver who does not know that is a
+// solver who walks nine cairns first. A number that moves the wrong way is a
+// number somebody will one day quote.
+//
+// The comparison that means something is **shortest against shortest**, which
+// is what [`solvable_knowing`] does with `None` and with `Some(kind)`: nine
+// moves without the golem and one with it, which is the pair `PLAN-M14.md` §1.2
+// is actually about.
+
+/// The fewest moves this floor can be solved in, optionally reading it through
+/// an instrument.
 ///
 /// **The shortest honest path rather than the worst one**, because an
-/// instrument is information: it tells you which tile to walk to, so the sweep
-/// collapses to the solution itself. That is what `PLAN-M14.md` §1.2 means by
-/// *an instrument makes a floor short, never possible* — a number worth
-/// printing beside the blind one.
+/// instrument is *information*: it tells you which tile to walk to, so the
+/// sweep collapses to the solution itself. `None` is the same question asked of
+/// somebody carrying nothing, and the pair is what §1.2's *an instrument makes
+/// a floor short, never possible* means — nine moves across the Cairnfield
+/// against one on the slab.
 pub fn solvable_knowing(
     world: &World,
     events: &EventsData,
-    instrument: &str,
+    instrument: Option<&str>,
 ) -> Result<usize, Unsolvable> {
-    let kit = Carrying::for_floor(world, events).with(instrument);
+    let mut kit = Carrying::for_floor(world, events);
+    if let Some(k) = instrument {
+        kit = kit.with(k);
+    }
     shortest(world, events, &kit)
 }
 
@@ -284,14 +361,55 @@ fn walk(world: &World, events: &EventsData, kit: &Carrying) -> Result<usize, Uns
         of_size: kit.of_size.clone(),
     };
     let mut seen: BTreeMap<Position, Option<usize>> = BTreeMap::new();
-    worst(&start, &goal, &all, kit, 0, &mut seen)
+    let mut floors: BTreeMap<Vec<String>, BTreeSet<String>> = BTreeMap::new();
+    worst(&start, &goal, &all, kit, world, &mut floors, 0, &mut seen)
 }
 
+/// Which event tiles the solver can walk to, on the map these marks have left.
+///
+/// **Wading is not assumed.** The solver is somebody who came down a hole with
+/// an instrument, not somebody wearing a set of greaves ground off a Bog Toad;
+/// a floor that is only solvable in the Toad's Own Frame is a floor, and one
+/// that needs it to be solvable at all is a wall.
+fn reachable(world: &World, marks: &[String], events: &[&crate::tile_event::TileEvent]) -> BTreeSet<String> {
+    let mut w = world.clone();
+    w.drain_by(marks);
+    let allowed = crate::world::Allowances::default();
+    let mut seen: BTreeSet<(u8, u8)> = BTreeSet::new();
+    let mut queue = vec![w.start];
+    seen.insert(w.start);
+    while let Some((x, y)) = queue.pop() {
+        for (dx, dy) in [(0i32, -1i32), (0, 1), (1, 0), (-1, 0)] {
+            let (nx, ny) = (x as i32 + dx, y as i32 + dy);
+            if !w.in_bounds(nx, ny) {
+                continue;
+            }
+            let (nx, ny) = (nx as u8, ny as u8);
+            if w.walkable(nx, ny, &allowed) && seen.insert((nx, ny)) {
+                queue.push((nx, ny));
+            }
+        }
+    }
+    events
+        .iter()
+        .filter(|e| {
+            world
+                .places
+                .iter()
+                .any(|p| p.id == e.id && seen.contains(&(p.at[0], p.at[1])))
+        })
+        .map(|e| e.id.clone())
+        .collect()
+}
+
+#[allow(clippy::too_many_arguments)]
 fn worst(
     pos: &Position,
     goal: &[&PlaceDef],
     all: &[&crate::tile_event::TileEvent],
     kit: &Carrying,
+    world: &World,
+    floors: &mut BTreeMap<Vec<String>, BTreeSet<String>>,
     depth: usize,
     seen: &mut BTreeMap<Position, Option<usize>>,
 ) -> Result<usize, Unsolvable> {
@@ -315,8 +433,18 @@ fn worst(
     let mut remaining = 0usize;
     // (event index, choice index) pairs that would move the floor on.
     let mut progress: Vec<(usize, usize)> = Vec::new();
+    let raisable = raisable_here(all);
+    let marks: Vec<String> = pos.flags.iter().chain(pos.answered.iter()).cloned().collect();
+    let here = floors
+        .entry(marks.clone())
+        .or_insert_with(|| reachable(world, &marks, all))
+        .clone();
     for (ei, e) in all.iter().enumerate() {
         if !e.repeats && pos.answered.contains(&e.id) {
+            continue;
+        }
+        // **A card on the far side of a channel is not a card yet.**
+        if !here.contains(&e.id) {
             continue;
         }
         let mut live = false;
@@ -329,6 +457,13 @@ fn worst(
             let mut raises = Vec::new();
             flags_of(&c.outcome, &mut raises);
             if !raises.iter().any(|f| !pos.met(f)) {
+                continue;
+            }
+            // **A card this floor can never open is read once.** See the module
+            // header: it is the difference between 45 and 54 on the Cairnfield,
+            // and it is what a person actually does with a slab that says it
+            // wants a golem.
+            if !ever_possible(&c.requires, &raisable, kit) {
                 continue;
             }
             live = true;
@@ -352,7 +487,7 @@ fn worst(
     let mut best: Option<usize> = None;
     for (ei, ci) in progress {
         let next = after(pos, all[ei], ci);
-        let cost = worst(&next, goal, all, kit, depth + 1, seen)?;
+        let cost = worst(&next, goal, all, kit, world, floors, depth + 1, seen)?;
         let total = remaining + cost;
         best = Some(best.map_or(total, |b: usize| b.max(total)));
     }
@@ -375,14 +510,24 @@ fn shortest(world: &World, events: &EventsData, kit: &Carrying) -> Result<usize,
     let mut frontier = vec![start.clone()];
     let mut seen: BTreeSet<Position> = BTreeSet::new();
     seen.insert(start);
+    let mut floors: BTreeMap<Vec<String>, BTreeSet<String>> = BTreeMap::new();
     for taken in 0..MAX_ROUNDS {
         if frontier.iter().any(|p| goal.iter().all(|g| p.there(g))) {
             return Ok(taken);
         }
         let mut next = Vec::new();
         for pos in &frontier {
+            let marks: Vec<String> =
+                pos.flags.iter().chain(pos.answered.iter()).cloned().collect();
+            let here = floors
+                .entry(marks.clone())
+                .or_insert_with(|| reachable(world, &marks, &all))
+                .clone();
             for e in &all {
                 if !e.repeats && pos.answered.contains(&e.id) {
+                    continue;
+                }
+                if !here.contains(&e.id) {
                     continue;
                 }
                 for (ci, c) in e.choices.iter().enumerate() {

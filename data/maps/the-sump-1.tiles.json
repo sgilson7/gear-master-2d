@@ -2,7 +2,7 @@
   "format": "gm2d-tiles",
   "version": 1,
   "id": "the-sump-1",
-  "_note": "Floor 1 of the Wextreen Sump. **No `outside`**: a floor of the Sump is not one sitting, because its budget is what you brought rather than how tired you are — so a save taken here reopens here, and a player who needs a three-by-two from the van can go and get it. What that costs is the walk.",
+  "_note": "Floor one of the Wextreen Sump. **Three channels and three wheels, and one of the wheels is not needed** — channel C is walked round at its dry east end, so the wheel that opens it buys a crossing that is already there, and it is the one that costs you a component you do not get back. The floor is a tax on not looking. The wheels sit below the channels they open, in the order you meet them; the first draft had wheel B one step from the arrival tile, which is not a puzzle. **No `outside`**: a floor of the Sump is not one sitting, because its budget is what you brought rather than how tired you are. A save taken here reopens here, and a player who needs a three-by-two from the van can go and get it; what that costs is the walk. **And nothing here names an instrument** — `reach.rs::nothing_in_a_map_file_knows_about_a_survey` refuses one, and it is right to: a map that knew which lens reads it is a map that would have to be edited to add a second.",
   "width": 12,
   "height": 12,
   "start": [
@@ -12,15 +12,15 @@
   "rows": [
     "^^^^^^^^^^^^",
     "^,,,,,,,,,,^",
+    "^~~~~~~~~~~^",
+    "^,,,,,,,,,,^",
+    "^,%,,,,,,%,^",
+    "^~~~~~~~~~~^",
+    "^,,,,,,,,,,^",
+    "^%,,,,,,,,%^",
+    "^~~~~~~~~,,^",
     "^,,,,,,,,,,^",
     "^,,,,,,,,,,^",
-    "^,,,,,,,,,,^",
-    "^,,,,,,,,,,^",
-    "^,,,,,,,,,,^",
-    "^,,,,,,,,,,^",
-    "^,,,,,,,,,,^",
-    "^,,,,,,,,,,^",
-    "^,,,,==,,,,^",
     "^^^^^^^^^^^^"
   ],
   "regions": [
@@ -60,11 +60,35 @@
     },
     {
       "at": [
-        5,
-        5
+        1,
+        3
       ],
       "kind": "event",
-      "id": "the-sump-1-stub"
+      "id": "the-bearing-plate"
+    },
+    {
+      "at": [
+        1,
+        6
+      ],
+      "kind": "event",
+      "id": "the-wheel-that-is-marked-a"
+    },
+    {
+      "at": [
+        5,
+        3
+      ],
+      "kind": "event",
+      "id": "the-wheel-that-is-marked-b"
+    },
+    {
+      "at": [
+        10,
+        9
+      ],
+      "kind": "event",
+      "id": "the-wheel-that-is-marked-c"
     },
     {
       "at": [
@@ -80,6 +104,141 @@
         10
       ],
       "hidden_until": "sluice-b"
+    }
+  ],
+  "drains": [
+    {
+      "when": "sluice-a",
+      "from": "water",
+      "to": "silt",
+      "tiles": [
+        [
+          1,
+          5
+        ],
+        [
+          2,
+          5
+        ],
+        [
+          3,
+          5
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          5,
+          5
+        ],
+        [
+          6,
+          5
+        ],
+        [
+          7,
+          5
+        ],
+        [
+          8,
+          5
+        ],
+        [
+          9,
+          5
+        ],
+        [
+          10,
+          5
+        ]
+      ]
+    },
+    {
+      "when": "sluice-b",
+      "from": "water",
+      "to": "silt",
+      "tiles": [
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          2
+        ],
+        [
+          3,
+          2
+        ],
+        [
+          4,
+          2
+        ],
+        [
+          5,
+          2
+        ],
+        [
+          6,
+          2
+        ],
+        [
+          7,
+          2
+        ],
+        [
+          8,
+          2
+        ],
+        [
+          9,
+          2
+        ],
+        [
+          10,
+          2
+        ]
+      ]
+    },
+    {
+      "when": "sluice-c",
+      "from": "water",
+      "to": "silt",
+      "tiles": [
+        [
+          1,
+          8
+        ],
+        [
+          2,
+          8
+        ],
+        [
+          3,
+          8
+        ],
+        [
+          4,
+          8
+        ],
+        [
+          5,
+          8
+        ],
+        [
+          6,
+          8
+        ],
+        [
+          7,
+          8
+        ],
+        [
+          8,
+          8
+        ]
+      ]
     }
   ]
 }

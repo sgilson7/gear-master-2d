@@ -1142,6 +1142,7 @@ pub static TURTLE_DICK: Theme = Theme {
         ("Gallowglass", "Mumu Lelonde"),
         ("The Rust Parliament", "The Shareholders"),
         ("Sootmother", "Marbulon"),
+        ("The Ninth Surveyor", "THE ONE WHO WENT DOWN"),
         ("The Quiet Hour", "The Grand Calculation"),
         ("Verdigris", "Gappy Handman"),
         ("The Drowned Court", "The Sea of Cleveland"),

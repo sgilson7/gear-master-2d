@@ -192,9 +192,10 @@ fn the_lip_is_a_stack_and_it_wants_an_instrument() {
     st.flags.push("the-shelf-is-open".into());
     st.flags.push("cairn-9".into());
     assert_eq!(lip.opens_onto(&st), Some("the-sump-4"));
-    // M14.1 ships stubs, so the bottom clears on the stub's flag; M14.2 puts
-    // the Ninth Surveyor on that tile and this becomes the boss's own id.
-    st.flags.push("the-sump-is-bottomed".into());
+    // **The bottom clears on the boss and the three above it on a flag**, which
+    // is what `Floor::cleared` reading both is for: three of the four floors
+    // have no boss at all.
+    st.answered.push("the-ninth-surveyor".into());
     assert_eq!(lip.opens_onto(&st), None, "the Sump is finished and still has a floor in it");
     assert_eq!(lip.floors_cleared(&st), 4);
 }

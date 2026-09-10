@@ -1822,9 +1822,9 @@
       "id": "the-ninth-clipboard",
       "title": "THE NINTH CLIPBOARD",
       "prose": [
-        "The post at the edge of the Treyway holds nine clipboards on nine chains and one empty chain. This is the ninth, and it is down here, forty tiles from its chain, wedged under a stone.",
-        "Nine rows, one per survey, and a column headed HEIGHT filled in for all nine. They are not in order of survey and they are not in order of height, and the ninth's own row is the shortest figure on the sheet, which is a thing you can read two ways.",
-        "The third is eleven feet. Everybody knows the third is eleven feet."
+        "The post at the edge of the Treyway holds nine clipboards on nine chains and one empty chain. This is the ninth, and it is down here, forty paces from its chain, wedged under a stone.",
+        "One column, headed HEIGHT, filled in for all nine surveys in the order they were made: nine feet, five feet, eleven feet, four feet, six feet, eight feet, seven feet, two feet, one foot.",
+        "They are not in order of height. The third is eleven and everybody knows the third is eleven; the ninth is one foot, because she went down instead of up."
       ],
       "choices": [
         {
@@ -1852,22 +1852,100 @@
       ]
     },
     {
-      "id": "the-sump-1-stub",
-      "title": "THE FIRST FLOOR",
+      "id": "the-bearing-plate",
+      "title": "THE BEARING PLATE",
       "prose": [
-        "Three channels of standing water across a room twelve paces on a side, and three wheels in the wall, one to a channel."
+        "A brass plate bolted flat to the floor with a hole through the middle of it and eight lines cut out from the hole, and the lines do not agree with the walls.",
+        "Six of the eight have a figure scratched beside them and two do not. The two without are the two that point at the wheels."
       ],
       "choices": [
         {
-          "label": "Turn the second wheel",
-          "blurb": "Costs the walk to it. The middle channel goes down.",
+          "label": "Take the bearing",
+          "blurb": "Costs nothing. The plate is cut for an instrument and you have one.",
+          "requires": {
+            "surveying": "compass"
+          },
+          "unmet": "The plate wants a compass laid in the hole, and you have not built one.",
+          "outcome": {
+            "all": [
+              {
+                "flag": "read-the-lip"
+              },
+              {
+                "xp": 24
+              }
+            ]
+          }
+        },
+        {
+          "label": "Pace it out",
+          "blurb": "Costs 12 fatigue and the walk. You get the same two lines.",
+          "outcome": {
+            "all": [
+              {
+                "flag": "read-the-lip"
+              },
+              {
+                "tire": 12
+              },
+              {
+                "xp": 16
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "the-wheel-that-is-marked-a",
+      "title": "THE WHEEL MARKED A",
+      "prose": [
+        "A wheel in the wall the size of a cartwheel, with a shard-shaped socket in the hub and the letter A cut above it.",
+        "Below it, in the same hand as the plate: the second channel. There are three channels and this is the second one from the top, which is a thing somebody wanted written down."
+      ],
+      "choices": [
+        {
+          "label": "Set a shard in the hub",
+          "blurb": "Costs nothing. The shard comes back out.",
+          "requires": {
+            "holding": "Map Shard"
+          },
+          "unmet": "The hub is cut for a Map Shard and there is not one on you.",
+          "outcome": {
+            "all": [
+              {
+                "flag": "sluice-a"
+              },
+              {
+                "xp": 20
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "the-wheel-that-is-marked-b",
+      "title": "THE WHEEL MARKED B",
+      "prose": [
+        "The same wheel again with B cut above it, and this one has been turned before. The hub is worn bright and the floor under it is worn into a curve four inches deep.",
+        "It turns eleven degrees and stops, and what stops it is not the wheel."
+      ],
+      "choices": [
+        {
+          "label": "Turn it on the bearing",
+          "blurb": "Costs nothing. The top channel goes down.",
+          "requires": {
+            "flag": "read-the-lip"
+          },
+          "unmet": "You have not read the lip, so the wheel goes eleven degrees and stops.",
           "outcome": {
             "all": [
               {
                 "flag": "sluice-b"
               },
               {
-                "xp": 10
+                "xp": 28
               }
             ]
           }
@@ -1875,22 +1953,170 @@
       ]
     },
     {
-      "id": "the-sump-2-stub",
-      "title": "THE SECOND FLOOR",
+      "id": "the-wheel-that-is-marked-c",
+      "title": "THE WHEEL MARKED C",
       "prose": [
-        "A room twelve paces on a side with one door in the north wall and a slot cut in the door, three fingers by two."
+        "C, and a socket that is not a socket: a square hole two fingers by two, cut through the hub and out the other side, with the far end splayed where something was driven in and left.",
+        "The bottom channel. There is one wheel per channel and this is the third of the three."
       ],
       "choices": [
         {
-          "label": "Try the slot",
-          "blurb": "Costs the walk to it. The door is on a counterweight.",
+          "label": "Jam it and turn",
+          "blurb": "Costs the piece. It stays in the hub and the hub keeps it.",
+          "requires": {
+            "loose_item_of_size": {
+              "w": 2,
+              "h": 2
+            }
+          },
+          "unmet": "The hole is two by two and nothing loose on you is.",
+          "outcome": {
+            "all": [
+              {
+                "give_up": {
+                  "w": 2,
+                  "h": 2
+                }
+              },
+              {
+                "flag": "sluice-c"
+              },
+              {
+                "xp": 20
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "the-lintel",
+      "title": "THE LINTEL",
+      "prose": [
+        "A stone lintel lying flat where it fell, with two lines of survey shorthand cut into the underside of it and a third line rubbed out.",
+        "The shorthand is nine years old and is the fourth surveyor's. Everybody at the reach could read it and nobody at the reach is here."
+      ],
+      "choices": [
+        {
+          "label": "Read the shorthand",
+          "blurb": "Costs nothing. It says what the door is cut for.",
+          "requires": {
+            "surveying": "atlas"
+          },
+          "unmet": "It is an atlas hand, and you have not built an atlas to read it with.",
+          "outcome": {
+            "all": [
+              {
+                "flag": "read-the-shelf"
+              },
+              {
+                "xp": 24
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "the-weighed-door",
+      "title": "THE WEIGHED DOOR",
+      "prose": [
+        "A door in the north wall with no handle and a slot cut through it at the height of a hip, and behind the door a counterweight you can hear settling.",
+        "It is a door that opens for the right weight and not for the right person. Three people have tried it and left the marks of three different attempts, and one of the three got through."
+      ],
+      "choices": [
+        {
+          "label": "Put it in the slot",
+          "blurb": "Costs the piece. The slot keeps it and the door comes up.",
+          "requires": {
+            "loose_item_of_size": {
+              "w": 3,
+              "h": 2
+            }
+          },
+          "unmet": "The slot is three by two and nothing loose on you is that shape.",
+          "outcome": {
+            "all": [
+              {
+                "give_up": {
+                  "w": 3,
+                  "h": 2
+                }
+              },
+              {
+                "flag": "the-shelf-is-open"
+              },
+              {
+                "xp": 30
+              }
+            ]
+          }
+        },
+        {
+          "label": "Set the counterweight off",
+          "blurb": "Costs nothing. The shorthand says where the catch is.",
+          "requires": {
+            "flag": "read-the-shelf"
+          },
+          "unmet": "You have not read the shelf, so the catch is a rumour about a door.",
           "outcome": {
             "all": [
               {
                 "flag": "the-shelf-is-open"
               },
               {
-                "xp": 10
+                "xp": 34
+              }
+            ]
+          }
+        },
+        {
+          "label": "Stand what you made in it",
+          "blurb": "Costs nothing. You get it back on the far side.",
+          "requires": {
+            "assembled_of_rarity": "epic"
+          },
+          "unmet": "The counterweight wants something epic standing in it and nothing you have made is.",
+          "outcome": {
+            "all": [
+              {
+                "flag": "the-shelf-is-open"
+              },
+              {
+                "xp": 34
+              }
+            ]
+          }
+        },
+        {
+          "label": "Try the slot as you are",
+          "blurb": "Costs a minute. It tells you the shape and nothing else.",
+          "outcome": "nothing"
+        }
+      ]
+    },
+    {
+      "id": "the-cairn-at-2-2",
+      "title": "A CAIRN",
+      "prose": [
+        "A heap of slag four feet high with a flat stone on top of it, built on the spot somebody stopped. There is no name on it. There were never names on them.",
+        "The nine are not in the order they were built and they are not in the order of their heights, and both of those facts are somebody's decision rather than an accident."
+      ],
+      "choices": [
+        {
+          "label": "Add a stone",
+          "blurb": "Costs the walk. The heap takes it or it does not.",
+          "requires": {
+            "flag": "cairn-3"
+          },
+          "unmet": "The cairn under this one has not been built, so a stone here would be the wrong stone.",
+          "outcome": {
+            "all": [
+              {
+                "flag": "cairn-4"
+              },
+              {
+                "xp": 8
               }
             ]
           }
@@ -1898,29 +2124,254 @@
       ]
     },
     {
-      "id": "the-sump-3-stub",
-      "title": "THE THIRD FLOOR",
+      "id": "the-cairn-at-9-2",
+      "title": "A CAIRN",
       "prose": [
-        "Nine cairns in a field of slag, each one a different height and none of them signed."
+        "A heap of slag seven feet high with a flat stone on top of it, built on the spot somebody stopped. There is no name on it. There were never names on them.",
+        "The nine are not in the order they were built and they are not in the order of their heights, and both of those facts are somebody's decision rather than an accident."
       ],
       "choices": [
         {
-          "label": "Lay the ninth stone",
-          "blurb": "Costs the walk to it. The tenth cairn is the way down.",
+          "label": "Add a stone",
+          "blurb": "Costs the walk. The heap takes it or it does not.",
+          "requires": {
+            "flag": "cairn-6"
+          },
+          "unmet": "The cairn under this one has not been built, so a stone here would be the wrong stone.",
+          "outcome": {
+            "all": [
+              {
+                "flag": "cairn-7"
+              },
+              {
+                "xp": 8
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "the-cairn-at-5-4",
+      "title": "A CAIRN",
+      "prose": [
+        "A heap of slag eleven feet high with a flat stone on top of it, built on the spot somebody stopped. There is no name on it. There were never names on them.",
+        "The nine are not in the order they were built and they are not in the order of their heights, and both of those facts are somebody's decision rather than an accident."
+      ],
+      "choices": [
+        {
+          "label": "Add a stone",
+          "blurb": "Costs the walk. The heap takes it or it does not.",
+          "requires": {
+            "flag": "cairn-2"
+          },
+          "unmet": "The cairn under this one has not been built, so a stone here would be the wrong stone.",
+          "outcome": {
+            "all": [
+              {
+                "flag": "cairn-3"
+              },
+              {
+                "xp": 8
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "the-cairn-at-2-5",
+      "title": "A CAIRN",
+      "prose": [
+        "A heap of slag two feet high with a flat stone on top of it, built on the spot somebody stopped. There is no name on it. There were never names on them.",
+        "The nine are not in the order they were built and they are not in the order of their heights, and both of those facts are somebody's decision rather than an accident."
+      ],
+      "choices": [
+        {
+          "label": "Add a stone",
+          "blurb": "Costs the walk. The heap takes it or it does not.",
+          "requires": {
+            "flag": "cairn-7"
+          },
+          "unmet": "The cairn under this one has not been built, so a stone here would be the wrong stone.",
+          "outcome": {
+            "all": [
+              {
+                "flag": "cairn-8"
+              },
+              {
+                "xp": 8
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "the-cairn-at-9-5",
+      "title": "A CAIRN",
+      "prose": [
+        "A heap of slag nine feet high with a flat stone on top of it, built on the spot somebody stopped. There is no name on it. There were never names on them.",
+        "The nine are not in the order they were built and they are not in the order of their heights, and both of those facts are somebody's decision rather than an accident."
+      ],
+      "choices": [
+        {
+          "label": "Add a stone",
+          "blurb": "Costs the walk. The heap takes it or it does not.",
+          "outcome": {
+            "all": [
+              {
+                "flag": "cairn-1"
+              },
+              {
+                "xp": 8
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "the-cairn-at-2-7",
+      "title": "A CAIRN",
+      "prose": [
+        "A heap of slag five feet high with a flat stone on top of it, built on the spot somebody stopped. There is no name on it. There were never names on them.",
+        "The nine are not in the order they were built and they are not in the order of their heights, and both of those facts are somebody's decision rather than an accident."
+      ],
+      "choices": [
+        {
+          "label": "Add a stone",
+          "blurb": "Costs the walk. The heap takes it or it does not.",
+          "requires": {
+            "flag": "cairn-1"
+          },
+          "unmet": "The cairn under this one has not been built, so a stone here would be the wrong stone.",
+          "outcome": {
+            "all": [
+              {
+                "flag": "cairn-2"
+              },
+              {
+                "xp": 8
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "the-cairn-at-9-7",
+      "title": "A CAIRN",
+      "prose": [
+        "A heap of slag one foot high with a flat stone on top of it, built on the spot somebody stopped. There is no name on it. There were never names on them.",
+        "The nine are not in the order they were built and they are not in the order of their heights, and both of those facts are somebody's decision rather than an accident."
+      ],
+      "choices": [
+        {
+          "label": "Add a stone",
+          "blurb": "Costs the walk. The heap takes it or it does not.",
+          "requires": {
+            "flag": "cairn-8"
+          },
+          "unmet": "The cairn under this one has not been built, so a stone here would be the wrong stone.",
           "outcome": {
             "all": [
               {
                 "flag": "cairn-9"
               },
               {
-                "xp": 10
+                "xp": 8
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "the-cairn-at-5-9",
+      "title": "A CAIRN",
+      "prose": [
+        "A heap of slag six feet high with a flat stone on top of it, built on the spot somebody stopped. There is no name on it. There were never names on them.",
+        "The nine are not in the order they were built and they are not in the order of their heights, and both of those facts are somebody's decision rather than an accident."
+      ],
+      "choices": [
+        {
+          "label": "Add a stone",
+          "blurb": "Costs the walk. The heap takes it or it does not.",
+          "requires": {
+            "flag": "cairn-4"
+          },
+          "unmet": "The cairn under this one has not been built, so a stone here would be the wrong stone.",
+          "outcome": {
+            "all": [
+              {
+                "flag": "cairn-5"
+              },
+              {
+                "xp": 8
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "the-cairn-at-8-9",
+      "title": "A CAIRN",
+      "prose": [
+        "A heap of slag eight feet high with a flat stone on top of it, built on the spot somebody stopped. There is no name on it. There were never names on them.",
+        "The nine are not in the order they were built and they are not in the order of their heights, and both of those facts are somebody's decision rather than an accident."
+      ],
+      "choices": [
+        {
+          "label": "Add a stone",
+          "blurb": "Costs the walk. The heap takes it or it does not.",
+          "requires": {
+            "flag": "cairn-5"
+          },
+          "unmet": "The cairn under this one has not been built, so a stone here would be the wrong stone.",
+          "outcome": {
+            "all": [
+              {
+                "flag": "cairn-6"
+              },
+              {
+                "xp": 8
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "the-stones",
+      "title": "THE STONES",
+      "prose": [
+        "A slab in the middle of the field with nine shallow dishes ground into it, and the dishes are the nine cairns laid out where they stand.",
+        "Eight of the dishes have grit in them. The ninth is swept, and swept recently."
+      ],
+      "choices": [
+        {
+          "label": "Set it on the slab",
+          "blurb": "Costs nothing. It walks the field for you and lays all nine.",
+          "requires": {
+            "surveying": "golem"
+          },
+          "unmet": "The slab is cut for a golem to stand on and you have not built one.",
+          "outcome": {
+            "all": [
+              {
+                "flag": "cairn-9"
+              },
+              {
+                "xp": 40
               }
             ]
           }
         },
         {
           "label": "Walk it with the sheet",
-          "blurb": "Costs one walk. You lay all nine in the order they were built.",
+          "blurb": "Costs one walk instead of nine. You have the order in your hand.",
           "requires": {
             "flag": "read-the-ninth"
           },
@@ -1931,30 +2382,7 @@
                 "flag": "cairn-9"
               },
               {
-                "xp": 10
-              }
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "id": "the-sump-4-stub",
-      "title": "THE BOTTOM",
-      "prose": [
-        "Water on four sides and an island in the middle of it, and something on the island that has been there eleven years."
-      ],
-      "choices": [
-        {
-          "label": "Cross to the island",
-          "blurb": "Costs the wade. There is no walking round it.",
-          "outcome": {
-            "all": [
-              {
-                "flag": "the-sump-is-bottomed"
-              },
-              {
-                "xp": 10
+                "xp": 36
               }
             ]
           }

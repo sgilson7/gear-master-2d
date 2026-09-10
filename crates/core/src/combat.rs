@@ -3318,6 +3318,75 @@ pub const LADDER: &[MonsterSpec] = &[
         drops: &[],
         items: &[],
     },
+    // **The Ninth Surveyor** — rates above Sootmother, and the number was set by
+    // measurement rather than by adding to hers. `PLAN-M14.md` §4.4 says *by DPS
+    // bracket against the walker's board, never by copying 4910/124 and adding*,
+    // and the recon behind it is the reason: measured against
+    // `common::geared_from`, this board beats Francis at 2958 and loses to Cairn
+    // Chorus at 1141, so a **rating** predicts nothing about whether a fight is
+    // winnable. What it loses to is damage per second. So this is dressed to be
+    // beaten slowly rather than to hit hard, and `tests/sump.rs` measures the
+    // margin against Sootmother's rather than against a number.
+    //
+    // She went down instead of up, and she has been standing on the island at
+    // the bottom of her own hole for eleven years with the weather still on her.
+    MonsterSpec {
+        name: "The Ninth Surveyor",
+        health: 6900,
+        strength: 196,
+        regen: 13,
+        mind_resist: 88,
+        curse_resist: 88,
+        physical_resist: 66,
+        magic_resist: 62,
+        attacks: &[],
+        gear: &[
+        // **The weapon grid is where a fight is decided, and the first draft
+        // did not have one.** A hilt and two accessories assemble nothing, so
+        // the creature turned up to the fight carrying a decoration: measured,
+        // it dealt **7.8 damage a second** and the same at strength 152 and at
+        // 320, because strength pays a swing and there was no swing to pay.
+        // Laid out the way The Last Light's is, which is the one board in the
+        // ladder measured at the bracket this creature is aimed at.
+        ("Sunderer", SlotKind::Weapon, 0, 0, 0),
+        ("Sunderer", SlotKind::Weapon, 2, 0, 0),
+        ("Kingmaker Hilt", SlotKind::Weapon, 0, 3, 0),
+        ("Clockwork Key", SlotKind::Weapon, 4, 0, 0),
+        ("Chain Coil", SlotKind::Weapon, 4, 1, 0),
+        // Eleven years of weather on a helmet.
+        ("Anvil Frame", SlotKind::Helmet, 0, 0, 0),
+        ("Mirrored Visor", SlotKind::Helmet, 3, 0, 0),
+        ("Bulwark Plating", SlotKind::Helmet, 0, 2, 0),
+        ("Archon's Crest", SlotKind::Helmet, 3, 1, 0),
+        ("Stonewall Frame", SlotKind::Helmet, 2, 3, 0),
+        ("Mana Ward", SlotKind::Helmet, 0, 4, 0),
+        ("Consecrated Plating", SlotKind::Helmet, 4, 4, 0),
+        ("Warlord's Crest", SlotKind::Helmet, 0, 6, 0),
+        // The coat.
+        ("Bulwark Base", SlotKind::Chest, 0, 0, 0),
+        ("Aegis Weave", SlotKind::Chest, 0, 2, 0),
+        ("Aegis Weave", SlotKind::Chest, 3, 2, 0),
+        ("Adamant Base", SlotKind::Chest, 0, 4, 0),
+        ("Godsheet Layer", SlotKind::Chest, 3, 4, 0),
+        ("Wellspring Base", SlotKind::Chest, 0, 6, 0),
+        ("Mail Layer", SlotKind::Chest, 3, 6, 0),
+        ("Bulwark Material", SlotKind::Gloves, 0, 0, 0),
+        ("Sovereign Mold", SlotKind::Gloves, 3, 0, 0),
+        ("Seal of the Deep", SlotKind::Gloves, 0, 2, 0),
+        ("Storm Signet", SlotKind::Gloves, 2, 2, 0),
+        // Boots that have been down and up nine times.
+        ("Sevenleague Boots", SlotKind::Greaves, 0, 0, 0),
+        ("Treadmill Sole", SlotKind::Greaves, 2, 0, 0),
+        ("Sevenleague Sole", SlotKind::Greaves, 4, 0, 0),
+        ("Overflow Plate", SlotKind::Greaves, 2, 1, 0),
+        ],
+        gear_offset: 0,
+        bounty: 402,
+        sprite: MonsterSprite::Sentinel,
+        rank: Rank::Boss,
+        drops: &[],
+        items: &[],
+    },
 ];
 
 // ----------------------------------------------------------- combatants

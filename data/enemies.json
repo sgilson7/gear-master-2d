@@ -8525,6 +8525,218 @@
       "rank": "boss",
       "rating": 1507,
       "items": 9
+    },
+    {
+      "name": "The Ninth Surveyor",
+      "health": 6900,
+      "strength": 196,
+      "regen": 13,
+      "mind_resist": 88,
+      "curse_resist": 88,
+      "physical_resist": 66,
+      "magic_resist": 62,
+      "gear": [
+        [
+          "Sunderer",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Sunderer",
+          "weapon",
+          2,
+          0,
+          0
+        ],
+        [
+          "Kingmaker Hilt",
+          "weapon",
+          0,
+          3,
+          0
+        ],
+        [
+          "Balance Weight",
+          "weapon",
+          4,
+          0,
+          0
+        ],
+        [
+          "Bulwark Vial",
+          "weapon",
+          4,
+          1,
+          0
+        ],
+        [
+          "Stormcaught Frame",
+          "helmet",
+          0,
+          0,
+          0
+        ],
+        [
+          "Mana Ward",
+          "helmet",
+          3,
+          0,
+          0
+        ],
+        [
+          "Braced Plating",
+          "helmet",
+          0,
+          2,
+          0
+        ],
+        [
+          "Archon's Crest",
+          "helmet",
+          3,
+          1,
+          0
+        ],
+        [
+          "Anvil Frame",
+          "helmet",
+          2,
+          3,
+          0
+        ],
+        [
+          "Mana Ward",
+          "helmet",
+          0,
+          4,
+          0
+        ],
+        [
+          "Bulwark Plating",
+          "helmet",
+          4,
+          4,
+          0
+        ],
+        [
+          "Archon's Crest",
+          "helmet",
+          0,
+          6,
+          0
+        ],
+        [
+          "Bulwark Base",
+          "chest",
+          0,
+          0,
+          0
+        ],
+        [
+          "Aegis Weave",
+          "chest",
+          0,
+          2,
+          0
+        ],
+        [
+          "Aegis Weave",
+          "chest",
+          3,
+          2,
+          0
+        ],
+        [
+          "Heartwood Base",
+          "chest",
+          0,
+          4,
+          0
+        ],
+        [
+          "Aegis Weave",
+          "chest",
+          3,
+          4,
+          0
+        ],
+        [
+          "Wellspring Base",
+          "chest",
+          0,
+          6,
+          0
+        ],
+        [
+          "Felt Layer",
+          "chest",
+          3,
+          6,
+          0
+        ],
+        [
+          "Bulwark Material",
+          "gloves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Sovereign Mold",
+          "gloves",
+          3,
+          0,
+          0
+        ],
+        [
+          "Storm Signet",
+          "gloves",
+          0,
+          2,
+          0
+        ],
+        [
+          "Ring of Hours",
+          "gloves",
+          2,
+          2,
+          0
+        ],
+        [
+          "Sevenleague Boots",
+          "greaves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Treadmill Sole",
+          "greaves",
+          2,
+          0,
+          0
+        ],
+        [
+          "Sevenleague Sole",
+          "greaves",
+          4,
+          0,
+          0
+        ],
+        [
+          "Overflow Plate",
+          "greaves",
+          2,
+          1,
+          0
+        ]
+      ],
+      "bounty": 402,
+      "rank": "boss",
+      "rating": 2053,
+      "items": 8
     }
   ]
 }

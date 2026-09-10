@@ -28,8 +28,13 @@ fn the_treyway_is_its_own_map() {
     assert_eq!(w.id, TREYWAY, "the file's id is not the id it is filed under");
     let over = data::world(D);
     assert_ne!((w.width, w.height), (over.width, over.height), "the same map twice");
-    assert_eq!((w.width, w.height), (16, 16));
-    assert_eq!(w.regions.len(), 3, "three bands, easiest at the door");
+    // **Sixteen by twenty-six since M14.1.** The south is drawn in this file
+    // rather than in a second one, because the note at the top of the map
+    // already says West Bambulon is a tile of it and two files would be two
+    // places to keep identical. Rows 0 to 14 did not move, which is what
+    // `no_gate_into_the_treyway_moved` is for.
+    assert_eq!((w.width, w.height), (16, 26));
+    assert_eq!(w.regions.len(), 4, "three bands, easiest at the door, and the shore below them");
 }
 
 /// **Its own terrain vocabulary, and the sea is not the lake.**
@@ -120,12 +125,26 @@ fn every_road_off_the_treyway_says_where_it_goes() {
     for p in &w.places {
         match p.kind {
             PlaceKind::Gate => {
-                let to = p.to.as_deref().unwrap_or_else(|| panic!("{}: a gate to nowhere", p.id));
-                assert!(
-                    data::MAPS.iter().any(|(m, _)| *m == to),
-                    "{}: opens onto {to:?}, which is not a map",
-                    p.id
-                );
+                // **A road names one map or a stack of them**, and the lip of
+                // the Sump is the first gate on this map that is the second
+                // kind. `opens_onto` answers which floor you get; what this
+                // asks is that every one of them is a map that exists, because
+                // a gate pointing at a hole is a player on a map with no way
+                // off it.
+                let goes: Vec<&str> = p
+                    .to
+                    .as_deref()
+                    .into_iter()
+                    .chain(p.floors.iter().map(|f| f.map.as_str()))
+                    .collect();
+                assert!(!goes.is_empty(), "{}: a gate to nowhere", p.id);
+                for to in goes {
+                    assert!(
+                        data::MAPS.iter().any(|(m, _)| *m == to),
+                        "{}: opens onto {to:?}, which is not a map",
+                        p.id
+                    );
+                }
                 assert!(!p.name.is_empty(), "{}: a road with no name on it", p.id);
             }
             PlaceKind::Event => {

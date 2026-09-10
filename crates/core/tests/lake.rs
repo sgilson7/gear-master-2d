@@ -87,11 +87,15 @@ fn every_drain_names_terrain_that_exists() {
                 w.terrain_name(0, 0) != d.from.as_str(),
                 "{id}: the corner of the map drains, which is a whole-map rewrite"
             );
-            // And the thing it waits for is something that can happen.
-            let happens = data::MAPS.iter().any(|(other, _)| {
-                data::map(other, D).places.iter().any(|p| p.id == d.when)
-            });
-            assert!(happens, "{id}: waits for {:?}, which nothing ever writes", d.when);
+            // **And what it waits for is asked somewhere else now.** The
+            // clause that stood here counted only place ids, because when it
+            // was written a drain waited on a boss going down. The tide on the
+            // Treyway waits on `built-the-tenth`, which is a *flag* an event
+            // raises, so this refused it for the right reason and the wrong
+            // question — the third narrow lint in this block to do that.
+            // `primitives_m14.rs::no_flag_is_waited_on_forever` asks it over
+            // every mark and every reader at once, flags included, and two
+            // lints asking one question is how they drift.
         }
     }
 }

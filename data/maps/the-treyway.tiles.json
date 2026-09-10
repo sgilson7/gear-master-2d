@@ -4,7 +4,7 @@
   "id": "the-treyway",
   "_note": "The map behind the door in the western wall, and the first one drawn at a different scale. West Bambulon is twenty tiles of walking; this is sixteen tiles of country, and one of them is West Bambulon. So the terrain vocabulary is its own — plain, coast, range, sea — and a range is not a cliff you walk round in an afternoon. **`sea` is not `water`**: `Rule::Wade` opens the rim of anything drawn `~`, and an ocean drawn with it would be an ocean the Toad set walks the edge of. Three regions, banded south to north, and the band the door opens onto is rated where West Bambulon's hardest one leaves off — a player who has beaten the Cave arrives at level twelve or better, so bracketing this at five to nine would have put a whole continent below the map it opens off. Two places are written as events rather than gates because the maps they promise are not built yet: a road that says where it goes is a promise, and a gate onto a map this build has not got is a hole.",
   "width": 16,
-  "height": 16,
+  "height": 26,
   "start": [
     13,
     13
@@ -25,6 +25,16 @@
     "S:--,==,,,,,--:S",
     "S:-#=,,,,,,,-#:S",
     "S:::--------:::S",
+    "SSSSSSSStSSSSSSS",
+    "SSSSSSSStSSSSSSS",
+    "S::::::::::::::S",
+    "S:--,,,,,,,,--:S",
+    "S:-,,%%,,,%%,,-S",
+    "S:-,,%,,,,,%,,-S",
+    "S:-,,,,,,,,,,,-S",
+    "S:-,%,,,,,,,%,-S",
+    "S:--,,%%%%%,,--S",
+    "S::,,,,,,,,,,::S",
     "SSSSSSSSSSSSSSSS"
   ],
   "regions": [
@@ -36,7 +46,7 @@
           0,
           11,
           15,
-          15
+          14
         ]
       ],
       "enemies": [
@@ -77,6 +87,25 @@
         "Slag Warden",
         "Null Sentinel",
         "Crowned Hollow"
+      ]
+    },
+    {
+      "id": "the-low-water",
+      "name": "The Low Water",
+      "bounds": [
+        [
+          0,
+          15,
+          15,
+          24
+        ]
+      ],
+      "enemies": [
+        "Iron Abbot",
+        "Obsidian Colossus",
+        "Rimefather",
+        "Cairn Chorus",
+        "The Rust Parliament"
       ]
     }
   ],
@@ -140,6 +169,70 @@
       ],
       "kind": "event",
       "id": "the-wextreen-reach"
+    },
+    {
+      "at": [
+        8,
+        14
+      ],
+      "kind": "event",
+      "id": "the-tideline"
+    },
+    {
+      "at": [
+        3,
+        19
+      ],
+      "kind": "event",
+      "id": "the-ninth-clipboard"
+    },
+    {
+      "at": [
+        12,
+        22
+      ],
+      "kind": "event",
+      "id": "the-low-water-mark"
+    },
+    {
+      "at": [
+        7,
+        21
+      ],
+      "kind": "gate",
+      "id": "the-lip-of-the-sump",
+      "name": "the lip of the Wextreen Sump",
+      "needs_survey": true,
+      "shut": "The ground stops and keeps going. There is a hole in it eleven feet across with nine sets of initials cut round the rim, and what is down it will not hold still long enough to be a shape; you have nothing to read it with and it has nothing to say.",
+      "prose": [
+        "Whatever you are carrying settles, and the hole acquires a floor, and then three more under that.",
+        "Somebody has cut steps. They are cut for going down and not for coming back, which is a thing you can tell by looking at them."
+      ],
+      "floors": [
+        {
+          "map": "the-sump-1",
+          "cleared": "sluice-b"
+        },
+        {
+          "map": "the-sump-2",
+          "cleared": "the-shelf-is-open"
+        },
+        {
+          "map": "the-sump-3",
+          "cleared": "cairn-9"
+        },
+        {
+          "map": "the-sump-4",
+          "cleared": "the-sump-is-bottomed"
+        }
+      ]
+    }
+  ],
+  "drains": [
+    {
+      "when": "built-the-tenth",
+      "from": "tide",
+      "to": "coast"
     }
   ]
 }

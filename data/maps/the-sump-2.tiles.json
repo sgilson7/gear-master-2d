@@ -1,0 +1,81 @@
+{
+  "format": "gm2d-tiles",
+  "version": 1,
+  "id": "the-sump-2",
+  "_note": "Floor 2 of the Wextreen Sump. **No `outside`**: a floor of the Sump is not one sitting, because its budget is what you brought rather than how tired you are — so a save taken here reopens here, and a player who needs a three-by-two from the van can go and get it. What that costs is the walk.",
+  "width": 12,
+  "height": 12,
+  "start": [
+    5,
+    10
+  ],
+  "rows": [
+    "^^^^^^^^^^^^",
+    "^,,,,,,,,,,^",
+    "^,,,,,,,,,,^",
+    "^,,,,,,,,,,^",
+    "^,,,,,,,,,,^",
+    "^,,,,,,,,,,^",
+    "^,,,,,,,,,,^",
+    "^,,,,,,,,,,^",
+    "^,,,,,,,,,,^",
+    "^,,,,,,,,,,^",
+    "^,,,,==,,,,^",
+    "^^^^^^^^^^^^"
+  ],
+  "regions": [
+    {
+      "id": "the-sump-2-floor",
+      "name": "The Shelf",
+      "bounds": [
+        [
+          0,
+          0,
+          11,
+          11
+        ]
+      ],
+      "enemies": [
+        "Obsidian Colossus",
+        "Rimefather",
+        "Cairn Chorus",
+        "The Rust Parliament"
+      ]
+    }
+  ],
+  "places": [
+    {
+      "at": [
+        5,
+        10
+      ],
+      "kind": "gate",
+      "id": "the-sump-2-up",
+      "name": "the steps back up",
+      "to": "the-sump-1"
+    },
+    {
+      "at": [
+        5,
+        5
+      ],
+      "kind": "event",
+      "id": "the-sump-2-stub"
+    },
+    {
+      "at": [
+        5,
+        1
+      ],
+      "kind": "gate",
+      "id": "the-sump-2-stair",
+      "name": "the steps down",
+      "to": "the-sump-3",
+      "at_to": [
+        5,
+        10
+      ],
+      "hidden_until": "the-shelf-is-open"
+    }
+  ]
+}

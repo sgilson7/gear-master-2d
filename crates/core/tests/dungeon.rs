@@ -53,14 +53,34 @@ fn every_gate_leads_somewhere_you_can_stand() {
                 goes.push(p.to.as_deref().unwrap_or_else(|| panic!("{}: a gate to nowhere", p.id)));
             } else {
                 assert!(p.to.is_none(), "{}: a stack that also names one map", p.id);
-                // Each floor's mark is the boss standing on it, or the door
-                // would open onto a floor that can never be cleared.
+                // **A floor is done when the thing on it is down, or when its
+                // puzzle is solved**, and the two are the same field because
+                // they are the same sentence. The Drambus Stack's five name the
+                // boss standing on them, which writes its own tile id into
+                // `answered`; three of the Wextreen Sump's four have no boss at
+                // all and name the flag their floor raises. Either way the mark
+                // has to be something that *happens on that floor*, or the door
+                // opens onto a floor that can never be cleared — which is the
+                // thing this asks and it is why it is not a list of bosses.
+                let events = data::events();
                 for f in &p.floors {
                     let floor = data::map(&f.map, D);
                     assert_eq!(floor.id, f.map, "{}: {:?} is not a map", p.id, f.map);
+                    let a_place = floor.places.iter().any(|b| b.id == f.cleared);
+                    let a_flag = floor
+                        .places
+                        .iter()
+                        .filter_map(|pl| events.get(&pl.id))
+                        .flat_map(|e| e.choices.iter())
+                        .any(|c| {
+                            let mut raised = Vec::new();
+                            gm2d_core::tile_event::flags_raised(&c.outcome, &mut raised);
+                            raised.iter().any(|r| *r == f.cleared)
+                        });
                     assert!(
-                        floor.places.iter().any(|b| b.id == f.cleared),
-                        "{}: nothing on {} is called {:?}, so the floor never clears",
+                        a_place || a_flag,
+                        "{}: nothing on {} is called {:?} and nothing on it raises it, \
+                         so the floor never clears",
                         p.id,
                         f.map,
                         f.cleared

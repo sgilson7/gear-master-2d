@@ -43,7 +43,22 @@ fn the_whole_map_is_reachable_from_the_start() {
     // walled off a quarter of it in silence — which is exactly the failure the
     // flood fill exists for and exactly the one a per-map test cannot see.
     for (id, _) in gm2d_core::data::MAPS {
-        let w = gm2d_core::data::map(id, D);
+        // **Everything drained, because a tile that opens later is not walled
+        // off in silence.** The lake's middle is water until a tower comes
+        // down and the Treyway's south is behind two tiles of tide until the
+        // tenth cairn goes up; flooding the map *as written* reports both as
+        // stranded, which is the map working. What this asks is the other
+        // question — is any tile walled off by a mistyped glyph — and the map
+        // with every drain fired is the one that can answer it.
+        //
+        // The other direction is `low_water.rs::the_south_is_shut_until_the_
+        // reach_is_finished`, which walks the undrained map and demands the
+        // shore be unreachable. The pair is the whole statement; either one
+        // alone is half of it.
+        let mut opened = gm2d_core::world::WorldState::default();
+        opened.map = (*id).to_string();
+        opened.flags = gm2d_core::data::map(id, D).drains.iter().map(|d| d.when.clone()).collect();
+        let w = gm2d_core::data::map_now(id, D, &opened);
         let mut seen: HashSet<(u8, u8)> = HashSet::new();
         let mut queue = vec![w.start];
         seen.insert(w.start);

@@ -1808,6 +1808,158 @@
           }
         }
       ]
+    },
+    {
+      "id": "the-tideline",
+      "title": "THE TIDELINE",
+      "prose": [
+        "A post driven into the coast where the plain stops, with the water eleven feet out and the notches cut into the post going down the way you would expect and then not.",
+        "There are eleven years of them. The first nine step down a thumb's width a year. The tenth is a hand lower than the ninth and the eleventh has not been cut, because the person who was cutting them stopped coming.",
+        "Underneath the last one, in the same hand as the note under the third cairn: the reach was wider on the way back."
+      ]
+    },
+    {
+      "id": "the-ninth-clipboard",
+      "title": "THE NINTH CLIPBOARD",
+      "prose": [
+        "The post at the edge of the Treyway holds nine clipboards on nine chains and one empty chain. This is the ninth, and it is down here, forty tiles from its chain, wedged under a stone.",
+        "Nine rows, one per survey, and a column headed HEIGHT filled in for all nine. They are not in order of survey and they are not in order of height, and the ninth's own row is the shortest figure on the sheet, which is a thing you can read two ways.",
+        "The third is eleven feet. Everybody knows the third is eleven feet."
+      ],
+      "choices": [
+        {
+          "label": "Copy the nine heights",
+          "blurb": "Costs the time to write them down. You keep the order.",
+          "outcome": {
+            "all": [
+              {
+                "flag": "read-the-ninth"
+              },
+              {
+                "xp": 22
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "the-low-water-mark",
+      "title": "THE LOW WATER MARK",
+      "prose": [
+        "A line of dry weed along the shore at the height of a knee, running for two hundred paces and stopping where the slag starts.",
+        "Everything above the line is what the sea has given back. It is four hundred paces of ground that was not there when the nine were surveying, which is why none of the nine maps has it on."
+      ]
+    },
+    {
+      "id": "the-sump-1-stub",
+      "title": "THE FIRST FLOOR",
+      "prose": [
+        "Three channels of standing water across a room twelve paces on a side, and three wheels in the wall, one to a channel."
+      ],
+      "choices": [
+        {
+          "label": "Turn the second wheel",
+          "blurb": "Costs the walk to it. The middle channel goes down.",
+          "outcome": {
+            "all": [
+              {
+                "flag": "sluice-b"
+              },
+              {
+                "xp": 10
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "the-sump-2-stub",
+      "title": "THE SECOND FLOOR",
+      "prose": [
+        "A room twelve paces on a side with one door in the north wall and a slot cut in the door, three fingers by two."
+      ],
+      "choices": [
+        {
+          "label": "Try the slot",
+          "blurb": "Costs the walk to it. The door is on a counterweight.",
+          "outcome": {
+            "all": [
+              {
+                "flag": "the-shelf-is-open"
+              },
+              {
+                "xp": 10
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "the-sump-3-stub",
+      "title": "THE THIRD FLOOR",
+      "prose": [
+        "Nine cairns in a field of slag, each one a different height and none of them signed."
+      ],
+      "choices": [
+        {
+          "label": "Lay the ninth stone",
+          "blurb": "Costs the walk to it. The tenth cairn is the way down.",
+          "outcome": {
+            "all": [
+              {
+                "flag": "cairn-9"
+              },
+              {
+                "xp": 10
+              }
+            ]
+          }
+        },
+        {
+          "label": "Walk it with the sheet",
+          "blurb": "Costs one walk. You lay all nine in the order they were built.",
+          "requires": {
+            "flag": "read-the-ninth"
+          },
+          "unmet": "You have not read the nine heights, so one cairn is nine cairns.",
+          "outcome": {
+            "all": [
+              {
+                "flag": "cairn-9"
+              },
+              {
+                "xp": 10
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "the-sump-4-stub",
+      "title": "THE BOTTOM",
+      "prose": [
+        "Water on four sides and an island in the middle of it, and something on the island that has been there eleven years."
+      ],
+      "choices": [
+        {
+          "label": "Cross to the island",
+          "blurb": "Costs the wade. There is no walking round it.",
+          "outcome": {
+            "all": [
+              {
+                "flag": "the-sump-is-bottomed"
+              },
+              {
+                "xp": 10
+              }
+            ]
+          }
+        }
+      ]
     }
   ]
 }

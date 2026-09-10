@@ -622,5 +622,22 @@ fn no_flag_is_waited_on_forever() {
             note(&d.when, &format!("the drain on {}", w.id), &mut orphans);
         }
     }
+    // **A place hidden until itself never appears**, which is the one
+    // assertion `ending.rs::every_hidden_place_names_something_that_happens`
+    // had that this did not, carried over when that lint was subsumed. It is
+    // not covered above, because a place id *is* something that gets written.
+    for w in &maps {
+        for p in &w.places {
+            if let Some(k) = &p.hidden_until {
+                assert_ne!(k, &p.id, "{} on {}: is hidden until itself", p.id, w.id);
+            }
+            assert!(
+                !p.hidden_until_all.contains(&p.id),
+                "{} on {}: is hidden until itself",
+                p.id,
+                w.id
+            );
+        }
+    }
     assert!(orphans.is_empty(), "{}", orphans.join("\n"));
 }

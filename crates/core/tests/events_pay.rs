@@ -61,8 +61,18 @@ fn every_flag_an_event_sets_is_read_by_something() {
     for (id, _) in data::MAPS {
         let w = data::map(id, D);
         for p in &w.places {
+            // **Five ways a map reads a flag, and it counted one.** M14 hides a
+            // stair behind one, seals a door on two, clears a floor of a stack
+            // with one and takes a tide out with one — so a lint that only knew
+            // about `hidden_until` reported three live flags as promises into a
+            // counter. The failure it is guarding against is real and is
+            // `Outcome::Xp`'s; what it needed was the whole list of readers.
             read.extend(p.hidden_until.iter().cloned());
+            read.extend(p.hidden_until_all.iter().cloned());
+            read.extend(p.needs_all.iter().cloned());
+            read.extend(p.floors.iter().map(|f| f.cleared.clone()));
         }
+        read.extend(w.drains.iter().map(|d| d.when.clone()));
     }
     let orphans: Vec<&String> = set.iter().filter(|f| !read.contains(f)).collect();
     assert!(

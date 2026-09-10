@@ -173,34 +173,18 @@ fn the_ending_errand_waits_for_the_boss() {
     assert_eq!(quest::stage(&g, q), quest::Stage::Ready, "standing at the door was not enough");
 }
 
-/// Every conditional place names something that can actually happen.
-///
-/// A `hidden_until` nobody ever writes is a place nobody ever sees, and
-/// nothing else in the game would say so.
-#[test]
-fn every_hidden_place_names_something_that_happens() {
-    let events = data::events();
-    for (id, _) in data::MAPS {
-        let w = data::map(id, D);
-        // Everything any map can write into `answered`: a boss tile's own id,
-        // an event's id, a gate's own id where it carries a paragraph, and an
-        // errand's word marker.
-        let mut writable: Vec<String> = Vec::new();
-        for (other, _) in data::MAPS {
-            for p in data::map(other, D).places {
-                writable.push(p.id.clone());
-            }
-        }
-        writable.extend(events.events.iter().map(|e| e.id.clone()));
-        writable.extend(data::quests().quests.iter().map(|q| quest::spoken(&q.id)));
-        for p in &w.places {
-            let Some(k) = &p.hidden_until else { continue };
-            assert!(
-                writable.contains(k),
-                "{}: hidden until {k:?}, which nothing ever writes",
-                p.id
-            );
-            assert_ne!(k, &p.id, "{}: is hidden until itself", p.id);
-        }
-    }
-}
+// **`every_hidden_place_names_something_that_happens` is gone, and it was not
+// repaired.** It asked whether a `hidden_until` is something anything ever
+// writes and counted only what reaches `answered` — a place id, an event id, an
+// errand's word — because when it was written that was the only way a place
+// could be conditional. M14 hides six stairs behind a *flag*, so it refused
+// every floor of the Wextreen Sump for the right reason and the wrong question.
+//
+// `primitives_m14.rs::no_flag_is_waited_on_forever` is the same question asked
+// wider: every mark anything waits on — `hidden_until`, `hidden_until_all`,
+// `needs_all`, a drain's `when`, a choice's `Flag` — against everything that
+// raises one, flags included. Extending this one would have left two lints
+// asking one question, and **two answers to one question is how they drift**.
+// The one assertion it had that the new one did not — a place hidden until
+// itself — went with it.
+

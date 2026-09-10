@@ -38,6 +38,13 @@ pub const STACK_1_JSON: &str = include_str!("../../../data/maps/the-drambus-stac
 pub const UNDER_LAKE_JSON: &str = include_str!("../../../data/maps/under-the-lake.tiles.json");
 /// The surveyable map. Static, authored, and read through whatever you carried.
 pub const REACH_JSON: &str = include_str!("../../../data/maps/the-reach.tiles.json");
+/// The Wextreen Sump, top down. Four floors, a puzzle each, and **not** one
+/// sitting: the Stack's budget is fatigue and this one's is what you brought,
+/// so every floor has a stair back up and none of them names an `outside`.
+pub const SUMP_1_JSON: &str = include_str!("../../../data/maps/the-sump-1.tiles.json");
+pub const SUMP_2_JSON: &str = include_str!("../../../data/maps/the-sump-2.tiles.json");
+pub const SUMP_3_JSON: &str = include_str!("../../../data/maps/the-sump-3.tiles.json");
+pub const SUMP_4_JSON: &str = include_str!("../../../data/maps/the-sump-4.tiles.json");
 pub const EVENTS_JSON: &str = include_str!("../../../data/events.json");
 pub const THEME_TD_JSON: &str = include_str!("../../../data/theme.td.json");
 pub const SKILLS_JSON: &str = include_str!("../../../data/skills.json");
@@ -67,6 +74,10 @@ pub const FILES: &[(&str, &str)] = &[
     ("maps/the-drambus-stack-1.tiles.json", STACK_1_JSON),
     ("maps/under-the-lake.tiles.json", UNDER_LAKE_JSON),
     ("maps/the-reach.tiles.json", REACH_JSON),
+    ("maps/the-sump-1.tiles.json", SUMP_1_JSON),
+    ("maps/the-sump-2.tiles.json", SUMP_2_JSON),
+    ("maps/the-sump-3.tiles.json", SUMP_3_JSON),
+    ("maps/the-sump-4.tiles.json", SUMP_4_JSON),
     ("events.json", EVENTS_JSON),
     ("theme.td.json", THEME_TD_JSON),
     ("skills.json", SKILLS_JSON),
@@ -99,6 +110,10 @@ pub const MAPS: &[(&str, &str)] = &[
     ("the-drambus-stack-1", STACK_1_JSON),
     ("under-the-lake", UNDER_LAKE_JSON),
     ("the-reach", REACH_JSON),
+    ("the-sump-1", SUMP_1_JSON),
+    ("the-sump-2", SUMP_2_JSON),
+    ("the-sump-3", SUMP_3_JSON),
+    ("the-sump-4", SUMP_4_JSON),
 ];
 
 /// One map by id, falling back to the overworld.

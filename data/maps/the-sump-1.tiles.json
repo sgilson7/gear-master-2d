@@ -1,0 +1,85 @@
+{
+  "format": "gm2d-tiles",
+  "version": 1,
+  "id": "the-sump-1",
+  "_note": "Floor 1 of the Wextreen Sump. **No `outside`**: a floor of the Sump is not one sitting, because its budget is what you brought rather than how tired you are — so a save taken here reopens here, and a player who needs a three-by-two from the van can go and get it. What that costs is the walk.",
+  "width": 12,
+  "height": 12,
+  "start": [
+    5,
+    10
+  ],
+  "rows": [
+    "^^^^^^^^^^^^",
+    "^,,,,,,,,,,^",
+    "^,,,,,,,,,,^",
+    "^,,,,,,,,,,^",
+    "^,,,,,,,,,,^",
+    "^,,,,,,,,,,^",
+    "^,,,,,,,,,,^",
+    "^,,,,,,,,,,^",
+    "^,,,,,,,,,,^",
+    "^,,,,,,,,,,^",
+    "^,,,,==,,,,^",
+    "^^^^^^^^^^^^"
+  ],
+  "regions": [
+    {
+      "id": "the-sump-1-floor",
+      "name": "The Lip",
+      "bounds": [
+        [
+          0,
+          0,
+          11,
+          11
+        ]
+      ],
+      "enemies": [
+        "Iron Abbot",
+        "Obsidian Colossus",
+        "Rimefather",
+        "Cairn Chorus"
+      ]
+    }
+  ],
+  "places": [
+    {
+      "at": [
+        5,
+        10
+      ],
+      "kind": "gate",
+      "id": "the-sump-1-up",
+      "name": "the steps back up",
+      "to": "the-treyway",
+      "at_to": [
+        7,
+        21
+      ]
+    },
+    {
+      "at": [
+        5,
+        5
+      ],
+      "kind": "event",
+      "id": "the-sump-1-stub"
+    },
+    {
+      "at": [
+        5,
+        1
+      ],
+      "kind": "gate",
+      "id": "the-sump-1-stair",
+      "name": "the steps down",
+      "to": "the-sump-2",
+      "at_to": [
+        5,
+        10
+      ],
+      "hidden_until": "sluice-b"
+    }
+  ]
+}

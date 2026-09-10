@@ -411,9 +411,18 @@ pub struct Drain {
 pub struct Floor {
     /// The map id.
     pub map: String,
-    /// What has to be in `answered` for this floor to be gone — the id of the
-    /// boss tile standing on it. Named here rather than looked up so the gate
-    /// can answer without loading five maps to ask them.
+    /// What has to have happened for this floor to be gone.
+    ///
+    /// **`answered` or `flags`, and M14 is why it is both.** The Drambus
+    /// Stack's five floors each name the id of the boss tile standing on
+    /// them — a boss writes its own tile down when it goes down, so a floor is
+    /// done when the thing on it is. The Wextreen Sump's are not like that:
+    /// three of its four floors have no boss at all and are done when their
+    /// *puzzle* is solved, which is a flag. Reading both is what lets a floor
+    /// say in one field what finishing it means.
+    ///
+    /// Named here rather than looked up so the gate can answer without loading
+    /// four maps to ask them.
     pub cleared: String,
 }
 
@@ -428,18 +437,17 @@ impl PlaceDef {
         if self.floors.is_empty() {
             return self.to.as_deref();
         }
+        let marks = state.marks();
         self.floors
             .iter()
-            .find(|f| !state.answered.iter().any(|a| *a == f.cleared))
+            .find(|f| !marks.iter().any(|m| *m == f.cleared))
             .map(|f| f.map.as_str())
     }
 
     /// How many of this gate's floors are gone.
     pub fn floors_cleared(&self, state: &WorldState) -> usize {
-        self.floors
-            .iter()
-            .filter(|f| state.answered.iter().any(|a| *a == f.cleared))
-            .count()
+        let marks = state.marks();
+        self.floors.iter().filter(|f| marks.iter().any(|m| *m == f.cleared)).count()
     }
 }
 

@@ -2085,6 +2085,188 @@ def check_the_tide_is_drawn_before_it_goes_out(page, name, fails, base):
     print("ok: the tide is drawn before it goes out, and the bar crosses to a map of its own")
 
 
+def check_a_fight_you_have_had_is_not_drawn(page, name, fails, base):
+    """**The one thing only a browser can say: that the fight screen did not
+    open.**
+
+    `cargo test` proves the settlement is identical to a fought one down to the
+    drop roll and the stream's position. What it cannot prove is a negative
+    about a screen — and the whole of what M15.2 adds is that nothing is drawn.
+
+    Three questions, and the third is the one that would have been left out:
+
+    1. the menu lists what has been beaten five times **and nothing else**
+    2. a marked creature walked into does not open `#fight`, and the result
+       reaches the strip *and* survives into the history
+    3. **unmarking it opens the screen again** — a switch that only goes one way
+       is not a switch, and nothing in `cargo test` can see the screen
+    """
+    def beaten(body, count, marked):
+        # **Stripped, and then packed again by the button.** The strip is trap 7
+        # — these run on a character who has fought fifty times and may have
+        # *earned* the Rat King's Mandate, which routs a Cave Rat, and a routed
+        # rat is not an instant battle and would fail this check for the wrong
+        # reason. The repack is `#preset` after the plant, because a bare board
+        # loses to a rat and this check is about what is drawn rather than about
+        # who wins.
+        strip_the_boards(body)
+        # **The starting weapon, seated by hand.** `#preset` is the packing
+        # screen's button and the packing screen is a town away; what this check
+        # needs is a board that beats a rat, which is the two components the game
+        # opens with. The blade is 1x4 against a three-row frame, so it goes down
+        # turned — which is the M4 soft-lock in miniature and the reason
+        # Auto-pack exists.
+        reg = body["character"].setdefault("registry", [])
+        owned = body["character"].setdefault("owned", [])
+        weapon = next(b for b in body["character"]["boards"] if b[0] == "weapon")[1]
+        weapon["rows"] = max(weapon.get("rows", 3), 3)
+        for piece, rot, x, y in [("Oak Handle", 0, 0, 0), ("Iron Blade", 1, 1, 0)]:
+            reg.append({"def": piece, "rot": rot})
+            owned.append(len(reg) - 1)
+            weapon["placed"].append([len(reg) - 1, x, y])
+        w = body.setdefault("world", {})
+        w["map"] = ""
+        # One tile north of the pit, so the walk is inside the flats and the
+        # only thing the ground can deal is a rat or a toad.
+        w["at"] = [4, 16]
+        w["counters"] = [c for c in w.get("counters", [])
+                         if not str(c[0]).startswith("beat:")]
+        w["counters"] = w["counters"] + [["beat:Cave Rat", count], ["beat:Bog Toad", 2]]
+        w["instant"] = ["Cave Rat"] if marked else []
+        # **A class, because the fork is the one screen that does not take
+        # Escape.** A level-five character who has not been asked is *owed* the
+        # question, so the load opens it and every click after that lands in a
+        # modal — which is exactly what this check hit on its first run, and is
+        # written down in `CLAUDE.md` as *taking a class off a save is not the
+        # same as not being a licensee*. Berserker, which is not the Patent's,
+        # so nothing about enching moves.
+        body["character"]["class"] = "Berserker"
+        body["character"]["xp"] = 4000
+
+    # --- 1. the list is the count and nothing else ---------------------------
+    plant(page, base, lambda b: beaten(b, 6, False), stem="instant-menu")
+    dismiss_card(page)
+    close_fight(page)
+    # **A keypress goes nowhere without the canvas.** `walk()` is on the map's
+    # own key handler, and a plant leaves focus wherever the file input left it.
+    page.evaluate("() => document.getElementById('map').focus()")
+    if page.is_visible("#instant-open") is False:
+        fails.append(f"{name}: six wins and the Instant Battle button is not there")
+        return
+    marked_name = ""
+    page.click("#instant-open")
+    page.wait_for_selector("#instant", state="visible", timeout=5000)
+    try:
+        listed = page.evaluate("""() => [...document.querySelectorAll('#instant-list button')]
+            .map(b => b.dataset.creature)""")
+        if listed != ["Cave Rat"]:
+            fails.append(f"{name}: the menu lists {listed!r}; two wins should not be on it")
+        # **The name the fight screen would print**, taken off the menu rather
+        # than written here: a creature's name is themed and this file has no
+        # business holding a second copy of the theme's word for one.
+        marked_name = page.evaluate("""() => (document
+            .querySelector("#instant-list li")?.firstChild?.textContent ?? '')
+            .split(' — ')[0].trim()""")
+        costs = page.evaluate("() => document.querySelectorAll('#instant-costs li').length")
+        if costs < 4:
+            fails.append(f"{name}: the menu says {costs} things about what a switch costs")
+        # **The boss line.** A marked creature settles in a field and is fought
+        # at the end of a corridor, which is correct and is surprising — and a
+        # rule the player cannot see is a rule they report as a bug.
+        said = page.text_content("#instant-costs")
+        if "boss" not in said:
+            fails.append(f"{name}: nothing says a boss is fought either way: {said!r}")
+        # **And the screen is on top of the map, not under it.** The class fork
+        # shipped underneath the town for a milestone because a `.screen` with
+        # no tier inherits 20 and the file's order decided the rest.
+        over = page.evaluate("""() => {
+          const b = document.getElementById('instant-close');
+          const r = b.getBoundingClientRect();
+          const el = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+          return el === b || (el && el.id === 'instant-close');
+        }""")
+        if not over:
+            fails.append(f"{name}: something covers the Instant Battle screen")
+    finally:
+        page.keyboard.press("Escape")
+        page.wait_for_selector("#instant", state="hidden", timeout=5000)
+
+    # --- 2. marked: nothing is drawn, and the strip says what happened -------
+    plant(page, base, lambda b: beaten(b, 6, True), stem="instant-on")
+    dismiss_card(page)
+    close_fight(page)
+    page.evaluate("() => document.getElementById('map').focus()")
+    drawn, settled, steps = None, False, 0
+    # **`PATROL`, because it is the road a starting kit can win on.** Six east
+    # and six west along the pit's row, which is where the pacing was
+    # calibrated — an encounter is per-mille per tile, so a two-tile shuffle is
+    # a walk that can go two hundred steps without meeting anything. A marked
+    # rat settles; anything else opens the screen and is walked away from,
+    # which is itself the control: the screen still has to open for what is not
+    # marked.
+    #
+    # **The whole strip, not a slice of it.** `#tape` keeps the last few lines
+    # and drops the rest into the history, so `tape(page)[before:]` goes on
+    # returning the last one or two however many fights have happened — a
+    # comparison that quietly stops being about anything. The receipt is one
+    # line and it is read the moment it lands.
+    for i in range(240):
+        if leave_town(page) or dismiss_card(page):
+            continue
+        if page.is_visible("#fight"):
+            who = (page.text_content("#fight-name") or "").strip()
+            close_fight(page)
+            if who == marked_name:
+                drawn = who
+                break
+            continue
+        if any("watch" in t for t in tape(page)):
+            settled = True
+            break
+        page.keyboard.press(PATROL[i % len(PATROL)])
+        steps += 1
+    if drawn:
+        fails.append(f"{name}: a marked creature opened the fight screen: {drawn!r}")
+    elif not settled:
+        fails.append(f"{name}: {steps} steps and no instant battle reached the strip")
+    else:
+        said = next(t for t in tape(page) if "watch" in t)
+        # It is a whole settlement, not a note that one happened: the receipt
+        # is the only interface this fight has.
+        for want in ("Fnorp", "experience", "tired"):
+            if want not in said:
+                fails.append(f"{name}: the instant receipt has no {want} in it: {said!r}")
+        # And it survives into the history, which is the half the ask names.
+        page.click("#history-open")
+        page.wait_for_selector("#history", state="visible", timeout=5000)
+        kept = page.text_content("#history-list") or ""
+        page.keyboard.press("Escape")
+        page.wait_for_selector("#history", state="hidden", timeout=5000)
+        if "watch" not in kept:
+            fails.append(f"{name}: the result did not survive into the history")
+
+    # --- 3. the switch goes both ways ---------------------------------------
+    page.click("#instant-open")
+    page.wait_for_selector("#instant", state="visible", timeout=5000)
+    try:
+        page.click("#instant-list button[data-creature='Cave Rat']")
+        page.wait_for_timeout(150)
+        still = page.evaluate("""() => document
+            .querySelector("#instant-list button[data-creature='Cave Rat']")
+            .getAttribute('aria-pressed')""")
+        if still != "false":
+            fails.append(f"{name}: the switch would not come off: aria-pressed={still!r}")
+    finally:
+        page.keyboard.press("Escape")
+        page.wait_for_selector("#instant", state="hidden", timeout=5000)
+    page.evaluate("() => document.getElementById('map').focus()")
+    if walk_until_a_fight(page, limit=240):
+        close_fight(page)
+    else:
+        fails.append(f"{name}: the switch came off and no fight screen opened in 240 steps")
+    print("ok: a fight you have had is settled where it stands and never drawn")
+
+
 def check_the_sump_refuses_without_an_instrument(page, name, fails, base):
     """**The lip of the Sump is the Reach's door in a second place.**
 
@@ -5257,6 +5439,7 @@ def walk_the_gate(browser, name, fails=None):
     # minutes of fighting away, and what wants proving is what happens *at* that
     # place rather than the road to it.
     check_the_tide_is_drawn_before_it_goes_out(page, name, fails, path)
+    check_a_fight_you_have_had_is_not_drawn(page, name, fails, path)
     check_the_sump_refuses_without_an_instrument(page, name, fails, path)
     check_a_wheel_says_what_it_wants(page, name, fails, path)
     check_the_chair_refuses_the_wrong_move(page, name, fails, path)

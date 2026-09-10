@@ -412,6 +412,11 @@ pub fn position() -> String {
                 // the button up. Core's answer: the page never asks what rules
                 // a character has, it asks what it may offer.
                 "homeward": g.character.rules().contains(&gm2d_core::rule::Rule::Homeward),
+                // **Whether anything has been beaten enough times to skip.**
+                // Same shape as the line above and the same reason: the page
+                // asks what it may offer, never what the rules are. A button
+                // that opens an empty list is a feature reported as broken.
+                "can_instant": !g.instant_candidates().is_empty(),
                 "walked": g.world.count("tiles-walked"),
                 "fights": g.world.count("encounters"),
             })
@@ -2053,6 +2058,61 @@ pub fn settle_fight() -> String {
             "receipt": s.receipt,
         })
         .to_string()
+    })
+}
+
+/// The Instant Battle menu: everything beaten five times, with its switch.
+///
+/// **Eligibility is core's and so is the count.** The page draws the list it is
+/// handed; a screen that decided for itself which creatures had been beaten
+/// enough would be a second rulebook, and this one has a threshold in it.
+///
+/// `costs` is what the screen prints under the list, and it is here for the
+/// reason every other derived sentence is: what a mark costs you is a fact
+/// about the rules, so it is stated once beside the behaviour and not typed
+/// into the markup where it would go stale the day the fatigue constant moved.
+#[wasm_bindgen]
+pub fn instant_json() -> String {
+    with(|g| {
+        let lines: Vec<serde_json::Value> = g
+            .instant_candidates()
+            .into_iter()
+            .map(|l| {
+                serde_json::json!({
+                    "canonical": l.canonical,
+                    "name": l.name,
+                    "beaten": l.beaten,
+                    "marked": l.marked,
+                })
+            })
+            .collect();
+        serde_json::json!({
+            "after": gm2d_core::fight::INSTANT_AFTER,
+            "costs": gm2d_core::fight::what_a_mark_costs(),
+            "lines": lines,
+        })
+        .to_string()
+    })
+}
+
+/// Turn a creature's switch on or off.
+///
+/// Returns `""` when it took and the refusal when it did not, which is the
+/// shape every other counter in this shim answers in. **Core refuses, not
+/// this** — the sentence comes back with the count in it, because a button that
+/// greys with no reason is a button reported as a bug.
+#[wasm_bindgen]
+pub fn set_instant(creature: &str, on: bool) -> String {
+    with_mut(|g| {
+        if on {
+            match g.mark_instant(creature) {
+                Ok(()) => String::new(),
+                Err(why) => why,
+            }
+        } else {
+            g.unmark_instant(creature);
+            String::new()
+        }
     })
 }
 

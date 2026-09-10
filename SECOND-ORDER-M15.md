@@ -84,3 +84,53 @@ against 60 shared ones is 66 in one engine and 78 across three. Somebody
 budgeting a check count off that sentence will be wrong by twelve.
 
 **Candidate: yes** — one sentence in `CLAUDE.md` in M15.5.
+
+## 6. Three plants in a row, and every one hit a documented trap — M15.2
+
+The browser check for the menu failed four times before it passed, and **not one
+of the four was a bug in the feature**. Each was a trap `CLAUDE.md` already
+names, met in the order a new check meets them:
+
+| what happened | which trap |
+|---|---|
+| `#instant-open` visible, click timed out for thirty seconds | *the class fork is the one screen that does not take Escape* — `xp: 4000` with no class opens it, and every click after that lands in a modal |
+| `#preset` timed out | Auto-pack is on the **fight** screen, a town away; the plant seats the two starting components by hand instead, blade turned, which is the M4 soft-lock in miniature |
+| `next(...)` raised on `b[0] == "Weapon"` | `save::slot_name` writes `"weapon"`, lower case |
+| 240 steps and an empty tape | keypresses go nowhere without `#map` focused, **and** `tape(page)[before:]` slices a strip that is capped at `TAPE` lines, so it goes on returning the last one or two however many fights have happened |
+
+The last one is the only one worth generalising and it is a **new** shape: *a
+slice of a capped list is a comparison that quietly stops being about anything.*
+It is the "compares zero with zero" failure with a scrollback in it — the check
+would have gone on passing on a build where the receipt landed and then scrolled
+away.
+
+**Candidate: yes** — grep `drive.py` for other `tape(page)[` slices in M15.5.
+There is at least one shape like it and it may be right or may be the same
+mistake.
+
+## 7. A `git checkout` on a file with uncommitted work — M15.2
+
+Reverting a deliberate break with `git checkout crates/wasm/src/lib.rs` took the
+milestone's *own* uncommitted exports with it. Twenty minutes to notice and
+five to redo, and the reason it was not caught immediately is that the shim
+compiles fine without them — the page just stops having a menu.
+
+The habit is the fix: **copy the file before breaking it and copy it back**,
+which is what the rest of this block's negative tests do. No code change.
+
+**Candidate: no.** Recorded because it is the kind of thing that reads as a
+mystery the second time.
+
+## 8. Line continuations inside a Rust string, edited by script — M15.2
+
+`what_a_mark_costs` was written with `\` continuations inside its string
+literals. A later scripted edit rewrote the file and the backslashes went, which
+is invisible in a diff read quickly and turns into **runs of eleven spaces in
+the middle of a player-facing sentence.** Caught by reading the function, not by
+a test: nothing in the suite reads that string, and the browser check only looks
+for the word *boss*.
+
+Rewritten with one string per line. **Candidate: yes** — a tone lint for
+`  ` (two or more spaces) inside a player-facing string would have caught it,
+and `tests/tone.rs` is where the eight machine-checkable TONE rules already
+live.

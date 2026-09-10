@@ -73,6 +73,12 @@
           <div class="row">
             <button id="skills" type="button">The tree</button>
             <button id="errands-open" type="button">Errands</button>
+            <!-- **Only once something has been beaten five times.** A button
+                 that opens an empty list is a feature reported as broken, which
+                 is the rack's lesson and the van's: a screen you cannot use is
+                 worse than a screen that is not there yet. `paintPanel` un-hides
+                 it the moment the fifth win lands. -->
+            <button id="instant-open" type="button" hidden>Instant Battle</button>
             <!-- **Not `#numbers`.** That button handed out the map's danger
                  and its odds to everybody for nothing, which made a skill that
                  grants them a skill that grants nothing. The reading is earned
@@ -133,6 +139,35 @@
         <ol id="history-list" class="tape whole"></ol>
         <div class="actionbar">
           <button id="history-close" type="button" class="primary">Back</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- **A fight you have already had.** Beat something five times and you may
+         set it to settle where it stands: the fight is simulated in full and
+         banked in full and nothing opens, and the result arrives on the strip
+         like everything else the game says.
+
+         **Its own id, and not a prefix anything else owns.** `#instrument` is
+         three characters away and is the survey frame; `.card`, `.tabs` and
+         `#kit` have each cost a day here, so the screen is `#instant` and every
+         child is `instant-*`. It sits on tier 30 — *what you opened from the
+         map* — beside the tree, the log and the history, because it is a thing
+         you go and look at rather than a thing that happens to you. -->
+    <div id="instant" class="screen" hidden>
+      <div class="screenbox">
+        <header class="fighthead">
+          <div>
+            <p class="eyebrow">a fight you have already had</p>
+            <h2>Instant Battle</h2>
+            <p class="note" id="instant-note"></p>
+          </div>
+        </header>
+        <ul id="instant-list" class="tape whole"></ul>
+        <h4 class="sub-h">What a switch costs you</h4>
+        <ul id="instant-costs" class="stats"></ul>
+        <div class="actionbar">
+          <button id="instant-close" type="button" class="primary">Back</button>
         </div>
       </div>
     </div>

@@ -297,6 +297,35 @@ pub fn instant(game: &mut Game, difficulty: Difficulty) -> Option<Settlement> {
 /// defeating a specific enemy 5 times, you can set them to instant battle"*.
 pub const INSTANT_AFTER: u32 = 5;
 
+/// What marking a creature costs you, in the engine's words.
+///
+/// **A spec, not prose** — TONE 13a, unthemed and with the numbers in it,
+/// because somebody deciding whether to flip a switch is weighing what it does
+/// rather than reading about it. It lives here rather than in the markup for
+/// the reason `Node::line` is derived rather than written into a blurb: a
+/// sentence beside the behaviour it describes cannot go stale, and the two
+/// figures in it are read off the constants that decide them.
+///
+/// The last line is the one nobody would guess. Eight of the nine creatures
+/// that stand on a boss tile also stand in a region pool, so a marked creature
+/// settles in the field and is fought at the end of the corridor — which is
+/// correct, and is surprising, and *a rule the player cannot see is a rule they
+/// report as a bug.*
+pub fn what_a_mark_costs() -> Vec<String> {
+    vec![
+        "It is not drawn. There is no replay, no log to read afterwards, and no way to slow it down."
+            .to_string(),
+        "You cannot walk away from one. A fight you would have fled is a fight you have had."
+            .to_string(),
+        format!(
+            "It costs the same {}% as any other fight, and losing one takes everything you are carrying.",
+            crate::fatigue::PER_FIGHT
+        ),
+        "A creature standing on a boss's tile is fought either way. The switch is about meeting one out there."
+            .to_string(),
+    ]
+}
+
 /// The counter a creature's wins are kept under.
 ///
 /// One function so the writer and every reader spell it the same way. A

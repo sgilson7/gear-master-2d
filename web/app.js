@@ -19,6 +19,7 @@ import init, {
   ench_rack_json, attach_ench, detach_ench, toggle_ench,
   bank_json, bank_put, bank_take,
   kit_json, kit_reading_json,
+  instant_json, set_instant,
 } from './pkg/gm2d_wasm.js';
 import { Board } from './board.js';
 import { Theirs } from './theirs.js';
@@ -399,6 +400,12 @@ function paintPanel() {
   // And the way home is the set's. Offering a click that will be refused is a
   // worse screen than not offering it — the rack's lesson, and the same answer.
   $('homeward').hidden = !p.homeward;
+  // **And the menu is the fifth win's.** A button that opens an empty list is a
+  // feature reported as broken; the same answer the rack gives an unlicensed
+  // character and the van gives a level-nine one. Asked off the payload rather
+  // than counted here — how many creatures are eligible is a threshold, and a
+  // threshold in the page is a second rulebook.
+  $('instant-open').hidden = !p.can_instant;
   if (!p.scouting && debug) toggleScout();
   $('walked').textContent = p.walked;
   $('fights').textContent = p.fights;
@@ -633,6 +640,72 @@ function openHistory() {
 
 function closeHistory() {
   $('history').hidden = true;
+  $('map').focus();
+}
+
+// ------------------------------------------------------- a fight you have had
+
+/// Everything beaten five times, with a switch each.
+///
+/// **The list is core's and so is the count.** The page draws what it is handed
+/// and asks core to flip a switch; whether a creature may be marked is a
+/// threshold and a threshold decided here would be a second rulebook.
+function paintInstant() {
+  const r = JSON.parse(instant_json());
+  $('instant-note').textContent =
+    `Beat something ${r.after} times and you may stop watching. The fight still happens, ` +
+    `and it still counts.`;
+  // What a switch costs, off `fight::what_a_mark_costs` — derived beside the
+  // behaviour it describes, unthemed, TONE 13a. Not typed into the markup,
+  // where it would go stale the first time the fatigue constant moved.
+  $('instant-costs').replaceChildren(...(r.costs ?? []).map((t) => {
+    const li = document.createElement('li');
+    li.textContent = t;
+    return li;
+  }));
+  const list = $('instant-list');
+  if (!r.lines.length) {
+    list.innerHTML = `<li class="none">Nothing yet. Beat the same creature ` +
+      `${r.after} times and it turns up here.</li>`;
+    return;
+  }
+  list.replaceChildren(...r.lines.map((l) => {
+    const li = document.createElement('li');
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = l.marked ? 'primary' : '';
+    b.setAttribute('aria-pressed', String(l.marked));
+    b.dataset.creature = l.canonical;
+    b.textContent = l.marked ? 'Settled where it stands' : 'Fight it on the screen';
+    b.onclick = () => {
+      // Core refuses and hands back the sentence. A refusal that says nothing
+      // is a button reported as a bug, so it goes to the strip like everything
+      // else the game says.
+      const why = set_instant(l.canonical, !l.marked);
+      if (why) log(why, true);
+      paintInstant();
+      autosave();
+    };
+    const said = document.createElement('span');
+    said.textContent = `${l.name} — beaten ${l.beaten} times. `;
+    li.append(said, b);
+    return li;
+  }));
+}
+
+function openInstant() {
+  // **Painted after it is shown, not before.** `openTree` painted a hidden
+  // screen and drew seventeen wires at the origin, because you cannot measure
+  // `display: none`. Nothing here is measured, and the order is right anyway:
+  // the next screen that measures something will inherit it rather than
+  // rediscovering it.
+  $('instant').hidden = false;
+  paintInstant();
+  $('instant-close').focus();
+}
+
+function closeInstant() {
+  $('instant').hidden = true;
   $('map').focus();
 }
 
@@ -2467,6 +2540,7 @@ function walk(dir) {
   if (!$('card').hidden || !$('fight').hidden || !$('town').hidden ||
       !$('tree').hidden || !$('fork').hidden || !$('log').hidden ||
       !$('history').hidden || !$('instrument').hidden ||
+      !$('instant').hidden ||
       !$('ending').hidden || !$('vendor').hidden) return;
   const r = JSON.parse(try_step(dir));
   blocked = r.moved ? null : r.blocked;
@@ -2694,6 +2768,10 @@ async function main() {
       if (e.key === 'Escape') closeHistory();
       return;
     }
+    if (!$('instant').hidden) {
+      if (e.key === 'Escape') closeInstant();
+      return;
+    }
     if (!$('ending').hidden) {
       if (e.key === 'Escape') closeEnding();
       return;
@@ -2747,6 +2825,8 @@ async function main() {
   };
   $('history-open').onclick = openHistory;
   $('history-close').onclick = closeHistory;
+  $('instant-open').onclick = openInstant;
+  $('instant-close').onclick = closeInstant;
   paintTape();
 
   board = new Board($('board'), {

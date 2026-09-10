@@ -60,13 +60,13 @@ events that pay something and say what they pay — added on the human's ask.
 `PLAN-M9.md`, `PLAN-M10.md` and `PLAN-M11.md` are done; `PLAN.md` §6d is what
 M11 left open, §6c is M10.3's, §6b is M9.4's and §6a is M8.8's.
 
-**One thing is in flight**, uncommitted on `main`: **spells, books, crystal
-balls, inks and alignments are buyable.** 106 casting components, six of them
-reachable, all six errand rewards — because `roll_barrel` named its kinds by
-hand and covered one of the weapon's three recipes, and because the arcane shelf
-is on a map that does not exist. See *The barrel could not hold a book* and *A
-reward you could buy, eighteen times over*. 788 passing, gate green in three
-engines, **not deployed**.
+**Nothing is in flight.** The most recent thing on `main` is `0aae36b`, live at
+`5fb93594`: **spells, books, crystal balls, inks and alignments are buyable.**
+106 casting components, six of them reachable and all six errand rewards —
+because `roll_barrel` named its kinds by hand and covered one of the weapon's
+three recipes, and because the arcane shelf is on a map that does not exist. See
+*The barrel could not hold a book* and *A reward you could buy, eighteen times
+over*.
 
 Everything below shipped between M12 closing and M13
 opening — all of it reported from play, all of it on `main`, all of it walked on
@@ -86,6 +86,14 @@ the live page:
 | `5ff7eb4` | an instrument has a frame of its own, and surveying no longer costs your sword arm |
 | `f439274` | a row is bought all the way up to the old size, and the tree's wires are drawn where they are |
 
+And since M13 shipped:
+
+| | |
+|---|---|
+| `f2d1bd4` | M13: what two classes reach — live at `ac2256c7` |
+| `6790385` | the deploy note for `ac2256c7` |
+| `0aae36b` | the barrel could not hold a book — live at `5fb93594` |
+
 **Two of them touched the save and none of them the catalogue**, and neither did
 M13. The bank adds `Character::banked`, which defaults empty and is skipped when
 it is; the instrument frame adds a sixth board, and a file naming five gets one
@@ -94,9 +102,10 @@ not change its name and `catalog_fingerprint` hashes names, so the catalogue is
 still 568, there is still no seam, and every file that opened on M12 opens on
 this — `Character::repair_boards` lifts an old build's instrument out of the
 weapon grid on the way in. The stamp a deploy leaves is a record of that deploy and not
-a claim about now, the same way the two M12 stamps below are; **what has to
+a claim about now, the same way the M12 and M13 stamps below are; **what has to
 agree is the pair**, `index.html` asking for `app.js?v=X` and that `app.js`
-carrying `BUILD='X'`.
+carrying `BUILD='X'`. The live one as this was written is `5fb93594`, and it
+will be wrong by the next deploy whatever that deploy is for.
 
 **M13 is done and live**, deployed at `ac2256c7` on the human's word, verified
 the way this file has demanded since M8: `GM2D_ORIGIN=… drive.py` walked all
@@ -3601,6 +3610,29 @@ live build a418bea0
 
 **Seventeen with real coordinates is the whole of the wire fix**, and the
 number the old gate could not tell from seventeen at the origin.
+
+**The deploy after M13 is the barrel, and its table is one list.** The gate asked
+sixty-three of the questions against the deployed page in three engines; what a
+person went and looked at is whether the casting family had actually reached a
+counter, read off the page's own `__shopJson` rather than off the data file:
+
+```
+live build 5fb93594
+  index.html asks app.js?v=5fb93594   app.js carries BUILD='5fb93594'
+  chromium walked the gate    ok      firefox  walked the gate    ok
+  webkit   walked the gate    ok      63 ok lines, no failures
+  the barrel, in the pit      16 lines, and four of them are the casting cores:
+                              Guidance Sheet 25, Minus One Degrees 45,
+                              Copy Paste Race 50, Blizzard Globe 35
+                              — a book, two spells and a ball, at x1
+  console errors: none                off-origin requests: none
+```
+
+**Whether they *assemble* is core's question and stays there.**
+`every_recipe_assembles_out_of_the_barrel_alone` seats them and asks the recipe
+table; a browser cannot say anything about that a hundred and fifty milliseconds
+of `cargo test` does not say better. What only the live page can answer is
+whether the counter is carrying them, which is what the list above is.
 
 **M13's is the shortest table here and the most of it is not in the table.**
 Sixty-three of the questions are the gate's, walked against the deployed page in

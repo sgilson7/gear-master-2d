@@ -1,12 +1,20 @@
 //! M14.1 — the Treyway's south, and the tide that goes out on the tenth cairn.
 //!
-//! **The Treyway is one file and is now sixteen by twenty-six.** The note at
-//! the top of that file already says West Bambulon is a tile of it; a second
-//! file for the shore would have been two places to keep identical everywhere
-//! they are not deliberately different, which is how a map and its copy drift.
+//! **It is its own map, and for one milestone it was not.** M14.1 drew the
+//! shore into `the-treyway.tiles.json` at sixteen by twenty-six on the *one
+//! country, one file* principle — the note at the top of that map already says
+//! West Bambulon is a tile of it, and two files are two places to keep
+//! identical. That instinct is right and it was the wrong call here, for a
+//! reason that has nothing to do with content: **`#map` has been a fixed square
+//! in CSS since the first map**, so a grid half again as tall as it is wide came
+//! out squashed. Reported from play as *"the resolution for the overworld looks
+//! all messed up"*.
 //!
-//! So the thing this milestone has to prove is that **nothing above row 15
-//! moved**, and that is what most of this file is.
+//! So the shore is `the-low-water`, and it is reached the way it always was —
+//! over a bar of shingle the tide leaves at column 8, which is one tile of
+//! `tide` on the Treyway's last row that becomes `coast` when the tenth cairn
+//! goes up. **What changed is that the bar is a gate rather than two tiles of
+//! the same grid.**
 
 use gm2d_core::combat::Difficulty;
 use gm2d_core::data;
@@ -14,16 +22,17 @@ use gm2d_core::world::{Allowances, PlaceKind, WorldState};
 
 const D: Difficulty = Difficulty::Easy;
 const TREYWAY: &str = "the-treyway";
+const SHORE: &str = "the-low-water";
 
 /// **Every gate into the Treyway lands where it always did.**
 ///
-/// Rows 0 to 14 are byte-for-byte what they were, so no `at_to` on any road
-/// into this map had to move — and the way to say that is to walk every gate
-/// on every map and check the tile it names is the tile it named.
+/// Rows 0 to 14 are byte-for-byte what they were through both shapes of this
+/// map, so no `at_to` on any road into it ever had to move — and the way to say
+/// that is to walk every gate on every map and check the tile it names is a
+/// tile you can stand on.
 ///
-/// Negative-tested by inserting the eleven new rows at the *top* of the file
-/// rather than the bottom: the door back into Bambulon landed in the sea, and
-/// this named it.
+/// Negative-tested by inserting a row at the *top* of the file rather than the
+/// bottom: the door back into Bambulon landed in the sea, and this named it.
 #[test]
 fn no_gate_into_the_treyway_moved() {
     let treyway = data::map(TREYWAY, D);
@@ -36,7 +45,7 @@ fn no_gate_into_the_treyway_moved() {
             roads += 1;
             let Some([x, y]) = p.at_to else { continue };
             assert!(
-                treyway.passable(x, y),
+                treyway.ever_walkable(x, y),
                 "{id}/{}: lands at ({x}, {y}) on the Treyway, which is {:?}",
                 p.id,
                 treyway.terrain_name(x, y)
@@ -56,14 +65,14 @@ fn no_gate_into_the_treyway_moved() {
 
 /// **The tide goes out on the tenth cairn, and not before.**
 ///
-/// Two tiles at column 8, and they are the only ground between the coast at
-/// row 14 and the shore at row 17. Drawn from the first visit — a player
-/// standing at the water has been able to see the far side the whole time —
-/// and impassable until `built-the-tenth`, which is the last thing anybody does
-/// on the Reach.
+/// One tile at column 8 on the Treyway's last row, and it is the only ground
+/// between the coast at row 14 and a map nobody can otherwise reach. Drawn from
+/// the first visit — a player standing at the water has been able to see the
+/// bar the whole time — and impassable until `built-the-tenth`, which is the
+/// last thing anybody does on the Reach.
 ///
-/// Negative-tested by drawing them `coast` in the file: the south was walkable
-/// from the first afternoon and `the_south_is_shut_until_the_reach_is_finished`
+/// Negative-tested by drawing it `coast` in the file: the crossing was walkable
+/// from the first afternoon and `the_shore_is_shut_until_the_reach_is_finished`
 /// said so.
 #[test]
 fn the_tide_goes_out_on_the_tenth_cairn() {
@@ -72,13 +81,11 @@ fn the_tide_goes_out_on_the_tenth_cairn() {
     let dry = Allowances { wade: false, level: 99 };
 
     let before = data::map_now(TREYWAY, D, &st);
-    for y in [15u8, 16] {
-        assert_eq!(before.terrain_name(8, y), "tide", "(8, {y}) is not the tide");
-        assert!(!before.walkable(8, y, &dry), "the tide was out before the tenth cairn");
-        // **Drawn, though.** A wall you cannot see is a map that ends; a tide
-        // you can see is a map with a far side you have not earned.
-        assert!(before.ever_walkable(8, y), "the tide is a wall nothing ever opens");
-    }
+    assert_eq!(before.terrain_name(8, 15), "tide", "(8, 15) is not the tide");
+    assert!(!before.walkable(8, 15, &dry), "the tide was out before the tenth cairn");
+    // **Drawn, though.** A wall you cannot see is a map that ends; a tide you
+    // can see is a map with a far side you have not earned.
+    assert!(before.ever_walkable(8, 15), "the tide is a wall nothing ever opens");
 
     // A Toad set does not open it either. `Rule::Wade` opens `water`, and the
     // sea and the tide are their own terrains for exactly this reason.
@@ -87,30 +94,29 @@ fn the_tide_goes_out_on_the_tenth_cairn() {
 
     st.flags.push("built-the-tenth".into());
     let after = data::map_now(TREYWAY, D, &st);
-    for y in [15u8, 16] {
-        assert_eq!(after.terrain_name(8, y), "coast", "(8, {y}) did not go out");
-        assert!(after.walkable(8, y, &dry), "the tide went out and is still a wall");
-    }
-    // And it took nothing else with it.
+    assert_eq!(after.terrain_name(8, 15), "coast", "the bar did not come out");
+    assert!(after.walkable(8, 15, &dry), "the tide went out and is still a wall");
+    // And it took nothing else with it: it is a bar of shingle, not a coastline.
     assert_eq!(after.terrain_name(7, 15), "sea", "the whole row went out");
-    assert_eq!(after.terrain_name(9, 16), "sea", "the whole row went out");
+    assert_eq!(after.terrain_name(9, 15), "sea", "the whole row went out");
 }
 
-/// **The shore is reachable once the tide is out, and not one tile of it
-/// before.**
+/// **The shore is shut until the Reach is finished, and it is a gate that
+/// shuts it.**
 ///
-/// The reachability question asked the way M11.7's failure taught this project
-/// to ask it: not *are there tiles*, but *can a walker get to them from the
-/// door they come in through*.
+/// The crossing stands on the bar, so it is not a *hidden* place and not a
+/// refusal — it is a tile you cannot stand on until the tide is out, which is
+/// the whole of what a land bridge is. Asked the way M11.7's failure taught
+/// this project to ask it: not *are there tiles*, but *can a walker get to them
+/// from the door they come in through*.
 #[test]
-fn the_south_is_shut_until_the_reach_is_finished() {
-    let flood = |flags: &[&str]| -> usize {
+fn the_shore_is_shut_until_the_reach_is_finished() {
+    let reach = |flags: &[&str]| -> bool {
         let mut st = WorldState::default();
         st.map = TREYWAY.into();
         st.flags = flags.iter().map(|s| s.to_string()).collect();
         let w = data::map_now(TREYWAY, D, &st);
-        let a = Allowances { wade: false, level: 99 };
-        // From the door back into Bambulon, which is where a player arrives.
+        let a = Allowances { wade: true, level: 99 };
         let mut seen = std::collections::BTreeSet::new();
         let mut queue = vec![[13u8, 13u8]];
         seen.insert([13u8, 13u8]);
@@ -126,57 +132,78 @@ fn the_south_is_shut_until_the_reach_is_finished() {
                 }
             }
         }
-        seen.iter().filter(|[_, y]| *y >= 15).count()
+        seen.contains(&[8, 15])
     };
 
-    assert_eq!(flood(&[]), 0, "the shore was reachable before the tide went out");
-    let open = flood(&["built-the-tenth"]);
-    assert!(open > 100, "the tide went out onto {open} tiles, which is not a country");
+    assert!(!reach(&[]), "the bar was walkable before the tide went out");
+    assert!(reach(&["built-the-tenth"]), "the tenth cairn went up and the bar is still a wall");
+
+    // And the crossing stands on it, which is what makes the far side a map
+    // rather than a rumour.
+    let w = data::map(TREYWAY, D);
+    let bar = w.place_at(8, 15).expect("nothing on the bar");
+    assert_eq!(bar.id, "the-tide-crossing");
+    assert_eq!(bar.to.as_deref(), Some(SHORE));
+    assert!(!bar.prose.is_empty(), "you cross to another country and nothing is said");
 }
 
-/// **The Low Water is its own band, and the commonest fight in it is one you
-/// can win.**
+/// **The shore is a map, a band of its own, and it goes back where it came
+/// from.**
 ///
 /// `every_region_has_a_fight_you_can_win_and_every_boss_can_be_beaten` says the
-/// second half over every map; what is here is the first: the shore is not part
-/// of the first Treyway, which brackets twelve to sixteen, and it is not part
-/// of the Kolok Downs either.
+/// winnable half over every map; what is here is that it is *harder than the
+/// tile you cross from*, and that the way back lands on the coast rather than
+/// in the sea.
 #[test]
 fn the_shore_is_a_band_of_its_own() {
-    let w = data::map(TREYWAY, D);
-    let low = w
+    let w = data::map(SHORE, D);
+    assert_eq!((w.width, w.height), (16, 11), "the shore is not the shape it was drawn");
+    assert_eq!(w.regions.len(), 1, "the shore is one band");
+    let low = &w.regions[0];
+    assert_eq!(low.id, "the-low-water");
+
+    let first = data::map(TREYWAY, D)
         .regions
         .iter()
-        .find(|r| r.id == "the-low-water")
-        .expect("the shore has no region");
-    let first = w.regions.iter().find(|r| r.id == "the-first-treyway").expect("the door's band");
+        .find(|r| r.id == "the-first-treyway")
+        .map(|r| r.danger)
+        .expect("the door's band");
     assert!(
-        low.danger > first.danger,
-        "the shore ({}) is no harder than the tile you come in on ({})",
-        low.danger,
-        first.danger
+        low.danger > first,
+        "the shore ({}) is no harder than the coast you cross from ({first})",
+        low.danger
     );
-    // Every walkable tile of the south is in it, which is the check that would
-    // have caught a box drawn one row short.
-    for y in 17..25u8 {
-        for x in 0..16u8 {
+
+    // Every walkable tile of it is in that band — the check that would have
+    // caught a box drawn one row short.
+    for y in 0..w.height {
+        for x in 0..w.width {
             if w.passable(x, y) {
                 assert_eq!(
                     w.region_at(x, y).map(|r| r.id.as_str()),
                     Some("the-low-water"),
-                    "({x}, {y}) is walkable and is not the shore's"
+                    "({x}, {y}) is walkable and is in no band"
                 );
             }
         }
     }
+
+    // And the way back is on the bar, landing on the coast it came from.
+    let back = w.place_at(8, 1).expect("no way back over the tide");
+    assert_eq!(back.to.as_deref(), Some(TREYWAY));
+    assert_eq!(back.at_to, Some([8, 14]), "the way back lands somewhere else");
+    let t = data::map(TREYWAY, D);
+    assert_eq!(t.terrain_name(8, 14), "plain", "it lands in the sea");
+    // **Not on the bar itself.** Arriving on the gate you came through is a
+    // tile you have to step off before you can step back.
+    assert_ne!(w.start, (8, 1), "the shore starts you standing on the way off it");
 }
 
-/// **The lip of the Sump refuses the way the Reach's edge does**, and it is a
-/// stack of four rather than one map.
+/// **The lip of the Wextreen Sump is on the shore, and it is a stack of four.**
 #[test]
 fn the_lip_is_a_stack_and_it_wants_an_instrument() {
-    let w = data::map(TREYWAY, D);
-    let lip = w.place_at(7, 21).expect("nothing at the lip");
+    let w = data::map(SHORE, D);
+    let lip = w.place_at(7, 6).expect("nothing at the lip");
     assert_eq!(lip.id, "the-lip-of-the-sump");
     assert!(lip.needs_survey, "the lip opens for anybody");
     assert!(lip.to.is_none(), "the lip names one map as well as four floors");
@@ -192,10 +219,17 @@ fn the_lip_is_a_stack_and_it_wants_an_instrument() {
     st.flags.push("the-shelf-is-open".into());
     st.flags.push("cairn-9".into());
     assert_eq!(lip.opens_onto(&st), Some("the-sump-4"));
-    // **The bottom clears on the boss and the three above it on a flag**, which
-    // is what `Floor::cleared` reading both is for: three of the four floors
-    // have no boss at all.
     st.answered.push("the-ninth-surveyor".into());
     assert_eq!(lip.opens_onto(&st), None, "the Sump is finished and still has a floor in it");
     assert_eq!(lip.floors_cleared(&st), 4);
+
+    // And the way back up out of the first floor lands beside it.
+    let up = data::map("the-sump-1", D)
+        .places
+        .iter()
+        .find(|p| p.id == "the-sump-1-up")
+        .map(|p| (p.to.clone(), p.at_to))
+        .expect("the Sump's first floor has no way up");
+    assert_eq!(up.0.as_deref(), Some(SHORE));
+    assert_eq!(up.1, Some([7, 6]), "coming up out of the Sump does not put you at its lip");
 }

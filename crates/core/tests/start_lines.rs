@@ -94,12 +94,14 @@ fn write_the_start_lines() {
         "the start line does not carry an instrument, so the lip refuses it"
     );
 
-    // At the lip, one tile below it.
-    g.world.map = "the-treyway".into();
-    g.world.at = [7, 22];
-    let w = gm2d_core::data::map_now("the-treyway", D, &g.world);
-    assert!(w.passable(7, 22), "the start line stands in the sea");
-    assert!(w.passable(8, 15), "the tide has not gone out on this start line");
+    // At the lip, one tile below it, on the shore's own map.
+    g.world.map = "the-low-water".into();
+    g.world.at = [7, 7];
+    let w = gm2d_core::data::map_now("the-low-water", D, &g.world);
+    assert!(w.passable(7, 7), "the start line stands in the sea");
+    // And the bar is out, so the walk can go home the way it came.
+    let t = gm2d_core::data::map_now("the-treyway", D, &g.world);
+    assert!(t.passable(8, 15), "the tide has not gone out on this start line");
     write("at-the-lip", &g);
 
     // And the other one: at the door under the lake, which is the Silt Stair's
@@ -125,7 +127,7 @@ fn write_the_start_lines() {
 fn the_start_lines_open_and_stand_where_they_say() {
     let dir = concat!(env!("CARGO_MANIFEST_DIR"), "/../../testing/saves");
     for (name, map, at) in [
-        ("at-the-lip", "the-treyway", [7u8, 22u8]),
+        ("at-the-lip", "the-low-water", [7u8, 7u8]),
         ("under-the-lake", "under-the-lake", [6, 7]),
     ] {
         let text = std::fs::read_to_string(format!("{dir}/{name}.json")).unwrap_or_else(|e| {

@@ -783,10 +783,10 @@
       "skill_points": 19
     },
     "world": {
-      "map": "the-treyway",
+      "map": "the-low-water",
       "at": [
         7,
-        22
+        7
       ],
       "last_town": "kettleworks",
       "answered": [

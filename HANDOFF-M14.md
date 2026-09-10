@@ -223,6 +223,42 @@ Getting there found four things, and **only the first was the floor**:
 4. **The first enabled choice is a trap at a card that comes back.** The chair's
    first move has no requirement and stays live for ever.
 
+## 5b. And then the map was the wrong shape
+
+Reported from play after the block shipped, with the design call attached: the
+shore should be **its own map**, reached the same way, over the land bridge —
+because *"the resolution for the overworld looks all messed up now"*.
+
+**The report is about M14.1's map and the fault is older than the game's second
+map.** `fitMap` sizes the canvas's *backing store* to the grid and has since M8;
+`#map` pinned the *displayed* size to a 640-pixel square, so the browser scaled
+a non-square backing store to a square box on both axes independently. Every
+non-square map has been drawn at the wrong aspect ratio since the Great Gear
+Cave — nobody noticed because all of them were *wider* than they were tall, and
+a nine-by-five room stretched to a square still reads as a room.
+
+Three changes, and they are three kinds of thing:
+
+1. **The split**, which is the design call. The Treyway is 16x16 again;
+   `the-low-water` is its own file at 16x11; the bar is a **gate** on one tile
+   of `tide` rather than two tiles of the same grid. Better than it was even
+   without the rendering — a shore you cross *to* is a place, and a shore drawn
+   on the bottom of somewhere else is a suburb.
+2. **The CSS**, which is the fault underneath and which the split alone would
+   have left in place for the Cave and the map under the lake.
+3. **The shore's own ground.** It was open scrub at 140 per mille under a pool
+   whose mean rating is twelve hundred — 350 after the danger multiplier, one
+   step in three — and its pool held Cairn Chorus, which is the creature
+   `common::geared_from` loses to. `make play` crossed it twenty-eight times,
+   was beaten on twenty-seven, and never got down the hole. It has a road down
+   the middle now and the pool is four, which is what every other approach in
+   this game looks like.
+
+`wading_does_not_move_a_place_or_a_region` had to learn one thing from it:
+**ground the world opens is not ground a set opens.** The check it exists for —
+a place three players in four never find because it is behind a rule they did
+not know to build for — is untouched.
+
 ## 6. What is left
 
 **Nothing in the block.** Seven milestones, the suite green, the gate green in

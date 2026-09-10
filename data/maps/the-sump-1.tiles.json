@@ -52,10 +52,10 @@
       "kind": "gate",
       "id": "the-sump-1-up",
       "name": "the steps back up",
-      "to": "the-treyway",
+      "to": "the-low-water",
       "at_to": [
         7,
-        21
+        6
       ]
     },
     {

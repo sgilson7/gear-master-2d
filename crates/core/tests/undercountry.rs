@@ -201,15 +201,15 @@ fn the_third_town_has_no_shelves_and_says_so() {
     );
 }
 
-/// **Twelve maps became twenty, and every walkable tile of every one of them is
-/// still reachable from where you arrive.**
+/// **Twelve maps became twenty-one, and every walkable tile of every one of
+/// them is still reachable from where you arrive.**
 ///
 /// The M11.7 lesson stated over the new maps: a content block needs a
 /// reachability *measurement*, and the measurement has to name the tile it
 /// starts from.
 #[test]
-fn reachability_derives_over_twenty_maps() {
-    assert_eq!(data::MAPS.len(), 20, "the game ships {} maps", data::MAPS.len());
+fn reachability_derives_over_twenty_one_maps() {
+    assert_eq!(data::MAPS.len(), 21, "the game ships {} maps", data::MAPS.len());
     for (id, _) in data::MAPS {
         let mut opened = WorldState::default();
         opened.map = (*id).to_string();

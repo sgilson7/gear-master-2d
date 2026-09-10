@@ -28,13 +28,16 @@ fn the_treyway_is_its_own_map() {
     assert_eq!(w.id, TREYWAY, "the file's id is not the id it is filed under");
     let over = data::world(D);
     assert_ne!((w.width, w.height), (over.width, over.height), "the same map twice");
-    // **Sixteen by twenty-six since M14.1.** The south is drawn in this file
-    // rather than in a second one, because the note at the top of the map
-    // already says West Bambulon is a tile of it and two files would be two
-    // places to keep identical. Rows 0 to 14 did not move, which is what
-    // `no_gate_into_the_treyway_moved` is for.
-    assert_eq!((w.width, w.height), (16, 26));
-    assert_eq!(w.regions.len(), 4, "three bands, easiest at the door, and the shore below them");
+    // **Sixteen by sixteen, and it went to twenty-six and came back.** M14.1
+    // drew the south into this file on the *one country, one file* principle,
+    // which is the right instinct and was the wrong call: `#map` had been a
+    // fixed square in CSS since the first map, so a grid half again as tall as
+    // it is wide came out squashed. Reported from play. The shore is
+    // `the-low-water` now and is reached the way it always was, over a bar of
+    // shingle the tide leaves at column 8 — what changed is that the bar is a
+    // **gate** rather than two tiles of the same grid.
+    assert_eq!((w.width, w.height), (16, 16));
+    assert_eq!(w.regions.len(), 3, "three bands, easiest at the door");
 }
 
 /// **Its own terrain vocabulary, and the sea is not the lake.**

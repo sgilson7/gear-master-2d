@@ -38,6 +38,15 @@ pub const STACK_1_JSON: &str = include_str!("../../../data/maps/the-drambus-stac
 pub const UNDER_LAKE_JSON: &str = include_str!("../../../data/maps/under-the-lake.tiles.json");
 /// The surveyable map. Static, authored, and read through whatever you carried.
 pub const REACH_JSON: &str = include_str!("../../../data/maps/the-reach.tiles.json");
+/// The Treyway's south, over a bar of shingle the tide leaves.
+///
+/// **Its own file, and it was not.** The shore was drawn into the Treyway at
+/// sixteen by twenty-six on the *one country, one file* principle, which is the
+/// right instinct and was the wrong call: `#map` had been a fixed square in CSS
+/// since the first map, so a grid half again as tall as it is wide came out
+/// squashed. Reported from play as *"the resolution for the overworld looks all
+/// messed up"*.
+pub const LOW_WATER_JSON: &str = include_str!("../../../data/maps/the-low-water.tiles.json");
 /// The Wextreen Sump, top down. Four floors, a puzzle each, and **not** one
 /// sitting: the Stack's budget is fatigue and this one's is what you brought,
 /// so every floor has a stair back up and none of them names an `outside`.
@@ -84,6 +93,7 @@ pub const FILES: &[(&str, &str)] = &[
     ("maps/the-drambus-stack-1.tiles.json", STACK_1_JSON),
     ("maps/under-the-lake.tiles.json", UNDER_LAKE_JSON),
     ("maps/the-reach.tiles.json", REACH_JSON),
+    ("maps/the-low-water.tiles.json", LOW_WATER_JSON),
     ("maps/the-sump-1.tiles.json", SUMP_1_JSON),
     ("maps/the-sump-2.tiles.json", SUMP_2_JSON),
     ("maps/the-sump-3.tiles.json", SUMP_3_JSON),
@@ -125,6 +135,7 @@ pub const MAPS: &[(&str, &str)] = &[
     ("the-drambus-stack-1", STACK_1_JSON),
     ("under-the-lake", UNDER_LAKE_JSON),
     ("the-reach", REACH_JSON),
+    ("the-low-water", LOW_WATER_JSON),
     ("the-sump-1", SUMP_1_JSON),
     ("the-sump-2", SUMP_2_JSON),
     ("the-sump-3", SUMP_3_JSON),

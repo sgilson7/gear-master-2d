@@ -1,11 +1,11 @@
 [1m==>[0m Building gm2d-wasm for wasm32-unknown-unknown
-    Finished `release` profile [optimized] target(s) in 0.01s
+    Finished `release` profile [optimized] target(s) in 0.07s
 [1m==>[0m Assembling /Users/samgilson/Documents/GearMaster2D/dist/web
 [1m==>[0m Generating JS bindings
 [1m==>[0m Stamping build version
-[1m==>[0m Done: /Users/samgilson/Documents/GearMaster2D/dist/web (build 97cf07b2)
+[1m==>[0m Done: /Users/samgilson/Documents/GearMaster2D/dist/web (build 709cba5a)
     2.7M	/Users/samgilson/Documents/GearMaster2D/dist/web
-    wasm: 1668 KB
+    wasm: 1671 KB
   started from testing/saves/under-the-lake.json
 
 --- a walk in progress --------------------------------------------------
@@ -41,9 +41,6 @@
         An empty room with a kitchen chair in the middle of it, and the chair is facing away from the door in the nort
         chose: Turn it to face the door
         Nothing you could point to
-
---- back up -------------------------------------------------------------
-  level 20 · 5,6 in The Chair Room · 20000 Fnorp · carrying 26 · worn 0% · Showstopper
   card: THE CHAIR
         An empty room with a kitchen chair in the middle of it, and the chair is facing away from the door in the nort
         chose: Count to four
@@ -126,7 +123,7 @@
          4% more tired. 44% of you is missing until you take something for it.
 
 --- back up -------------------------------------------------------------
-  level 20 · 4,4 in The Bottom of the Bottom · 23201 Fnorp · carrying 3282 · worn 44% · Showstopper
+  level 20 · 6,4 in The Bottom of the Bottom · 23201 Fnorp · carrying 3282 · worn 44% · Showstopper
   fight: The Morning Rush (rates 1496) with 21 items -> It stops moving
          +284 Fnorp
          +299 experience, carried
@@ -1311,7 +1308,7 @@ DID NOT CROSS AND COME BACK in 8000 steps. level 20 · 7,3 in The Great Gear Cav
   read on the Treyway: ['the-wextreen-reach']
   floors of the Drambus Stack down: 5 of 5
   the thing under the lake: beaten
-  (5247 of 8000 presses actually moved)
+  (5245 of 8000 presses actually moved)
 
 --- what happened -------------------------------------------------------
   204 wins, 0 losses

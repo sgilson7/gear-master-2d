@@ -104,7 +104,24 @@ main.wide { max-width: 1120px; }
 .board { display: grid; grid-template-columns: 640px minmax(240px, 1fr);
   gap: 28px; align-items: start; margin: 28px 0 8px; }
 .mapwrap { border: 1px solid var(--line); line-height: 0; }
-#map { display: block; width: 640px; height: 640px; image-rendering: pixelated; }
+/* **The canvas keeps the map's shape.**
+   `fitMap` has sized the *backing store* to the map since M8 — twenty by twenty
+   is 640 by 640 and the Cave's nine by five is 288 by 160 — and this pinned the
+   *displayed* size to a square, so every map that is not square has been drawn
+   at the wrong aspect ratio for as long as there has been a second map. Nobody
+   noticed while the non-square ones were wider than they were tall: a room
+   stretched to a square still reads as a room.
+
+   M14 drew a country half again as tall as it is wide and it came out crushed,
+   which is what the report was: *"the resolution for the overworld looks all
+   messed up"*. The shore is its own map now — that is the design call — and
+   **this is the fault underneath it**, which the split alone would have left in
+   place for the Cave and the map under the lake.
+
+   `height: auto` on a replaced element takes the ratio from the backing store,
+   so the width still fills the column and the shape is the map's. */
+#map { display: block; width: 100%; max-width: 640px; height: auto;
+       image-rendering: pixelated; }
 #map:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
 aside { display: flex; flex-direction: column; gap: 20px; }
 .panel { background: var(--surface); border: 1px solid var(--line); padding: 18px 20px; }
@@ -151,7 +168,9 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
 @media (max-width: 1040px) {
   .board { grid-template-columns: 1fr; }
   .mapwrap { max-width: 640px; }
-  #map { width: 100%; height: auto; aspect-ratio: 1; }
+  /* No `aspect-ratio` here either — see the rule above. The narrow layout was
+     forcing the same square on the same maps. */
+  #map { width: 100%; height: auto; }
 }
 
 /* --- M3: the fight screen ---------------------------------------------- */

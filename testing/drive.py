@@ -1987,17 +1987,20 @@ def plant(page, base_path, edit, stem="probe"):
 
 
 def check_the_tide_is_drawn_before_it_goes_out(page, name, fails, base):
-    """**The far side of the water is on the page from the first visit.**
+    """**The bar of shingle is on the page from the first visit, and it is a
+    wall until the tenth cairn goes up.**
 
-    Two tiles at column 8, rows 15 and 16, drawn `tide`: sea-coloured,
-    impassable, and drained to coast when the tenth cairn goes up. A player
-    standing at row 14 has been able to see the country below the whole time,
-    which is what makes finishing the Reach a thing you go and do rather than a
-    thing you find out about.
+    One tile at column 8 on the Treyway's last row. A player standing at the
+    coast has been able to see it the whole time, which is what makes finishing
+    the Reach a thing you go and do rather than a thing you find out about.
 
-    Only a browser can say the tiles are **drawn**. `cargo test` can say what
-    terrain they are and does; what it cannot say is whether the page put
-    anything on the canvas where they are.
+    Only a browser can say the tile is **drawn**. `cargo test` can say what
+    terrain it is and does; what it cannot say is whether the page put anything
+    on the canvas where it is — and **whether the canvas is the shape of the
+    map**, which it was not: `#map` was pinned to a 640-pixel square in CSS
+    while `fitMap` sized the backing store to the grid, so every map that is not
+    square has been drawn at the wrong aspect ratio since there was a second
+    map.
     """
     def on_the_coast(body, built):
         strip_the_boards(body)
@@ -2011,23 +2014,28 @@ def check_the_tide_is_drawn_before_it_goes_out(page, name, fails, base):
 
     plant(page, base, lambda b: on_the_coast(b, False), stem="tide-in")
     shape = page.evaluate("() => { const w = window.__world(); return [w.width, w.height]; }")
-    if shape != [16, 26]:
-        fails.append(f"{name}: the Treyway came back {shape[0]}x{shape[1]} on the coast")
-    # The page holds the terrain of every tile; the tide is two of them and the
-    # sea either side of it is not the same thing.
-    # `world_json` sends `rows[y][x]` as the terrain's **name**, once per tile,
-    # because the page draws hue and motif off it. So the page is asked what it
-    # is holding rather than what it painted, which is the closest a check can
-    # get to "is it on the canvas" without reading pixels — and it is the same
-    # payload the canvas draws from.
-    read = page.evaluate("""() => {
-        const r = window.__world().rows;
-        return { tide: [r[15][8], r[16][8]], sea: [r[15][7], r[16][9]] };
+    if shape != [16, 16]:
+        fails.append(f"{name}: the Treyway came back {shape[0]}x{shape[1]}")
+
+    # **The canvas is the shape of the map.** Both of these were 640 before the
+    # split, on a map that is not square, and the page was drawing every tile
+    # 1.25 times too wide and 0.77 times too tall.
+    box = page.evaluate("""() => {
+        const c = document.getElementById('map');
+        const r = c.getBoundingClientRect();
+        return { w: c.width, h: c.height, cw: Math.round(r.width), ch: Math.round(r.height) };
     }""")
-    if read["tide"] != ["tide", "tide"]:
-        fails.append(f"{name}: the tide is drawn {read['tide']!r} before it goes out")
-    if read["sea"] != ["sea", "sea"]:
-        fails.append(f"{name}: the water either side of the tide is {read['sea']!r}")
+    want = box["w"] / box["h"]
+    got = box["cw"] / max(box["ch"], 1)
+    if abs(want - got) > 0.02:
+        fails.append(f"{name}: the map's backing store is {box['w']}x{box['h']} and the "
+                     f"canvas is drawn {box['cw']}x{box['ch']}, which is a different shape")
+
+    read = page.evaluate("() => window.__world().rows[15][8]")
+    if read != "tide":
+        fails.append(f"{name}: the bar is drawn {read!r} before the tide goes out")
+    if page.evaluate("() => window.__world().rows[15][7]") != "sea":
+        fails.append(f"{name}: the water beside the bar is not sea")
     # And you cannot walk onto it.
     page.keyboard.press("ArrowDown")
     page.wait_for_timeout(300)
@@ -2037,18 +2045,34 @@ def check_the_tide_is_drawn_before_it_goes_out(page, name, fails, base):
         fails.append(f"{name}: the tide was out before the tenth cairn: "
                      f"{page.text_content('#coords')!r}")
 
+    # --- and the tenth cairn takes it out, onto a map of its own --------------
     plant(page, base, lambda b: on_the_coast(b, True), stem="tide-out")
-    read = page.evaluate("() => { const r = window.__world().rows; return [r[15][8], r[16][8]]; }")
-    if read != ["coast", "coast"]:
-        fails.append(f"{name}: the tenth cairn went up and the tide is still {read!r}")
+    if page.evaluate("() => window.__world().rows[15][8]") != "coast":
+        fails.append(f"{name}: the tenth cairn went up and the bar is still tide")
     page.keyboard.press("ArrowDown")
-    page.wait_for_timeout(300)
+    page.wait_for_timeout(400)
     dismiss_card(page)
     close_fight(page)
-    if page.text_content("#coords").strip() != "8, 15":
-        fails.append(f"{name}: the tide went out and is still a wall: "
-                     f"{page.text_content('#coords')!r}")
-    print("ok: the tide is drawn before it goes out, and walkable after")
+    where = page.evaluate("() => window.__world().id")
+    if where != "the-low-water":
+        fails.append(f"{name}: walked onto the bar and arrived on {where!r}")
+    else:
+        shape = page.evaluate("() => { const w = window.__world(); return [w.width, w.height]; }")
+        if shape != [16, 11]:
+            fails.append(f"{name}: the shore came back {shape[0]}x{shape[1]}")
+        # The same question on a map that is *not* square, which is the one the
+        # old CSS got wrong.
+        box = page.evaluate("""() => {
+            const c = document.getElementById('map');
+            const r = c.getBoundingClientRect();
+            return { w: c.width, h: c.height, cw: Math.round(r.width), ch: Math.round(r.height) };
+        }""")
+        want = box["w"] / box["h"]
+        got = box["cw"] / max(box["ch"], 1)
+        if abs(want - got) > 0.02:
+            fails.append(f"{name}: the shore's canvas is {box['cw']}x{box['ch']} for a "
+                         f"{box['w']}x{box['h']} grid, which is a different shape")
+    print("ok: the tide is drawn before it goes out, and the bar crosses to a map of its own")
 
 
 def check_the_sump_refuses_without_an_instrument(page, name, fails, base):
@@ -2069,22 +2093,22 @@ def check_the_sump_refuses_without_an_instrument(page, name, fails, base):
         if instrument:
             seat_a_set(body, instrument, "instrument")
         w = body.setdefault("world", {})
-        w["map"] = "the-treyway"
-        w["at"] = [7, 22]
+        w["map"] = "the-low-water"
+        w["at"] = [7, 7]
         w["flags"] = list(w.get("flags", [])) + ["built-the-tenth"]
 
     plant(page, base, lambda b: at_the_lip(b), stem="sump-bare")
     dismiss_card(page)
     close_fight(page)
     where = page.evaluate("() => [window.__world().id, document.getElementById('coords').textContent]")
-    if where[0] != "the-treyway" or where[1].strip() != "7, 22":
+    if where[0] != "the-low-water" or where[1].strip() != "7, 7":
         fails.append(f"{name}: planted below the lip and came up at {where!r}")
         return
     page.keyboard.press("ArrowUp")
     page.wait_for_timeout(500)
     dismiss_card(page)
     close_fight(page)
-    if page.evaluate("() => window.__world().id") != "the-treyway":
+    if page.evaluate("() => window.__world().id") != "the-low-water":
         fails.append(f"{name}: a bare board walked into the Sump")
     # **The refusal is a screen and not a line on the strip**, the same as the
     # Reach's — `openKit(wants_instrument, shut)` takes the sentence with it —
@@ -2560,10 +2584,13 @@ def check_the_door_opens_on_the_treyway(page, name, fails):
     # A different map: its own size, its own ground, its own regions.
     shape = page.evaluate("() => { const w = window.__world(); "
                           "return [w.width, w.height, (w.places||[]).length]; }")
-    # **Sixteen by twenty-six since M14.1**, and the number is pinned rather
-    # than loosened: the point of this line is that the page is drawing a
-    # *different* map from the one it came off, and a range would stop saying so.
-    if shape[0] != 16 or shape[1] != 26:
+    # **Sixteen by sixteen, and it went to twenty-six and came back.** M14.1
+    # drew the shore into this map and M14.9 split it out again — `#map` had
+    # been a fixed square in CSS since the first map, so a grid half again as
+    # tall as it is wide came out squashed. The number is pinned rather than
+    # loosened: the point of this line is that the page is drawing a *different*
+    # map from the one it came off, and a range would stop saying so.
+    if shape[0] != 16 or shape[1] != 16:
         fails.append(f"{name}: the Treyway came back {shape[0]}x{shape[1]}")
     here = page.text_content("#region") or ""
     if "Bambulon" in here or not here.strip():

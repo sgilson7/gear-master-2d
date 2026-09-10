@@ -401,3 +401,40 @@ which is the whole of what makes its transcript worth reading. **Not a plant**:
 `crates/core/tests/start_lines.rs` out of `common::geared_from`, and
 `the_start_lines_open_and_stand_where_they_say` is what stops them going stale
 the way a checked-in save silently does.
+
+---
+
+## 27. A country half again as tall as it is wide, and a fixed square in CSS
+
+Reported from play after the block shipped: *"the resolution for the overworld
+looks all messed up now"*, with the design call attached — the shore should be
+its own map, reached the same way, over the land bridge.
+
+**The report is about M14.1's map and the fault is older than the game's second
+map.** `fitMap` sizes the canvas's *backing store* to the grid and has since M8;
+`#map` pinned the *displayed* size to a 640-pixel square, so the browser scaled
+a non-square backing store to a square box on both axes independently.
+
+**Every non-square map has been drawn at the wrong aspect ratio since the Great
+Gear Cave.** Nobody noticed because all of them were *wider* than they were
+tall — a nine-by-five room stretched to a square still reads as a room. Sixteen
+by twenty-six is 1.25× across and 0.77× down, and that reads as broken.
+
+Two fixes and they are different kinds:
+
+- **The split is the design call.** The Treyway is 16×16 again, `the-low-water`
+  is its own file at 16×11, and the bar of shingle is a **gate** on one tile of
+  `tide` rather than two tiles of the same grid. That is better than it was even
+  without the rendering: a shore you cross *to* is a place, and a shore drawn on
+  the bottom of somewhere else is a suburb.
+- **The CSS is the fault underneath**, and the split alone would have left it in
+  place for the Cave and the map under the lake.
+
+**The lesson is the one this file keeps writing down from a different angle:**
+`fitMap`'s comment argued the backing store carefully and correctly, and the
+line that undid it was three properties away in another file. *A rule with two
+homes is a rule with two answers* — and a canvas has two sizes.
+
+`check_the_tide_is_drawn_before_it_goes_out` measures the shape now, on a square
+map and on one that is not, because **only a browser can say what shape a canvas
+came out.**

@@ -344,9 +344,14 @@ which is this repository's answer to *the board a player actually has*.
 
     GM2D_FROM=testing/saves/at-the-lip.json make play
 
+**Both were re-walked after the shore was split off the Treyway**, so the
+transcripts describe the layout that ships: the bar of shingle, its own map, and
+the road down the middle of it.
+
 ### `m14-the-sump.txt` — four floors, three puzzles, three different routes
 
-The tide is out, the lip opens for a compass, and then:
+The bar of shingle is out, the walk crosses it onto the shore, takes the road
+down the middle to the lip, and the lip opens for a compass. Then:
 
 - **The Lip.** Turned wheel C and paid a Morning-Rush Mold for it — the wheel
   that is not needed, which is the tax on not looking. Was refused at the wheel
@@ -387,3 +392,15 @@ forty-four card reads saved.
    like standing on nothing.
 4. **The first enabled choice is a trap at a card that comes back.** The chair's
    first move has no requirement and stays live for ever.
+
+### And a fifth, after the shore became its own map
+
+**An approach is not a battlefield.** The shore was drawn as open scrub at 140
+per mille under a pool whose mean rating is twelve hundred — 350 after the
+danger multiplier, one step in three — and its pool held Cairn Chorus, which is
+the one creature `common::geared_from` loses to. The walk crossed it **twenty-
+eight times, was beaten on twenty-seven, and never once got down the hole.**
+
+A road down the middle and a pool of four fixed it: zero losses, and the walk
+takes all four floors. Every other approach in this game is a road; this is the
+first one that was not, and it is four tiles long.

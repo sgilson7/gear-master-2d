@@ -877,11 +877,11 @@ the door to hand in. What it must not do is pretend there is more.
 ## Twenty maps, and where they live
 
 M11 took the map count from two to eleven, and the first thing it had to do was
-move the two. **M14 took it to twenty** and had to move nothing, which is the
-return on that: nine new files in the same directory, nine lines in
-`data::MAPS`, and the only map that changed shape is the Treyway, which grew a
-south **in its own file** — one country, one file, for the reason there were not
-two of it in the first place. `data/tiles.json` and `data/dungeon.json` are
+move the two. **M14 took it to twenty-one** and had to move nothing, which is
+the return on that: ten new files in the same directory, ten lines in
+`data::MAPS`, and **no map changed shape.** The Treyway grew a south in its own
+file — one country, one file — and then gave it back, for a reason that is not
+about content at all: see *A country half again as tall as it is wide*. `data/tiles.json` and `data/dungeon.json` are
 `data/maps/west-bambulon.tiles.json` and
 `data/maps/the-great-gear-cave.tiles.json`; every map is one file in one
 directory named for the id it registers under, and `data::MAPS` is still the
@@ -897,6 +897,7 @@ the rename was cheaper before the nine than after.
 | **the-drambus-stack-5 … -1** | 10×10 each | five floors, one boss each, one sitting each |
 | **under-the-lake** | 13×9 | what the lake was on top of, and the door the demo ends at |
 | **the-reach** | 20×20 | the same map every time; what changes is the instrument |
+| **the-low-water** | 16×11 | the Treyway's south, over a bar of shingle the tide leaves |
 | **the-sump-1 … -4** | 12×12 each | the Wextreen Sump: three puzzles and the Ninth Surveyor |
 | **the-silt-stair-1 … -4** | 12×12 each | the Silt Stair: three puzzles and what Marbulon faced away from |
 | **the-undercountry** | 20×20 | the country under the country, and one town with nothing in it |
@@ -1026,6 +1027,57 @@ there is a ring of cut stone in the middle of it with a grating in it.
 - **`walkable` widened and nothing had to be re-derived**, because
   `an_allowance_never_shuts_anything` has held over every tile of every map
   since M9.2. An allowance that only ever adds is an allowance you can widen.
+
+## A country half again as tall as it is wide
+
+Reported from play, and the whole of it is one line of CSS that predates the
+block:
+
+> *the bottom map in the overworld should be a separate map, accessible in the
+> same way as currently via a little land bridge, but not all rendered in the
+> same map, cause the resolution for the overworld looks all messed up now*
+
+**`fitMap` sizes the canvas's backing store to the map** — twenty by twenty is
+640 by 640, the Cave's nine by five is 288 by 160 — and its own comment says
+why: *"a canvas pinned to the larger left the cave floating in a screen of
+nothing."* That has been right since M8. What was wrong is the line under it:
+`#map { width: 640px; height: 640px }`, a **fixed square in CSS**, so the
+browser scaled a non-square backing store to a square box on both axes
+independently.
+
+**Every map that is not square has therefore been drawn at the wrong aspect
+ratio for as long as there has been a second map.** Nobody noticed because all
+of them were *wider* than they were tall — a room stretched to a square still
+reads as a room. M14.1 drew a country sixteen by twenty-six, which is scaled
+1.25× across and 0.77× down, and it came out crushed.
+
+Two things came out of it and they are different kinds of thing.
+
+**The split is the design call, and it is the human's.** The Treyway is sixteen
+by sixteen again and the shore is `the-low-water`, its own file at sixteen by
+eleven. *One country, one file* is still the right instinct — it is why West
+Bambulon and the Treyway share a note and why the lake is one map read twice —
+and it is not a rule that beats a map you cannot look at.
+
+**The bar is a gate now, and it was two tiles of the same grid.** One tile of
+`tide` at column 8 on the Treyway's last row, drawn from the first visit,
+impassable, and `coast` once the tenth cairn goes up on the Reach. The crossing
+stands on it — so the shore is not behind a *hidden* place and not behind a
+refusal; it is behind a tile you cannot stand on yet, which is what a land
+bridge is. `wading_does_not_move_a_place_or_a_region` had to learn the
+difference: **ground the world opens is not ground a set opens**, and the check
+it exists for — a place three players in four never find because it is behind a
+rule they did not know to build for — is untouched.
+
+**The CSS is the fault underneath, and the split alone would have left it.**
+`width: 100%; max-width: 640px; height: auto` takes the ratio from the backing
+store, so the Cave is a wide short room rather than a stretched square and the
+map under the lake stops being taller than it is. `check_the_tide_is_drawn_
+before_it_goes_out` measures it on both sides of the crossing — the backing
+store against the drawn rectangle, on a square map and on one that is not —
+because **only a browser can say what shape a canvas came out.** Negative-tested
+by putting the square back: *"the shore's canvas is 640x640 for a 512x352 grid,
+which is a different shape."*
 
 ## Down twice, and the country under the country
 
@@ -4164,6 +4216,8 @@ about a string. Every one caught something on its first run:
 | 14.6 | **The stop-line is on a `Door`, not on the town.** §1.5 says the third town's prose says the writing stops here; a `TownShelf` is an id, a stock list and a commission list and has never had prose. So it is on the one kind the game already has for a screen that is not a loop, one tile south of the counter — which also gives `PlaceKind::Door` back the user M14.3 took off it when the door under the lake became a gate. | `data/maps/the-undercountry.tiles.json` |
 | 14.7 | **Marbulon's third answer is the gate's own paragraph, not a third choice on her card.** §6 asks for the choice; her event is spent the moment you take either of her errands, and her errands are the questline that unlocks the Cave — so a third choice on it is a choice nobody can reach. | `data/maps/west-bambulon.tiles.json`, `the-door-in-the-shallows` |
 | 14.8 | **`the_ninth_surveyor_is_a_fight_the_board_wins`**, not `..._beatable_by_the_walker_at_22`. A level-22 board is not one this game produces — the shipped transcript ends at fourteen — and `common::geared_from` is what M11.7 established as *the board a player actually has*. **Both bosses were dressed by damage a second and not by rating**, which is what §4.4 asks for and which the recon justifies: that board beats Francis at 2958 and loses to Cairn Chorus at 1141. | `crates/core/tests/sump.rs` |
+| 14.10 | **The Treyway's south is its own map, and for one milestone it was not.** M14.1 drew it into `the-treyway.tiles.json` at 16x26 on the *one country, one file* principle — the right instinct, and the wrong call for a reason that is not about content: **`#map` has been a fixed square in CSS since the first map**, so a grid half again as tall as it is wide came out squashed. Reported from play. `the-low-water` is 16x11, and the bar of shingle the tide leaves is a **gate** on one tile of `tide` rather than two tiles of the same grid. The CSS is fixed too, because the split alone would have left every non-square map — the Cave, the map under the lake — still stretched. | `data/maps/the-low-water.tiles.json`, `web/styles.css` |
+| 14.11 | **The shore has a road down it and no Cairn Chorus in its pool.** Open scrub at 140 per mille under a pool of mean rating twelve hundred is 350 after the danger multiplier — one step in three — and `common::geared_from` loses to Cairn Chorus at 1141. `make play` crossed the shore twenty-eight times, was beaten on twenty-seven, and never once got down the hole. **A shore you cannot cross is a dungeon gated behind a draw**, and every other approach in this game is a road. | `data/maps/the-low-water.tiles.json` |
 | 14.9 | **The wading shortcut on the Gallery is drawn, and saves eight tiles.** §9 decision 4 leaves it to the recon — *"if it saves nothing it is cut"*. The chains are in opposite walls, so a flooded gallery is seventeen tiles round and nine across. **Flooding the room makes the walk worse**, which is the design rather than an accident: chain A costs you the crossing you had and the Toad's Own Frame is what gives it back. | `data/maps/the-silt-stair-3.tiles.json` |
 
 Also true, and not in the brief because it could not have been:
@@ -4311,7 +4365,7 @@ content*, and one check now measures what a range used to guess at.
 | `crates/core` | **~49k lines**, down from ~50k at the fork and up 1.5k over M14 — `wc -l` over every `.rs` under `crates/core/src`. The method is named because the figure carried here through M12.6 was 42.4k while the code had moved under it |
 | wasm | **1660 KB**, up from 1539 KB at M13 — `dist/web/pkg/gm2d_wasm_bg.wasm` after `make web`. CI builds its own and the two are not bit-identical, which is why the *stamp* is checked against itself and never against a number |
 | Save format | v1. **No seam, still, and M14 adds no field at all** — nine maps, eight floors, two creatures, two terrains and four new `Requirement`/`Outcome` arms, and not one of them is in the save: a map is content, an event's shape is content, and what a run has done was already `answered` and `flags`. Every save that opened on M11 opens on this. Before it: **M13 is the first block to take a field *out*.** Five new `Character` fields, every one `#[serde(default)]` and skipped when empty — `second_class`, `expert`, `second_paper`, `fast_wins`, `told_curses` — so an older file opens as one class with no paper and nothing following it out of the last fight, which is what those characters had. **`assembly_pct` is gone from the file**: it was written and then thrown away on the way in, and *a number that is stored and ignored is a number somebody will one day believe*. A save now carries **six boards**; one naming five gets an instrument frame at the base height, and `repair_boards` lifts an old build's instrument out of the weapon grid on the way in — the loader is where a field carried across a build change is caught. `banked`, `commissions`, `rolled_barrel`, `rolled_ledgers`, `rerolls` and `bought_licence` all default the same way |
-| Maps | **20**, in `data/maps/*.tiles.json` — west-bambulon 20×20, the-great-gear-cave 9×5, **the-treyway 16×26**, kettleworks-field 20×20, five Drambus Stack floors 10×10, under-the-lake 13×9, the-reach 20×20, **four Wextreen Sump floors 12×12, four Silt Stair floors 12×12, the-undercountry 20×20** |
+| Maps | **21**, in `data/maps/*.tiles.json` — west-bambulon 20×20, the-great-gear-cave 9×5, the-treyway 16×16, kettleworks-field 20×20, five Drambus Stack floors 10×10, under-the-lake 13×9, the-reach 20×20, **the-low-water 16×11, four Wextreen Sump floors 12×12, four Silt Stair floors 12×12, the-undercountry 20×20** |
 | Places | **129 over twenty maps**: 3 towns, 80 events, 33 gates, 9 bosses, 2 crossings, 1 bench, **1 door** — 41 of the events are the Kettleworks field alone, and the one door is the last screen in the game, on the Undercountry |
 | Events | **80 placed: 64 ask something and 16 are notes, over 102 choices.** **21 chains from 10 roots**, every root choice handing over an errand. **One of the eighty repeats** — the chair at the bottom of the Silt Stair, which is three moves at one object and the only event in the game that is not spent when it is answered |
 | `PlaceKind` | 7: town, event, gate, boss, door, crossing, bench — **unchanged**; the Stack is `PlaceDef::floors` on a gate, not an eighth kind |

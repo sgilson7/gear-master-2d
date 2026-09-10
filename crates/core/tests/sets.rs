@@ -439,8 +439,19 @@ fn wading_does_not_move_a_place_or_a_region() {
                 assert_eq!(w.terrain_name(p.at[0], p.at[1]), "water");
                 continue;
             }
+            // **And ground the *world* opens is not ground a set opens.** The
+            // tide crossing stands on a bar of shingle that is `tide` until the
+            // tenth cairn goes up on the Reach and `coast` after it. That is
+            // the world changing rather than the player's kit, so it is not the
+            // thing this check is about — what it is about is a place three
+            // players in four never find because it is behind a rule they did
+            // not know to build for.
+            let here = w.terrain_name(p.at[0], p.at[1]);
+            let world_opens_it = w.drains.iter().any(|d| {
+                d.from == here && w.terrain_named(&d.to).is_some_and(|t| t.passable)
+            });
             assert!(
-                w.passable(p.at[0], p.at[1]),
+                w.passable(p.at[0], p.at[1]) || world_opens_it,
                 "{}: {} stands on ground that only a waded set could reach",
                 id,
                 p.id

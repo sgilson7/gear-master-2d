@@ -226,7 +226,7 @@ REBASELINE_GOLDEN_COMBAT=1 cargo test -p gm2d-core
   something, seventy-three choices, and **ten of them are chain roots** whose
   every branch opens a different errand. Before M12.5 nine asked anything at
   all and forty-one were prose that paid nothing.
-- **Twenty maps and three towns.** West Bambulon is where you start; the Great
+- **Twenty-one maps and three towns.** West Bambulon is where you start; the Great
   Gear Cave is a short dungeon behind a gate that wants Marbulon's key, and its
   boss drops the key to **a door in the western wall**. Behind that door is
   **the Treyway**, a 16×16 country of which West Bambulon is one tile, and the
@@ -442,12 +442,13 @@ quest log. `git log origin/main..HEAD` is the check and it costs nothing.
 
 ### Six things M11 established, so you do not re-derive them
 
-1. **Twenty maps live in `data/maps/`, one file per id.** `data/tiles.json` and
+1. **Twenty-one maps live in `data/maps/`, one file per id.** `data/tiles.json` and
    `data/dungeon.json` are gone as names; two maps could be two nouns in a data
-   directory and eleven cannot. **M14 took it to twenty and had to move
-   nothing**, which is the return on having done it: nine new files, nine lines
-   in `data::MAPS`, and the only map that changed shape is the Treyway, which
-   grew a south *in its own file*.
+   directory and eleven cannot. **M14 took it to twenty-one and had to
+   move nothing**, which is the return on having done it: ten new files, ten
+   lines in `data::MAPS`, and no map changed shape — the Treyway grew a south in
+   its own file and then gave it back, because `#map` was a fixed square in CSS
+   and a country half again as tall as it is wide came out squashed.
 2. **`data::map_at` is the file and `data::map_now` is the game** — the same
    split `place_at` and `place_now` made. A lake that is water until a tower
    falls is `TilesData::drains`, not a second map file and not a grid in the

@@ -1,0 +1,110 @@
+{
+  "format": "gm2d-tiles",
+  "version": 1,
+  "id": "the-low-water",
+  "_note": "The Treyway's south, and **its own file since the shore was split off it.** It was drawn into `the-treyway.tiles.json` at sixteen by twenty-six — *one country, one file*, which is the right instinct and was the wrong call here: `#map` has been a fixed square in CSS since the first map, so a grid half again as tall as it is wide came out squashed. The shore is reached the way it always was, over a bar of shingle the tide leaves at column 8; what changed is that the bar is a **gate** rather than two tiles of the same grid. **A road down the middle of it, and no Cairn Chorus in the pool.** The shore is an approach and it was drawn like a battlefield: `make play` crossed it twenty-eight times, was beaten twenty-seven, and never got down the hole.",
+  "width": 16,
+  "height": 11,
+  "start": [
+    8,
+    2
+  ],
+  "rows": [
+    "SSSSSSSSSSSSSSSS",
+    "SSSSSSSS=SSSSSSS",
+    "S:::::::=::::::S",
+    "S:--,,,,=,,,--:S",
+    "S:-,,%%,=,%%,,-S",
+    "S:-,,%,,=,,%,,-S",
+    "S:-,,,,,=,,,,,-S",
+    "S:-,%,,,,,,,%,-S",
+    "S:--,,%%%%%,,--S",
+    "S::,,,,,,,,,,::S",
+    "SSSSSSSSSSSSSSSS"
+  ],
+  "regions": [
+    {
+      "id": "the-low-water",
+      "name": "The Low Water",
+      "bounds": [
+        [
+          0,
+          0,
+          15,
+          10
+        ]
+      ],
+      "enemies": [
+        "Iron Abbot",
+        "Obsidian Colossus",
+        "Rimefather",
+        "The Rust Parliament"
+      ]
+    }
+  ],
+  "places": [
+    {
+      "at": [
+        8,
+        1
+      ],
+      "kind": "gate",
+      "id": "the-way-back-over-the-tide",
+      "name": "the way back over the tide",
+      "to": "the-treyway",
+      "at_to": [
+        8,
+        14
+      ]
+    },
+    {
+      "at": [
+        3,
+        4
+      ],
+      "kind": "event",
+      "id": "the-ninth-clipboard"
+    },
+    {
+      "at": [
+        13,
+        7
+      ],
+      "kind": "event",
+      "id": "the-low-water-mark"
+    },
+    {
+      "at": [
+        7,
+        6
+      ],
+      "kind": "gate",
+      "id": "the-lip-of-the-sump",
+      "name": "the lip of the Wextreen Sump",
+      "needs_survey": true,
+      "shut": "The ground stops and keeps going. There is a hole in it eleven feet across with nine sets of initials cut round the rim, and what is down it will not hold still long enough to be a shape; you have nothing to read it with and it has nothing to say.",
+      "prose": [
+        "Whatever you are carrying settles, and the hole acquires a floor, and then three more under that.",
+        "Somebody has cut steps. They are cut for going down and not for coming back, which is a thing you can tell by looking at them."
+      ],
+      "floors": [
+        {
+          "map": "the-sump-1",
+          "cleared": "sluice-b"
+        },
+        {
+          "map": "the-sump-2",
+          "cleared": "the-shelf-is-open"
+        },
+        {
+          "map": "the-sump-3",
+          "cleared": "cairn-9"
+        },
+        {
+          "map": "the-sump-4",
+          "cleared": "the-ninth-surveyor"
+        }
+      ]
+    }
+  ]
+}

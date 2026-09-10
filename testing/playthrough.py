@@ -659,6 +659,7 @@ def main():
             seen_under = False
             seen_under_country = False
             seen_sump = False
+            seen_low_water = False
             came_back = False
             floors_down = 0
             answered = set()
@@ -920,14 +921,14 @@ def main():
                 want = None
                 grate = place_by_id("the-way-under-the-lake")
                 reach_edge = place_by_id("the-reach-edge")
-                lip = place_by_id("the-lip-of-the-sump")
+                bar = place_by_id("the-tide-crossing")
                 # **The tide, read off the page's own grid.** The lip is on the
                 # map from the first visit and is two tiles of sea away until
                 # the tenth cairn goes up; a walk that heads for it before then
                 # bounces off the water three times and bars the tile, which is
                 # the right behaviour and a waste of a hundred presses.
                 tide_out = (world["id"] == "the-treyway"
-                            and len(world.get("rows") or []) > 16
+                            and len(world.get("rows") or []) > 15
                             and world["rows"][15][8] != "tide")
                 if world["id"] == "under-the-lake":
                     if not seen_under:
@@ -1017,6 +1018,40 @@ def main():
                         want, why = list(pick[0]), phase
                     elif up:
                         want, why = up["at"], "back up"
+                    else:
+                        want, why = None, phase
+                elif world["id"] == "the-low-water":
+                    # **The shore.** Read what is on it, then go down the hole;
+                    # worn through, go back over the bar, because there is no
+                    # town on this side of it.
+                    if not seen_low_water:
+                        seen_low_water = True
+                        head("the low water")
+                        say(f"  {panel(page)}")
+                        phase = "the low water"
+                    lip = place_by_id("the-lip-of-the-sump")
+                    back = place_by_id("the-way-back-over-the-tide")
+                    shore = [tuple(p["at"]) for p in world["places"]
+                             if p["kind"] == "event"
+                             and (world["id"], tuple(p["at"])) not in read_over]
+                    if c["fatigue"] >= 40 and back:
+                        want, why = back["at"], "back over the tide"
+                    elif lip and c["fatigue"] < 24:
+                        # **The hole first, and the shore on the way back.**
+                        # The clipboard and the marker are both off the road,
+                        # and reading them cost enough fights to send the walk
+                        # home over the tide before it ever got down — which is
+                        # not what somebody who crossed a tide to reach a
+                        # dungeon does. There is no town on this side, so what
+                        # is spent up here is spent for good.
+                        want, why = lip["at"], "the sump"
+                    elif shore:
+                        shore.sort(key=lambda a: abs(a[0] - here[0]) + abs(a[1] - here[1]))
+                        want, why = list(shore[0]), phase
+                    elif lip:
+                        want, why = lip["at"], "the sump"
+                    elif back:
+                        want, why = back["at"], "back over the tide"
                     else:
                         want, why = None, phase
                 elif world["id"] == "the-undercountry":
@@ -1124,18 +1159,17 @@ def main():
                     elif promises:
                         promises.sort(key=lambda a: abs(a[0] - here[0]) + abs(a[1] - here[1]))
                         want, why = list(promises[0]), "the treyway"
-                    elif (lip and tide_out and c["fatigue"] < 30
+                    elif (bar and tide_out and c["fatigue"] < 30
                           and (len(recent) < 6 or sum(recent) * 2 >= len(recent))):
-                        # **The lip of the Wextreen Sump**, which is only there
-                        # to walk to once the tide has gone out and only opens
-                        # for somebody carrying an instrument. Rested and
-                        # winning, the same two guards the Stack's door has and
-                        # for the same reason: what is down it is four floors
-                        # from a town.
+                        # **The bar of shingle**, which is only walkable once the
+                        # tide has gone out. What is over it is the shore and
+                        # then four floors, so this is rested and winning — the
+                        # same two guards the Stack's door has and for the same
+                        # reason.
                         if not seen_sump:
                             seen_sump = True
-                            say("  the tide is out and the lip is open")
-                        want, why = lip["at"], "the sump"
+                            say("  the tide is out and the bar is walkable")
+                        want, why = bar["at"], "the low water"
                     elif reach_edge and floors_down >= 5 and lake_done and not surveyed:
                         # **Last of all.** The edge refuses without an
                         # instrument and says so, which is a road being shut —

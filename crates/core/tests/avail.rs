@@ -15,6 +15,9 @@ use gm2d_core::piece::{PieceKind, SlotKind, CATALOG};
 use gm2d_core::shop::{shelf, STARTING_GOLD};
 use std::collections::HashSet;
 
+mod common;
+
+
 #[test]
 fn every_town_stocks_something_and_stocks_it_from_the_catalogue() {
     // `ShopsData::parse` already refuses an unknown name; this is the check
@@ -22,7 +25,13 @@ fn every_town_stocks_something_and_stocks_it_from_the_catalogue() {
     let shops = data::shops();
     assert!(!shops.towns.is_empty(), "nowhere sells anything");
     for t in &shops.towns {
-        assert!(!t.stock.is_empty(), "{} sells nothing", t.id);
+        // **An unwritten town is an empty room on purpose**, and the list is
+        // where that is said. See `UNWRITTEN`.
+        assert!(
+            !t.stock.is_empty() || UNWRITTEN.contains(&t.id.as_str()),
+            "{} sells nothing",
+            t.id
+        );
         for name in &t.stock {
             assert!(
                 CATALOG.iter().any(|d| d.name == *name),
@@ -54,6 +63,10 @@ fn every_town_stocks_something_and_stocks_it_from_the_catalogue() {
 /// waiting, on purpose.
 const STAGED: &[&str] = &["high-wick"];
 
+// `UNWRITTEN` lives in `common`, because `quests.rs` asks the same question of
+// the same town — see the const.
+use common::UNWRITTEN;
+
 #[test]
 fn towns_anywhere_in_the_world_all_trade_and_all_want_something() {
     use gm2d_core::world::PlaceKind;
@@ -72,9 +85,23 @@ fn towns_anywhere_in_the_world_all_trade_and_all_want_something() {
     let shops = data::shops();
     let quests = data::quests();
     for t in &towns {
+        if UNWRITTEN.contains(&t.as_str()) {
+            // And the exception is asserted rather than skipped: an unwritten
+            // town that quietly grew a shelf is a list that has gone stale.
+            assert!(
+                shops.town(t).is_some_and(|s| s.stock.is_empty()),
+                "{t} is listed as unwritten and has a shelf"
+            );
+            assert!(quests.at(t).is_empty(), "{t} is listed as unwritten and wants something");
+            continue;
+        }
         assert!(shops.town(t).is_some(), "{t} is on a map and sells nothing");
         assert!(!quests.at(t).is_empty(), "{t} is on a map and wants nothing");
     }
+    let mut written: Vec<&str> =
+        UNWRITTEN.iter().copied().filter(|id| !towns.contains(*id)).collect();
+    written.sort();
+    assert!(written.is_empty(), "{written:?} are listed as unwritten and are on no map");
 
     // Anything shelved for a place that is on no map is staged, and has to be
     // named as such.
@@ -109,6 +136,10 @@ fn no_two_towns_are_the_same_shop() {
     for a in &shops.towns {
         for b in &shops.towns {
             if a.id >= b.id {
+                continue;
+            }
+            // Nought of nought is not one shop in two costumes.
+            if UNWRITTEN.contains(&a.id.as_str()) || UNWRITTEN.contains(&b.id.as_str()) {
                 continue;
             }
             let sa: HashSet<&str> = a.stock.iter().map(|s| s.as_str()).collect();

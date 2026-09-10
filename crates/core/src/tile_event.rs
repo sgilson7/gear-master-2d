@@ -22,7 +22,18 @@ pub enum Requirement {
     None,
     /// Fnorp in the purse.
     Gold(i32),
-    /// A flag set by an earlier event.
+    /// Something that has happened, by its mark.
+    ///
+    /// **`answered` or `flags`, since M14.4**, which is what every other
+    /// "has this happened" in the engine has always read: `place_is_there`,
+    /// `PlaceDef::opens_onto` and a drain all ask `WorldState::marks`, and this
+    /// asked half of it. So a choice could wait on a flag an event raises and
+    /// not on a boss going down, which is the same kind of fact — and Marbulon
+    /// asking what is behind her door *now* is a question about two bosses.
+    ///
+    /// Checked before it was widened: no flag any choice in the game requires
+    /// shares a name with an event or a place, so nothing already shipped
+    /// changed answer.
     Flag(String),
     /// A component held, worn or not.
     Holding(String),
@@ -58,6 +69,17 @@ pub enum Requirement {
     /// rarity, so a typo is a map that will not load rather than a door nobody
     /// can open.
     AssembledOfRarity(String),
+    /// All of them, and it is the mirror of [`Outcome::All`].
+    ///
+    /// **A requirement is one condition and that was a limit rather than a
+    /// design.** M14.4's one user is the third thing you may ask Marbulon,
+    /// which is a question about *both* bottoms — and the two arms of a door
+    /// that wants two things met were otherwise a flag raised by a third event
+    /// that exists to raise it, which is bookkeeping wearing a scene.
+    ///
+    /// `describe` joins with *and*, so the plain statement before an attempt
+    /// stays one sentence.
+    All(Vec<Requirement>),
     /// The instrument assembled on the character's frame is this one.
     ///
     /// **Never the only way through a door.** `PLAN-M14.md` §1.2: an instrument
@@ -256,6 +278,14 @@ impl Requirement {
             Requirement::None => String::new(),
             Requirement::Gold(n) => format!("Requires: {n} Fnorp"),
             Requirement::Flag(what) => format!("Requires: {}", what.replace('-', " ")),
+            Requirement::All(list) => {
+                let each: Vec<String> = list
+                    .iter()
+                    .map(|r| r.describe().trim_start_matches("Requires: ").to_string())
+                    .filter(|s| !s.is_empty())
+                    .collect();
+                if each.is_empty() { String::new() } else { format!("Requires: {}", each.join(" and ")) }
+            }
             Requirement::Holding(name) => format!("Requires: {name}"),
             // **The shape, and both ways round.** A slot does not care which
             // way up a rectangle goes in, and a line that named one orientation
@@ -283,6 +313,15 @@ impl Requirement {
             | Requirement::Gold(_)
             | Requirement::Flag(_)
             | Requirement::Holding(_) => Ok(()),
+            // **Empty means nothing is asked**, which is `None` wearing a list
+            // — and a requirement that is secretly `None` is a door somebody
+            // will think is shut.
+            Requirement::All(list) => {
+                if list.is_empty() {
+                    return Err("asks for all of nothing".into());
+                }
+                list.iter().try_for_each(|r| r.check())
+            }
             // Zero of anything is a hole with no sides. One by one is a
             // legitimate ask — the catalogue is full of rings.
             Requirement::LooseItemOfSize { w, h } => (*w > 0 && *h > 0)

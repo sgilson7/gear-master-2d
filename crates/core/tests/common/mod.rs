@@ -328,3 +328,24 @@ pub fn items_in_a_row(ch: &mut Character, n: usize) {
 pub fn two_items_that_touch(ch: &mut Character) {
     items_in_a_row(ch, 2);
 }
+
+
+/// Towns that are on a map and deliberately have nothing in them.
+///
+/// **The mirror of `avail.rs`'s `STAGED`, and the same rule from the other
+/// side.** That one is a shelf with no ground under it; this is ground with no
+/// shelf on it, and both are fine *only* because somebody wrote the name down.
+/// A third empty town fails wherever this is read.
+///
+/// One entry, and it is `PLAN-M14.md` §1.5: the third town ships with a name, a
+/// start tile and a region, and a shop with no shelves and no errands. **It is
+/// not a placeholder drawn as a town, it is a town drawn honestly** — what goes
+/// in it is the next plan's, and a shelf invented to keep a lint quiet would be
+/// content nobody asked for standing exactly where the content that *was* asked
+/// for has to go.
+///
+/// **Here rather than in one of the two test files that read it**, because two
+/// copies of a list of exceptions is two places for it to go stale — which is
+/// the sixth time this project has paid for a hand-written list and the first
+/// time it was caught before it was written twice.
+pub const UNWRITTEN: &[&str] = &["the-third-town"];

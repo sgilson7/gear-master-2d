@@ -212,6 +212,24 @@ fn every_refusal_names_what_is_missing() {
                 ],
                 Requirement::AssembledOfRarity(r) => vec![r.to_lowercase()],
                 Requirement::Surveying(kind) => vec![kind.to_lowercase()],
+                // **A list is satisfied by naming any one of them**, which is
+                // the honest bar: a refusal that says *"both of the things at
+                // the bottom"* has named the thing in the way without reading
+                // out two tile ids at somebody.
+                Requirement::All(list) => list
+                    .iter()
+                    .flat_map(|r| match r {
+                        Requirement::Gold(n) => vec![n.to_string(), spell(*n)],
+                        Requirement::Flag(f) => vec![f.replace('-', " ")],
+                        Requirement::Holding(name) => vec![name.to_lowercase()],
+                        Requirement::AssembledOfRarity(x) => vec![x.to_lowercase()],
+                        Requirement::Surveying(k) => vec![k.to_lowercase()],
+                        Requirement::LooseItemOfSize { w, h } => {
+                            vec![format!("{w} by {h}"), format!("{h} by {w}")]
+                        }
+                        _ => Vec::new(),
+                    })
+                    .collect(),
             };
             if subjects.is_empty() {
                 continue;

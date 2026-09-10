@@ -5,6 +5,8 @@
 //! the reward is two components that only work as a pair. Each of those three
 //! is a place it can go wrong quietly, so each is checked here.
 
+mod common;
+
 use gm2d_core::combat::{Difficulty, MonsterSpec, Outcome};
 use gm2d_core::data;
 use gm2d_core::game::Game;
@@ -98,9 +100,21 @@ fn every_town_has_an_errand() {
                 .collect::<Vec<_>>()
         })
         .filter(|id| q.quests.iter().all(|e| &e.giver != id))
+        // **Except the one that is empty on purpose**, and the list is in
+        // `common` because `avail.rs` asks the same question of the same town.
+        // See `common::UNWRITTEN`.
+        .filter(|id| !common::UNWRITTEN.contains(&id.as_str()))
         .collect();
     bare.sort();
     assert!(bare.is_empty(), "towns that want nothing: {bare:?}");
+    // And the exception is asserted rather than skipped: an unwritten town
+    // that quietly grew an errand is a list that has gone stale.
+    for id in common::UNWRITTEN {
+        assert!(
+            q.quests.iter().all(|e| e.giver != *id),
+            "{id} is listed as unwritten and hands out an errand"
+        );
+    }
 }
 
 /// What every errand asks for lives somewhere a player can reach it.

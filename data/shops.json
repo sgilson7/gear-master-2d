@@ -122,6 +122,12 @@
           "fights": 9
         }
       ]
+    },
+    {
+      "id": "the-third-town",
+      "_note": "**Empty on purpose, and `avail.rs`'s `UNWRITTEN` is where that is written down.** PLAN-M14.md §1.5: the third town ships with a name, a start tile and a region, and nothing to buy — a shelf invented to keep a lint quiet would be content nobody asked for standing where the content that was asked for has to go.",
+      "stock": [],
+      "commissions": []
     }
   ]
 }

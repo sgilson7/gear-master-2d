@@ -182,7 +182,20 @@ impl Game {
         match &c.requires {
             Requirement::None => true,
             Requirement::Gold(n) => self.character.gold >= *n,
-            Requirement::Flag(f) => self.world.flags.iter().any(|x| x == f),
+            // **`marks`, not `flags`.** See the field: everything else in this
+            // engine that asks whether a thing has happened reads both lists,
+            // and a boss going down is as much a fact about what you did as a
+            // flag an event raised.
+            Requirement::Flag(f) => self.world.marks().iter().any(|x| x == f),
+            Requirement::All(list) => list.iter().all(|r| {
+                self.can_take(&crate::tile_event::Choice {
+                    label: String::new(),
+                    blurb: String::new(),
+                    requires: r.clone(),
+                    outcome: crate::tile_event::Outcome::Nothing,
+                    unmet: String::new(),
+                })
+            }),
             Requirement::Holding(name) => self.character.holds(name),
             // **Loose, and asked of the bag rather than of the board.** A
             // seated component is doing a job, and a door that took one would

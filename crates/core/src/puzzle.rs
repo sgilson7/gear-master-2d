@@ -163,6 +163,21 @@ impl Carrying {
                         out.best_rarity = want;
                     }
                 }
+                // A list asks for what its members ask for, so the fixture
+                // walks into it.
+                Requirement::All(list) => {
+                    for r in list {
+                        match r {
+                            Requirement::LooseItemOfSize { w, h } => {
+                                *out.of_size.entry(key(*w, *h)).or_insert(0) += 1;
+                            }
+                            Requirement::Holding(name) => {
+                                out.holding.insert(name.clone());
+                            }
+                            _ => {}
+                        }
+                    }
+                }
                 Requirement::None | Requirement::Gold(_) | Requirement::Flag(_) => {}
                 // Never supplied. See the doc above.
                 Requirement::Surveying(_) => {}
@@ -279,6 +294,7 @@ fn raisable_here(all: &[&crate::tile_event::TileEvent]) -> BTreeSet<String> {
 fn ever_possible(r: &Requirement, raisable: &BTreeSet<String>, kit: &Carrying) -> bool {
     match r {
         Requirement::Flag(f) => raisable.contains(f),
+        Requirement::All(list) => list.iter().all(|r| ever_possible(r, raisable, kit)),
         // Everything else is a fact about the solver, and a fact about the
         // solver does not change while they are on one floor.
         other => takeable(other, &Position::default(), kit),
@@ -301,6 +317,7 @@ fn takeable(r: &Requirement, pos: &Position, kit: &Carrying) -> bool {
         Requirement::AssembledOfRarity(r) => crate::rating::Rarity::by_name(r)
             .is_some_and(|want| kit.best_rarity.is_some_and(|have| have >= want)),
         Requirement::Surveying(kind) => kit.instrument.as_deref() == Some(kind.as_str()),
+        Requirement::All(list) => list.iter().all(|r| takeable(r, pos, kit)),
     }
 }
 

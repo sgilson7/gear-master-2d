@@ -1,0 +1,122 @@
+{
+  "format": "gm2d-tiles",
+  "version": 1,
+  "id": "the-undercountry",
+  "_note": "The country under the country. **Three ways in and one town, and the town is empty** — a shop with no shelves, no errands, and prose that says the writing stops here. `PLAN-M14.md` §1.5: it is not a placeholder drawn as a town, it is a town drawn honestly, and what goes in it is the next plan's. Twenty tiles of it are road between the three gates and the town and **nothing else on it is load-bearing**, which is §9 decision 2 left where it was found: a country drawn to a guess is a country somebody has to unpick.",
+  "width": 20,
+  "height": 20,
+  "start": [
+    10,
+    2
+  ],
+  "rows": [
+    "^^^^^^^^^^^^^^^^^^^^",
+    "^AAAA,,,,,,,,,,AAAA^",
+    "^AA,,,,,,==,,,,,,AA^",
+    "^A,,,,,,,,=,,,,,,,A^",
+    "^,,,,%%,,,=,,,%%,,,^",
+    "^,,,%%%,,,=,,,%%%,,^",
+    "^,,,,%%,,,=,,,,%%,,^",
+    "^,,,,,,,,,=,,,,,,,,^",
+    "^,,,,,,,,,=,,,,,,,,^",
+    "^,,,,TT,,,=,,,TT,,,^",
+    "^,,,,TT,,,#,,,TT,,,^",
+    "^,,,,,,,,,=,,,,,,,,^",
+    "^,,,,,,,,,=,,,,,,,,^",
+    "^,,,%%,,,,=,,,,%%,,^",
+    "^,,%%%,,,,=,,,,%%%,^",
+    "^,,,%%,,,,=,,,,%%,,^",
+    "^,,,,,,,,,=,,,,,,,,^",
+    "^,,=======,=======,^",
+    "^A,,,,,,,,,,,,,,,,A^",
+    "^^^^^^^^^^^^^^^^^^^^"
+  ],
+  "regions": [
+    {
+      "id": "the-undercountry",
+      "name": "The Undercountry",
+      "bounds": [
+        [
+          0,
+          0,
+          19,
+          19
+        ]
+      ],
+      "enemies": [
+        "Gallowglass",
+        "Hollowmarch",
+        "The Drowned Court",
+        "The Ninth Surveyor",
+        "What Marbulon Faced Away From"
+      ]
+    }
+  ],
+  "places": [
+    {
+      "at": [
+        10,
+        10
+      ],
+      "kind": "town",
+      "id": "the-third-town",
+      "name": "a town with no name on the post yet"
+    },
+    {
+      "at": [
+        3,
+        17
+      ],
+      "kind": "gate",
+      "id": "the-way-up-the-sump",
+      "name": "the way back up the Sump",
+      "to": "the-sump-4",
+      "at_to": [
+        5,
+        4
+      ]
+    },
+    {
+      "at": [
+        16,
+        17
+      ],
+      "kind": "gate",
+      "id": "the-way-up-the-stair",
+      "name": "the way back up the Stair",
+      "to": "the-silt-stair-4",
+      "at_to": [
+        5,
+        4
+      ]
+    },
+    {
+      "at": [
+        10,
+        2
+      ],
+      "kind": "gate",
+      "id": "marbulons-door-from-below",
+      "name": "the underside of a door in the shallows",
+      "to": "west-bambulon",
+      "at_to": [
+        3,
+        9
+      ]
+    },
+    {
+      "at": [
+        10,
+        11
+      ],
+      "kind": "door",
+      "id": "the-way-on-from-here",
+      "name": "the way on",
+      "prose": [
+        "The road runs south out of the town for four miles and then stops, and what it stops at is not a wall and not a coast and not an edge.",
+        "This is where the writing stops. Not the game — the writing. What is past this is not hidden and not locked and not saved for later: nobody has decided it yet.",
+        "You dropped a tower, drained a lake, took two dungeons apart from the inside and came up under a door an old woman has been sitting in front of for eleven years. The last fact this game has for you is that she was right about the number."
+      ]
+    }
+  ]
+}

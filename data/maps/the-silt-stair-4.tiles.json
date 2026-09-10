@@ -73,6 +73,29 @@
         "Map Shard",
         "Living Earth"
       ]
+    },
+    {
+      "at": [
+        5,
+        5
+      ],
+      "kind": "gate",
+      "id": "the-silt-stair-4-way-on",
+      "name": "the door onto the Undercountry",
+      "to": "the-undercountry",
+      "at_to": [
+        16,
+        17
+      ],
+      "needs_all": [
+        "the-ninth-surveyor",
+        "the-bottom-of-the-bottom"
+      ],
+      "shut": "The door is cut for two hands and has two keyholes in it, and one of them turns.",
+      "prose": [
+        "Both of them turn. The door goes back nine inches and stops against something soft, and the something soft is grass.",
+        "There is a country on the other side of it, and the other way in comes out four miles west of this one. Somebody cut both and did not mention either."
+      ]
     }
   ]
 }

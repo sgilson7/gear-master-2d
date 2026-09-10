@@ -17,12 +17,16 @@ const D: Difficulty = Difficulty::Easy;
 
 // ------------------------------------------------------------------ the curve
 
-/// The table is the formula. Generated rather than typed, and checked here so
-/// the two cannot drift.
+/// The table is the formula, over **both** arms of it.
+///
+/// Generated rather than typed, and checked here so the two cannot drift. The
+/// formula is `progression::curve`, which is the one place the sum is done —
+/// this test does not restate it, because a test that carries its own copy of
+/// what it is checking is a second rulebook with a shorter feedback loop.
 #[test]
 fn the_table_matches_the_formula() {
     for level in 1..=MAX_LEVEL as u32 {
-        let want = (20.0_f64 * 1.35_f64.powi(level as i32 - 1)).round() as i32;
+        let want = progression::curve(level).round() as i32;
         assert_eq!(
             progression::xp_to_next(level),
             want,
@@ -30,7 +34,151 @@ fn the_table_matches_the_formula() {
             progression::xp_to_next(level)
         );
     }
-    assert_eq!(XP_TO_NEXT[0], 20);
+    assert_eq!(XP_TO_NEXT[0], 20, "the first level no longer costs what it always has");
+    // And it covers both shapes, or "both arms" above is one arm.
+    assert!(MAX_LEVEL as u32 > progression::JOINT, "the table stops before the joint");
+}
+
+/// **The two arms agree at fifty.**
+///
+/// Not `curve(50) == curve(50)`, which is a check that compares a number with
+/// itself. Each arm is evaluated at the joint *separately*, from the published
+/// constants, and the two are required to be the same number — which is what
+/// catches the mistake this is written against: an exponential anchored at
+/// forty-nine, or at `L - JOINT + 1`, produces a curve that jumps by the whole
+/// base at the one level a player will be watching for.
+#[test]
+fn the_curve_has_no_step_at_fifty() {
+    use gm2d_core::progression::{CURVE_A, CURVE_B, CURVE_C, CURVE_BASE, JOINT};
+    let j = JOINT as f64;
+    let quadratic_at_the_joint = CURVE_A * j * j + CURVE_B * j + CURVE_C;
+    let exponential_at_the_joint = quadratic_at_the_joint * CURVE_BASE.powi(0);
+    assert!(
+        (quadratic_at_the_joint - exponential_at_the_joint).abs() < 1e-9,
+        "the arms disagree at the joint: {quadratic_at_the_joint} against {exponential_at_the_joint}"
+    );
+    // **Asked of `curve` and not of the table.** The table is a `const` and an
+    // anchor written `L - JOINT + 1` leaves it untouched, so a check that read
+    // `xp_to_next` here would pass on the exact mistake it exists to catch and
+    // leave the catching to `the_table_matches_the_formula` — which is a
+    // different check with a different failure message.
+    assert!(
+        (progression::curve(JOINT) - quadratic_at_the_joint).abs() < 1e-9,
+        "the formula at the joint is {} and the quadratic says {quadratic_at_the_joint}",
+        progression::curve(JOINT)
+    );
+    assert!(
+        (progression::curve(JOINT + 1) - quadratic_at_the_joint * CURVE_BASE).abs() < 1e-6,
+        "level {} is {} and one step of the base past the joint is {}",
+        JOINT + 1,
+        progression::curve(JOINT + 1),
+        quadratic_at_the_joint * CURVE_BASE
+    );
+    // And the table is those numbers, taken through the same rounding.
+    assert_eq!(progression::xp_to_next(JOINT), quadratic_at_the_joint.round() as i32);
+    assert_eq!(
+        progression::xp_to_next(JOINT + 1),
+        (quadratic_at_the_joint * CURVE_BASE).round() as i32,
+        "level {} is not one step of the base past the joint",
+        JOINT + 1
+    );
+    // **And nothing anywhere jumps by more than the base.** The quadratic's
+    // own steepest step is level three to four, at 1.361 — rounding on small
+    // numbers — so the bound is the base with a whole point of slack, which is
+    // still far under the 1.35 a misanchored exponential would add.
+    for level in 1..MAX_LEVEL as u32 {
+        let a = progression::xp_to_next(level) as f64;
+        let b = progression::xp_to_next(level + 1) as f64;
+        assert!(
+            b <= a * (CURVE_BASE + 0.02),
+            "level {} costs {a} and level {} costs {b}, which is a cliff",
+            level,
+            level + 1
+        );
+    }
+}
+
+/// The curve is monotone, positive, and fits the type it is stored in.
+///
+/// **`XP_TO_NEXT` is `[i32; MAX_LEVEL]` and the arm past the joint grows by a
+/// third every level**, which is the trap `PLAN-M15.md` §2.6 names: overflow
+/// checks are on in `[profile.test]` and off in a release build, so an
+/// overflowing table fails loudly in one and silently in the other — and a
+/// level that costs a negative amount is a level everybody already has.
+///
+/// The headroom is stated rather than hoped for: the first level whose cost
+/// does not fit is **95**, so `MAX_LEVEL` has thirty-five levels of room. This
+/// is the check that goes red the day somebody raises either number too far.
+#[test]
+fn the_curve_never_overflows() {
+    let mut last = 0;
+    for level in 1..=MAX_LEVEL as u32 {
+        let cost = progression::xp_to_next(level);
+        assert!(cost > 0, "level {level} costs {cost}, which is not a cost");
+        assert!(cost >= last, "level {level} is cheaper than the one before it");
+        last = cost;
+    }
+    // The whole climb, summed, is what `Character::xp` has to hold.
+    let whole: i64 = (1..=MAX_LEVEL as u32).map(|l| progression::xp_to_next(l) as i64).sum();
+    assert!(whole < i32::MAX as i64, "the whole climb is {whole}, which will not fit");
+    assert_eq!(progression::xp_to_reach(MAX_LEVEL as u32 + 1) as i64, whole);
+    // And there is room to move `MAX_LEVEL` before it is a problem, which is
+    // the number the constant's own doc quotes.
+    assert!(
+        progression::curve(94) < i32::MAX as f64,
+        "the headroom stated on MAX_LEVEL is not there"
+    );
+    assert!(
+        progression::curve(95) >= i32::MAX as f64,
+        "the headroom is larger than MAX_LEVEL's doc claims, so the figure is stale"
+    );
+}
+
+/// **The climb to twenty is at most half what it was, and it is a quarter.**
+///
+/// The human's anchor has two bounds and this is the one that is arithmetic:
+/// `xp_to_reach(20)` was 17,053 and must be no more than 8,526. The other bound
+/// is 150 fights and lives in the walk.
+#[test]
+fn the_climb_to_twenty_is_at_most_half_what_it_was() {
+    // The recorded figure, written out rather than recomputed: the old curve is
+    // gone and a test that rebuilt it would be a test carrying a copy of
+    // something that no longer exists.
+    const WAS: i32 = 17_053;
+    let now = progression::xp_to_reach(20);
+    assert!(
+        now <= WAS / 2,
+        "level twenty costs {now} and half of what it was is {}",
+        WAS / 2
+    );
+    // And the whole point of the block: it is very much less than half.
+    assert!(now < WAS / 3, "it is meant to be about 150 fights, and it costs {now}");
+}
+
+/// **The exponential is steeper than the quadratic it replaced.**
+///
+/// Otherwise *"then exponential after level 50"* is decoration: a curve whose
+/// second arm a quadratic keeps up with is one arm with a different formula
+/// written on it. Measured at the top of the table, where the gap is the point.
+#[test]
+fn the_curve_past_fifty_is_steeper_than_the_quadratic_would_have_been() {
+    use gm2d_core::progression::{CURVE_A, CURVE_B, CURVE_C, JOINT};
+    let top = MAX_LEVEL as f64;
+    let quadratic_would_be = CURVE_A * top * top + CURVE_B * top + CURVE_C;
+    let is = progression::curve(MAX_LEVEL as u32);
+    assert!(
+        is > quadratic_would_be * 2.0,
+        "at level {MAX_LEVEL} the exponential asks {is:.0} and the quadratic would have \
+         asked {quadratic_would_be:.0}, which is not a change of shape"
+    );
+    // And below the joint the two are the same thing, or the arms are swapped.
+    let below = JOINT as f64 - 1.0;
+    assert!(
+        (progression::curve(JOINT - 1) - (CURVE_A * below * below + CURVE_B * below + CURVE_C))
+            .abs()
+            < 1e-9,
+        "the level below the joint is not on the quadratic"
+    );
 }
 
 /// Reaching level 5 costs what the plan says it costs.

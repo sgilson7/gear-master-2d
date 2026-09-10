@@ -5,11 +5,32 @@
 //!
 //! # The curve
 //!
-//! `xp_to_next(L) = round(20 · 1.35^(L−1))`, from `PLAN.md` 1.5. Computed once
-//! into [`XP_TO_NEXT`] and read from the table thereafter, so nothing at runtime
-//! does float arithmetic on a level-up — a level is a thing a player watches
-//! happen, and a level that lands one experience point differently on one
-//! machine is a save that disagrees with itself.
+//! **Quadratic to fifty, exponential after it**, which is the human's ask in
+//! their own words: *"make the experience curve for levelling up less steep, so
+//! you level up a bit faster at higher levels. i want the experience needed to
+//! be quadratic up till level 50, then exponential after level 50."*
+//!
+//! ```text
+//! xp_to_next(L) = A·L² + B·L + C                    for L <= 50
+//!               = (A·50² + B·50 + C) · 1.35^(L−50)  for L >= 50
+//! ```
+//!
+//! The two arms **agree at fifty** rather than meeting near it, which is not
+//! negotiable: fifty is the one level a player will be watching for, and a
+//! curve with a cliff in it there is a curve that has been described wrongly.
+//! [`curve`] is the one place the sum is done and [`XP_TO_NEXT`] is it
+//! evaluated once, so the table and the formula cannot drift —
+//! `the_table_matches_the_formula` regenerates it over **both** arms.
+//!
+//! It was `round(20 · 1.35^(L−1))`, exponential from level one, which is why
+//! level twenty cost seventeen thousand and levels past twenty were a wall
+//! rather than a curve. See [`CURVE_A`] for what the three coefficients are
+//! fitted to and why the base past fifty is not a new number.
+//!
+//! Read from the table at runtime and never computed, so nothing does float
+//! arithmetic on a level-up — a level is a thing a player watches happen, and a
+//! level that lands one experience point differently on one machine is a save
+//! that disagrees with itself.
 //!
 //! # The rows
 //!
@@ -47,17 +68,111 @@ pub const MAX_ROWS: u8 = crate::slot::SLOT_H;
 // file has one of those in `character.rs::STARTER` already.
 
 /// The highest level the table covers.
-pub const MAX_LEVEL: usize = 32;
+///
+/// **Sixty, because a curve that changes shape at fifty needs somewhere to go
+/// past it** or the change of shape is decoration. It was 32, which is a table
+/// that stops nine levels before the joint.
+///
+/// Ten levels of exponential is the recommendation `PLAN-M15.md` §5 decision 1
+/// makes — *"60 is a suggestion and not an answer"* — taken because the work
+/// could not start without a number, and flagged as the human's. What decides
+/// whether it can go further is [`CURVE_BASE`]: the first level whose cost does
+/// not fit an `i32` is **95**, so there are thirty-five levels of headroom and
+/// `the_curve_never_overflows` is what holds it.
+pub const MAX_LEVEL: usize = 60;
+
+/// Where the quadratic stops and the exponential starts.
+///
+/// The human's number. Both arms are evaluated here and they agree, which is
+/// what makes it a joint rather than a step.
+pub const JOINT: u32 = 50;
+
+/// The quadratic's square term.
+///
+/// **Solved, not chosen.** Three constraints fix all three coefficients, and
+/// the first two are contracts this game already had:
+///
+/// | constraint | value | why |
+/// |---|---|---|
+/// | `xp_to_next(1)` | 20 | the first level costs what it always has |
+/// | `xp_to_reach(5)` | 132 | the one measured contract in the game |
+/// | `xp_to_reach(20)` | 4,300 | the ask |
+///
+/// **Pinning `reach(5)` at 132 exactly is the useful half.**
+/// `level_five_lands_where_the_plan_says` walks the shipped map and demands
+/// level five in 25–35 fights, and [`XP_DIVISOR`] is set by that test rather
+/// than by taste. Fitting the curve to hold the one number that test measures
+/// means the divisor does not move and the test passes untouched — and a
+/// divisor that *had* to move would mean the fit was wrong rather than that the
+/// test was.
+///
+/// **4,300 is measured and it is not the plan's 6,000.** The human's anchor is
+/// *"about 150 fights, and less than it is now by about half — take whichever
+/// is lower"*, and `PLAN-M15.md` §2.5 recommends 6,000 on the reasoning that
+/// 150 fights at forty experience a win is plausible. It is not: replaying the
+/// shipped walk's own payouts, the mean over its first 150 wins is **28.7**, so
+/// 6,000 puts level twenty at 184 fights and 5,500 at 175 — both outside the
+/// band. 4,300 lands it at **150 exactly**, and clears the half-bound of 8,526
+/// with room to spare, because the half was never the binding one. The plan
+/// says what to do in this case in as many words: *if the half still leaves 150
+/// out of reach, go under it.*
+pub const CURVE_A: f64 = 1.4257309942;
+/// The quadratic's linear term. See [`CURVE_A`].
+pub const CURVE_B: f64 = 2.4884990253;
+/// The quadratic's constant term. See [`CURVE_A`].
+pub const CURVE_C: f64 = 16.0857699805;
+
+/// What each level past [`JOINT`] multiplies the one before it by.
+///
+/// **Not a new number: it is the curve this game already had.** Every level
+/// from one to thirty-two used to cost 1.35 times the one before it, and what
+/// M15.3 does is replace that with a quadratic *up to fifty* and let the old
+/// growth rate take over again past it. So the wall past the joint is the wall
+/// the game has always had, moved to where the ask puts it.
+///
+/// It is steep on purpose and by a measured amount: at level sixty the
+/// exponential asks **14 times** what the quadratic would have asked, which is
+/// what makes the change of shape a change rather than a decoration.
+/// `the_curve_past_fifty_is_steeper_than_the_quadratic_would_have_been` is that
+/// sentence as a check, because an exponential that a quadratic keeps up with
+/// is an exponential nobody would notice.
+pub const CURVE_BASE: f64 = 1.35;
+
+/// What leaving `level` costs, as the formula rather than as the table.
+///
+/// **The one place the sum is done.** [`XP_TO_NEXT`] is this evaluated once at
+/// authoring time and `the_table_matches_the_formula` regenerates it over both
+/// arms, so the table cannot drift from the curve — which is the same
+/// arrangement `Node::line` has with the effect it describes.
+///
+/// Both arms are defined at [`JOINT`] and both give the same answer there. That
+/// is the joint, and `the_curve_has_no_step_at_fifty` asks each arm for it
+/// separately rather than trusting the `<=`.
+pub fn curve(level: u32) -> f64 {
+    let l = level.max(1) as f64;
+    let j = JOINT as f64;
+    let quadratic = |x: f64| CURVE_A * x * x + CURVE_B * x + CURVE_C;
+    if level <= JOINT {
+        quadratic(l)
+    } else {
+        quadratic(j) * CURVE_BASE.powi((level - JOINT) as i32)
+    }
+}
 
 /// Experience from one level to the next, indexed by level − 1.
 ///
 /// `XP_TO_NEXT[0]` is what level 1 costs to leave. Generated by the test
-/// `the_table_matches_the_formula`, so the numbers here and the formula in the
-/// plan cannot drift apart without something going red.
+/// `the_table_matches_the_formula` off [`curve`], so the numbers here and the
+/// formula above it cannot drift apart without something going red.
 pub const XP_TO_NEXT: [i32; MAX_LEVEL] = [
-    20, 27, 36, 49, 66, 90, 121, 163, 221, 298, 402, 543, 733, 989, 1336,
-    1803, 2434, 3286, 4436, 5989, 8085, 10915, 14736, 19893, 26856, 36256,
-    48945, 66076, 89202, 120423, 162571, 219471,
+    20, 27, 36, 49, 64, 82, 103, 127,
+    154, 184, 216, 251, 289, 330, 374, 421,
+    470, 523, 578, 636, 697, 761, 828, 897,
+    969, 1045, 1123, 1204, 1287, 1374, 1463, 1556,
+    1651, 1749, 1850, 1953, 2060, 2169, 2282, 2397,
+    2515, 2636, 2759, 2886, 3015, 3147, 3282, 3420,
+    3561, 3705, 5002, 6752, 9115, 12306, 16613, 22427,
+    30276, 40873, 55179, 74492,
 ];
 
 /// What it costs to leave `level`.

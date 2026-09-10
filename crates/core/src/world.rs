@@ -1732,6 +1732,39 @@ pub fn here(world: &World, state: &WorldState, allowed: &Allowances) -> Step {
 /// draws nothing at all: bumping into a wall must not advance the stream, or
 /// two players walking the same route would see different fights depending on
 /// how often they misjudged a cliff.
+/// The gate **on this map** that leads to wherever an event stands.
+///
+/// **One hop, and that is deliberate.** A refusal is a keypress, and
+/// `data::all_maps` parses twenty-one files; what a player needs is not the
+/// name of a map two countries away, it is the door on the map under their
+/// feet. The Reach is entered from the Treyway, which is where somebody is
+/// standing when the shore turns them back.
+///
+/// `None` when the event is not one hop away — better silence than a direction
+/// that is wrong, and the sentence reads without it.
+fn gate_toward(world: &World, event: &str, difficulty: Difficulty) -> Option<String> {
+    for p in &world.places {
+        if p.kind != PlaceKind::Gate {
+            continue;
+        }
+        let Some(to) = p.to.as_deref() else { continue };
+        let far = crate::data::map(to, difficulty);
+        if far.places.iter().any(|q| q.id == event) {
+            let name = if p.name.is_empty() { p.id.clone() } else { p.name.clone() };
+            return Some(name);
+        }
+    }
+    None
+}
+
+/// Whether a mark has been made, in either of the two lists that hold them.
+///
+/// `answered` is written by places and events and `flags` by an outcome, and
+/// every reader that asks *has this happened* has always checked both.
+fn marks_have(state: &WorldState, what: &str) -> bool {
+    state.answered.iter().any(|a| a == what) || state.flags.iter().any(|f| f == what)
+}
+
 pub fn step(
     world: &World,
     state: &mut WorldState,
@@ -1770,7 +1803,39 @@ pub fn step(
         // signpost on it.
         if let Some(p) = world.place_now(state, nx, ny, allowed) {
             if !p.shut.is_empty() {
-                let mut out = Step::nowhere(&p.shut);
+                // **And where the ground is opened, if something opens it.**
+                // Reported from play twice: the first time the shore said what
+                // a cliff says, and the second time — with the sentence in —
+                // *"i've defeated marbulon and still cant access it"*. Naming
+                // the tenth notch is not naming where the tenth cairn is cut,
+                // and it is cut **two maps away** on the Wextreen Reach.
+                //
+                // This is `Requirement::wants` for ground rather than for a
+                // choice, and it is the same argument M12.6 made: with only
+                // the flavour a refusal is a wall, and the statement is what
+                // makes it a target. Looked up rather than listed, so a chain
+                // that is re-authored cannot leave it pointing at the wrong
+                // place, and appended rather than replacing the prose, because
+                // the world's sentence is the world's.
+                let mut said = p.shut.clone();
+                let here = world.terrain_name(nx, ny);
+                if let Some(d) = world
+                    .drains
+                    .iter()
+                    .find(|d| d.from == here && !marks_have(state, &d.when))
+                {
+                    if let Some((event, title)) =
+                        crate::tile_event::where_a_flag_is_raised(&crate::data::events(), &d.when)
+                    {
+                        match gate_toward(world, &event, difficulty) {
+                            Some(gate) => {
+                                said.push_str(&format!(" It is {title} that opens it, through {gate}."))
+                            }
+                            None => said.push_str(&format!(" It is {title} that opens it.")),
+                        }
+                    }
+                }
+                let mut out = Step::nowhere(&said);
                 out.refused_by = Some(p.id.clone());
                 return out;
             }

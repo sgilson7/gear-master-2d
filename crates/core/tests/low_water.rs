@@ -337,6 +337,37 @@ fn the_tide_says_what_is_over_the_bar() {
         said.contains("tenth"),
         "the refusal does not name what opens it: {said:?}"
     );
+    // **And where it is opened.** Reported from play a second time, with the
+    // sentence above already live: *"i've defeated marbulon and still cant
+    // access it."* Naming the tenth notch is not naming where the tenth cairn
+    // is cut, and it is cut two maps away on the Wextreen Reach.
+    //
+    // The title is looked up off the event that raises the flag, so this
+    // asserts the lookup rather than a string: re-author the chain and the
+    // sentence follows it.
+    let opens = gm2d_core::tile_event::where_a_flag_is_raised(
+        &gm2d_core::data::events(),
+        "built-the-tenth",
+    )
+    .expect("something raises built-the-tenth");
+    assert!(
+        said.contains(&opens.1),
+        "the refusal does not say where the tenth is cut ({}): {said:?}",
+        opens.1
+    );
+    // **And the door on the map you are standing on**, which is the actionable
+    // half: an event title is a thing you may never have seen, and the edge of
+    // the Reach is a place on the Treyway with your feet on it.
+    let edge = data::map(TREYWAY, D)
+        .places
+        .iter()
+        .find(|p| p.to.as_deref() == Some("the-reach"))
+        .map(|p| p.name.clone())
+        .expect("the Treyway has a gate onto the Reach");
+    assert!(
+        said.contains(&edge),
+        "the refusal does not name the door on this map ({edge}): {said:?}"
+    );
     assert_eq!(
         s.refused_by.as_deref(),
         Some("the-tide-crossing"),

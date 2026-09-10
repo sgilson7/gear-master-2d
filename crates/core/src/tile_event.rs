@@ -257,6 +257,30 @@ fn sets_flag(o: &Outcome, flag: &str) -> bool {
     }
 }
 
+/// Where a flag is raised, as a sentence a refusal can end with.
+///
+/// **The same lookup [`Requirement::wants`] does, for ground rather than for a
+/// choice.** That one turned *"Requires: corked the frame"* into *"Requires:
+/// corked the frame — THE STANDING FRAME"*, on the argument that with only the
+/// flavour a refusal is a wall and the statement is what makes it a target.
+/// A drained tile is the same wall with more rock in front of it: the shore
+/// waits on `built-the-tenth` and the tenth cairn is cut **two maps away**, so
+/// the map is named as well as the event.
+///
+/// **Looked up, never listed.** Whichever choice raises the flag is the one
+/// that opens the ground, so a chain that is re-authored cannot leave this
+/// sentence pointing at the wrong place.
+///
+/// `None` when nothing raises it — a flag some other system owns, which is not
+/// this function's business to guess about.
+pub fn where_a_flag_is_raised(events: &EventsData, flag: &str) -> Option<(String, String)> {
+    let e = events
+        .events
+        .iter()
+        .find(|e| e.choices.iter().any(|c| sets_flag(&c.outcome, flag)))?;
+    Some((e.id.clone(), e.title.clone()))
+}
+
 impl Requirement {
     /// What this asks for, in a plain sentence.
     ///

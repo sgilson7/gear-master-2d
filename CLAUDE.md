@@ -60,7 +60,15 @@ events that pay something and say what they pay — added on the human's ask.
 `PLAN-M9.md`, `PLAN-M10.md` and `PLAN-M11.md` are done; `PLAN.md` §6d is what
 M11 left open, §6c is M10.3's, §6b is M9.4's and §6a is M8.8's.
 
-**Nothing is in flight.** Everything below shipped between M12 closing and M13
+**One thing is in flight**, uncommitted on `main`: **spells, books, crystal
+balls, inks and alignments are buyable.** 106 casting components, six of them
+reachable, all six errand rewards — because `roll_barrel` named its kinds by
+hand and covered one of the weapon's three recipes, and because the arcane shelf
+is on a map that does not exist. See *The barrel could not hold a book* and *A
+reward you could buy, eighteen times over*. 788 passing, gate green in three
+engines, **not deployed**.
+
+Everything below shipped between M12 closing and M13
 opening — all of it reported from play, all of it on `main`, all of it walked on
 the live page:
 
@@ -303,6 +311,21 @@ something cost a day.
   number that is stored and ignored is a number somebody will one day believe.
   It is derived on load and nothing writes it to a file. See *Derived, never
   banked, and that includes the last one*.
+- **Ask the recipe table, never a list of kinds.** `roll_barrel` named thirteen
+  kinds by hand under a comment claiming it covered *the five recipes*; there
+  are seven, because a weapon is a blade **or a book or a crystal ball**, and
+  the list covered the blade. A hundred and six casting components were on no
+  counter in the game for as long as the barrel has existed.
+  `shop::barrel_wants` is derived, with the counts the recipes ask for, and
+  `every_recipe_assembles_out_of_the_barrel_alone` is the check that its
+  grid-shaped neighbour could not make. **Sixth time a hand-written list has
+  cost this project something.**
+- **A shelf nobody can walk up to undercuts nothing.** The barrel and the order
+  book refuse what a town stocks, so the cheap tier cannot undercut the
+  authored one — and `shops.json` carries a shelf for High Wick, which is on no
+  map and is the *arcane* one. It was holding three of the five barrel-priced
+  spells out of the cheap tier on behalf of a counter nobody has stood at.
+  `data::towns_on_the_map` is the question both pools ask now.
 - **A knob is a player-facing string, and so is a canonical name.** An expert's
   tuning prints the bare knob — `Effect::Tunes::line` — so a knob called
   `harvest` promises the nature pool, which is the theme's word for it and not
@@ -2308,6 +2331,84 @@ one design: **luck is cheap, choice is dear, and the middle is a shelf.**
   rule *When a test disagrees with a cost, suspect the test's idea of income
   first.*
 
+### The barrel could not hold a book, and nothing said so
+
+Reported as *"make spells generally more available, so spells, crystal balls,
+books, alignments, inks"*. Measured before anything moved, and the measurement
+is the finding: of the **106** components in the casting family — 18 books, 31
+spells, 19 inks, 26 orbs, 12 alignments — **six** were reachable, and all six
+were errand rewards. Nothing on either placed town's shelf. Nothing in the
+barrel. Nothing in an authored order. Nothing off a creature or out of an event.
+
+Two causes, and both are lists.
+
+**`roll_barrel` named its kinds by hand.** Thirteen rows — Handle, Damaging,
+Frame, Plating, Base, Layer, Material, Mold, Material, Mold, Ring, Accessory,
+Crest — under a comment reading *one of each kind the five recipes need*. There
+are **seven** recipes across the five worn grids, because `piece::recipes` has
+said since before the fork that a weapon is a blade **or a book or a crystal
+ball**, and the list covered the blade. So a rerolled barrel could not produce a
+book either, and the two casting ways of building a weapon assembled nothing
+from any counter in the game.
+
+`shop::barrel_wants` is derived from the recipe table now, with the counts the
+recipes ask for — **a book wants one spell and a ball wants two**, so a barrel
+holding one spell is a barrel that cannot finish a ball. Fourteen cores and two
+extras rolled from the kinds a recipe will *take* rather than require, which is
+what a reroll is for. **A list of kinds written by hand is the sixth of these
+this project has paid for**, after `package-web.sh`'s modules, the `EVENT_ONLY`
+regex twice, the gate's own ceiling and Auto-pack's twenty-two names.
+
+**And High Wick is the arcane shelf, on no map.** It is the only counter in the
+game that sells a book, an ink and three spells — and `barrel_pool` and
+`ledger_pool` both refused anything *any* town stocked, so a town nobody can
+walk into was holding three of the five barrel-priced spells out of the cheap
+tier on its own behalf. The rule is about **undercutting**, and a shelf with no
+ground under it undercuts nothing: `on_a_shelf_you_can_reach` asks
+`data::towns_on_the_map`, and the day High Wick is placed its stock leaves the
+cheap tiers by itself.
+
+**89 of the 106 are buyable somewhere now**, and the opening barrel — ×1 of
+catalogue, under every counter, from the first afternoon — carries a Chapbook,
+two spells and a Clouded Orb, so all three ways of building a weapon can be
+finished out of it.
+
+- **`every_recipe_assembles_out_of_the_barrel_alone` is the check that was
+  missing.** Its neighbour asks whether each of the five *grids* makes
+  something, and the weapon grid always did. Asking the recipe table instead
+  cannot go stale the next time a grid grows a second way of being built —
+  break the barrel back to blade-only and it names both missing ways.
+- **A rolled barrel is held to the same shape**, off `barrel_wants`, because
+  the authored one passing while every rerolled one lost a way to build a
+  weapon is exactly the shape of the bug that was there.
+- **Neither placed town gained arcana, on purpose.** The pit is cheap basics
+  and Kettleworks is metalwork; a town is its character, and the barrel is
+  under every counter and is nobody's character. An ink *was* put on the pit's
+  shelf and taken back off: `the_floors_cost_more_than_the_things_at_the_end_of
+  _them` went red, because the errand chain already pays a book and a spell and
+  one cheap ink to multiply them measurably raised the endgame board. **The ask
+  was availability, not power.**
+- **The bin got junkier to make room.** `the_barrel_is_a_floor_and_not_a_ceiling`
+  holds the barrel's mean piece rating under the pit shelf's, and four casting
+  cores pushed it over; a lower-rated layer, greaves material and sole bring it
+  back to 3.87 against the pit's 3.90. **Inks and alignments cannot be in the
+  authored barrel at all** — they are multipliers and the cheapest rates 11
+  against the pit's ceiling of 10 — so they arrive by reroll and by commission,
+  where nothing holds a floor.
+
+### A reward you could buy, eighteen times over
+
+Found by nearly authoring it: the first draft of the barrel's spell line was
+**the Warding Sigil**, which an errand pays.
+
+*A reward you could have bought makes the errand a slow way to shop* has been
+written down since the errands were built, and it was enforced for the shelf
+only. `EVENT_ONLY` holds every set piece and every chain reward off every
+counter — and **eighteen ordinary errand rewards were never on that list**, so
+the barrel could roll seven of them and the order book eleven more. Both pools
+read `quests.json` now, and `no_cheap_tier_sells_what_an_errand_pays` is the
+lint, over the rolled pools *and* the authored barrel.
+
 ### Turning one over
 
 The barrel and the order book reroll. The shelf does not, for the reason it
@@ -3864,11 +3965,13 @@ content*, and one check now measures what a range used to guess at.
 | Instruments | 3 — compass, atlas, survey golem, all three on **their own frame**: `SlotKind::Instrument`, six by three, outside `SlotKind::ALL` so nothing that asks what a board is worth ever counts it. It never grows, and one instrument is what it holds |
 | Data files | **23** — 12 in `data/` and 11 in `data/maps/`; `data::FILES` is the list `data_is_current` walks |
 | Starting kit | 2 components, **140 Fnorp**, 1 assembled weapon. The purse moved ×5 with the prices; at 28 a beginner could afford three of thirteen barrel lines and no helmet, and both M4 soft-lock guards said so |
-| Towns | **2 placed** (the pit and Kettleworks), 1 staged; fixed shelves of 11 / 15 / 17 that **still never reroll**; none sells an ench. Under each counter: a **13-line barrel** and an **order book** (8 lines over 3 towns), and those two *do* turn over |
+| Towns | **2 placed** (the pit and Kettleworks), 1 staged; fixed shelves of 11 / 15 / 17 that **still never reroll**; none sells an ench, and neither placed one sells arcana — a town is its character. Under each counter: a **16-line barrel** and an **order book** (8 lines over 3 towns), and those two *do* turn over. **High Wick is the arcane shelf and it is the staged one**, which is why the barrel had to be what carries the casting family |
 | Errands | **40** — 19 authored, and **21 chain errands a choice hands over**. A chain errand is `granted`: never offered at a counter, because the branch you did not take must not be sitting on the tile a moment later |
 | Enchs | **8** — 3 on the van's table at **2,000 each**, 2 awarded by a class tree, 1 off an errand, and **2 written for the ends of chains**. The van also sells **a licence for 5,000** to anybody whose class did not come with one |
 | Restoratives | 3, at **20 / 55 / 140** Fnorp — and one of them is now also a bus fare |
-| The counters | shelf **×5** of catalogue, order book **×10**, barrel **×1**. The barrel holds nothing dearer than 60 and the book nothing cheaper than 65, so the three tiers cannot overlap |
+| The counters | shelf **×5** of catalogue, order book **×10**, barrel **×1**. The barrel holds nothing dearer than 60 and the book nothing cheaper than 65, so the three tiers cannot overlap. **None of the three sells what an errand pays** — eighteen rewards were buyable until a lint read `quests.json` |
+| The barrel | **16 lines**: fourteen cores and two extras, and its shape is `shop::barrel_wants` **derived from the recipe table** rather than a list of kinds. It covers all three ways of building a weapon — a blade, a book and a crystal ball — where a hand-written list covered the blade and left a hundred and six casting components on no counter in the game |
+| Casting components | **106** — 18 books, 31 spells, 19 inks, 26 orbs, 12 alignments. **89 are buyable somewhere**, up from **6**, all six of which were errand rewards. The opening barrel carries a book, two spells and an orb, so both caster ways finish out of it on the first afternoon |
 | A reroll | `n*n` Fnorp for the nth, counted **per type**, wiped every ten levels in every town. The line you have on order is never rerolled out from under you |
 | Board pressure | fill **43%** at level five and **37%** at eight before M12 — *down*, because rows arrived on a clock and components did not. `pressure::of` is the measurement and `pressure::target` is what it is aimed at |
 | Boards | **Six frames**: five worn, 6×3 at level 1 and 6×8 once the tree has been walked all the way up, and the instrument's, 6×3 for ever.  **A row is no longer a thing a level hands you** — it is a skill point or a finished errand, **11 nodes and 2 errands**, and M12.0's measurement of why is in *A row is earned, not scheduled* |
@@ -3882,7 +3985,7 @@ content*, and one check now measures what a range used to guess at.
 | Figures | 27 `.tex` → **81 SVGs** (13 family drawings, 4 drawn for themselves, 5 classes, 3 towns, you) |
 | Art coverage | **58 of 58 creatures**, 3 of 3 towns, 5 of 5 classes, and you. The set pieces, the instruments and the enchs have no art and want none — a component has never had a figure |
 | Browser gate | **63 `ok:` lines**, 3 engines. The newest five are M13.8's: the papers are drawn and the locked one counts, the second fork offers four and can be slept on, two finished trees take the expert and a point moves the promise at its tab, a Full Bill's component holds two enchs and everybody else's holds one, and the sheet says every class you are. **All five were negative-tested** |
-| The suite | **785 passing, and 34 seconds warm.** It was a minute through most of M13 and `rules_m13.rs` was 29.6s of it: `beacon_board` ran Auto-pack over the whole catalogue on twenty-row grids, four times, because it was the only fixture in the repository with two items that touch. `common::items_in_a_row` is what replaced it — **0.03s** — and `experts_reach.rs` went 9.6s → 6.5s by measuring once per *set* of nodes rather than once per question. `drops.rs` at 11.3s is now the slowest file and is untouched. `[profile.test] opt-level = 2` since M12.6, with debug assertions and overflow checks still on — this is the `test` profile, not `--release` |
+| The suite | **788 passing, and 34 seconds warm.** It was a minute through most of M13 and `rules_m13.rs` was 29.6s of it: `beacon_board` ran Auto-pack over the whole catalogue on twenty-row grids, four times, because it was the only fixture in the repository with two items that touch. `common::items_in_a_row` is what replaced it — **0.03s** — and `experts_reach.rs` went 9.6s → 6.5s by measuring once per *set* of nodes rather than once per question. `drops.rs` at 11.3s is now the slowest file and is untouched. `[profile.test] opt-level = 2` since M12.6, with debug assertions and overflow checks still on — this is the `test` profile, not `--release` |
 
 Note the catalogue is **568**, not the 374 the retheme document counts — it
 grew upstream after that document was written, and three times here. Any

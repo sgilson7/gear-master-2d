@@ -328,7 +328,15 @@ impl ShopsData {
             // component in both places is a shelf entry a player would never
             // reach for, and a shelf line nobody takes is a line of the
             // designed curve that has quietly stopped existing.
-            if let Some(t) = d.towns.iter().find(|t| t.stock.iter().any(|s| s == name)) {
+            // **On the map**, for the reason `on_a_shelf_you_can_reach` gives:
+            // a shelf with no ground under it is a counter nobody has stood at.
+            let placed = crate::data::towns_on_the_map();
+            if let Some(t) = d
+                .towns
+                .iter()
+                .filter(|t| placed.iter().any(|p| *p == t.id))
+                .find(|t| t.stock.iter().any(|s| s == name))
+            {
                 return Err(format!(
                     "the barrel holds {name:?} and so does {}'s shelf; a shelf entry the                      barrel also carries is a shelf entry nobody takes",
                     t.id
@@ -442,9 +450,8 @@ pub const REROLL_LEDGER: &str = "ledger";
 /// its shelf, nothing carried rather than worn, small and cheap — or a reroll
 /// is a way to shake a set piece out of the catalogue.
 pub fn barrel_pool() -> Vec<&'static PieceDef> {
-    let shops = crate::data::shops();
-    let on_a_shelf: Vec<&str> =
-        shops.towns.iter().flat_map(|t| t.stock.iter().map(|s| s.as_str())).collect();
+    let on_a_shelf = on_a_shelf_you_can_reach();
+    let paid = what_an_errand_pays();
     CATALOG
         .iter()
         .filter(|d| {
@@ -454,50 +461,162 @@ pub fn barrel_pool() -> Vec<&'static PieceDef> {
                 && d.kind != crate::piece::PieceKind::Quest
                 && d.quest.is_none()
                 && !crate::piece::EVENT_ONLY.contains(&d.name)
-                && !on_a_shelf.contains(&d.name)
+                && !on_a_shelf.iter().any(|n| n == d.name)
+                && !paid.iter().any(|n| n == d.name)
         })
         .collect()
 }
 
-/// Roll a barrel: one of each kind the five recipes need, plus the extras.
+/// Everything an errand pays.
+///
+/// **A reward you could have bought makes the errand a slow way to shop**,
+/// which this project wrote down when the errands were built and enforced for
+/// the *shelf* only. `EVENT_ONLY` holds every set piece and every chain reward
+/// off every counter; **eighteen ordinary errand rewards were never on that
+/// list**, so the barrel could sell you the Warding Sigil an errand was about
+/// to hand over, and the order book could take a commission for eleven more.
+/// Found by nearly authoring it — the first draft of the barrel's spell line
+/// *was* the Warding Sigil.
+///
+/// The cheap tiers are rolled, so this cannot be a hand-kept list: it is what
+/// `quests.json` says it pays, read fresh.
+fn what_an_errand_pays() -> Vec<String> {
+    crate::data::quests().quests.iter().flat_map(|q| q.reward.clone()).collect()
+}
+
+/// Everything a town **on the map** has on its shelf.
+///
+/// **The exclusion is about undercutting, so it is about shelves a player can
+/// walk up to.** `shops.json` carries a shelf for High Wick, which is on no
+/// map — staged content, which this project allows and names in `avail.rs` —
+/// and asking every shelf meant the barrel and the order book were both
+/// stepping around a counter nobody has ever stood at. High Wick is the
+/// *arcane* shelf: a book, an ink and three of the five spells the barrel could
+/// otherwise afford.
+///
+/// So a shelf with no ground under it excludes nothing, and the day High Wick
+/// is placed its stock leaves the cheap tiers on its own — which is this rule
+/// working rather than a change to it.
+fn on_a_shelf_you_can_reach() -> Vec<String> {
+    let shops = crate::data::shops();
+    let placed = crate::data::towns_on_the_map();
+    shops
+        .towns
+        .iter()
+        .filter(|t| placed.iter().any(|p| *p == t.id))
+        .flat_map(|t| t.stock.iter().cloned())
+        .collect()
+}
+
+/// One of each kind the recipes need, and as many of each as they ask for.
+///
+/// **Derived from `piece::recipes`, and it used to be a list.** The list said
+/// Handle, Damaging, Frame, Plating, Base, Layer, Material, Mold, Material,
+/// Mold, Ring, Accessory, Crest — thirteen kinds, and its comment said *one of
+/// each kind the five recipes need*. There are **seven** recipes across the
+/// five worn grids, because a weapon can be a blade, a book or a crystal ball,
+/// and the list covered the blade. So the barrel could never hold a book, a
+/// spell or an orb, a rerolled one never could either, and **a third of the
+/// weapon grid's design space — a hundred and six components — was on no
+/// counter in the game.**
+///
+/// A list of kinds written by hand is the failure this project has now found
+/// five times: `package-web.sh`'s modules, the `EVENT_ONLY` regex twice, the
+/// gate's own ceiling, Auto-pack's twenty-two names. **This one went stale the
+/// moment the weapon grew a second way of being built**, which was before the
+/// fork.
+///
+/// The counts are the recipe's own: a book wants one spell and a ball wants
+/// **two**, so a barrel holding one spell is a barrel that cannot finish a
+/// ball. Deduplicated by the largest ask, per kind, per grid.
+pub fn barrel_wants() -> Vec<(crate::piece::PieceKind, crate::piece::SlotKind)> {
+    let mut want: Vec<(crate::piece::PieceKind, crate::piece::SlotKind, usize)> = Vec::new();
+    for &slot in crate::piece::SlotKind::ALL.iter() {
+        for recipe in crate::piece::recipes(slot) {
+            for &(kind, least, _) in recipe.iter() {
+                if least == 0 {
+                    continue;
+                }
+                match want.iter_mut().find(|(k, s, _)| *k == kind && *s == slot) {
+                    // **The largest ask, not the sum.** One recipe wanting a
+                    // spell and another wanting two is a grid that needs two,
+                    // not three.
+                    Some((_, _, n)) => *n = (*n).max(least),
+                    None => want.push((kind, slot, least)),
+                }
+            }
+        }
+    }
+    want.into_iter().flat_map(|(k, s, n)| std::iter::repeat_n((k, s), n)).collect()
+}
+
+/// The kinds a recipe will take and does not require.
+///
+/// **The barrel's extras, and they are rolled rather than listed** — an ink, an
+/// alignment, a ring, a crest, an accessory. None of them finishes anything on
+/// its own, which is what makes them the right thing to fill the last places
+/// with: a barrel that is only cores is a barrel with no decisions in it.
+pub fn barrel_extras() -> Vec<(crate::piece::PieceKind, crate::piece::SlotKind)> {
+    let required = barrel_wants();
+    let mut out: Vec<(crate::piece::PieceKind, crate::piece::SlotKind)> = Vec::new();
+    for &slot in crate::piece::SlotKind::ALL.iter() {
+        for recipe in crate::piece::recipes(slot) {
+            for &(kind, least, _) in recipe.iter() {
+                if least == 0 && !required.contains(&(kind, slot)) && !out.contains(&(kind, slot)) {
+                    out.push((kind, slot));
+                }
+            }
+        }
+    }
+    out
+}
+
+/// How many places the barrel has past its cores.
+///
+/// Two, which is what `the_barrel_is_stocked_and_small` leaves once every
+/// recipe's cores are in: fourteen and sixteen. The barrel is the bargain bin,
+/// and a bargain bin the size of a shop is a shop.
+pub const BARREL_EXTRAS: usize = 2;
+
+/// Roll a barrel: every recipe's cores, and a couple of the things a recipe
+/// will take.
 ///
 /// **Deterministic off the run's own stream**, like every other roll in this
 /// game, so a seeded walk still replays and two machines agree about what the
 /// barrel held.
 pub fn roll_barrel(rng: &mut crate::rng::Rng) -> Vec<String> {
-    use crate::piece::{PieceKind, SlotKind};
     let pool = barrel_pool();
-    // The eight that make the five grids assemble, then three fillers. Same
-    // shape as the authored barrel, because that shape is what makes it a
-    // barrel rather than a bag.
-    let want: &[(PieceKind, Option<SlotKind>)] = &[
-        (PieceKind::Handle, None),
-        (PieceKind::Damaging, None),
-        (PieceKind::Frame, None),
-        (PieceKind::Plating, Some(SlotKind::Helmet)),
-        (PieceKind::Base, None),
-        (PieceKind::Layer, None),
-        (PieceKind::Material, Some(SlotKind::Gloves)),
-        (PieceKind::Mold, Some(SlotKind::Gloves)),
-        (PieceKind::Material, Some(SlotKind::Greaves)),
-        (PieceKind::Mold, Some(SlotKind::Greaves)),
-        (PieceKind::Ring, None),
-        (PieceKind::Accessory, None),
-        (PieceKind::Crest, None),
-    ];
     let mut out: Vec<String> = Vec::new();
-    for (kind, slot) in want {
+    let take = |kind: crate::piece::PieceKind,
+                slot: crate::piece::SlotKind,
+                out: &mut Vec<String>,
+                rng: &mut crate::rng::Rng| {
         let mut fits: Vec<&&PieceDef> = pool
             .iter()
-            .filter(|d| d.kind == *kind && slot.map(|s| d.slot == s).unwrap_or(true))
+            .filter(|d| d.kind == kind && d.fits(slot))
             .filter(|d| !out.iter().any(|n| n == d.name))
             .collect();
         if fits.is_empty() {
-            continue;
+            return;
         }
         fits.sort_by_key(|d| d.name);
         let i = rng.below(fits.len());
         out.push(fits[i].name.to_string());
+    };
+    for (kind, slot) in barrel_wants() {
+        take(kind, slot, &mut out, rng);
+    }
+    // And the extras, rolled from the kinds a recipe will take. **Which ones
+    // is the roll's**, so turning the barrel over changes the fillers as well
+    // as the cores — which is most of what a reroll is for.
+    let mut extras = barrel_extras();
+    for _ in 0..BARREL_EXTRAS {
+        if extras.is_empty() {
+            break;
+        }
+        let i = rng.below(extras.len());
+        let (kind, slot) = extras.remove(i);
+        take(kind, slot, &mut out, rng);
     }
     out
 }
@@ -509,8 +628,8 @@ pub fn roll_barrel(rng: &mut crate::rng::Rng) -> Vec<String> {
 /// a town already stocks.
 pub fn ledger_pool() -> Vec<&'static PieceDef> {
     let shops = crate::data::shops();
-    let on_a_shelf: Vec<&str> =
-        shops.towns.iter().flat_map(|t| t.stock.iter().map(|s| s.as_str())).collect();
+    let on_a_shelf = on_a_shelf_you_can_reach();
+    let paid = what_an_errand_pays();
     let in_barrel: Vec<&str> = shops.barrel.iter().map(|s| s.as_str()).collect();
     CATALOG
         .iter()
@@ -520,7 +639,8 @@ pub fn ledger_pool() -> Vec<&'static PieceDef> {
                 && d.kind != crate::piece::PieceKind::Quest
                 && d.quest.is_none()
                 && !crate::piece::EVENT_ONLY.contains(&d.name)
-                && !on_a_shelf.contains(&d.name)
+                && !on_a_shelf.iter().any(|n| n == d.name)
+                && !paid.iter().any(|n| n == d.name)
                 && !in_barrel.contains(&d.name)
         })
         .collect()

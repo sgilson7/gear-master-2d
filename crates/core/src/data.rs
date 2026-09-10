@@ -183,6 +183,49 @@ pub fn shops() -> crate::shop::ShopsData {
     crate::shop::ShopsData::parse(SHOPS_JSON).expect("the shipped shelves are broken")
 }
 
+/// The ids of every town a player can actually walk into.
+///
+/// **`shops.json` holds shelves and `data/maps/*` holds ground, and the two do
+/// not have to agree.** A shelf with no map under it is *staged* — content
+/// waiting for a map, which this project allows and names — and `avail.rs`'s
+/// `STAGED` list is where that is written down.
+///
+/// What it is for: the barrel and the order book both refuse to stock anything
+/// a town already has on its shelf, so that the cheap tier cannot undercut the
+/// authored one. **A shelf nobody can reach undercuts nothing**, and High Wick
+/// is the arcane shelf — the only one in the game that sells a book, an ink and
+/// three spells — sitting on a map that does not exist. It was taking three of
+/// the five barrel-priced spells in the catalogue out of the barrel's reach on
+/// behalf of a counter no player has ever stood at.
+///
+/// Parsed on every call, like everything else in this file and for the same
+/// reason: a cache is a second place for it to be stale. The places are read
+/// straight off the tiles rather than through `World::load`, because *which
+/// towns exist* is a question about the file and building eleven worlds to
+/// answer it would be building eleven worlds.
+pub fn towns_on_the_map() -> Vec<String> {
+    #[derive(serde::Deserialize)]
+    struct JustPlaces {
+        #[serde(default)]
+        places: Vec<JustPlace>,
+    }
+    #[derive(serde::Deserialize)]
+    struct JustPlace {
+        id: String,
+        kind: String,
+    }
+    let mut out: Vec<String> = Vec::new();
+    for (_, text) in MAPS {
+        let Ok(f) = serde_json::from_str::<JustPlaces>(text) else { continue };
+        for p in f.places {
+            if p.kind == "town" && !out.contains(&p.id) {
+                out.push(p.id);
+            }
+        }
+    }
+    out
+}
+
 /// The errands the towns hand out.
 pub fn quests() -> crate::quest::QuestsData {
     crate::quest::QuestsData::parse(QUESTS_JSON).expect("the shipped errands are broken")

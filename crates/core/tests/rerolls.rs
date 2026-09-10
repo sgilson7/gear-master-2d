@@ -146,8 +146,16 @@ fn ten_levels_resets_every_counter() {
 fn a_rolled_barrel_is_still_a_barrel() {
     let mut g = rich();
     let shops = gm2d_core::data::shops();
-    let on_a_shelf: Vec<&str> =
-        shops.towns.iter().flat_map(|t| t.stock.iter().map(|s| s.as_str())).collect();
+    // **Shelves you can walk up to**, which is what the rule is about: the
+    // barrel must not undercut a counter, and a counter on no map undercuts
+    // nothing. See `nothing_in_the_barrel_is_on_a_shelf_you_can_reach`.
+    let placed = gm2d_core::data::towns_on_the_map();
+    let on_a_shelf: Vec<&str> = shops
+        .towns
+        .iter()
+        .filter(|t| placed.iter().any(|p| *p == t.id))
+        .flat_map(|t| t.stock.iter().map(|s| s.as_str()))
+        .collect();
     for _ in 0..25 {
         g.reroll_barrel().expect("rolled");
         let b = g.barrel_now();
@@ -164,15 +172,13 @@ fn a_rolled_barrel_is_still_a_barrel() {
             );
             assert!(!on_a_shelf.contains(&o.def.name), "{} is on a shelf", o.def.name);
         }
-        // Every grid still assembles out of it.
+        // **Every recipe still finishes out of it**, which is a wider claim
+        // than the five kinds this used to name: a weapon has three ways of
+        // being built and a list of kinds written here would go stale the same
+        // way the one in `roll_barrel` did. `shop::barrel_wants` is the
+        // recipe table's answer, so this asks it.
         let kinds: Vec<gm2d_core::piece::PieceKind> = b.iter().map(|o| o.def.kind).collect();
-        for want in [
-            gm2d_core::piece::PieceKind::Handle,
-            gm2d_core::piece::PieceKind::Damaging,
-            gm2d_core::piece::PieceKind::Frame,
-            gm2d_core::piece::PieceKind::Base,
-            gm2d_core::piece::PieceKind::Layer,
-        ] {
+        for (want, _) in shop::barrel_wants() {
             assert!(kinds.contains(&want), "a rolled barrel has no {want:?}");
         }
     }

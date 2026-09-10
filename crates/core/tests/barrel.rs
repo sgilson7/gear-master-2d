@@ -98,6 +98,154 @@ fn every_grid_assembles_out_of_the_barrel_alone() {
     }
 }
 
+/// **Every way of building a weapon, not just the one the list happened to
+/// cover.**
+///
+/// `every_grid_assembles_out_of_the_barrel_alone` above asks whether each of
+/// the five grids makes *something*, and the weapon grid always did: the barrel
+/// held a handle and an edge. What it never held was a book, a spell or an orb,
+/// so **the other two ways of building a weapon assembled nothing from any
+/// counter in the game** — a hundred and six components, a third of the weapon
+/// grid's design space, on no shelf, in no barrel and in no order book.
+///
+/// The check that was green through it was asking about grids, and `recipes`
+/// has said there are three ways to build that one since before the fork. So
+/// this asks the recipe table instead — which means it cannot go stale the next
+/// time a grid grows a second way of being built.
+#[test]
+fn every_recipe_assembles_out_of_the_barrel_alone() {
+    let names: Vec<&str> = barrel().iter().map(|d| d.name).collect();
+    let mut missing = Vec::new();
+    for &kind in SlotKind::ALL.iter() {
+        for (r, recipe) in gm2d_core::piece::recipes(kind).iter().enumerate() {
+            // Seat exactly what this recipe asks for, in the order it asks —
+            // greedily, from the barrel and from nowhere else.
+            let mut ch = common::bench();
+            ch.grow_boards(20);
+            for k in SlotKind::ALL {
+                ch.loadout.slot_mut(k).clear();
+            }
+            let mut short = Vec::new();
+            for &(want, least, _) in recipe.iter() {
+                for _ in 0..least {
+                    let Some(id) = ch.owned.iter().copied().find(|&p| {
+                        let d = ch.registry.def(p);
+                        d.kind == want && d.fits(kind) && names.contains(&d.name)
+                            && !ch.is_equipped(p)
+                    }) else {
+                        short.push(format!("{want:?}"));
+                        continue;
+                    };
+                    let mut seated = false;
+                    'seat: for y in 0..ch.loadout.slot(kind).rows() {
+                        for x in 0..gm2d_core::slot::SLOT_W {
+                            if ch.equip(id, kind, x, y).is_ok() {
+                                gm2d_core::loadout::lock_assembled_in(
+                                    &mut ch.loadout, &ch.registry, kind);
+                                seated = true;
+                                break 'seat;
+                            }
+                        }
+                    }
+                    if !seated {
+                        short.push(format!("{want:?} (no room)"));
+                    }
+                }
+            }
+            let made = ch.report(kind).items.iter().any(|i| i.assembled);
+            if !made {
+                missing.push(format!("{kind:?} way {r}: nothing, short of {short:?}"));
+            }
+        }
+    }
+    assert!(
+        missing.is_empty(),
+        "a way of building a grid that no barrel can finish:\n  {}",
+        missing.join("\n  ")
+    );
+}
+
+/// **A rerolled barrel is the same barrel**, and that is the half the authored
+/// one cannot prove.
+///
+/// *The rules are the rules whoever rolled it* is already written down for
+/// what the barrel may **hold**; this is the same sentence about what it must
+/// **do**. `shop::barrel_wants` is derived from the recipe table, so a roll
+/// covers every way of building every grid — and if it ever stops, the authored
+/// barrel would still pass the check above while every rerolled one quietly
+/// lost a way to build a weapon.
+#[test]
+fn a_rolled_barrel_covers_every_recipe_too() {
+    use gm2d_core::piece::PieceKind;
+    let wants = shop::barrel_wants();
+    for &kind in SlotKind::ALL.iter() {
+        for recipe in gm2d_core::piece::recipes(kind).iter() {
+            for &(want, least, _) in recipe.iter() {
+                if least == 0 {
+                    continue;
+                }
+                let asked = wants.iter().filter(|(k, s)| *k == want && *s == kind).count();
+                assert!(
+                    asked >= least,
+                    "{kind:?} wants {least} of {want:?} and a rolled barrel takes {asked}"
+                );
+            }
+        }
+    }
+    // And the pool can actually answer every one of them, which is the other
+    // way this goes quiet: a want nothing in the catalogue can fill is a want
+    // that rolls nothing and says nothing.
+    let pool = shop::barrel_pool();
+    for (k, s) in &wants {
+        let n = pool.iter().filter(|d| d.kind == *k && d.fits(*s)).count();
+        assert!(n > 0, "nothing cheap and small enough is a {k:?} for {s:?}");
+    }
+    // Five spells, three orbs and six books, at the barrel's price — which is
+    // the number this whole change is about and the one that was zero.
+    let casting = |k: PieceKind| pool.iter().filter(|d| d.kind == k).count();
+    for k in [PieceKind::Book, PieceKind::Spell, PieceKind::Orb, PieceKind::Ink,
+              PieceKind::Alignment] {
+        assert!(casting(k) >= 2, "the barrel can only ever offer {} of {k:?}", casting(k));
+    }
+    // The orb's way needs two spells at once, so one is not enough however
+    // many rolls you take.
+    assert!(casting(PieceKind::Spell) >= 2, "a crystal ball needs two spells and the barrel has one");
+}
+
+/// **Nothing the cheap tiers sell is something an errand pays.**
+///
+/// *A reward you could have bought makes the errand a slow way to shop* is a
+/// rule this project wrote down when the errands were built, and it was
+/// enforced for the shelf only: `EVENT_ONLY` holds every set piece and every
+/// chain reward off every counter, and **eighteen ordinary errand rewards were
+/// never on that list.** So the barrel could sell you the Warding Sigil an
+/// errand was about to hand over, and the order book could take a commission
+/// for eleven more.
+///
+/// Found by nearly authoring it: the first draft of the barrel's spell line
+/// *was* the Warding Sigil. Both pools read `quests.json` now.
+#[test]
+fn no_cheap_tier_sells_what_an_errand_pays() {
+    let quests = gm2d_core::data::quests();
+    let paid: Vec<&str> = quests.quests.iter().flat_map(|q| q.reward.iter().map(|r| r.as_str())).collect();
+    assert!(paid.len() > 10, "the errands pay {} things, so this check is asleep", paid.len());
+    let mut bad = Vec::new();
+    for (tier, pool) in [("the barrel", shop::barrel_pool()), ("the order book", shop::ledger_pool())] {
+        for d in pool {
+            if paid.contains(&d.name) {
+                bad.push(format!("{tier} can hold {}, which an errand pays", d.name));
+            }
+        }
+    }
+    // And the authored barrel, which is not rolled from that pool.
+    for d in barrel() {
+        if paid.contains(&d.name) {
+            bad.push(format!("the barrel holds {}, which an errand pays", d.name));
+        }
+    }
+    assert!(bad.is_empty(), "an errand made into a slow way to shop:\n  {}", bad.join("\n  "));
+}
+
 #[test]
 fn the_barrel_is_the_same_in_every_town_and_on_every_visit() {
     // One list, not a list per town: the barrel is furniture rather than a
@@ -114,14 +262,26 @@ fn the_barrel_is_the_same_in_every_town_and_on_every_visit() {
 }
 
 #[test]
-fn nothing_in_the_barrel_is_on_a_shelf() {
+fn nothing_in_the_barrel_is_on_a_shelf_you_can_reach() {
     // **The shelf is the ceiling and the barrel is the floor**, and a
     // component in both is a shelf line nobody would ever take: the barrel
     // charges the same price and never runs out. Refused at load, and this is
     // that refusal proved rather than trusted.
+    //
+    // **On the map**, and the qualifier is the whole of what changed. The rule
+    // is about *undercutting*, and a shelf nobody can walk up to undercuts
+    // nothing — `shops.json` carries a shelf for High Wick, which is on no map
+    // and is named as staged in `avail.rs`. It is also the arcane shelf: a
+    // book, an ink and three of the five spells the barrel could afford, all
+    // held out of the cheap tier on behalf of a counter nobody has stood at.
+    //
+    // The day High Wick is placed its stock leaves the barrel on its own,
+    // which is this rule working rather than an exception to it.
     let shops = gm2d_core::data::shops();
+    let placed = gm2d_core::data::towns_on_the_map();
+    assert!(!placed.is_empty(), "no town is on any map, so this check is asleep");
     for d in barrel() {
-        for t in &shops.towns {
+        for t in shops.towns.iter().filter(|t| placed.iter().any(|p| *p == t.id)) {
             assert!(
                 !t.stock.iter().any(|n| n == d.name),
                 "{} is in the barrel and on {}'s shelf",

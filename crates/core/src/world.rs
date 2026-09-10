@@ -250,6 +250,23 @@ pub struct PlaceDef {
     /// `Gate`: what to say when you are not.
     #[serde(default)]
     pub shut: String,
+    /// `Gate` and `Door`: it opens only once every one of these is in
+    /// `answered` or in `flags`.
+    ///
+    /// **The sibling of [`PlaceDef::hidden_until_all`], and the difference is
+    /// the whole of why there are two.** That one decides whether a place is
+    /// *there*; this one decides whether it *opens*, and the place is drawn
+    /// either way. A door at the bottom of a dungeon that is not there yet is
+    /// a room somebody walks out of thinking the dungeon ended — and
+    /// `PLAN-M14.md` §1.6 says in as many words that finishing the first of
+    /// the two shows you *"a sealed door with the other dungeon's name in the
+    /// refusal"*, which a hidden door cannot do.
+    ///
+    /// The refusal is `shut` plus what is still wanted, derived by
+    /// `Game::sealed_because` — because a sealed door that says nothing is a
+    /// bug report, and this file has now written that sentence six times.
+    #[serde(default)]
+    pub needs_all: Vec<String>,
     /// `Gate`: it opens only for somebody carrying a survey instrument.
     ///
     /// **Not `needs`**, and the difference is the one this project keeps
@@ -287,6 +304,24 @@ pub struct PlaceDef {
     /// door *wants* is still a component, and `needs` is where that lives.
     #[serde(default)]
     pub hidden_until: Option<String>,
+    /// Not here at all until **every** one of these is in `answered` or in
+    /// `flags`.
+    ///
+    /// [`PlaceDef::hidden_until`] stays as the one-id case and is not
+    /// deprecated: a door behind one boss is most doors, and rewriting eleven
+    /// maps to say `["x"]` would be churn in exchange for nothing.
+    ///
+    /// **The two are ANDed**, not tried in turn. A place naming both wants
+    /// both, which is what a reader of the file would assume and is the only
+    /// reading that cannot surprise anybody.
+    ///
+    /// What it is for: the two doors onto the Undercountry, one at the bottom
+    /// of each dungeon, each wanting *both* bosses. So the first dungeon you
+    /// finish shows you a sealed door with the other one's name in the
+    /// refusal — see [`World::sealed_because`], because **a sealed door that
+    /// says nothing is a bug report.**
+    #[serde(default)]
+    pub hidden_until_all: Vec<String>,
     /// `Door`: what it says when it opens. The only prose a place carries, and
     /// it is here rather than in `events.json` because a door is not a card:
     /// there is nothing to choose and nothing to answer.
@@ -354,6 +389,20 @@ pub struct Drain {
     pub from: String,
     /// What it becomes.
     pub to: String,
+    /// Restrict the drain to these cells.
+    ///
+    /// **Absent, it is the whole map**, which is what the lake needed and what
+    /// every drain in the game was until M14. A floor with two channels needs
+    /// the other thing: one wheel opens one channel, and a wheel that drained
+    /// every tile of water on the floor would be a puzzle with one move in it.
+    ///
+    /// Cells are checked at load against the map's bounds **and against
+    /// `from`** — a drain naming a cell that is not the terrain it drains is a
+    /// drain that will fire and change nothing, which is the failure this
+    /// project keeps finding one milestone late. Checked against the map as
+    /// *written*, because that is the only state a file can be checked in.
+    #[serde(default)]
+    pub tiles: Option<Vec<[u8; 2]>>,
 }
 
 /// One storey of a stack of maps, and the mark that says it is done.
@@ -404,12 +453,35 @@ pub fn place_is_there(p: &PlaceDef, state: &WorldState, allowed: &Allowances) ->
     if p.hidden_until_level.is_some_and(|n| allowed.level < n) {
         return false;
     }
-    match &p.hidden_until {
-        None => true,
-        Some(k) => {
-            state.answered.iter().any(|a| a == k) || state.flags.iter().any(|f| f == k)
-        }
+    let met = |k: &String| {
+        state.answered.iter().any(|a| a == k) || state.flags.iter().any(|f| f == k)
+    };
+    // **ANDed, both of them.** `hidden_until` is the one-id case and
+    // `hidden_until_all` is the list; a place naming both wants both, which is
+    // the only reading of two conditions on one place that cannot surprise
+    // somebody reading the file.
+    if p.hidden_until.as_ref().is_some_and(|k| !met(k)) {
+        return false;
     }
+    p.hidden_until_all.iter().all(met)
+}
+
+/// What a place behind [`PlaceDef::hidden_until_all`] is still waiting for.
+///
+/// **Empty when it is not waiting for anything**, which includes a place that
+/// is already there and a place that has no such list. The caller asks this
+/// only when it is about to say something.
+///
+/// A free function beside [`place_is_there`] for the same reason that one is
+/// one: two callers, one question, and the second caller is a browser check.
+pub fn still_wanted(p: &PlaceDef, state: &WorldState) -> Vec<String> {
+    let marks = state.marks();
+    p.hidden_until_all
+        .iter()
+        .chain(p.hidden_until.iter())
+        .filter(|k| !marks.iter().any(|m| m == *k))
+        .cloned()
+        .collect()
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -668,6 +740,43 @@ impl World {
         }
         if !world.passable(world.start.0, world.start.1) {
             return Err("the starting tile is impassable".into());
+        }
+        // **A drain that names a cell it cannot drain is a drain that will fire
+        // and change nothing**, which is the failure this project keeps finding
+        // one milestone late — a rule that runs, reports success, and moves no
+        // tile. Checked against the map as *written*: a file is the only state
+        // a file can be checked in, and every drain in this game turns terrain
+        // that is there at the start.
+        for d in &world.drains {
+            if world.terrain_index(&d.from).is_none() {
+                return Err(format!("a drain turns {:?}, which is no terrain", d.from));
+            }
+            if world.terrain_index(&d.to).is_none() {
+                return Err(format!("a drain turns something into {:?}, which is no terrain", d.to));
+            }
+            let Some(cells) = &d.tiles else { continue };
+            if cells.is_empty() {
+                return Err(format!(
+                    "the drain on {:?} names no cells at all; leave `tiles` out to mean the whole map",
+                    d.when
+                ));
+            }
+            for &[x, y] in cells {
+                if !world.in_bounds(x as i32, y as i32) {
+                    return Err(format!(
+                        "the drain on {:?} names ({x}, {y}), which is off the map",
+                        d.when
+                    ));
+                }
+                if world.terrain_name(x, y) != d.from {
+                    return Err(format!(
+                        "the drain on {:?} names ({x}, {y}), which is {:?} and not the {:?} it drains",
+                        d.when,
+                        world.terrain_name(x, y),
+                        d.from
+                    ));
+                }
+            }
         }
         // A bench selling an ench the catalogue has not got is a shop nobody
         // can buy from, and nothing else in the game would say so. The same
@@ -1020,9 +1129,12 @@ impl World {
         if here == "water" {
             return true;
         }
-        // Or something drains it into ground.
+        // Or something drains it into ground. **This cell**, which is what
+        // `tiles` narrows: a drain that opens two squares of a channel does not
+        // make the whole channel somewhere a place may be put.
         self.drains.iter().any(|d| {
             d.from == here
+                && d.tiles.as_ref().is_none_or(|cells| cells.contains(&[x, y]))
                 && self
                     .terrain
                     .iter()
@@ -1073,9 +1185,29 @@ impl World {
             else {
                 continue;
             };
-            for t in self.tiles.iter_mut() {
-                if *t == from {
-                    *t = to;
+            // **Named cells, or the whole map.** A drain with no `tiles` is
+            // every tile of that terrain, which is what the lake is and what
+            // every drain in the game was before M14. A floor with two channels
+            // needs the other thing, and it is still the terrain that decides
+            // *what* changes — a listed cell that is not `from` is left alone,
+            // which is the same guard `World::load` makes at parse time and is
+            // repeated here because a drained map is built from a state and a
+            // state can name a mark twice.
+            match &d.tiles {
+                None => {
+                    for t in self.tiles.iter_mut() {
+                        if *t == from {
+                            *t = to;
+                        }
+                    }
+                }
+                Some(cells) => {
+                    for &[x, y] in cells {
+                        let Some(i) = self.idx(x, y) else { continue };
+                        if self.tiles[i] == from {
+                            self.tiles[i] = to;
+                        }
+                    }
                 }
             }
         }

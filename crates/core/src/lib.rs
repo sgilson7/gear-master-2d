@@ -28,6 +28,7 @@ pub mod look;
 pub mod naming;
 pub mod piece;
 pub mod pressure;
+pub mod puzzle;
 pub mod progression;
 pub mod rating;
 pub mod reward;

@@ -184,6 +184,26 @@ impl Game {
             Requirement::Gold(n) => self.character.gold >= *n,
             Requirement::Flag(f) => self.world.flags.iter().any(|x| x == f),
             Requirement::Holding(name) => self.character.holds(name),
+            // **Loose, and asked of the bag rather than of the board.** A
+            // seated component is doing a job, and a door that took one would
+            // break an item on a screen nobody is looking at.
+            Requirement::LooseItemOfSize { w, h } => {
+                !self.character.loose_of_size(*w, *h).is_empty()
+            }
+            // **The live board, not the tray.** This is the one lock in the
+            // game you answer by packing, which is what makes a door wanting it
+            // a question about the thing this whole game is.
+            Requirement::AssembledOfRarity(r) => {
+                let want = crate::rating::Rarity::by_name(r);
+                want.is_some_and(|want| {
+                    self.character.combat_items().iter().any(|i| i.rarity() >= want)
+                })
+            }
+            // **The same answer a `needs_survey` gate gets**, off
+            // `Game::survey_kind`, which reads the rules the board grants — so
+            // an instrument taken apart between one door and the next is an
+            // instrument that is not there.
+            Requirement::Surveying(kind) => self.survey_kind().as_deref() == Some(kind.as_str()),
         }
     }
 
@@ -201,7 +221,13 @@ impl Game {
     ) -> Result<Vec<String>, String> {
         let events = crate::data::events();
         let Some(e) = events.get(id) else { return Err("no such event".into()) };
-        if self.world.answered.iter().any(|a| a == id) {
+        // **A puzzle is a sequence and a card is a decision.** Everything in
+        // this game before M14 was the second, and being spent for good is what
+        // a decision *is*; a chair that wants three moves in an order is three
+        // answers to one object, so a repeating event is never written down and
+        // therefore never refused. What keeps that from being a faucet is at
+        // load: a repeating event may not pay — see `TileEvent::repeats`.
+        if !e.repeats && self.world.answered.iter().any(|a| a == id) {
             return Err("already answered".into());
         }
         let Some(c) = e.choices.get(n) else { return Err("no such choice".into()) };
@@ -211,7 +237,9 @@ impl Game {
         let outcome = c.outcome.clone();
         let mut receipt = Vec::new();
         self.apply_outcome(&outcome, &mut receipt, difficulty);
-        self.world.answered.push(id.to_string());
+        if !e.repeats {
+            self.world.answered.push(id.to_string());
+        }
         Ok(receipt)
     }
 
@@ -301,6 +329,20 @@ impl Game {
                 self.warp_to(map, *at, difficulty);
                 receipt.push("You are somewhere else. It is a long walk back.".into());
             }
+            // **What the door kept, by name.** A component that leaves the bag
+            // without a word reads as a bug — this project's oldest rule, and
+            // the same reason a spent key is announced.
+            Outcome::GiveUp { w, h } => match self.character.give_up(*w, *h) {
+                Some(name) => {
+                    let themed = self.theme_piece(&name);
+                    receipt.push(format!("{themed} stays in it."));
+                }
+                // Reachable only through `apply_outcome_for_test` or an outcome
+                // whose choice did not ask for the shape it takes — which
+                // `every_giving_up_choice_asks_for_what_it_takes` refuses at
+                // load. Said out loud rather than passed over in silence.
+                None => receipt.push(format!("Nothing you had was {w} by {h}.")),
+            },
             Outcome::Nothing => receipt.push("Nothing you could point to".into()),
         }
     }
@@ -687,6 +729,12 @@ impl Game {
         if place.needs_survey && self.survey_kind().is_none() {
             return Unlocked::Shut;
         }
+        // **Before the key, and never spent.** A seal is a fact about what you
+        // have finished elsewhere; there is nothing to hand over and nothing to
+        // use up, so it is asked every time exactly as an instrument is.
+        if !self.sealed_wanting(place).is_empty() {
+            return Unlocked::Shut;
+        }
         let Some(key) = place.needs.clone() else {
             return Unlocked::Open;
         };
@@ -700,6 +748,58 @@ impl Game {
         self.character.spend_one(&key);
         self.world.answered.push(place.id.clone());
         Unlocked::Spent { key }
+    }
+
+    /// What this place is still sealed on, by mark id.
+    ///
+    /// Empty for the ninety-nine places in the game that are not sealed, which
+    /// is why `unlock` can ask it unconditionally.
+    pub fn sealed_wanting(&self, place: &crate::world::PlaceDef) -> Vec<String> {
+        let marks = self.world.marks();
+        place
+            .needs_all
+            .iter()
+            .filter(|k| !marks.iter().any(|m| m == *k))
+            .cloned()
+            .collect()
+    }
+
+    /// Why a sealed door is sealed, in a sentence, or `None` if it is not.
+    ///
+    /// **Two registers on one line, TONE 13a, the same split `crossing_refuses`
+    /// makes.** `shut` is the world's and is written in the map file; *which
+    /// dungeon is still standing* is the engine's, derived, and looked up so it
+    /// cannot go stale when a boss is renamed.
+    ///
+    /// The names come from the places themselves, across every map this build
+    /// ships — a mark is a boss's tile id, and the boss's tile carries the name
+    /// a player would recognise. A mark nothing names falls back to itself with
+    /// its hyphens taken out, which is worse prose and better than silence.
+    pub fn sealed_because(
+        &self,
+        place: &crate::world::PlaceDef,
+        difficulty: crate::combat::Difficulty,
+    ) -> Option<String> {
+        let wanting = self.sealed_wanting(place);
+        if wanting.is_empty() {
+            return None;
+        }
+        let maps = crate::data::all_maps(difficulty);
+        let name_of = |mark: &str| -> String {
+            maps.iter()
+                .flat_map(|w| w.places.iter())
+                .find(|p| p.id == mark && !p.name.is_empty())
+                .map(|p| p.name.clone())
+                .unwrap_or_else(|| mark.replace('-', " "))
+        };
+        let named: Vec<String> = wanting.iter().map(|m| name_of(m)).collect();
+        let list = match named.as_slice() {
+            [one] => one.clone(),
+            [a, b] => format!("{a} and {b}"),
+            rest => rest.join(", "),
+        };
+        let head = if place.shut.is_empty() { "It will not open.".to_string() } else { place.shut.clone() };
+        Some(format!("{head} It is waiting on {list}."))
     }
 
     /// Which instrument is assembled, if any.

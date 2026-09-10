@@ -316,6 +316,17 @@ impl Rarity {
         }
     }
 
+    /// The inverse of [`Rarity::name`], for a data file that names one.
+    ///
+    /// Here rather than a `match` in `tile_event.rs`, because a second table of
+    /// four strings is a second table of four strings and this one is already
+    /// the one `name` writes.
+    pub fn by_name(what: &str) -> Option<Rarity> {
+        [Rarity::Common, Rarity::Rare, Rarity::Epic, Rarity::Legendary]
+            .into_iter()
+            .find(|r| r.name() == what)
+    }
+
     pub fn name(self) -> &'static str {
         match self {
             Rarity::Common => "common",

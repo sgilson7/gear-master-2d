@@ -1682,6 +1682,60 @@ impl Character {
         }
     }
 
+    /// Every loose component whose footprint is a solid `w` by `h`, either way
+    /// up — **cheapest first**.
+    ///
+    /// **Loose, because a door that took a seated component would break an item
+    /// on a screen the player is not looking at.** That is `deposit`'s rule and
+    /// it is the same rule: banking happens in a town, and a door in the ground
+    /// is no more able to show you what it just took apart.
+    ///
+    /// **Solid, not merely inside the box.** A slot cut three by two takes a
+    /// three-by-two; an L that fits within one leaves two cells of daylight and
+    /// would not hold anything up.
+    ///
+    /// Cheapest first, and ties by id, so that [`Character::give_up`] takes the
+    /// same piece off two players with the same bag — the rule every other
+    /// deterministic walk in this engine follows, for the reason `loose_for`
+    /// gives.
+    pub fn loose_of_size(&self, w: u8, h: u8) -> Vec<PieceId> {
+        let fits = |id: PieceId| {
+            let base = crate::shape::Shape::new(self.registry.def(id).cells);
+            (0..4).any(|turns| {
+                let s = base.rotated(turns);
+                s.width() == w
+                    && s.height() == h
+                    && s.area() == w as usize * h as usize
+            })
+        };
+        let mut out: Vec<PieceId> = self
+            .owned
+            .iter()
+            .copied()
+            .filter(|&id| !self.is_equipped(id))
+            // A tally is carried and not worn, and handing one to a door would
+            // be handing over somebody's errand. `can_equip` already refuses
+            // one; this is the same exclusion where the bag is read.
+            .filter(|&id| self.registry.def(id).kind != crate::piece::PieceKind::Quest)
+            .filter(|&id| fits(id))
+            .collect();
+        out.sort_by_key(|&id| (crate::rating::piece_rating(self.registry.def(id)), id.0));
+        out
+    }
+
+    /// Leave the cheapest loose `w` by `h` where you put it.
+    ///
+    /// Returns its canonical name, or `None` when there was none to give — and
+    /// **a refusal spends nothing**, which is why the lookup and the removal are
+    /// one function rather than a question followed by an act.
+    pub fn give_up(&mut self, w: u8, h: u8) -> Option<String> {
+        let id = *self.loose_of_size(w, h).first()?;
+        let name = self.registry.def(id).name.to_string();
+        self.owned.retain(|&p| p != id);
+        self.tidy_enchs();
+        Some(name)
+    }
+
     pub fn take_supply(&mut self, id: &str, n: u32) -> u32 {
         let have = self.supply_count(id).min(n);
         for (s, count) in self.supplies.iter_mut() {

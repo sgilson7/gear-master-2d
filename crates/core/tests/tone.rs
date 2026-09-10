@@ -201,6 +201,17 @@ fn every_refusal_names_what_is_missing() {
                 Requirement::Gold(n) => vec![n.to_string(), spell(*n)],
                 Requirement::Flag(f) => vec![f.replace('-', " ")],
                 Requirement::Holding(name) => vec![name.to_lowercase()],
+                // **A wheel says what shape it wants**, in digits or in words,
+                // and either way up — a slot does not care which way a
+                // rectangle goes in and neither may its refusal.
+                Requirement::LooseItemOfSize { w, h } => vec![
+                    format!("{w} by {h}"),
+                    format!("{h} by {w}"),
+                    format!("{} by {}", spell(*w as i32), spell(*h as i32)),
+                    format!("{} by {}", spell(*h as i32), spell(*w as i32)),
+                ],
+                Requirement::AssembledOfRarity(r) => vec![r.to_lowercase()],
+                Requirement::Surveying(kind) => vec![kind.to_lowercase()],
             };
             if subjects.is_empty() {
                 continue;

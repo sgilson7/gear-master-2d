@@ -130,7 +130,7 @@ fn a_crossing_refuses_and_says_why() {
                         &Allowances { level: need - 1, ..Allowances::default() });
     assert!(!s.moved, "a level {} character walked north", need - 1);
     assert_eq!(low.at, c.at, "a refused step moved somebody");
-    assert_eq!(s.crossing.as_deref(), Some(c.id.as_str()), "the page cannot tell what refused");
+    assert_eq!(s.refused_by.as_deref(), Some(c.id.as_str()), "the page cannot tell what refused");
     let why = s.blocked.expect("a refusal with no sentence");
     assert!(why.contains(&c.shut), "the world's half is missing: {why:?}");
     assert!(why.contains(&need.to_string()), "the number is missing: {why:?}");
@@ -183,7 +183,7 @@ fn a_crossing_never_shuts_somebody_in() {
         let s = world::step(&w, &mut state, &mut rng, D, d, &nobody);
         // Some of these run into the lake or the map's edge; what must never
         // happen is a refusal *by the crossing*.
-        assert_eq!(s.crossing, None, "planted inside, the crossing refused {d:?} as well");
+        assert_eq!(s.refused_by, None, "planted inside, the crossing refused {d:?} as well");
     }
 }
 

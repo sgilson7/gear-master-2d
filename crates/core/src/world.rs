@@ -1609,14 +1609,23 @@ pub struct Step {
     pub boss: Option<String>,
     /// A bench you are now standing at.
     pub bench: Option<String>,
-    /// The crossing that refused this step, if one did.
+    /// The **place** that refused this step, if a place did rather than the
+    /// ground.
     ///
     /// `blocked` already carries the sentence; this says *which kind* of
     /// refusal it was, so the page can put it where a player will read it. A
     /// cliff is a bump and belongs in the one-line flash at the bottom of the
-    /// map; a crossing is a fact about where the game goes next and deserves
-    /// the message panel.
-    pub crossing: Option<String>,
+    /// map; a place that is shut is a fact about where the game goes next and
+    /// deserves the message panel.
+    ///
+    /// **It was called `crossing` and named the one instance it had.** Two
+    /// gates in this game stand on ground nobody can walk on — the way under
+    /// the lake, on water, and the tide crossing, on tide — and both were
+    /// answering with the terrain's generic line, because `walkable` refuses
+    /// before anything asks the place. Reported from play at the shore:
+    /// *"the land is pink and it says no way through"*. A crossing is one kind
+    /// of place that refuses and it was never the only one.
+    pub refused_by: Option<String>,
     /// A fight rolled on entering.
     pub encounter: Option<&'static MonsterSpec>,
 }
@@ -1650,7 +1659,7 @@ impl Step {
             door: None,
             boss: None,
             bench: None,
-            crossing: None,
+            refused_by: None,
             encounter: None,
         }
     }
@@ -1681,7 +1690,7 @@ pub fn here(world: &World, state: &WorldState, allowed: &Allowances) -> Step {
         door: None,
         boss: None,
         bench: None,
-        crossing: None,
+        refused_by: None,
         encounter: None,
     };
     if let Some(p) = world.place_now(state, x, y, allowed) {
@@ -1723,6 +1732,31 @@ pub fn step(
     // handful of bools the caller filled in; a `World` that took a character
     // to answer this would be a map that knew about bags.
     if !world.walkable(nx, ny, allowed) {
+        // **A place standing on that tile knows more about it than the
+        // ground does.** Two gates in this game are on terrain nobody can
+        // walk on — the way under the lake, on water until a tower falls or a
+        // toad's frame goes on, and the tide crossing, on tide until the tenth
+        // cairn goes up two maps away — and until this was written both of
+        // them answered with the sentence a cliff answers with. Reported from
+        // play, standing at the shore: *"the land is pink and it says no way
+        // through"*, which is the game refusing and declining to say by what.
+        //
+        // The sentence is the map file's, like every other `shut`: **the
+        // world's register, in the world's words.** What is the engine's is
+        // only that it is a *place's* refusal rather than the ground's, which
+        // is what puts it on the strip instead of in the one-second flash at
+        // the bottom of the canvas.
+        //
+        // `place_now` and not `place_at`, so a hidden place stays hidden: a
+        // refusal that named a door nobody has found would be a secret with a
+        // signpost on it.
+        if let Some(p) = world.place_now(state, nx, ny, allowed) {
+            if !p.shut.is_empty() {
+                let mut out = Step::nowhere(&p.shut);
+                out.refused_by = Some(p.id.clone());
+                return out;
+            }
+        }
         return Step::nowhere(match world.terrain_name(nx, ny) {
             // Still the frame's fault, and a toad's frame is the answer to it.
             "water" => "you would have to swim, and you are wearing a frame",
@@ -1738,7 +1772,7 @@ pub fn step(
     // walking into a cliff.
     if let Some(why) = world.crossing_refuses(state, (nx, ny), allowed) {
         let mut out = Step::nowhere(&why);
-        out.crossing = world.crossing_into(state, nx, ny, allowed).map(|c| c.id.clone());
+        out.refused_by = world.crossing_into(state, nx, ny, allowed).map(|c| c.id.clone());
         return out;
     }
 
@@ -1755,7 +1789,7 @@ pub fn step(
         door: None,
         boss: None,
         bench: None,
-        crossing: None,
+        refused_by: None,
         encounter: None,
     };
 

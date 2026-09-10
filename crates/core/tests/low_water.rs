@@ -233,3 +233,120 @@ fn the_lip_is_a_stack_and_it_wants_an_instrument() {
     assert_eq!(up.0.as_deref(), Some(SHORE));
     assert_eq!(up.1, Some([7, 6]), "coming up out of the Sump does not put you at its lip");
 }
+
+// -------------------------------------------- a shut door that says so
+
+/// **A place standing on ground nobody can walk on has to say why.**
+///
+/// Reported from play, standing at the shore: *"i cannot go to the southern
+/// area in my save, the land is pink and it says no way through"*. It is one
+/// tile of `tide` and `world::step` refuses on `walkable` **before** anything
+/// asks the place, so the sentence a player got was the sentence a cliff gets
+/// — no tide, no cairn, no Reach, and nothing that could be acted on.
+///
+/// Two gates in the game are like this and both were silent: the tide crossing,
+/// and the way under the lake, which sits on `water` until a five-floor tower
+/// comes down or a toad's frame goes on. So the check is over **every place on
+/// every map** rather than over these two, because a list of two written by
+/// hand is a list that can be one.
+///
+/// The refusal is content — `shut`, in the map file, in the world's words,
+/// TONE 12. What the engine owns is only that it is a *place's* refusal and
+/// therefore goes on the strip rather than in the one-second flash.
+#[test]
+fn a_place_on_ground_you_cannot_stand_on_says_why() {
+    let plain = Allowances::default();
+    let mut found = 0;
+    for (id, _) in data::MAPS {
+        let w = data::map(id, D);
+        for p in &w.places {
+            if w.walkable(p.at[0], p.at[1], &plain) {
+                continue;
+            }
+            found += 1;
+            assert!(
+                !p.shut.is_empty(),
+                "{id}: {} stands on {} and has nothing to say about it, \
+                 so the only sentence a player can get there is the cliff's",
+                p.id,
+                w.terrain_name(p.at[0], p.at[1])
+            );
+        }
+    }
+    assert!(found >= 2, "no place stands on impassable ground, so this check is vacuous");
+}
+
+/// And the sentence actually comes back out of the step, on the strip.
+///
+/// **The half a data check cannot see.** `shut` being written is one thing;
+/// `walkable` returning before anything reads it is what the report was.
+#[test]
+fn the_tide_says_what_is_over_the_bar() {
+    let mut g = gm2d_core::game::Game::new(3, "td");
+    g.world = WorldState::at_start(&data::map(TREYWAY, D));
+    g.world.map = TREYWAY.into();
+    g.world.at = [8, 14];
+    let allowed = g.character.allowances();
+    let live = data::map_now(TREYWAY, D, &g.world);
+    let s = gm2d_core::world::step(
+        &live,
+        &mut g.world,
+        &mut g.rng,
+        D,
+        gm2d_core::world::Dir::South,
+        &allowed,
+    );
+    assert!(!s.moved, "the bar is under water and the step went through anyway");
+    let said = s.blocked.clone().unwrap_or_default();
+    assert!(
+        said.contains("tenth"),
+        "the refusal does not name what opens it: {said:?}"
+    );
+    assert_eq!(
+        s.refused_by.as_deref(),
+        Some("the-tide-crossing"),
+        "the sentence would go in the flash rather than on the strip"
+    );
+
+    // **And it stops saying it once the tide is out**, which is the second
+    // visit this project keeps forgetting to check.
+    g.world.at = [8, 14];
+    g.world.flags.push("built-the-tenth".into());
+    let live = data::map_now(TREYWAY, D, &g.world);
+    let s = gm2d_core::world::step(
+        &live,
+        &mut g.world,
+        &mut g.rng,
+        D,
+        gm2d_core::world::Dir::South,
+        &allowed,
+    );
+    assert!(s.moved, "the tenth cairn went up and the bar is still a wall");
+    assert_eq!(s.gate.as_deref(), Some("the-tide-crossing"));
+}
+
+/// The lake says what is on top of it, and stops when the tower is down.
+#[test]
+fn the_lake_says_what_is_on_top_of_it() {
+    let mut g = gm2d_core::game::Game::new(3, "td");
+    g.world = WorldState::at_start(&data::map("west-bambulon", D));
+    g.world.map = "west-bambulon".into();
+    g.world.at = [8, 10];
+    let allowed = g.character.allowances();
+    let live = data::map_now("west-bambulon", D, &g.world);
+    let s = gm2d_core::world::step(
+        &live,
+        &mut g.world,
+        &mut g.rng,
+        D,
+        gm2d_core::world::Dir::South,
+        &allowed,
+    );
+    assert!(!s.moved, "walked onto the lake in a frame");
+    let said = s.blocked.clone().unwrap_or_default();
+    assert!(
+        said.contains("Drambus Stack"),
+        "the refusal does not name what is standing on the tap: {said:?}"
+    );
+    assert_eq!(s.refused_by.as_deref(), Some("the-way-under-the-lake"));
+}

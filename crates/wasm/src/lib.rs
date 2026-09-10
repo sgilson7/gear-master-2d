@@ -713,10 +713,13 @@ pub fn try_step(dir: &str) -> String {
                 "boss": s.boss,
                 "bench": s.bench,
                 // Which kind of refusal it was. `blocked` already carries the
-                // sentence; this is what lets the page put a crossing's in the
+                // sentence; this is what lets the page put a *place's* in the
                 // message panel and a cliff's in the flash at the bottom of
                 // the map, without the page reading the sentence to guess.
-                "crossing": s.crossing,
+                // A crossing is one kind of place that refuses and was never
+                // the only one — two gates in this game stand on ground nobody
+                // can walk on.
+                "refused_by": s.refused_by,
                 "routed": routed,
                 // **Nothing to fight.** A rout took the encounter, so this is
                 // null and the fight screen never opens — reported off

@@ -2044,6 +2044,16 @@ def check_the_tide_is_drawn_before_it_goes_out(page, name, fails, base):
     if page.text_content("#coords").strip() != "8, 14":
         fails.append(f"{name}: the tide was out before the tenth cairn: "
                      f"{page.text_content('#coords')!r}")
+    # **And it says what is over the bar, on the strip.** Reported from play:
+    # *"the land is pink and it says no way through"*. `world::step` refuses on
+    # `walkable` before anything asks the place, so what a player got was the
+    # sentence a cliff gets — and it went in the one-second flash along the
+    # bottom of the canvas rather than to the strip, because the page chose the
+    # channel off a field called `crossing` and this is not one. Only a browser
+    # can say which channel it landed in.
+    said_it = last_said(page)
+    if "tenth" not in said_it:
+        fails.append(f"{name}: the tide refused without naming what opens it: {said_it!r}")
 
     # --- and the tenth cairn takes it out, onto a map of its own --------------
     plant(page, base, lambda b: on_the_coast(b, True), stem="tide-out")

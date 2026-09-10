@@ -2470,11 +2470,14 @@ function walk(dir) {
       !$('ending').hidden || !$('vendor').hidden) return;
   const r = JSON.parse(try_step(dir));
   blocked = r.moved ? null : r.blocked;
-  // **A crossing gets the message panel, a cliff gets the flash.** Core says
-  // which this was; the page does not read the sentence to work it out. A
-  // refusal that is a fact about where the game goes next is worth more than
-  // one second of 13px text along the bottom of a canvas.
-  if (r.crossing) log(r.blocked, true);
+  // **A place that refuses gets the message panel, a cliff gets the flash.**
+  // Core says which this was; the page does not read the sentence to work it
+  // out. A refusal that is a fact about where the game goes next is worth more
+  // than one second of 13px text along the bottom of a canvas — and a crossing
+  // was only ever one kind of it. The tide over the bar of shingle and the
+  // lake over the grating are the other two, and both said what a cliff says
+  // until this line stopped naming the instance.
+  if (r.refused_by) log(r.blocked, true);
   paintPanel(); draw(); autosave();
   if (blocked) setTimeout(() => { blocked = null; draw(); }, 1100);
   // Arriving is the doing: an errand that says "go and talk to them" is

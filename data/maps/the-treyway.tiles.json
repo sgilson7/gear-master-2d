@@ -157,6 +157,7 @@
       "kind": "gate",
       "id": "the-tide-crossing",
       "name": "the tide crossing",
+      "shut": "The water is over the bar and the bar is nine feet down. Eleven years of notches on the post say it goes out the year somebody cuts the tenth, and nobody has cut the tenth.",
       "to": "the-low-water",
       "at_to": [
         8,

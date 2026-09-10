@@ -271,6 +271,7 @@
       "kind": "gate",
       "id": "the-way-under-the-lake",
       "name": "the way under the lake",
+      "shut": "There is a lake on top of it. The Bengulon Tally says the level is a decision somebody upstream makes on a Tuesday, and the Drambus Stack is what is standing on the tap. Or wear something that does not mind the water.",
       "to": "under-the-lake",
       "prose": [
         "There is a ring of cut stone in the middle of the lake with a grating in it, and the grating has been open the whole time.",

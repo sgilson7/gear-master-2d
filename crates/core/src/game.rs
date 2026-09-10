@@ -871,6 +871,68 @@ impl Game {
         })
     }
 
+    // ------------------------------------------------------------ what you met
+
+    /// Start an encounter, and write down that you have seen this creature.
+    ///
+    /// **The one door**, and that is the whole reason it exists. An encounter
+    /// was set in two places in the shim — the ground rolling one and a boss
+    /// standing on a tile — and a bestiary that is populated at one of them is
+    /// a bestiary with no bosses in it. A third caller is coming the day
+    /// somebody adds a way to be ambushed, and it will get this for free.
+    ///
+    /// **What counts as having met something is a rule**, so it is here rather
+    /// than in the shim: a page that decided it would be a second rulebook, and
+    /// the failure it would make is invisible — a creature missing from a list
+    /// nobody can prove should have been in it.
+    pub fn encounter_with(&mut self, enemy: &str, at: [u8; 2]) {
+        // Canonically, like everything the engine matches on. A `MonsterSpec`
+        // this build has not got is still put in `encounter` — `fight::spec`
+        // answers `None` and the caller handles it, which is what happens
+        // today — but it is not written into the bestiary, because there is
+        // nothing to look up.
+        if let Some(m) = crate::combat::creature(enemy) {
+            self.world.bump(&crate::fight::met_key(m.name));
+        }
+        self.encounter = Some(crate::fight::Encounter { enemy: enemy.to_string(), at });
+    }
+
+    /// How many times this creature has been met, won or lost or walked away
+    /// from.
+    pub fn met(&self, creature: &str) -> u32 {
+        self.world.count(&crate::fight::met_key(creature))
+    }
+
+    /// Whether this creature has an entry.
+    ///
+    /// **One meeting is the whole price**, which is the ask in its own words:
+    /// *"once you have encountered an enemy once."* It is deliberately not the
+    /// five Instant Battle asks for — that one is buying the right to stop
+    /// watching a fight and this is being allowed to remember one.
+    pub fn has_met(&self, creature: &str) -> bool {
+        self.met(creature) > 0
+    }
+
+    /// Everything you have met, in the order the ladder lists it.
+    ///
+    /// **Derived, never banked**, like the Instant Battle list beside it: the
+    /// counters are the record and this is a question asked of them. Ordered by
+    /// the ladder rather than by when you met them, because a glossary is a
+    /// thing you look things up in — a list that reorders itself as you fight
+    /// is a list you cannot find anything in twice.
+    pub fn bestiary(&self) -> Vec<BestiaryLine> {
+        crate::combat::LADDER
+            .iter()
+            .filter(|m| self.has_met(m.name))
+            .map(|m| BestiaryLine {
+                canonical: m.name.to_string(),
+                name: self.theme_name(m.name),
+                met: self.met(m.name),
+                beaten: self.beaten(m.name),
+            })
+            .collect()
+    }
+
     // -------------------------------------------------- a fight you have had
 
     /// How many times this creature has gone down, fought or routed.
@@ -963,6 +1025,22 @@ impl Game {
         let name = crate::combat::creature(creature).map(|m| m.name).unwrap_or(creature);
         self.world.instant.retain(|c| c != name);
     }
+}
+
+/// One line of the bestiary's index.
+///
+/// The entry itself — stats, resists, board, cards — is built where a
+/// creature's card already is, so the glossary and the fight screen cannot
+/// disagree about what a creature is.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct BestiaryLine {
+    pub canonical: String,
+    /// Themed, because a creature's name is the world's word — TONE 13.
+    pub name: String,
+    pub met: u32,
+    /// **Shown beside it**, because *met four times and beaten none* is the
+    /// most useful sentence a glossary can put next to a creature.
+    pub beaten: u32,
 }
 
 /// One line of the Instant Battle menu.

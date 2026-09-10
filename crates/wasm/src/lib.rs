@@ -417,6 +417,9 @@ pub fn position() -> String {
                 // asks what it may offer, never what the rules are. A button
                 // that opens an empty list is a feature reported as broken.
                 "can_instant": !g.instant_candidates().is_empty(),
+                // And whether anything has been met. Same shape again: the
+                // page asks what it may offer, never what the rules are.
+                "can_bestiary": !g.bestiary().is_empty(),
                 "walked": g.world.count("tiles-walked"),
                 "fights": g.world.count("encounters"),
             })
@@ -474,10 +477,11 @@ pub fn try_step(dir: &str) -> String {
             // only in the page would mean a player who saved while a creature
             // was on screen came back with no creature and a free step.
             if let Some(m) = s.encounter {
-                g.encounter = Some(gm2d_core::fight::Encounter {
-                    enemy: m.name.to_string(),
-                    at: g.world.at,
-                });
+                // **Core's one door**, which also writes down that you have
+                // seen it. A bestiary populated at one of the two places an
+                // encounter is set is a bestiary with no bosses in it.
+                let at = g.world.at;
+                g.encounter_with(m.name, at);
             }
             // **Something that will not fight you.** Core's answer, and it
             // takes the encounter with it: a routed creature never reaches the
@@ -704,10 +708,8 @@ pub fn try_step(dir: &str) -> String {
             if let Some(id) = &s.boss {
                 if let Some(p) = w.places.iter().find(|p| p.id == *id) {
                     if let Some(c) = p.creature.clone() {
-                        g.encounter = Some(gm2d_core::fight::Encounter {
-                            enemy: c,
-                            at: g.world.at,
-                        });
+                        let at = g.world.at;
+                        g.encounter_with(&c, at);
                     }
                 }
             }
@@ -1463,47 +1465,129 @@ pub fn clear_board() {
 
 // ---------------------------------------------------------------- the fight
 
+/// Everything one creature is, in one place.
+///
+/// **One builder, because there are two screens.** The fight panel and the
+/// bestiary ask the same question — *what is this thing* — and two builders
+/// would be two answers to it, which is the `oneCard` argument one layer out:
+/// four places render an item and there is one function that says what an item
+/// is. A glossary that disagreed with the fight screen about a creature's
+/// resistances would be worse than no glossary.
+fn creature_json(
+    g: &gm2d_core::game::Game,
+    spec: &'static gm2d_core::combat::MonsterSpec,
+) -> serde_json::Value {
+    let (reg, lo) = spec.loadout_at(DIFFICULTY);
+    // The creature's own stats and profiles, off the same pipeline the fight
+    // runs — so a card on its side quotes the cadence and the swing that will
+    // actually land, exactly as the player's do.
+    let (stats, profiles) = spec.outfit_at(DIFFICULTY);
+    let theme = gm2d_core::theme::by_id(&g.theme);
+
+    // Its five grids, in the same shape `board_json` reports the player's.
+    // A creature packs a board like anybody else, and until now the only
+    // thing the page could see of it was a list of names.
+    let slots = side_slots(&reg, &lo, &profiles, stats, theme);
+
+    // **What it does to a blow, which nothing has ever shown.** Every one of
+    // these has been on `Stats` since the fork and all sixty creatures carry
+    // them: resist cuts the blow, pierce cuts the resistance, hardening cancels
+    // the piercing, and resist clamps at 95. A player stacking magic damage
+    // against something with 60 magic resist could measure it and could not
+    // read it — *a derived number needs somewhere it is shown*, and this is the
+    // fifth time that sentence has been the answer here.
+    //
+    // Zeroes are dropped rather than printed. A list of nine rows of which
+    // seven say nought is a list nobody reads, and *zero is a number* — but on
+    // a defence it is the ordinary case rather than a claim, so it is absence
+    // rather than a lie.
+    let defences: Vec<serde_json::Value> = [
+        ("physical resist", stats.physical_resist, "%"),
+        ("magic resist", stats.magic_resist, "%"),
+        ("mind resist", stats.mind_resist, "%"),
+        ("curse resist", stats.curse_resist, "%"),
+        ("physical pierce", stats.physical_pierce, "%"),
+        ("magic pierce", stats.magic_pierce, "%"),
+        ("physical hardening", stats.physical_harden, "%"),
+        ("magic hardening", stats.magic_harden, "%"),
+        ("reflect", stats.reflect, "%"),
+    ]
+    .into_iter()
+    .filter(|(_, v, _)| *v != 0)
+    .map(|(what, v, unit)| serde_json::json!({ "what": what, "value": v, "unit": unit }))
+    .collect();
+
+    serde_json::json!({
+        "name": g.theme_name(spec.name),
+        "canonical": spec.name,
+        "note": theme.note(spec.name),
+        "rank": format!("{:?}", spec.rank).to_lowercase(),
+        "health": stats.health,
+        "strength": stats.strength,
+        "regen": stats.regen,
+        "bounty": spec.bounty,
+        "rating": gm2d_core::rating::creature_rating(spec, DIFFICULTY),
+        "defences": defences,
+        "attacks": spec.attacks.iter()
+            .map(|a| serde_json::json!({
+                "name": a.name,
+                "cooldown_ms": a.cooldown_ms,
+                "damage": a.damage,
+                "mind": a.mind,
+                "armor": a.armor,
+            }))
+            .collect::<Vec<_>>(),
+        "slots": slots,
+        "items": lo.combat_items(&reg).iter()
+            .map(|i| serde_json::json!({ "name": i.name, "rating": i.rating }))
+            .collect::<Vec<_>>(),
+    })
+}
+
 /// The creature waiting, or `null`.
 #[wasm_bindgen]
 pub fn encounter_json() -> String {
     with(|g| {
         let Some(e) = g.encounter.as_ref() else { return "null".into() };
         let Some(spec) = gm2d_core::fight::spec(e) else { return "null".into() };
-        let (reg, lo) = spec.loadout_at(DIFFICULTY);
-        // The creature's own stats and profiles, off the same pipeline the
-        // fight runs — so a card on its side quotes the cadence and the swing
-        // that will actually land, exactly as the player's do.
-        let (stats, profiles) = spec.outfit_at(DIFFICULTY);
-        let theme = gm2d_core::theme::by_id(&g.theme);
+        creature_json(g, spec).to_string()
+    })
+}
 
-        // Its five grids, in the same shape `board_json` reports the player's.
-        // A creature packs a board like anybody else, and until now the only
-        // thing the page could see of it was a list of names.
-        let slots = side_slots(&reg, &lo, &profiles, stats, theme);
-
+/// The index of everything you have met, and one entry when you ask for it.
+///
+/// **Eligibility is core's**, like the Instant Battle menu's: a page that
+/// decided for itself which creatures were in the book would be a second
+/// rulebook, and this one has a threshold in it — one meeting.
+///
+/// `entry` is `null` for a creature you have not met, **and the refusal is the
+/// point**: an entry the shim would hand over for anything would make the
+/// bestiary a wiki of the whole ladder, which is the opposite of what was
+/// asked for.
+#[wasm_bindgen]
+pub fn bestiary_json(canonical: &str) -> String {
+    with(|g| {
+        let lines: Vec<serde_json::Value> = g
+            .bestiary()
+            .into_iter()
+            .map(|l| {
+                serde_json::json!({
+                    "canonical": l.canonical,
+                    "name": l.name,
+                    "met": l.met,
+                    "beaten": l.beaten,
+                })
+            })
+            .collect();
+        let entry = (!canonical.is_empty())
+            .then(|| gm2d_core::combat::creature(canonical))
+            .flatten()
+            .filter(|m| g.has_met(m.name))
+            .map(|m| creature_json(g, m));
         serde_json::json!({
-            "name": g.theme_name(spec.name),
-            "canonical": spec.name,
-            "note": theme.note(spec.name),
-            "rank": format!("{:?}", spec.rank).to_lowercase(),
-            "health": stats.health,
-            "strength": stats.strength,
-            "regen": stats.regen,
-            "bounty": spec.bounty,
-            "rating": gm2d_core::rating::creature_rating(spec, DIFFICULTY),
-            "attacks": spec.attacks.iter()
-                .map(|a| serde_json::json!({
-                    "name": a.name,
-                    "cooldown_ms": a.cooldown_ms,
-                    "damage": a.damage,
-                    "mind": a.mind,
-                    "armor": a.armor,
-                }))
-                .collect::<Vec<_>>(),
-            "slots": slots,
-            "items": lo.combat_items(&reg).iter()
-                .map(|i| serde_json::json!({ "name": i.name, "rating": i.rating }))
-                .collect::<Vec<_>>(),
+            "lines": lines,
+            "of": gm2d_core::combat::LADDER.len(),
+            "entry": entry,
         })
         .to_string()
     })

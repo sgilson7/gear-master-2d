@@ -2267,6 +2267,141 @@ def check_a_fight_you_have_had_is_not_drawn(page, name, fails, base):
     print("ok: a fight you have had is settled where it stands and never drawn")
 
 
+def check_the_bestiary_holds_what_you_have_met(page, name, fails, base):
+    """**A glossary of what you have seen, and the resists that were on no
+    screen.**
+
+    Asked for as *"once you have encountered an enemy once, you should be able
+    to see a bestiary glossary entry for them where you can see their loadout
+    and stats"*, with the premise *"currently you cannot see enemies stats /
+    resists"* — which was true: every defensive number has been on `Stats` since
+    the fork and nothing printed one.
+
+    `cargo test` proves what is in the book and what an entry may contain. What
+    only a browser can say is that the entry **draws**: a board with cells in
+    it, cards beside it, and a defences list that is not an empty box under a
+    heading.
+    """
+    def having_met(body, who):
+        strip_the_boards(body)
+        w = body.setdefault("world", {})
+        w["map"] = ""
+        w["at"] = [4, 17]
+        w["counters"] = [c for c in w.get("counters", [])
+                         if not str(c[0]).startswith("met:")]
+        w["counters"] = w["counters"] + [[f"met:{c}", n] for c, n in who]
+        body["character"]["class"] = "Berserker"
+        body["character"]["xp"] = 4000
+
+    # **Nothing met: no button.** A screen you cannot use is worse than one that
+    # is not there yet, which is the rack's answer and the van's.
+    plant(page, base, lambda b: having_met(b, []), stem="book-empty")
+    dismiss_card(page)
+    close_fight(page)
+    if page.is_visible("#bestiary-open"):
+        fails.append(f"{name}: the Bestiary button is there having met nothing")
+
+    # The Iron Abbot wears a board; the Cave Rat is the one creature in the game
+    # with innate attacks, so the pair covers both shapes an entry can take.
+    plant(page, base, lambda b: having_met(b, [("Cave Rat", 3), ("Iron Abbot", 1)]),
+          stem="book-two")
+    dismiss_card(page)
+    close_fight(page)
+    if not page.is_visible("#bestiary-open"):
+        fails.append(f"{name}: met two creatures and the Bestiary button is not there")
+        return
+    page.click("#bestiary-open")
+    page.wait_for_selector("#bestiary", state="visible", timeout=5000)
+    try:
+        listed = page.evaluate("""() => [...document.querySelectorAll('#bestiary-list button')]
+            .map(b => b.dataset.creature)""")
+        if sorted(listed) != ["Cave Rat", "Iron Abbot"]:
+            fails.append(f"{name}: the book holds {listed!r}, having met two")
+        # **And not the whole ladder**, which is the refusal being the point.
+        if len(listed) > 2:
+            fails.append(f"{name}: the book handed over creatures nobody has met")
+        # **Asking for one you have not met gets nothing**, which is the other
+        # half of that and is the half the index cannot show. Without it the
+        # shim could hand an entry over for any name in the ladder and this
+        # check would stay green — a glossary of the whole bestiary is the
+        # opposite of what was asked for.
+        stranger = page.evaluate(
+            "() => JSON.parse(window.__bestiary('Bog Toad')).entry")
+        if stranger is not None:
+            fails.append(f"{name}: an entry came back for a creature nobody has met")
+        mine = page.evaluate(
+            "() => JSON.parse(window.__bestiary('Iron Abbot')).entry")
+        if mine is None:
+            fails.append(f"{name}: no entry for a creature that has been met")
+
+        # The entry that wears something: a board with cells and cards beside it.
+        page.click("#bestiary-list button[data-creature='Iron Abbot']")
+        page.wait_for_timeout(250)
+        shown = page.evaluate("""() => {
+            const c = document.getElementById('bestiary-board');
+            const box = c.closest('.theirs-grids');
+            return {
+              name: document.getElementById('bestiary-name').textContent.trim(),
+              body: document.querySelectorAll('#bestiary-body li').length,
+              defences: document.querySelectorAll('#bestiary-defences li').length,
+              head: !document.getElementById('bestiary-defences-head').hidden,
+              cards: document.querySelectorAll('#bestiary-cards .made-item').length,
+              board: box && !box.hidden ? c.width * c.height : 0,
+            };
+        }""")
+        if not shown["name"] or shown["name"] == "—":
+            fails.append(f"{name}: the entry has no name on it")
+        if shown["body"] < 2:
+            fails.append(f"{name}: the entry says {shown['body']} things about the creature")
+        # **The resists, which is the half the report was about.**
+        if not shown["defences"]:
+            fails.append(f"{name}: the Iron Abbot's entry shows no defences at all")
+        if shown["defences"] and not shown["head"]:
+            fails.append(f"{name}: defences are drawn under a hidden heading")
+        if not shown["cards"]:
+            fails.append(f"{name}: the entry shows no loadout, and the ask names it")
+        if not shown["board"]:
+            fails.append(f"{name}: the entry's board was not drawn")
+
+        # And the screen is on top of the map rather than under it.
+        over = page.evaluate("""() => {
+          const b = document.getElementById('bestiary-close');
+          const r = b.getBoundingClientRect();
+          const el = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+          return { hit: el === b, what: el ? (el.id || el.className || el.tagName) : 'nothing',
+                   rect: [Math.round(r.top), Math.round(r.height)],
+                   vh: window.innerHeight };
+        }""")
+        if not over["hit"]:
+            fails.append(f"{name}: something covers the Bestiary screen: {over!r}")
+    finally:
+        page.keyboard.press("Escape")
+        page.wait_for_selector("#bestiary", state="hidden", timeout=5000)
+
+    # --- and the live fight panel shows them too ----------------------------
+    # The other half of *you cannot see enemies stats / resists*: the fight
+    # screen is where a player is actually asking the question.
+    page.evaluate("() => document.getElementById('map').focus()")
+    if walk_until_a_fight(page, limit=240):
+        got = page.evaluate("""() => {
+            document.getElementById('tab-theirs').click();
+            return {
+              rows: document.querySelectorAll('#theirs-defences li').length,
+              head: !document.getElementById('theirs-defences-head').hidden,
+              payload: (window.__encounter() ?? {}).defences ?? [],
+            };
+        }""")
+        close_fight(page)
+        if len(got["payload"]) != got["rows"]:
+            fails.append(f"{name}: core sent {len(got['payload'])} defences and the panel "
+                         f"drew {got['rows']}")
+        if got["payload"] and not got["head"]:
+            fails.append(f"{name}: the fight panel hid the defences heading over a full list")
+    else:
+        fails.append(f"{name}: no fight in 240 steps, so the panel's defences were not read")
+    print("ok: the bestiary holds what you have met, with its board and what it resists")
+
+
 def check_the_sump_refuses_without_an_instrument(page, name, fails, base):
     """**The lip of the Sump is the Reach's door in a second place.**
 
@@ -5464,6 +5599,7 @@ def walk_the_gate(browser, name, fails=None):
     # place rather than the road to it.
     check_the_tide_is_drawn_before_it_goes_out(page, name, fails, path)
     check_a_fight_you_have_had_is_not_drawn(page, name, fails, path)
+    check_the_bestiary_holds_what_you_have_met(page, name, fails, path)
     check_the_sump_refuses_without_an_instrument(page, name, fails, path)
     check_a_wheel_says_what_it_wants(page, name, fails, path)
     check_the_chair_refuses_the_wrong_move(page, name, fails, path)

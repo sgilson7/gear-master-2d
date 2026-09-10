@@ -19,7 +19,7 @@ import init, {
   ench_rack_json, attach_ench, detach_ench, toggle_ench,
   bank_json, bank_put, bank_take,
   kit_json, kit_reading_json,
-  instant_json, set_instant,
+  instant_json, set_instant, bestiary_json,
 } from './pkg/gm2d_wasm.js';
 import { Board } from './board.js';
 import { Theirs } from './theirs.js';
@@ -406,6 +406,8 @@ function paintPanel() {
   // than counted here — how many creatures are eligible is a threshold, and a
   // threshold in the page is a second rulebook.
   $('instant-open').hidden = !p.can_instant;
+  // And the book is the first meeting's.
+  $('bestiary-open').hidden = !p.can_bestiary;
   if (!p.scouting && debug) toggleScout();
   $('walked').textContent = p.walked;
   $('fights').textContent = p.fights;
@@ -709,6 +711,101 @@ function closeInstant() {
   $('map').focus();
 }
 
+// ------------------------------------------------------------- the bestiary
+
+let bestiaryBoard = null;
+let bestiaryOn = '';
+
+/// The index, and whichever entry is open.
+///
+/// **The list is core's and so is the entry.** `bestiary_json` refuses a
+/// creature you have not met — the refusal is the point, because an entry the
+/// shim handed over for anything would make this a wiki of the whole ladder,
+/// which is the opposite of what was asked for.
+function paintBestiary() {
+  const r = JSON.parse(bestiary_json(bestiaryOn));
+  $('bestiary-note').textContent =
+    `${r.lines.length} of ${r.of}. Meet something once and it is in here for good — ` +
+    `what it is wearing, what it hits for, and what it does to a blow.`;
+
+  const list = $('bestiary-list');
+  if (!r.lines.length) {
+    list.innerHTML = `<li class="none">Nothing yet. Anything you meet turns up here.</li>`;
+  } else {
+    list.replaceChildren(...r.lines.map((l) => {
+      const li = document.createElement('li');
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.dataset.creature = l.canonical;
+      b.className = l.canonical === bestiaryOn ? 'primary' : '';
+      b.setAttribute('aria-pressed', String(l.canonical === bestiaryOn));
+      // Met and beaten are two different questions and the useful sentence is
+      // both: *met four times and beaten none* is what a glossary is for.
+      b.innerHTML = `${l.name} <span class="dim">met ${l.met}, beaten ${l.beaten}</span>`;
+      b.onclick = () => { bestiaryOn = l.canonical; paintBestiary(); };
+      li.append(b);
+      return li;
+    }));
+  }
+
+  const m = r.entry;
+  $('bestiary-name').textContent = m ? m.name : '—';
+  portrait($('bestiary-art'), m ? figure('creatures', m.canonical) : null, m ? m.name : '');
+  if (!m) {
+    $('bestiary-body').innerHTML =
+      `<li class="none">Pick something on the left.</li>`;
+    paintDefences([], 'bestiary-defences', 'bestiary-defences-head');
+    $('bestiary-cards').innerHTML = '';
+    bestiaryBoard.load([]);
+    $('bestiary-board').closest('.theirs-grids').hidden = true;
+    return;
+  }
+  // The same rows the fight panel prints, off the same payload.
+  const secs = (ms) => (ms / 1000).toFixed(2);
+  const body = [
+    `<li><b>${m.health}</b> health</li>`,
+    `<li><b>${m.strength}</b> strength</li>`,
+    `<li><b>${m.rating}</b> rated, <b>${m.bounty}</b> Fnorp</li>`,
+  ];
+  if (m.regen) body.push(`<li><b>${m.regen}</b> health a second</li>`);
+  for (const a of m.attacks ?? []) {
+    const what = [
+      a.damage ? `${a.damage} damage` : null,
+      a.mind ? `${a.mind} to your maximum health` : null,
+      a.armor ? `${a.armor} armor for itself` : null,
+    ].filter(Boolean).join(', ') || 'nothing';
+    body.push(`<li>${a.name} — <b>${what}</b> <span class="dim">every ${secs(a.cooldown_ms)}s</span></li>`);
+  }
+  $('bestiary-body').innerHTML = body.join('');
+  paintDefences(m.defences, 'bestiary-defences', 'bestiary-defences-head');
+
+  const { html, any } = cards(m.slots ?? []);
+  $('bestiary-cards').innerHTML = any ? html
+    : `<p class="empty">It is wearing nothing. Everything it does, it does with its own body.</p>`;
+  bestiaryBoard.load(m.slots ?? []);
+  // A creature with no gear gets no grid, for the reason the fight panel gives:
+  // an empty black box says "something failed to draw".
+  $('bestiary-board').closest('.theirs-grids').hidden = !bestiaryBoard.slots.length;
+}
+
+function openBestiary() {
+  // **Shown, then painted.** `openTree` painted a hidden screen and drew
+  // seventeen wires at the origin, because you cannot measure `display: none`
+  // — and this one has a canvas in it, which sizes itself to its box.
+  $('bestiary').hidden = false;
+  if (!bestiaryOn) {
+    const first = JSON.parse(bestiary_json('')).lines[0];
+    bestiaryOn = first ? first.canonical : '';
+  }
+  paintBestiary();
+  $('bestiary-close').focus();
+}
+
+function closeBestiary() {
+  $('bestiary').hidden = true;
+  $('map').focus();
+}
+
 function autosave() {
   try { localStorage.setItem(AUTOSAVE, save_json()); } catch { /* private window */ }
 }
@@ -972,6 +1069,27 @@ function openFight() {
 /// components, they assemble or they do not, and what comes out is items with
 /// stats and a cadence. For six milestones the page threw all of that away and
 /// printed a name.
+/// What a creature does to a blow, into a list.
+///
+/// **One renderer, because there are two screens.** The fight panel and the
+/// bestiary print the same rows off the same `defences` array core built, so
+/// the glossary cannot say a creature resists something the fight screen does
+/// not — which is the whole reason `creature_json` is one builder.
+///
+/// Core drops the zeroes; the page draws what it is handed and counts nothing.
+/// A head that is there with an empty list under it says "something failed to
+/// draw", so the head is hidden with it.
+function paintDefences(rows, listId, headId) {
+  const list = $(listId);
+  const head = $(headId);
+  const any = (rows ?? []).length > 0;
+  head.hidden = !any;
+  list.hidden = !any;
+  list.innerHTML = (rows ?? [])
+    .map((d) => `<li><b>${d.value}${d.unit}</b> ${d.what}</li>`)
+    .join('');
+}
+
 function paintTheirs(m) {
   $('theirs-title').textContent = m.name;
   portrait($('theirs-art'), figure('creatures', m.canonical), m.name);
@@ -992,6 +1110,9 @@ function paintTheirs(m) {
     body.push(`<li>${a.name} — <b>${what}</b> <span class="dim">every ${secs(a.cooldown_ms)}s</span></li>`);
   }
   $('theirs-body').innerHTML = body.join('');
+  // The other half of *you cannot see enemies stats / resists*: the numbers
+  // were real and were on no screen.
+  paintDefences(m.defences, 'theirs-defences', 'theirs-defences-head');
 
   const { html, any } = cards(m.slots ?? []);
   $('theirs-cards').innerHTML = any ? html
@@ -2540,7 +2661,7 @@ function walk(dir) {
   if (!$('card').hidden || !$('fight').hidden || !$('town').hidden ||
       !$('tree').hidden || !$('fork').hidden || !$('log').hidden ||
       !$('history').hidden || !$('instrument').hidden ||
-      !$('instant').hidden ||
+      !$('instant').hidden || !$('bestiary').hidden ||
       !$('ending').hidden || !$('vendor').hidden) return;
   const r = JSON.parse(try_step(dir));
   blocked = r.moved ? null : r.blocked;
@@ -2772,6 +2893,10 @@ async function main() {
       if (e.key === 'Escape') closeInstant();
       return;
     }
+    if (!$('bestiary').hidden) {
+      if (e.key === 'Escape') closeBestiary();
+      return;
+    }
     if (!$('ending').hidden) {
       if (e.key === 'Escape') closeEnding();
       return;
@@ -2827,6 +2952,8 @@ async function main() {
   $('history-close').onclick = closeHistory;
   $('instant-open').onclick = openInstant;
   $('instant-close').onclick = closeInstant;
+  $('bestiary-open').onclick = openBestiary;
+  $('bestiary-close').onclick = closeBestiary;
   paintTape();
 
   board = new Board($('board'), {
@@ -2866,6 +2993,7 @@ async function main() {
                 top: box.top + py, bottom: box.top + py + 8 }, p);
   };
   theirs = new Theirs($('theirs-board'));
+  bestiaryBoard = new Theirs($('bestiary-board'));
   theirs.onpoint = (key) => lightCard($('panel-theirs'), key);
   $('tab-yours').onclick = () => showTab('yours');
   $('tab-theirs').onclick = () => showTab('theirs');
@@ -2898,6 +3026,7 @@ async function main() {
   window.__replay = replay;
   window.__classOffer = () => JSON.parse(class_offer_json());
   window.__encounter = () => JSON.parse(encounter_json());
+  window.__bestiary = (who) => bestiary_json(who ?? '');
   window.__character = () => JSON.parse(character_json());
   // **M12.0's probe reads this and works nothing out.** Board pressure is
   // `core::pressure`, and the walker printing it is the same discipline as the

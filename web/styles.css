@@ -195,7 +195,7 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
    full-viewport overlay, `.screen.framed[hidden]` kept a hidden fight screen
    swallowing clicks, and this. All three were found by `elementFromPoint` and
    none of them by reading. `check_the_fork_is_on_top` is what stops a fourth. */
-#tree, #log, #ending, #history, #combat, #instrument, #instant { z-index: 30; }
+#tree, #log, #ending, #history, #combat, #instrument, #instant, #bestiary { z-index: 30; }
 /* **`#instant` is not `#instrument`.** Three characters apart, one tier apart
    from nothing, and both on this line — which is the point of the line: the
    stack is written down rather than decided by the order of the file, and a
@@ -732,3 +732,26 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
 .pack .tin:hover:not(:disabled) { background: var(--surface-2); }
 .pack .tin b { font-size: 13px; }
 .pack .tin .meta { font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
+
+
+/* The bestiary: an index you pick from and an entry beside it.
+   **`.screen framed`, and it had to be.** An entry is a portrait, a stats list,
+   a defences list, a board and every card the creature is wearing — the Iron
+   Abbot's came to 2,200 pixels, so the Back button sat off the bottom of a
+   720-tall window and Escape was the only way out. That is the fight screen's
+   own problem and `.framed` is its own answer: header, a scrolling middle, and
+   one action row that does not move. `.bestiary-split` is the middle.
+
+   Two columns where there is room and one where there is not. */
+.bestiary-split { flex: 1 1 auto; min-height: 0; overflow-y: auto;
+  display: grid; gap: 18px; grid-template-columns: 1fr;
+  align-items: start; padding-bottom: 10px; }
+@media (min-width: 900px) {
+  .bestiary-split { grid-template-columns: minmax(22ch, 30ch) 1fr; }
+  /* The index scrolls on its own so a long book does not push the entry down
+     the page; on one column they share the middle's scroll instead. */
+  #bestiary-list { max-height: 100%; overflow-y: auto; }
+}
+#bestiary-list button { width: 100%; text-align: left; }
+#bestiary-entry { min-width: 0; }
+#bestiary-board { width: 100%; max-width: 420px; height: auto; }

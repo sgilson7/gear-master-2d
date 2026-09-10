@@ -79,6 +79,10 @@
                  worse than a screen that is not there yet. `paintPanel` un-hides
                  it the moment the fifth win lands. -->
             <button id="instant-open" type="button" hidden>Instant Battle</button>
+            <!-- **Only once something has been met.** Same answer the rack and
+                 the van give: a screen you cannot use is worse than a screen
+                 that is not there yet. -->
+            <button id="bestiary-open" type="button" hidden>Bestiary</button>
             <!-- **Not `#numbers`.** That button handed out the map's danger
                  and its odds to everybody for nothing, which made a skill that
                  grants them a skill that grants nothing. The reading is earned
@@ -168,6 +172,40 @@
         <ul id="instant-costs" class="stats"></ul>
         <div class="actionbar">
           <button id="instant-close" type="button" class="primary">Back</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- **What you have seen.** One meeting is the whole price. The entry is
+         built by the same `creature_json` the fight panel reads, so a glossary
+         cannot disagree with the screen it is a glossary of.
+
+         Its own id and its own prefix: `#theirs-*` is the fight panel's and
+         reusing it would put two elements on one id, which is the `.card`
+         collision in a new coat. Tier 30, *what you opened from the map*. -->
+    <div id="bestiary" class="screen framed" hidden>
+      <div class="screenbox">
+        <header class="fighthead">
+          <div>
+            <p class="eyebrow">what you have seen</p>
+            <h2>Bestiary</h2>
+            <p class="note" id="bestiary-note"></p>
+          </div>
+        </header>
+        <div class="bestiary-split">
+          <ul id="bestiary-list" class="tape whole"></ul>
+          <div id="bestiary-entry">
+            <h4 id="bestiary-name">&mdash;</h4>
+            <img id="bestiary-art" class="portrait wide" hidden alt="">
+            <ul id="bestiary-body" class="stats"></ul>
+            <h4 class="sub-h" id="bestiary-defences-head" hidden>What it does to a blow</h4>
+            <ul id="bestiary-defences" class="stats"></ul>
+            <div class="theirs-grids"><canvas id="bestiary-board"></canvas></div>
+            <div id="bestiary-cards"></div>
+          </div>
+        </div>
+        <div class="actionbar">
+          <button id="bestiary-close" type="button" class="primary">Back</button>
         </div>
       </div>
     </div>
@@ -499,6 +537,13 @@
                 <h4 id="theirs-title">&mdash;</h4>
                 <img id="theirs-art" class="portrait wide" hidden alt="">
                 <ul id="theirs-body" class="stats"></ul>
+                <!-- **What it does to a blow**, which nothing has ever shown.
+                     Every one of these has been on `Stats` since the fork and
+                     all sixty creatures carry them; a player stacking magic
+                     damage against sixty magic resist could measure it and
+                     could not read it. -->
+                <h4 class="sub-h" id="theirs-defences-head" hidden>What it does to a blow</h4>
+                <ul id="theirs-defences" class="stats"></ul>
                 <div class="theirs-grids"><canvas id="theirs-board"></canvas></div>
                 <div id="theirs-cards"></div>
               </div>

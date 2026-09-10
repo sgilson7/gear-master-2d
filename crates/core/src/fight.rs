@@ -326,6 +326,16 @@ pub fn what_a_mark_costs() -> Vec<String> {
     ]
 }
 
+/// The counter a creature's **meetings** are kept under.
+///
+/// Sibling of [`beat_key`] and deliberately a second counter rather than a
+/// reading of the first: **meeting is not beating.** A creature that killed you
+/// four times is one you have met four times and beaten none, and the bestiary
+/// is about what you have *seen*.
+pub fn met_key(creature: &str) -> String {
+    format!("met:{creature}")
+}
+
 /// The counter a creature's wins are kept under.
 ///
 /// One function so the writer and every reader spell it the same way. A

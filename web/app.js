@@ -813,6 +813,20 @@ function openEvent(id) {
       .map((line) => { const p = document.createElement('p'); p.textContent = line; return p; }));
     box.hidden = false;
     $('card-bar').hidden = false;
+    // **The world, because a choice can put a place on the map.**
+    //
+    // `paintPanel` re-reads only when the *map id* moves, which is right for
+    // every path that carries you somewhere and wrong for this one: answering
+    // an event raises a flag, and a flag is what a `hidden_until` reads — so
+    // the third turn of the chair opens the door in the north wall and the
+    // page went on drawing an empty room until something else made it re-read.
+    //
+    // The same fault as the stale map and the world-the-page-is-holding, one
+    // step along, and the same rule: **a page that draws a world has to be told
+    // which world, every time it can have changed.** Answering is one of those
+    // times. Found by the browser gate — nothing in `cargo test` can see a
+    // place that is there and not drawn.
+    world = JSON.parse(world_json());
     paintPanel(); draw(); autosave();
   });
   // **After the card is built, not before.** `showCard` clears this section

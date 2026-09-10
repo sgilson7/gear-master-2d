@@ -1986,6 +1986,326 @@ def plant(page, base_path, edit, stem="probe"):
         page.wait_for_timeout(400)
 
 
+def check_the_tide_is_drawn_before_it_goes_out(page, name, fails, base):
+    """**The far side of the water is on the page from the first visit.**
+
+    Two tiles at column 8, rows 15 and 16, drawn `tide`: sea-coloured,
+    impassable, and drained to coast when the tenth cairn goes up. A player
+    standing at row 14 has been able to see the country below the whole time,
+    which is what makes finishing the Reach a thing you go and do rather than a
+    thing you find out about.
+
+    Only a browser can say the tiles are **drawn**. `cargo test` can say what
+    terrain they are and does; what it cannot say is whether the page put
+    anything on the canvas where they are.
+    """
+    def on_the_coast(body, built):
+        strip_the_boards(body)
+        w = body.setdefault("world", {})
+        w["map"] = "the-treyway"
+        w["at"] = [8, 14]
+        flags = list(w.get("flags", []))
+        if built:
+            flags.append("built-the-tenth")
+        w["flags"] = flags
+
+    plant(page, base, lambda b: on_the_coast(b, False), stem="tide-in")
+    shape = page.evaluate("() => { const w = window.__world(); return [w.width, w.height]; }")
+    if shape != [16, 26]:
+        fails.append(f"{name}: the Treyway came back {shape[0]}x{shape[1]} on the coast")
+    # The page holds the terrain of every tile; the tide is two of them and the
+    # sea either side of it is not the same thing.
+    # `world_json` sends `rows[y][x]` as the terrain's **name**, once per tile,
+    # because the page draws hue and motif off it. So the page is asked what it
+    # is holding rather than what it painted, which is the closest a check can
+    # get to "is it on the canvas" without reading pixels — and it is the same
+    # payload the canvas draws from.
+    read = page.evaluate("""() => {
+        const r = window.__world().rows;
+        return { tide: [r[15][8], r[16][8]], sea: [r[15][7], r[16][9]] };
+    }""")
+    if read["tide"] != ["tide", "tide"]:
+        fails.append(f"{name}: the tide is drawn {read['tide']!r} before it goes out")
+    if read["sea"] != ["sea", "sea"]:
+        fails.append(f"{name}: the water either side of the tide is {read['sea']!r}")
+    # And you cannot walk onto it.
+    page.keyboard.press("ArrowDown")
+    page.wait_for_timeout(300)
+    dismiss_card(page)
+    close_fight(page)
+    if page.text_content("#coords").strip() != "8, 14":
+        fails.append(f"{name}: the tide was out before the tenth cairn: "
+                     f"{page.text_content('#coords')!r}")
+
+    plant(page, base, lambda b: on_the_coast(b, True), stem="tide-out")
+    read = page.evaluate("() => { const r = window.__world().rows; return [r[15][8], r[16][8]]; }")
+    if read != ["coast", "coast"]:
+        fails.append(f"{name}: the tenth cairn went up and the tide is still {read!r}")
+    page.keyboard.press("ArrowDown")
+    page.wait_for_timeout(300)
+    dismiss_card(page)
+    close_fight(page)
+    if page.text_content("#coords").strip() != "8, 15":
+        fails.append(f"{name}: the tide went out and is still a wall: "
+                     f"{page.text_content('#coords')!r}")
+    print("ok: the tide is drawn before it goes out, and walkable after")
+
+
+def check_the_sump_refuses_without_an_instrument(page, name, fails, base):
+    """**The lip of the Sump is the Reach's door in a second place.**
+
+    A gate that wants an instrument is not a wall, it is a bench: it opens the
+    instrument frame rather than printing a refusal, because it is the one kind
+    of shut door whose answer the player may be carrying the parts for. What
+    only a browser can say is that the second one behaves like the first —
+    core has one rule and two places read it, and a page that special-cased the
+    Reach would pass every test in `cargo test`.
+    """
+    def at_the_lip(body, instrument=None):
+        # **The board first, the world after** — `strip_the_boards` resets
+        # `world.map` and `seat_a_set` strips too, so a plant that wants a
+        # different map sets it once every stripper has run.
+        strip_the_boards(body)
+        if instrument:
+            seat_a_set(body, instrument, "instrument")
+        w = body.setdefault("world", {})
+        w["map"] = "the-treyway"
+        w["at"] = [7, 22]
+        w["flags"] = list(w.get("flags", [])) + ["built-the-tenth"]
+
+    plant(page, base, lambda b: at_the_lip(b), stem="sump-bare")
+    dismiss_card(page)
+    close_fight(page)
+    where = page.evaluate("() => [window.__world().id, document.getElementById('coords').textContent]")
+    if where[0] != "the-treyway" or where[1].strip() != "7, 22":
+        fails.append(f"{name}: planted below the lip and came up at {where!r}")
+        return
+    page.keyboard.press("ArrowUp")
+    page.wait_for_timeout(500)
+    dismiss_card(page)
+    close_fight(page)
+    if page.evaluate("() => window.__world().id") != "the-treyway":
+        fails.append(f"{name}: a bare board walked into the Sump")
+    # **The refusal is a screen and not a line on the strip**, the same as the
+    # Reach's — `openKit(wants_instrument, shut)` takes the sentence with it —
+    # and the first version of this check read the tape, found nothing, and was
+    # right about the wrong element.
+    elif page.is_hidden("#instrument"):
+        fails.append(f"{name}: the lip refused and did not open the frame")
+    else:
+        said = (page.text_content("#instrument-shut") or "").lower()
+        if "nothing to read it with" not in said:
+            fails.append(f"{name}: the lip refused with {said[:140]!r}")
+        page.keyboard.press("Escape")
+        page.wait_for_selector("#instrument", state="hidden", timeout=5000)
+
+    # **And a compass opens it**, which is the half that says the second survey
+    # gate in the game behaves like the first.
+    plant(page, base, lambda b: at_the_lip(b, COMPASS), stem="sump-compass")
+    page.keyboard.press("ArrowUp")
+    page.wait_for_timeout(500)
+    dismiss_card(page)
+    close_fight(page)
+    if page.evaluate("() => window.__world().id") != "the-sump-1":
+        fails.append(f"{name}: a compass did not open the lip of the Sump")
+    print("ok: the lip of the Sump refuses in the Reach's words and opens the frame")
+
+
+def check_a_wheel_says_what_it_wants(page, name, fails, base):
+    """**The wheel that costs you something says what shape it wants, and keeps
+    it.**
+
+    Wheel C is the one that is not needed — channel C is walked round at its dry
+    east end — and it is the only wheel in the game that keeps what you feed it.
+    So it is the one whose refusal has to name a shape, and the one where a
+    browser can watch a component leave the tray.
+    """
+    def at_the_wheel(body, carrying):
+        strip_the_boards(body)
+        w = body.setdefault("world", {})
+        w["map"] = "the-sump-1"
+        w["at"] = [10, 9]
+        if carrying:
+            give(body, ["Emberplate"])
+
+    # **Nothing loose that is two by two.** The walk's own character has fought
+    # fifty times and owns a bagful, so this is planted rather than assumed —
+    # and `strip_the_boards` clears the *grids*, which is not the tray.
+    def bare(body):
+        at_the_wheel(body, False)
+        body["character"]["owned"] = []
+        body["character"]["registry"] = []
+
+    plant(page, base, bare, stem="wheel-bare")
+    page.evaluate("(at) => window.__standHere(at)", [10, 8])
+    page.keyboard.press("ArrowDown")
+    page.wait_for_timeout(350)
+    close_fight(page)
+    if page.is_hidden("#card"):
+        fails.append(f"{name}: walked onto the wheel with nothing and no card opened")
+        return
+    said = page.evaluate("""() => [...document.querySelectorAll('#card-choices .choice')]
+        .map(e => e.textContent).join(' ')""").lower()
+    if "two by two" not in said:
+        fails.append(f"{name}: the wheel's refusal does not name a shape: {said[:160]!r}")
+    leave_the_card(page)
+
+    # And a two-by-two in the tray turns it, and is gone from the tray.
+    def carrying(body):
+        bare(body)
+        give(body, ["Emberplate"])
+
+    plant(page, base, carrying, stem="wheel-fed")
+    had = page.evaluate("""() => {
+        const s = JSON.parse(window.__save());
+        const c = s.character ?? s.state?.character ?? {};
+        return (c.owned ?? []).length;
+    }""")
+    page.evaluate("(at) => window.__standHere(at)", [10, 8])
+    page.keyboard.press("ArrowDown")
+    page.wait_for_timeout(350)
+    close_fight(page)
+    rows = page.evaluate("""() => [...document.querySelectorAll('#card-choices .choice')]
+        .map(e => ({ off: e.disabled || e.classList.contains('locked') }))""")
+    live = [i for i, r in enumerate(rows) if not r["off"]]
+    if not live:
+        fails.append(f"{name}: a two-by-two in the tray and the wheel still refuses")
+    else:
+        page.locator("#card-choices .choice").nth(live[0]).click()
+        page.wait_for_timeout(300)
+        left = page.evaluate("""() => {
+            const s = JSON.parse(window.__save());
+            const c = s.character ?? s.state?.character ?? {};
+            return (c.owned ?? []).length;
+        }""")
+        if left != had - 1:
+            fails.append(f"{name}: the wheel turned and the tray went {had} -> {left}")
+    leave_the_card(page)
+    print("ok: a wheel that keeps what you feed it says what shape it wants")
+
+
+def check_the_chair_refuses_the_wrong_move(page, name, fails, base):
+    """**Three moves in an order, at one object, and the wrong one is refused.**
+
+    `PLAN-M14.md` §5.2 wants nine and asks for a fight on a wrong move; nine is
+    not expressible in monotone flags over three always-offered labels, and *a
+    refusal spends nothing* is older and harder than *a wrong move costs a
+    fight*. So the chair is three moves and a wrong one is greyed with a reason.
+
+    What only a browser can say: **the card comes back**. Every other event in
+    this game is spent the moment it is answered, so a page that wrote the chair
+    into `answered` would look identical in `cargo test` and be a room with one
+    move in it.
+    """
+    def in_the_room(body):
+        strip_the_boards(body)
+        w = body.setdefault("world", {})
+        w["map"] = "the-silt-stair-2"
+        w["at"] = [5, 7]
+
+    plant(page, base, in_the_room, stem="chair")
+    seen = 0
+    for step in range(3):
+        # **Put down beside it and step on**, which is one keypress and no
+        # geometry: walking round a chair three times is a test about walking.
+        page.evaluate("(at) => window.__standHere(at)", [5, 7])
+        page.keyboard.press("ArrowUp")
+        page.wait_for_timeout(350)
+        close_fight(page)
+        if page.is_hidden("#card"):
+            fails.append(f"{name}: the chair did not come back on visit {step + 1}")
+            break
+        seen += 1
+        rows = page.evaluate("""() => [...document.querySelectorAll('#card-choices .choice')]
+            .map(e => ({ text: e.textContent, off: e.disabled || e.classList.contains('locked') }))""")
+        live = [i for i, r in enumerate(rows) if not r["off"]]
+        if not rows:
+            # **A spent card still opens; its choices are gone.** So `repeats`
+            # coming off reads as an empty card rather than as a missing one,
+            # and the sentence has to say which.
+            fails.append(f"{name}: the chair was answered once and is spent")
+            break
+        if len(rows) != 3:
+            fails.append(f"{name}: the chair offers {len(rows)} things, not three")
+            break
+        # **The move that advances is live and every move after it is not.**
+        #
+        # Not *exactly one is live*, which is what this asked first and is not
+        # true: monotone flags cannot un-set a flag, so the first move of a
+        # cycle has no requirement and stays live for ever. Turning a chair to
+        # face a door it already faces is a thing you can do and it does
+        # nothing, which is honest — what would be dishonest is a room where
+        # the next move is not the only one that moves.
+        if step not in live:
+            fails.append(f"{name}: move {step + 1} of the chair is refused at step {step + 1}")
+            break
+        ahead = [i for i in live if i > step]
+        if ahead:
+            fails.append(f"{name}: move {ahead[0] + 1} of the chair is live at step "
+                         f"{step + 1}, so the room can be finished out of order")
+        page.locator("#card-choices .choice").nth(step).click()
+        page.wait_for_timeout(300)
+        leave_the_card(page)
+    if seen == 3:
+        there = page.evaluate("""() => (window.__world().places ?? [])
+            .some(p => p.id === 'the-silt-stair-2-stair')""")
+        if not there:
+            fails.append(f"{name}: three right moves and the door is still not there")
+        print("ok: the chair is three moves in an order, and it comes back")
+
+
+def check_the_third_town_is_empty_on_purpose(page, name, fails, base):
+    """**A town drawn honestly, and the screen after it that says so.**
+
+    `PLAN-M14.md` §1.5 says the *town's* prose carries the stop-line; a town has
+    no prose field and never has, so the sentence is on the one kind the game
+    already has for a screen that is not a loop — a `Door`, one tile south of
+    the counter, which you walk onto on the way out.
+    """
+    def down_there(body):
+        strip_the_boards(body)
+        w = body.setdefault("world", {})
+        w["map"] = "the-undercountry"
+        w["at"] = [10, 9]
+        w["answered"] = list(w.get("answered", [])) + [
+            "the-ninth-surveyor", "the-bottom-of-the-bottom"]
+
+    plant(page, base, down_there, stem="third-town")
+    page.keyboard.press("ArrowDown")
+    page.wait_for_timeout(400)
+    close_fight(page)
+    if page.is_hidden("#town"):
+        fails.append(f"{name}: walked into the third town and no counter opened")
+    else:
+        # **Count the buttons, because a line on the shelf is a thing you can
+        # press.** `.ware` is the packing screen's class and this box does not
+        # use it — the first version counted zero of them on a shelf with a
+        # book on it and was saved only by the sentence below.
+        shelf = page.evaluate("() => document.querySelectorAll('#shelf button').length")
+        if shelf:
+            fails.append(f"{name}: the empty town has {shelf} things on the shelf")
+        # **And it says so rather than drawing nothing.** An empty box is
+        # indistinguishable from a box that failed to draw.
+        said = (page.text_content("#shelf") or "").lower()
+        if "nothing for sale" not in said:
+            fails.append(f"{name}: the empty shelf is blank rather than saying so: {said[:80]!r}")
+        page.click("#leave")
+        page.wait_for_selector("#town", state="hidden", timeout=5000)
+    page.keyboard.press("ArrowDown")
+    page.wait_for_timeout(400)
+    close_fight(page)
+    if page.is_hidden("#ending"):
+        fails.append(f"{name}: nothing south of the town says where the writing stops")
+    else:
+        prose = page.evaluate("""() => [...document.querySelectorAll('#ending-prose p')]
+            .map(p => p.textContent).join(' ')""")
+        if "decided" not in prose.lower():
+            fails.append(f"{name}: the last screen does not say what it is: {prose[:80]!r}")
+        page.click("#ending-close")
+        page.wait_for_selector("#ending", state="hidden", timeout=5000)
+    print("ok: the third town is empty, and the screen after it says so")
+
+
 def check_an_errand_can_be_handed_in_where_it_was_taken(page, name, fails):
     """The reported blocker: Marbulon's tile went dead once her card was read.
 
@@ -2571,26 +2891,34 @@ def check_the_lake_drains_and_the_demo_ends_under_it(page, name, fails):
 
     plant(page, base, lambda b: under_it(b, True), stem="lake-boss-down")
     door = page.evaluate("""() => (window.__world().places ?? [])
-        .find(p => p.kind === 'door')""")
+        .find(p => p.id === 'the-door-under-the-lake')""")
     if not door:
         fails.append(f"{name}: the boss is down and there is nothing behind it")
         plant(page, base, lambda body: None, stem="lake-restore")
         return
+    # **It is a way on since M14.3, and it was a screen that said nobody had
+    # decided.** *Nothing is behind the door* was true and is not: it opens onto
+    # the Silt Stair, and the sentence it was carrying moved one map further
+    # down onto the third town, where the writing actually stops.
+    if door.get("kind") != "gate":
+        fails.append(f"{name}: the door under the lake is a {door.get('kind')!r}")
     page.evaluate("(at) => window.__standHere(at)", [door["at"][0] - 1, door["at"][1]])
     close_fight(page)
     dismiss_card(page)
     page.keyboard.press("ArrowRight")
-    page.wait_for_timeout(400)
-    if page.is_hidden("#ending"):
-        fails.append(f"{name}: walked onto the last door in the game and nothing happened")
-    else:
-        prose = page.evaluate("""() => [...document.querySelectorAll('#ending-prose p')]
-            .map(p => p.textContent).join(' ')""")
-        if "decided" not in prose.lower():
-            fails.append(f"{name}: the ending does not say what it is: {prose[:80]!r}")
-        # It is not the fork: you can back out of it.
-        page.click("#ending-close")
-        page.wait_for_selector("#ending", state="hidden", timeout=5000)
+    page.wait_for_timeout(500)
+    where = page.evaluate("() => window.__world().id")
+    if where != "the-silt-stair-1":
+        fails.append(f"{name}: walked through the door under the lake and arrived on {where!r}")
+    # **The paragraph is a card, not a line on the strip.** A gate with prose
+    # shows it once through `showCard`, and the strip gets "you go through." —
+    # which is what the first version of this assertion read, and it read it
+    # for the right reason and off the wrong element.
+    card = page.evaluate("""() => [...document.querySelectorAll('#card-prose p')]
+        .map(p => p.textContent).join(' ')""").lower()
+    if "stair" not in card:
+        fails.append(f"{name}: went through and the card did not say what was behind it: {card[:120]!r}")
+    leave_the_card(page)
 
     plant(page, base, lambda body: None, stem="lake-restore")
 
@@ -3092,6 +3420,21 @@ def strip_the_boards(body):
     body["character"]["locks"] = []
     body["character"]["enchanted"] = []
     body.setdefault("world", {})["map"] = ""
+
+
+def give(body, names):
+    """Put loose components in a planted save's bag, by canonical name.
+
+    The three lines every plant that wants something in the tray has written out
+    for itself since M8 — append to the registry, append the index to `owned` —
+    written once, because six copies of *what it means to own a thing* is six
+    places for the save format to change underneath.
+    """
+    ch = body["character"]
+    reg = ch.setdefault("registry", [])
+    for n in names:
+        reg.append({"def": n})
+        ch.setdefault("owned", []).append(len(reg) - 1)
 
 
 def seat_a_set(body, pieces, slot):
@@ -4870,6 +5213,17 @@ def walk_the_gate(browser, name, fails=None):
     # Last in the upload block, because it replaces the game with somebody
     # else's: everything above wants the walk's own state.
     check_the_frozen_save_is_playable(page, name, fails)
+    # --- M14: the south, the two dungeons and the country under the country --
+    #
+    # Five checks sharing one downloaded save, planted five ways. Grouped here
+    # because every one of them wants a character standing somewhere twenty
+    # minutes of fighting away, and what wants proving is what happens *at* that
+    # place rather than the road to it.
+    check_the_tide_is_drawn_before_it_goes_out(page, name, fails, path)
+    check_the_sump_refuses_without_an_instrument(page, name, fails, path)
+    check_a_wheel_says_what_it_wants(page, name, fails, path)
+    check_the_chair_refuses_the_wrong_move(page, name, fails, path)
+    check_the_third_town_is_empty_on_purpose(page, name, fails, path)
     # Put the walk's own game back, or every check after this reads a stranger's.
     page.set_input_files("#file", str(path))
     page.wait_for_function(

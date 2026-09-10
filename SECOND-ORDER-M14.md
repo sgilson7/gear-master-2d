@@ -242,3 +242,66 @@ The row is kept rather than deleted because the wrong version of it was about to
 become an M14.6 candidate, and *the fix for a number nobody measured is a day
 spent on the wrong file*. `lake.rs::every_drain_names_terrain_that_exists` does
 load twenty maps per drain and it costs 0.05s.
+
+### 18. A stack gate that wants an instrument never opened the frame
+
+`wants_instrument = p.to.clone()` in the shim, which was right while the only
+survey gate in the game opened onto **one** map. The lip of the Wextreen Sump is
+a *stack* — four floors and no `to` at all — so `to` was `None`, the page had no
+map to read the trade against, and **the one door in the game whose answer you
+may be carrying the parts for printed a refusal and stopped.**
+
+`p.opens_onto(&g.world)` is core's answer to *which map is through it now*, and
+it is the one the display should have been asking all along.
+
+**Found by the browser gate.** `cargo test` cannot see a screen that did not
+open, and there is no core-side assertion that would have caught it: the gate's
+refusal, the instrument list and the frame's contents were all correct.
+
+**Status: fixed in M14.5.**
+
+### 19. The world the page is holding, one step along
+
+Answering an event raises a flag; a flag is what a `hidden_until` reads; so the
+third turn of the chair opens the door in the north wall — **and the page went
+on drawing an empty room.** `paintPanel` re-reads the world only when the *map
+id* moves, which is right for every path that carries you somewhere and wrong
+for this one.
+
+This is the third instance of one rule, and the rule has not changed: **a page
+that draws a world has to be told which world, every time it can have changed.**
+The stale map was a defeat carrying you to another map; the world-the-page-is-
+holding was a save being restored; this is a choice being taken.
+
+Also found by the browser gate, and it is the same sentence as row 18: nothing
+in `cargo test` can see a place that is there and not drawn.
+
+**Status: fixed in M14.5.**
+
+### 20. Two gate checks that read the right thing off the wrong element
+
+Both caught by the negative pass rather than by the run:
+
+- The lip's refusal was read off the **strip**. A gate that wants an instrument
+  goes through `openKit(wants_instrument, shut)`, so the sentence is on
+  `#instrument-shut` and the strip says nothing — and the Reach's own check has
+  read it off the frame since M11.6.
+- The empty shelf was counted as `#shelf .ware`. That is the *packing screen's*
+  class; the shelf draws buttons. The count came back zero on a shelf with a
+  book on it, and only the second assertion — that an empty box says *"Nothing
+  for sale here"* rather than being blank — reported the fault.
+
+**A check that reads its answer off the wrong element is green on a broken
+build**, which is the compares-zero-with-zero family again and is why the
+negative pass is not optional.
+
+### 21. `PlaceKind::Door` keeps its user, and §1.5 was wrong about where
+
+§1.5 says *the town's prose says the writing stops here*. **A town has no prose
+field and never has** — a `TownShelf` is an id, a stock list and a commission
+list. So the stop-line is on a `Door` one tile south of the counter, which is
+the kind the game already has for a screen that is not a loop and which M14.3
+had just left without a user.
+
+Row 15's question is answered by the content rather than by deleting a variant:
+the ending screen is a `Door`, there is exactly one, and it is on the last map.

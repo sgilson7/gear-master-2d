@@ -615,7 +615,21 @@ pub fn try_step(dir: &str) -> String {
                         // is through it, because what an instrument *reads* is
                         // a question about the map on the far side.
                         if p.needs_survey {
-                            wants_instrument = p.to.clone();
+                            // **Which map is through it is core's**, and asking
+                            // `to` directly was right while the only survey gate
+                            // in the game opened onto one map. The lip of the
+                            // Wextreen Sump is a *stack* — four floors and no
+                            // `to` at all — so `to` was `None`, the page had no
+                            // map to read the trade against, and **the frame
+                            // never opened**: the one door in the game whose
+                            // answer you may be carrying the parts for printed
+                            // a refusal and stopped. Found by the browser gate;
+                            // `cargo test` cannot see a screen that did not
+                            // open.
+                            wants_instrument = p
+                                .opens_onto(&g.world)
+                                .map(|m| m.to_string())
+                                .or_else(|| p.to.clone());
                         }
                     }
                 }

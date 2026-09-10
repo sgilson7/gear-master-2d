@@ -200,10 +200,23 @@ impl Paper {
     /// The Patent has never had one — it is the way round the fork for anybody
     /// whose class did not come with it, and gating that on anything would be
     /// gating the exception.
+    ///
+    /// **And the Second Paper has none either, since M15.4.** It wanted one
+    /// finished tree and the human took that off in their own words: *"the
+    /// second class should no longer be gated behind finishing the first one,
+    /// instead you get it whenever you can afford the 2nd paper at spike
+    /// kaklons van."* So it is gated by its price and by the level that puts
+    /// the van on the road, and by nothing else.
+    ///
+    /// **The expert paper is not in that ask and keeps its gate.** Two finished
+    /// trees is what makes it free — the twenty-four points *are* the price, and
+    /// a free paper anybody can walk up to is not a paper, it is a fourth class
+    /// on the fork. That is the whole of why the two lines are different, and
+    /// it is why `StockGate::TreesFinished` still has a user rather than
+    /// becoming a variant nothing constructs.
     pub fn gate(self) -> Option<StockGate> {
         match self {
-            Paper::Patent => None,
-            Paper::Second => Some(StockGate::TreesFinished(1)),
+            Paper::Patent | Paper::Second => None,
             Paper::Expert => Some(StockGate::TreesFinished(2)),
         }
     }

@@ -431,6 +431,9 @@ impl Game {
                         .to_string(),
                     self.character.second_class.is_some() || self.character.second_paper,
                 ),
+                // **Nothing else stands between a character and this line.**
+                // It wanted one finished tree until M15.4; what is left is the
+                // five thousand and the level that puts the van on the road.
                 Paper::Expert => {
                     // **The line prints the expert's own promise**, so a player
                     // choosing a second class can see what that pairing

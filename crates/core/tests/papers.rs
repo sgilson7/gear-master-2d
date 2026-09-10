@@ -53,12 +53,18 @@ fn all_three_papers_are_on_the_counter_from_the_first_visit() {
     let g = at_level(12);
     let ids: Vec<&str> = g.papers().iter().map(|l| l.paper.id()).collect();
     assert_eq!(ids, vec!["licence", "second-paper", "expert-paper"]);
-    // Two of them refused, and both refusals name the count.
+    // **One of them refused, since M15.4**, and its refusal names the count.
+    // The Patent has never had a gate and the Second Paper stopped having one
+    // when the human took the tree off it; what is left on that line is five
+    // thousand Fnorp, which is a price rather than a gate and is why `afford`
+    // is a separate field from `why`.
     assert!(line(&g, Paper::Patent).unwrap().why.is_none(), "the Patent has never had a gate");
-    for p in [Paper::Second, Paper::Expert] {
-        let why = line(&g, p).unwrap().why.expect("refused");
-        assert!(why.contains("finished"), "{p:?}: {why}");
-    }
+    assert!(
+        line(&g, Paper::Second).unwrap().why.is_none(),
+        "the second paper is refusing, and it is meant to be gated by its price"
+    );
+    let why = line(&g, Paper::Expert).unwrap().why.expect("refused");
+    assert!(why.contains("finished"), "{why}");
 }
 
 /// **The third line prints the expert's own promise**, so a player choosing a
@@ -96,30 +102,75 @@ fn an_answered_paper_leaves_the_counter() {
 
 // ------------------------------------------------------------------ buying
 
+/// **Five thousand Fnorp, and nothing else.**
+///
+/// It wanted one finished tree until M15.4 and the human took that off in their
+/// own words: *"the second class should no longer be gated behind finishing the
+/// first one, instead you get it whenever you can afford the 2nd paper at spike
+/// kaklons van."*
+///
+/// So this test is the old one with its first assertion turned round: a
+/// character who has spent **no points at all** buys it, and the only refusal
+/// left is the money. The version that pinned the tree gate is not repaired,
+/// it is inverted — a test that pins the behaviour you are deliberately
+/// changing is a test to rewrite in the commit that changes it, with the reason
+/// in the message.
 #[test]
-fn the_second_paper_wants_one_finished_tree_and_five_thousand() {
+fn the_second_paper_wants_five_thousand_and_nothing_else() {
     let mut g = at_level(12);
     g.character.choose_class("Berserker").unwrap();
-    g.character.gold = 10_000;
+    assert_eq!(g.character.finished_trees(), 0, "this character has finished a tree already");
 
-    // Not before the tree is finished, and a refusal spends nothing.
-    let why = g.buy_paper(Paper::Second).unwrap_err();
-    assert!(why.contains("finished"), "{why}");
-    assert_eq!(g.character.gold, 10_000, "a refusal spends nothing");
+    // **No gate on the line at all**, with nothing finished.
+    assert!(
+        line(&g, Paper::Second).unwrap().why.is_none(),
+        "the second paper is still refusing somebody who can afford it"
+    );
 
-    finish(&mut g.character, "Berserker");
-    assert!(line(&g, Paper::Second).unwrap().why.is_none(), "the tree is finished");
-
-    // And not without the money.
+    // The money is the only thing left, and a refusal spends nothing.
     g.character.gold = 4_999;
     let why = g.buy_paper(Paper::Second).unwrap_err();
     assert!(why.contains("4999"), "{why}");
     assert!(!g.character.second_paper, "a refusal spends nothing");
+    assert_eq!(g.character.gold, 4_999);
 
     g.character.gold = 5_000;
     assert_eq!(g.buy_paper(Paper::Second).unwrap(), 5_000);
     assert_eq!(g.character.gold, 0);
     assert!(g.character.owed_a_second_class());
+
+    // **And finishing a tree changes nothing about it**, which is the other
+    // direction and the one that would catch a gate coming back by accident.
+    let mut h = at_level(12);
+    h.character.choose_class("Berserker").unwrap();
+    finish(&mut h.character, "Berserker");
+    h.character.gold = 5_000;
+    assert!(line(&h, Paper::Second).unwrap().why.is_none());
+    assert_eq!(h.buy_paper(Paper::Second).unwrap(), 5_000);
+}
+
+/// **The expert paper kept its gate, and that is not an oversight.**
+///
+/// The ask names the second paper and not this one. Two finished trees is what
+/// makes the expert *free* — the twenty-four points are the price — and a free
+/// paper anybody can walk up to is not a paper, it is a fourth class on the
+/// fork.
+#[test]
+fn the_expert_paper_still_wants_two_finished_trees() {
+    let mut g = at_level(12);
+    g.character.choose_class("Berserker").unwrap();
+    let why = line(&g, Paper::Expert).unwrap().why.expect("refused with nothing finished");
+    assert!(why.contains("finished"), "{why}");
+    assert_eq!(
+        gm2d_core::shop::Paper::Expert.gate(),
+        Some(gm2d_core::shop::StockGate::TreesFinished(2)),
+        "the expert paper lost its gate with the second paper's"
+    );
+    assert_eq!(
+        gm2d_core::shop::Paper::Second.gate(),
+        None,
+        "the second paper is still gated on something"
+    );
 }
 
 /// **The paper is spent on the choice, not on the purchase**, so it survives

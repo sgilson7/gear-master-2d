@@ -4911,32 +4911,56 @@ def check_the_papers_are_drawn_and_refused(page, name, fails):
     with page.expect_download(timeout=20000) as dl:
         page.click("#download")
     base = dl.value.path()
-    bers = tree_nodes("Berserker")
 
-    def one_tree_finished(body):
+    def at_the_van(body, finished):
         c = body["character"]
         c["gold"] = 50_000
         c["xp"] = 400_000               # well past the level the van wants
         c["class"] = "Berserker"
-        c["skills_taken"] = list(bers)
+        # **Nothing spent, in the first plant.** The second paper wanted one
+        # finished tree until M15.4 and the human took that off; the check that
+        # says so has to stand somewhere the old gate would have refused, which
+        # is a character who has not spent a point.
+        c["skills_taken"] = list(tree_nodes("Berserker")) if finished else []
         c["skill_points"] = 20
         body["world"]["at"] = [4, 6]
         body["world"]["map"] = "west-bambulon"
         body.pop("encounter", None)
 
     try:
-        plant(page, base, one_tree_finished, stem="papers-one")
+        # --- nothing finished: two lines open, one refused ------------------
+        plant(page, base, lambda b: at_the_van(b, False), stem="papers-none")
         stand_at_the_van(page)
-        drawn = papers_on_the_counter(page)
-        by_id = {p["id"]: p for p in drawn}
+        by_id = {p["id"]: p for p in papers_on_the_counter(page)}
         for want in ("licence", "second-paper", "expert-paper"):
             if want not in by_id:
-                fails.append(f"{name}: {want} is not on the counter with one tree finished")
+                fails.append(f"{name}: {want} is not on the counter with nothing finished")
+        if "second-paper" in by_id and by_id["second-paper"]["off"]:
+            fails.append(
+                f"{name}: the second paper is refused with nothing finished and 50,000 Fnorp — "
+                f"it is gated by its price now: {by_id['second-paper']['text'][:120]!r}")
+        if "expert-paper" in by_id:
+            row = by_id["expert-paper"]
+            if not row["off"]:
+                fails.append(f"{name}: the expert paper sold with nothing finished")
+            elif "finished" not in row["text"]:
+                fails.append(
+                    f"{name}: the expert paper's refusal does not count: {row['text'][:120]!r}")
+        for sel in ("#vendor-close", "#leave"):
+            if page.is_visible(sel):
+                page.click(sel)
+
+        # --- one finished: the expert line still refuses, and counts --------
+        plant(page, base, lambda b: at_the_van(b, True), stem="papers-one")
+        stand_at_the_van(page)
+        by_id = {p["id"]: p for p in papers_on_the_counter(page)}
         if "expert-paper" in by_id:
             row = by_id["expert-paper"]
             if not row["off"]:
                 fails.append(f"{name}: the expert paper sold with one tree finished")
-            # The count, in the sentence, off `StockGate::refusal`.
+            # The count, in the sentence, off `StockGate::refusal`. This is the
+            # check that keeps `StockGate` from going vacuous now that only one
+            # paper constructs one.
             if "1 of the 1" not in row["text"]:
                 fails.append(
                     f"{name}: the expert paper's refusal does not count: {row['text'][:120]!r}")

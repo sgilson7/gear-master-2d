@@ -590,7 +590,36 @@ def main():
             page.click("#reset")
             page.wait_for_timeout(200)
 
-            head("a new game")
+            # **`GM2D_FROM` starts the walk somewhere other than the beginning,
+            # and the default is still a new game.**
+            #
+            # This walker's whole value is that it starts at level one and plays
+            # — it found an Auto-pack seating the starting kit for the whole
+            # game and a class fork opening underneath the town, and both were
+            # green in the suite. That does not change.
+            #
+            # What it cannot do is get everywhere. M14 put eight floors behind
+            # the Drambus Stack, and a walk that plateaus at level eleven on the
+            # tower's fourth floor never sees one of them — **which is a fact
+            # about the walker and not about the floors**, and `PLAN.md` §6d row
+            # 3 has been saying so since M11.9. A transcript that stops three
+            # maps short is still a transcript; what it is not is evidence about
+            # the maps it did not reach.
+            #
+            # So: a save file, loaded before the first press, and everything
+            # after it is the same walk. Not a plant with assertions on it —
+            # that is `drive.py`'s job and it does it well — a *start line*.
+            #
+            #     GM2D_FROM=testing/saves/at-the-lip.json make play
+            start_from = os.environ.get("GM2D_FROM")
+            if start_from:
+                page.set_input_files("#file", start_from)
+                page.wait_for_function(
+                    "() => Array.from(document.querySelectorAll('#tape li'))"
+                    ".some(e => (e.textContent || '').includes('Loaded'))", timeout=20000)
+                say(f"  started from {start_from}")
+
+            head("a new game" if not start_from else "a walk in progress")
             say(" ", panel(page))
             # The baseline starts at level one, before a single fight, because
             # a curve that starts at the first level *gained* is missing the
@@ -599,9 +628,16 @@ def main():
             probe.at_level(page.evaluate("() => window.__character()")["level"])
             # Where the map is.
             world = page.evaluate("() => window.__world()")
-            town = next(p for p in world["places"] if p["kind"] == "town")
+            # **`None` rather than a `StopIteration`.** A new game starts on the
+            # map with the pit on it, so this was `next(...)` for eleven
+            # blocks — and `GM2D_FROM` can start a walk on a map with no town on
+            # it at all, which is most of them. The map's own branch looks its
+            # own town up anyway; this line is the opening sentence of the
+            # transcript and nothing else reads it.
+            town = next((p for p in world["places"] if p["kind"] == "town"), None)
             gate = next((p for p in world["places"] if p["kind"] == "gate"), None)
-            say(f"  town at {town['at']}, cave gate at {gate['at'] if gate else '—'}")
+            say(f"  town at {town['at'] if town else '—'}, "
+                f"gate at {gate['at'] if gate else '—'}")
 
             head("the road")
             phase = ""
@@ -650,6 +686,13 @@ def main():
             # already crossed off. `answered` is the real record; this is the
             # walker's own give-up list, the same one `done_marks` is.
             read_over = set()
+            # Tiles written into `read_over` by a refusal rather than by a card.
+            # See where they are cleared.
+            refused = set()
+            # Tiles that have actually produced a card. See where they are read:
+            # a card that opened is not a tile with nothing on it, however many
+            # times you are standing on it afterwards.
+            productive = set()
             # Targets that would not let us in, by how many presses were spent
             # finding that out.
             stuck = {}
@@ -675,7 +718,30 @@ def main():
                         losses += 1
                     continue
                 if page.is_visible("#card"):
+                    # `position()` reports `x` and `y`, not an `at` pair — the
+                    # save carries the pair and the cheap call carries the two.
+                    at_now = tuple(page.evaluate(
+                        "() => { const p = JSON.parse(window.__position()); return [p.x, p.y]; }"))
+                    productive.add((page.evaluate("() => window.__world().id"), at_now))
                     card(page, probe=probe)
+                    # **A lever changes what is reachable, so a bar goes stale.**
+                    #
+                    # The walk gives up on a tile it has been refused three times
+                    # — M9.3's lesson, and right for a crossing, which refuses on
+                    # what you *are*. It is wrong on a floor with a sluice on it:
+                    # the Lip's wheel B is behind channel A, so the walker bounced
+                    # off the water three times, barred the wheel, wrote it down as
+                    # read, turned wheel A, and then had nothing left to walk to on
+                    # a floor it was two moves from finishing.
+                    #
+                    # Answering a card is the one thing that can move a wall in
+                    # this game. So the bars come off, and the tiles that were
+                    # written down as read *because they refused* come off with
+                    # them — the ones actually read stay read.
+                    barred.clear()
+                    stuck.clear()
+                    read_over -= refused
+                    refused.clear()
                     continue
                 if page.is_visible("#vendor"):
                     # **The man in the van.** M10 put him on the Verge road at
@@ -829,7 +895,15 @@ def main():
                 surveyed = "the-trig-stone" in answered
                 read_the_lot = (TREYWAY_PROMISES <= answered and seen_kettleworks
                                 and floors_down >= 5 and lake_done)
-                if seen_treyway and world["id"] == "west-bambulon" and read_the_lot:
+                # **A walk that started past this has nothing to come back
+                # from.** `GM2D_FROM` puts the walker on a start line where the
+                # tower is already down and the lake is already a bed, so this
+                # fired the first time it stepped onto Bambulon — one hundred
+                # and fifty presses in, with the Lip three quarters solved
+                # behind it. A run that begins after the demo ends finishes when
+                # it runs out of presses.
+                if (not start_from and seen_treyway
+                        and world["id"] == "west-bambulon" and read_the_lot):
                     came_back = True
                     head("back through the door")
                     say(f"  {panel(page)}")
@@ -894,9 +968,33 @@ def main():
                         head(world["id"].replace("-", " "))
                         say(f"  {panel(page)}")
                         phase = world["id"].replace("-", " ")
-                    unread = [tuple(p["at"]) for p in world["places"]
-                              if p["kind"] == "event"
-                              and (world["id"], tuple(p["at"])) not in read_over]
+                    # **Three tiers, and each one is a thing that went wrong.**
+                    #
+                    # `read_over` is *"nothing happened here"* — and it is also
+                    # where a tile lands when a step at it has been refused
+                    # three times, which on a floor with a sluice on it is every
+                    # tile behind the sluice. `productive` is the honest
+                    # question: which of these has actually given me a card.
+                    #
+                    # 1. **Never opened, never refused.** The ordinary case.
+                    # 2. **Never opened, but written off.** The chain across the
+                    #    flooded gallery: the walk was turned back on the way to
+                    #    it and then re-pulled the chain under its feet for
+                    #    twelve thousand presses.
+                    # 3. **Anything on the floor**, the tile you are standing on
+                    #    included — which is what a chair you are turning needs,
+                    #    because an event only opens when you walk *onto* it and
+                    #    the drop below steps you off so you can walk back.
+                    #
+                    # Dropping tier 1 was the version that pressed at a wheel
+                    # behind a channel eleven times; dropping tier 2 was the
+                    # version that never crossed the gallery.
+                    on_this = [tuple(p["at"]) for p in world["places"] if p["kind"] == "event"]
+                    fresh = [a for a in on_this
+                             if (world["id"], a) not in productive
+                             and (world["id"], a) not in read_over]
+                    never = [a for a in on_this if (world["id"], a) not in productive]
+                    unread = fresh or never or on_this
                     down = next((p for p in world["places"]
                                  if p["kind"] == "gate" and p["id"].endswith("-stair")), None)
                     up = next((p for p in world["places"]
@@ -914,8 +1012,9 @@ def main():
                     elif down:
                         want, why = down["at"], phase
                     elif unread:
-                        unread.sort(key=lambda a: abs(a[0] - here[0]) + abs(a[1] - here[1]))
-                        want, why = list(unread[0]), phase
+                        pick = sorted(unread,
+                                      key=lambda a: abs(a[0] - here[0]) + abs(a[1] - here[1]))
+                        want, why = list(pick[0]), phase
                     elif up:
                         want, why = up["at"], "back up"
                     else:
@@ -1025,7 +1124,7 @@ def main():
                     elif promises:
                         promises.sort(key=lambda a: abs(a[0] - here[0]) + abs(a[1] - here[1]))
                         want, why = list(promises[0]), "the treyway"
-                    elif (lip and tide_out and surveyed and c["fatigue"] < 30
+                    elif (lip and tide_out and c["fatigue"] < 30
                           and (len(recent) < 6 or sum(recent) * 2 >= len(recent))):
                         # **The lip of the Wextreen Sump**, which is only there
                         # to walk to once the tide has gone out and only opens
@@ -1117,7 +1216,7 @@ def main():
                     # finished nine levels down on the run before it.
                     winning = len(recent) < 6 or sum(recent) * 2 >= len(recent)
                     limit = 400 if winning else 60
-                    if c["carried"] >= limit or c["fatigue"] >= 28:
+                    if town and (c["carried"] >= limit or c["fatigue"] >= 28):
                         want, why = town["at"], "home before the door"
                     else:
                         want, why = wall_door["at"], "door"
@@ -1201,7 +1300,21 @@ def main():
                     say(f"  {panel(page)}")
                     phase = why
 
-                if want is not None and tuple(want) == here:
+                if want is not None and tuple(want) == here and (world["id"], here) in productive:
+                    # **A card that opened is not "nothing here for us".**
+                    #
+                    # M14's chair is three moves at one object, and an event
+                    # only opens when you *walk onto* it — so standing on it
+                    # after answering looks exactly like standing on a tile with
+                    # nothing on it, and the walk wrote the chair off after one
+                    # move and went back up four floors. Six times.
+                    #
+                    # Dropping the target without writing it off is the whole
+                    # fix: the next press moves off it and the press after that
+                    # walks back on, which is what a person does at a lock they
+                    # are turning.
+                    want = None
+                elif want is not None and tuple(want) == here:
                     # Standing on it and nothing opened, so there is nothing
                     # here for us. Do not walk back to it.
                     read_over.add((world["id"], here))
@@ -1289,6 +1402,7 @@ def main():
                             f" — {last_said(page) or 'no reason given'}")
                         done_marks.add(tuple(want))
                         read_over.add((world["id"], tuple(want)))
+                        refused.add((world["id"], tuple(want)))
                         done_marks.add(here)
                         errand_turn += 1
                         stuck.clear()

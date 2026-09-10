@@ -320,3 +320,70 @@ Two numbers in it are not good news and are in `TRIAGE-M12.md` as rows 8 and 9.
 fit nowhere, because the barrel is bought and then declined by Auto-pack. And
 **the loss rate is up from 34.5% to 42.2%**, which is the likeliest consequence
 of the shelf costing five times what it did.
+
+---
+
+## M14 — three transcripts, and the first one is the finding
+
+`m14-a-new-game.txt` is `make play` as it has always been: a new game, from
+level one, with no help. **It plateaus at level eleven against the Drambus
+Stack's fourth floor** and never reaches a single thing M14 added. It cleared
+floor five, reached floor four, and then spent the rest of its budget walking
+between the pit and the field.
+
+**That is a fact about the walker and not about the floors**, and `PLAN.md` §6d
+row 3 has been saying so since M11.9: *a walker with a destination stops being a
+player.* It is kept because a transcript that stops is still a transcript, and
+because it is the reason the other two exist.
+
+`GM2D_FROM` is what the other two use — a **start line**, not a plant. The
+difference matters: `drive.py` plants a save and asserts about the state it
+planted, and this loads a save before the first press and then walks. The files
+are written by `crates/core/tests/start_lines.rs` out of `common::geared_from`,
+which is this repository's answer to *the board a player actually has*.
+
+    GM2D_FROM=testing/saves/at-the-lip.json make play
+
+### `m14-the-sump.txt` — four floors, three puzzles, three different routes
+
+The tide is out, the lip opens for a compass, and then:
+
+- **The Lip.** Turned wheel C and paid a Morning-Rush Mold for it — the wheel
+  that is not needed, which is the tax on not looking. Was refused at the wheel
+  behind channel A, turned wheel A, **took the bearing off the plate with the
+  compass**, and turned wheel B.
+- **The Shelf.** Read the lintel, then *"Stand what you made in it"* — the
+  epic-item door, free.
+- **The Cairnfield.** Walked four cairns by hand, laid a stone, then *"Walk it
+  with the sheet"* — the clipboard read two hundred paces away on the shore.
+- **The Sump Floor.** Beat **THE ONE WHO WENT DOWN**, rated 2053, and took all
+  three drops.
+
+Three floors and three different currencies: a component, nothing, and
+forty-four card reads saved.
+
+### `m14-the-silt-stair.txt` — the chair, in three moves
+
+- **The Landing.** Laid a one-by-four in the groove and it kept it.
+- **The Chair Room.** *Turn it to face the door · Count to four · Turn it back*
+  — the sequence Marbulon does in front of her own door on the first map — and
+  the door in the north wall opened.
+- **The Drowned Gallery.** Pulled chain A, walked the seventeen tiles round the
+  flooded gallery, pulled chain B.
+- **The Bottom of the Bottom.** Beat **WHAT SHE FACED AWAY FROM**, rated 2123,
+  and took all three drops.
+
+### Four things the walker taught this block, and one of them was the floor
+
+1. **The floors were floored with scrub.** 68 tiles at 140 per mille against a
+   pool this strong is a fight every four steps; a level-twenty board wore to
+   the sixty percent cap crossing one room. Every other dungeon in this game is
+   road at 30. **This one was the floor being wrong**, and it is what
+   `PROMPT-M14.md` said to watch for.
+2. **A lever changes what is reachable, so a bar goes stale.** The walk gives up
+   on a tile refused three times — right for a crossing, wrong for a sluice.
+3. **A card that opened is not a tile with nothing on it.** An event opens when
+   you walk *onto* it, so standing on the chair after answering looked exactly
+   like standing on nothing.
+4. **The first enabled choice is a trap at a card that comes back.** The chair's
+   first move has no requirement and stays live for ever.

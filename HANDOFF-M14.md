@@ -36,6 +36,7 @@ right, which is the reason to believe the other five.
 | M14.4 | **The Undercountry** — one town, empty and declared; `Requirement::All`; `Flag` reads `marks` | ✅ 828 |
 | M14.5 | **The gate** — five checks, three engines, and **both of the things they found were real** | ✅ 78 `ok:` |
 | M14.6 | **The notebook executed** — six floors became every floor | ✅ 831 |
+| M14.8 | **Two dungeons walked end to end** — and three of the four things that stopped the walker were the walker | ✅ 832 |
 
 ---
 
@@ -178,6 +179,45 @@ Two bosses, two drafts, both wrong the same way and neither about a number:
 | M14.2 | **`the_ninth_surveyor_is_a_fight_the_board_wins`.** | A level-22 board is not one this game produces. |
 
 ---
+
+## 5a. `make play`, and the four things that stopped it
+
+**The new-game walk plateaus at level eleven against the Drambus Stack's fourth
+floor** and never reaches one thing M14 added. That is `PLAN.md` §6d row 3 —
+*a walker with a destination stops being a player* — and it is kept as
+`m14-a-new-game.txt` because a transcript that stops is still a transcript.
+
+`GM2D_FROM` is what walks the rest: **a start line, not a plant.** `drive.py`
+plants a save and asserts about the state it planted; this loads one before the
+first press and then it is the same walk. The files are written by
+`crates/core/tests/start_lines.rs` out of `common::geared_from`, and
+`the_start_lines_open_and_stand_where_they_say` is what stops them going stale
+the way a checked-in save silently does.
+
+With it, **both dungeons walk end to end**:
+
+- `m14-the-sump.txt` — four floors, three puzzles solved by three different
+  routes (the wheel that costs a component, the epic-item door, the clipboard
+  shortcut), and **THE ONE WHO WENT DOWN** beaten at 2053 with all three drops.
+- `m14-the-silt-stair.txt` — the groove, **the chair in three moves**, both
+  chains, and **WHAT SHE FACED AWAY FROM** beaten at 2123 with all three drops.
+
+Getting there found four things, and **only the first was the floor**:
+
+1. **The floors were floored with scrub.** 68 tiles at 140 per mille against a
+   pool this strong is a fight every four steps; a level-twenty board wore to
+   the sixty percent cap crossing one room. Every other dungeon in this game is
+   road at 30 — the Cave, the Stack, the map under the lake are all cut
+   passages. **This is the one `PROMPT-M14.md` said to watch for**, and it was
+   right: the floor was wrong and the walker was not.
+2. **A lever changes what is reachable, so a bar goes stale.** Right for a
+   crossing, which refuses on what you *are*; wrong for a sluice.
+3. **A card that opened is not a tile with nothing on it.** An event opens when
+   you walk *onto* it, so standing on the chair after answering looked exactly
+   like standing on nothing — and the walk climbed back up four floors. Six
+   times.
+4. **The first enabled choice is a trap at a card that comes back.** The chair's
+   first move has no requirement and stays live for ever.
 
 ## 6. What is left
 

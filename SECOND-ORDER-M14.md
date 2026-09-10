@@ -331,3 +331,73 @@ And two the block found and did not have a place to put:
 |---|---|---|
 | new | **`solvable_blind` is not run over every floor in the game** — six floors are checked by hand in two files, and the seventh, eighth and any future one are checked by nobody | M14.6e |
 | new | **the walker takes the first enabled choice**, which is a trap at any card that comes back | M14.6f — done in M14.5's walker work |
+
+---
+
+## What `make play` found, which is four things and three of them are the walker
+
+**M14.2's own prompt says it**: *if `make play` never leaves floor one, the whole
+block's gate is blind past that floor.* It did not leave the pit town, and the
+reason turned out to be four separate things.
+
+### 22. The floors were floored with scrub, and that one *was* the floor
+
+68 tiles of `scrub` at 140 per mille against a pool this strong is a fight every
+four steps. A level-twenty board wore to the **sixty percent cap crossing one
+room** and went home.
+
+Every other dungeon in this game is floored with `road` at 30 — the Cave, the
+Stack, the map under the lake are all cut passages. All eight floors are now,
+and the walk that had spent six fights crossing the Lip spent two.
+
+**This is the one the prompt is about, and it is the floor being wrong rather
+than the walker.**
+
+### 23. A lever changes what is reachable, so a bar goes stale
+
+The walk gives up on a tile it has been refused three times — M9.3's lesson, and
+right for a crossing, which refuses on what you *are*. It is wrong on a floor
+with a sluice on it: the Lip's wheel B is behind channel A, so the walker
+bounced off the water three times, **barred the wheel, wrote it down as read**,
+turned wheel A, and then had nothing left to walk to on a floor it was two moves
+from finishing.
+
+Answering a card is the one thing in this game that can move a wall. So the bars
+come off when one is answered, and the tiles written down as read *because they
+refused* come off with them.
+
+### 24. A card that opened is not a tile with nothing on it
+
+An event opens when you **walk onto** it, so standing on the chair after
+answering looks exactly like standing on a tile with nothing on it — and the
+walker wrote the chair off after one move and climbed back up four floors. Six
+times.
+
+Dropping the target without writing it off is the whole fix: the next press
+moves off it and the one after walks back on, which is what a person does at a
+lock they are turning.
+
+### 25. The walker took the first enabled choice, which is a trap at a card that comes back
+
+The chair's first move has **no requirement** — monotone flags cannot un-set a
+flag, so the first move of a cycle stays live for ever. A walker that always
+takes the first enabled choice turns the chair to face the door for the rest of
+the run.
+
+It remembers what it has already pressed *at this card* now, which changes
+nothing anywhere else: every other event in the game is spent the moment it is
+answered.
+
+### 26. `GM2D_FROM`, and why a start line is not a plant
+
+The new-game walk plateaus at **level eleven against the Drambus Stack's fourth
+floor** and never reaches any of this. That is a fact about the walker and not
+about the floors, and `PLAN.md` §6d row 3 has been saying so since M11.9.
+
+So `make play` takes a save to start from, and the default is still a new game —
+which is the whole of what makes its transcript worth reading. **Not a plant**:
+`drive.py` plants a save and asserts about the state it planted, and this is a
+*start line*, after which it is the same walk. The two are written by
+`crates/core/tests/start_lines.rs` out of `common::geared_from`, and
+`the_start_lines_open_and_stand_where_they_say` is what stops them going stale
+the way a checked-in save silently does.

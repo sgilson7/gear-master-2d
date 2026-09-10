@@ -1,0 +1,1332 @@
+[1m==>[0m Building gm2d-wasm for wasm32-unknown-unknown
+    Finished `release` profile [optimized] target(s) in 0.01s
+[1m==>[0m Assembling /Users/samgilson/Documents/GearMaster2D/dist/web
+[1m==>[0m Generating JS bindings
+[1m==>[0m Stamping build version
+[1m==>[0m Done: /Users/samgilson/Documents/GearMaster2D/dist/web (build 97cf07b2)
+    2.7M	/Users/samgilson/Documents/GearMaster2D/dist/web
+    wasm: 1668 KB
+  started from testing/saves/under-the-lake.json
+
+--- a walk in progress --------------------------------------------------
+  level 20 · 6,7 in Under the Lake · 20000 Fnorp · carrying 0 · worn 0% · no class
+  probe: level 20 · fill 30% (helmet 42% chest 42% gloves 36% greaves 10% weapon 21%) · bench 0 · from nothing yet
+  town at —, gate at [1, 1]
+
+--- the road ------------------------------------------------------------
+  fork: 5 classes offered
+        [0] Gorillathon at [25, 187, 326, 218] clickable=True (Gorillathon)
+        [1] Funnel Sergeant at [361, 187, 326, 218] clickable=True (Funnel Sergeant)
+        [2] Worm-Fact Keeper at [697, 187, 326, 218] clickable=True (Worm-Fact Keeper)
+        [3] Kaklon Licensee at [25, 415, 326, 252] clickable=True (Every assembly bonus on )
+        [4] Top of the Bill at [361, 415, 326, 252] clickable=True (Top of the BillA fight w)
+  fork: took Top of the Bill
+
+--- under the lake ------------------------------------------------------
+  level 20 · 6,7 in Under the Lake · 20000 Fnorp · carrying 0 · worn 0% · Showstopper
+  card: THE DOOR UNDER THE LAKE
+        The silt comes away in one piece, the way a thing does when it has been there long enough to have set, and the
+
+--- the silt stair 1 ----------------------------------------------------
+  level 20 · 5,10 in The Landing · 20000 Fnorp · carrying 0 · worn 0% · Showstopper
+  card: THE CUT STAIR
+        The steps down are cut for something rather than for somebody: a groove one hand wide and four hands long runs
+        chose: Lay it in the stair
+        The Signal Wire from Multicity stays in it.
+        +26 experience, carried
+
+--- the silt stair 2 ----------------------------------------------------
+  level 20 · 5,10 in The Chair Room · 20000 Fnorp · carrying 26 · worn 0% · Showstopper
+  card: THE CHAIR
+        An empty room with a kitchen chair in the middle of it, and the chair is facing away from the door in the nort
+        chose: Turn it to face the door
+        Nothing you could point to
+
+--- back up -------------------------------------------------------------
+  level 20 · 5,6 in The Chair Room · 20000 Fnorp · carrying 26 · worn 0% · Showstopper
+  card: THE CHAIR
+        An empty room with a kitchen chair in the middle of it, and the chair is facing away from the door in the nort
+        chose: Count to four
+        Nothing you could point to
+  card: THE CHAIR
+        An empty room with a kitchen chair in the middle of it, and the chair is facing away from the door in the nort
+        chose: Turn it back
+        Nothing you could point to
+  fight: The Unmovable Rock (rates 1118) with 21 items -> It stops moving
+         +197 Fnorp
+         +223 experience, carried
+         249 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+
+--- the silt stair 3 ----------------------------------------------------
+  level 20 · 5,10 in The Drowned Gallery · 20197 Fnorp · carrying 249 · worn 4% · Showstopper
+  card: THE CHAIN MARKED A
+        A chain coming out of the west wall at the height of a shoulder with two links worn bright and the rest of it 
+        chose: Pull the chain marked A
+        +22 experience, carried
+  fight: Emperor of Dobira (rates 1129) with 21 items -> It stops moving
+         +262 Fnorp
+         +225 experience, carried
+         496 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  card: THE CHAIN MARKED B
+        The second chain, and this one has four links worn bright rather than two, which is somebody pulling a thing t
+        chose: Pull the chain marked B
+        +30 experience, carried
+  fight: Emperor of Dobira (rates 1129) with 21 items -> It stops moving
+         +262 Fnorp
+         +225 experience, carried
+         751 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+
+--- the silt stair 4 ----------------------------------------------------
+  level 20 · 5,10 in The Bottom of the Bottom · 20721 Fnorp · carrying 751 · worn 12% · Showstopper
+  fight: The Morning Rush (rates 1496) with 21 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         1050 on you. It is worth nothing until you bank it.
+         4% more tired. 16% of you is missing until you take something for it.
+  fight: WHAT SHE FACED AWAY FROM (rates 2123) with 21 items -> It stops moving
+         +448 Fnorp
+         +424 experience, carried
+         1474 on you. It is worth nothing until you bank it.
+         It was carrying The Octarine Ball.
+         It was carrying A Piece of the Reach.
+         It was carrying Ground That Is Not Finished.
+         4% more tired. 20% of you is missing until you take something for it.
+  fight: Mumu Lelonde (rates 1534) with 21 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         1780 on you. It is worth nothing until you bank it.
+         4% more tired. 24% of you is missing until you take something for it.
+  fight: Mumu Lelonde (rates 1534) with 21 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         2086 on you. It is worth nothing until you bank it.
+         4% more tired. 28% of you is missing until you take something for it.
+  fight: The Morning Rush (rates 1496) with 21 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         2385 on you. It is worth nothing until you bank it.
+         4% more tired. 32% of you is missing until you take something for it.
+  fight: The Morning Rush (rates 1496) with 21 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         2684 on you. It is worth nothing until you bank it.
+         4% more tired. 36% of you is missing until you take something for it.
+  fight: The Morning Rush (rates 1496) with 21 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         2983 on you. It is worth nothing until you bank it.
+         4% more tired. 40% of you is missing until you take something for it.
+  fight: The Morning Rush (rates 1496) with 21 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         3282 on you. It is worth nothing until you bank it.
+         4% more tired. 44% of you is missing until you take something for it.
+
+--- back up -------------------------------------------------------------
+  level 20 · 4,4 in The Bottom of the Bottom · 23201 Fnorp · carrying 3282 · worn 44% · Showstopper
+  fight: The Morning Rush (rates 1496) with 21 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         3581 on you. It is worth nothing until you bank it.
+         4% more tired. 48% of you is missing until you take something for it.
+
+--- the silt stair 3 ----------------------------------------------------
+  level 20 · 5,9 in The Drowned Gallery · 23485 Fnorp · carrying 3581 · worn 48% · Showstopper
+
+--- back up -------------------------------------------------------------
+  level 20 · 5,9 in The Drowned Gallery · 23485 Fnorp · carrying 3581 · worn 48% · Showstopper
+
+--- the silt stair 2 ----------------------------------------------------
+  level 20 · 5,4 in The Chair Room · 23485 Fnorp · carrying 3581 · worn 48% · Showstopper
+
+--- back up -------------------------------------------------------------
+  level 20 · 5,4 in The Chair Room · 23485 Fnorp · carrying 3581 · worn 48% · Showstopper
+  fight: Emperor of Dobira (rates 1129) with 21 items -> It stops moving
+         +262 Fnorp
+         +225 experience, carried
+         3806 on you. It is worth nothing until you bank it.
+         4% more tired. 52% of you is missing until you take something for it.
+
+--- the silt stair 1 ----------------------------------------------------
+  level 20 · 5,8 in The Landing · 23747 Fnorp · carrying 3806 · worn 52% · Showstopper
+
+--- back up -------------------------------------------------------------
+  level 20 · 5,8 in The Landing · 23747 Fnorp · carrying 3806 · worn 52% · Showstopper
+
+--- back up the steps ---------------------------------------------------
+  level 20 · 7,7 in Under the Lake · 23747 Fnorp · carrying 3806 · worn 52% · Showstopper
+  fight: The Eight Hymns (rates 1487) with 21 items -> It stops moving
+         +295 Fnorp
+         +297 experience, carried
+         4103 on you. It is worth nothing until you bank it.
+         4% more tired. 56% of you is missing until you take something for it.
+  fight: The Morning Rush (rates 1496) with 21 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         4402 on you. It is worth nothing until you bank it.
+         4% more tired. 60% of you is missing until you take something for it.
+  fight: The Eight Hymns (rates 1487) with 21 items -> It stops moving
+         +295 Fnorp
+         +297 experience, carried
+         4699 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: The Eight Hymns (rates 1487) with 21 items -> It stops moving
+         +295 Fnorp
+         +297 experience, carried
+         4996 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+
+--- cave ----------------------------------------------------------------
+  level 20 · 8,11 in The Burnwarp Shallows · 24916 Fnorp · carrying 4996 · worn 60% · Showstopper
+  fight: Idol of Marbulon (rates 204) with 21 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 3.5s.
+         +40 experience, carried
+         5036 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Ponkey Dong (rates 306) with 21 items -> It stops moving
+         +44 Fnorp
+         +22 more for the speed of it. 6.1s.
+         +61 experience, carried
+         5097 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Boucherian Commander (rates 446) with 21 items -> It stops moving
+         +75 Fnorp
+         +37 more for the speed of it. 7.0s.
+         +89 experience, carried
+         5186 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+
+--- boss ----------------------------------------------------------------
+  level 20 · 2,1 in The Great Gear Cave · 25139 Fnorp · carrying 5186 · worn 60% · Showstopper
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         5218 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         5250 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         5282 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         5314 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         5346 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         5378 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         5410 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         5442 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         5474 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         5506 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         5538 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         5570 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         5602 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Idol of Marbulon (rates 204) with 21 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 3.5s.
+         +40 experience, carried
+         5642 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         5674 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         5706 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         5738 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         5770 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         5802 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Idol of Marbulon (rates 204) with 21 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 3.5s.
+         +40 experience, carried
+         5842 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         5874 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         5906 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Idol of Marbulon (rates 204) with 21 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 3.5s.
+         +40 experience, carried
+         5946 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         5978 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Idol of Marbulon (rates 204) with 21 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 3.5s.
+         +40 experience, carried
+         6018 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         6050 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         6082 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         6114 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         6146 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Idol of Marbulon (rates 204) with 21 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 3.5s.
+         +40 experience, carried
+         6186 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Idol of Marbulon (rates 204) with 21 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 3.5s.
+         +40 experience, carried
+         6226 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         6258 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         6290 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         6322 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         6354 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         6386 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Idol of Marbulon (rates 204) with 21 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 3.5s.
+         +40 experience, carried
+         6426 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         6458 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Idol of Marbulon (rates 204) with 21 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 3.5s.
+         +40 experience, carried
+         6498 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         6530 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         6562 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         6594 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         6626 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         6658 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         6690 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         6722 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         6754 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         6786 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         6818 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Idol of Marbulon (rates 204) with 21 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 3.5s.
+         +40 experience, carried
+         6858 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         6890 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         6922 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         6954 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         6986 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Idol of Marbulon (rates 204) with 21 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 3.5s.
+         +40 experience, carried
+         7026 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         7058 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         7090 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         7122 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Idol of Marbulon (rates 204) with 21 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 3.5s.
+         +40 experience, carried
+         7162 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         7194 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         7226 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         7258 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         7290 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         7322 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         7354 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Idol of Marbulon (rates 204) with 21 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 3.5s.
+         +40 experience, carried
+         7394 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         7426 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         7458 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         7490 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Idol of Marbulon (rates 204) with 21 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 3.5s.
+         +40 experience, carried
+         7530 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         7562 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Idol of Marbulon (rates 204) with 21 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 3.5s.
+         +40 experience, carried
+         7602 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         7634 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         7666 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         7698 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         7730 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         7762 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         7794 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         7826 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         7858 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Idol of Marbulon (rates 204) with 21 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 3.5s.
+         +40 experience, carried
+         7898 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         7930 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         7962 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         7994 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         8026 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         8058 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         8090 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         8122 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         8154 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         8186 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         8218 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         8250 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Idol of Marbulon (rates 204) with 21 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 3.5s.
+         +40 experience, carried
+         8290 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         8322 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         8354 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Idol of Marbulon (rates 204) with 21 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 3.5s.
+         +40 experience, carried
+         8394 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         8426 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         8458 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         8490 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         8522 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         8554 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Idol of Marbulon (rates 204) with 21 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 3.5s.
+         +40 experience, carried
+         8594 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Idol of Marbulon (rates 204) with 21 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 3.5s.
+         +40 experience, carried
+         8634 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         8666 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         8698 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         8730 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         8762 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Idol of Marbulon (rates 204) with 21 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 3.5s.
+         +40 experience, carried
+         8802 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         8834 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Idol of Marbulon (rates 204) with 21 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 3.5s.
+         +40 experience, carried
+         8874 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         8906 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Idol of Marbulon (rates 204) with 21 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 3.5s.
+         +40 experience, carried
+         8946 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Idol of Marbulon (rates 204) with 21 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 3.5s.
+         +40 experience, carried
+         8986 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         9018 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         9050 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         9082 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Idol of Marbulon (rates 204) with 21 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 3.5s.
+         +40 experience, carried
+         9122 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         9154 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         9186 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         9218 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         9250 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         9282 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         9314 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         9346 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Idol of Marbulon (rates 204) with 21 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 3.5s.
+         +40 experience, carried
+         9386 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Idol of Marbulon (rates 204) with 21 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 3.5s.
+         +40 experience, carried
+         9426 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         9458 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         9490 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         9522 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         9554 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         9586 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         9618 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Idol of Marbulon (rates 204) with 21 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 3.5s.
+         +40 experience, carried
+         9658 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         9690 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         9722 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Idol of Marbulon (rates 204) with 21 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 3.5s.
+         +40 experience, carried
+         9762 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Idol of Marbulon (rates 204) with 21 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 3.5s.
+         +40 experience, carried
+         9802 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         9834 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Idol of Marbulon (rates 204) with 21 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 3.5s.
+         +40 experience, carried
+         9874 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         9906 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         9938 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         9970 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Idol of Marbulon (rates 204) with 21 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 3.5s.
+         +40 experience, carried
+         10010 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         10042 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         10074 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         10106 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Idol of Marbulon (rates 204) with 21 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 3.5s.
+         +40 experience, carried
+         10146 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         10178 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         10210 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         10242 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         10274 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         10306 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         10338 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         10370 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         10402 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         10434 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         10466 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         10498 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         10530 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         10562 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         10594 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         10626 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         10658 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         10690 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         10722 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Idol of Marbulon (rates 204) with 21 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 3.5s.
+         +40 experience, carried
+         10762 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Idol of Marbulon (rates 204) with 21 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 3.5s.
+         +40 experience, carried
+         10802 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         10834 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         10866 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         10898 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         10930 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         10962 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         10994 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         11026 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         11058 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Idol of Marbulon (rates 204) with 21 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 3.5s.
+         +40 experience, carried
+         11098 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         11130 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Idol of Marbulon (rates 204) with 21 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 3.5s.
+         +40 experience, carried
+         11170 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         11202 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Idol of Marbulon (rates 204) with 21 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 3.5s.
+         +40 experience, carried
+         11242 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         11274 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         11306 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         11338 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Velothi High Guard (rates 161) with 21 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.0s.
+         +32 experience, carried
+         11370 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+
+DID NOT CROSS AND COME BACK in 8000 steps. level 20 · 7,3 in The Great Gear Cave · 32096 Fnorp · carrying 11370 · worn 60% · Showstopper
+  read on the Treyway: ['the-wextreen-reach']
+  floors of the Drambus Stack down: 5 of 5
+  the thing under the lake: beaten
+  (5247 of 8000 presses actually moved)
+
+--- what happened -------------------------------------------------------
+  204 wins, 0 losses
+  level 20 · 7,3 in The Great Gear Cave · 32096 Fnorp · carrying 11370 · worn 60% · Showstopper
+  errands: 
+  sheet: 776 max health, 30 strength, 12 regen a second, 300% weapon power, 76% mind resist, 130% curse resist, 35% physical resist, 51% magic resist
+  probe: level 20 · fill 30% (helmet 42% chest 42% gloves 36% greaves 10% weapon 21%) · bench 0 · from drop 3
+
+--- the measure ---------------------------------------------------------
+  level  fill   helmet    chest   gloves  greaves   weapon   bench   want
+     20   30%      42%      42%      36%      10%      21%       0   80% UNDER / bench 2 UNDER
+  at the end, level 20: fill 30%, bench 0
+
+  pieces by source: drop 3
+
+--- the page ------------------------------------------------------------
+  no console errors
+EXIT=0

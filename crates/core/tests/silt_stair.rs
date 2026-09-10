@@ -162,8 +162,11 @@ fn the_gallery_drains_to_silt_and_not_lakebed() {
 
     // And the ring outside it never moved.
     for w in [&dry, &wet, &done] {
-        assert_eq!(w.terrain_name(1, 5), "scrub", "the walk round the gallery went with it");
-        assert_eq!(w.terrain_name(5, 9), "scrub", "the tile the stair stands on drained");
+        // **The ring outside the gallery is road**, like every other dungeon
+        // floor in the game — see the map's own note. What matters here is that
+        // it does not move when the gallery does.
+        assert_eq!(w.terrain_name(1, 5), "road", "the walk round the gallery went with it");
+        assert_eq!(w.terrain_name(5, 9), "road", "the tile the stair stands on drained");
     }
 }
 

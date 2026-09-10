@@ -1,0 +1,826 @@
+{
+  "format": "gm2d-save",
+  "version": 1,
+  "catalog": {
+    "pieces": 568,
+    "fingerprint": "a167071e69d7db67"
+  },
+  "state": {
+    "rng_state": 6840143426475589633,
+    "theme": "td",
+    "character": {
+      "gold": 20000,
+      "registry": [
+        {
+          "def": "Oak Handle"
+        },
+        {
+          "def": "Iron Blade"
+        },
+        {
+          "def": "Tin Frame"
+        },
+        {
+          "def": "Tin Plating"
+        },
+        {
+          "def": "Crest of Vigor"
+        },
+        {
+          "def": "Leather Material"
+        },
+        {
+          "def": "Gripping Mold"
+        },
+        {
+          "def": "Greave Mold"
+        },
+        {
+          "def": "Plain Sole"
+        },
+        {
+          "def": "Sackcloth Base"
+        },
+        {
+          "def": "Rag Layer"
+        },
+        {
+          "def": "Balance Weight"
+        },
+        {
+          "def": "Ruby Inlay"
+        },
+        {
+          "def": "Steel Frame"
+        },
+        {
+          "def": "Iron Plating"
+        },
+        {
+          "def": "Ridged Frame"
+        },
+        {
+          "def": "Steel Material"
+        },
+        {
+          "def": "Gauntlet Mold"
+        },
+        {
+          "def": "Bulwark Material"
+        },
+        {
+          "def": "Boiled Leather"
+        },
+        {
+          "def": "Runner's Mold"
+        },
+        {
+          "def": "Striding Mold"
+        },
+        {
+          "def": "Ash Haft"
+        },
+        {
+          "def": "Chipped Edge"
+        },
+        {
+          "def": "Hooked Edge"
+        },
+        {
+          "def": "Chain Coil"
+        },
+        {
+          "def": "Plate Layer"
+        },
+        {
+          "def": "Hide Base"
+        },
+        {
+          "def": "The Bog Census"
+        },
+        {
+          "def": "Census Bolt"
+        },
+        {
+          "def": "Counting Frame"
+        },
+        {
+          "def": "Bread Knife"
+        },
+        {
+          "def": "Boundary Cork"
+        },
+        {
+          "def": "Witch's Thimble"
+        },
+        {
+          "def": "The Witch's Key"
+        },
+        {
+          "def": "Nine-Plane Lens"
+        },
+        {
+          "def": "Ridged Frame",
+          "rot": 3
+        },
+        {
+          "def": "Mirrored Visor"
+        },
+        {
+          "def": "Mercurial Ink"
+        },
+        {
+          "def": "Warding Sigil"
+        },
+        {
+          "def": "Sprocketman's Gratitude"
+        },
+        {
+          "def": "Booking Hall"
+        },
+        {
+          "def": "Crownwright's Measure"
+        },
+        {
+          "def": "Signal Wire"
+        },
+        {
+          "def": "Points Rodding"
+        },
+        {
+          "def": "The Green Ledger"
+        },
+        {
+          "def": "Surveyor's Orb"
+        },
+        {
+          "def": "Cosmic Alignment"
+        },
+        {
+          "def": "Map Shard"
+        },
+        {
+          "def": "Crownwright's Measure"
+        },
+        {
+          "def": "Living Earth"
+        },
+        {
+          "def": "Living Earth"
+        },
+        {
+          "def": "Runed Lining"
+        },
+        {
+          "def": "Mail Layer"
+        },
+        {
+          "def": "Trailworn Sole"
+        },
+        {
+          "def": "Grove Base"
+        },
+        {
+          "def": "Warding Ring"
+        },
+        {
+          "def": "Frostbite Mold"
+        },
+        {
+          "def": "Spiked Vambrace"
+        },
+        {
+          "def": "Felt Layer"
+        },
+        {
+          "def": "Lightweave"
+        },
+        {
+          "def": "Cosmic Alignment"
+        },
+        {
+          "def": "Ratskin Material"
+        },
+        {
+          "def": "Ratskin Mold"
+        },
+        {
+          "def": "Rat Signet"
+        },
+        {
+          "def": "Toad Frame"
+        },
+        {
+          "def": "Toad Hide"
+        },
+        {
+          "def": "Bone Crown"
+        },
+        {
+          "def": "Bone Scale"
+        },
+        {
+          "def": "Bone Fletch"
+        },
+        {
+          "def": "Glass Lens"
+        },
+        {
+          "def": "Magnet"
+        },
+        {
+          "def": "Living Earth"
+        },
+        {
+          "def": "Rimeglove Material"
+        },
+        {
+          "def": "Rimeglove Mold"
+        },
+        {
+          "def": "Rime Signet"
+        },
+        {
+          "def": "Sentinel Material"
+        },
+        {
+          "def": "Sentinel Mold"
+        },
+        {
+          "def": "Sentinel Plating"
+        },
+        {
+          "def": "Idol's Frame"
+        },
+        {
+          "def": "Idol's Plating"
+        },
+        {
+          "def": "Idol's Crest"
+        },
+        {
+          "def": "Chorister's Base"
+        },
+        {
+          "def": "Chorister's Layer"
+        },
+        {
+          "def": "Chorister's Weave"
+        },
+        {
+          "def": "Drover's Material"
+        },
+        {
+          "def": "Drover's Mold"
+        },
+        {
+          "def": "Drover's Sole"
+        }
+      ],
+      "owned": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87
+      ],
+      "boards": [
+        [
+          "helmet",
+          {
+            "rows": 23,
+            "placed": [
+              [
+                15,
+                0,
+                0
+              ],
+              [
+                78,
+                3,
+                0
+              ],
+              [
+                80,
+                4,
+                0
+              ],
+              [
+                81,
+                0,
+                1
+              ],
+              [
+                4,
+                5,
+                1
+              ],
+              [
+                13,
+                2,
+                2
+              ],
+              [
+                68,
+                0,
+                3
+              ],
+              [
+                37,
+                0,
+                4
+              ],
+              [
+                2,
+                3,
+                4
+              ],
+              [
+                69,
+                5,
+                4
+              ],
+              [
+                36,
+                0,
+                5
+              ],
+              [
+                35,
+                2,
+                5
+              ],
+              [
+                87,
+                3,
+                6
+              ],
+              [
+                14,
+                3,
+                7
+              ],
+              [
+                42,
+                1,
+                8
+              ],
+              [
+                79,
+                0,
+                9
+              ],
+              [
+                3,
+                3,
+                9
+              ],
+              [
+                30,
+                3,
+                10
+              ]
+            ]
+          }
+        ],
+        [
+          "chest",
+          {
+            "rows": 23,
+            "placed": [
+              [
+                55,
+                0,
+                0
+              ],
+              [
+                45,
+                3,
+                0
+              ],
+              [
+                66,
+                0,
+                2
+              ],
+              [
+                83,
+                2,
+                2
+              ],
+              [
+                40,
+                4,
+                2
+              ],
+              [
+                65,
+                0,
+                4
+              ],
+              [
+                84,
+                3,
+                4
+              ],
+              [
+                9,
+                4,
+                5
+              ],
+              [
+                26,
+                0,
+                6
+              ],
+              [
+                27,
+                0,
+                7
+              ],
+              [
+                32,
+                3,
+                7
+              ],
+              [
+                53,
+                4,
+                8
+              ],
+              [
+                52,
+                0,
+                9
+              ],
+              [
+                59,
+                4,
+                9
+              ],
+              [
+                82,
+                0,
+                10
+              ]
+            ]
+          }
+        ],
+        [
+          "gloves",
+          {
+            "rows": 23,
+            "placed": [
+              [
+                76,
+                0,
+                0
+              ],
+              [
+                58,
+                2,
+                0
+              ],
+              [
+                56,
+                4,
+                0
+              ],
+              [
+                33,
+                5,
+                0
+              ],
+              [
+                64,
+                3,
+                1
+              ],
+              [
+                75,
+                4,
+                1
+              ],
+              [
+                6,
+                1,
+                2
+              ],
+              [
+                85,
+                3,
+                2
+              ],
+              [
+                16,
+                0,
+                5
+              ],
+              [
+                63,
+                2,
+                5
+              ],
+              [
+                74,
+                4,
+                5
+              ],
+              [
+                18,
+                3,
+                7
+              ],
+              [
+                19,
+                0,
+                9
+              ],
+              [
+                17,
+                3,
+                9
+              ],
+              [
+                73,
+                4,
+                9
+              ]
+            ]
+          }
+        ],
+        [
+          "greaves",
+          {
+            "rows": 23,
+            "placed": [
+              [
+                5,
+                0,
+                0
+              ],
+              [
+                54,
+                2,
+                0
+              ],
+              [
+                77,
+                4,
+                0
+              ],
+              [
+                62,
+                4,
+                2
+              ]
+            ]
+          }
+        ],
+        [
+          "weapon",
+          {
+            "rows": 23,
+            "placed": [
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                31,
+                1,
+                0
+              ],
+              [
+                1,
+                2,
+                0
+              ],
+              [
+                25,
+                3,
+                0
+              ],
+              [
+                11,
+                4,
+                0
+              ],
+              [
+                22,
+                4,
+                1
+              ],
+              [
+                24,
+                0,
+                3
+              ],
+              [
+                12,
+                0,
+                4
+              ],
+              [
+                38,
+                1,
+                4
+              ],
+              [
+                47,
+                2,
+                4
+              ],
+              [
+                28,
+                1,
+                5
+              ],
+              [
+                29,
+                3,
+                5
+              ]
+            ]
+          }
+        ],
+        [
+          "instrument",
+          {
+            "rows": 23,
+            "placed": [
+              [
+                48,
+                0,
+                0
+              ],
+              [
+                70,
+                2,
+                0
+              ],
+              [
+                71,
+                3,
+                0
+              ]
+            ]
+          }
+        ]
+      ],
+      "locks": [
+        {
+          "pieces": [
+            48,
+            70,
+            71
+          ],
+          "offsets": [
+            [
+              0,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              3,
+              0
+            ]
+          ]
+        }
+      ],
+      "name_seed": 0,
+      "xp": 20000,
+      "carried": 0,
+      "fatigue": 0,
+      "supplies": [],
+      "skill_points": 19
+    },
+    "world": {
+      "map": "the-treyway",
+      "at": [
+        7,
+        22
+      ],
+      "last_town": "kettleworks",
+      "answered": [
+        "the-drambus-stack-5-boss",
+        "the-drambus-stack-4-boss",
+        "the-drambus-stack-3-boss",
+        "the-drambus-stack-2-boss",
+        "the-drambus-stack-1-boss",
+        "the-bottom-of-the-lake",
+        "the-bottom-of-the-cave",
+        "the-door-in-the-wall",
+        "the-trig-stone",
+        "the-nine-surveys",
+        "the-wextreen-reach"
+      ],
+      "flags": [
+        "read-the-reach",
+        "signed-the-trig",
+        "built-the-tenth",
+        "read-the-ninth"
+      ],
+      "counters": [],
+      "bought": [],
+      "bought_enchs": [],
+      "quests_taken": [],
+      "quests_done": [],
+      "pinned": null,
+      "positions": [],
+      "commissions": [],
+      "rolled_barrel": [],
+      "rolled_ledgers": [],
+      "rerolls": [],
+      "reroll_band": 0,
+      "active_survey": null
+    }
+  }
+}

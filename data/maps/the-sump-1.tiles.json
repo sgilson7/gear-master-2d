@@ -2,7 +2,7 @@
   "format": "gm2d-tiles",
   "version": 1,
   "id": "the-sump-1",
-  "_note": "Floor one of the Wextreen Sump. **Three channels and three wheels, and one of the wheels is not needed** — channel C is walked round at its dry east end, so the wheel that opens it buys a crossing that is already there, and it is the one that costs you a component you do not get back. The floor is a tax on not looking. The wheels sit below the channels they open, in the order you meet them; the first draft had wheel B one step from the arrival tile, which is not a puzzle. **No `outside`**: a floor of the Sump is not one sitting, because its budget is what you brought rather than how tired you are. A save taken here reopens here, and a player who needs a three-by-two from the van can go and get it; what that costs is the walk. **And nothing here names an instrument** — `reach.rs::nothing_in_a_map_file_knows_about_a_survey` refuses one, and it is right to: a map that knew which lens reads it is a map that would have to be edited to add a second.",
+  "_note": "Floor one of the Wextreen Sump. **Three channels and three wheels, and one of the wheels is not needed** — channel C is walked round at its dry east end, so the wheel that opens it buys a crossing that is already there, and it is the one that costs you a component you do not get back. The floor is a tax on not looking. The wheels sit below the channels they open, in the order you meet them; the first draft had wheel B one step from the arrival tile, which is not a puzzle. **No `outside`**: a floor of the Sump is not one sitting, because its budget is what you brought rather than how tired you are. A save taken here reopens here, and a player who needs a three-by-two from the van can go and get it; what that costs is the walk. **And nothing here names an instrument** — `reach.rs::nothing_in_a_map_file_knows_about_a_survey` refuses one, and it is right to: a map that knew which lens reads it is a map that would have to be edited to add a second. **Floored with `road`, like every other dungeon in this game.** The first draft floored all eight of these with `scrub` — 140 per mille against a pool this strong is a fight every four steps, and `make play` wore a level-twenty board to the sixty percent cap crossing one room and went home. The Cave, the Stack and the map under the lake are all cut passages floored with road at 30, and a floor whose walk costs more than its puzzle is a floor that is a corridor with a toll on it.",
   "width": 12,
   "height": 12,
   "start": [
@@ -11,16 +11,16 @@
   ],
   "rows": [
     "^^^^^^^^^^^^",
-    "^,,,,,,,,,,^",
+    "^==========^",
     "^~~~~~~~~~~^",
-    "^,,,,,,,,,,^",
-    "^,%,,,,,,%,^",
+    "^==========^",
+    "^=%======%=^",
     "^~~~~~~~~~~^",
-    "^,,,,,,,,,,^",
-    "^%,,,,,,,,%^",
-    "^~~~~~~~~,,^",
-    "^,,,,,,,,,,^",
-    "^,,,,,,,,,,^",
+    "^==========^",
+    "^%========%^",
+    "^~~~~~~~~==^",
+    "^==========^",
+    "^==========^",
     "^^^^^^^^^^^^"
   ],
   "regions": [

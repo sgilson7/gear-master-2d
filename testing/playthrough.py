@@ -745,6 +745,13 @@ def main():
             # Targets that would not let us in, by how many presses were spent
             # finding that out.
             stuck = {}
+            # **What to go and read when a road refuses.** `SECOND-ORDER-M16.md`
+            # row 42: on a puzzle floor the thing that opens a road is a card
+            # two tiles away, and this walker only knew M9.3's lesson — that a
+            # road which refuses is a road you stop walking at. Persistent
+            # rather than a local, because `want` is re-derived every step.
+            to_read = None
+            tried_reading = set()
             for step in range(STEPS):
                 if page.is_visible("#ending"):
                     head("the ending")
@@ -1166,7 +1173,14 @@ def main():
                             # Reading forty cards is not what this run is for.
                             # Six is enough to prove the map answers.
                             unread = unread[:0]
-                        if unread:
+                        # **One detour at a time, and a failed one bars.** A
+                        # detour that could spawn a detour ping-ponged between
+                        # two tiles that both refused — go and read A, be
+                        # refused at A, go and read B, be refused at B, go and
+                        # read A. If the thing we went to read refuses us too,
+                        # it is a wall like any other and the M9.3 rule takes
+                        # over.
+                        if unread and to_read is None:
                             unread.sort(key=lambda a: abs(a[0] - here[0]) + abs(a[1] - here[1]))
                             want, why = list(unread[0]), "kettleworks field"
                         elif road and (floors_down >= 5
@@ -1407,6 +1421,23 @@ def main():
                     done_marks.add(here)
                     errand_turn += 1
                     want = None
+                # **The detour outranks the destination, which is the point.**
+                # Something refused three times and there is a card on this map
+                # nobody has read; a player goes and reads it *instead of*
+                # pressing into the thing that refused them. A version of this
+                # that only ran when there was nothing else to do never ran at
+                # all — the errand goes on pointing at the blocked tile, so
+                # `want` is never None and the detour is never reached. It said
+                # *going to read (12, 13) first* six hundred times and stood
+                # where it was.
+                #
+                # Dropped the moment it is read or stood on, so this is one
+                # detour and not a new destination.
+                if to_read is not None:
+                    if (world["id"], tuple(to_read)) in read_over or tuple(to_read) == here:
+                        to_read = None
+                    else:
+                        want, why = list(to_read), "something on this map is unread"
                 if want is None:
                     # **The band you can win in.** A starting kit beats what is
                     # in the pit and nothing above it, so the grind walks the
@@ -1474,14 +1505,14 @@ def main():
                 before = page.text_content("#coords")
                 was_on = world["id"]
                 press = cross_to(page, world, here, going, press)
-                if page.text_content("#coords") != before:
-                    moved += 1
                 # **How many shots a table takes to cross.** `PLAN-M17.md` §7
                 # M17.4 wants the number and only a walk can produce it: a
                 # table's whole question is whether crossing it is a few
                 # decisions or a hundred, and nothing in `cargo test` plays.
                 if world.get("is_table"):
                     shots_on[was_on] = shots_on.get(was_on, 0) + 1
+                if page.text_content("#coords") != before:
+                    moved += 1
                 elif want is not None:
                     # **A road that is shut is a road you stop walking at.**
                     # M9.3 put two crossings on the map and this walker pressed
@@ -1498,6 +1529,56 @@ def main():
                         # back on what you *are*. Barring on the first refusal
                         # instead walled the walk into a corner of its own
                         # making: six hundred moves out of twenty thousand.
+                        # **And a road refused three times might be a road a
+                        # card opens.** `SECOND-ORDER-M16.md` row 42: started
+                        # on the Flat Below, the walk read one stake and then
+                        # pressed into a band of quicksand for a thousand
+                        # steps — because M9.3 taught this walker that a road
+                        # that refuses is a road you stop walking at, and
+                        # nothing had taught it that on a puzzle floor the
+                        # thing that opens the road is a **card two tiles
+                        # away**.
+                        #
+                        # So before barring: is there anything on this map
+                        # left to read? A player who is turned back goes and
+                        # looks at the thing they have not looked at. Barring
+                        # is what happens when there is nothing left.
+                        unread = [tuple(p["at"]) for p in world["places"]
+                                  if p["kind"] == "event"
+                                  and (world["id"], tuple(p["at"])) not in read_over
+                                  and tuple(p["at"]) not in barred
+                                  and (world["id"], tuple(p["at"])) not in tried_reading
+                                  and tuple(p["at"]) != here
+                                  # **Not the thing that just refused you**,
+                                  # which the first draft allowed: a blocked
+                                  # tile with a card on it is still an unread
+                                  # card, so the detour picked it, failed to
+                                  # reach it, and picked the tile it had just
+                                  # come from. Ping-pong with a reason.
+                                  and tuple(p["at"]) != tuple(want)]
+                        # **One detour at a time, and a failed one bars.** A
+                        # detour that could spawn a detour ping-ponged between
+                        # two tiles that both refused — go and read A, be
+                        # refused at A, go and read B, be refused at B, go and
+                        # read A. If the thing we went to read refuses us too,
+                        # it is a wall like any other and the M9.3 rule takes
+                        # over.
+                        if unread and to_read is None:
+                            # The nearest one, because that is the one a person
+                            # walks to. The road is **not** barred and not
+                            # marked done: this is a detour, and the point is
+                            # to come back to it.
+                            unread.sort(key=lambda t: abs(t[0] - here[0]) + abs(t[1] - here[1]))
+                            to_read = list(unread[0])
+                            # **Once each.** A card the walker cannot reach
+                            # either is a second wall, and a detour that
+                            # re-chose the same unreachable card is the loop
+                            # this is here to end wearing a different coat.
+                            tried_reading.add((world["id"], tuple(unread[0])))
+                            say(f"  shut: {tuple(want)} — going to read "
+                                f"{unread[0]} first")
+                            stuck.clear()
+                            continue
                         barred.add(aiming)
                         say(f"  shut: {tuple(want)} is not reachable yet"
                             f" — {last_said(page) or 'no reason given'}")

@@ -741,13 +741,32 @@ def map_box(page):
 
 
 def pull_to(page, tx, ty):
-    """Drag the cue from the ball back towards tile (tx, ty). Leaves it pulled."""
+    """Drag the cue from the ball back towards tile (tx, ty). Leaves it pulled.
+
+    **Both ends have to be on the screen, and this is the second time that has
+    cost a run.** `page.mouse.move` takes viewport coordinates and so does
+    `getBoundingClientRect`, so scrolling is handled — right up until an end of
+    the drag is *off* the viewport, which webkit clamps and chromium does not.
+    The check then drags from the ball to somewhere near the ball, the pull is
+    under the threshold, and it reports *pulling the cue back drew nothing* in
+    one engine of three. Same shape as the playback controls being clicked by
+    id when the question was whether they were reachable: **measure, do not
+    assume.**
+    """
+    page.evaluate("() => document.getElementById('map').scrollIntoView({block: 'center'})")
+    page.wait_for_timeout(80)
     b = map_box(page)
     at = json.loads(page.evaluate("() => window.__position()"))
     sx = b["x"] + (at["x"] + 0.5) * b["cw"]
     sy = b["y"] + (at["y"] + 0.5) * b["ch"]
     ex = b["x"] + (tx + 0.5) * b["cw"]
     ey = b["y"] + (ty + 0.5) * b["ch"]
+    view = page.viewport_size
+    for who, (x, y) in (("the ball", (sx, sy)), ("the pull", (ex, ey))):
+        if not (0 <= x <= view["width"] and 0 <= y <= view["height"]):
+            raise AssertionError(
+                f"{who} is at ({x:.0f}, {y:.0f}) and the window is "
+                f"{view['width']}x{view['height']} - the drag would be clamped")
     page.mouse.move(sx, sy)
     page.mouse.down()
     # Two moves: a drag is a drag, and the page ignores a press that never
@@ -821,7 +840,9 @@ def check_the_cue_draws_what_core_is_asked(page, name, fails):
         page.mouse.up()
         page.wait_for_timeout(700)
         if not cue:
-            fails.append(f"{name}: pulling the cue back drew nothing")
+            b = map_box(page)
+            fails.append(f"{name}: pulling the cue back drew nothing - the map is at "
+                         f"({b['x']:.0f}, {b['y']:.0f}) and a tile is {b['cw']:.0f}px")
             return
         if abs(((cue["angle"] - 18 + 36) % 72) - 36) > 1:
             fails.append(f"{name}: pulled straight back and the cue reads {cue['angle']}, "

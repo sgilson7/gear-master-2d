@@ -453,6 +453,28 @@ impl Game {
     /// stops a warp ever landing somebody in scenery. `every_warp_lands_
     /// somewhere_you_can_stand` checks the data over every map; this is what
     /// makes a warp safe even where the data is wrong.
+    ///
+    /// **It resolves no place, on purpose, and that is now a decision rather
+    /// than a gap.** `SECOND-ORDER-M16.md` row 28 wrote it down as the third
+    /// kind of arrival — *put down somewhere by something that is not a step
+    /// and not a gate* — with no resolution path, which nearly shipped a lever
+    /// nobody could pull: a one-tile alcove behind a sinkhole is a card that
+    /// opens for nobody, because you land, nothing resolves, and there is
+    /// nowhere to step off and back on.
+    ///
+    /// The path exists now and it is [`crate::world::arrive_at`], written in
+    /// M17 for a **landing**, which is the same shape: a tile you are on
+    /// without having stepped onto it. This does not call it, and the reason
+    /// is the one M16 gave: every warp in the game lands you on ground, a
+    /// warp that opened a card would make a fall into a conversation, and the
+    /// alcove was fixed in the **map** — an alcove is two tiles, the one you
+    /// land on and the one the lever is on. `a_warp_resolves_no_place` is what
+    /// keeps that a decision.
+    ///
+    /// So there are four doors onto a tile and each answers a different
+    /// question: `step` (you walked), `arrive_at` (you came to rest),
+    /// `here` (you stood still and asked again), and this one, which moves you
+    /// and says nothing.
     pub fn warp_to(&mut self, map: &str, at: [u8; 2], difficulty: crate::combat::Difficulty) {
         self.world.remember_at(self.world.at);
         self.world.go_to(map);

@@ -545,3 +545,142 @@ fn the_cork_chain_is_a_ladder_and_not_a_wall() {
 fn c_wants(events: &gm2d_core::tile_event::EventsData, flag: &str) -> String {
     gm2d_core::tile_event::Requirement::Flag(flag.to_string()).wants(events)
 }
+
+/// **A fall is not a free ride, and only a map can tell you which one it is.**
+///
+/// `SECOND-ORDER-M16.md` row 22. `tile_event::pays` treats every `Warp` as a
+/// payment, which is why `a_repeating_event_may_never_pay` refuses a repeating
+/// one — and that is right for a *ride*, because a warp that moves you between
+/// maps for nothing is the Drover's Stride without the tin. It is wrong for a
+/// **fall**: the Reefs' sinkholes drop you into an alcove on the floor you are
+/// already standing on, which is not travel, it is a hole.
+///
+/// `pays` cannot tell the two apart, and it is not its fault: `events.json`
+/// does not know which map an event is placed on. **The maps do**, so this
+/// joins them — which is the map-aware lint the row asks for — and states the
+/// rule the parse-time check is the conservative shadow of:
+///
+/// - a warp that **leaves** the map is a ride: it may not land in a town and
+///   it may not repeat;
+/// - a warp that **stays** is a fall: it may land anywhere standable, and the
+///   only reason none of them repeats today is that parse cannot see this.
+///
+/// **And it reports the split**, because the number is the finding: **four
+/// falls and one ride.** The distinction is real content and not theory, which
+/// is the answer to the row — the conservative rule is costing four events the
+/// ability to repeat, and each of them is a hole you can fall into once.
+///
+/// **Which half of this is live, said out loud.** The `stays || leaves`
+/// assertion and the count are; the *a ride may not repeat* one is not,
+/// because `EventsData::parse` already refuses every repeating warp before
+/// this runs. It is written down anyway and it is not decoration: it is the
+/// guard that has to already exist the day somebody relaxes parse to allow a
+/// repeating **fall**, which is `PLAN-M16.md` §4.3's sinkholes asking again.
+/// A check that is unreachable today and says so is worth more than one that
+/// is unreachable today and does not.
+#[test]
+fn a_warp_that_stays_on_its_own_map_is_a_fall_and_not_a_ride() {
+    let events = data::events();
+
+    // Which map places which event. An event on no map is staged content and
+    // is skipped rather than failed — that is `avail.rs`'s `STAGED` rule, and
+    // this is not the lint that polices it.
+    let mut placed: std::collections::BTreeMap<String, Vec<&str>> = Default::default();
+    for (id, _) in data::MAPS {
+        for p in data::map(id, D).places {
+            placed.entry(p.id).or_default().push(id);
+        }
+    }
+
+    let (mut falls, mut rides) = (0, 0);
+    for e in &events.events {
+        let Some(on) = placed.get(&e.id) else { continue };
+        for c in &e.choices {
+            let mut warps = Vec::new();
+            warps_in(&c.outcome, &mut warps);
+            for (to, _) in &warps {
+                // An event placed on two maps that warps to one of them is a
+                // fall from one and a ride from the other, which is a thing
+                // nobody should be able to author by accident.
+                let stays = on.iter().all(|m| m == to);
+                let leaves = on.iter().all(|m| m != to);
+                assert!(
+                    stays || leaves,
+                    "{:?} is on {on:?} and warps to {to}, which is a fall from one and a \
+                     ride from the other",
+                    e.id
+                );
+                if stays {
+                    falls += 1;
+                } else {
+                    rides += 1;
+                    // A ride is the thing the conservative rule is about.
+                    assert!(
+                        !e.repeats,
+                        "{:?} repeats and rides you to {to}, which is free fast travel",
+                        e.id
+                    );
+                }
+            }
+        }
+    }
+    println!("warps: {falls} falls and {rides} rides");
+    assert!(falls + rides > 0, "no warps at all, so this asks nothing");
+}
+
+/// **A warp moves you and says nothing, and that is a decision.**
+///
+/// `SECOND-ORDER-M16.md` row 28: there are four doors onto a tile in this game
+/// and each answers a different question — `world::step` (you walked),
+/// `world::arrive_at` (you came to rest), `world::here` (you stood still and
+/// asked again), and `Game::warp_to`, which moves you and resolves nothing.
+///
+/// The row was written because the fourth had no *stated* reason, and it
+/// nearly shipped a lever nobody could pull: a one-tile alcove behind a
+/// sinkhole is a card that opens for nobody. **The fix was the map** — an
+/// alcove is two tiles, the one you land on and the one the lever is on — and
+/// `warp_to` was deliberately left alone, because every warp in the game lands
+/// you on ground and a fall that opened a card would be a fall that started a
+/// conversation.
+///
+/// This is what keeps it a decision. Break it by having `warp_to` resolve the
+/// landing tile and the alcove becomes a warp that answers itself.
+#[test]
+fn a_warp_resolves_no_place() {
+    // A warp whose landing tile has an event on it, which is the only
+    // arrangement where "resolves" and "does not" can be told apart at all.
+    let events = data::events();
+    let mut found = None;
+    for (id, _) in data::MAPS {
+        let w = data::map(id, D);
+        for p in &w.places {
+            if p.kind != gm2d_core::world::PlaceKind::Event {
+                continue;
+            }
+            if events.events.iter().any(|e| e.id == p.id) {
+                found = Some((id, p.at));
+                break;
+            }
+        }
+        if found.is_some() {
+            break;
+        }
+    }
+    let (map, at) = found.expect("some map has an event on it");
+
+    let mut g = gm2d_core::game::Game::new(3, "td");
+    g.warp_to(map, at, D);
+
+    assert_eq!(g.world.map_id(), *map, "the warp did not arrive");
+    assert_eq!(g.world.at, at, "the warp landed somewhere else");
+    // The event is standing right there and nothing has happened to it: not
+    // answered, not marked, not reported. You were put down, not walked in.
+    let w = data::map(map, D);
+    let here = w.place_at(at[0], at[1]).expect("the tile has a place on it");
+    assert_eq!(here.kind, gm2d_core::world::PlaceKind::Event);
+    assert!(
+        !g.world.answered.contains(&here.id),
+        "{}: warping onto it answered it - a warp resolves no place",
+        here.id
+    );
+}

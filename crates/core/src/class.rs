@@ -28,6 +28,22 @@ use crate::stats::Stats;
 ///
 /// Adding an axis is additive: existing classes keep their thresholds and
 /// simply never mention the new one.
+///
+/// **Inherited, and nothing in GM2D reads it.** Upstream ranked the classes a
+/// build qualified for at a fountain and handed over the dearest; GM2D has no
+/// fountains — the fork is a screen at level five where you pick one of seven,
+/// and the second and third come off Spike's counter. So `ClassDef::requires`
+/// is scored by nobody and `demand` is called by nobody, which is why
+/// `SECOND-ORDER-M16.md` row 34 could observe that **there is no mind axis
+/// here** — fifteen of these and not one counts a maximum being eaten — and
+/// still say the Whisperer works.
+///
+/// It is kept rather than deleted for the reason `Character::grown_health` is:
+/// it is the field a ranking would go in the day somebody wants one, and it
+/// costs nothing where it is. **What it must not do is be mistaken for a live
+/// number.** Adding a sixteenth axis to describe a class the engine never
+/// consults would be a point spent on a promise that reaches nothing, which is
+/// the failure this repository has paid for four times.
 #[derive(Copy, Clone, Eq, PartialEq, Debug)]
 pub enum Axis {
     /// Magic damage across the build.
@@ -956,7 +972,8 @@ impl ClassPower {
 
 /// One class: a name, what the build has to look like, and what you get.
 ///
-/// `requires` is the contract. It may only mention axes.
+/// `requires` may only mention axes — and **nothing reads it**; see [`Axis`]
+/// for why, and for why it is kept.
 #[derive(Copy, Clone, Debug)]
 pub struct ClassDef {
     pub name: &'static str,
@@ -966,8 +983,11 @@ pub struct ClassDef {
 }
 
 impl ClassDef {
-    /// How much this class asks for in total. What decides which of the
-    /// classes you qualify for you are actually given - see `rank`.
+    /// How much this class asks for in total. What decided, upstream, which of
+    /// the classes you qualified for you were actually given.
+    ///
+    /// **Called by nothing here**, because GM2D has no fountain to rank at.
+    /// See [`Axis`].
     pub fn demand(&self) -> i32 {
         self.requires.iter().map(|&(_, n)| n).sum()
     }

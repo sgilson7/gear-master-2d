@@ -23,6 +23,9 @@ path = "src/mkrun.rs"
 [dependencies]
 gm2d-core = { path = "../core" }
 
+# **How wide the fan is**, which is the number a table is judged on: how many
+# distinct tiles a shot can reach, per power. Mean distance saturates on a map
+# this size and says nothing; this does not. Authoring bench, not game.
 [[bin]]
-name = "probe"
-path = "src/probe.rs"
+name = "fan"
+path = "src/fan.rs"

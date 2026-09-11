@@ -369,3 +369,67 @@ fn a_boss_is_never_instant() {
         "{creature} stands in a region pool and could never be skipped anywhere"
     );
 }
+
+/// **A pocket is a boss tile, and six of them on one floor are still six tiles.**
+///
+/// `SECOND-ORDER-M16.md` row 12: the Reefs' six sinkhole pockets are
+/// `PlaceKind::Boss` with no drops, which makes each a **certainty** rather
+/// than a 260‰ roll — and that took the game's boss-tile count from nine to
+/// fifteen under M15.1's rule that *the boss refusal is the tile's and not the
+/// name's*. The row asks whether marking something met in a pocket reads
+/// wrong.
+///
+/// It does not, and the two halves are separate:
+///
+/// 1. **A pocket refuses, exactly as the plate at the bottom does.** It is a
+///    boss tile, so `instant` will not settle it — you fight what is in a hole
+///    you fell into.
+/// 2. **And it cannot be farmed for the mark.** Three of the six creatures
+///    stand in two pockets each and three in one, so the whole floor is worth
+///    at most **two** of the five wins a mark costs — and each pocket is spent
+///    the first time, because a boss writes its own tile id into `answered`.
+///    A player who marks the Iron Abbot marked it by meeting it in the field,
+///    which is what the mark is supposed to mean.
+#[test]
+fn a_pocket_is_a_boss_tile_and_cannot_be_farmed_for_a_mark() {
+    let floor = gm2d_core::data::map("the-reefs-1", D);
+    let pockets: Vec<_> = floor
+        .places
+        .iter()
+        .filter(|p| p.kind == gm2d_core::world::PlaceKind::Boss)
+        .cloned()
+        .collect();
+    assert_eq!(pockets.len(), 6, "the Flat Below has {} pockets", pockets.len());
+
+    // **At most two of the five.** Counted rather than asserted per creature,
+    // because the floor gaining a seventh pocket is exactly the change that
+    // should land here.
+    let mut most = std::collections::BTreeMap::new();
+    for p in &pockets {
+        let who = p.creature.clone().expect("a pocket has somebody in it");
+        *most.entry(who).or_insert(0u32) += 1;
+    }
+    let worst = *most.values().max().expect("six pockets hold somebody");
+    assert!(
+        worst < INSTANT_AFTER,
+        "one creature is in {worst} pockets of a floor and a mark costs {INSTANT_AFTER} - \
+         the whole floor is a shortcut to marking it"
+    );
+
+    // And each of them refuses, the way the plate at the bottom does.
+    for p in &pockets {
+        let creature = p.creature.clone().expect("a pocket has somebody in it");
+        let mut g = Game::new(9, "td");
+        g.character = common::geared_from(&["the-end-of-all-gears"]);
+        g.world.map = "the-reefs-1".into();
+        g.world.at = p.at;
+        g.world.add(&fight::beat_key(&creature), INSTANT_AFTER);
+        g.mark_instant(&creature).expect("every pocket creature stands in pools too");
+        g.encounter = Some(Encounter { enemy: creature.clone(), at: p.at });
+        assert!(
+            fight::instant(&mut g, D).is_none(),
+            "{}: the thing in the hole settled without a screen",
+            p.id
+        );
+    }
+}

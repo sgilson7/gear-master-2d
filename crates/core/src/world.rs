@@ -1781,6 +1781,56 @@ pub fn here(world: &World, state: &WorldState, allowed: &Allowances) -> Step {
 /// draws nothing at all: bumping into a wall must not advance the stream, or
 /// two players walking the same route would see different fights depending on
 /// how often they misjudged a cliff.
+/// Open any door a no-op choice shut.
+///
+/// **A repair, and it is here for the reason `World::repair` is**: a save
+/// carried across a build change is a save that will arrive wrong, and the
+/// loader is where that is caught.
+///
+/// Until this commit, taking a choice whose outcome was `Nothing` wrote the
+/// event into `answered` — so the Wextreen Sump's weighed door, which has three
+/// ways through and one *Try the slot as you are*, could be shut for good by
+/// the one choice that costs nothing. Fixing `answer_event` stops it happening
+/// again and does nothing for a save it has already happened to, and somebody
+/// is standing in one.
+///
+/// **The rule is narrow on purpose.** An event is un-answered only when all
+/// three hold:
+///
+/// - it has a choice that does nothing at all, so it is one of these doors;
+/// - it has a choice that raises a flag, so it is a door rather than a card;
+/// - **none** of the flags any of its choices would raise is set — so it was
+///   answered by the no-op and was never actually opened.
+///
+/// That last one is what keeps this from being a way to take a card twice: an
+/// event that was answered properly has its flag, and is left alone.
+pub fn reopen_doors_a_no_op_shut(state: &mut WorldState, events: &crate::tile_event::EventsData) {
+    let mut reopen: Vec<String> = Vec::new();
+    for e in &events.events {
+        if !state.answered.iter().any(|a| a == &e.id) {
+            continue;
+        }
+        let does_nothing =
+            e.choices.iter().any(|c| matches!(c.outcome, crate::tile_event::Outcome::Nothing));
+        if !does_nothing {
+            continue;
+        }
+        let raises: Vec<String> = e
+            .choices
+            .iter()
+            .flat_map(|c| crate::tile_event::flags_set_by(&c.outcome))
+            .collect();
+        if raises.is_empty() {
+            continue;
+        }
+        if raises.iter().any(|f| state.flags.iter().any(|has| has == f)) {
+            continue;
+        }
+        reopen.push(e.id.clone());
+    }
+    state.answered.retain(|a| !reopen.contains(a));
+}
+
 /// How many of your steps the cart stays at a stop.
 ///
 /// The human's number: *"appears in a random area for 5 movements then teleports

@@ -153,6 +153,63 @@ pub fn piece_lines(def: &PieceDef) -> Vec<(&'static str, String)> {
 /// stat, which is why it is its own group rather than a line in the first one.
 /// The sentence is `Trigger::describe`'s and names who it lands on, so a
 /// component that curses its own wearer reads as the downside it is.
+/// One row of *what this does to a blow*.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Defence {
+    /// Unthemed, TONE 13a: this is a spec and somebody comparing two creatures
+    /// is comparing numbers.
+    pub what: &'static str,
+    /// **What the fight will actually use**, not what the stat block says.
+    pub value: i32,
+    /// What it says before the cap took it down, or `None` when nothing did.
+    pub raw: Option<i32>,
+}
+
+/// What a stat block does to a blow, as the fight will use it.
+///
+/// **In core because the caps are**, and they are not one number: a physical or
+/// magic resistance tops out at [`stats::RESIST_CAP`] and the mind and curse
+/// lanes at [`stats::MIND_CAP`], because those two *can* be shut out completely
+/// and the other two never can.
+///
+/// **Found on the live page.** The bestiary's first version built this list in
+/// the shim off the raw stat block, and the Iron Abbot's entry read *"144% mind
+/// resist"* and *"99% physical resist"* — two numbers the simulation will never
+/// use. The page was drawing what core sent it, which is the rule; core was
+/// sending something it does not itself believe, which is the rule one level
+/// up. A glossary that disagrees with the thing it is a glossary of is worse
+/// than no glossary.
+///
+/// `raw` is kept rather than dropped so a screen can say *capped from 144*: a
+/// number that quietly changed is a number somebody will think is a bug.
+///
+/// Zeroes are left out. On a defence, nought is the ordinary case rather than a
+/// claim, so it is absence rather than a row saying nothing.
+pub fn defences_of(s: &crate::stats::Stats) -> Vec<Defence> {
+    use crate::stats::{MIND_CAP, RESIST_CAP};
+    // `None` is a lane with no ceiling at all — piercing and hardening are
+    // already clamped against each other where they are used, and `reflect`
+    // pays a share rather than taking one away.
+    let rows: [(&'static str, i32, Option<i32>); 9] = [
+        ("physical resist", s.physical_resist, Some(RESIST_CAP)),
+        ("magic resist", s.magic_resist, Some(RESIST_CAP)),
+        ("mind resist", s.mind_resist, Some(MIND_CAP)),
+        ("curse resist", s.curse_resist, Some(MIND_CAP)),
+        ("physical pierce", s.physical_pierce, Some(MIND_CAP)),
+        ("magic pierce", s.magic_pierce, Some(MIND_CAP)),
+        ("physical hardening", s.physical_harden, Some(MIND_CAP)),
+        ("magic hardening", s.magic_harden, Some(MIND_CAP)),
+        ("reflect", s.reflect, None),
+    ];
+    rows.into_iter()
+        .filter(|(_, v, _)| *v != 0)
+        .map(|(what, v, cap)| {
+            let capped = cap.map(|c| v.min(c)).unwrap_or(v);
+            Defence { what, value: capped, raw: (capped != v).then_some(v) }
+        })
+        .collect()
+}
+
 pub fn curse_lines(triggers: &[Trigger]) -> Vec<String> {
     triggers.iter().filter(|t| lands_a_curse(t)).map(|t| t.describe()).collect()
 }

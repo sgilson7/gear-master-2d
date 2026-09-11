@@ -2356,6 +2356,24 @@ def check_the_bestiary_holds_what_you_have_met(page, name, fails, base):
         # **The resists, which is the half the report was about.**
         if not shown["defences"]:
             fails.append(f"{name}: the Iron Abbot's entry shows no defences at all")
+        # **And none of them is above what the fight will use.** Found on the
+        # deployed page: the entry read *144% mind resist* and *99% physical
+        # resist*, and the simulation clamps those lanes at 100 and 95. Core
+        # sends the capped figure now and says what it was capped from, because
+        # a number that quietly changed reads as a bug.
+        rows = page.evaluate(
+            "() => [...document.querySelectorAll('#bestiary-defences li')]"
+            ".map(l => l.textContent.trim())")
+        for row in rows:
+            head = row.split('%')[0]
+            if head.lstrip('-').isdigit() and int(head) > 100:
+                fails.append(f"{name}: a defence is printed above anything the fight uses: "
+                             f"{row!r}")
+            if "resist" in row and "capped" not in row:
+                got = int(head) if head.lstrip('-').isdigit() else 0
+                if got > 95 and "mind" not in row and "curse" not in row:
+                    fails.append(f"{name}: {row!r} is over the 95 the fight clamps to and "
+                                 f"does not say it was capped")
         if shown["defences"] and not shown["head"]:
             fails.append(f"{name}: defences are drawn under a hidden heading")
         if not shown["cards"]:

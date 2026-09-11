@@ -257,6 +257,19 @@ fn sets_flag(o: &Outcome, flag: &str) -> bool {
     }
 }
 
+/// Every flag an outcome would raise.
+///
+/// A free function beside [`sets_flag`], which asks about one: two callers want
+/// the list rather than the question, and walking the `All` tree twice in two
+/// places is how the two answers start to differ.
+pub fn flags_set_by(o: &Outcome) -> Vec<String> {
+    match o {
+        Outcome::Flag(f) => vec![f.clone()],
+        Outcome::All(list) => list.iter().flat_map(flags_set_by).collect(),
+        _ => Vec::new(),
+    }
+}
+
 /// Where a flag is raised, as a sentence a refusal can end with.
 ///
 /// **The same lookup [`Requirement::wants`] does, for ground rather than for a

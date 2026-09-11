@@ -656,6 +656,10 @@ impl SaveFile {
         // M13 means the instrument parts a file written before there was an
         // instrument frame left among the blades. See `repair_boards`.
         game.character.repair_boards();
+        // **And any door a choice that does nothing shut**, which until this
+        // commit could happen at the Wextreen Sump's weighed door and made the
+        // floor unfinishable. Reported from play by somebody standing in one.
+        crate::world::reopen_doors_a_no_op_shut(&mut game.world, &crate::data::events());
         // **What the nodes and the classes imply, derived.** The save carries
         // which nodes were taken and which classes were chosen, not what they
         // did — and since M13.9 it does not carry `assembly_pct` at all, so

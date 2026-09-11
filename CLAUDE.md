@@ -408,9 +408,19 @@ something cost a day.
   the character — and never the character. Same division a gate's key makes.
   `Allowances::of` matches `Rule` exhaustively, so a new rule is a decision
   about walking rather than a silence.
-- **A puzzle is monotone, because flags are.** `WorldState.flags` and
-  `answered` only ever grow, so a puzzle whose wrong move locks the right one is
-  a puzzle the save cannot come back from. Every one in this game is solved by
+- **A puzzle is monotone, because flags are — and that is a guarantee about
+  flags, not about doors.** `WorldState.flags` and `answered` only ever grow, so
+  a puzzle whose wrong move locks the right one is a puzzle the save cannot come
+  back from. **Growing is what broke it once**: `answer_event` wrote the event
+  into `answered` whatever the choice did, so *Try the slot as you are* — the
+  one choice in the game that does nothing at all — shut the Wextreen Sump's
+  weighed door for good and made the floor unfinishable. Reported from play by
+  somebody standing in it. **A choice that changes nothing is not an answer**
+  now, `no_choice_that_does_nothing_spends_a_door` is the rule over every event
+  there is, and `world::reopen_doors_a_no_op_shut` unsticks the saves it already
+  happened to. `puzzle::solvable_blind` could not have caught it: a blind solver
+  never takes a choice that does nothing, which is the one move a model of a
+  good player will not make. Every one in this game is solved by
   *discovering* something and never by avoiding something — and that is not a
   limit, it is what kind of puzzles this game has. `puzzle::solvable_blind` is
   the proof and `every_floor_in_the_game_can_be_solved_blind` runs it over every
@@ -4535,7 +4545,7 @@ content*, and one check now measures what a range used to guess at.
 | Figures | 27 `.tex` → **83 SVGs** (13 family drawings, 4 drawn for themselves, 5 classes, 3 towns, you) |
 | Art coverage | **60 of 60 creatures**, 3 of 3 towns, 5 of 5 classes, and you. The set pieces, the instruments and the enchs have no art and want none — a component has never had a figure |
 | Browser gate | **90 `ok:` lines over 3 engines** — which is 67 in any one of them, not 81; the count is a total and reading it as per-engine is wrong by fourteen. The newest is M15.2's, and it is the only one that can answer a *negative*: that a fight you have already had is settled and **never drawn**. The newest five are M14.5's: the tide is drawn before it goes out and walkable after, the lip of the Sump refuses in the Reach's words and opens the frame, a wheel that keeps what you feed it says what shape it wants, the chair is three moves in an order **and comes back**, and the third town is empty with the screen after it saying so. **All five were negative-tested, and two of the five found faults on a green build** — see *A stack gate that wants an instrument* |
-| The suite | **883 passing, and ~32 seconds warm** after M15, the bestiary, the cart and the sands; **832 and 27.5s** after M14 — measured after M14, and the ten slowest files are the ten that were slow at M13: `drops.rs` at 11.0s and `experts_reach.rs` at 6.3s, neither of them M14's, and nothing this block added is above 0.4s. **`SECOND-ORDER-M14.md` row 17 was written claiming it had slowed to minutes and is corrected there**: what is minutes is rebuilding sixty test binaries after a change to `combat.rs`, which is a fact about editing the engine. Before M14 it was **788 passing, and 34 seconds warm.** It was a minute through most of M13 and `rules_m13.rs` was 29.6s of it: `beacon_board` ran Auto-pack over the whole catalogue on twenty-row grids, four times, because it was the only fixture in the repository with two items that touch. `common::items_in_a_row` is what replaced it — **0.03s** — and `experts_reach.rs` went 9.6s → 6.5s by measuring once per *set* of nodes rather than once per question. `drops.rs` at 11.3s is now the slowest file and is untouched. `[profile.test] opt-level = 2` since M12.6, with debug assertions and overflow checks still on — this is the `test` profile, not `--release` |
+| The suite | **892 passing, and ~32 seconds warm** after M15, the bestiary, the cart and the sands; **832 and 27.5s** after M14 — measured after M14, and the ten slowest files are the ten that were slow at M13: `drops.rs` at 11.0s and `experts_reach.rs` at 6.3s, neither of them M14's, and nothing this block added is above 0.4s. **`SECOND-ORDER-M14.md` row 17 was written claiming it had slowed to minutes and is corrected there**: what is minutes is rebuilding sixty test binaries after a change to `combat.rs`, which is a fact about editing the engine. Before M14 it was **788 passing, and 34 seconds warm.** It was a minute through most of M13 and `rules_m13.rs` was 29.6s of it: `beacon_board` ran Auto-pack over the whole catalogue on twenty-row grids, four times, because it was the only fixture in the repository with two items that touch. `common::items_in_a_row` is what replaced it — **0.03s** — and `experts_reach.rs` went 9.6s → 6.5s by measuring once per *set* of nodes rather than once per question. `drops.rs` at 11.3s is now the slowest file and is untouched. `[profile.test] opt-level = 2` since M12.6, with debug assertions and overflow checks still on — this is the `test` profile, not `--release` |
 | Floors with a puzzle | **6**, and floors with a boss **2**. Every one is monotone — flags only grow, so no move can make the way on unreachable — and `puzzle::solvable_blind` counts the worst case rather than the plan asserting it |
 | Blind-solution ceilings | Sump **8 / 1 / 45**, Stair **1 / 3 / 3**. The plan guessed 10 / 11 / 45 and 2 / 27 / 3; **the Cairnfield's forty-five came back exactly**, which is the reason to believe the other five. `every_floor_in_the_game_can_be_solved_blind` holds every floor there is under 45 |
 | `Requirement` kinds | **8**: none, gold, flag, holding, **loose_item_of_size**, **assembled_of_rarity**, **surveying**, **all**. Three of them are ported from `event::Requirement`, which is the cut campaign's type — `PLAN-M14.md` §1.1 names them and they were unreachable from a data file |

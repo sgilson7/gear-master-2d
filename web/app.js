@@ -1152,8 +1152,12 @@ function paintDefences(rows, listId, headId) {
   const any = (rows ?? []).length > 0;
   head.hidden = !any;
   list.hidden = !any;
+  // **`raw` is what the stat block says and `value` is what the fight uses.**
+  // Saying so rather than quietly printing the smaller one: a number that
+  // changed with no explanation is a number somebody reports as a bug.
   list.innerHTML = (rows ?? [])
-    .map((d) => `<li><b>${d.value}${d.unit}</b> ${d.what}</li>`)
+    .map((d) => `<li><b>${d.value}${d.unit}</b> ${d.what}` +
+      (d.raw ? ` <span class="dim">capped, from ${d.raw}${d.unit}</span>` : '') + `</li>`)
     .join('');
 }
 

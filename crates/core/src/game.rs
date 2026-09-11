@@ -250,7 +250,31 @@ impl Game {
         let outcome = c.outcome.clone();
         let mut receipt = Vec::new();
         self.apply_outcome(&outcome, &mut receipt, difficulty);
-        if !e.repeats {
+        // **A choice that changes nothing is not an answer**, and a door it
+        // spent is a door nobody can open.
+        //
+        // Reported from play at the Wextreen Sump's weighed door: *"at the
+        // weighted door i couldn't do anything and selected the bottom option,
+        // can i still open the door to the next floor using the lintel?"* — and
+        // the answer was no. That door has four choices: three open it and the
+        // fourth is *Try the slot as you are*, which costs a minute and tells
+        // you the shape. Taking it wrote the event into `answered`, and the
+        // stair out is `hidden_until: the-shelf-is-open`, so the floor became
+        // unfinishable.
+        //
+        // **This is the hole in the monotone argument**, which says a puzzle is
+        // safe because `flags` and `answered` only ever *grow*. Growing is
+        // exactly what did it: the guarantee is that you cannot lose a flag,
+        // and it was read as a guarantee that you cannot lose a **door**.
+        // `every_floor_in_the_game_can_be_solved_blind` could not see it
+        // either, because a blind solver never takes a choice that does
+        // nothing — it is the one move a model of a good player will not make.
+        //
+        // Exactly one choice in the shipped game is a no-op, and it is that
+        // one; `no_choice_that_does_nothing_spends_a_door` counts them so this
+        // stays true.
+        let changed_something = !matches!(outcome, crate::tile_event::Outcome::Nothing);
+        if !e.repeats && changed_something {
             self.world.answered.push(id.to_string());
         }
         Ok(receipt)

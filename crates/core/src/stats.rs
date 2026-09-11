@@ -64,6 +64,23 @@ pub struct Stats {
     pub nature: i32,
 }
 
+/// The most a physical or magic resistance can ever be worth.
+///
+/// **A named cap rather than a literal**, because the number reaches a screen
+/// now: the bestiary prints what a creature does to a blow, and a glossary that
+/// said *99% physical resist* where the fight uses 95 would be a glossary
+/// disagreeing with the thing it is a glossary of. `after_defences` is the one
+/// place it is applied and this is the one place it is written.
+pub const RESIST_CAP: i32 = 95;
+
+/// And the most a mind or curse resistance is worth.
+///
+/// A hundred rather than ninety-five, and the difference is real: those two
+/// lanes *can* be shut out completely — `curse::mind_damage_after_resist` and
+/// `curse::lands_after_resist` both clamp here, and full immunity is a thing a
+/// creature is allowed to have.
+pub const MIND_CAP: i32 = 100;
+
 /// A character with no gear at all. An unequipped run is a losing run — that
 /// is deliberate, it is what makes assembling gear matter.
 /// Deliberately NOT scaled with the gear. Gear health went up fivefold because
@@ -443,7 +460,7 @@ pub fn after_defences(raw: i32, resist: i32, pierce: i32, harden: i32) -> i32 {
     let harden = harden.clamp(0, 100);
     let pierce = pierce.max(0);
     let effective_pierce = (pierce * (100 - harden) / 100).clamp(0, 100);
-    let resist = resist.clamp(0, 95);
+    let resist = resist.clamp(0, RESIST_CAP);
     let effective_resist = resist * (100 - effective_pierce) / 100;
     let kept = 100 - effective_resist;
     ((raw as i64 * kept as i64) / 100).max(0) as i32

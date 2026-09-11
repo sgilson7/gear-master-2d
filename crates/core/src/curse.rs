@@ -145,7 +145,7 @@ impl CurseKind {
     /// on the item it stopped - but it still answers to resistance the same
     /// way everything else does.
     pub fn landing_ms(self, curse_resist: i32) -> u32 {
-        let resist = curse_resist.clamp(0, 100);
+        let resist = curse_resist.clamp(0, crate::stats::MIND_CAP);
         let scaled = (self.base_duration_ms() as i64 * (100 - resist) as i64 / 100) as u32;
         scaled / TICK_MS * TICK_MS
     }
@@ -365,7 +365,7 @@ impl Curses {
 /// Mind damage after the target's mind resistance. Mind damage eats *maximum*
 /// health, so it can't be healed off — resistance is the only defence.
 pub fn mind_damage_after_resist(raw: i32, mind_resist: i32) -> i32 {
-    let resist = mind_resist.clamp(0, 100);
+    let resist = mind_resist.clamp(0, crate::stats::MIND_CAP);
     (raw as i64 * (100 - resist) as i64 / 100) as i32
 }
 

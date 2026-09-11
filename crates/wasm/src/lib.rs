@@ -1513,21 +1513,10 @@ fn creature_json(
     // seven say nought is a list nobody reads, and *zero is a number* — but on
     // a defence it is the ordinary case rather than a claim, so it is absence
     // rather than a lie.
-    let defences: Vec<serde_json::Value> = [
-        ("physical resist", stats.physical_resist, "%"),
-        ("magic resist", stats.magic_resist, "%"),
-        ("mind resist", stats.mind_resist, "%"),
-        ("curse resist", stats.curse_resist, "%"),
-        ("physical pierce", stats.physical_pierce, "%"),
-        ("magic pierce", stats.magic_pierce, "%"),
-        ("physical hardening", stats.physical_harden, "%"),
-        ("magic hardening", stats.magic_harden, "%"),
-        ("reflect", stats.reflect, "%"),
-    ]
-    .into_iter()
-    .filter(|(_, v, _)| *v != 0)
-    .map(|(what, v, unit)| serde_json::json!({ "what": what, "value": v, "unit": unit }))
-    .collect();
+    let defences: Vec<serde_json::Value> = gm2d_core::explain::defences_of(&stats)
+        .into_iter()
+        .map(|d| serde_json::json!({ "what": d.what, "value": d.value, "raw": d.raw, "unit": "%" }))
+        .collect();
 
     serde_json::json!({
         "name": g.theme_name(spec.name),

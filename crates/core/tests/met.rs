@@ -248,3 +248,57 @@ fn the_ladder_is_carrying_defences_worth_printing() {
         gm2d_core::combat::LADDER.len()
     );
 }
+
+/// **A defence is printed at what the fight will use, not what the block says.**
+///
+/// Found by hand-checking the deployed page: the Iron Abbot's entry read *"144%
+/// mind resist"* and *"99% physical resist"*, and the simulation clamps those
+/// lanes at 100 and 95. The page was drawing what core sent it, which is the
+/// rule; **core was sending a number it does not itself believe**, which is the
+/// rule one level up — and a glossary that disagrees with the thing it is a
+/// glossary of is worse than no glossary.
+#[test]
+fn no_defence_is_printed_above_what_the_fight_will_use() {
+    use gm2d_core::stats::{MIND_CAP, RESIST_CAP};
+    let mut capped = 0;
+    for m in gm2d_core::combat::LADDER {
+        let (s, _) = m.outfit_at(D);
+        for d in gm2d_core::explain::defences_of(&s) {
+            let cap = match d.what {
+                "physical resist" | "magic resist" => RESIST_CAP,
+                "reflect" => i32::MAX,
+                _ => MIND_CAP,
+            };
+            assert!(
+                d.value <= cap,
+                "{}: {} is printed at {} and the fight caps it at {cap}",
+                m.name,
+                d.what,
+                d.value
+            );
+            if let Some(raw) = d.raw {
+                capped += 1;
+                assert!(raw > d.value, "{}: {} claims a cap that took nothing off", m.name, d.what);
+            }
+        }
+    }
+    // **And something in the shipped ladder is actually over a cap**, or this
+    // check is comparing every number with a ceiling none of them reach.
+    assert!(capped > 0, "no creature in the game exceeds a defence cap, so this proves nothing");
+}
+
+/// The clamp the bestiary prints is the clamp the fight applies, read from the
+/// same constant rather than from a second copy of the number.
+#[test]
+fn the_printed_cap_is_the_fights_own() {
+    use gm2d_core::stats::{Stats, MIND_CAP, RESIST_CAP};
+    let s = Stats { physical_resist: 400, mind_resist: 400, ..Stats::new(10, 0, 0, 100) };
+    let rows = gm2d_core::explain::defences_of(&s);
+    let by = |w: &str| rows.iter().find(|d| d.what == w).expect("row").value;
+    assert_eq!(by("physical resist"), RESIST_CAP);
+    assert_eq!(by("mind resist"), MIND_CAP);
+    // And the fight agrees, asked directly.
+    assert_eq!(gm2d_core::curse::mind_damage_after_resist(100, 400), 0);
+    let dealt = gm2d_core::stats::after_defences(1000, 400, 0, 0);
+    assert_eq!(dealt, 1000 * (100 - RESIST_CAP) / 100, "the fight's own clamp is not {RESIST_CAP}");
+}

@@ -1,0 +1,737 @@
+  started from testing/saves/at-the-reefs.json
+
+--- a walk in progress --------------------------------------------------
+  level 45 · 8,13 in The Flat Below · 33904 Fnorp · carrying 0 · worn 0% · Berserker
+  probe: level 45 · fill 43% (helmet 35% chest 47% gloves 35% greaves 37% weapon 62%) · bench 0 · from nothing yet
+  town at —, gate at [11, 5]
+
+--- the road ------------------------------------------------------------
+
+--- boss ----------------------------------------------------------------
+  level 45 · 8,13 in The Flat Below · 33904 Fnorp · carrying 0 · worn 0% · Berserker
+  fight: Emperor of Dobira (rates 1129) with 12 items -> It stops moving
+         +262 Fnorp
+         +225 experience, carried
+         225 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  card: THE RIGHT-HAND STAKE
+        The right-hand stake, and the sand is banked a hand's depth higher against this one than against the other two
+        chose: Pull it
+        5% more tired
+        +12 experience, carried
+  card: THE SECOND SHEET
+        A folding table, the legs pushed through the crust, and a sheet of paper weighted at the four corners with sla
+        chose: Read the flat with the compass
+        Nothing you could point to
+  shut: (3, 11) — going to read (12, 13) first
+  card: THE RIGHT-HAND STAKE
+        The right-hand stake, and the sand is banked a hand's depth higher against this one than against the other two
+  card: THE SECOND SHEET
+        A folding table, the legs pushed through the crust, and a sheet of paper weighted at the four corners with sla
+        chose: Read the flat with the compass
+        Nothing you could point to
+  shut: (3, 11) — going to read (12, 9) first
+  card: THE RIGHT-HAND STAKE
+        The right-hand stake. It is the only one of the nine with a name cut on it and the name has been scratched out
+        chose: Read the flat with the compass
+        Nothing you could point to
+  shut: (3, 11) — going to read (14, 13) first
+  fight: Time Order Bishop (rates 1030) with 12 items -> It stops moving
+         +242 Fnorp
+         +206 experience, carried
+         443 on you. It is worth nothing until you bank it.
+         4% more tired. 13% of you is missing until you take something for it.
+  fight: Time Order Bishop (rates 1030) with 12 items -> It stops moving
+         +242 Fnorp
+         +206 experience, carried
+         649 on you. It is worth nothing until you bank it.
+         4% more tired. 17% of you is missing until you take something for it.
+  fight: Emperor of Dobira (rates 1129) with 12 items -> It stops moving
+         +262 Fnorp
+         +225 experience, carried
+         874 on you. It is worth nothing until you bank it.
+         4% more tired. 21% of you is missing until you take something for it.
+  fight: The Unmovable Rock (rates 1118) with 12 items -> It stops moving
+         +197 Fnorp
+         +223 experience, carried
+         1097 on you. It is worth nothing until you bank it.
+         4% more tired. 25% of you is missing until you take something for it.
+  card: THE SECOND SHEET
+        A folding table, the legs pushed through the crust, and a sheet of paper weighted at the four corners with sla
+        chose: Read the flat with the compass
+        Nothing you could point to
+  shut: (3, 11) — going to read (7, 13) first
+  fight: Time Order Bishop (rates 1030) with 12 items -> It stops moving
+         +242 Fnorp
+         +206 experience, carried
+         1303 on you. It is worth nothing until you bank it.
+         4% more tired. 29% of you is missing until you take something for it.
+  fight: Emperor of Dobira (rates 1129) with 12 items -> It stops moving
+         +262 Fnorp
+         +225 experience, carried
+         1528 on you. It is worth nothing until you bank it.
+         4% more tired. 33% of you is missing until you take something for it.
+  card: THE MIDDLE STAKE
+        The middle stake. The chain on it has been pulled once already and put back, which you can tell because the li
+        chose: Pull it
+        5% more tired
+        +12 experience, carried
+  card: THE RIGHT-HAND STAKE
+        The right-hand stake, and the sand is banked a hand's depth higher against this one than against the other two
+  fight: Time Order Bishop (rates 1030) with 12 items -> It stops moving
+         +242 Fnorp
+         +206 experience, carried
+         1746 on you. It is worth nothing until you bank it.
+         4% more tired. 42% of you is missing until you take something for it.
+  card: THE SECOND SHEET
+        A folding table, the legs pushed through the crust, and a sheet of paper weighted at the four corners with sla
+        chose: Read the flat with the compass
+        Nothing you could point to
+  shut: (3, 11) — going to read (12, 5) first
+  shut: (12, 5) — going to read (7, 9) first
+  fight: Emperor of Dobira (rates 1129) with 12 items -> It stops moving
+         +262 Fnorp
+         +225 experience, carried
+         1971 on you. It is worth nothing until you bank it.
+         4% more tired. 46% of you is missing until you take something for it.
+  fight: The Unmovable Rock (rates 1118) with 12 items -> It stops moving
+         +197 Fnorp
+         +223 experience, carried
+         2194 on you. It is worth nothing until you bank it.
+         4% more tired. 50% of you is missing until you take something for it.
+  card: THE RIGHT-HAND STAKE
+        The right-hand stake. It is the only one of the nine with a name cut on it and the name has been scratched out
+        chose: Pull it
+        5% more tired
+        +12 experience, carried
+  card: THE MIDDLE STAKE
+        The middle stake of the second corridor. The crust around it is walked flat for four feet in every direction.
+        chose: Read the flat with the compass
+        Nothing you could point to
+  fight: The Unmovable Rock (rates 1118) with 12 items -> It stops moving
+         +197 Fnorp
+         +223 experience, carried
+         2429 on you. It is worth nothing until you bank it.
+         4% more tired. 59% of you is missing until you take something for it.
+  fight: Emperor of Dobira (rates 1129) with 12 items -> It stops moving
+         +262 Fnorp
+         +225 experience, carried
+         2654 on you. It is worth nothing until you bank it.
+         1% more tired. 60% of you is missing until you take something for it.
+  card: THE RIGHT-HAND STAKE
+        The right-hand stake. It is the only one of the nine with a name cut on it and the name has been scratched out
+  fight: Emperor of Dobira (rates 1129) with 12 items -> It stops moving
+         +262 Fnorp
+         +225 experience, carried
+         2879 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Emperor of Dobira (rates 1129) with 12 items -> It stops moving
+         +262 Fnorp
+         +225 experience, carried
+         3104 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  shut: (3, 11) — going to read (7, 5) first
+  shut: (7, 5) — going to read (2, 9) first
+  fight: Time Order Bishop (rates 1030) with 12 items -> It stops moving
+         +242 Fnorp
+         +206 experience, carried
+         3310 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Time Order Bishop (rates 1030) with 12 items -> It stops moving
+         +242 Fnorp
+         +206 experience, carried
+         3516 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: The Unmovable Rock (rates 1118) with 12 items -> It stops moving
+         +197 Fnorp
+         +223 experience, carried
+         3739 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  card: THE MIDDLE STAKE
+        The middle stake of the second corridor. The crust around it is walked flat for four feet in every direction.
+        chose: Pull it
+        0% more tired
+        +12 experience, carried
+  fight: The Unmovable Rock (rates 1118) with 12 items -> It stops moving
+         +197 Fnorp
+         +223 experience, carried
+         3974 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Time Order Bishop (rates 1030) with 12 items -> It stops moving
+         +242 Fnorp
+         +206 experience, carried
+         4180 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  card: THE LEFT-HAND STAKE
+        A stake at the left-hand end, and the chain is new. Somebody has been down here since.
+        chose: Pull it
+        0% more tired
+        +12 experience, carried
+  fight: Time Order Bishop (rates 1030) with 12 items -> It stops moving
+         +242 Fnorp
+         +206 experience, carried
+         4398 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: The Unmovable Rock (rates 1118) with 12 items -> It stops moving
+         +197 Fnorp
+         +223 experience, carried
+         4621 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  card: THE MIDDLE STAKE
+        The middle stake of the second corridor. The crust around it is walked flat for four feet in every direction.
+  fight: Emperor of Dobira (rates 1129) with 12 items -> It stops moving
+         +262 Fnorp
+         +225 experience, carried
+         4846 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Emperor of Dobira (rates 1129) with 12 items -> It stops moving
+         +262 Fnorp
+         +225 experience, carried
+         5071 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  card: THE RIGHT-HAND STAKE
+        The right-hand stake. It is the only one of the nine with a name cut on it and the name has been scratched out
+  shut: (3, 11) — going to read (2, 13) first
+  fight: The Unmovable Rock (rates 1118) with 12 items -> It stops moving
+         +197 Fnorp
+         +223 experience, carried
+         5294 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Emperor of Dobira (rates 1129) with 12 items -> It stops moving
+         +262 Fnorp
+         +225 experience, carried
+         5519 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Emperor of Dobira (rates 1129) with 12 items -> It stops moving
+         +262 Fnorp
+         +225 experience, carried
+         5744 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Emperor of Dobira (rates 1129) with 12 items -> It stops moving
+         +262 Fnorp
+         +225 experience, carried
+         5969 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: The Unmovable Rock (rates 1118) with 12 items -> It stops moving
+         +197 Fnorp
+         +223 experience, carried
+         6192 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Emperor of Dobira (rates 1129) with 12 items -> It stops moving
+         +262 Fnorp
+         +225 experience, carried
+         6417 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Time Order Bishop (rates 1030) with 12 items -> It stops moving
+         +242 Fnorp
+         +206 experience, carried
+         6623 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Time Order Bishop (rates 1030) with 12 items -> It stops moving
+         +242 Fnorp
+         +206 experience, carried
+         6829 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Emperor of Dobira (rates 1129) with 12 items -> It stops moving
+         +262 Fnorp
+         +225 experience, carried
+         7054 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  card: THE LEFT-HAND STAKE
+        A stake of slag driven through the crust at the left-hand end of the corridor, with a chain on it going down i
+        chose: Read the flat with the compass
+        Nothing you could point to
+  fight: Emperor of Dobira (rates 1129) with 12 items -> It stops moving
+         +262 Fnorp
+         +225 experience, carried
+         7279 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Emperor of Dobira (rates 1129) with 12 items -> It stops moving
+         +262 Fnorp
+         +225 experience, carried
+         7504 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  card: THE MIDDLE STAKE
+        The middle stake. The chain on it has been pulled once already and put back, which you can tell because the li
+  fight: The Unmovable Rock (rates 1118) with 12 items -> It stops moving
+         +197 Fnorp
+         +223 experience, carried
+         7727 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Emperor of Dobira (rates 1129) with 12 items -> It stops moving
+         +262 Fnorp
+         +225 experience, carried
+         7952 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  card: THE RIGHT-HAND STAKE
+        The right-hand stake, and the sand is banked a hand's depth higher against this one than against the other two
+  card: THE SECOND SHEET
+        A folding table, the legs pushed through the crust, and a sheet of paper weighted at the four corners with sla
+        chose: Read the flat with the compass
+        Nothing you could point to
+  shut: (3, 11) — going to read (2, 5) first
+  fight: The Unmovable Rock (rates 1118) with 12 items -> It stops moving
+         +197 Fnorp
+         +223 experience, carried
+         8175 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Time Order Bishop (rates 1030) with 12 items -> It stops moving
+         +242 Fnorp
+         +206 experience, carried
+         8381 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Emperor of Dobira (rates 1129) with 12 items -> It stops moving
+         +262 Fnorp
+         +225 experience, carried
+         8606 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Time Order Bishop (rates 1030) with 12 items -> It stops moving
+         +242 Fnorp
+         +206 experience, carried
+         8812 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Time Order Bishop (rates 1030) with 12 items -> It stops moving
+         +242 Fnorp
+         +206 experience, carried
+         9018 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Emperor of Dobira (rates 1129) with 12 items -> It stops moving
+         +262 Fnorp
+         +225 experience, carried
+         9243 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Emperor of Dobira (rates 1129) with 12 items -> It stops moving
+         +262 Fnorp
+         +225 experience, carried
+         9468 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: The Unmovable Rock (rates 1118) with 12 items -> It stops moving
+         +197 Fnorp
+         +223 experience, carried
+         9691 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: The Unmovable Rock (rates 1118) with 12 items -> It stops moving
+         +197 Fnorp
+         +223 experience, carried
+         9914 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: The Unmovable Rock (rates 1118) with 12 items -> It stops moving
+         +197 Fnorp
+         +223 experience, carried
+         10137 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Time Order Bishop (rates 1030) with 12 items -> It stops moving
+         +242 Fnorp
+         +206 experience, carried
+         10343 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  card: THE LEFT-HAND STAKE
+        The left-hand stake of the top corridor, and the chain runs down into the band at an angle that says the bay u
+        chose: Pull it
+        0% more tired
+        +12 experience, carried
+  fight: Time Order Bishop (rates 1030) with 12 items -> It stops moving
+         +242 Fnorp
+         +206 experience, carried
+         10561 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Time Order Bishop (rates 1030) with 12 items -> It stops moving
+         +242 Fnorp
+         +206 experience, carried
+         10767 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Emperor of Dobira (rates 1129) with 12 items -> It stops moving
+         +262 Fnorp
+         +225 experience, carried
+         10992 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  card: THE MIDDLE STAKE
+        The middle stake. Above it, in the ceiling of the room beyond, there is a hole with light in it, which is the 
+        chose: Pull it
+        0% more tired
+        +12 experience, carried
+  fight: The Unmovable Rock (rates 1118) with 12 items -> It stops moving
+         +197 Fnorp
+         +223 experience, carried
+         11227 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Time Order Bishop (rates 1030) with 12 items -> It stops moving
+         +242 Fnorp
+         +206 experience, carried
+         11433 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: The Unmovable Rock (rates 1118) with 12 items -> It stops moving
+         +197 Fnorp
+         +223 experience, carried
+         11656 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: Emperor of Dobira (rates 1129) with 12 items -> It stops moving
+         +262 Fnorp
+         +225 experience, carried
+         11881 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  fight: The Unmovable Rock (rates 1118) with 12 items -> It stops moving
+         +197 Fnorp
+         +223 experience, carried
+         12104 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  card: THE WAY BACK OFF THE SANDS
+        Up the shingle and onto ground that stays where it is.
+
+--- the low water -------------------------------------------------------
+  level 45 · 8,9 in The Low Water · 46934 Fnorp · carrying 12104 · worn 60% · Berserker
+
+--- back over the tide --------------------------------------------------
+  level 45 · 8,9 in The Low Water · 46934 Fnorp · carrying 12104 · worn 60% · Berserker
+
+--- the treyway ---------------------------------------------------------
+  level 45 · 8,14 in The First Treyway · 46934 Fnorp · carrying 12104 · worn 60% · Berserker
+  16x16, 3 regions: The First Treyway, The Kolok Downs, The Wextreen Heights
+
+--- back ----------------------------------------------------------------
+  level 45 · 8,14 in The First Treyway · 46934 Fnorp · carrying 12104 · worn 60% · Berserker
+
+--- home ----------------------------------------------------------------
+  level 45 · 1,10 in The Burnwarp Shallows · 46934 Fnorp · carrying 12104 · worn 60% · Berserker
+  fight: Velothi High Guard (rates 161) with 12 items -> It stops moving
+         +24 Fnorp
+         +24 more for the speed of it. 3.5s.
+         +32 experience, carried
+         12136 on you. It is worth nothing until you bank it.
+         You cannot get any more tired than this. 60% of you is missing.
+  in town: level 45 · 1,18 in The End of All Gears · 46982 Fnorp · carrying 12136 · worn 0% · Berserker
+  town: 12136 experience spent.  ·  Level 46. One point to spend.  ·  Level 47. One point to spend.  ·  Level 48. One point to spend.  ·  A row is bought at the tree, or finished off an errand.
+  town: bought Spindrift-Can Frame
+  town: bought Cork Plating
+  town: bought Soft Drink Cap
+  town: bought Boiled Gooster Hide
+  town: bought Crank-Turner's Mold
+  town: bought Cork Greave Mold
+  town: bought Slow Trundler Sole
+  town: bought Gray Smock
+  town: bought Robe Scrap
+  town: bought Trillion-Pound Plate
+  town: bought Rhinestone Inset
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: ordered: Fishing-Line Grip
+  town: errand: THE EYES HAVE IT — Taken. beat 5 × Bengulon Jungle Toad, then hand in 5 × Bengulon Toad Eye.
+  town: errand: THE ONES STILL DOWN THERE — Taken. hand over 4 × Long Shift Tin.
+  town: errand: SOMEBODY SHOULD TELL HIM — Taken. go to THE CORK BOUNDARY, then report back.
+  town: errand: A DOOR WHERE THERE WAS NOT ONE — Taken. go to the door in the wall, then report back.
+  tree: took Frame Sense
+  tree: took Thick Skull
+  tree: took Corked
+  probe: level 48 · fill 44% (helmet 35% chest 47% gloves 33% greaves 39% weapon 66%) · bench 0 · from shelf 11 barrel 16
+
+--- errand --------------------------------------------------------------
+  level 48 · 1,18 in The End of All Gears · 45422 Fnorp · carrying 0 · worn 0% · Berserker
+  fight: A. Rat (rates 16) with 13 items -> It stops moving
+         +6 Fnorp
+         +6 more for the speed of it. 1.5s.
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        chose: Take a strip
+        THE CORK YOU TOOK. It is in your errands now.
+        +8 experience, carried
+  fight: Velothi High Guard (rates 161) with 13 items -> It stops moving
+         +24 Fnorp
+         +24 more for the speed of it. 2.9s.
+         +32 experience, carried
+         43 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+
+--- the treyway ---------------------------------------------------------
+  level 48 · 8,14 in The First Treyway · 45482 Fnorp · carrying 43 · worn 8% · Berserker
+  card: THE KETTLEWORKS ROAD
+        The road goes west and there is a milestone at the turn with two numbers cut into it. The top one says eleven 
+        chose: Ask what they want
+        THE ROAD THEY ASKED ABOUT. It is in your errands now.
+        +8 experience, carried
+  the tide is out and the bar is walkable
+
+--- the low water -------------------------------------------------------
+  level 48 · 4,12 in The First Treyway · 45482 Fnorp · carrying 51 · worn 8% · Berserker
+  card: THE TIDE CROSSING
+        The bar of shingle the tide has left is nine feet across and four hundred long, and it is the only part of it 
+
+--- the sump ------------------------------------------------------------
+  level 48 · 8,2 in The Low Water · 45482 Fnorp · carrying 51 · worn 8% · Berserker
+  card: THE LIP OF THE WEXTREEN SUMP
+        Whatever you are carrying settles, and the hole acquires a floor, and then three more under that.
+
+--- the sump 1 ----------------------------------------------------------
+  level 48 · 5,10 in The Lip · 45482 Fnorp · carrying 51 · worn 8% · Berserker
+  card: THE WHEEL MARKED C
+        C, and a socket that is not a socket: a square hole two fingers by two, cut through the hub and out the other 
+  shut: (5, 3) — going to read (5, 3) first
+  shut: (5, 3) — going to read (1, 6) first
+  card: THE WHEEL MARKED A
+        A wheel in the wall the size of a cartwheel, with a shard-shaped socket in the hub and the letter A cut above 
+        chose: Set a shard in the hub
+        +20 experience, carried
+  card: THE BEARING PLATE
+        A brass plate bolted flat to the floor with a hole through the middle of it and eight lines cut out from the h
+        chose: Take the bearing
+        +24 experience, carried
+  card: THE WHEEL MARKED B
+        The same wheel again with B cut above it, and this one has been turned before. The hub is worn bright and the 
+        chose: Turn it on the bearing
+        +28 experience, carried
+
+--- the sump 2 ----------------------------------------------------------
+  level 48 · 5,10 in The Shelf · 45482 Fnorp · carrying 123 · worn 8% · Berserker
+  fight: The Nine Who Stopped (rates 1141) with 13 items -> You stop moving
+         No bounty. Nothing was beaten.
+         The 123 experience you were carrying is gone.
+         You wake up walking, and you have been walking a while.
+         4% more tired. 12% of you is missing until you take something for it.
+
+--- errand --------------------------------------------------------------
+  level 48 · 1,18 in The End of All Gears · 45482 Fnorp · carrying 0 · worn 0% · Berserker
+  fight: A. Rat (rates 16) with 13 items -> It stops moving
+         +6 Fnorp
+         +6 more for the speed of it. 1.5s.
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 13 items -> It stops moving
+         +6 Fnorp
+         +6 more for the speed of it. 1.5s.
+         +3 experience, carried
+         6 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: Bengulon Jungle Toad (rates 80) with 13 items -> It stops moving
+         +8 Fnorp
+         +8 more for the speed of it. 1.5s.
+         +16 experience, carried
+         22 on you. It is worth nothing until you bank it.
+         Took a Bengulon Toad Eye.
+         It had a Bengulon Toad Hide on it. They do not usually.
+         4% more tired. 12% of you is missing until you take something for it.
+  fight: Wallspider Swarm (rates 95) with 13 items -> It stops moving
+         +9 Fnorp
+         +9 more for the speed of it. 2.8s.
+         +19 experience, carried
+         41 on you. It is worth nothing until you bank it.
+         4% more tired. 16% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 13 items -> It stops moving
+         +6 Fnorp
+         +6 more for the speed of it. 1.5s.
+         +3 experience, carried
+         44 on you. It is worth nothing until you bank it.
+         4% more tired. 20% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 13 items -> It stops moving
+         +6 Fnorp
+         +6 more for the speed of it. 1.5s.
+         +3 experience, carried
+         47 on you. It is worth nothing until you bank it.
+         4% more tired. 24% of you is missing until you take something for it.
+  drank a tin: Cork Tea. 10% of it comes off; 14% left.
+  fight: Bengulon Jungle Toad (rates 80) with 13 items -> It stops moving
+         +8 Fnorp
+         +8 more for the speed of it. 1.5s.
+         +16 experience, carried
+         63 on you. It is worth nothing until you bank it.
+         Took a Bengulon Toad Eye.
+         4% more tired. 18% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 13 items -> It stops moving
+         +6 Fnorp
+         +6 more for the speed of it. 1.5s.
+         +3 experience, carried
+         66 on you. It is worth nothing until you bank it.
+         4% more tired. 22% of you is missing until you take something for it.
+  fight: Bengulon Jungle Toad (rates 80) with 13 items -> It stops moving
+         +8 Fnorp
+         +8 more for the speed of it. 1.5s.
+         +16 experience, carried
+         82 on you. It is worth nothing until you bank it.
+         Took a Bengulon Toad Eye.
+         4% more tired. 26% of you is missing until you take something for it.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+
+DID NOT CROSS AND COME BACK in 600 steps. level 48 · 9,17 in The End of All Gears · 45608 Fnorp · carrying 82 · worn 26% · Berserker
+  read on the Treyway: ['the-kettleworks-road', 'the-wextreen-reach']
+  floors of the Drambus Stack down: 5 of 5
+  the thing under the lake: beaten
+  (415 of 600 presses actually moved)
+  shots taken on each table: the-treyway 4
+
+--- what happened -------------------------------------------------------
+  67 wins, 1 losses
+  level 48 · 9,17 in The End of All Gears · 45608 Fnorp · carrying 82 · worn 26% · Berserker
+  errands: THE EYES HAVE IT [carrying], THE ONES STILL DOWN THERE [carrying], SOMEBODY SHOULD TELL HIM [ready], A DOOR WHERE THERE WAS NOT ONE [ready], THE CORK YOU TOOK [carrying], THE ROAD THEY ASKED ABOUT [carrying]
+  sheet: 779 max health, 16 strength, 7 regen a second, 279% weapon power, 38% mind resist, 54% curse resist, 27% magic resist
+  probe: level 48 · fill 52% (helmet 47% chest 68% gloves 62% greaves 12% weapon 72%) · bench 0 · from shelf 11 barrel 16 drop 4
+
+--- the measure ---------------------------------------------------------
+  level  fill   helmet    chest   gloves  greaves   weapon   bench   want
+     45   43%      35%      47%      35%      37%      62%       0   80% UNDER / bench 2 UNDER
+     48   44%      35%      47%      33%      39%      66%       0   80% UNDER / bench 2 UNDER
+  at the end, level 48: fill 52%, bench 0
+
+  pieces by source: shelf 11, barrel 16, drop 4
+
+--- the page ------------------------------------------------------------
+  no console errors

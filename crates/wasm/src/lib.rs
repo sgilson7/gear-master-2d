@@ -383,6 +383,11 @@ pub fn world_json() -> String {
                     "golem": w.survey.golem,
                 })),
             "width": w.width, "height": w.height, "rows": rows, "walk": walk,
+            // **What moves you on this map**, which is a property of the map
+            // rather than of where you are standing — so it belongs beside the
+            // grid and not only on the strip. The walker reads this to decide
+            // whether to press a key or take a shot.
+            "is_table": w.traversal == gm2d_core::world::Traversal::Shot,
             "scouting": scouting,
             "chances": chances, "places": places, "regions": regions,
             // **The stones, and the marks they go on.** Both drawn, because a
@@ -434,6 +439,22 @@ pub fn position() -> String {
                 "can_bestiary": !g.bestiary().is_empty(),
                 "walked": g.world.count("tiles-walked"),
                 "fights": g.world.count("encounters"),
+                // **`walked` becomes `shots` on a table**, which is one figure
+                // in one place rather than a second row: the strip says how you
+                // have been getting about, and on a shot map that is shots.
+                // Which of the two it is comes from core, because *which map
+                // you are on* is the game's and the page draws what it is sent.
+                "shots": g.world.count("shots-taken"),
+                "is_table": w.traversal == gm2d_core::world::Traversal::Shot,
+                // And the danger figure is what the roll will use, not what the
+                // tile says: a landing rolls at `LANDING_MULT` of the tile's own
+                // rate, so a strip printing the bare rate would be printing a
+                // number nothing consults.
+                "landing_mult": if w.traversal == gm2d_core::world::Traversal::Shot {
+                    gm2d_core::shot::LANDING_MULT
+                } else {
+                    100
+                },
             })
             .to_string()
         })
@@ -481,7 +502,7 @@ pub fn try_step(dir: &str) -> String {
             // tile the far side should remember — see `remember_at`.
             let stepped_from = g.world.at;
             let s = if standing {
-                world::here(w, &g.world, &allowed)
+                world::here(w, &g.world, &allowed, DIFFICULTY)
             } else {
                 world::step(w, &mut g.world, &mut g.rng, DIFFICULTY, d, &allowed)
             };
@@ -557,253 +578,13 @@ pub fn try_step(dir: &str) -> String {
                     spoke = gm2d_core::quest::on_arrival(g, &id);
                 }
             }
-
-            // **A gate is answered here, not in `World`.** Whether it opens
-            // depends on what is in the bag, and a map does not know about
-            // bags. Either the player goes through or they are told what the
-            // lock wants.
-            let mut went = None;
-            let mut shut = None;
-            // Which map is through a gate that refused for want of an
-            // instrument. `None` for every other kind of refusal.
-            let mut wants_instrument: Option<String> = None;
-            // The key that turned just now, if one did, in the player's words.
-            let mut turned = None;
-            if let Some(id) = &s.gate {
-                if let Some(p) = w.places.iter().find(|p| p.id == *id).cloned() {
-                    // **Read before the key turns.** `Game::unlock` writes the
-                    // place into `answered` when it spends a key, and the
-                    // gate's own paragraph uses that same set to mean "you have
-                    // been through here before". Asking afterwards would open
-                    // the door and eat the speech in the same step.
-                    let unseen = !g.world.answered.iter().any(|a| *a == p.id);
-                    // **The whole answer is core's**, key and instrument both —
-                    // whether it opens, whether the key is spent, and whether
-                    // it was already open. A shim that decided any of that
-                    // would be a second rulebook, and *a key is spent* is a
-                    // rule the fast suite has to be able to reach.
-                    let opened = g.unlock(&p);
-                    if let gm2d_core::game::Unlocked::Spent { key } = &opened {
-                        turned = Some(g.theme_piece(key));
-                    }
-                    if opened != gm2d_core::game::Unlocked::Shut {
-                        // **Which map a gate opens onto is core's**, and for a
-                        // stack of floors it is a question about what has been
-                        // answered. `None` here is not a locked door: it is a
-                        // stack that has come all the way down, and `shut` is
-                        // what is said where the door used to be.
-                        let opens = p.opens_onto(&g.world).map(|s| s.to_string());
-                        if let Some(to) = opens {
-                            // **Where you left off, unless the gate says
-                            // otherwise.** A dungeon's mouth names its landing
-                            // tile on both sides, because a corridor has one
-                            // door and the trip round is a constant. A border
-                            // does not: the Treyway is sixteen tiles of country
-                            // and coming back to its southern corner every time
-                            // would make the door a chute. So `at_to` wins where
-                            // it is written, and where it is not the far side
-                            // remembers — which is a content decision in the map
-                            // file rather than a branch here.
-                            let landing = p
-                                .at_to
-                                .unwrap_or_else(|| map_in(&to, &marks, |d| d.arrival(&g.world)));
-                            // Written down before the move, or the map you are
-                            // leaving forgets where you were standing on it —
-                            // and it is the tile you stepped *from*, not the
-                            // doorway, so coming back does not put you one
-                            // keypress from going straight back through.
-                            g.world.remember_at(stepped_from);
-                            g.world.go_to(&to);
-                            g.world.at = landing;
-                            // Repaired on the far side: a gate whose landing
-                            // tile is not walkable would strand somebody on a
-                            // map they cannot leave.
-                            map_in(&to, &marks, |dest| dest.repair(&mut g.world, &allowed));
-                            // A gate may carry a paragraph — the door in the
-                            // western wall does, because crossing out of
-                            // Bambulon is a thing that happens once. Shown the
-                            // first time and remembered, so a save taken after
-                            // it comes back to a road rather than to the speech.
-                            let first = !p.prose.is_empty() && unseen;
-                            if first && !g.world.answered.iter().any(|a| *a == p.id) {
-                                g.world.answered.push(p.id.clone());
-                            }
-                            // **A survey opens on the way in and closes on
-                            // the way out.** Re-read every entry, so walking
-                            // out and back with a different instrument is a
-                            // different map — which is the whole feature. The
-                            // instrument is not consumed (`PLAN-M11.md` §8
-                            // row 5): shards are the grind and the instrument
-                            // is the achievement.
-                            g.world.active_survey = surveyable(&to)
-                                .then(|| survey_kind(g).map(|k| (to.clone(), k)))
-                                .flatten();
-                            // A golem that walked in with you has not had its
-                            // fight yet. Cleared at the gate, because what the
-                            // mark records is *this entry*.
-                            g.world
-                                .answered
-                                .retain(|a| a != gm2d_core::fight::GOLEM_SPENT);
-                            went = Some((
-                                to,
-                                p.name.clone(),
-                                if first { p.prose.clone() } else { Vec::new() },
-                            ));
-                        } else {
-                            // A stack with no floors left. Not locked: gone.
-                            shut = Some(if p.shut.is_empty() {
-                                "There is nothing there any more.".to_string()
-                            } else {
-                                p.shut.clone()
-                            });
-                        }
-                    } else {
-                        shut = Some(if p.shut.is_empty() {
-                            "It is locked.".to_string()
-                        } else {
-                            p.shut.clone()
-                        });
-                        // **A gate that wants an instrument is not a wall, it
-                        // is a bench.** It is the one kind of shut door whose
-                        // answer the player is carrying the parts for, so the
-                        // page opens the instrument frame on it rather than
-                        // printing a refusal and stopping. Core says which map
-                        // is through it, because what an instrument *reads* is
-                        // a question about the map on the far side.
-                        if p.needs_survey {
-                            // **Which map is through it is core's**, and asking
-                            // `to` directly was right while the only survey gate
-                            // in the game opened onto one map. The lip of the
-                            // Wextreen Sump is a *stack* — four floors and no
-                            // `to` at all — so `to` was `None`, the page had no
-                            // map to read the trade against, and **the frame
-                            // never opened**: the one door in the game whose
-                            // answer you may be carrying the parts for printed
-                            // a refusal and stopped. Found by the browser gate;
-                            // `cargo test` cannot see a screen that did not
-                            // open.
-                            wants_instrument = p
-                                .opens_onto(&g.world)
-                                .map(|m| m.to_string())
-                                .or_else(|| p.to.clone());
-                        }
-                    }
-                }
-            }
-
-            // **The door in the wall.** The same division a gate makes and
-            // for the same reason: whether it opens depends on what is in the
-            // bag, and a map does not know about bags.
-            let mut ending = None;
-            if let Some(id) = &s.door {
-                if let Some(p) = w.places.iter().find(|p| p.id == *id).cloned() {
-                    // The same one answer a gate gets. `unlock` is what
-                    // remembers the door, so a save taken after it opens comes
-                    // back to an open door rather than to a locked one — which
-                    // this branch used to do for itself.
-                    let opened = g.unlock(&p);
-                    if let gm2d_core::game::Unlocked::Spent { key } = &opened {
-                        turned = Some(g.theme_piece(key));
-                    }
-                    if opened != gm2d_core::game::Unlocked::Shut {
-                        ending = Some(serde_json::json!({
-                            "id": p.id,
-                            "name": p.name,
-                            "prose": p.prose,
-                        }));
-                    } else {
-                        shut = Some(if p.shut.is_empty() {
-                            "It is locked.".to_string()
-                        } else {
-                            p.shut.clone()
-                        });
-                    }
-                }
-            }
-
-            // A creature standing here rather than one the ground rolled.
-            if let Some(id) = &s.boss {
-                if let Some(p) = w.places.iter().find(|p| p.id == *id) {
-                    if let Some(c) = p.creature.clone() {
-                        let at = g.world.at;
-                        g.encounter_with(&c, at);
-                    }
-                }
-            }
-
-            // **A town takes the tiredness off**, and says so. The rule is
-            // core's; this is where the arriving happens.
+            let (went, shut, wants_instrument, turned, ending) =
+                answer_the_gate(g, &s, stepped_from);
             let mended = s.town.as_ref().map(|t| g.arrive_in_town(t)).unwrap_or(0);
 
-            serde_json::json!({
-                "moved": s.moved,
-                "blocked": s.blocked,
-                "mended": mended,
-                "event": s.event,
-                // What reading it cost, when there was nothing on it you could
-                // do. Zero is dropped by the page rather than printed.
-                "toll": toll,
-                "spent": s.spent,
-                "town": s.town,
-                "spoke": spoke,
-                // **A crossing, and what it said on the way through.** The
-                // map id so the page knows to redraw, and the paragraph the
-                // gate carries the first time — empty every time after.
-                "went": went.as_ref().map(|(to, name, prose)| serde_json::json!({
-                    "to": to,
-                    // The place's own name, so the card the page shows says
-                    // which door this was. It said THE DOOR IN THE WALL for
-                    // every gate in the game, including the one into a tower
-                    // of cheese two maps away from that wall.
-                    "name": name,
-                    "prose": prose,
-                })),
-                "shut": shut,
-                "wants_instrument": wants_instrument,
-                // **The key that turned, and left the bag doing it.** A thing
-                // that disappears out of your inventory without a word reads
-                // as a bug, which is this project's oldest rule wearing a new
-                // coat: a derived number needs somewhere it is shown, and so
-                // does a spent one.
-                "turned": turned,
-                "ending": ending,
-                "boss": s.boss,
-                "bench": s.bench,
-                // The cart, if today is a day it is here.
-                "caravan": s.caravan,
-                // **Where the cart is, whether or not you are on it.**
-                // Distinct from the line above, which means *you are standing
-                // on it* — this is what tells the page its copy of the world
-                // has gone stale. `paintPanel` re-reads only when the **map
-                // id** moves, and a cart that teleports changes which places
-                // exist on a map you never left. Fourth instance of *a page
-                // that draws a world has to be told which world, every time it
-                // can have changed*, and the first where the map is the same
-                // one throughout.
-                "cart_at": g.world.caravan.as_ref().map(|c| c.place.clone()),
-                // Which kind of refusal it was. `blocked` already carries the
-                // sentence; this is what lets the page put a *place's* in the
-                // message panel and a cliff's in the flash at the bottom of
-                // the map, without the page reading the sentence to guess.
-                // A crossing is one kind of place that refuses and was never
-                // the only one — two gates in this game stand on ground nobody
-                // can walk on.
-                "refused_by": s.refused_by,
-                "routed": routed,
-                "instant": instant,
-                // **Nothing to fight.** A rout or an instant battle took the
-                // encounter, so this is null and the fight screen never opens —
-                // reported off `g.encounter` rather than off the step, which
-                // still remembers rolling one.
-                "encounter": g.encounter.as_ref().and_then(|e| gm2d_core::fight::spec(e))
-                    .map(|m| serde_json::json!({
-                    "name": g.theme_name(m.name),
-                    "canonical": m.name,
-                    "rating": gm2d_core::rating::creature_rating(m, DIFFICULTY),
-                    "note": gm2d_core::theme::by_id(&g.theme).note(m.name),
-                })),
-            })
-            .to_string()
+            report_step(g, &s, mended, toll, spoke, &went, shut, wants_instrument,
+                        turned, ending, routed, instant)
+                .to_string()
         })
     })
 }
@@ -3816,4 +3597,460 @@ pub fn look_over(piece: u32, slot: &str) -> String {
         })
         .to_string()
     })
+}
+
+
+/// Fire, and say what happened.
+///
+/// **The cue is the shim's; what it sends is a `Shot` and what comes back is a
+/// `Flight`.** The page draws the flight and decides nothing — the rule since
+/// M8, and a physics loop in JavaScript would be the first thing in the
+/// repository that ran differently in three engines.
+///
+/// The landing half is `report_step`, which is `try_step`'s own payload: a
+/// landing is the same arrival, so it is the same shape, and the page has one
+/// thing to read rather than two.
+#[wasm_bindgen]
+pub fn try_shoot(angle: u16, power: u8) -> String {
+    with_mut(|g| {
+        let shot = gm2d_core::shot::Shot::new(angle, power);
+        let before = g.world.map_id();
+        // Where the shot was fired from, which is the tile the far side of a
+        // gate should remember — see `remember_at`, and the same thing a step
+        // hands over.
+        let fired_from = g.world.at;
+        let (flight, s) = g.shoot(shot, DIFFICULTY);
+        let terrain = {
+            let marks = seen_by(g);
+            map_in(&before, &marks, |w| {
+                w.terrain_name(flight.rest.0, flight.rest.1).to_string()
+            })
+        };
+        let per_mille = {
+            let marks = seen_by(g);
+            map_in(&before, &marks, |w| {
+                w.encounter_per_mille(flight.rest.0, flight.rest.1)
+                    * gm2d_core::shot::LANDING_MULT
+                    / 100
+            })
+        };
+        let said = flight.tape(g.world.count("shots-taken"), &terrain, per_mille);
+        // An encounter becomes state the moment it is rolled, the same as a
+        // step's — a player who saved with a creature on screen must not come
+        // back with a free shot.
+        if let Some(m) = s.encounter {
+            let at = g.world.at;
+            g.encounter_with(m.name, at);
+        }
+        // **The same gate the step goes through**, and the same payload. A
+        // shot that comes to rest on a gate — or beside one on ground nobody
+        // can stand on — opens the same door, because there is one answer to
+        // whether it opens and it is not the shim's.
+        let (went, shut, wants_instrument, turned, ending) =
+            answer_the_gate(g, &s, fired_from);
+        let mended = s.town.as_ref().map(|t| g.arrive_in_town(t)).unwrap_or(0);
+        let toll = s.event.as_deref().map(|id| g.read_event(id)).unwrap_or(0);
+        let spoke = s
+            .event
+            .as_deref()
+            .map(|id| gm2d_core::quest::on_arrival(g, id))
+            .unwrap_or_default();
+        let mut out = report_step(
+            g, &s, mended, toll, spoke, &went, shut, wants_instrument, turned, ending, None, None,
+        );
+        out["said"] = serde_json::Value::String(said);
+        out["sunk"] = serde_json::Value::Bool(flight.sunk().is_some());
+        out["tiring"] = serde_json::json!(flight.tiring());
+        out["map"] = serde_json::Value::String(g.world.map_id());
+        // **The path in sub-cells, which is what the shim animates.** Not
+        // tiles: a ball that moved in whole tiles would be a ball nobody could
+        // watch, and `shot::SUB` is the unit the physics is in.
+        out["path"] = serde_json::json!(flight.path);
+        out["sub"] = serde_json::json!(gm2d_core::shot::SUB);
+        out["contacts"] = contacts_json(&flight);
+        out.to_string()
+    })
+}
+
+/// What a flight touched, for a screen to flash and a check to read.
+///
+/// **One builder for the preview and for the shot**, because they are the same
+/// question: a page that drew a spike on the arrow and then did not flash one
+/// on the flight would be two answers to *what is in the way*. Walls and plain
+/// crossings are dropped — every flight is full of them and neither is a thing
+/// that happens to you.
+fn contacts_json(flight: &gm2d_core::shot::Flight) -> serde_json::Value {
+    serde_json::json!(flight
+        .contacts
+        .iter()
+        .filter_map(|c| match c {
+            gm2d_core::shot::Contact::Bumper { at, .. } =>
+                Some(serde_json::json!({ "kind": "bumper", "at": [at.0, at.1] })),
+            gm2d_core::shot::Contact::Spike { at, .. } =>
+                Some(serde_json::json!({ "kind": "spike", "at": [at.0, at.1] })),
+            gm2d_core::shot::Contact::Chute { from, to, .. } =>
+                Some(serde_json::json!({ "kind": "chute", "at": [from.0, from.1],
+                                         "to": [to.0, to.1] })),
+            gm2d_core::shot::Contact::Sand { at, .. } =>
+                Some(serde_json::json!({ "kind": "sand", "at": [at.0, at.1] })),
+            gm2d_core::shot::Contact::Sunk { at, .. } =>
+                Some(serde_json::json!({ "kind": "pocket", "at": [at.0, at.1] })),
+            _ => None,
+        })
+        .collect::<Vec<_>>())
+}
+
+/// A shot that lands on a tile, if there is one.
+///
+/// **The walker's move on a shot map and the gate's**, and it is the same
+/// `shot::aim_at` the reachability lint floods with — so what a check aims at
+/// is what a player could have aimed at. `playthrough.py` does **not** simulate
+/// physics in Python; it asks this.
+#[wasm_bindgen]
+pub fn aim_at(x: u8, y: u8, near: bool) -> String {
+    with(|g| {
+        let marks = seen_by(g);
+        let here = g.world.map_id();
+        let allowed = g.character.allowances();
+        let from = (g.world.at[0], g.world.at[1]);
+        map_in(&here, &marks, |w| {
+            match gm2d_core::shot::aim_at(w, &g.world, from, (x, y), near, &allowed) {
+                Some(s) => serde_json::json!({ "angle": s.angle, "power": s.power }).to_string(),
+                None => serde_json::json!({ "angle": null, "power": null }).to_string(),
+            }
+        })
+    })
+}
+
+/// Where a shot would land, without taking it.
+///
+/// **The ghost the cue draws, and the walker's own move.** Same function both
+/// times, so what the arrow promises is what the shot does.
+#[wasm_bindgen]
+pub fn preview_shot(angle: u16, power: u8) -> String {
+    with(|g| {
+        let marks = seen_by(g);
+        let here = g.world.map_id();
+        let allowed = g.character.allowances();
+        let from = (g.world.at[0], g.world.at[1]);
+        map_in(&here, &marks, |w| {
+            let f = gm2d_core::shot::shoot_with(
+                w,
+                &g.world,
+                from,
+                gm2d_core::shot::Shot::new(angle, power),
+                &allowed,
+            );
+            serde_json::json!({
+                "path": f.path,
+                "sub": gm2d_core::shot::SUB,
+                "rest": [f.rest.0, f.rest.1],
+                "tiring": f.tiring(),
+                // **What the arrow has to warn about.** A preview that showed
+                // where a ball stops and not the spike on the way is a preview
+                // that hides the only thing on this table that charges you.
+                "contacts": contacts_json(&f),
+            })
+            .to_string()
+        })
+    })
+}
+
+/// The JSON one arrival produces, whether you walked to it or flew.
+///
+/// **Extracted from `try_step` rather than written twice**, which is
+/// `PLAN-M17.md` §2.3 one layer up from `world::arrive_at`: a landing is the
+/// same arrival, so it is the same payload. A second builder would be a second
+/// answer to *what happened*, and the page would have two shapes to read.
+#[allow(clippy::too_many_arguments)]
+fn report_step(
+    g: &mut gm2d_core::game::Game,
+    s: &gm2d_core::world::Step,
+    mended: i32,
+    toll: i32,
+    spoke: Vec<String>,
+    went: &Option<(String, String, Vec<String>)>,
+    shut: Option<String>,
+    wants_instrument: Option<String>,
+    turned: Option<String>,
+    ending: Option<serde_json::Value>,
+    routed: Option<serde_json::Value>,
+    instant: Option<serde_json::Value>,
+) -> serde_json::Value {
+    serde_json::json!({
+                "moved": s.moved,
+                "blocked": s.blocked,
+                "mended": mended,
+                "event": s.event,
+                // What reading it cost, when there was nothing on it you could
+                // do. Zero is dropped by the page rather than printed.
+                "toll": toll,
+                "spent": s.spent,
+                "town": s.town,
+                "spoke": spoke,
+                // **A crossing, and what it said on the way through.** The
+                // map id so the page knows to redraw, and the paragraph the
+                // gate carries the first time — empty every time after.
+                "went": went.as_ref().map(|(to, name, prose)| serde_json::json!({
+                    "to": to,
+                    // The place's own name, so the card the page shows says
+                    // which door this was. It said THE DOOR IN THE WALL for
+                    // every gate in the game, including the one into a tower
+                    // of cheese two maps away from that wall.
+                    "name": name,
+                    "prose": prose,
+                })),
+                "shut": shut,
+                "wants_instrument": wants_instrument,
+                // **The key that turned, and left the bag doing it.** A thing
+                // that disappears out of your inventory without a word reads
+                // as a bug, which is this project's oldest rule wearing a new
+                // coat: a derived number needs somewhere it is shown, and so
+                // does a spent one.
+                "turned": turned,
+                "ending": ending,
+                "boss": s.boss,
+                "bench": s.bench,
+                // The cart, if today is a day it is here.
+                "caravan": s.caravan,
+                // **Where the cart is, whether or not you are on it.**
+                // Distinct from the line above, which means *you are standing
+                // on it* — this is what tells the page its copy of the world
+                // has gone stale. `paintPanel` re-reads only when the **map
+                // id** moves, and a cart that teleports changes which places
+                // exist on a map you never left. Fourth instance of *a page
+                // that draws a world has to be told which world, every time it
+                // can have changed*, and the first where the map is the same
+                // one throughout.
+                "cart_at": g.world.caravan.as_ref().map(|c| c.place.clone()),
+                // Which kind of refusal it was. `blocked` already carries the
+                // sentence; this is what lets the page put a *place's* in the
+                // message panel and a cliff's in the flash at the bottom of
+                // the map, without the page reading the sentence to guess.
+                // A crossing is one kind of place that refuses and was never
+                // the only one — two gates in this game stand on ground nobody
+                // can walk on.
+                "refused_by": s.refused_by,
+                "routed": routed,
+                "instant": instant,
+                // **Nothing to fight.** A rout or an instant battle took the
+                // encounter, so this is null and the fight screen never opens —
+                // reported off `g.encounter` rather than off the step, which
+                // still remembers rolling one.
+                "encounter": g.encounter.as_ref().and_then(|e| gm2d_core::fight::spec(e))
+                    .map(|m| serde_json::json!({
+                    "name": g.theme_name(m.name),
+                    "canonical": m.name,
+                    "rating": gm2d_core::rating::creature_rating(m, DIFFICULTY),
+                    "note": gm2d_core::theme::by_id(&g.theme).note(m.name),
+                })),
+    })
+}
+
+
+/// What a gate does when you arrive at it, and what it says when it does not.
+///
+/// **Extracted from `try_step` rather than written twice**, for the reason
+/// `world::arrive_at` and `report_step` were: a shot that comes to rest on a
+/// gate — or beside one on ground nobody can stand on — has to open the same
+/// door, and a second copy of *whether it opens* would be the shim deciding
+/// something. Which it is not allowed to do.
+///
+/// Returns the four things the payload needs and the one the ending needs.
+#[allow(clippy::type_complexity)]
+fn answer_the_gate(
+    g: &mut gm2d_core::game::Game,
+    s: &gm2d_core::world::Step,
+    stepped_from: [u8; 2],
+) -> (
+    Option<(String, String, Vec<String>)>,
+    Option<String>,
+    Option<String>,
+    Option<String>,
+    Option<serde_json::Value>,
+) {
+    // The map the arrival happened on, and what has been answered — both
+    // re-read here because this is its own function now.
+    let here = g.world.map_id();
+    let marks = seen_by(g);
+    let w = map_in(&here, &marks, |w| w.clone());
+    let allowed = g.character.allowances();
+
+        // **A gate is answered here, not in `World`.** Whether it opens
+        // depends on what is in the bag, and a map does not know about
+        // bags. Either the player goes through or they are told what the
+        // lock wants.
+        let mut went = None;
+        let mut shut = None;
+        // Which map is through a gate that refused for want of an
+        // instrument. `None` for every other kind of refusal.
+        let mut wants_instrument: Option<String> = None;
+        // The key that turned just now, if one did, in the player's words.
+        let mut turned = None;
+        if let Some(id) = &s.gate {
+            if let Some(p) = w.places.iter().find(|p| p.id == *id).cloned() {
+                // **Read before the key turns.** `Game::unlock` writes the
+                // place into `answered` when it spends a key, and the
+                // gate's own paragraph uses that same set to mean "you have
+                // been through here before". Asking afterwards would open
+                // the door and eat the speech in the same step.
+                let unseen = !g.world.answered.iter().any(|a| *a == p.id);
+                // **The whole answer is core's**, key and instrument both —
+                // whether it opens, whether the key is spent, and whether
+                // it was already open. A shim that decided any of that
+                // would be a second rulebook, and *a key is spent* is a
+                // rule the fast suite has to be able to reach.
+                let opened = g.unlock(&p);
+                if let gm2d_core::game::Unlocked::Spent { key } = &opened {
+                    turned = Some(g.theme_piece(key));
+                }
+                if opened != gm2d_core::game::Unlocked::Shut {
+                    // **Which map a gate opens onto is core's**, and for a
+                    // stack of floors it is a question about what has been
+                    // answered. `None` here is not a locked door: it is a
+                    // stack that has come all the way down, and `shut` is
+                    // what is said where the door used to be.
+                    let opens = p.opens_onto(&g.world).map(|s| s.to_string());
+                    if let Some(to) = opens {
+                        // **Where you left off, unless the gate says
+                        // otherwise.** A dungeon's mouth names its landing
+                        // tile on both sides, because a corridor has one
+                        // door and the trip round is a constant. A border
+                        // does not: the Treyway is sixteen tiles of country
+                        // and coming back to its southern corner every time
+                        // would make the door a chute. So `at_to` wins where
+                        // it is written, and where it is not the far side
+                        // remembers — which is a content decision in the map
+                        // file rather than a branch here.
+                        let landing = p
+                            .at_to
+                            .unwrap_or_else(|| map_in(&to, &marks, |d| d.arrival(&g.world)));
+                        // Written down before the move, or the map you are
+                        // leaving forgets where you were standing on it —
+                        // and it is the tile you stepped *from*, not the
+                        // doorway, so coming back does not put you one
+                        // keypress from going straight back through.
+                        g.world.remember_at(stepped_from);
+                        g.world.go_to(&to);
+                        g.world.at = landing;
+                        // Repaired on the far side: a gate whose landing
+                        // tile is not walkable would strand somebody on a
+                        // map they cannot leave.
+                        map_in(&to, &marks, |dest| dest.repair(&mut g.world, &allowed));
+                        // A gate may carry a paragraph — the door in the
+                        // western wall does, because crossing out of
+                        // Bambulon is a thing that happens once. Shown the
+                        // first time and remembered, so a save taken after
+                        // it comes back to a road rather than to the speech.
+                        let first = !p.prose.is_empty() && unseen;
+                        if first && !g.world.answered.iter().any(|a| *a == p.id) {
+                            g.world.answered.push(p.id.clone());
+                        }
+                        // **A survey opens on the way in and closes on
+                        // the way out.** Re-read every entry, so walking
+                        // out and back with a different instrument is a
+                        // different map — which is the whole feature. The
+                        // instrument is not consumed (`PLAN-M11.md` §8
+                        // row 5): shards are the grind and the instrument
+                        // is the achievement.
+                        g.world.active_survey = surveyable(&to)
+                            .then(|| survey_kind(g).map(|k| (to.clone(), k)))
+                            .flatten();
+                        // A golem that walked in with you has not had its
+                        // fight yet. Cleared at the gate, because what the
+                        // mark records is *this entry*.
+                        g.world
+                            .answered
+                            .retain(|a| a != gm2d_core::fight::GOLEM_SPENT);
+                        went = Some((
+                            to,
+                            p.name.clone(),
+                            if first { p.prose.clone() } else { Vec::new() },
+                        ));
+                    } else {
+                        // A stack with no floors left. Not locked: gone.
+                        shut = Some(if p.shut.is_empty() {
+                            "There is nothing there any more.".to_string()
+                        } else {
+                            p.shut.clone()
+                        });
+                    }
+                } else {
+                    shut = Some(if p.shut.is_empty() {
+                        "It is locked.".to_string()
+                    } else {
+                        p.shut.clone()
+                    });
+                    // **A gate that wants an instrument is not a wall, it
+                    // is a bench.** It is the one kind of shut door whose
+                    // answer the player is carrying the parts for, so the
+                    // page opens the instrument frame on it rather than
+                    // printing a refusal and stopping. Core says which map
+                    // is through it, because what an instrument *reads* is
+                    // a question about the map on the far side.
+                    if p.needs_survey {
+                        // **Which map is through it is core's**, and asking
+                        // `to` directly was right while the only survey gate
+                        // in the game opened onto one map. The lip of the
+                        // Wextreen Sump is a *stack* — four floors and no
+                        // `to` at all — so `to` was `None`, the page had no
+                        // map to read the trade against, and **the frame
+                        // never opened**: the one door in the game whose
+                        // answer you may be carrying the parts for printed
+                        // a refusal and stopped. Found by the browser gate;
+                        // `cargo test` cannot see a screen that did not
+                        // open.
+                        wants_instrument = p
+                            .opens_onto(&g.world)
+                            .map(|m| m.to_string())
+                            .or_else(|| p.to.clone());
+                    }
+                }
+            }
+        }
+
+        // **The door in the wall.** The same division a gate makes and
+        // for the same reason: whether it opens depends on what is in the
+        // bag, and a map does not know about bags.
+        let mut ending = None;
+        if let Some(id) = &s.door {
+            if let Some(p) = w.places.iter().find(|p| p.id == *id).cloned() {
+                // The same one answer a gate gets. `unlock` is what
+                // remembers the door, so a save taken after it opens comes
+                // back to an open door rather than to a locked one — which
+                // this branch used to do for itself.
+                let opened = g.unlock(&p);
+                if let gm2d_core::game::Unlocked::Spent { key } = &opened {
+                    turned = Some(g.theme_piece(key));
+                }
+                if opened != gm2d_core::game::Unlocked::Shut {
+                    ending = Some(serde_json::json!({
+                        "id": p.id,
+                        "name": p.name,
+                        "prose": p.prose,
+                    }));
+                } else {
+                    shut = Some(if p.shut.is_empty() {
+                        "It is locked.".to_string()
+                    } else {
+                        p.shut.clone()
+                    });
+                }
+            }
+        }
+
+        // A creature standing here rather than one the ground rolled.
+        if let Some(id) = &s.boss {
+            if let Some(p) = w.places.iter().find(|p| p.id == *id) {
+                if let Some(c) = p.creature.clone() {
+                    let at = g.world.at;
+                    g.encounter_with(&c, at);
+                }
+            }
+        }
+
+        // **A town takes the tiredness off**, and says so. The rule is
+        // core's; this is where the arriving happens.
+        let mended = s.town.as_ref().map(|t| g.arrive_in_town(t)).unwrap_or(0);
+    (went, shut, wants_instrument, turned, ending)
 }

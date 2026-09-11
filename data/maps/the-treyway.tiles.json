@@ -2,7 +2,7 @@
   "format": "gm2d-tiles",
   "version": 1,
   "id": "the-treyway",
-  "_note": "The map behind the door in the western wall, and the first one drawn at a different scale. West Bambulon is twenty tiles of walking; this is sixteen tiles of country, and one of them is West Bambulon. So the terrain vocabulary is its own — plain, coast, range, sea — and a range is not a cliff you walk round in an afternoon. **`sea` is not `water`**: `Rule::Wade` opens the rim of anything drawn `~`, and an ocean drawn with it would be an ocean the Toad set walks the edge of. Three regions, banded south to north, and the band the door opens onto is rated where West Bambulon's hardest one leaves off — a player who has beaten the Cave arrives at level twelve or better, so bracketing this at five to nine would have put a whole continent below the map it opens off. Two places are written as events rather than gates because the maps they promise are not built yet: a road that says where it goes is a promise, and a gate onto a map this build has not got is a hole.",
+  "_note": "The map behind the door in the western wall, and the first one drawn at a different scale. West Bambulon is twenty tiles of walking; this is sixteen tiles of country, and one of them is West Bambulon. So the terrain vocabulary is its own — plain, coast, range, sea — and a range is not a cliff you walk round in an afternoon. **`sea` is not `water`**: `Rule::Wade` opens the rim of anything drawn `~`, and an ocean drawn with it would be an ocean the Toad set walks the edge of. Three regions, banded south to north, and the band the door opens onto is rated where West Bambulon's hardest one leaves off — a player who has beaten the Cave arrives at level twelve or better, so bracketing this at five to nine would have put a whole continent below the map it opens off. Two places are written as events rather than gates because the maps they promise are not built yet: a road that says where it goes is a promise, and a gate onto a map this build has not got is a hole.\n\n**A table since M17.** `traversal: \"shot\"` — you pull back, aim, and fire, and where you stop is where you are. The eight obstacles are places like any other and they are in this file for the reason every place is: a thing that stands on a tile lives where the tiles live. What makes them a new *kind* is that the ball hits them **in flight**, which is the one thing a step has nowhere to happen.\n\nThe bumper at the pass is the shot the map is for — up the middle between two ranges and off the boulder at the top; the drove way is a chute because that is what a drove way is, and it carries a ball from the south-west to the north-east in one line; the pocket is in the wood, which is where things go missing; and the drift beside the tideline is there so the way south is a stopped ball rather than a lucky one.\n\n**Four of `PLAN-M17.md` §4.1's eight coordinates are on range**, which is impassable, and one shares the tideline's own tile. The intent is kept and the tile moved to the nearest ground that carries it — the ridge spikes to the road at [6,5] and [7,5], the drove stone to [9,9], the tideline drift to [9,14].",
   "width": 16,
   "height": 16,
   "start": [
@@ -167,6 +167,91 @@
         "The bar of shingle the tide has left is nine feet across and four hundred long, and it is the only part of it anybody has ever walked on.",
         "It goes down again. Nobody at the reach has ever said how long it stays, because in eleven years of notches nobody has ever been on the far side when it did."
       ]
+    },
+    {
+      "at": [
+        8,
+        3
+      ],
+      "kind": "bumper",
+      "id": "the-pass-bumper",
+      "name": "the boulder at the pass"
+    },
+    {
+      "at": [
+        9,
+        9
+      ],
+      "kind": "bumper",
+      "id": "the-drove-bumper",
+      "name": "the drove stone"
+    },
+    {
+      "at": [
+        6,
+        5
+      ],
+      "kind": "spike",
+      "id": "the-ridge-spike",
+      "name": "the ridge, and what is on it"
+    },
+    {
+      "at": [
+        7,
+        5
+      ],
+      "kind": "spike",
+      "id": "the-second-spike",
+      "name": "the second of them"
+    },
+    {
+      "at": [
+        11,
+        12
+      ],
+      "kind": "spike",
+      "id": "the-low-spike",
+      "name": "a stake in the scrub"
+    },
+    {
+      "at": [
+        4,
+        5
+      ],
+      "kind": "pocket",
+      "id": "the-wood-pocket",
+      "name": "the hole in the wood"
+    },
+    {
+      "at": [
+        7,
+        10
+      ],
+      "kind": "sand",
+      "id": "the-drift",
+      "name": "the drift"
+    },
+    {
+      "at": [
+        9,
+        14
+      ],
+      "kind": "sand",
+      "id": "the-tideline-drift",
+      "name": "the drift above the tideline"
+    },
+    {
+      "at": [
+        2,
+        7
+      ],
+      "kind": "chute",
+      "id": "the-drove-chute",
+      "name": "the drove way",
+      "at_to": [
+        13,
+        2
+      ]
     }
   ],
   "drains": [
@@ -175,5 +260,6 @@
       "from": "tide",
       "to": "coast"
     }
-  ]
+  ],
+  "traversal": "shot"
 }

@@ -238,6 +238,54 @@ ROUGH_COST = 6
 PLACE_COST = 40
 
 
+
+# How many shots each table has taken, by map id. Reported at the end.
+shots_on = {}
+
+
+def cross_to(page, world, here, target, press):
+    """Move one move towards a tile — a step on a floor, a shot on a table.
+
+    **The walker does not simulate physics.** `shot::aim_at` is core's and it is
+    the same function the reachability lint floods with and the browser gate
+    aims by, so what this walker aims at is what a player could have aimed at.
+    A pathfinder in Python would be a second answer to *where does a ball go*,
+    and it would be the first thing in this repository that disagreed with the
+    engine about the map.
+
+    **A shot is one move and lands where it lands.** That is the whole
+    difference between a table and a floor: `toward` gives a direction and a
+    table does not take one, so the target goes to `aim_at` whole and the
+    answer is an angle and a power. Exact first, then near — a ball that ends a
+    tile off is a ball you take another shot from, which is what a player does.
+
+    Returns the key it pressed, or the shot it took, for the caller's log.
+    """
+    if not world.get("is_table"):
+        page.keyboard.press(press)
+        return press
+    # **On the map, because a patrol post can be off it.** The grind aims six
+    # tiles east and west of where it is, which on a floor is a direction and
+    # on a table is a coordinate — and a coordinate off the edge is a question
+    # `aim_at` has no answer to rather than a shot worth taking.
+    tx = max(0, min(world["width"] - 1, target[0]))
+    ty = max(0, min(world["height"] - 1, target[1]))
+    for exact in (False, True):
+        aim = page.evaluate(
+            "([x, y, near]) => window.__aimAt(x, y, near)",
+            [tx, ty, exact])
+        if aim.get("angle") is not None:
+            page.evaluate("([a, p]) => window.__shoot(a, p)",
+                          [aim["angle"], aim["power"]])
+            page.wait_for_timeout(60)
+            return f"shot {aim['angle']}/{aim['power']}"
+    # **Nowhere to aim is not nowhere to go.** A ball with no shot to the target
+    # takes the longest one it has, which is a player breaking for the open.
+    page.evaluate("() => window.__shoot(Math.floor(Math.random() * 72), 8)")
+    page.wait_for_timeout(60)
+    return "shot, blind"
+
+
 def toward(world, here, target, barred=()):
     """One step towards a tile, along the road where there is one.
 
@@ -1374,8 +1422,11 @@ def main():
                     if world["id"] == "west-bambulon":
                         lane = 17 if c["level"] < 5 else (14 if c["level"] < 9 else 11)
                         if here[1] != lane:
-                            press = toward(world, here, (here[0], lane), barred) or "ArrowUp"
+                            going = (here[0], lane)
+                            press = toward(world, here, going, barred) or "ArrowUp"
                         else:
+                            going = ((here[0] + 6, here[1]) if (patrol // 8) % 2 == 0
+                                     else (here[0] - 6, here[1]))
                             press = "ArrowRight" if (patrol // 8) % 2 == 0 else "ArrowLeft"
                             patrol += 1
                     elif home_here:
@@ -1399,22 +1450,38 @@ def main():
                                     far = (x, ty)
                         spot = (far or near) if (patrol // 10) % 2 else (near or far)
                         patrol += 1
+                        going = spot or (here[0] + 6, here[1])
                         press = ((toward(world, here, spot, barred) if spot else None)
                                  or "ArrowRight")
                     else:
+                        going = ((here[0] + 6, here[1]) if (patrol // 8) % 2 == 0
+                                 else (here[0] - 6, here[1]))
                         press = "ArrowRight" if (patrol // 8) % 2 == 0 else "ArrowLeft"
                         patrol += 1
                 else:
                     target = want
+                    going = tuple(target)
                     press = toward(world, here, target, barred) or "ArrowRight"
                 # Where that press was trying to go, so a refusal can be
                 # written down against the tile that refused it.
                 heading = next((d for d, k in KEYS.items() if k == press), (0, 0))
                 aiming = (here[0] + heading[0], here[1] + heading[1])
-                before = page.text_content("#walked")
-                page.keyboard.press(press)
-                if page.text_content("#walked") != before:
+                # **Where you are, not how far you have walked.** A table
+                # counts shots and not tiles — `a_shot_counts_shots_and_not_
+                # tiles` is what keeps that true — so a walker that read
+                # `#walked` to find out whether it had moved would sit on the
+                # Treyway for ever believing it never had.
+                before = page.text_content("#coords")
+                was_on = world["id"]
+                press = cross_to(page, world, here, going, press)
+                if page.text_content("#coords") != before:
                     moved += 1
+                # **How many shots a table takes to cross.** `PLAN-M17.md` §7
+                # M17.4 wants the number and only a walk can produce it: a
+                # table's whole question is whether crossing it is a few
+                # decisions or a hundred, and nothing in `cargo test` plays.
+                if world.get("is_table"):
+                    shots_on[was_on] = shots_on.get(was_on, 0) + 1
                 elif want is not None:
                     # **A road that is shut is a road you stop walking at.**
                     # M9.3 put two crossings on the map and this walker pressed
@@ -1449,6 +1516,9 @@ def main():
                 say(f"  the thing under the lake: "
                     f"{'beaten' if 'the-bottom-of-the-lake' in answered else 'still down there'}")
             say(f"  ({moved} of {STEPS} presses actually moved)")
+            if shots_on:
+                say(f"  shots taken on each table: "
+                    + ", ".join(f"{m} {n}" for m, n in sorted(shots_on.items())))
 
             head("what happened")
             c = page.evaluate("() => window.__character()")

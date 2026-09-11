@@ -716,6 +716,374 @@ def check_a_grid_says_what_it_takes(page, name, fails):
             fails.append(f"{name}: a recipe says {k!r}, which is the theme's word for it")
 
 
+# --------------------------------------------------------------- M17.3: the cue
+
+def on_the_table(body, at=(8, 12), flags=(), answered=()):
+    """A save standing on the Treyway, which is a table."""
+    strip_the_boards(body)
+    w = body.setdefault("world", {})
+    w["map"] = "the-treyway"
+    w["at"] = [at[0], at[1]]
+    w["last_town"] = "the-end-of-all-gears"
+    w["flags"] = list(w.get("flags", [])) + list(flags)
+    w["answered"] = list(w.get("answered", [])) + list(answered)
+
+
+def map_box(page):
+    """Where the map canvas is on screen, and how big a tile is drawn."""
+    return page.evaluate("""() => {
+        const c = document.getElementById('map');
+        const r = c.getBoundingClientRect();
+        const w = window.__world();
+        return { x: r.x, y: r.y, w: r.width, h: r.height,
+                 cw: r.width / w.width, ch: r.height / w.height };
+    }""")
+
+
+def pull_to(page, tx, ty):
+    """Drag the cue from the ball back towards tile (tx, ty). Leaves it pulled."""
+    b = map_box(page)
+    at = json.loads(page.evaluate("() => window.__position()"))
+    sx = b["x"] + (at["x"] + 0.5) * b["cw"]
+    sy = b["y"] + (at["y"] + 0.5) * b["ch"]
+    ex = b["x"] + (tx + 0.5) * b["cw"]
+    ey = b["y"] + (ty + 0.5) * b["ch"]
+    page.mouse.move(sx, sy)
+    page.mouse.down()
+    # Two moves: a drag is a drag, and the page ignores a press that never
+    # travels — you pull the cue rather than tapping the table.
+    page.mouse.move((sx + ex) / 2, (sy + ey) / 2, steps=4)
+    page.mouse.move(ex, ey, steps=6)
+    page.wait_for_timeout(60)
+
+
+def clear_screens(page):
+    """Close whatever a shot opened, whichever screen it was.
+
+    **A shot can end anywhere**, which is the thing that makes a table
+    different from a walk: you aim at a tile and the ball decides, so a check
+    that fired one does not know whether it is looking at a card, a fight, a
+    town, a vendor, a caravan or an instrument frame. `dismiss_card` and
+    `close_fight` between them cover two of the six, and a check whose `finally`
+    covered two left the other four standing over the page — where the next
+    check's first click times out and the whole failure list goes unprinted.
+    That is this file's oldest harness rule (*a check that opens a screen has
+    to close it, on every path out*) meeting a gesture whose outcome it cannot
+    predict.
+    """
+    dismiss_card(page)
+    close_fight(page)
+    for screen, button in [
+        ("#town", "#leave"),
+        ("#vendor", "#vendor-close"),
+        ("#caravan", "#caravan-close"),
+        ("#instrument", "#instrument-done"),
+        ("#bestiary", "#bestiary-close"),
+        ("#instant", "#instant-close"),
+        ("#log", "#log-close"),
+        ("#ending", "#ending-close"),
+    ]:
+        if page.is_visible(screen):
+            try:
+                page.click(button, timeout=3000)
+                page.wait_for_selector(screen, state="hidden", timeout=3000)
+            except Exception:
+                page.keyboard.press("Escape")
+                page.wait_for_timeout(120)
+
+
+def check_the_cue_draws_what_core_is_asked(page, name, fails):
+    """The arrow you pulled is the shot core is handed.
+
+    **Only a browser can say this.** The page turns a pointer into an angle and
+    a power, and there are seventy-two of the first and ten of the second — so
+    the one thing that cannot be checked anywhere else is that what it *draws*
+    is a shot core would accept, and that firing hands over those same two
+    numbers rather than the raw pull.
+
+    Snapped before it is drawn, which is the whole design: a page that drew a
+    thirty-seven degree pull and then fired the nearest of seventy-two would be
+    a page whose arrow is a decoration.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+    plant(page, base, lambda b: on_the_table(b, (8, 12)), stem="cue-draw")
+    try:
+        if not page.evaluate("() => JSON.parse(window.__position()).is_table"):
+            fails.append(f"{name}: the Treyway is not a table")
+            return
+
+        # Pull back *south*, so the ball goes north. The angle table is a maths
+        # circle and north is a quarter of seventy-two.
+        pull_to(page, 8, 15)
+        cue = page.evaluate("() => window.__cue()")
+        page.mouse.up()
+        page.wait_for_timeout(700)
+        if not cue:
+            fails.append(f"{name}: pulling the cue back drew nothing")
+            return
+        if abs(((cue["angle"] - 18 + 36) % 72) - 36) > 1:
+            fails.append(f"{name}: pulled straight back and the cue reads {cue['angle']}, "
+                         f"which is not north")
+        if not (1 <= cue["power"] <= 10):
+            fails.append(f"{name}: the cue pulled to power {cue['power']}")
+
+        # And a longer pull is a harder shot, which is the only thing the
+        # number means.
+        dismiss_card(page)
+        close_fight(page)
+        plant(page, base, lambda b: on_the_table(b, (8, 8)), stem="cue-power")
+        pull_to(page, 8, 9)
+        short = page.evaluate("() => window.__cue()")
+        page.mouse.move(map_box(page)["x"] + 8.5 * map_box(page)["cw"],
+                        map_box(page)["y"] + 14.5 * map_box(page)["ch"], steps=6)
+        page.wait_for_timeout(60)
+        long = page.evaluate("() => window.__cue()")
+        page.mouse.up()
+        page.wait_for_timeout(700)
+        if not (short and long and long["power"] > short["power"]):
+            fails.append(f"{name}: pulling further did not pull harder: "
+                         f"{short} then {long}")
+        else:
+            print(f"ok: the cue snaps to what core takes, and pulling further "
+                  f"pulls harder ({short['power']} -> {long['power']})")
+    finally:
+        clear_screens(page)
+        plant(page, base, lambda body: None, stem="cue-restore")
+
+
+def check_a_shot_animates_to_where_core_said(page, name, fails):
+    """The ball is drawn along the flight core returned, and stops where it did.
+
+    **The page draws numbers core sent it** — the rule this project has broken
+    three times and each time invisibly. A flight is a list of sub-cell
+    positions and the page's only job is to walk it; a page that integrated its
+    own physics would look perfectly plausible and would disagree with the
+    tile the game thinks you are on.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+    plant(page, base, lambda b: on_the_table(b, (8, 12)), stem="fly")
+    try:
+        said = page.evaluate("() => window.__preview(18, 4)")
+        page.evaluate("() => window.__shoot(18, 4)")
+        page.wait_for_timeout(900)
+        drawn = page.evaluate("() => window.__trail()")
+        if drawn["trail"] != said["path"]:
+            fails.append(f"{name}: the page drew {len(drawn['trail'])} points and core "
+                         f"returned {len(said['path'])}")
+        at = json.loads(page.evaluate("() => window.__position()"))
+        if [at["x"], at["y"]] != list(said["rest"]):
+            fails.append(f"{name}: core said the ball stops at {said['rest']} and the "
+                         f"game put it at {[at['x'], at['y']]}")
+        else:
+            print(f"ok: a shot flies the path core returned and stops on {said['rest']}")
+    finally:
+        clear_screens(page)
+        plant(page, base, lambda body: None, stem="fly-restore")
+
+
+def check_the_keyboard_shoots(page, name, fails):
+    """Four keys and a space, and no pointer anywhere near it.
+
+    A table played only with a mouse is a table somebody cannot play. The keys
+    are the map's own arrows doing a different job, which is why `aimKey` has
+    to answer *false* on a floor — see the check below.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+    plant(page, base, lambda b: on_the_table(b, (8, 12)), stem="cue-keys")
+    try:
+        page.click("#map")
+        was = json.loads(page.evaluate("() => window.__position()"))
+        page.keyboard.press("ArrowUp")
+        page.wait_for_timeout(60)
+        page.keyboard.press("ArrowLeft")
+        page.wait_for_timeout(60)
+        cue = page.evaluate("() => window.__cue()")
+        if not cue:
+            fails.append(f"{name}: the arrows drew no cue on a table")
+            return
+        moved = json.loads(page.evaluate("() => window.__position()"))
+        if [moved["x"], moved["y"]] != [was["x"], was["y"]]:
+            fails.append(f"{name}: aiming moved the ball from "
+                         f"{[was['x'], was['y']]} to {[moved['x'], moved['y']]}")
+        page.keyboard.press(" ")
+        page.wait_for_timeout(900)
+        after = json.loads(page.evaluate("() => window.__position()"))
+        if [after["x"], after["y"]] == [was["x"], was["y"]]:
+            fails.append(f"{name}: space fired nothing")
+        elif after["shots"] != was["shots"] + 1:
+            fails.append(f"{name}: the keyboard fired and the count went "
+                         f"{was['shots']} -> {after['shots']}")
+        else:
+            print(f"ok: four keys aim and space fires, with no pointer "
+                  f"({cue['angle']}/{cue['power']} -> {[after['x'], after['y']]})")
+    finally:
+        clear_screens(page)
+        plant(page, base, lambda body: None, stem="keys-restore")
+
+
+def check_a_spike_flashes_and_the_fatigue_moves(page, name, fails):
+    """A spike costs you eight and says so, and the ball goes straight through.
+
+    The one obstacle that charges in the currency a fight charges in. What only
+    a browser answers is whether the player is *told*: a toll taken in silence
+    is the *derived number with nowhere it is shown* failure, in the one place
+    it would read as the game cheating.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+    # Three spikes on this table; the low one is reachable from up the road.
+    plant(page, base, lambda b: on_the_table(b, (11, 14)), stem="spike")
+    try:
+        before = page.evaluate("() => window.__character().fatigue ?? 0")
+        aim = None
+        for power in range(2, 11):
+            got = page.evaluate(f"() => window.__preview(18, {power})")
+            if any(c.get("kind") == "spike" for c in got.get("contacts", [])):
+                aim = (18, power)
+                break
+        if aim is None:
+            fails.append(f"{name}: no shot north from [11, 14] goes through a spike")
+            return
+        page.evaluate(f"() => window.__shoot({aim[0]}, {aim[1]})")
+        page.wait_for_timeout(900)
+        after = page.evaluate("() => window.__character().fatigue ?? 0")
+        if after <= before:
+            fails.append(f"{name}: a shot through a spike left fatigue at {after}")
+        said = " ".join(tape(page)).lower()
+        if "spike" not in said and "ridge" not in said and "%" not in said:
+            fails.append(f"{name}: the spike took {after - before} and said {said!r}")
+        else:
+            print(f"ok: a spike takes {after - before}% on the way through, and says so")
+    finally:
+        clear_screens(page)
+        plant(page, base, lambda body: None, stem="spike-restore")
+
+
+def check_sunk_lands_you_in_town(page, name, fails):
+    """In the pocket is out of play: the town screen, and a sentence.
+
+    A ball that sinks is the one contact that ends the shot somewhere the
+    player did not aim, so it is the one that most needs saying out loud.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+    plant(page, base, lambda b: on_the_table(b, (1, 2)), stem="pocket")
+    # **Searched in the page, not over the wire.** Seventy-two angles by ten
+    # powers is seven hundred round trips, and a check that takes a minute to
+    # find its own shot is a check somebody turns off.
+    aim = page.evaluate("""() => {
+        for (let a = 0; a < 72; a++) for (let p = 1; p <= 10; p++) {
+            const f = window.__preview(a, p);
+            if ((f.contacts || []).some(c => c.kind === 'pocket')) return [a, p];
+        }
+        return null;
+    }""")
+    try:
+        if aim is None:
+            fails.append(f"{name}: no shot from anywhere near the wood sinks")
+            return
+        page.evaluate(f"() => window.__shoot({aim[0]}, {aim[1]})")
+        page.wait_for_timeout(1200)
+        if not page.is_visible("#town"):
+            fails.append(f"{name}: sinking did not open the town")
+        said = " ".join(tape(page)).lower()
+        if "pocket" not in said and "wood" not in said and "out of play" not in said:
+            fails.append(f"{name}: sinking said {said!r}")
+        else:
+            print("ok: a ball in the pocket is out of play, and wakes up in town")
+    finally:
+        clear_screens(page)
+        plant(page, base, lambda body: None, stem="pocket-restore")
+
+
+def check_a_floor_still_steps(page, name, fails):
+    """A floor is walked and a table is shot, and the same four keys do both.
+
+    **The arrows mean two things now**, which is the largest thing M17 did to a
+    control that has meant one thing since M1. A floor that grew a cue would be
+    a dungeon nobody could walk out of, and it would be invisible to every test
+    in `cargo test` — the keys are the page's.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+
+    def in_the_pit(body):
+        strip_the_boards(body)
+        w = body.setdefault("world", {})
+        w["map"] = "west-bambulon"
+        w["at"] = [9, 12]
+
+    plant(page, base, in_the_pit, stem="floor-steps")
+    try:
+        if page.evaluate("() => JSON.parse(window.__position()).is_table"):
+            fails.append(f"{name}: West Bambulon came back a table")
+            return
+        page.click("#map")
+        was = json.loads(page.evaluate("() => window.__position()"))
+        page.keyboard.press("ArrowUp")
+        page.wait_for_timeout(250)
+        dismiss_card(page)
+        close_fight(page)
+        now = json.loads(page.evaluate("() => window.__position()"))
+        if page.evaluate("() => window.__cue()"):
+            fails.append(f"{name}: an arrow on a floor drew a cue")
+        if [now["x"], now["y"]] == [was["x"], was["y"]]:
+            fails.append(f"{name}: an arrow on a floor moved nobody")
+        elif now["walked"] != was["walked"] + 1:
+            fails.append(f"{name}: a step on a floor counted "
+                         f"{was['walked']} -> {now['walked']} tiles")
+        else:
+            print("ok: a floor still steps, one tile a press, and draws no cue")
+    finally:
+        clear_screens(page)
+        plant(page, base, lambda body: None, stem="floor-restore")
+
+
+def check_reduced_motion_skips_the_flight(page, name, fails):
+    """Do not move things is not tell me less.
+
+    The path is the whole of what a shot *said* — where it bounced, what it
+    crossed — so the setting drops the animation and keeps the line. A version
+    that cleared the trail would leave somebody who asked for less motion with
+    no account of a shot at all, which is the accessibility failure wearing the
+    accessibility feature's coat.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+    plant(page, base, lambda b: on_the_table(b, (8, 12)), stem="still")
+    try:
+        page.emulate_media(reduced_motion="reduce")
+        said = page.evaluate("() => window.__preview(18, 4)")
+        page.evaluate("() => window.__shoot(18, 4)")
+        page.wait_for_timeout(120)
+        drawn = page.evaluate("() => window.__trail()")
+        at = json.loads(page.evaluate("() => window.__position()"))
+        if drawn["ball"] is not None:
+            fails.append(f"{name}: reduced motion still animated a ball")
+        if not drawn["trail"]:
+            fails.append(f"{name}: reduced motion dropped the trail as well as the flight")
+        if [at["x"], at["y"]] != list(said["rest"]):
+            fails.append(f"{name}: reduced motion landed on {[at['x'], at['y']]} and core "
+                         f"said {said['rest']}")
+        else:
+            print(f"ok: reduced motion is at rest on the next frame, with the "
+                  f"{len(drawn['trail'])}-point trail still drawn")
+    finally:
+        page.emulate_media(reduced_motion="no-preference")
+        clear_screens(page)
+        plant(page, base, lambda body: None, stem="still-restore")
+
+
 def check_the_panel_says_what_a_pool_pays(page, name, fails):
     """A banked pool says what it is buying you.
 
@@ -1188,7 +1556,10 @@ def check_an_instrument_has_its_own_frame(page, name, fails):
         weapon_before = page.evaluate(weapon)
 
         page.click("#map")
-        page.keyboard.press("ArrowRight")
+        # **Landed on, since M17 made the Treyway a table.** The edge is a
+        # gate on ground a ball can rest on, so it is reached with the cue —
+        # which is the gesture a player makes, not a second way in.
+        cross(page, 6, 1)
         page.wait_for_timeout(500)
         if not page.is_visible("#instrument"):
             fails.append(f"{name}: the Reach refused and opened no frame")
@@ -1957,6 +2328,70 @@ def last_said(page):
     return lines[-1] if lines else ""
 
 
+def cross(page, x, y, near=True):
+    """Get to a tile, by stepping or by shooting, whichever the map wants.
+
+    **The Treyway is a table since M17**, so a check that presses ArrowDown on
+    it presses a key that aims rather than one that moves. Every check that
+    crossed that map by walking had to learn this, and the honest way to teach
+    them is one helper that asks core which kind of map it is standing on —
+    the same question the page asks, and the same `shot::aim_at` the walker and
+    the reachability lint use, so what a check aims at is what a player could
+    have aimed at.
+
+    Returns True if it thinks it got there.
+    """
+    if not page.evaluate("() => JSON.parse(window.__position()).is_table"):
+        here = json.loads(page.evaluate("() => window.__position()"))
+        dx, dy = x - here["x"], y - here["y"]
+        for _ in range(abs(dx)):
+            page.keyboard.press("ArrowRight" if dx > 0 else "ArrowLeft")
+            page.wait_for_timeout(90)
+        for _ in range(abs(dy)):
+            page.keyboard.press("ArrowDown" if dy > 0 else "ArrowUp")
+            page.wait_for_timeout(90)
+        return True
+    # **Shoot until you are there, up to six** — which is `PLAN-M17.md` §2.7's
+    # own ceiling and is what a player does. One shot is one shot: the aim is
+    # exact but the table is not a menu, and a ball that ends a tile off is a
+    # ball you take another shot from.
+    for _ in range(6):
+        at = json.loads(page.evaluate("() => window.__position()"))
+        if [at["x"], at["y"]] == [x, y]:
+            # **Already there is not already arrived.** A planted check is put
+            # down without a landing, and on a table the whole of what a place
+            # says happens *on* the landing — so ask it, with the same `here`
+            # the instrument frame's Go in uses.
+            page.evaluate("() => window.__here()")
+            page.wait_for_timeout(200)
+            return True
+        aim = None
+        for exact in (False, True):
+            got = page.evaluate(f"() => window.__aimAt({x}, {y}, {str(exact).lower()})")
+            if got.get("angle") is not None:
+                aim = got
+                break
+        if aim is None:
+            return False
+        page.evaluate(f"() => window.__shoot({aim['angle']}, {aim['power']})")
+        page.wait_for_timeout(700)
+        # **A gate that opens a screen has arrived.** The Reach's edge and the
+        # Sump's lip answer with the instrument frame rather than with a step,
+        # and that frame sits over the fight's Run button — so a helper that
+        # went on tidying would hang on a click it can never land, which is
+        # this file's *a check that opens a screen has to close it* seen from
+        # the other side: do not tidy a screen somebody else owns.
+        if page.is_visible("#instrument"):
+            return True
+        dismiss_card(page)
+        close_fight(page)
+        # A gate the landing opened takes you off the map, which is arriving.
+        if not page.evaluate("() => JSON.parse(window.__position()).is_table"):
+            return True
+    at = json.loads(page.evaluate("() => window.__position()"))
+    return [at["x"], at["y"]] == [x, y]
+
+
 def plant(page, base_path, edit, stem="probe"):
     """Load a save built by editing a downloaded one. Returns nothing.
 
@@ -2006,7 +2441,13 @@ def check_the_tide_is_drawn_before_it_goes_out(page, name, fails, base):
         strip_the_boards(body)
         w = body.setdefault("world", {})
         w["map"] = "the-treyway"
-        w["at"] = [8, 14]
+        # **Beside the bar while the tide is in, and back up the field once it
+        # is out.** The crossing is on row 15 and the refusal is delivered from
+        # beside it, so the first case wants [8, 14]; the way *through* is a
+        # tile you land on, and there is no shot from [8, 14] that stops on the
+        # tile below it — a ball a tile away either falls short or bounces off
+        # the south wall. Four tiles up is a tee a shot is taken from.
+        w["at"] = [8, 10] if built else [8, 14]
         flags = list(w.get("flags", []))
         if built:
             flags.append("built-the-tenth")
@@ -2037,7 +2478,7 @@ def check_the_tide_is_drawn_before_it_goes_out(page, name, fails, base):
     if page.evaluate("() => window.__world().rows[15][7]") != "sea":
         fails.append(f"{name}: the water beside the bar is not sea")
     # And you cannot walk onto it.
-    page.keyboard.press("ArrowDown")
+    cross(page, 8, 14)
     page.wait_for_timeout(300)
     dismiss_card(page)
     close_fight(page)
@@ -2059,13 +2500,17 @@ def check_the_tide_is_drawn_before_it_goes_out(page, name, fails, base):
     plant(page, base, lambda b: on_the_coast(b, True), stem="tide-out")
     if page.evaluate("() => window.__world().rows[15][8]") != "coast":
         fails.append(f"{name}: the tenth cairn went up and the bar is still tide")
-    page.keyboard.press("ArrowDown")
+    # **On the bar, not beside it.** Once the tide is out the crossing's own
+    # tile is ground a ball can come to rest on, so the way south is entered by
+    # landing on it like every other gate — which is what makes it safe for a
+    # gate offered from *beside* to hand back a refusal and never a way through.
+    cross(page, 8, 15)
     page.wait_for_timeout(400)
     dismiss_card(page)
     close_fight(page)
     where = page.evaluate("() => window.__world().id")
     if where != "the-low-water":
-        fails.append(f"{name}: walked onto the bar and arrived on {where!r}")
+        fails.append(f"{name}: crossed the bar and arrived on {where!r}")
     else:
         shape = page.evaluate("() => { const w = window.__world(); return [w.width, w.height]; }")
         if shape != [16, 11]:
@@ -3045,12 +3490,18 @@ def check_the_third_town_is_empty_on_purpose(page, name, fails, base):
         strip_the_boards(body)
         w = body.setdefault("world", {})
         w["map"] = "the-undercountry"
-        w["at"] = [10, 9]
+        # **Up the road rather than beside the counter**, since M17 made this
+        # map a table: a shot from the next tile along either falls short or
+        # bounces past, so a check that plants itself adjacent has nowhere to
+        # play from. Four tiles up the central lane is a tee.
+        w["at"] = [10, 5]
         w["answered"] = list(w.get("answered", [])) + [
             "the-ninth-surveyor", "the-bottom-of-the-bottom"]
 
     plant(page, base, down_there, stem="third-town")
-    page.keyboard.press("ArrowDown")
+    # **Shot, since M17 made the Undercountry a table.** The town and the screen
+    # after it are where M14 put them; what changed is how you get to a tile.
+    cross(page, 10, 10)
     page.wait_for_timeout(400)
     close_fight(page)
     if page.is_hidden("#town"):
@@ -3070,7 +3521,7 @@ def check_the_third_town_is_empty_on_purpose(page, name, fails, base):
             fails.append(f"{name}: the empty shelf is blank rather than saying so: {said[:80]!r}")
         page.click("#leave")
         page.wait_for_selector("#town", state="hidden", timeout=5000)
-    page.keyboard.press("ArrowDown")
+    cross(page, 10, 11)
     page.wait_for_timeout(400)
     close_fight(page)
     if page.is_hidden("#ending"):
@@ -3437,7 +3888,10 @@ def check_the_road_west_reaches_a_town(page, name, fails):
         fails.append(f"{name}: could not stand on the Treyway")
         plant(page, base, lambda body: None, stem="road-west-restore")
         return
-    page.keyboard.press("ArrowDown")
+    # **A table is crossed by shooting**, since M17 made the Treyway one — and
+    # the gate is a tile you land on, so this is the same gesture a player
+    # makes with the cue rather than a second way in.
+    cross(page, road[0], road[1])
     page.wait_for_timeout(400)
     dismiss_card(page)
     close_fight(page)
@@ -3781,7 +4235,7 @@ def check_the_reach_reads_through_what_you_carry(page, name, fails):
 
     # --- with nothing ---------------------------------------------------------
     plant(page, base, lambda b: at_the_edge(b), stem="reach-shut")
-    page.keyboard.press("ArrowLeft")
+    cross(page, edge[0], edge[1])
     page.wait_for_timeout(350)
     dismiss_card(page)
     close_fight(page)
@@ -3802,7 +4256,7 @@ def check_the_reach_reads_through_what_you_carry(page, name, fails):
 
     # --- with a compass -------------------------------------------------------
     plant(page, base, lambda b: at_the_edge(b, COMPASS), stem="reach-compass")
-    page.keyboard.press("ArrowLeft")
+    cross(page, edge[0], edge[1])
     page.wait_for_timeout(400)
     dismiss_card(page)
     close_fight(page)
@@ -3826,7 +4280,7 @@ def check_the_reach_reads_through_what_you_carry(page, name, fails):
 
     # --- and a different instrument is a different map ------------------------
     plant(page, base, lambda b: at_the_edge(b, GOLEM), stem="reach-golem")
-    page.keyboard.press("ArrowLeft")
+    cross(page, edge[0], edge[1])
     page.wait_for_timeout(400)
     dismiss_card(page)
     close_fight(page)
@@ -6331,6 +6785,15 @@ def walk_the_gate(browser, name, fails=None):
     check_she_is_wearing_it(page, name, fails)
     check_the_fork_is_seven_wide(page, name, fails)
     check_the_furnace_line_moves(page, name, fails)
+
+    # --- the cue ---------------------------------------------------------------
+    check_the_cue_draws_what_core_is_asked(page, name, fails)
+    check_a_shot_animates_to_where_core_said(page, name, fails)
+    check_the_keyboard_shoots(page, name, fails)
+    check_a_spike_flashes_and_the_fatigue_moves(page, name, fails)
+    check_sunk_lands_you_in_town(page, name, fails)
+    check_a_floor_still_steps(page, name, fails)
+    check_reduced_motion_skips_the_flight(page, name, fails)
 
     # --- the log ---------------------------------------------------------------
     check_the_panel_says_what_a_pool_pays(page, name, fails)

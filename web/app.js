@@ -11,6 +11,7 @@ import init, {
   quest_log_json, guide_json, pin_quest,
   character_json, skills_json, take_skill, pressure_json, pools_json,
   class_offer_json, choose_class, choose_second_class, class_name, all_trees_json,
+  try_shoot, preview_shot, aim_at,
   gold, piece_count, version, save_version,
   board_json, legal_anchors, place, pick_up, rotate, toggle_lock, undo, clear_board,
   look_json, look_over,
@@ -334,6 +335,11 @@ function draw() {
 
   if (debug && world.scouting) drawDebug(g, pos);
 
+  // **The ball and the cue, over everything and under nothing.** A table draws
+  // both; a floor draws neither, and `onATable` is core's answer.
+  drawFlight(g, TILE);
+  drawCue(g, TILE);
+
   if (blocked) {
     g.fillStyle = 'rgba(139,66,37,.9)';
     g.fillRect(0, c.height - 26, c.width, 26);
@@ -453,7 +459,12 @@ function paintPanel() {
   // And the book is the first meeting's.
   $('bestiary-open').hidden = !p.can_bestiary;
   if (!p.scouting && debug) toggleScout();
-  $('walked').textContent = p.walked;
+  // **`walked` becomes `shots` on a table.** One figure in one place rather
+  // than a second row: the strip says how you have been getting about, and on
+  // a shot map that is shots. Which of the two it is comes from core — *which
+  // map you are on* is the game's, and the page draws what it is sent.
+  $('walked-label').textContent = p.is_table ? 'shots' : 'walked';
+  $('walked').textContent = p.is_table ? p.shots : p.walked;
   $('fights').textContent = p.fights;
   $('gold').textContent = gold();
   paintSheet(c);
@@ -2778,6 +2789,175 @@ function paintKit() {
 
 // ---------------------------------------------------------------- walking
 
+// ------------------------------------------------------------------- the cue
+//
+// **On a shot map the map screen has a cue instead of arrow keys.** Pull back
+// from the ball and let go, exactly like every pool game since 8 Ball Pool —
+// and the arrow snaps to five degrees and ten lengths, so what is drawn is what
+// core will be asked. `check_the_cue_draws_what_core_is_asked` measures that.
+//
+// **The page decides nothing about the flight.** It sends a `Shot`, gets a
+// `Flight`, and animates it. A physics loop here would be the first thing in
+// the repository that ran differently in three engines.
+let cue = null;
+
+/// Is the map the player is on a table?
+///
+/// **Core's answer**, off the same `position()` the strip reads. The page does
+/// not keep a list of which maps are tables — *which map you are on* is the
+/// game's, and a second list here would be a second rulebook.
+function onATable() {
+  try { return !!JSON.parse(position()).is_table; } catch { return false; }
+}
+
+/// The arrow, in map pixels, from the ball back the way you pulled.
+/// The ball in flight and the trail behind it.
+function drawFlight(ctx, cell) {
+  if (!trail.length) return;
+  ctx.save();
+  ctx.strokeStyle = 'rgba(200,162,74,.45)';
+  ctx.lineWidth = Math.max(1.5, cell / 14);
+  ctx.beginPath();
+  trail.forEach(([sx, sy], i) => {
+    const x = (sx / sub) * cell;
+    const y = (sy / sub) * cell;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+  if (ball) {
+    ctx.beginPath();
+    ctx.arc((ball[0] / sub) * cell, (ball[1] / sub) * cell, cell / 5, 0, Math.PI * 2);
+    ctx.fillStyle = '#e8d9a8';
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+function drawCue(ctx, cell) {
+  if (!cue) return;
+  const [px, py] = position_at();
+  const x = (px + 0.5) * cell;
+  const y = (py + 0.5) * cell;
+  const rad = (cue.angle * 5) * Math.PI / 180;
+  // Screen coordinates, so up is negative y — the same flip `Shot::velocity`
+  // makes, and it is made in both places because both draw the same circle.
+  const dx = Math.cos(rad);
+  const dy = -Math.sin(rad);
+  const len = cue.power * cell * 0.55;
+  ctx.save();
+  ctx.strokeStyle = 'rgba(200,162,74,.95)';
+  ctx.lineWidth = Math.max(2, cell / 10);
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(x - dx * len, y - dy * len);
+  ctx.lineTo(x + dx * cell * 0.4, y + dy * cell * 0.4);
+  ctx.stroke();
+  // The head, so which way it is pointing is not a thing anybody has to work
+  // out from two ends of a line.
+  ctx.beginPath();
+  ctx.arc(x + dx * cell * 0.4, y + dy * cell * 0.4, cell / 7, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(200,162,74,.95)';
+  ctx.fill();
+  ctx.restore();
+}
+
+/// Where the ball is, in tiles.
+function position_at() {
+  const p = JSON.parse(position());
+  return [p.x, p.y];
+}
+
+/// Walk the flight, eight ticks a frame, and then land.
+///
+/// **Reduced motion skips to rest with the trail drawn**, because a player who
+/// has asked for less movement has asked for less movement and not for less
+/// information.
+function flyAndLand(r, done) {
+  const still = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+  trail = r.path || [];
+  sub = r.sub || 16;
+  // **Reduced motion keeps the trail and skips the flight.** The path is the
+  // whole of what a shot *said* — where it bounced, what it crossed — and a
+  // setting that means *do not move things* is not one that means *tell me
+  // less*. So the ball is at rest on the next frame with the line still drawn.
+  if (still || !trail.length) { ball = null; draw(); done(); return; }
+  let i = 0;
+  const step = () => {
+    i += 8;
+    if (i >= trail.length) { ball = null; draw(); done(); return; }
+    ball = trail[i];
+    draw();
+    requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+let trail = [];
+let ball = null;
+let sub = 16;
+
+/// Pull back to here, snapped to what core can be asked.
+///
+/// **Snapped before it is drawn**, which is the whole of why the arrow and the
+/// shot agree: seventy-two angles and ten powers, and the page never draws a
+/// thirty-seven-degree pull it cannot then fire.
+function aimAt([tx, ty]) {
+  const [px, py] = position_at();
+  // Back *from* the ball, so the arrow points where the ball will go.
+  const dx = (px + 0.5) - tx;
+  const dy = (py + 0.5) - ty;
+  const dist = Math.hypot(dx, dy);
+  if (dist < 0.35) { cue = null; draw(); return; }
+  // Screen y is down and the angle table is a maths circle.
+  let deg = Math.atan2(-dy, dx) * 180 / Math.PI;
+  if (deg < 0) deg += 360;
+  cue = {
+    angle: Math.round(deg / 5) % 72,
+    power: Math.max(1, Math.min(10, Math.round(dist * 1.6))),
+  };
+  draw();
+}
+
+/// Fire.
+function shoot() {
+  if (!cue) return;
+  trail = [];
+  const r = JSON.parse(try_shoot(cue.angle, cue.power));
+  cue = null;
+  log(r.said);
+  flyAndLand(r, () => {
+    // **The line stays until the next shot.** A trail cleared on landing is a
+    // shot you cannot look back at, and on a table looking back at the last
+    // one is how you take the next — the same reason the strip keeps the last
+    // thing said rather than flashing it. It is cleared where a shot starts.
+    world = JSON.parse(world_json());
+    paintPanel(); draw(); autosave();
+    if (r.toll > 0) log(`Nothing here for you, and it cost ${r.toll}%.`, true);
+    if ((r.spoke ?? []).length) log(`You have been. ${r.spoke.join(', ')}.`);
+    // **The same gate a step goes through.** Not a second handling: these are
+    // the same four fields `walk` reads and they mean the same things, because
+    // the shim answered them through the same `answer_the_gate`.
+    if (r.turned) log(`${r.turned} turns once and is gone. The way stays open.`);
+    if (r.went) {
+      world = JSON.parse(world_json());
+      log('You go through.');
+      paintPanel(); draw(); autosave();
+      if ((r.went.prose ?? []).length) {
+        showCard((r.went.name || 'the way through').toUpperCase(), r.went.prose, [], null);
+      }
+    }
+    if (r.wants_instrument) openKit(r.wants_instrument, r.shut);
+    else if (r.shut) log(r.shut, true);
+    if (r.ending) openEnding(r.ending);
+    if (r.mended > 0) log(`Somebody puts a chair out. ${r.mended}% of you comes back.`);
+    if (r.town) openTown(r.town);
+    else if (r.bench) openVendor();
+    else if (r.caravan) openCaravan();
+    else if (r.event) openEvent(r.event);
+    else if (r.encounter) openFight();
+  });
+}
+
 function walk(dir) {
   if (!$('card').hidden || !$('fight').hidden || !$('town').hidden ||
       !$('tree').hidden || !$('fork').hidden || !$('log').hidden ||
@@ -2882,6 +3062,28 @@ const KEYS = {
   w: 'n', s: 's', a: 'w', d: 'e',
   W: 'n', S: 's', A: 'w', D: 'e',
 };
+
+/// **The cue's keys, and there are four of them.** Left and right turn by five
+/// degrees, up and down change the power, space shoots — and the arrow is drawn
+/// the same either way, because a map screen that only worked with a mouse
+/// would be the first in the game.
+///
+/// Returns true when it handled the key, so the walk below it does not also
+/// take a step on a map where there is no stepping.
+function aimKey(k) {
+  if (!onATable()) return false;
+  if (!cue) cue = { angle: 18, power: 5 };
+  switch (k) {
+    case 'ArrowLeft': case 'a': case 'A': cue.angle = (cue.angle + 1) % 72; break;
+    case 'ArrowRight': case 'd': case 'D': cue.angle = (cue.angle + 71) % 72; break;
+    case 'ArrowUp': case 'w': case 'W': cue.power = Math.min(10, cue.power + 1); break;
+    case 'ArrowDown': case 's': case 'S': cue.power = Math.max(1, cue.power - 1); break;
+    case ' ': case 'Enter': shoot(); return true;
+    default: return false;
+  }
+  draw();
+  return true;
+}
 
 function download(name, text) {
   const url = URL.createObjectURL(new Blob([text], { type: 'application/json' }));
@@ -3077,9 +3279,60 @@ async function main() {
     if (e.key === 'Escape' && !$('card').hidden) { closeCard(); return; }
     // `d` is east on WASD, so the overlay gets its own key and a button.
     if (e.key === '`' && !$('scout').hidden) { e.preventDefault(); toggleScout(); return; }
+    // **The cue first, and only on a table.** `aimKey` returns false on a
+    // floor, so a map you walk across still walks — `check_a_floor_still_steps`
+    // is what keeps West Bambulon's arrow keys red if that ever stops being
+    // true.
+    if (aimKey(e.key)) { e.preventDefault(); return; }
     const dir = KEYS[e.key];
     if (dir) { e.preventDefault(); walk(dir); }
   });
+
+  // **The drag.** Press on the map and pull away from the ball: the arrow is
+  // drawn back from it, its length the power and its direction the aim, exactly
+  // like every pool game since 8 Ball Pool. It snaps to five degrees and ten
+  // lengths **before** it is drawn, so what is on the screen is what core is
+  // asked — which is what `check_the_cue_draws_what_core_is_asked` measures.
+  {
+    const map = $('map');
+    const tileOf = (e) => {
+      const r = map.getBoundingClientRect();
+      // Canvas pixels are not CSS pixels: the backing store has its own size
+      // and the box scales it, which cost this project an evening on the recipe
+      // buttons. Both axes, because a non-square map scales them differently.
+      const sx = map.width / r.width;
+      const sy = map.height / r.height;
+      return [(e.clientX - r.left) * sx / TILE, (e.clientY - r.top) * sy / TILE];
+    };
+    // **You pull the cue; you do not tap the table.** A press that never moves
+    // is a click — somebody focusing the canvas to use the keys, which is the
+    // gesture this page has asked for since M1 — and a click that fired a
+    // full-power shot from wherever the pointer happened to be is a table that
+    // plays itself. So a shot needs a *drag*, and the threshold is in CSS
+    // pixels rather than tiles because it is about the hand and not the map.
+    const DRAG = 6;
+    let pulling = false;
+    let from = null;
+    map.addEventListener('pointerdown', (e) => {
+      if (!onATable()) return;
+      pulling = true;
+      from = [e.clientX, e.clientY];
+      map.setPointerCapture?.(e.pointerId);
+    });
+    map.addEventListener('pointermove', (e) => {
+      if (!pulling) return;
+      if (Math.hypot(e.clientX - from[0], e.clientY - from[1]) < DRAG) return;
+      aimAt(tileOf(e));
+    });
+    map.addEventListener('pointerup', () => {
+      if (!pulling) return;
+      pulling = false;
+      // No cue means no drag, which means it was a click. Nothing is fired and
+      // nothing is cleared — a cue set with the keys survives a stray tap.
+      if (cue) shoot();
+    });
+    map.addEventListener('pointercancel', () => { pulling = false; cue = null; draw(); });
+  }
 
   $('scout').onclick = toggleScout;
   $('homeward').onclick = () => {
@@ -3172,6 +3425,22 @@ async function main() {
   window.__legalAnchors = legal_anchors;
   window.__replay = replay;
   window.__classOffer = () => JSON.parse(class_offer_json());
+  // **The cue, for a check that has to cross a table.** `aim_at` is core's and
+  // is the same function the walker uses, so what a check aims at is what a
+  // player could have aimed at — and `__shoot` fires it through the same door
+  // the drag does.
+  window.__aimAt = (x, y, near) => JSON.parse(aim_at(x, y, !!near));
+  window.__preview = (angle, power) => JSON.parse(preview_shot(angle, power));
+  window.__shoot = (angle, power) => { cue = { angle, power }; shoot(); };
+  window.__cue = () => cue;
+  // What the page is drawing of a flight: the path in sub-cells, where the
+  // ball is on it, and the scale. A check reads the *drawing* here and the
+  // flight off `preview_shot`, which is the only way to catch a page that
+  // animates somewhere core did not say.
+  window.__trail = () => ({ trail, ball, sub });
+  // Standing still and letting the place answer again — the gesture behind
+  // the instrument frame's Go in, reachable to a check that planted itself.
+  window.__here = () => walk('here');
   window.__encounter = () => JSON.parse(encounter_json());
   window.__bestiary = (who) => bestiary_json(who ?? '');
   window.__character = () => JSON.parse(character_json());

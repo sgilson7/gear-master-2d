@@ -156,6 +156,17 @@ fn every_road_off_the_treyway_says_where_it_goes() {
                     .unwrap_or_else(|| panic!("{} has nothing to read", p.id));
                 assert!(!e.prose.is_empty(), "{}: a promise that says nothing", p.id);
             }
+            // **An obstacle is a thing on the table, not a thing you read.**
+            // M17 made this map a table and put nine of them on it: a bumper
+            // is hit, a spike charges you, a pocket swallows the ball. None of
+            // them is a place a player walks up to and none has prose — what
+            // they owe is that a shot can *find* them, which is
+            // `every_place_on_a_shot_map_is_reachable_by_shots`'s question and
+            // not this one. A name, though, because the strip says what you
+            // hit and a nameless one would say nothing.
+            k if k.is_obstacle() => {
+                assert!(!p.name.is_empty(), "{}: an obstacle with no name on it", p.id);
+            }
             other => panic!("{}: the Treyway has a {other:?} on it and nothing expects one", p.id),
         }
     }

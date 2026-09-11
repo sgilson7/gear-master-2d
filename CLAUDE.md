@@ -64,6 +64,22 @@ events that pay something and say what they pay — added on the human's ask.
 `PLAN-M9.md`, `PLAN-M10.md` and `PLAN-M11.md` are done; `PLAN.md` §6d is what
 M11 left open, §6c is M10.3's, §6b is M9.4's and §6a is M8.8's.
 
+**M17 is done: the overworld is a table.** The Treyway and the Undercountry
+carry `traversal: "shot"` — the arrow keys aim a cue, space fires, the ball
+runs to rest under integer physics in `core::shot`, and *where you stop is
+where you are*. Every other map is still walked a tile a press. Six
+milestones, `PLAN-M17.md` is the frame, `HANDOFF-M17.md` is the block's record,
+and `SECOND-ORDER-M17.md` is its notebook — **twenty-nine rows, all closed**,
+and rows 16 to 19 are what the one worklist row turned into once it was built
+and found to be wrong. See *Two countries are tables* in Part one.
+
+**The block's own fault was found by the browser gate and not by `cargo test`**,
+which is the argument for the gate in one sentence: a gate offered from beside
+it opened a bar still under nine feet of water, because **the tide crossing has
+never carried a condition of its own — the impassable ground *was* the
+condition.** Nothing in core could see it, because every core test that could
+have asked was asking *is the gate offered* rather than *should it be*.
+
 **M16 is done and live**, deployed at `e3a2193f` and verified the way this file
 has demanded since M8: `GM2D_ORIGIN=… drive.py` walked **all seventy-eight
 checks against the deployed page**, and the pair agrees — `index.html` asks for
@@ -667,6 +683,123 @@ fighting differently:
 ---
 
 # Part one — the world you walk on
+
+## Two countries are tables, and you shoot across them
+
+**M17.** `TilesData::traversal` is `step` or `shot`, and the Treyway and the
+Undercountry are the second kind. The arrow keys aim a cue instead of taking a
+step, space fires, and the ball runs to rest — *where you stop is where you
+are*.
+
+- **The physics is integers and it is in core**, for the reason every roll is
+  per-mille: a seeded walk has to produce the same flight in every browser, and
+  a float is the one thing that rounds differently in three engines. Sixteenths
+  of a tile, seventy-two five-degree angles read out of a `(cos, sin)` table,
+  powers one to ten, and **no `f32`, no `sqrt` and no trigonometry at
+  runtime** — `the_physics_has_no_floating_point_in_it` is a lint over the
+  *source*, because an `f32` produces a flight that is *nearly* right and a
+  hash cannot tell you about that until somebody in another browser reports it.
+- **The shim animates what core returns and decides nothing.** A `Flight` is a
+  list of sub-cell positions and the page's only job is to walk it. A physics
+  loop in JavaScript would be the first thing here that ran differently in
+  three engines, and `check_a_shot_animates_to_where_core_said` compares the
+  drawn path against `preview_shot`'s.
+- **`POWER_UNIT` is 30 and the plan said 22**, and the property that decides it
+  is not in the plan: **distance has to be monotone in power.** A cue where
+  pulling back harder lands you *nearer* is a cue nobody can aim, and at 22 —
+  and at every restitution under 80 — it is not, because a fast ball spends its
+  extra speed on ricochets and a bounce that costs too much makes a strong shot
+  die at the wall it hit.
+- **A bumper adds a fixed kick and is counted, and both halves cost a draft.**
+  Thirty *percent* compounds: reflected at four fifths and boosted a third, a
+  ball between a bumper and a wall gains four percent a round trip for ever,
+  and shots ran to `MAX_TICKS`. A fixed kick settles at about `2.2k` — **and
+  still never stops**, because **friction is charged per tile crossed and a
+  ball bouncing in place crosses none.** So the pump is counted: three, and
+  after the third a bumper is a wall, which is what it already is to a ball
+  approaching it.
+- **A landing is `world::arrive_at`, which is `step`'s own second half.**
+  Extracted rather than written twice, and `step` calls it too, so there is one
+  answer to *what is here*. It rolls at `LANDING_MULT` — 150% — because a
+  landing is a longer stay than a step and a shot map has far fewer of them.
+- **`shots-taken` is bumped and `tiles-walked` is not**, and the strip says
+  *shots* rather than *walked* on a table. Which of the two it is comes from
+  core, because *which map you are on* is the game's.
+
+### A gate beside you offers its refusal, never the way through
+
+The block's most expensive hour, and the cause is one sentence: **the tide
+crossing has never carried a condition of its own, because the impassable
+ground *was* the condition.** Every other gate in this game is answered by the
+shim asking the bag; that one was answered by `walkable` refusing the step
+before anything asked the place. So a rule that reached it *without stepping*
+bypassed the only lock it had, and the first draft of the beside-rule walked a
+player over a bar still under nine feet of water.
+
+- **Once the tenth cairn drains it the tile is `coast`**, which is ground a
+  ball can come to rest on, so the way south is entered by landing on it like
+  every other gate. That is what makes it safe for the beside-rule to hand back
+  a refusal and nothing else.
+- **`world::here` needed it too, and that is a soft-lock rather than a
+  tidy-up.** On a table you come to rest beside a gate, so somebody who landed
+  next to the Reach's edge, built a compass in the frame it opened and pressed
+  *Go in* was refused for ever. `gate_beside` is one function and both doors
+  onto a tile ask it.
+- **The reachability lint could not have found it, because it took "beside" for
+  an answer.** A lint that accepts *landable or landable beside* cannot tell a
+  gate you can enter from one you can only be turned away from — this file's
+  *a lint that reads a list rather than the behaviour is the failure it exists
+  to catch, one level up*, in a new coat. It asks the sharp question now: **can
+  a ball come to rest on this tile, in some state of the world** — flooded
+  **and** drained, because a map is not one grid and a drain turns `tide` into
+  `coast`. And it asks an **obstacle** the question that is true of one, which
+  is whether any shot *hits* it: a bumper is a tile no ball can ever rest on,
+  and that is what a bumper is.
+- **Found by the browser gate in three engines**, which is the argument for it.
+
+### A tile one step away is a tile you cannot shoot to
+
+From directly adjacent every power overshoots or bounces off the wall behind,
+so three gate checks that planted themselves beside their target and fired
+never arrived — the bar of shingle, the third town, and the screen after it.
+That is not a fault; it is what a cue *is*, and the fix is a tee rather than a
+nudge. **Worth knowing before somebody puts two places next to each other on a
+table.**
+
+### You pull the cue; you do not tap the table
+
+A click on the canvas fired a full-power shot from wherever the pointer
+happened to be, because `pointerdown` set the cue and `pointerup` fired it — so
+somebody clicking the map to focus it for the keyboard took a shot. A shot
+needs a **drag** now, thresholded in CSS pixels because it is about the hand
+and not the map, and a press that never travels leaves a cue set with the keys
+alone.
+
+- **The trail is cleared where a shot starts, not where it lands.** A line
+  wiped on landing is a shot you cannot look back at, and on a table looking
+  back at the last one is how you take the next — the strip's argument for
+  keeping the last thing said. It also makes reduced motion mean what it says:
+  **do not move things is not tell me less**, so the ball is at rest on the
+  next frame with the path still drawn.
+- **A shot can end on any screen, so a check that fires one must tidy any of
+  them.** `dismiss_card` and `close_fight` cover two of six; a check whose
+  `finally` covered two left a town over the page, the next check's first click
+  timed out, and the whole failure list went unprinted. `clear_screens` is the
+  one door.
+- **`check_a_floor_still_steps` is the hardest check in the block to
+  negative-test**, and the reason is the finding: every lie about *the arrows
+  mean two things now* takes the whole gate down before the check runs, because
+  a floor that grows a cue is a dungeon nobody can walk out of.
+
+### The walker asks core where a ball goes
+
+`shot::aim_at` sweeps the seventy-two by ten and returns the gentlest shot that
+lands on a tile, and it is the **one** answer: the reachability lint floods
+with it, the browser gate crosses with it, and `playthrough.py` aims with it. A
+pathfinder in Python would be a second answer to *where does a ball go*, and it
+would be the first thing here that disagreed with the engine about the map.
+`make play` crosses the Treyway in **three** shots against the plan's nine, and
+everything on either table is reachable in **two** rounds.
 
 ## The world
 
@@ -4902,6 +5035,9 @@ Every figure below was re-measured for M12.6 rather than carried forward.
 | M16.2: the Assay, and two doors the plan hung above what this game builds | 933 passing |
 | M16.3: the Needle Room, and something on the plate wearing your own board | 941 passing |
 | **M16.4 + M16.5: two classes GM2D wrote, and the twenty-one pairs they make** | **950 passing** |
+| M16.6: six browser checks, a walk that loops, and the block written down | 950 passing |
+| M17.0: a table nobody can see yet, and a cue you could not have aimed | 960 passing |
+| **M17.1–M17.5: the overworld is a table, and you shoot across it** | **NNN passing** |
 
 **M13.5 adds none and M13.7 and M13.8 add none, and all three are honest.**
 M13.5 lands ten trees into a data file and the three lints it needed were
@@ -4929,10 +5065,11 @@ content*, and one check now measures what a range used to guess at.
 | `crates/core` | **~49k lines**, down from ~50k at the fork and up 1.5k over M14 — `wc -l` over every `.rs` under `crates/core/src`. The method is named because the figure carried here through M12.6 was 42.4k while the code had moved under it |
 | wasm | **1660 KB**, up from 1539 KB at M13 — `dist/web/pkg/gm2d_wasm_bg.wasm` after `make web`. CI builds its own and the two are not bit-identical, which is why the *stamp* is checked against itself and never against a number |
 | Save format | v1. **No seam, still, and M14 adds no field at all** — nine maps, eight floors, two creatures, two terrains and four new `Requirement`/`Outcome` arms, and not one of them is in the save: a map is content, an event's shape is content, and what a run has done was already `answered` and `flags`. Every save that opened on M11 opens on this. Before it: **M13 is the first block to take a field *out*.** Five new `Character` fields, every one `#[serde(default)]` and skipped when empty — `second_class`, `expert`, `second_paper`, `fast_wins`, `told_curses` — so an older file opens as one class with no paper and nothing following it out of the last fight, which is what those characters had. **`assembly_pct` is gone from the file**: it was written and then thrown away on the way in, and *a number that is stored and ignored is a number somebody will one day believe*. A save now carries **six boards**; one naming five gets an instrument frame at the base height, and `repair_boards` lifts an old build's instrument out of the weapon grid on the way in — the loader is where a field carried across a build change is caught. `banked`, `commissions`, `rolled_barrel`, `rolled_ledgers`, `rerolls` and `bought_licence` all default the same way |
+| Tables | **2** — the Treyway and the Undercountry, `traversal: "shot"` in the map file. Everything on either is reachable in **two** rounds of shots and `make play` crosses the Treyway in **three**, against `PLAN-M17.md` §2.7's ceiling of nine. `only_the_country_maps_are_tables` asserts the list, so a third is a decision somebody makes there |
 | Maps | **25**, in `data/maps/*.tiles.json` — west-bambulon 20×20, the-great-gear-cave 9×5, the-treyway 16×16, kettleworks-field 20×20, five Drambus Stack floors 10×10, under-the-lake 13×9, the-reach 20×20, **the-low-water 16×11, four Wextreen Sump floors 12×12, four Silt Stair floors 12×12, the-undercountry 20×20** |
-| Places | **129 over twenty maps**: 3 towns, 80 events, 33 gates, 9 bosses, 2 crossings, 1 bench, **1 door** — 41 of the events are the Kettleworks field alone, and the one door is the last screen in the game, on the Undercountry |
+| Places | **196 over twenty-five maps**: 3 towns, 107 events, 43 gates, 16 bosses, 8 caravan stops, 2 crossings, 1 bench, 1 door, and **15 obstacles** — 4 bumpers, 5 drifts of sand, 3 spikes, 2 pockets and a chute, which are M17's and are the first places in the game that a *foot* never touches. 41 of the events are the Kettleworks field alone, and the one door is the last screen in the game, on the Undercountry |
 | Events | **80 placed: 64 ask something and 16 are notes, over 102 choices.** **21 chains from 10 roots**, every root choice handing over an errand. **One of the eighty repeats** — the chair at the bottom of the Silt Stair, which is three moves at one object and the only event in the game that is not spent when it is answered |
-| `PlaceKind` | 7: town, event, gate, boss, door, crossing, bench — **unchanged**; the Stack is `PlaceDef::floors` on a gate, not an eighth kind |
+| `PlaceKind` | **13**: town, event, gate, boss, door, crossing, bench, caravan, **bumper, spike, pocket, chute, sand**. The five new ones are M17's and `is_obstacle()` is what separates them: an obstacle is hit **in flight**, which is the one thing a step has nowhere to happen. The Stack is still `PlaceDef::floors` on a gate rather than a kind |
 | Effect kinds | **7**: stat, start_with, grow_slot_rows, assembly_pct, grants, gives_ench, **tunes** — the seventh is M13.2's, and the knob it names is checked at parse time against the tree's own class |
 | Ench effect kinds | 4: power, haste, spin, fragile — **unchanged** |
 | `Rule` kinds | **16**: curse_on_activate, spin_extra, spin_keep, spin_every, scout, rout, wade, survey, homeward, **spread**, **row_harvest**, **beacon**, **productivity**, **burn_keeps_bonus**, **burn_carries**, **mind_pierce**. The last three are M16's and each is granted by more than one expert tree; the four before them are M13.3's and are the first since M9 that needed code in the fight rather than a translation at the bell |
@@ -4965,7 +5102,7 @@ content*, and one check now measures what a range used to guess at.
 | The papers | **3** on Spike's van, all drawn from the first visit: the Patent's licence at 5,000, **the Second Paper at 5,000 behind nothing at all**, and the expert paper at **nothing** behind two finished trees — the twenty-four points are the price, which is what keeps a free paper from being a fourth class on the fork. M15.4 took the tree gate off the second paper on the human's ask; the level that puts the van on the road is what is left |
 | Figures | 27 `.tex` → **83 SVGs** (13 family drawings, 4 drawn for themselves, 5 classes, 3 towns, you) |
 | Art coverage | **60 of 60 creatures**, 3 of 3 towns, 5 of 5 classes, and you. The set pieces, the instruments and the enchs have no art and want none — a component has never had a figure |
-| Browser gate | **78 `ok:` lines in one engine**, six of them M16's and every one negative-tested — the way under is silt until the sheet, a stake offers the pull and a compass that lies, a sinkhole drops you in an alcove nothing walks into, the Tenth Surveyor's panel draws the run's own items, the fork is seven cards in two rows, and a Stoker's replay says what the furnace took. Before it: **96 `ok:` lines over 3 engines** — which is 67 in any one of them, not 81; the count is a total and reading it as per-engine is wrong by fourteen. The newest is M15.2's, and it is the only one that can answer a *negative*: that a fight you have already had is settled and **never drawn**. The newest five are M14.5's: the tide is drawn before it goes out and walkable after, the lip of the Sump refuses in the Reach's words and opens the frame, a wheel that keeps what you feed it says what shape it wants, the chair is three moves in an order **and comes back**, and the third town is empty with the screen after it saying so. **All five were negative-tested, and two of the five found faults on a green build** — see *A stack gate that wants an instrument* |
+| Browser gate | **85 `ok:` lines in one engine**, seven of them M17's and every one negative-tested — the cue snaps to what core takes and pulling further pulls harder, a shot flies the path core returned, four keys aim and space fires with no pointer, a spike takes its percent and says so, a ball in the pocket wakes up in town, a floor still steps and draws no cue, and reduced motion is at rest with the trail still drawn. **The hardest of the seven to break is the floor one**: every lie about *the arrows mean two things now* takes the whole gate down before the check runs. Before it: **78 `ok:` lines**, six of them M16's and every one negative-tested — the way under is silt until the sheet, a stake offers the pull and a compass that lies, a sinkhole drops you in an alcove nothing walks into, the Tenth Surveyor's panel draws the run's own items, the fork is seven cards in two rows, and a Stoker's replay says what the furnace took. Before it: **96 `ok:` lines over 3 engines** — which is 67 in any one of them, not 81; the count is a total and reading it as per-engine is wrong by fourteen. The newest is M15.2's, and it is the only one that can answer a *negative*: that a fight you have already had is settled and **never drawn**. The newest five are M14.5's: the tide is drawn before it goes out and walkable after, the lip of the Sump refuses in the Reach's words and opens the frame, a wheel that keeps what you feed it says what shape it wants, the chair is three moves in an order **and comes back**, and the third town is empty with the screen after it saying so. **All five were negative-tested, and two of the five found faults on a green build** — see *A stack gate that wants an instrument* |
 | The suite | **950 passing** after M16 — and **ten minutes cold**, because every map file is an `include_str!` and any change under `data/` relinks sixty test binaries. `SECOND-ORDER-M14.md` row 17 says the same of `combat.rs`; this is the same fact about a different file. Before it: **913 passing, and ~33 seconds warm** after M15, the bestiary, the cart and the sands; **832 and 27.5s** after M14 — measured after M14, and the ten slowest files are the ten that were slow at M13: `drops.rs` at 11.0s and `experts_reach.rs` at 6.3s, neither of them M14's, and nothing this block added is above 0.4s. **`SECOND-ORDER-M14.md` row 17 was written claiming it had slowed to minutes and is corrected there**: what is minutes is rebuilding sixty test binaries after a change to `combat.rs`, which is a fact about editing the engine. Before M14 it was **788 passing, and 34 seconds warm.** It was a minute through most of M13 and `rules_m13.rs` was 29.6s of it: `beacon_board` ran Auto-pack over the whole catalogue on twenty-row grids, four times, because it was the only fixture in the repository with two items that touch. `common::items_in_a_row` is what replaced it — **0.03s** — and `experts_reach.rs` went 9.6s → 6.5s by measuring once per *set* of nodes rather than once per question. `drops.rs` at 11.3s is now the slowest file and is untouched. `[profile.test] opt-level = 2` since M12.6, with debug assertions and overflow checks still on — this is the `test` profile, not `--release` |
 | Floors with a puzzle | **6**, and floors with a boss **2**. Every one is monotone — flags only grow, so no move can make the way on unreachable — and `puzzle::solvable_blind` counts the worst case rather than the plan asserting it |
 | Blind-solution ceilings | Sump **8 / 1 / 45**, Stair **1 / 3 / 3**. The plan guessed 10 / 11 / 45 and 2 / 27 / 3; **the Cairnfield's forty-five came back exactly**, which is the reason to believe the other five. `every_floor_in_the_game_can_be_solved_blind` holds every floor there is under 45 |

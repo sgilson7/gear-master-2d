@@ -19,7 +19,7 @@
 use crate::character::Character;
 use crate::fight::Encounter;
 use crate::rng::Rng;
-use crate::world::WorldState;
+use crate::world::{Step, WorldState};
 
 /// The whole of a session's state.
 #[derive(Clone, Debug)]
@@ -382,6 +382,67 @@ impl Game {
             },
             Outcome::Nothing => receipt.push("Nothing you could point to".into()),
         }
+    }
+
+    /// Fire, and land.
+    ///
+    /// **`shot::shoot` runs the flight and this resolves what it stopped on**,
+    /// which is `PLAN-M17.md` §2.3 in two lines: *nothing rolls, enters, or
+    /// pays in flight except the obstacles' contacts, and when it stops, `Step`'s
+    /// own resolution is called with the landing tile.* There is no second
+    /// answer to *what is here* — `world::arrive_at` is the one the step above
+    /// it uses.
+    ///
+    /// Returns the flight so the shim can draw it, and the `Step` so the shim
+    /// can open whatever the landing opened.
+    pub fn shoot(
+        &mut self,
+        shot: crate::shot::Shot,
+        difficulty: crate::combat::Difficulty,
+    ) -> (crate::shot::Flight, Step) {
+        let allowed = self.character.allowances();
+        let id = self.world.map_id();
+        let w = crate::data::map_now(&id, difficulty, &self.world);
+        let from = (self.world.at[0], self.world.at[1]);
+        let flight = crate::shot::shoot_with(&w, &self.world, from, shot, &allowed);
+
+        // **The table's contacts are paid before the landing**, in the order
+        // they happened: a spike you went through on the way tires you whether
+        // or not the ball ended somewhere good.
+        let tiring = flight.tiring();
+        if tiring > 0 {
+            self.character.tire_hard(tiring as i32);
+        }
+        self.world.bump("shots-taken");
+
+        // **A pocket is the drain, and it is the only thing on a table that
+        // moves you off the map.** Nothing here kills you and nothing takes
+        // your carried experience: a pocket is a bad shot, not a lost fight.
+        if flight.sunk().is_some() {
+            let town = self.world.last_town.clone();
+            let home = crate::data::all_maps(difficulty)
+                .into_iter()
+                .find_map(|m| m.places.iter().find(|p| p.id == town).map(|p| (m.id.clone(), p.at)));
+            if let Some((map, at)) = home {
+                self.warp_to(&map, at, difficulty);
+                let mut out = Step::nowhere("sunk");
+                out.town = Some(town);
+                return (flight, out);
+            }
+        }
+
+        self.world.at = [flight.rest.0, flight.rest.1];
+        let mut rng = self.rng.clone();
+        let step = crate::world::arrive_at(
+            &w,
+            &mut self.world,
+            &mut rng,
+            difficulty,
+            flight.rest,
+            &allowed,
+        );
+        self.rng = rng;
+        (flight, step)
     }
 
     /// Put the player on another map, at a tile they can stand on.

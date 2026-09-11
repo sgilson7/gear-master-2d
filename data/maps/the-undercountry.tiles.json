@@ -2,7 +2,7 @@
   "format": "gm2d-tiles",
   "version": 1,
   "id": "the-undercountry",
-  "_note": "The country under the country. **Three ways in and one town, and the town is empty** — a shop with no shelves, no errands, and prose that says the writing stops here. `PLAN-M14.md` §1.5: it is not a placeholder drawn as a town, it is a town drawn honestly, and what goes in it is the next plan's. Twenty tiles of it are road between the three gates and the town and **nothing else on it is load-bearing**, which is §9 decision 2 left where it was found: a country drawn to a guess is a country somebody has to unpick.",
+  "_note": "The country under the country. **Three ways in and one town, and the town is empty** \u2014 a shop with no shelves, no errands, and prose that says the writing stops here. `PLAN-M14.md` \u00a71.5: it is not a placeholder drawn as a town, it is a town drawn honestly, and what goes in it is the next plan's. Twenty tiles of it are road between the three gates and the town and **nothing else on it is load-bearing**, which is \u00a79 decision 2 left where it was found: a country drawn to a guess is a country somebody has to unpick.\n\n**A table since M17, and the second one.** `traversal: \"shot\"` \u2014 the country under the country is crossed by pulling back and firing, the same as the Treyway above it. `PLAN-M17.md` \u00a74.2 asks for three things and it gets all three: **sand past each of the three ways up**, so an arrival at one is a stopped ball rather than a lucky one; **the central road is the one fast lane**, at cost 1 against the scrub's 1 and the slag's 2, running the whole height of the map through the town's own door; and six obstacles, with **a bumper on each of the two far slag ranges** and the pocket in the south-west, which is the corner of this map with nothing on it and is therefore the corner it would be a shame to end up in.\n\n**The drifts are past the gates and not before them.** Sand stops a ball dead, so a drift on the approach is a wall in front of a door; one on the far side is a backstop. Both ways up are on the southern road with open scrub below them, and Marbulon's door is at the top with open scrub above \u2014 which is the only reason all three could take the same treatment.\n\n**And nothing about the country moved.** Nine tiles gained a place; not one of them changed terrain, and the town, the three gates and the door at the end of the writing are where M14 put them. A map becoming a table is a line in its header, which is the whole point of `Traversal` being on the file rather than in the save.",
   "width": 20,
   "height": 20,
   "start": [
@@ -114,9 +114,70 @@
       "name": "the way on",
       "prose": [
         "The road runs south out of the town for four miles and then stops, and what it stops at is not a wall and not a coast and not an edge.",
-        "This is where the writing stops. Not the game — the writing. What is past this is not hidden and not locked and not saved for later: nobody has decided it yet.",
+        "This is where the writing stops. Not the game \u2014 the writing. What is past this is not hidden and not locked and not saved for later: nobody has decided it yet.",
         "You dropped a tower, drained a lake, took two dungeons apart from the inside and came up under a door an old woman has been sitting in front of for eleven years. The last fact this game has for you is that she was right about the number."
       ]
+    },
+    {
+      "at": [
+        5,
+        5
+      ],
+      "kind": "bumper",
+      "id": "the-low-bumper",
+      "name": "the low boulder",
+      "shut": "A boulder the size of a cart, and the ground round it is scoured smooth. Everything that comes down here has been off it."
+    },
+    {
+      "at": [
+        15,
+        14
+      ],
+      "kind": "bumper",
+      "id": "the-high-bumper",
+      "name": "the high boulder",
+      "shut": "Its twin, or near enough. Nobody carried either of them here."
+    },
+    {
+      "at": [
+        3,
+        18
+      ],
+      "kind": "sand",
+      "id": "the-sump-drift",
+      "name": "the drift under the sump",
+      "shut": "Grit, a foot of it, banked against the wall. Whatever rolls in stops."
+    },
+    {
+      "at": [
+        16,
+        18
+      ],
+      "kind": "sand",
+      "id": "the-stair-drift",
+      "name": "the drift under the stair",
+      "shut": "The same grit, the same wall, the other end of it."
+    },
+    {
+      "at": [
+        10,
+        1
+      ],
+      "kind": "sand",
+      "id": "the-door-drift",
+      "name": "the drift under the door",
+      "shut": "It has been coming down through the shallows for years, and this is where it has got to."
+    },
+    {
+      "at": [
+        4,
+        14
+      ],
+      "kind": "pocket",
+      "id": "the-lost-corner",
+      "name": "the lost corner",
+      "shut": "A hole in the slag with nothing at the bottom you can see. Things go in here and the country does not give them back."
     }
-  ]
+  ],
+  "traversal": "shot"
 }

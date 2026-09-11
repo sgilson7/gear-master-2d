@@ -227,6 +227,32 @@ pub enum PlaceKind {
     /// rather than by the stop's, because it is one cart and moving it is not
     /// restocking it.
     Caravan,
+    // ---------------------------------------------- M17's five obstacles
+    //
+    // **They are places because they stand on tiles**, and the map file is
+    // where things that stand on tiles live. What makes them a new *kind*
+    // rather than five more of an old one is that the ball hits them **in
+    // flight**: every place before these happens when you stop on it, and a
+    // step has nowhere else to happen.
+    //
+    // Five and not one with a field, because each does something the others do
+    // not and an exhaustive match is what makes adding a sixth a decision.
+    /// Reflects like a wall and adds [`crate::shot::BUMPER_BOOST`] percent.
+    /// You cannot stop on one: it is solid.
+    Bumper,
+    /// Costs `Tire(8)` on contact, and the ball goes through. You can stop on
+    /// one, and the tile under it is whatever it is.
+    Spike,
+    /// The ball goes over it at speed and **sinks** if it stops on it: back to
+    /// your last town, twelve percent more tired. Pinball Quest's bottom of the
+    /// table, and it is the only obstacle that moves you off the map.
+    Pocket,
+    /// A mouth. The ball enters here and leaves at the chute's `to`, keeping
+    /// its speed and its heading. You cannot stop in one.
+    Chute,
+    /// **Stops the ball dead** the moment it enters. Mini-golf's bunker, and
+    /// the one obstacle you aim *for*.
+    Sand,
     /// A threshold you may cross only when something is true of you.
     ///
     /// A gate's sibling: a gate is a way onto another map and a crossing is a
@@ -591,6 +617,23 @@ pub struct TilesData {
     pub traversal: Traversal,
 }
 
+impl PlaceKind {
+    /// Is this one of the five things a ball hits in flight?
+    ///
+    /// **Asked in one place**, so the next obstacle is one line here rather
+    /// than five `matches!` that drift.
+    pub fn is_obstacle(self) -> bool {
+        matches!(
+            self,
+            PlaceKind::Bumper
+                | PlaceKind::Spike
+                | PlaceKind::Pocket
+                | PlaceKind::Chute
+                | PlaceKind::Sand
+        )
+    }
+}
+
 /// How a player crosses a map.
 #[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -831,6 +874,46 @@ impl World {
             }
             if !world.ever_walkable(x, y) {
                 return Err(format!("{:?} is placed on impassable ground at ({x}, {y})", p.id));
+            }
+            // **The five obstacles are the ball's, so they belong on a table.**
+            // One on a step map is a place a foot walks over and nothing
+            // happens, which is the dead content this project keeps catching a
+            // milestone late — and it is checked here rather than in a test
+            // because a map that will not load is better than one that loads
+            // with a bumper nobody can hit.
+            if p.kind.is_obstacle() && world.traversal != Traversal::Shot {
+                return Err(format!(
+                    "{:?} is a {:?} on a map you walk across, and an obstacle is the ball's",
+                    p.id, p.kind
+                ));
+            }
+            // **A bumper is solid and a pocket is not a place.** Both are
+            // refusals the ball could not make for itself: it hits a bumper
+            // *because* it is solid, so one on ground it could rest on would be
+            // a wall nobody drew, and a pocket sharing a tile with a gate would
+            // be a gate you fall through.
+            match p.kind {
+                PlaceKind::Chute => {
+                    let Some(at) = p.at_to else {
+                        return Err(format!("{:?} is a chute with no far end", p.id));
+                    };
+                    if !world.ever_walkable(at[0], at[1]) {
+                        return Err(format!(
+                            "{:?} spits the ball onto ({}, {}), which is not ground",
+                            p.id, at[0], at[1]
+                        ));
+                    }
+                }
+                PlaceKind::Pocket | PlaceKind::Sand | PlaceKind::Spike | PlaceKind::Bumper => {
+                    if world.places.iter().any(|q| q.at == p.at && q.id != p.id) {
+                        return Err(format!(
+                            "{:?} shares a tile with something else, and an obstacle is the \
+                             only thing on its own",
+                            p.id
+                        ));
+                    }
+                }
+                _ => {}
             }
         }
         if !world.passable(world.start.0, world.start.1) {
@@ -1824,7 +1907,13 @@ impl Step {
         self.encounter.map(|m| m.name)
     }
 
-    fn nowhere(why: &str) -> Self {
+    /// A step that did not happen, with a sentence saying why.
+    ///
+    /// **`pub(crate)` since M17**, because a pocket is a landing that did not
+    /// land: `Game::shoot` needs to report *sunk* in the same shape a refused
+    /// step reports a wall, and a second struct for it would be a second answer
+    /// to *what happened when I tried to move*.
+    pub(crate) fn nowhere(why: &str) -> Self {
         Step {
             moved: false,
             blocked: Some(why.to_string()),
@@ -1855,7 +1944,151 @@ impl Step {
 /// reopen a card you dismissed, re-mend you, or put a creature in front of you
 /// for standing still. A gate is the one place whose answer can change while
 /// you stand on it, because the answer is a question about you.
-pub fn here(world: &World, state: &WorldState, allowed: &Allowances) -> Step {
+/// Why a step onto `(x, y)` is refused, in whatever register knows best.
+///
+/// **A place standing on that tile knows more about it than the ground does.**
+/// Two gates in this game are on terrain nobody can walk on — the way under
+/// the lake, on water until a tower falls or a toad's frame goes on, and the
+/// tide crossing, on tide until the tenth cairn goes up two maps away — and
+/// until this was written both of them answered with the sentence a cliff
+/// answers with. Reported from play, standing at the shore: *"the land is pink
+/// and it says no way through"*, which is the game refusing and declining to
+/// say by what.
+///
+/// **Extracted in M17 because a table has a second door onto it.** A ball that
+/// comes to rest beside a gate on impassable ground is offered that gate, and
+/// what it must be offered is *this* — the refusal, in the map's own words —
+/// rather than the way through, which is the fault the beside-rule shipped
+/// with for a milestone: the tide crossing has never had a condition of its
+/// own, because the ground under it was the condition.
+fn refused_at(
+    world: &World,
+    state: &WorldState,
+    x: u8,
+    y: u8,
+    allowed: &Allowances,
+    difficulty: Difficulty,
+) -> Step {
+    let (nx, ny) = (x, y);
+        // **A place standing on that tile knows more about it than the
+    // ground does.** Two gates in this game are on terrain nobody can
+    // walk on — the way under the lake, on water until a tower falls or a
+    // toad's frame goes on, and the tide crossing, on tide until the tenth
+    // cairn goes up two maps away — and until this was written both of
+    // them answered with the sentence a cliff answers with. Reported from
+    // play, standing at the shore: *"the land is pink and it says no way
+    // through"*, which is the game refusing and declining to say by what.
+    //
+    // The sentence is the map file's, like every other `shut`: **the
+    // world's register, in the world's words.** What is the engine's is
+    // only that it is a *place's* refusal rather than the ground's, which
+    // is what puts it on the strip instead of in the one-second flash at
+    // the bottom of the canvas.
+    //
+    // `place_now` and not `place_at`, so a hidden place stays hidden: a
+    // refusal that named a door nobody has found would be a secret with a
+    // signpost on it.
+    if let Some(p) = world.place_now(state, nx, ny, allowed) {
+        if !p.shut.is_empty() {
+            // **And where the ground is opened, if something opens it.**
+            // Reported from play twice: the first time the shore said what
+            // a cliff says, and the second time — with the sentence in —
+            // *"i've defeated marbulon and still cant access it"*. Naming
+            // the tenth notch is not naming where the tenth cairn is cut,
+            // and it is cut **two maps away** on the Wextreen Reach.
+            //
+            // This is `Requirement::wants` for ground rather than for a
+            // choice, and it is the same argument M12.6 made: with only
+            // the flavour a refusal is a wall, and the statement is what
+            // makes it a target. Looked up rather than listed, so a chain
+            // that is re-authored cannot leave it pointing at the wrong
+            // place, and appended rather than replacing the prose, because
+            // the world's sentence is the world's.
+            let mut said = p.shut.clone();
+            let here = world.terrain_name(nx, ny);
+            if let Some(d) = world
+                .drains
+                .iter()
+                .find(|d| d.from == here && !marks_have(state, &d.when))
+            {
+                if let Some((event, title)) =
+                    crate::tile_event::where_a_flag_is_raised(&crate::data::events(), &d.when)
+                {
+                    match gate_toward(world, &event, difficulty) {
+                        Some(gate) => {
+                            said.push_str(&format!(" It is {title} that opens it, through {gate}."))
+                        }
+                        None => said.push_str(&format!(" It is {title} that opens it.")),
+                    }
+                }
+            }
+            let mut out = Step::nowhere(&said);
+            out.refused_by = Some(p.id.clone());
+            return out;
+        }
+    }
+    return Step::nowhere(match world.terrain_name(nx, ny) {
+        // Still the frame's fault, and a toad's frame is the answer to it.
+        "water" => "you would have to swim, and you are wearing a frame",
+        "rock" => "rock, and no way up it",
+        _ => "there is no way through",
+    });
+}
+
+/// Where a ball at `(x, y)` is told, from beside it, why a gate is shut.
+///
+/// **A gate on ground nobody can stand on says so from beside it.**
+/// `PLAN-M17.md` §2.6: *a wall is not a place*, and the Treyway has one — the
+/// tide crossing stands on `tide`, which is impassable until the tenth cairn
+/// goes up. On a step map you walk into it and it refuses in its own words; on
+/// a table there is no step, so a ball that comes to rest beside one is told
+/// there rather than nowhere.
+///
+/// **It hands back the refusal and never the way through**, which is the half
+/// that shipped wrong for a milestone: the tide crossing has never carried a
+/// condition of its own, because the impassable ground *was* the condition —
+/// so a beside-rule that reported `Step::gate` walked a player over a bar that
+/// was still under nine feet of water. Once the tenth cairn drains it the
+/// ground is `coast`, the tile is landable, and it is entered by landing on
+/// it like any other gate. A gate with nothing to say (`shut` empty) is not
+/// one of these and is skipped.
+///
+/// Shot maps only, and gates only. A *town* you could enter from next door
+/// would be a town with no door, and on a step map this would make every wall
+/// gate openable from a tile away, which is not the rule that shipped.
+///
+/// **Both doors onto a tile ask it**: [`arrive_at`] when the ball stops, and
+/// [`here`] when the player stands still and lets the place answer again.
+fn gate_beside(
+    world: &World,
+    state: &WorldState,
+    x: u8,
+    y: u8,
+    allowed: &Allowances,
+) -> Option<(u8, u8)> {
+    if world.traversal != Traversal::Shot {
+        return None;
+    }
+    [(-1i32, 0i32), (1, 0), (0, -1), (0, 1)]
+        .into_iter()
+        .find_map(|(dx, dy)| {
+            let (bx, by) = (x as i32 + dx, y as i32 + dy);
+            if !world.in_bounds(bx, by) || world.walkable(bx as u8, by as u8, allowed) {
+                return None;
+            }
+            world
+                .place_now(state, bx as u8, by as u8, allowed)
+                .filter(|p| p.kind == PlaceKind::Gate && !p.shut.is_empty())
+                .map(|_| (bx as u8, by as u8))
+        })
+}
+
+pub fn here(
+    world: &World,
+    state: &WorldState,
+    allowed: &Allowances,
+    difficulty: Difficulty,
+) -> Step {
     let (x, y) = (state.at[0], state.at[1]);
     let mut out = Step {
         moved: false,
@@ -1871,6 +2104,11 @@ pub fn here(world: &World, state: &WorldState, allowed: &Allowances) -> Step {
         refused_by: None,
         encounter: None,
     };
+    if let Some((bx, by)) = gate_beside(world, state, x, y, allowed) {
+        let said = refused_at(world, state, bx, by, allowed, difficulty);
+        out.blocked = said.blocked;
+        out.refused_by = said.refused_by;
+    }
     if let Some(p) = world.place_now(state, x, y, allowed) {
         if p.kind == PlaceKind::Gate {
             out.gate = Some(p.id.clone());
@@ -2131,69 +2369,7 @@ pub fn step(
     // handful of bools the caller filled in; a `World` that took a character
     // to answer this would be a map that knew about bags.
     if !world.walkable(nx, ny, allowed) {
-        // **A place standing on that tile knows more about it than the
-        // ground does.** Two gates in this game are on terrain nobody can
-        // walk on — the way under the lake, on water until a tower falls or a
-        // toad's frame goes on, and the tide crossing, on tide until the tenth
-        // cairn goes up two maps away — and until this was written both of
-        // them answered with the sentence a cliff answers with. Reported from
-        // play, standing at the shore: *"the land is pink and it says no way
-        // through"*, which is the game refusing and declining to say by what.
-        //
-        // The sentence is the map file's, like every other `shut`: **the
-        // world's register, in the world's words.** What is the engine's is
-        // only that it is a *place's* refusal rather than the ground's, which
-        // is what puts it on the strip instead of in the one-second flash at
-        // the bottom of the canvas.
-        //
-        // `place_now` and not `place_at`, so a hidden place stays hidden: a
-        // refusal that named a door nobody has found would be a secret with a
-        // signpost on it.
-        if let Some(p) = world.place_now(state, nx, ny, allowed) {
-            if !p.shut.is_empty() {
-                // **And where the ground is opened, if something opens it.**
-                // Reported from play twice: the first time the shore said what
-                // a cliff says, and the second time — with the sentence in —
-                // *"i've defeated marbulon and still cant access it"*. Naming
-                // the tenth notch is not naming where the tenth cairn is cut,
-                // and it is cut **two maps away** on the Wextreen Reach.
-                //
-                // This is `Requirement::wants` for ground rather than for a
-                // choice, and it is the same argument M12.6 made: with only
-                // the flavour a refusal is a wall, and the statement is what
-                // makes it a target. Looked up rather than listed, so a chain
-                // that is re-authored cannot leave it pointing at the wrong
-                // place, and appended rather than replacing the prose, because
-                // the world's sentence is the world's.
-                let mut said = p.shut.clone();
-                let here = world.terrain_name(nx, ny);
-                if let Some(d) = world
-                    .drains
-                    .iter()
-                    .find(|d| d.from == here && !marks_have(state, &d.when))
-                {
-                    if let Some((event, title)) =
-                        crate::tile_event::where_a_flag_is_raised(&crate::data::events(), &d.when)
-                    {
-                        match gate_toward(world, &event, difficulty) {
-                            Some(gate) => {
-                                said.push_str(&format!(" It is {title} that opens it, through {gate}."))
-                            }
-                            None => said.push_str(&format!(" It is {title} that opens it.")),
-                        }
-                    }
-                }
-                let mut out = Step::nowhere(&said);
-                out.refused_by = Some(p.id.clone());
-                return out;
-            }
-        }
-        return Step::nowhere(match world.terrain_name(nx, ny) {
-            // Still the frame's fault, and a toad's frame is the answer to it.
-            "water" => "you would have to swim, and you are wearing a frame",
-            "rock" => "rock, and no way up it",
-            _ => "there is no way through",
-        });
+        return refused_at(world, state, nx, ny, allowed, difficulty);
     }
 
     // **The crossing, before the step rather than after it.** Everything else a
@@ -2224,7 +2400,28 @@ pub fn step(
     // placement and the same argument as the order book's: a clock that is not
     // next to that line is a clock that will one day miss a step invisibly.
     tick_caravan(world, state, rng);
+    arrive_at(world, state, rng, difficulty, (nx, ny), allowed)
+}
 
+/// What is here, now that you are standing on it.
+///
+/// **Extracted from [`step`] rather than written twice**, which is
+/// `PLAN-M17.md` §2.3 stated as code: *a landing is `Step`'s own resolution
+/// called at rest — do not write a second one.* A shot that comes to rest on a
+/// town enters the town, on a gate opens the gate, on ground rolls; and every
+/// one of those is this function, which the step above it now calls too.
+///
+/// **It does not move you and it does not count a tile.** The caller has
+/// already arrived — by a step, or by a flight — and `tiles-walked` is a thing
+/// a *step* bumps.
+pub fn arrive_at(
+    world: &World,
+    state: &mut WorldState,
+    rng: &mut Rng,
+    difficulty: Difficulty,
+    (nx, ny): (u8, u8),
+    allowed: &Allowances,
+) -> Step {
     let mut out = Step {
         moved: true,
         blocked: None,
@@ -2243,6 +2440,19 @@ pub fn step(
     // **Not there is not there.** A hidden place is not walked onto, not
     // reported and not drawn, so a door in a wall is a wall until the thing
     // that opens it has happened.
+    // **What a gate beside you is offering is its refusal.** Set before the
+    // match below and not instead of it: the crossing's only landable
+    // neighbour is the tile the tideline's own card is on, so a rule that
+    // returned early made the way south unreachable on a table. You land on
+    // the tideline, read it, and the crossing tells you what is over the bar.
+    // Landing *on* a gate — which is what happens once the ground opens —
+    // overwrites this, and is the only ordering that cannot surprise anybody.
+    if let Some((bx, by)) = gate_beside(world, state, nx, ny, allowed) {
+        let said = refused_at(world, state, bx, by, allowed, difficulty);
+        out.blocked = said.blocked;
+        out.refused_by = said.refused_by;
+    }
+
     if let Some(p) = world.place_now(state, nx, ny, allowed) {
         match p.kind {
             PlaceKind::Town => {
@@ -2319,10 +2529,31 @@ pub fn step(
             // above, before the step was taken. Falls through to the encounter
             // roll like any ordinary ground.
             PlaceKind::Crossing => {}
+            // **The five obstacles are the ball's and not the foot's.** On a
+            // step map there is no ball, and they are drawn on shot maps only —
+            // so a foot on one of them is ground, which is what `Spike` and
+            // `Sand` already are to a ball that stops on them and what the
+            // other three are to nobody. A `Step` that reported them would be a
+            // second answer to *what is here*, and `Game::shoot` is the one
+            // that has the flight to answer it with.
+            PlaceKind::Bumper
+            | PlaceKind::Spike
+            | PlaceKind::Pocket
+            | PlaceKind::Chute
+            | PlaceKind::Sand => {}
         }
     }
 
-    let chance = world.encounter_per_mille(nx, ny);
+    // **A landing rolls harder than a step.** `PLAN-M17.md` §2.3: a landing is
+    // a longer stay than a step, and a shot map has far fewer landings than a
+    // walk has steps — so the ground gets the same number of chances at you
+    // either way. The multiplier is on the *tile's own* rate, so the figure the
+    // strip prints is the figure the roll uses.
+    let chance = if world.traversal == Traversal::Shot {
+        world.encounter_per_mille(nx, ny) * crate::shot::LANDING_MULT / 100
+    } else {
+        world.encounter_per_mille(nx, ny)
+    };
     if chance > 0 && (rng.below(1000) as i32) < chance {
         out.encounter = world.draw_enemy(nx, ny, difficulty, rng);
         if out.encounter.is_some() {

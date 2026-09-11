@@ -64,6 +64,16 @@ events that pay something and say what they pay — added on the human's ask.
 `PLAN-M9.md`, `PLAN-M10.md` and `PLAN-M11.md` are done; `PLAN.md` §6d is what
 M11 left open, §6c is M10.3's, §6b is M9.4's and §6a is M8.8's.
 
+**M19 is five things reported from play, and three of them were bugs.** The ball
+slides (a flight is twenty ticks and the page advanced eight a frame, so a shot
+was over in fifty milliseconds); a diamond catches the ball, so hitting a gate
+is entering it; five obstacles were wearing the event's mark; the long cart runs
+between towns you have stood in; and **the Kettle-Stoker did nothing at all** —
+it dealt 746 against a classless character's 746, because empowerment scales
+magic hits and the board was swinging a blade. There is a **glossary** on `G`
+now, with every number in it read from the constant that decides it. See *The
+furnace reached nothing* and *Everything you need to play, in one place*.
+
 **M17 is done and live**, deployed at `fac56a16` and verified the way this file
 has demanded since M8: `GM2D_ORIGIN=… drive.py` walked **all eighty-five checks
 against the deployed page**, and the pair agrees. **The overworld is a table.** The Treyway and the Undercountry
@@ -760,6 +770,55 @@ player over a bar still under nine feet of water.
   is whether any shot *hits* it: a bumper is a tile no ball can ever rest on,
   and that is what a bumper is.
 - **Found by the browser gate in three engines**, which is the argument for it.
+
+### A diamond catches the ball, and the two rules are for two cases
+
+Reported from play: *"if you just simply hit the diamonds to enter a zone, you
+should enter it, it shouldnt have to perfectly land on it"* — and a cue that
+demands a tile exactly demands a hole in one. `PlaceKind::catches` is **gates
+and bosses**, the two things the map draws as a diamond and the two that are a
+way *into* somewhere; they end the flight where they are hit.
+
+- **Not towns and not events.** The Undercountry's town stands in the middle of
+  its one fast lane, and a town that caught every shot down that road would be
+  a road nobody can use. A signpost you can roll past is a signpost, and a cart
+  that snatched the ball out of the air would be a toll booth.
+- **Not the tile you shot from**, or a ball leaving a gate it was just refused
+  at is put straight back — a soft-lock made of one rule.
+- **A diamond on ground the ball cannot enter is answered by the beside-rule
+  instead**, which hands back its refusal. The tide crossing is on `tide` until
+  the tenth cairn goes up two maps away; nothing can land on it or fly into it.
+  The test asserts both by asking `walkable` rather than listing the exception.
+- From the Treyway's start the road west goes from **55 exact landings to 66
+  shots caught**.
+
+### Five obstacles were drawn as events
+
+Reported as a question, which is the tell: *"there are a bunch more event
+diamonds, are they actual events or are they obstacles?"* Only gates and bosses
+had a draw arm, so all nine obstacles fell through to the generic small diamond
+— five physical behaviours wearing one mark. `look.rs`'s rule is that **a mark
+is a shape nothing else draws**, and it had been kept for everything on the map
+except the things the ball actually hits.
+
+A boulder is a filled disc with a ring, the one round *solid* thing here. A
+pocket is the same circle inverted — dark, empty, lit rim — because one throws
+the ball away and the other keeps it. Spikes are teeth on a groundline, open at
+the top, because you go *through* them. Sand is low banked lines with stipple.
+A chute is two rails and an arrowhead, the only mark on any map that points.
+
+### You can watch the ball slide
+
+A flight is 4 to 47 physics ticks and a median one is **twenty** — and the page
+advanced *eight a frame*, so the ball was drawn about three times and the whole
+shot was over in fifty milliseconds, with the full path painted before it had
+travelled any of it. Reported as *"you should be able to watch the ball slide"*,
+which is exactly what it was not doing.
+
+The clock drives it now rather than the frame counter, and the ball is drawn
+**between** ticks, which is what makes it slide rather than hop. `TICK_MS` is 55
+so a median shot is about a second. The trail grows behind it and stays drawn
+after it lands.
 
 ### A tile one step away is a tile you cannot shoot to
 
@@ -2169,6 +2228,72 @@ names since M1 and the page rendered none of them.
 - One `oneCard` in `app.js` renders an item for the packing panel, the
   creature's panel and both sides of the replay. Four places, one answer to "is
   cork a standing stat".
+
+## The furnace reached nothing, and nothing drew it either
+
+Reported from play: *"for the kettle stoker, mana empowerment does not show on
+the bar in battle, and seemingly does nothing for my attacks."* Both halves
+were true and the second is the worse one.
+
+**`magic_empower` is `stacks × 5 × mana`, and it scales a *magic* hit and
+nothing else.** Empowerment is upstream's caster mechanic. So every stack the
+Kettle-Stoker's furnace bought on a board holding a blade was a number that
+could never be read — measured against `common::geared_from`, a Stoker dealt
+**746** and a classless character dealt **746**, over one burn. Not close;
+identical.
+
+- **`Combatant::burn_stacks` is counted apart and pays both lanes.** That is a
+  change to what a *Stoker* gets rather than to what empowerment means: nothing
+  but `stoke` ever writes it, so a Chronomancer's stacks are still the
+  caster's. The class is GM2D's own and nothing obliged it to inherit a
+  restriction its promise does not mention. The same fight now ends in 4,200ms
+  against 5,000.
+- **A first draft also had the furnace bank the mana it shovelled**, which made
+  the class work and quietly took **Fired Funnel's whole promise** — *every
+  stack the furnace buys is also mana* is not a promise if the furnace already
+  does it. `every_point_in_an_expert_tree_buys_something` said so on the next
+  run and named the node. *An expert's power is its own*, and the lint is the
+  thing that keeps saying so.
+- **`every_offered_class_reaches_something` passed it**, because its fixture
+  casts. *A fixture that can hold every branch of a mutually exclusive choice
+  is measuring a game nobody plays* — this is that sentence about a **lane**.
+  `the_furnace_reaches_a_board_that_swings` asks the shopped board instead.
+- **And `Event::Burned` was in `fight_json`'s `_ => ("other")` arm**, exactly
+  where `Cursed`, `Warded` and `Stunned` were before M8.2, so a class whose
+  whole identity is a number had no screen that printed it. It is on the pool
+  row now — beside the pools rather than as a chip, because a chip is a thing
+  that is *on* you with a clock running and empowerment is a thing you *have*.
+  **Sixth time** *a derived number needs somewhere it is shown* has been the
+  answer here.
+
+## Everything you need to play, in one place
+
+`crates/core/src/glossary.rs`, on **G** or a button. Five shelves in the order
+the game teaches itself: getting about, the board, the fight, what you can
+become, what you carry.
+
+Reported from play, and the example given is the argument: *"a game glossary
+that explains everything you need to play the game, with stuff like what mana
+empowerment does"*. Nothing had ever said what empowerment does, so a player
+watching the stacks climb could not tell a mechanic they did not understand
+from one that was broken. It was broken.
+
+- **Derived, never typed.** Every number is read from the constant that decides
+  it, every class describes itself with `ClassPower::describe`, and the pools
+  come off `Combatant::pool_pays` through `Stats::parts` — the same function
+  the standing panel draws. A glossary with its figures written out by hand is
+  a second rulebook with a slower feedback loop than the first.
+- **A first draft listed the pool fields by hand and dropped rage**, which is
+  the pool every player meets first. Two answers to *what does a pool pay* is
+  exactly the shape this file keeps recording.
+- **`the_numbers_are_read_and_not_typed` took three goes to stop being
+  vacuous**, and only breaking it found the first two. `contains("4")` passes
+  with the fatigue figure hardcoded to *nine*, because the cart's forty-Fnorp
+  fare has a 4 in it. Whole-number matching over the whole glossary passes too,
+  because a class promise says *every 4 seconds*. **A figure has to be checked
+  in the entry that says it.**
+- **Unthemed, TONE 13a**, except a class's *name*, which is the world's word
+  and goes through the theme — the same split the standing panel makes.
 
 ## The speed of a fight, and a log you can read
 
@@ -3750,6 +3875,29 @@ whole, the greaves take you to your last town for the price of one restorative.
 - **A refusal spends nothing.** Pinned in a test, because the first thing a
   player does with a refused button is press it again.
 
+## The long cart, and why it does not undercut the Stride
+
+Reported from play: *"there should be a way to teleport between towns."* From a
+town, the cart runs to any town you have stood in, for `game::CART_FARE` — 40
+Fnorp, two cheap tins.
+
+- **It runs counter to counter, which is the whole reason a second kind of
+  travel is allowed to exist.** The Drover's Stride's job is getting you *out
+  of the wilderness*: it works from anywhere and costs a tin. You have to
+  already be somewhere safe to board the cart, so it can never be the thing
+  that saves a run. What it sells is the walk between counters, which is
+  bookkeeping rather than a decision. `every_ride_begins_and_ends_at_a_counter`
+  is that stated as a property.
+- **Where you have been is a counter**, `stood:<town>`, bumped in
+  `arrive_in_town` — the `beat:` and `met:` pattern a third time. Counters
+  already round-trip, so remembering every town a run has stood in costs **no
+  save seam at all**, and `cart_stops` works the list out fresh.
+- **It charges, because free fast travel is the one thing that would flatten a
+  map.** And *a refusal spends nothing*, pinned the same way the reroll and the
+  bank pin it.
+- **Not the counter you are leaning on.** A timetable offering the town you are
+  standing in would be a fare for nothing.
+
 ## Fatigue is what a fight actually spends
 
 Health resets at every bell, which is why a rest had nothing to restore.
@@ -3966,6 +4114,38 @@ and nothing was checking that one.**
   triangle because the mitre sat straight on the robe, `ash` was a stack of
   circles. A figure that compiles is not a figure that works — rasterise the
   set and put your eyes on it.
+
+## Twenty-one expert papers, from one drawing
+
+Reported from play: *"there should be a sprite for all classes and all expert
+classes"* — and there were seven against **twenty-eight** things a character can
+end up being. So the panel drew a base class's portrait for somebody who had
+become an expert, and the second fork named what each pairing reaches and showed
+nothing of it.
+
+**An expert is literally a pair, so the drawing is a pair.** `art/expert.tex` is
+a stamped paper with two wax seals at the foot of it, one the colour of each
+parent class, compiled twenty-one times off `art/experts.json` — the
+thirteen-creature-families argument applied to a thing that is a pair by
+construction. Nothing about the sheet changes between them.
+
+- **One colour a class, chosen apart** rather than taken from each figure's
+  darkest ink: two muddy seals side by side are two blobs. Twenty-one pairs from
+  seven colours are all distinguishable by construction.
+- **The stamp is the office's own ink and neither parent's.** A stamp wearing
+  one parent's colour would say the paper belongs to that half of it.
+- **The map is written from the manifest**, so the file and the names cannot
+  drift — `art-manifest.py` owns the expert half of `art.json["classes"]` and
+  the seven hand-drawn ones survive.
+- **`every_class_the_game_offers_has_a_figure`** is the lint, and it is *offered
+  classes and experts only*: `class::CLASSES` is the inherited roster and
+  carries names GM2D offers from nowhere, so drawing a portrait for a class no
+  player can take is art shipped for nobody — the creature half of that file's
+  failure, upside down.
+- **The panel draws the deepest class you have become.** `classes` is what you
+  *are*, in the order they were paid for, so the last of them is the one a
+  portrait should be of. Reading `class` drew the level-five figure for somebody
+  who had finished two trees and taken the paper.
 
 ## The art was drawn and shown nowhere
 
@@ -5077,7 +5257,8 @@ Every figure below was re-measured for M12.6 rather than carried forward.
 | **M16.4 + M16.5: two classes GM2D wrote, and the twenty-one pairs they make** | **950 passing** |
 | M16.6: six browser checks, a walk that loops, and the block written down | 950 passing |
 | M17.0: a table nobody can see yet, and a cue you could not have aimed | 960 passing |
-| **M17.1–M17.5 + M18: the overworld is a table, and the notebooks executed** | **976 passing** |
+| M17.1–M17.5 + M18: the overworld is a table, and the notebooks executed | 976 passing |
+| **M19: a ball you can watch, a diamond you can hit, and a glossary** | **1,137 passing** |
 
 **M13.5 adds none and M13.7 and M13.8 add none, and all three are honest.**
 M13.5 lands ten trees into a data file and the three lints it needed were
@@ -5109,7 +5290,7 @@ content*, and one check now measures what a range used to guess at.
 | Maps | **25**, in `data/maps/*.tiles.json` — west-bambulon 20×20, the-great-gear-cave 9×5, the-treyway 16×16, kettleworks-field 20×20, five Drambus Stack floors 10×10, under-the-lake 13×9, the-reach 20×20, **the-low-water 16×11, four Wextreen Sump floors 12×12, four Silt Stair floors 12×12, the-undercountry 20×20** |
 | Places | **196 over twenty-five maps**: 3 towns, 107 events, 43 gates, 16 bosses, 8 caravan stops, 2 crossings, 1 bench, 1 door, and **15 obstacles** — 4 bumpers, 5 drifts of sand, 3 spikes, 2 pockets and a chute, which are M17's and are the first places in the game that a *foot* never touches. 41 of the events are the Kettleworks field alone, and the one door is the last screen in the game, on the Undercountry |
 | Events | **80 placed: 64 ask something and 16 are notes, over 102 choices.** **21 chains from 10 roots**, every root choice handing over an errand. **One of the eighty repeats** — the chair at the bottom of the Silt Stair, which is three moves at one object and the only event in the game that is not spent when it is answered |
-| `PlaceKind` | **13**: town, event, gate, boss, door, crossing, bench, caravan, **bumper, spike, pocket, chute, sand**. The five new ones are M17's and `is_obstacle()` is what separates them: an obstacle is hit **in flight**, which is the one thing a step has nowhere to happen. The Stack is still `PlaceDef::floors` on a gate rather than a kind |
+| `PlaceKind` | **13**: town, event, gate, boss, door, crossing, bench, caravan, **bumper, spike, pocket, chute, sand**. The five new ones are M17's and `is_obstacle()` is what separates them: an obstacle is hit **in flight**, which is the one thing a step has nowhere to happen. `catches()` is the other question, and it is a different five: a gate or a boss **stops the ball**, so hitting a diamond is entering it. Each of the thirteen has its own mark on the map, which for a milestone the five obstacles did not — they wore the event's. The Stack is still `PlaceDef::floors` on a gate rather than a kind |
 | Effect kinds | **7**: stat, start_with, grow_slot_rows, assembly_pct, grants, gives_ench, **tunes** — the seventh is M13.2's, and the knob it names is checked at parse time against the tree's own class |
 | Ench effect kinds | 4: power, haste, spin, fragile — **unchanged** |
 | `Rule` kinds | **16**: curse_on_activate, spin_extra, spin_keep, spin_every, scout, rout, wade, survey, homeward, **spread**, **row_harvest**, **beacon**, **productivity**, **burn_keeps_bonus**, **burn_carries**, **mind_pierce**. The last three are M16's and each is granted by more than one expert tree; the four before them are M13.3's and are the first since M9 that needed code in the fight rather than a translation at the bell |
@@ -5137,12 +5318,13 @@ content*, and one check now measures what a range used to guess at.
 | What a creature resists | **Shown, since the bestiary.** `physical_resist`, `magic_resist`, `mind_resist`, `curse_resist`, both pierces, both hardenings and `reflect` have been on `Stats` since the fork and **nothing had ever printed one** — reported as *"currently you cannot see enemies stats / resists"*. Zeroes are dropped rather than printed: on a defence, nought is the ordinary case rather than a claim. Sixth time *a derived number needs somewhere it is shown* has been the answer here |
 | Instant Battle | **Beat something five times and you may stop watching it.** `fight::instant` is `run` then `settle` with nothing drawn — no new settlement code, because a second answer to what a win pays is the mistake this project has paid for six times. It pays the speed bonus, rolls the drops, ticks the order book and costs the four percent, all of which `fight::rout` deliberately does none of. The tally is one `bump` in `pay_a_win` and the mark is one `#[serde(default)]` field on `WorldState`, so **no seam**. **The boss refusal is the tile's and not the name's**: eight of the nine creatures on a boss tile also stand in a region pool |
 | Skill trees | **29 trees, 208 nodes.** The base's 22, seven classes' 8 / 8 / 10 / 8 / 8 / 9 / 9, and **twenty-one expert trees of six each**. (Was: **16 trees, 124 nodes.**) The base's **22 over nine tiers**, the five classes' 8 / 8 / 10 / 8 / 8, and **ten expert trees of six each** — two roots, three, and a capstone, every node of which must reach that expert's own power. **11 of the base's grow a row** — M12.3's seven, plus a five-tier spine at 3/4/5/6/7 points that walks every frame to the original **six by eight**. Twenty-eight points for that ladder alone, against a `MAX_LEVEL` of **60** since M15.3 — it was 32, and a table that stops at 32 stops nine levels before the curve changes shape. An expert node costs **2** |
+| Class figures | **28 — seven hand-drawn and twenty-one colourways of one drawing.** An expert is a pair, so its figure is the paper Spike hands over with one wax seal per parent class. `every_class_the_game_offers_has_a_figure` is the lint, over the offered seven and the twenty-one and nothing else |
 | Classes offered | **7 on the fork, 28 in the game.** The Kettle-Stoker and the Whisperling are M16's and are **the first two classes GM2D wrote rather than inherited**; the twenty-one experts are `C(7,2)`, one a pair, and none is on any list a player picks from. **Every one of the twenty-eight reaches something and so does every one of the 126 expert nodes**, and both are lints that *call* rather than declare. (Was: **5 on the fork, 15 in the game.**) The ten experts are `C(5,2)`, one a pair, and none is on any list a player picks from — you finish two trees and the pair decides. **Every one of the fifteen reaches something and so does every one of the sixty expert nodes**, and both are lints that *call* rather than declare |
 | Experts | **21**, carrying **64 knobs**. Eleven are M16's and they grant three new rules between them — `burn_keeps_bonus`, `burn_carries`, `mind_pierce` — each granted by more than one tree, which is the shape `Spread` and `Beacon` already have. Six of them are about a furnace, and every one of the six carries its own: *an expert's power is self-contained*. (Was: **10**, carrying **31 knobs**.) Six are read at the tick, two settle in the purse, one is the board's, one crosses a fight boundary. A character holds **up to three classes** and all three are live |
 | The papers | **3** on Spike's van, all drawn from the first visit: the Patent's licence at 5,000, **the Second Paper at 5,000 behind nothing at all**, and the expert paper at **nothing** behind two finished trees — the twenty-four points are the price, which is what keeps a free paper from being a fourth class on the fork. M15.4 took the tree gate off the second paper on the human's ask; the level that puts the van on the road is what is left |
 | Figures | 27 `.tex` → **83 SVGs** (13 family drawings, 4 drawn for themselves, 5 classes, 3 towns, you) |
 | Art coverage | **60 of 60 creatures**, 3 of 3 towns, 5 of 5 classes, and you. The set pieces, the instruments and the enchs have no art and want none — a component has never had a figure |
-| Browser gate | **85 `ok:` lines in one engine**, seven of them M17's and every one negative-tested — the cue snaps to what core takes and pulling further pulls harder, a shot flies the path core returned, four keys aim and space fires with no pointer, a spike takes its percent and says so, a ball in the pocket wakes up in town, a floor still steps and draws no cue, and reduced motion is at rest with the trail still drawn. **The hardest of the seven to break is the floor one**: every lie about *the arrows mean two things now* takes the whole gate down before the check runs. Before it: **78 `ok:` lines**, six of them M16's and every one negative-tested — the way under is silt until the sheet, a stake offers the pull and a compass that lies, a sinkhole drops you in an alcove nothing walks into, the Tenth Surveyor's panel draws the run's own items, the fork is seven cards in two rows, and a Stoker's replay says what the furnace took. Before it: **96 `ok:` lines over 3 engines** — which is 67 in any one of them, not 81; the count is a total and reading it as per-engine is wrong by fourteen. The newest is M15.2's, and it is the only one that can answer a *negative*: that a fight you have already had is settled and **never drawn**. The newest five are M14.5's: the tide is drawn before it goes out and walkable after, the lip of the Sump refuses in the Reach's words and opens the frame, a wheel that keeps what you feed it says what shape it wants, the chair is three moves in an order **and comes back**, and the third town is empty with the screen after it saying so. **All five were negative-tested, and two of the five found faults on a green build** — see *A stack gate that wants an instrument* |
+| Browser gate | **90 `ok:` lines in one engine**, five of them M19's — the ball slides and the trail grows behind it, a diamond catches, the long cart runs between towns, the furnace shows on the bar, and the glossary opens on G. One of the five *passed while printing the wrong thing* (**9 burns off None**, reading `what` where an event's subject rides in `item`), which is the argument for a check that prints what it found. Before it: **85 `ok:` lines**, seven of them M17's and every one negative-tested — the cue snaps to what core takes and pulling further pulls harder, a shot flies the path core returned, four keys aim and space fires with no pointer, a spike takes its percent and says so, a ball in the pocket wakes up in town, a floor still steps and draws no cue, and reduced motion is at rest with the trail still drawn. **The hardest of the seven to break is the floor one**: every lie about *the arrows mean two things now* takes the whole gate down before the check runs. Before it: **78 `ok:` lines**, six of them M16's and every one negative-tested — the way under is silt until the sheet, a stake offers the pull and a compass that lies, a sinkhole drops you in an alcove nothing walks into, the Tenth Surveyor's panel draws the run's own items, the fork is seven cards in two rows, and a Stoker's replay says what the furnace took. Before it: **96 `ok:` lines over 3 engines** — which is 67 in any one of them, not 81; the count is a total and reading it as per-engine is wrong by fourteen. The newest is M15.2's, and it is the only one that can answer a *negative*: that a fight you have already had is settled and **never drawn**. The newest five are M14.5's: the tide is drawn before it goes out and walkable after, the lip of the Sump refuses in the Reach's words and opens the frame, a wheel that keeps what you feed it says what shape it wants, the chair is three moves in an order **and comes back**, and the third town is empty with the screen after it saying so. **All five were negative-tested, and two of the five found faults on a green build** — see *A stack gate that wants an instrument* |
 | The suite | **976 passing** after M18, and a `data/` touch costs about **three minutes**, not ten: **127 seconds relinking 83 test binaries and 47 running**, measured on an idle machine. The ten is a cold `--workspace`, which adds the lab and the shim on top of both. **Measure on a quiet machine or not at all** — one attempt at this read `real 1279.89` against `user 63.37`, which is twenty-one minutes of wall clock for a minute of work, because it was queued behind three browser gates. `include_str!` is not the thing to change — loading from disk in the test profile would make the tested path differ from the shipped one, which is two rulebooks — and the fix, if one is ever wanted, is **fewer test binaries**, which is a trade against one file per concern that nobody should make to save two minutes. `SECOND-ORDER-M16.md` row 17 is where that is measured. Before it: **950 passing** after M16. Before it: **913 passing, and ~33 seconds warm** after M15, the bestiary, the cart and the sands; **832 and 27.5s** after M14 — measured after M14, and the ten slowest files are the ten that were slow at M13: `drops.rs` at 11.0s and `experts_reach.rs` at 6.3s, neither of them M14's, and nothing this block added is above 0.4s. **`SECOND-ORDER-M14.md` row 17 was written claiming it had slowed to minutes and is corrected there**: what is minutes is rebuilding sixty test binaries after a change to `combat.rs`, which is a fact about editing the engine. Before M14 it was **788 passing, and 34 seconds warm.** It was a minute through most of M13 and `rules_m13.rs` was 29.6s of it: `beacon_board` ran Auto-pack over the whole catalogue on twenty-row grids, four times, because it was the only fixture in the repository with two items that touch. `common::items_in_a_row` is what replaced it — **0.03s** — and `experts_reach.rs` went 9.6s → 6.5s by measuring once per *set* of nodes rather than once per question. `drops.rs` at 11.3s is now the slowest file and is untouched. `[profile.test] opt-level = 2` since M12.6, with debug assertions and overflow checks still on — this is the `test` profile, not `--release` |
 | Floors with a puzzle | **6**, and floors with a boss **2**. Every one is monotone — flags only grow, so no move can make the way on unreachable — and `puzzle::solvable_blind` counts the worst case rather than the plan asserting it |
 | Blind-solution ceilings | Sump **8 / 1 / 45**, Stair **1 / 3 / 3**. The plan guessed 10 / 11 / 45 and 2 / 27 / 3; **the Cairnfield's forty-five came back exactly**, which is the reason to believe the other five. `every_floor_in_the_game_can_be_solved_blind` holds every floor there is under 45 |

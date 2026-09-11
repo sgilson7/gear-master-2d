@@ -28,3 +28,17 @@
 | **M18.7** | The two the builder may not decide | rarity's thresholds (row 14) and what a rating describes (row 24), written up as the human's | ✓ |
 | **M18.8** | The gate's webkit find | a drag clamped off-viewport; `pull_to` measures both ends. 85 checks green in all three engines | `94efff9` · 976 |
 | — | **Live** | `fac56a16`, deployed from `34f2dcd`; `GM2D_ORIGIN` walked all 85 against the deployed page | ✓ |
+
+## M19 — five things reported from play
+
+| # | Milestone | Deliverables | Ships |
+|---|---|---|---|
+| **M19.0** | The ball slides | clock-driven and interpolated between ticks; the trail grows behind it | `27d0542` · 1137 |
+| **M19.1** | A diamond catches the ball | `PlaceKind::catches`, `Contact::Caught`; hitting a gate is entering it | `27d0542` · 1137 |
+| **M19.2** | Five obstacles, five marks | a boulder, a hole, teeth, a drift and a lane — nine places had worn the event mark | `27d0542` · 1137 |
+| **M19.3** | The long cart | a ride between towns you have stood in, 40 Fnorp, from the town screen | `27d0542` · 1137 |
+| **M19.4** | The furnace reaches a board that swings | the Stoker dealt 746 against a classless 746; its stacks pay both lanes now | `27d0542` · 1137 |
+| **M19.5** | The furnace on the bar | `Event::Burned` was in the replay's `_` arm and nothing drew it | `27d0542` · 1137 |
+| **M19.6** | The glossary | five shelves on **G**, every number read from the constant that decides it | `27d0542` · 1137 |
+| **M19.7** | Twenty-one expert papers | one drawing, twenty-one colourways — an expert is a pair, so the figure is | `27d0542` · 1137 |
+| **M19.8** | Two browser checks | the furnace on the bar, and the glossary. 90 green | `f2196a0` · 1137 |

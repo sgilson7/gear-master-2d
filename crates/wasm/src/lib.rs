@@ -743,8 +743,21 @@ pub fn glossary_json() -> String {
                             // word for it is what goes on the chip.
                             "term": term,
                             "body": e.body,
-                            "aside": e.aside.iter().map(|a| theme.retell(a))
-                                .collect::<Vec<_>>(),
+                            // **And the two classes an expert names.**
+                            // `retell` swaps whole words and does not cover
+                            // the class table, so an aside reading *what
+                            // Berserker and Stoker reach together* sat under
+                            // an entry titled *Gorillathon* — a glossary you
+                            // cannot follow from one entry to the next.
+                            "aside": e.aside.iter().map(|a| {
+                                let said = theme.retell(a);
+                                match e.pair {
+                                    Some((x, y)) => said
+                                        .replace(x, theme.class(x))
+                                        .replace(y, theme.class(y)),
+                                    None => said,
+                                }
+                            }).collect::<Vec<_>>(),
                         })
                     })
                     .collect();

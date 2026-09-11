@@ -33,6 +33,16 @@ pub struct Entry {
     pub body: Vec<String>,
     /// Where you get it, or what it wants. Empty for most.
     pub aside: Vec<String>,
+    /// The two parents, when this entry is an expert.
+    ///
+    /// **Canonical, and the shim puts the player's word in.** The aside says
+    /// *what X and Y reach together* and X and Y are classes, so they have to
+    /// arrive in the theme's words — a glossary whose class entry is titled
+    /// *Gorillathon* and whose asides call it *Berserker* is a glossary you
+    /// cannot follow from one entry to another. `Theme::retell` swaps whole
+    /// words and does not cover the class table, so the pair travels beside
+    /// the sentence rather than being dug back out of it.
+    pub pair: Option<(&'static str, &'static str)>,
     /// The canonical name, when this entry *is* a class.
     ///
     /// **The theme's table is keyed on `&'static str`** and an entry's term is
@@ -50,7 +60,13 @@ impl Entry {
             body: body.iter().map(|s| s.to_string()).collect(),
             aside: Vec::new(),
             key: None,
+            pair: None,
         }
+    }
+
+    fn of_pair(mut self, pair: (&'static str, &'static str)) -> Entry {
+        self.pair = Some(pair);
+        self
     }
 
     fn of_class(mut self, canonical: &'static str) -> Entry {
@@ -281,7 +297,13 @@ fn the_fight() -> Vec<Entry> {
         "Mana and insight pay nothing for sitting on a pile. They are spent."
             .to_string(),
     );
-    out.push(Entry { term: "Pools".to_string(), body: lines, aside: Vec::new(), key: None });
+    out.push(Entry {
+        term: "Pools".to_string(),
+        body: lines,
+        aside: Vec::new(),
+        key: None,
+        pair: None,
+    });
 
     out.extend([
         Entry::new("Mana empowerment", &[
@@ -387,7 +409,10 @@ fn classes() -> Vec<Entry> {
     }
     for e in crate::expert::EXPERTS {
         out.push(
-            Entry::new(e.name, &[&e.power.describe()]).of_class(e.name).with_aside(&[format!(
+            Entry::new(e.name, &[&e.power.describe()])
+                .of_class(e.name)
+                .of_pair(e.pair)
+                .with_aside(&[format!(
                 "What {} and {} reach together.",
                 e.pair.0, e.pair.1
             )]),

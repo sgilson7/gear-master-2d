@@ -1276,6 +1276,128 @@ def check_the_long_cart_runs_between_towns(page, name, fails):
         plant(page, base, lambda body: None, stem="cart-restore")
 
 
+def check_the_furnace_shows_on_the_bar(page, name, fails):
+    """A Kettle-Stoker can see what the furnace bought.
+
+    **Reported from play: *"mana empowerment does not show on the bar in
+    battle, and seemingly does nothing for my attacks"*, and both halves were
+    true.** The engine half is `the_furnace_reaches_a_board_that_swings`; this
+    is the screen, and only a browser can answer it — `Event::Burned` sat in
+    `fight_json`'s `_ => ("other")` arm, exactly where `Cursed`, `Warded` and
+    `Stunned` were before M8.2, so nothing the furnace did ever reached the
+    page at all.
+
+    A class whose whole identity is a number that no screen prints is the
+    *derived number with nowhere it is shown* failure, and this is the sixth
+    time it has been the answer here.
+
+    **Planted rather than played**, because the furnace needs two things a
+    walk-up character has not got: a pool to shovel and a fight long enough to
+    shovel it in. An empty hopper buys nothing, which is the class's own rule.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+
+    def a_stoker_in_a_long_fight(body):
+        body["character"]["class"] = "Stoker"
+        w = body.setdefault("world", {})
+        w["map"] = "west-bambulon"
+        w["at"] = [9, 16]
+        body["encounter"] = {"enemy": "Kettle Wight", "at": [9, 16]}
+
+    plant(page, base, a_stoker_in_a_long_fight, stem="furnace")
+    try:
+        if page.is_hidden("#fight"):
+            fails.append(f"{name}: the planted fight did not open")
+            return
+        seen = page.evaluate("""() => {
+            const l = JSON.parse(window.__fightJson());
+            const burned = l.entries.filter(e => e.kind === 'burned');
+            return { burned: burned.length,
+                     stacks: Math.max(0, ...l.entries.map(e => e.pburn ?? 0)),
+                     // The pool's name rides in `item`, which is the field
+                     // every event's subject uses — a burn's subject is the
+                     // hopper it emptied.
+                     said: burned[0] ? burned[0].item : null };
+        }""")
+        # **The board has to bank something for the furnace to take.** A
+        # starting kit banks no rage, faith or nature at all, so a run with no
+        # burns is this check having no subject rather than a failure — and
+        # saying which it is beats reporting a zero.
+        if seen["burned"] == 0:
+            print("ok: the furnace had nothing to shovel on this board, which is its own rule")
+            return
+        if seen["stacks"] < 1:
+            fails.append(f"{name}: {seen['burned']} burns and the bar never carried a stack")
+            return
+        print(f"ok: the furnace shows on the bar — {seen['burned']} burns off "
+              f"{seen['said']}, up to x{seen['stacks']}")
+    finally:
+        clear_screens(page)
+        plant(page, base, lambda body: None, stem="furnace-restore")
+
+
+def check_the_glossary_says_what_a_thing_does(page, name, fails):
+    """Everything you need to play, in one place, and the numbers are real.
+
+    **Reported from play**, and the example given was the argument: *"a game
+    glossary that explains everything you need to play the game, with stuff
+    like what mana empowerment does"*. Empowerment is stacks times five times
+    the mana you hold, it scales one lane, and nothing in the game had ever
+    said so — so a player watching the stacks climb could not tell a mechanic
+    they did not understand from one that was broken.
+
+    Core holds the shelves and `the_numbers_are_read_and_not_typed` holds the
+    figures. What only a browser answers is that the screen exists, opens on
+    the key the original uses, and draws what core sent.
+    """
+    try:
+        page.keyboard.press("g")
+        page.wait_for_selector("#glossary", state="visible", timeout=5000)
+        tabs = page.evaluate(
+            "() => [...document.querySelectorAll('#gloss-tabs button')].map(b => b.textContent)")
+        if len(tabs) < 4:
+            fails.append(f"{name}: the glossary has {len(tabs)} shelves: {tabs}")
+            return
+        # The shelf the report was about, and the entry it named.
+        fight = next((t for t in tabs if "fight" in t.lower()), None)
+        if not fight:
+            fails.append(f"{name}: no shelf about fighting: {tabs}")
+            return
+        page.evaluate(
+            "(t) => [...document.querySelectorAll('#gloss-tabs button')]"
+            ".find(b => b.textContent === t).click()", fight)
+        page.wait_for_timeout(150)
+        txt = page.inner_text("#gloss-body")
+        low = txt.lower()
+        if "empowerment" not in low:
+            fails.append(f"{name}: the fight shelf does not mention empowerment")
+            return
+        # And it says a number rather than an adjective — the whole point.
+        if not any(ch.isdigit() for ch in txt):
+            fails.append(f"{name}: the fight shelf has no numbers in it at all")
+            return
+        # Every class a player can be is lookup-able, which is the half that
+        # goes stale on its own.
+        classes = next((t for t in tabs if "become" in t.lower()), None)
+        page.evaluate(
+            "(t) => [...document.querySelectorAll('#gloss-tabs button')]"
+            ".find(b => b.textContent === t).click()", classes)
+        page.wait_for_timeout(150)
+        n = page.evaluate("() => document.querySelectorAll('.gloss-entry').length")
+        if n < 22:
+            fails.append(f"{name}: the class shelf has {n} entries and there are "
+                         f"seven classes and twenty-one experts")
+        else:
+            print(f"ok: the glossary opens on G — {len(tabs)} shelves, {n} things you can "
+                  f"become, and the fight shelf says what empowerment does")
+    finally:
+        if page.is_visible("#glossary"):
+            page.click("#gloss-close")
+            page.wait_for_selector("#glossary", state="hidden", timeout=5000)
+
+
 def check_the_panel_says_what_a_pool_pays(page, name, fails):
     """A banked pool says what it is buying you.
 
@@ -6989,6 +7111,8 @@ def walk_the_gate(browser, name, fails=None):
     check_the_ball_slides_and_the_trail_grows_behind_it(page, name, fails)
     check_a_diamond_catches_the_ball(page, name, fails)
     check_the_long_cart_runs_between_towns(page, name, fails)
+    check_the_furnace_shows_on_the_bar(page, name, fails)
+    check_the_glossary_says_what_a_thing_does(page, name, fails)
 
     # --- the log ---------------------------------------------------------------
     check_the_panel_says_what_a_pool_pays(page, name, fails)

@@ -93,6 +93,14 @@ pub struct AtTheBell {
     pub curse_kinds: u32,
     /// Curses you landed on it that had expired before the bell.
     pub curses_expired: u32,
+    /// Whether the thing that went down was **unmade** rather than merely
+    /// killed.
+    ///
+    /// **Curtain Line's, and it is the one fact about a fight the purse could
+    /// not already read.** A Short Programme pays for a fast win however it
+    /// ended; this pays for how it ended, so the two are different questions
+    /// and the field is what makes them so.
+    pub unmade: bool,
     /// Fast wins in a row **before** this one.
     ///
     /// Carried on the character, because it outlives the fight — see
@@ -118,6 +126,11 @@ pub fn bounty_with_class(
         match c.power {
             // The one that pays. Quick is measured off the log's own duration,
             // so it is the fight that happened rather than an estimate of it.
+            // Neither of M16's pays a purse. The Stoker is a fight rule and
+            // the Whisperer changes where a fight *ends* — and an unmaking is a
+            // kill, so it pays what a kill pays through the ordinary path
+            // rather than through a second one here.
+            ClassPower::Stoker { .. } | ClassPower::Whisperer { .. } => {}
             ClassPower::Showstopper { pct: more, under_ms } => {
                 if duration_ms < under_ms {
                     pct += more;
@@ -211,8 +224,41 @@ fn expert_pct(e: crate::expert::ExpertPower, duration_ms: u32, at: AtTheBell) ->
             }
             column
         }
+        // **Curtain Line, which is the Showstopper's other half.** A creature
+        // *unmade* inside the window pays again on top of whatever the bill
+        // already was — and `at.unmade` is the one thing that makes it a
+        // different question from Short Programme's, which pays for a fast
+        // win however it ended.
+        CurtainLine { mult, under_ms, .. } => {
+            if at.unmade && (duration_ms as i32) < under_ms {
+                mult
+            } else {
+                0
+            }
+        }
+        // **Flash Powder is the Showstopper's half of its pairing**, so its
+        // window and its cut are the purse's the way Short Programme's are —
+        // and it is a different question from that one: this pays for a fast
+        // win on a board that *spent everything at the bell*, which is the
+        // trade, and Short Programme pays for a fast win on a bare board.
+        FlashPowder { until_ms, pct, .. } => {
+            if (duration_ms as i32) < until_ms {
+                pct
+            } else {
+                0
+            }
+        }
         // The fight's, read off `Combatant::expert` at the tick.
-        LoudCalculation { .. }
+        BareFurnace { .. }
+        | FiredFunnel { .. }
+        | ColdStoke { .. }
+        | PonkeyBoiler { .. }
+        | LoudDoubt { .. }
+        | RequisitionedSilence { .. }
+        | ToldOnce { .. }
+        | LicensedRumour { .. }
+        | AshAndWhisper { .. }
+        | LoudCalculation { .. }
         | StandingFact { .. }
         | OverwoundArm { .. }
         | CurseRequisition { .. }

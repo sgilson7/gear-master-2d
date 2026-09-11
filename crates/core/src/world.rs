@@ -114,6 +114,9 @@ impl Allowances {
                 | Rule::SpinExtra { .. }
                 | Rule::SpinKeep { .. }
                 | Rule::SpinEvery { .. }
+                | Rule::BurnKeepsBonus { .. }
+                | Rule::BurnCarries { .. }
+                | Rule::MindPierce { .. }
                 | Rule::Scout
                 | Rule::Rout { .. }
                 // A map rule, and this is a step rule. What an instrument does

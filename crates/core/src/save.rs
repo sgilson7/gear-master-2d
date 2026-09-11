@@ -214,6 +214,13 @@ pub struct CharacterSave {
     /// fight and land before the next one acts.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub told_curses: Vec<String>,
+    /// Empowerment the furnace bought that survived the last bell.
+    ///
+    /// **The second field in the game that carries a fact about a fight**, and
+    /// it defaults to zero so every older save opens cold — which is what those
+    /// characters were.
+    #[serde(default, skip_serializing_if = "is_zero_u32")]
+    pub warm_stacks: u32,
 }
 
 fn is_zero_i32(n: &i32) -> bool {
@@ -304,6 +311,7 @@ impl SaveFile {
             second_paper,
             fast_wins,
             told_curses,
+            warm_stacks,
             enchs_owned,
             enchanted,
             bought_licence,
@@ -396,6 +404,7 @@ impl SaveFile {
                     second_paper: *second_paper,
                     fast_wins: *fast_wins,
                     told_curses: told_curses.clone(),
+                    warm_stacks: *warm_stacks,
                     enchs_owned: enchs_owned.clone(),
                     bought_licence: *bought_licence,
                     enchanted: enchanted
@@ -521,6 +530,7 @@ impl SaveFile {
             second_paper,
             fast_wins,
             told_curses,
+            warm_stacks,
             enchs_owned,
             enchanted,
         } = character;
@@ -625,6 +635,7 @@ impl SaveFile {
         // `Character::carry_out_of`.
         character.fast_wins = fast_wins;
         character.told_curses = told_curses;
+        character.warm_stacks = warm_stacks;
         character.enchs_owned = enchs_owned;
         character.bought_licence = bought_licence;
         // Checked like every other index into the registry. An ench bolted to

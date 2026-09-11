@@ -261,6 +261,19 @@ pub struct Character {
     /// it is skipped when it is and why no older save was refused for it.
     #[serde(default)]
     pub told_curses: Vec<String>,
+    /// Empowerment stacks the furnace bought that survived the last bell.
+    ///
+    /// **The second field in the game that carries a fact about a fight**, and
+    /// it is here for the reason `told_curses` is: empowerment is bought inside
+    /// a fight and gone at the end of one, so a share of it surviving is not
+    /// derivable from anything about a character. `Rule::BurnCarries` is the
+    /// only thing that sets it and `Character::start_with` is the only thing
+    /// that reads it.
+    ///
+    /// Zero for everybody who is not a finished Stoker, which is why it is
+    /// skipped when it is and why no older save is refused for it.
+    #[serde(default)]
+    pub warm_stacks: u32,
     /// **Not serialised.** Undo is a session's history of its own edits, not
     /// part of the character: a save that restored forty snapshots would be a
     /// save that let you undo your way back into a previous session's board.
@@ -284,6 +297,7 @@ impl Character {
     /// item.
     pub fn new() -> Self {
         Character {
+            warm_stacks: 0,
             bought_licence: false,
             registry: PieceRegistry::new(),
             owned: Vec::new(),
@@ -1157,13 +1171,32 @@ impl Character {
     /// class has spent a point in its tree yet.
     pub fn class_defs(&self) -> Vec<crate::class::ClassDef> {
         let tuned = self.expert_power();
+        let skills = (!self.skills_taken.is_empty()).then(crate::data::skills);
         self.classes()
             .filter_map(|n| crate::class::CLASSES.iter().find(|c| c.name == n))
             .map(|d| match tuned {
                 Some(p) if Some(d.name) == self.expert.as_deref() => {
                     crate::class::ClassDef { power: crate::class::ClassPower::Expert(p), ..*d }
                 }
-                _ => *d,
+                // **And a base class's own tree tunes its own power**, which is
+                // M16's widening of the same idea: the Stoker's furnace runs
+                // faster and burns less because nodes in its tree say so, and a
+                // caller that read `CLASSES` would print the promise as written
+                // rather than as bought. That is the thirty-eight dead nodes of
+                // M13.6, one level down.
+                //
+                // `tunings_for` and not `tunings_from`: `per_stack` belongs to
+                // the Stoker *and* to the Patented Funnel.
+                _ => match skills.as_ref() {
+                    Some(s) if !d.power.knobs().is_empty() => {
+                        let mut power = d.power;
+                        for (knob, by) in s.tunings_for(d.name, &self.skills_taken) {
+                            power = power.tune(&knob, by);
+                        }
+                        crate::class::ClassDef { power, ..*d }
+                    }
+                    _ => *d,
+                },
             })
             .collect()
     }
@@ -1193,7 +1226,7 @@ impl Character {
         let name = self.expert.as_deref()?;
         let mut power = crate::expert::by_name(name)?.power;
         if !self.skills_taken.is_empty() {
-            for (knob, by) in crate::data::skills().tunings_from(&self.skills_taken) {
+            for (knob, by) in crate::data::skills().tunings_for(name, &self.skills_taken) {
                 power.tune(&knob, by);
             }
         }
@@ -1939,6 +1972,42 @@ impl Character {
                 self.told_curses.push(kind.name().to_string());
             }
         }
+
+        // **What the furnace leaves you warm with**, which is the second thing
+        // in the game that crosses a bell and is here for the same reason the
+        // first is: empowerment is bought inside a fight and gone at the end of
+        // one, so a share of it surviving is a fact about the *last fight* and
+        // nothing about a character can be read to get it back.
+        //
+        // Off `log.player`, which is the fighter as the bell *went* — so the
+        // wrong number. The stacks it ends with are what is wanted, and the log
+        // reports them: the last `Burned` entry's running total is the pile.
+        let carries: u32 = self
+            .rules()
+            .iter()
+            .filter_map(|r| match r {
+                crate::rule::Rule::BurnCarries { pct } => Some(*pct),
+                _ => None,
+            })
+            .sum();
+        self.warm_stacks = if carries == 0 {
+            0
+        } else {
+            let ended = log
+                .entries
+                .iter()
+                .rev()
+                .find_map(|e| match e.event {
+                    crate::combat::Event::Burned {
+                        side: crate::combat::Side::Player,
+                        stacks,
+                        ..
+                    } => Some(stacks),
+                    _ => None,
+                })
+                .unwrap_or(0);
+            ended * carries.min(100) / 100
+        };
     }
 
     /// reason `player_stats` reads the tree: a bought node's *effect* is not
@@ -1961,6 +2030,11 @@ impl Character {
         // starting mana goes, because it is the same thing: what the player is
         // already holding when the bell goes.
         held.mana += self.row_harvest();
+        // **What the furnace left you warm with.** Carried rather than derived,
+        // for the reason `told` below it is, and handed over through `Held`
+        // because that is the one door a thing you walk into a fight already
+        // holding goes through.
+        held.empowerment = self.warm_stacks;
         // **And whatever followed you out of the last fight.** A name this
         // build has not got is dropped rather than refused: a save is not worth
         // losing over a curse.
@@ -2327,7 +2401,15 @@ impl Character {
     /// time anything asks, without a field anywhere saying so.
     pub fn ench_racks(&self) -> usize {
         match self.expert_power() {
-            Some(crate::expert::ExpertPower::FullBill { racks, .. }) => racks.max(1) as usize,
+            Some(crate::expert::ExpertPower::FullBill { racks, .. })
+            // **Three experts hand out a rack now**, and it is a `max` rather
+            // than a sum for the reason `every_ench_comes_from_somewhere`
+            // exempts expert trees: a second source of the same thing is the
+            // design, and two sources adding up would be a rack per class held.
+            | Some(crate::expert::ExpertPower::LicensedRumour { racks, .. })
+            | Some(crate::expert::ExpertPower::PonkeyBoiler { licence: racks, .. }) => {
+                racks.max(1) as usize
+            }
             _ => 1,
         }
     }

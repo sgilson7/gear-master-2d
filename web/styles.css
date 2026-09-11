@@ -511,18 +511,29 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
   color: var(--ink);
   max-width: 62ch;
 }
-/* **Five classes, in two rows.** Three were offered and `auto-fill` left the
+/* **Seven classes, in two rows.** Three were offered and `auto-fill` left the
    row padded out with empty track; `auto-fit` collapsed it and the three shared
    the width. Four still fitted a 1280x720 viewport, measured — and `PLAN.md`
    §6a row 3 wrote down that a fifth would not, and that the fix was a two-row
-   grid rather than a shorter portrait. This is that: a floor of three tracks,
-   so five wrap to three and two rather than shrinking to five slivers, and a
-   card that is still tall enough to read the promise on.
-   `check_the_fork_is_on_top` measures the result with `elementFromPoint`. */
+   grid rather than a shorter portrait. Three tracks was that fix, and five
+   wrapped to three and two.
+
+   **M16 made it seven, and three tracks would have wrapped them 3 / 3 / 1** —
+   three rows, the last of them one card wide, on a screen whose whole job is
+   to be compared across. Four tracks is 4 / 3, which is the two rows §6a row 3
+   asked for, and it is the count that was measured as fitting 1280x720 before
+   three was chosen for five. `check_the_fork_is_on_top` measures the result
+   with `elementFromPoint`. */
 #fork-choices {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  max-width: 1000px;
-  gap: 10px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  max-width: 1240px;
+  gap: 9px;
+}
+/* Under eleven hundred a fourth column is narrower than a card can be read at,
+   so it goes back to three and the seven wrap 3 / 3 / 1 — which is worse than
+   4 / 3 and is better than four slivers. */
+@media (max-width: 1100px) {
+  #fork-choices { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 1000px; }
 }
 /* Three across and two down at 1280x720, which is the viewport the gate
    measures. Under nine hundred the third column is more than a card can be
@@ -531,9 +542,9 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
 @media (max-width: 900px) {
   #fork-choices { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
-/* The fork's own cards are shorter than a shelf's: there are five of them and
+/* The fork's own cards are shorter than a shelf's: there are seven of them and
    they have to fit without the promise falling below the fold. */
-/* The fork's own header is shorter than a screen's: five cards in two rows and
+/* The fork's own header is shorter than a screen's: seven cards in two rows and
    a paragraph explaining the choice do not both fit 720px otherwise, and the
    cards are the part somebody is reading. */
 #fork { padding-top: 14px; padding-bottom: 14px; }

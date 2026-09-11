@@ -1116,6 +1116,334 @@
    ]
   },
   {
+   "id": "kettle-stoker",
+   "name": "Kettle-Stoker",
+   "class": "Stoker",
+   "nodes": [
+    {
+     "id": "ks-firebox",
+     "name": "The Firebox",
+     "blurb": "Forty kettles and one firebox under all of them. Somebody has to keep it fed and it is not going to be the fire.",
+     "cost": 1,
+     "requires": [],
+     "effect": {
+      "start_with": {
+       "nature": 20
+      }
+     }
+    },
+    {
+     "id": "ks-damper",
+     "name": "The Damper",
+     "blurb": "You can shut one side of it down. Whether you should is a different question and it is asked four times a minute.",
+     "cost": 1,
+     "requires": [],
+     "effect": {
+      "start_with": {
+       "faith": 20
+      }
+     }
+    },
+    {
+     "id": "ks-hundredweight",
+     "name": "Coal by the Hundredweight",
+     "blurb": "Eleven of them a shift, and the ninth is the one that decides what sort of day it was.",
+     "cost": 1,
+     "requires": [
+      "ks-firebox"
+     ],
+     "effect": [
+      {
+       "stat": {
+        "health": 60
+       }
+      },
+      {
+       "start_with": {
+        "rage": 24
+       }
+      }
+     ]
+    },
+    {
+     "id": "ks-hotter-draught",
+     "name": "A Hotter Draught",
+     "blurb": "Open the door at the bottom and it pulls. It pulls whatever is in front of it, which is usually somebody's hat.",
+     "cost": 2,
+     "requires": [
+      "ks-damper"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "every_ms",
+       "by": -800
+      }
+     }
+    },
+    {
+     "id": "ks-clinker-rake",
+     "name": "The Clinker Rake",
+     "blurb": "What comes out the bottom is not coal any more and it is not ash yet. There is a tool for it and this is it.",
+     "cost": 2,
+     "requires": [
+      "ks-hundredweight"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "per_stack",
+       "by": -3
+      }
+     }
+    },
+    {
+     "id": "ks-held-over",
+     "name": "Held Over",
+     "blurb": "The shift ends and the fire does not. Somebody worked out that a banked pool is still warm after you have burned it.",
+     "cost": 2,
+     "requires": [
+      "ks-hotter-draught"
+     ],
+     "effect": {
+      "grants": {
+       "rule": {
+        "burn_keeps_bonus": {
+         "pct": 50
+        }
+       }
+      }
+     }
+    },
+    {
+     "id": "ks-twice-fired",
+     "name": "Twice-Fired",
+     "blurb": "Through the box once and through it again. Nine seconds faster and about four times as loud.",
+     "cost": 2,
+     "requires": [
+      "ks-clinker-rake",
+      "ks-held-over"
+     ],
+     "effect": [
+      {
+       "tunes": {
+        "knob": "every_ms",
+        "by": -800
+       }
+      },
+      {
+       "start_with": {
+        "mana": 10
+       }
+      }
+     ]
+    },
+    {
+     "id": "ks-the-shift",
+     "name": "The Kettleworks Shift",
+     "blurb": "Three hoppers, all full, and eleven hours between you and the end of it.",
+     "cost": 2,
+     "requires": [
+      "ks-twice-fired"
+     ],
+     "effect": [
+      {
+       "start_with": {
+        "rage": 20,
+        "faith": 20,
+        "nature": 20
+       }
+      },
+      {
+       "assembly_pct": {
+        "pct": 10
+       }
+      }
+     ]
+    },
+    {
+     "id": "ks-banked-fire",
+     "name": "Banked Fire",
+     "blurb": "You do not put it out. You rake it over and leave it, and in the morning it is still there, which is the whole trick.",
+     "cost": 2,
+     "requires": [
+      "ks-the-shift"
+     ],
+     "effect": {
+      "grants": {
+       "rule": {
+        "burn_carries": {
+         "pct": 25
+        }
+       }
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "whisperling",
+   "name": "Whisperling",
+   "class": "Whisperer",
+   "nodes": [
+    {
+     "id": "wh-a-word",
+     "name": "A Word in the Ear",
+     "blurb": "It is not a threat and it is not advice. It is a fact about the listener that the listener had not got round to.",
+     "cost": 1,
+     "requires": [],
+     "effect": {
+      "stat": {
+       "mind": 16
+      }
+     }
+    },
+    {
+     "id": "wh-insight-held",
+     "name": "Insight, Held",
+     "blurb": "You have been listening for eleven minutes and have said nothing, which everybody in the room has now noticed.",
+     "cost": 1,
+     "requires": [],
+     "effect": {
+      "start_with": {
+       "insight": 20
+      }
+     }
+    },
+    {
+     "id": "wh-second-word",
+     "name": "The Second Word",
+     "blurb": "The first one did the work. This one stops them putting it down.",
+     "cost": 1,
+     "requires": [
+      "wh-a-word"
+     ],
+     "effect": {
+      "stat": {
+       "mind": 14,
+       "mind_resist": 10
+      }
+     }
+    },
+    {
+     "id": "wh-dread-early",
+     "name": "Dread, Early",
+     "blurb": "Before the bell, which is a thing you are not supposed to be able to do and nobody has written down that you cannot.",
+     "cost": 2,
+     "requires": [
+      "wh-insight-held"
+     ],
+     "effect": {
+      "start_with": {
+       "dread": 1
+      }
+     }
+    },
+    {
+     "id": "wh-two-fifths",
+     "name": "Two-Fifths",
+     "blurb": "Three of them went down at a third and the fourth went down at forty percent, and the fourth is the one worth reading about.",
+     "cost": 2,
+     "requires": [
+      "wh-second-word"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "third",
+       "by": 7
+      }
+     }
+    },
+    {
+     "id": "wh-what-they-heard",
+     "name": "What They Heard",
+     "blurb": "A thick skull is nine inches of it and a word is not a thing you have to get through nine inches of.",
+     "cost": 2,
+     "requires": [
+      "wh-dread-early"
+     ],
+     "effect": {
+      "grants": {
+       "rule": {
+        "mind_pierce": {
+         "pct": 20
+        }
+       }
+      }
+     }
+    },
+    {
+     "id": "wh-long-whisper",
+     "name": "The Long Whisper",
+     "blurb": "Forty-five percent, and by then it has stopped being about the fight.",
+     "cost": 2,
+     "requires": [
+      "wh-two-fifths",
+      "wh-what-they-heard"
+     ],
+     "effect": [
+      {
+       "tunes": {
+        "knob": "third",
+        "by": 5
+       }
+      },
+      {
+       "stat": {
+        "mind": 12
+       }
+      }
+     ]
+    },
+    {
+     "id": "wh-three-of-them",
+     "name": "Three of Them",
+     "blurb": "Marbulon's door has three behind it and nobody has ever said what one is. A row on the helmet, which is where the listening is done.",
+     "cost": 2,
+     "requires": [
+      "wh-long-whisper"
+     ],
+     "effect": [
+      {
+       "start_with": {
+        "dread": 2
+       }
+      },
+      {
+       "grow_slot_rows": {
+        "slot": "helmet",
+        "rows": 1
+       }
+      }
+     ]
+    },
+    {
+     "id": "wh-last-word",
+     "name": "The Last Word",
+     "blurb": "Half of what it was, through a third of what it had. There is no ninth thing to say.",
+     "cost": 2,
+     "requires": [
+      "wh-three-of-them"
+     ],
+     "effect": [
+      {
+       "tunes": {
+        "knob": "third",
+        "by": 5
+       }
+      },
+      {
+       "grants": {
+        "rule": {
+         "mind_pierce": {
+          "pct": 15
+         }
+        }
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
    "id": "loud-calculation",
    "name": "Loud Calculation",
    "class": "LoudCalculation",
@@ -2151,6 +2479,1146 @@
        "tunes": {
         "knob": "beacon_pct",
         "by": 15
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "bare-furnace",
+   "name": "Bare Furnace",
+   "class": "BareFurnace",
+   "nodes": [
+    {
+     "id": "bf-open-grate",
+     "name": "The Open Grate",
+     "blurb": "Nothing in it and a draught straight through. Four bare frames and the fourth is the loudest.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "per_frame",
+       "by": 5
+      }
+     }
+    },
+    {
+     "id": "bf-draught-through",
+     "name": "Draught Through the Frame",
+     "blurb": "It pulls harder for having nothing to pull past.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "every_ms",
+       "by": -600
+      }
+     }
+    },
+    {
+     "id": "bf-nothing-to-slow-it",
+     "name": "Nothing to Slow It",
+     "blurb": "Eleven of them stacked and none of them in the way.",
+     "cost": 2,
+     "requires": [
+      "bf-open-grate"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "cap",
+       "by": 4
+      }
+     }
+    },
+    {
+     "id": "bf-the-cold-side",
+     "name": "The Cold Side",
+     "blurb": "What you burned is still warm on the side nobody stands at.",
+     "cost": 2,
+     "requires": [
+      "bf-draught-through"
+     ],
+     "effect": {
+      "grants": {
+       "rule": {
+        "burn_keeps_bonus": {
+         "pct": 25
+        }
+       }
+      }
+     }
+    },
+    {
+     "id": "bf-stripped",
+     "name": "Stripped for Firing",
+     "blurb": "Everything off it, down to the brackets, which is nine fewer things to catch.",
+     "cost": 2,
+     "requires": [
+      "bf-nothing-to-slow-it"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "per_frame",
+       "by": 5
+      }
+     }
+    },
+    {
+     "id": "bf-furnace-bare",
+     "name": "Furnace, Bare",
+     "blurb": "There is no fourth thing to take off it.",
+     "cost": 2,
+     "requires": [
+      "bf-stripped",
+      "bf-the-cold-side"
+     ],
+     "effect": [
+      {
+       "tunes": {
+        "knob": "every_ms",
+        "by": -600
+       }
+      },
+      {
+       "tunes": {
+        "knob": "cap",
+        "by": 6
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "fired-funnel",
+   "name": "Fired Funnel",
+   "class": "FiredFunnel",
+   "nodes": [
+    {
+     "id": "ff-exchange-window",
+     "name": "The Exchange Window",
+     "blurb": "Open eleven to four and shut the rest of the time, which is the Sergeant's idea of an exchange.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "worth",
+       "by": 4
+      }
+     }
+    },
+    {
+     "id": "ff-standing-order-hot",
+     "name": "Standing Order, Hot",
+     "blurb": "Filed nine times, honoured six, and nobody has asked about the other three.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "per_fight",
+       "by": 3
+      }
+     }
+    },
+    {
+     "id": "ff-boiler-receipt",
+     "name": "The Boiler Receipt",
+     "blurb": "Keep it. You will be asked for it and you will not have it.",
+     "cost": 2,
+     "requires": [
+      "ff-exchange-window"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "refund",
+       "by": 25
+      }
+     }
+    },
+    {
+     "id": "ff-twice-through",
+     "name": "Twice Through the Funnel",
+     "blurb": "Down it, round, and down it again, at four times the rate and none of the sense.",
+     "cost": 2,
+     "requires": [
+      "ff-standing-order-hot"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "per_fight",
+       "by": 3
+      }
+     }
+    },
+    {
+     "id": "ff-rate-goes-up",
+     "name": "The Rate Goes Up",
+     "blurb": "It went up on the eleventh and nobody was told on the tenth.",
+     "cost": 2,
+     "requires": [
+      "ff-boiler-receipt"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "worth",
+       "by": 4
+      }
+     }
+    },
+    {
+     "id": "ff-funnel-fired",
+     "name": "Funnel, Fired",
+     "blurb": "Both of them going at once, which the paperwork says is one machine.",
+     "cost": 2,
+     "requires": [
+      "ff-rate-goes-up",
+      "ff-twice-through"
+     ],
+     "effect": [
+      {
+       "tunes": {
+        "knob": "refund",
+        "by": 25
+       }
+      },
+      {
+       "tunes": {
+        "knob": "worth",
+        "by": 4
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "cold-stoke",
+   "name": "Cold Stoke",
+   "class": "ColdStoke",
+   "nodes": [
+    {
+     "id": "cs-their-coal",
+     "name": "Their Coal",
+     "blurb": "It was theirs. It is in your firebox. Nobody has raised it.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "per_stack",
+       "by": 1
+      }
+     }
+    },
+    {
+     "id": "cs-slow-match",
+     "name": "Slow Match",
+     "blurb": "Nine inches of it and it takes four minutes, which is exactly as long as you need.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "every_ms",
+       "by": -800
+      }
+     }
+    },
+    {
+     "id": "cs-fact-in-the-fire",
+     "name": "A Fact in the Fire",
+     "blurb": "A thing that is true for ever burns for ever, which is the Keeper's whole filing system.",
+     "cost": 2,
+     "requires": [
+      "cs-their-coal"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "standing",
+       "by": 1
+      }
+     }
+    },
+    {
+     "id": "cs-searing-hands",
+     "name": "Searing Hands",
+     "blurb": "The gloves land it and the firebox takes it.",
+     "cost": 2,
+     "requires": [
+      "cs-slow-match"
+     ],
+     "effect": {
+      "grants": {
+       "rule": {
+        "curse_on_activate": {
+         "slot": "gloves",
+         "curse": "searing"
+        }
+       }
+      }
+     }
+    },
+    {
+     "id": "cs-their-coal-twice",
+     "name": "Their Coal, Twice",
+     "blurb": "The second hundredweight off the same eleven people.",
+     "cost": 2,
+     "requires": [
+      "cs-fact-in-the-fire"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "per_stack",
+       "by": 1
+      }
+     }
+    },
+    {
+     "id": "cs-stoke-cold",
+     "name": "Stoke, Cold",
+     "blurb": "It has not gone out in nine years and it has never once been lit.",
+     "cost": 2,
+     "requires": [
+      "cs-their-coal-twice",
+      "cs-searing-hands"
+     ],
+     "effect": [
+      {
+       "tunes": {
+        "knob": "every_ms",
+        "by": -800
+       }
+      },
+      {
+       "tunes": {
+        "knob": "standing",
+        "by": 1
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ponkey-boiler",
+   "name": "Ponkey Boiler",
+   "class": "PonkeyBoiler",
+   "nodes": [
+    {
+     "id": "pb-the-governor",
+     "name": "The Governor",
+     "blurb": "Two brass balls on a spindle, and when it goes too fast they go out and it does not.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "per_spin",
+       "by": 2
+      }
+     }
+    },
+    {
+     "id": "pb-licence-warm",
+     "name": "The Licence, Warm",
+     "blurb": "Signed on the boiler plate, which the office says counts.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "gives_ench": {
+       "ench": "plug-energy-tap"
+      }
+     }
+    },
+    {
+     "id": "pb-steam-kept",
+     "name": "Steam Kept",
+     "blurb": "Eleven pounds of it in the drum and none of it going anywhere.",
+     "cost": 2,
+     "requires": [
+      "pb-the-governor"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "keep",
+       "by": 2
+      }
+     }
+    },
+    {
+     "id": "pb-second-plate",
+     "name": "The Second Plate",
+     "blurb": "Room on the component for one more, because the boiler plate has four holes and used two.",
+     "cost": 2,
+     "requires": [
+      "pb-licence-warm"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "licence",
+       "by": 1
+      }
+     }
+    },
+    {
+     "id": "pb-governor-set",
+     "name": "The Governor, Set",
+     "blurb": "Wound to nine hundred and left there.",
+     "cost": 2,
+     "requires": [
+      "pb-steam-kept"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "per_spin",
+       "by": 3
+      }
+     }
+    },
+    {
+     "id": "pb-boiler-ponkey",
+     "name": "Boiler, Ponkey",
+     "blurb": "The Turn, geared down eleven to one, into a firebox. Nobody asked it to.",
+     "cost": 2,
+     "requires": [
+      "pb-governor-set",
+      "pb-second-plate"
+     ],
+     "effect": [
+      {
+       "tunes": {
+        "knob": "keep",
+        "by": 2
+       }
+      },
+      {
+       "tunes": {
+        "knob": "per_spin",
+        "by": 2
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "flash-powder",
+   "name": "Flash Powder",
+   "class": "FlashPowder",
+   "nodes": [
+    {
+     "id": "fp-flash-pan",
+     "name": "The Flash Pan",
+     "blurb": "Four ounces of it under a tray, and the tray is the part that goes.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "all_at_once",
+       "by": 25
+      }
+     }
+    },
+    {
+     "id": "fp-longer-fuse",
+     "name": "A Longer Fuse",
+     "blurb": "Nine seconds instead of four, which is nine seconds of everybody watching.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "until_ms",
+       "by": 2000
+      }
+     }
+    },
+    {
+     "id": "fp-poster-singed",
+     "name": "The Poster, Singed",
+     "blurb": "It was a good poster. It is a better one now.",
+     "cost": 2,
+     "requires": [
+      "fp-flash-pan"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "pct",
+       "by": 10
+      }
+     }
+    },
+    {
+     "id": "fp-damp-powder",
+     "name": "Damp Powder",
+     "blurb": "It went up late and it went up anyway, which the hall preferred.",
+     "cost": 2,
+     "requires": [
+      "fp-longer-fuse"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "until_ms",
+       "by": 2000
+      }
+     }
+    },
+    {
+     "id": "fp-whole-pan",
+     "name": "The Whole Pan",
+     "blurb": "All of it. There was no reason to keep any back and there never is.",
+     "cost": 2,
+     "requires": [
+      "fp-poster-singed"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "all_at_once",
+       "by": 25
+      }
+     }
+    },
+    {
+     "id": "fp-powder-flashed",
+     "name": "Powder, Flashed",
+     "blurb": "Eleven seasons and this is the one they talk about.",
+     "cost": 2,
+     "requires": [
+      "fp-whole-pan",
+      "fp-damp-powder"
+     ],
+     "effect": [
+      {
+       "tunes": {
+        "knob": "pct",
+        "by": 15
+       }
+      },
+      {
+       "tunes": {
+        "knob": "until_ms",
+        "by": 2000
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "loud-doubt",
+   "name": "Loud Doubt",
+   "class": "LoudDoubt",
+   "nodes": [
+    {
+     "id": "ld-said-plainly",
+     "name": "The Plain Fact",
+     "blurb": "No preamble and no second sentence. Four hundred pounds of nothing to say.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "rate",
+       "by": 1
+      }
+     }
+    },
+    {
+     "id": "ld-the-count",
+     "name": "The Count",
+     "blurb": "Two things on, and one of them is a ring.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "worn",
+       "by": 1
+      }
+     }
+    },
+    {
+     "id": "ld-two-fifths-bare",
+     "name": "Two-Fifths, Bare",
+     "blurb": "Forty percent of what it was, and it was not wearing anything either.",
+     "cost": 2,
+     "requires": [
+      "ld-said-plainly"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "third",
+       "by": 7
+      }
+     }
+    },
+    {
+     "id": "ld-what-it-heard",
+     "name": "What It Heard",
+     "blurb": "A thick skull is nine inches and a plain fact is not slowed by inches.",
+     "cost": 2,
+     "requires": [
+      "ld-the-count"
+     ],
+     "effect": {
+      "grants": {
+       "rule": {
+        "mind_pierce": {
+         "pct": 10
+        }
+       }
+      }
+     }
+    },
+    {
+     "id": "ld-said-louder",
+     "name": "Said Louder",
+     "blurb": "The same four words, from closer.",
+     "cost": 2,
+     "requires": [
+      "ld-two-fifths-bare"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "rate",
+       "by": 1
+      }
+     }
+    },
+    {
+     "id": "ld-doubt-loud",
+     "name": "Doubt, Loud",
+     "blurb": "It sat down. Nobody has ever got it to say why.",
+     "cost": 2,
+     "requires": [
+      "ld-said-louder",
+      "ld-what-it-heard"
+     ],
+     "effect": [
+      {
+       "tunes": {
+        "knob": "worn",
+        "by": 1
+       }
+      },
+      {
+       "tunes": {
+        "knob": "third",
+        "by": 5
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "requisitioned-silence",
+   "name": "Requisitioned Silence",
+   "class": "RequisitionedSilence",
+   "nodes": [
+    {
+     "id": "rs-unpaid-word",
+     "name": "The Unpaid Word",
+     "blurb": "Form 9, unstamped, said out loud in a corridor.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "rate",
+       "by": 50
+      }
+     }
+    },
+    {
+     "id": "rs-form-silent",
+     "name": "The Form, Silent",
+     "blurb": "Four boxes, all of them blank, all of them countersigned.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "per_fight",
+       "by": 2
+      }
+     }
+    },
+    {
+     "id": "rs-heard-anyway",
+     "name": "Heard Anyway",
+     "blurb": "The requisition was denied on the eleventh and the thing happened on the ninth.",
+     "cost": 2,
+     "requires": [
+      "rs-unpaid-word"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "third",
+       "by": 5
+      }
+     }
+    },
+    {
+     "id": "rs-standing-silence",
+     "name": "The Standing Silence",
+     "blurb": "Filed once, honoured indefinitely, which is a thing the Sergeant discovered by accident.",
+     "cost": 2,
+     "requires": [
+      "rs-form-silent"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "per_fight",
+       "by": 3
+      }
+     }
+    },
+    {
+     "id": "rs-unpaid-twice",
+     "name": "The Unpaid Word, Twice",
+     "blurb": "Two of them in one corridor, and the second is the one that lands.",
+     "cost": 2,
+     "requires": [
+      "rs-heard-anyway"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "rate",
+       "by": 50
+      }
+     }
+    },
+    {
+     "id": "rs-silence-requisitioned",
+     "name": "Silence, Requisitioned",
+     "blurb": "Nine copies. One of them is going somewhere.",
+     "cost": 2,
+     "requires": [
+      "rs-unpaid-twice",
+      "rs-standing-silence"
+     ],
+     "effect": [
+      {
+       "tunes": {
+        "knob": "third",
+        "by": 7
+       }
+      },
+      {
+       "tunes": {
+        "knob": "rate",
+        "by": 50
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "told-once",
+   "name": "Told Once",
+   "class": "ToldOnce",
+   "nodes": [
+    {
+     "id": "to-told-again",
+     "name": "Told Again",
+     "blurb": "The second telling is the one that sticks, which is not how anybody wants it to work.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "per_curse",
+       "by": 3
+      }
+     }
+    },
+    {
+     "id": "to-four-kinds",
+     "name": "Four Kinds",
+     "blurb": "There are exactly four and it is carrying all of them.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "cap",
+       "by": 6
+      }
+     }
+    },
+    {
+     "id": "to-standing-fact-heard",
+     "name": "A Standing Fact, Heard",
+     "blurb": "A thing that will not stop being true is a thing it cannot stop hearing.",
+     "cost": 2,
+     "requires": [
+      "to-told-again"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "standing",
+       "by": 1
+      }
+     }
+    },
+    {
+     "id": "to-stunning-word",
+     "name": "A Word That Stops It",
+     "blurb": "The helmet says it and the thing stops to think about it.",
+     "cost": 2,
+     "requires": [
+      "to-four-kinds"
+     ],
+     "effect": {
+      "grants": {
+       "rule": {
+        "curse_on_activate": {
+         "slot": "helmet",
+         "curse": "stun"
+        }
+       }
+      }
+     }
+    },
+    {
+     "id": "to-told-louder",
+     "name": "Told Louder",
+     "blurb": "Eleven facts and it has run out of places to put them.",
+     "cost": 2,
+     "requires": [
+      "to-standing-fact-heard"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "per_curse",
+       "by": 3
+      }
+     }
+    },
+    {
+     "id": "to-once-told",
+     "name": "Once, Told",
+     "blurb": "It only needed the one. The other nine were for you.",
+     "cost": 2,
+     "requires": [
+      "to-told-louder",
+      "to-stunning-word"
+     ],
+     "effect": [
+      {
+       "tunes": {
+        "knob": "cap",
+        "by": 9
+       }
+      },
+      {
+       "tunes": {
+        "knob": "standing",
+        "by": 1
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "licensed-rumour",
+   "name": "Licensed Rumour",
+   "class": "LicensedRumour",
+   "nodes": [
+    {
+     "id": "lr-rumour-clause",
+     "name": "The Rumour Clause",
+     "blurb": "Page eleven, subsection four, which permits saying things about people.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "pct",
+       "by": 5
+      }
+     }
+    },
+    {
+     "id": "lr-licence-whispered",
+     "name": "The Licence, Whispered",
+     "blurb": "Off the house list, no charge, and nobody has been told why.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "gives_ench": {
+       "ench": "the-yodregar-index"
+      }
+     }
+    },
+    {
+     "id": "lr-two-a-component",
+     "name": "Two a Component",
+     "blurb": "The rack was built for two and the licence finally agrees.",
+     "cost": 2,
+     "requires": [
+      "lr-rumour-clause"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "racks",
+       "by": 1
+      }
+     }
+    },
+    {
+     "id": "lr-broadcast-quietly",
+     "name": "Broadcast, Quietly",
+     "blurb": "An enched component lends what it is carrying, and the lender does not notice.",
+     "cost": 2,
+     "requires": [
+      "lr-licence-whispered"
+     ],
+     "effect": {
+      "grants": {
+       "rule": {
+        "beacon": {
+         "pct": 25
+        }
+       }
+      }
+     }
+    },
+    {
+     "id": "lr-rumour-twice",
+     "name": "The Rumour, Twice",
+     "blurb": "Said in two places at once, which the licence also permits.",
+     "cost": 2,
+     "requires": [
+      "lr-two-a-component"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "pct",
+       "by": 5
+      }
+     }
+    },
+    {
+     "id": "lr-rumour-licensed",
+     "name": "Rumour, Licensed",
+     "blurb": "Stamped, filed, and going round the Kettleworks in nine minutes.",
+     "cost": 2,
+     "requires": [
+      "lr-rumour-twice",
+      "lr-broadcast-quietly"
+     ],
+     "effect": [
+      {
+       "tunes": {
+        "knob": "third",
+        "by": 7
+       }
+      },
+      {
+       "tunes": {
+        "knob": "pct",
+        "by": 5
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "curtain-line",
+   "name": "Curtain Line",
+   "class": "CurtainLine",
+   "nodes": [
+    {
+     "id": "cl-last-line",
+     "name": "The Last Line",
+     "blurb": "Six words. Hanglo Chiemstar used them eleven seasons running.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "third",
+       "by": 5
+      }
+     }
+    },
+    {
+     "id": "cl-longer-bow",
+     "name": "A Longer Bow",
+     "blurb": "Four of them, and the hall is still up on the fourth.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "under_ms",
+       "by": 2000
+      }
+     }
+    },
+    {
+     "id": "cl-second-house",
+     "name": "The Second House",
+     "blurb": "They came back at nine to see it again.",
+     "cost": 2,
+     "requires": [
+      "cl-last-line"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "mult",
+       "by": 50
+      }
+     }
+    },
+    {
+     "id": "cl-house-clock",
+     "name": "The House Clock",
+     "blurb": "It runs nine seconds slow and everybody has agreed not to fix it.",
+     "cost": 2,
+     "requires": [
+      "cl-longer-bow"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "under_ms",
+       "by": 2000
+      }
+     }
+    },
+    {
+     "id": "cl-last-line-held",
+     "name": "The Last Line, Held",
+     "blurb": "Held for four beats, which is three longer than it reads.",
+     "cost": 2,
+     "requires": [
+      "cl-second-house"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "third",
+       "by": 5
+      }
+     }
+    },
+    {
+     "id": "cl-line-curtain",
+     "name": "Line, Curtain",
+     "blurb": "And then the curtain, which is the part nobody remembers writing.",
+     "cost": 2,
+     "requires": [
+      "cl-last-line-held",
+      "cl-house-clock"
+     ],
+     "effect": [
+      {
+       "tunes": {
+        "knob": "mult",
+        "by": 50
+       }
+      },
+      {
+       "tunes": {
+        "knob": "third",
+        "by": 5
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ash-and-whisper",
+   "name": "Ash and Whisper",
+   "class": "AshAndWhisper",
+   "nodes": [
+    {
+     "id": "aw-ash-in-the-ear",
+     "name": "Ash in the Ear",
+     "blurb": "Warm, and it has something to say.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "rate",
+       "by": 1
+      }
+     }
+    },
+    {
+     "id": "aw-the-draught",
+     "name": "The Draught",
+     "blurb": "Both ends open and nine feet of it between them.",
+     "cost": 2,
+     "requires": [],
+     "effect": {
+      "tunes": {
+       "knob": "every_ms",
+       "by": -800
+      }
+     }
+    },
+    {
+     "id": "aw-two-fifths-burned",
+     "name": "Two-Fifths, Burned",
+     "blurb": "Forty percent of what it was, and most of that went up the chimney.",
+     "cost": 2,
+     "requires": [
+      "aw-ash-in-the-ear"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "third",
+       "by": 7
+      }
+     }
+    },
+    {
+     "id": "aw-held-over-cold",
+     "name": "Held Over, Cold",
+     "blurb": "What the furnace took is still paying half of what it paid.",
+     "cost": 2,
+     "requires": [
+      "aw-the-draught"
+     ],
+     "effect": {
+      "grants": {
+       "rule": {
+        "burn_keeps_bonus": {
+         "pct": 25
+        }
+       }
+      }
+     }
+    },
+    {
+     "id": "aw-ash-louder",
+     "name": "Ash, Louder",
+     "blurb": "Eleven hundredweight of it, and all of it saying the same thing.",
+     "cost": 2,
+     "requires": [
+      "aw-two-fifths-burned"
+     ],
+     "effect": {
+      "tunes": {
+       "knob": "rate",
+       "by": 1
+      }
+     }
+    },
+    {
+     "id": "aw-whisper-and-ash",
+     "name": "Whisper and Ash",
+     "blurb": "Nobody can tell which of the two did it and neither can you.",
+     "cost": 2,
+     "requires": [
+      "aw-ash-louder",
+      "aw-held-over-cold"
+     ],
+     "effect": [
+      {
+       "tunes": {
+        "knob": "third",
+        "by": 5
+       }
+      },
+      {
+       "tunes": {
+        "knob": "every_ms",
+        "by": -800
        }
       }
      ]

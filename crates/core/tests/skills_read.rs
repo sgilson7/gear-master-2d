@@ -177,8 +177,13 @@ fn a_mechanical_line_stays_short_enough_to_read_at_a_glance() {
 #[test]
 fn every_effect_key_is_one_the_engine_actually_reads() {
     const KNOWN: &[(&str, &[&str])] = &[
-        ("stat", &["health", "strength", "regen", "mind_resist", "curse_resist"]),
-        ("start_with", &["armor", "mana"]),
+        // **`mind` is M16's**, and it is the field the Whisperer is built on:
+        // it has been on `Stats` since the fork and the tree could not grant it,
+        // which was true for exactly as long as nothing was built on the lane.
+        ("stat", &["health", "strength", "regen", "mind_resist", "curse_resist", "mind"]),
+        // And the five below are the same idea one step wider: *what the player
+        // is already holding when the bell goes* is exactly what a pool is.
+        ("start_with", &["armor", "mana", "rage", "faith", "nature", "insight", "dread"]),
         ("grow_slot_rows", &["slot", "rows"]),
         ("assembly_pct", &["pct"]),
         ("grants", &["rule"]),
@@ -259,7 +264,7 @@ fn armour_the_tree_grants_is_armour_the_fight_starts_with() {
     };
     assert_eq!(soaked(Held::default()), 0, "nobody starts a fight wearing armour");
     assert_eq!(
-        soaked(Held { armor: 40, mana: 0, rules: Vec::new(), empty_frames: 0, told: Vec::new() }),
+        soaked(Held { armor: 40, mana: 0, rules: Vec::new(), empty_frames: 0, told: Vec::new(), empowerment: 0, rage: 0, faith: 0, nature: 0, insight: 0, dread: 0, mind: 0 }),
         40,
         "all forty points should be spent soaking, and no more than forty"
     );
@@ -270,7 +275,7 @@ fn armour_the_tree_grants_is_armour_the_fight_starts_with() {
 fn the_shipped_tree_still_hands_out_what_it_promises() {
     let tree = data::skills();
     let held = tree.start_with(&["corked".into(), "funnel-drill".into()]);
-    assert_eq!(held, Held { armor: 12, mana: 20, rules: Vec::new(), empty_frames: 0, told: Vec::new() }, "the two base nodes that grant them");
+    assert_eq!(held, Held { armor: 12, mana: 20, rules: Vec::new(), empty_frames: 0, told: Vec::new(), empowerment: 0, rage: 0, faith: 0, nature: 0, insight: 0, dread: 0, mind: 0 }, "the two base nodes that grant them");
 
     // And the mixed node keeps both halves: strength through `stats_from`,
     // armour through `start_with`.
@@ -415,7 +420,7 @@ fn the_log_opens_holding_what_the_tree_granted() {
     // asserted here rather than ignored.
     assert_eq!(
         held,
-        Held { armor: 12, mana: 20, rules: Vec::new(), empty_frames: 4, told: Vec::new() },
+        Held { armor: 12, mana: 20, rules: Vec::new(), empty_frames: 4, told: Vec::new(), empowerment: 0, rage: 0, faith: 0, nature: 0, insight: 0, dread: 0, mind: 0 },
         "the two nodes as shipped"
     );
 
@@ -466,7 +471,7 @@ fn the_four_nodes_a_player_took_all_do_something() {
     // a fixture whose board silently filled would change what this measures.
     assert_eq!(
         c.start_with(),
-        Held { armor: 12, mana: 20, rules: Vec::new(), empty_frames: 5, told: Vec::new() },
+        Held { armor: 12, mana: 20, rules: Vec::new(), empty_frames: 5, told: Vec::new(), empowerment: 0, rage: 0, faith: 0, nature: 0, insight: 0, dread: 0, mind: 0 },
         "Corked and Funnel Drill"
     );
 }

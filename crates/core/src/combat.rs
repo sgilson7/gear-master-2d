@@ -4183,6 +4183,54 @@ pub struct Combatant {
     /// The empty frames' spin: how far round they are, and what they hold.
     pub overwound_ms: u32,
     pub overwound_stacks: i32,
+    /// The Stoker's furnace: how long since the last shovelful, and what it is
+    /// set to. Zeroed for everybody who is not one — **a creature is never a
+    /// Stoker**, the same rule an expert follows.
+    pub burn_ms: u32,
+    pub burn_every_ms: u32,
+    pub burn_per_stack: i32,
+    /// What a burned pool still pays, in percent of its standing bonus.
+    ///
+    /// `Rule::BurnKeepsBonus`, and it is the Stoker's only rule: the trade made
+    /// gentler rather than removed. Zero for everybody, which is the trade as
+    /// written.
+    pub burn_keeps_pct: i32,
+    /// **M16's eleven experts, in two counters and nothing else.** Each is a
+    /// budget a fight starts with and spends, the way `reqs_left` and
+    /// `loud_free_left` are — everything else the eleven do is read off
+    /// `Combatant::expert` where its own mechanic lives, which is what keeps
+    /// eleven new powers from being thirty new fields.
+    pub fired_left: i32,
+    pub silent_left: i32,
+    /// Mind damage a silence has banked and the next activation will say.
+    pub silent_owed: i32,
+    /// **Told Once**, copied onto the sufferer at the bell: points a curse
+    /// standing on it adds to whatever threshold is being measured against it,
+    /// and the ceiling on that.
+    ///
+    /// On the *sufferer* rather than the lander, which is the one place this
+    /// block departs from `facts_standing`: the threshold is read inside
+    /// `take_mind_pierced`, which has one fighter and no view of the room.
+    pub told_per_curse: i32,
+    pub told_cap: i32,
+    /// Mind damage the character adds to every mind hit, off the tree.
+    ///
+    /// Named for what it is rather than for the stat it came from: `mind` on a
+    /// `Combatant` would read as *this fighter's mind damage*, which is the
+    /// board's and is already in the profiles.
+    pub said: i32,
+    /// Tenths of a stack the boiler has taken off the spin and not yet paid.
+    ///
+    /// Tenths in and whole stacks out, which is `overwound_stacks`'s own rule:
+    /// the pile is kept fine and only the crossings are paid, so nothing is
+    /// lost to rounding and nothing is paid twice.
+    pub boiler_tenths: i32,
+    /// What the furnace has taken this fight, by pool, so the bonus it keeps
+    /// can be paid without the pool being there.
+    pub burned: [i32; 3],
+    /// The Whisperer's threshold: the maximum health at or below which this
+    /// fighter is unmade, set once at the bell. `None` for everybody else.
+    pub unmade_at: Option<i32>,
     /// How many of the five worn frames have nothing seated in them.
     ///
     /// **A board fact the fight has to be told**, because a fight has never
@@ -4246,6 +4294,19 @@ impl Combatant {
             opening_banked: false,
             overwound_ms: 0,
             overwound_stacks: 0,
+            burn_ms: 0,
+            burn_every_ms: 0,
+            burn_per_stack: 0,
+            burn_keeps_pct: 0,
+            fired_left: 0,
+            silent_left: 0,
+            silent_owed: 0,
+            said: 0,
+            told_per_curse: 0,
+            told_cap: 0,
+            boiler_tenths: 0,
+            burned: [0; 3],
+            unmade_at: None,
             empty_frames: 0,
             max_health: stats.health,
             health: stats.health,
@@ -4385,6 +4446,19 @@ impl Combatant {
             opening_banked: false,
             overwound_ms: 0,
             overwound_stacks: 0,
+            burn_ms: 0,
+            burn_every_ms: 0,
+            burn_per_stack: 0,
+            burn_keeps_pct: 0,
+            fired_left: 0,
+            silent_left: 0,
+            silent_owed: 0,
+            said: 0,
+            told_per_curse: 0,
+            told_cap: 0,
+            boiler_tenths: 0,
+            burned: [0; 3],
+            unmade_at: None,
             empty_frames: 0,
             max_health: stats.health,
             health: stats.health,
@@ -4566,7 +4640,19 @@ impl Combatant {
 
     pub fn held_bonus(&self) -> Stats {
         let m = self.overflowing.max(1);
-        let (rage, faith, nature) = (self.rage * m, self.faith * m, self.nature * m);
+        // **What the furnace took still pays, if the rule says so.**
+        // `Rule::BurnKeepsBonus` is the Stoker's only rule and it is the trade
+        // made gentler rather than removed: a burned pool pays a share of the
+        // standing bonus it would have paid, for the rest of the fight. Without
+        // it the trade is what the class is — the bonus you were holding is
+        // exactly what you gave up — so this is zero for everybody who has not
+        // bought the node.
+        let kept = |i: usize| self.burned[i] * self.burn_keeps_pct.clamp(0, 100) / 100;
+        let (rage, faith, nature) = (
+            (self.rage + kept(0)) * m,
+            (self.faith + kept(1)) * m,
+            (self.nature + kept(2)) * m,
+        );
         // A fusion pays both its parents, each at double the parent's rate.
         // Written out rather than derived from `parents()` because the rates
         // are the design and reading them off a table hides what they are.
@@ -4764,6 +4850,29 @@ impl Combatant {
         if self.health > self.max_health {
             self.health = self.max_health;
         }
+        // **The unmaking, and it is here rather than at the tick** because this
+        // is the one place a maximum falls. `is_down` has fired at
+        // `max_health <= 0` since the fork, so the class does not invent a way
+        // to die — it moves where the line is.
+        if let Some(floor) = self.unmade_at {
+            // **Told Once: every curse standing on them raises it**, and it is
+            // read here rather than set at the bell because what it reads is a
+            // fact about *now*. The two knobs are copied onto the sufferer at
+            // the bell, which is the only way a fighter can know what has been
+            // said about it: this function has one combatant and no view of
+            // the room.
+            // **Percentage points of the maximum, not points of health.**
+            // `PLAN-M16.md` §12.8 says *raises the unmaking third by three
+            // points*, and a "point" of a threshold is a percentage point —
+            // eight raw points against a maximum in the thousands is noise, and
+            // a knob that moves noise is a knob nobody can watch move.
+            let standing: i32 = self.curses.iter().map(|c| c.stacks as i32).sum();
+            let pts = (self.told_per_curse * standing).min(self.told_cap);
+            let raised = floor + self.max_health * pts / 100;
+            if self.max_health <= raised {
+                self.health = 0;
+            }
+        }
         dealt
     }
 }
@@ -4910,6 +5019,22 @@ pub enum Event {
     Deflecting { side: Side, total: u32, reduction: i32 },
     /// Spell forking gained. Every cast lands once more per stack.
     Forking { side: Side, total: u32 },
+    /// A Stoker's furnace took a shovelful. **The pool falling and the stacks
+    /// rising on the same line**, so the replay can draw both on the tick they
+    /// happened rather than inferring one from the other — which is the *page
+    /// draws numbers core sent it* rule, stated for a number that moves twice.
+    Burned { side: Side, what: &'static str, points: i32, left: i32, stacks: u32 },
+    /// A creature whose maximum health went under a Whisperer's threshold.
+    ///
+    /// Its own event rather than a `Fell`, because *how* it ended is the whole
+    /// of what the class bought — and `Fell` is still logged after it, since it
+    /// is still down.
+    ///
+    /// **The maximum it is at and the line it went under**, which are the two
+    /// numbers in the room. Neither is the maximum it *started* with, and that
+    /// is deliberate: storing a starting maximum on every combatant to spell
+    /// out a log line is a field the fight would not otherwise have.
+    Unmade { side: Side, at: i32, under: i32 },
     Fell { side: Side },
     End { outcome: Outcome },
 }
@@ -5053,6 +5178,25 @@ impl CombatLog {
             Event::Activate { side, item, .. } => {
                 format!("{} {} activates {}", t, self.who(*side), item)
             }
+            // **Counted, never dramatised.** What went in, what is left, and
+            // what came out of it — the three numbers a person reading this
+            // line came for.
+            Event::Burned { side, what, points, left, stacks } => format!(
+                "{} {} shovels {} {} into the furnace ({} left, {} stacks)",
+                t,
+                self.who(*side),
+                points,
+                what,
+                left,
+                stacks
+            ),
+            Event::Unmade { side, at, under } => format!(
+                "{} {} is unmade: {} maximum health left, against the {} it takes",
+                t,
+                self.who(*side),
+                at,
+                under
+            ),
             Event::Broke { side, item, .. } => {
                 format!("{} {}'s {} comes apart and stops", t, self.who(*side), item)
             }
@@ -5374,6 +5518,72 @@ pub const FUNNEL_HOLD: i32 = SPELL_MANA_COST * 10;
 ///
 /// `half` is tenths of a stack a turn, so the arithmetic is integer the whole
 /// way down — the same reason every roll in this game is per-mille.
+/// The Stoker's furnace: shovel the largest held pool into empowerment.
+///
+/// **On the fighter's own clock, beside the spin's**, and here rather than
+/// inside the item loop for the reason `overwind` is: a fighter with four items
+/// must not stoke four times a tick. There is no item; there is a furnace.
+///
+/// **The largest, and only ever one of them.** `pools_worth_holding` returns
+/// rage, faith and nature — checked at the call site rather than assumed — and
+/// never mana or insight, which are spent already and pay nothing for being
+/// held. Ties go to the earliest, so two equal pools burn in a fixed order and
+/// a fight replays identically.
+///
+/// What it takes is recorded in `burned`, so `Rule::BurnKeepsBonus` can pay a
+/// share of a standing bonus the pool is no longer there to pay.
+fn stoke(c: &mut Combatant, who: u8, side: Side, t: u32, log: &mut Vec<LogEntry>) {
+    use crate::piece::Resource;
+    if c.burn_every_ms == 0 || c.burn_per_stack <= 0 {
+        return;
+    }
+    c.burn_ms += TICK_MS;
+    while c.burn_ms >= c.burn_every_ms {
+        c.burn_ms -= c.burn_every_ms;
+        const POOLS: [(Resource, &str); 3] =
+            [(Resource::Rage, "rage"), (Resource::Faith, "faith"), (Resource::Nature, "nature")];
+        let Some((at, &(what, name))) = POOLS
+            .iter()
+            .enumerate()
+            .max_by_key(|(i, (r, _))| (c.pool(*r), std::cmp::Reverse(*i)))
+        else {
+            return;
+        };
+        let have = c.pool(what);
+        if have <= 0 {
+            // **An empty hopper buys nothing.** A furnace with nothing in it is
+            // a furnace, not a free stack — which is the whole reason the class
+            // asks you to decide which pool to bank.
+            continue;
+        }
+        let took = have.min(c.burn_per_stack);
+        c.set_pool(what, have - took);
+        c.burned[at] += took;
+        c.empowerment += 1;
+        // **Fired Funnel: the furnace pays the funnel.** Every stack it buys
+        // is also mana, up to a budget the fight starts with — here rather
+        // than at the cast, because what is being exchanged is the *stack*
+        // and this is where a stack is bought.
+        if let Some(crate::expert::ExpertPower::FiredFunnel { worth, .. }) = c.expert {
+            if c.fired_left > 0 && worth > 0 {
+                c.fired_left -= 1;
+                c.mana += worth;
+            }
+        }
+        log.push(LogEntry {
+            who,
+            at_ms: t,
+            event: Event::Burned {
+                side,
+                what: name,
+                points: took,
+                left: have - took,
+                stacks: c.empowerment,
+            },
+        });
+    }
+}
+
 fn overwind(c: &mut Combatant, every_ms: u32) {
     use crate::expert::ExpertPower::OverwoundArm;
     let Some(OverwoundArm { half, ceiling, carry }) = c.expert else { return };
@@ -5427,6 +5637,37 @@ pub struct Held {
     /// `Character::start_with` fills it; everything that builds a `Held` by
     /// hand gets zero, which is the honest answer for a fixture with no board.
     pub empty_frames: u32,
+    /// Empowerment stacks already on you at the bell.
+    ///
+    /// **`Rule::BurnCarries` is the only thing that fills it**, and it is in
+    /// `Held` rather than in `Stats` for the reason `armor` and `mana` are: a
+    /// stack is a thing you are already holding, not a rate anything pays.
+    pub empowerment: u32,
+    /// Pools already banked at the bell, and the two things a mind build spends.
+    ///
+    /// **`Held` and not `Stats`**, which is the division this struct exists to
+    /// make: a `Stats` figure is a rate something pays and a `Held` figure is a
+    /// quantity you already have. A pool is the second.
+    pub rage: i32,
+    pub faith: i32,
+    pub nature: i32,
+    pub insight: i32,
+    pub dread: i32,
+    /// Mind damage the **character** adds to every mind hit it lands.
+    ///
+    /// **Through `Held` and not through `Stats`, which is the whole finding.**
+    /// `Effect::Stat { mind }` lands in the character's own `Stats`, and
+    /// `ItemProfile::stats.mind` is what the fight reads — so a tree that
+    /// granted mind damage granted nothing at all, which is the *eight skill
+    /// nodes* failure exactly and was caught by
+    /// `every_point_in_an_expert_tree_buys_something` before it shipped.
+    ///
+    /// It cannot be read off `player_stats` either: that sums every item's
+    /// stats, so adding it to every item's hit would pay the board's own mind
+    /// damage once per item. `Held` is the one door for *what the character
+    /// contributes, once, beside the item* — the same door the tree's armour,
+    /// its mana and its granted rules go through.
+    pub mind: i32,
 }
 
 /// Put an expert's power onto the fighter at the bell.
@@ -5439,6 +5680,28 @@ pub struct Held {
 /// The six that are combat's all land in the one `expert` field: what each
 /// does with its knobs is read where the mechanic is, because a knob copied
 /// into a second field here would be a second answer to what the tree tuned.
+/// Every furnace expert has a furnace, whether or not a Stoker lit one.
+///
+/// **An expert's power is self-contained**, which is the rule M13 set and this
+/// is the first block where it has cost anything to keep. Six of the
+/// twenty-one are about what a furnace does, and a furnace is the Stoker's —
+/// so a Fired Funnel whose promise is *every stack the furnace buys is also
+/// mana* would promise nothing if it had to wait for somebody else's power to
+/// be in the list beside it.
+///
+/// It is belt-and-braces rather than a behaviour change: you cannot hold one of
+/// these without being a Stoker. What it buys is that the promise is true of
+/// the power rather than of the pair, which is what lets
+/// `every_point_in_an_expert_tree_buys_something` ask its question of the
+/// expert alone — and asking it of the pair buries five of the original ten
+/// under two parent powers' worth of noise.
+fn light_the_furnace(c: &mut Combatant) {
+    if c.burn_every_ms == 0 {
+        c.burn_every_ms = 4_000;
+    }
+    c.burn_per_stack = c.burn_per_stack.max(10);
+}
+
 fn apply_expert(c: &mut Combatant, e: crate::expert::ExpertPower) {
     use crate::expert::ExpertPower::*;
     match e {
@@ -5449,7 +5712,20 @@ fn apply_expert(c: &mut Combatant, e: crate::expert::ExpertPower) {
         | CurseRequisition { .. }
         | PatentedFunnel { .. }
         | OpeningNumber { .. }
-        | CursedLicence { .. } => {
+        | CursedLicence { .. }
+        // **Nine of M16's eleven are the fight's too**, and each is read where
+        // its own mechanic is rather than copied into a field here — which is
+        // the rule this function's own doc states and the reason there is one
+        // `expert` field rather than thirty.
+        | BareFurnace { .. }
+        | FiredFunnel { .. }
+        | ColdStoke { .. }
+        | PonkeyBoiler { .. }
+        | FlashPowder { .. }
+        | LoudDoubt { .. }
+        | RequisitionedSilence { .. }
+        | LicensedRumour { .. }
+        | AshAndWhisper { .. } => {
             c.expert = Some(e);
             // **The budgets a fight starts with, seeded once at the bell.**
             // Read off the tuned power rather than kept beside it, so a knob
@@ -5462,18 +5738,73 @@ fn apply_expert(c: &mut Combatant, e: crate::expert::ExpertPower) {
                     c.opening_until_ms = window_ms.max(0) as u32;
                     c.opening_encores = encore.max(0);
                 }
+                // **A bare frame is a hopper that never empties**, and it is
+                // paid once at the bell rather than at the tick: an empty frame
+                // does not fill up and a stack bought from one is a stack you
+                // walked in with.
+                // **Ash and Whisper's furnace runs on what it burns**, so it
+                // needs a shovel even on a board with no Stoker in it.
+                BareFurnace { per_frame, every_ms, cap } => {
+                    let got = per_frame.max(0) * c.empty_frames as i32 / 10;
+                    c.empowerment += got.clamp(0, cap.max(0)) as u32;
+                    light_the_furnace(c);
+                    c.burn_every_ms = every_ms.max(TICK_MS as i32) as u32;
+                }
+                ColdStoke { every_ms, .. } | AshAndWhisper { every_ms, .. } => {
+                    light_the_furnace(c);
+                    c.burn_every_ms = every_ms.max(TICK_MS as i32) as u32;
+                }
+                // The Funnel's exchange window, spent like a requisition.
+                FiredFunnel { per_fight, .. } => {
+                    c.fired_left = per_fight.max(0);
+                    light_the_furnace(c);
+                }
+                // **The boiler's two other knobs land on things the fight
+                // already reads**: a turning item keeps more of its turns, and
+                // a component holds more enchs — which is the board's and is
+                // answered in `Character::ench_racks`, one of the thirty-one
+                // places that walk a board.
+                PonkeyBoiler { keep, .. } => {
+                    c.spin_keep += keep.max(0) as u32;
+                    light_the_furnace(c);
+                }
+                RequisitionedSilence { per_fight, .. } => c.silent_left = per_fight.max(0),
+                // **The flash is before the first tick**, which is what makes
+                // it the Showstopper's half of the pairing: everything you were
+                // holding, at once, and the fight is decided early or not at
+                // all.
+                FlashPowder { all_at_once, .. } => {
+                    light_the_furnace(c);
+                    let pct = all_at_once.clamp(0, 100);
+                    for (i, what) in [
+                        crate::piece::Resource::Rage,
+                        crate::piece::Resource::Faith,
+                        crate::piece::Resource::Nature,
+                    ]
+                    .into_iter()
+                    .enumerate()
+                    {
+                        let have = c.pool(what);
+                        let took = have * pct / 100;
+                        if took > 0 {
+                            c.set_pool(what, have - took);
+                            c.burned[i] += took;
+                            c.empowerment += (took / 10).max(1) as u32;
+                        }
+                    }
+                }
                 _ => {}
             }
         }
         // **The purse's**, settled by `reward::bounty_with_class` where the
         // argument about what a fight pays already lives. `Showstopper` is the
         // precedent and the reason that file exists.
-        ShortProgramme { .. } | EleventhSeason { .. } => {}
+        ShortProgramme { .. } | EleventhSeason { .. } | CurtainLine { .. } => {}
         // **The board's.** How many enchs fit on a component, and what an
         // enched component lends its neighbours, are packing-screen facts —
         // already in the profiles this fight was handed, the same way
         // `Recycler`'s assembly bonus is.
-        FullBill { .. } => {}
+        FullBill { .. } | ToldOnce { .. } => {}
     }
 }
 
@@ -5578,6 +5909,13 @@ pub fn simulate_party_holding(
     // add to and subtract from what the tree granted rather than replacing it.
     start_player.armor += held.armor;
     start_player.mana += held.mana;
+    start_player.empowerment += held.empowerment;
+    start_player.said += held.mind;
+    start_player.rage += held.rage;
+    start_player.faith += held.faith;
+    start_player.nature += held.nature;
+    start_player.insight += held.insight;
+    start_player.dread += held.dread.max(0) as u32;
     // A board fact, carried in rather than derived, because an empty frame
     // produces no `ItemProfile` and so is invisible from in here.
     start_player.empty_frames = held.empty_frames;
@@ -5605,6 +5943,19 @@ pub fn simulate_party_holding(
             // The three that tune the spin. They add and take the fastest,
             // because two nodes granting the same rule is a tree that stacks
             // rather than a tree with a last-one-wins in it.
+            // **All three of M16's, and each adds rather than replaces**, the
+            // way the spin's three do: two nodes granting the same rule is a
+            // tree that stacks, not a tree with a last-one-wins in it. Clamped
+            // where they are read rather than here.
+            crate::skills::Rule::BurnKeepsBonus { pct } => {
+                start_player.burn_keeps_pct += *pct as i32
+            }
+            // **Not combat's.** What survives a bell is settled after one, the
+            // same way `StandingFact::told` is — see `Character::carry_out_of`.
+            // The arm exists so that adding a rule is a decision rather than a
+            // silence.
+            crate::skills::Rule::BurnCarries { .. } => {}
+            crate::skills::Rule::MindPierce { pct } => start_player.mind_pierce += *pct as i32,
             crate::skills::Rule::SpinExtra { per_turn } => start_player.spin_extra += per_turn,
             crate::skills::Rule::SpinKeep { stacks } => start_player.spin_keep += stacks,
             crate::skills::Rule::SpinEvery { ms } => {
@@ -5656,6 +6007,18 @@ pub fn simulate_party_holding(
             crate::class::ClassPower::SlowTime(n) => start_player.slow_time = n,
             crate::class::ClassPower::Overflowing(n) => start_player.overflowing = n,
             crate::class::ClassPower::Leeching(pct) => start_player.leech = pct,
+            // **The furnace is lit at the bell**, like everything else here.
+            // `burn_ms` counts up on the fighter's own clock beside the spin's,
+            // for the same reason the spin does: there is no item, so there is
+            // no item's clock.
+            crate::class::ClassPower::Stoker { every_ms, per_stack } => {
+                start_player.burn_every_ms = every_ms.max(TICK_MS);
+                start_player.burn_per_stack = per_stack.max(0);
+            }
+            // **The threshold is the *foe's* and is set from the power the
+            // player holds**, which is why it is done below rather than here:
+            // `start_player` is the wrong combatant for it.
+            crate::class::ClassPower::Whisperer { .. } => {}
             crate::class::ClassPower::WrongSense(pct) => start_player.mind_pierce = pct,
             crate::class::ClassPower::FirstBlood => start_player.first_blood = true,
             // Not a combat rule at all: it changes what a corpse leaves
@@ -5725,8 +6088,76 @@ pub fn simulate_party_holding(
         }
     }
     let start_player = start_player;
-    let start_enemies: Vec<Combatant> =
+    let mut start_enemies: Vec<Combatant> =
         specs.iter().map(|m| Combatant::monster_at(m, difficulty)).collect();
+    // **The Whisperer's threshold is the foe's, set from the power the player
+    // holds**, which is why it is not in the loop above: `start_player` is the
+    // wrong combatant for it. Set once, off the maximum as the bell went, so
+    // eating a maximum down does not move the line it is being measured
+    // against — a threshold that chased the number it reads would never be
+    // crossed.
+    //
+    // **The tuning is read off `class_defs`**, which is the classes you *are*
+    // with the expert's knobs turned, not `CLASSES` — the thirty-eight dead
+    // nodes of M13.6 are what happens when a promise is printed from the
+    // roster.
+    // **Five of the twenty-one experts move the line as well**, and they are
+    // read here rather than each finding its own way to the foe for the reason
+    // the base class is: the threshold is set once, off the maximum as the bell
+    // went, and a line that chased the number it reads would never be crossed.
+    //
+    // The **largest** of them, not the sum. Two experts that each say *forty
+    // percent* say the same thing, and a character holding both would otherwise
+    // unmake at eighty — which is a threshold that has stopped describing
+    // anything.
+    let third = classes
+        .iter()
+        .filter_map(|c| match c.power {
+            crate::class::ClassPower::Whisperer { third } => Some(third),
+            crate::class::ClassPower::Expert(e) => match e {
+                crate::expert::ExpertPower::LoudDoubt { third, .. }
+                | crate::expert::ExpertPower::RequisitionedSilence { third, .. }
+                | crate::expert::ExpertPower::LicensedRumour { third, .. }
+                | crate::expert::ExpertPower::CurtainLine { third, .. }
+                | crate::expert::ExpertPower::AshAndWhisper { third, .. } => Some(third),
+                _ => None,
+            },
+            _ => None,
+        })
+        .max();
+    if let Some(third) = third {
+        for f in start_enemies.iter_mut() {
+            f.unmade_at = Some(f.max_health * third.clamp(1, 99) / 100);
+        }
+    }
+    // **Told Once's two knobs, copied onto whoever is going to suffer them.**
+    // `take_mind_pierced` has one combatant and no view of the room, so the
+    // only way a fighter can know what has been said about it is to be told at
+    // the bell — the same shape `unmade_at` above it takes, and for the same
+    // reason.
+    if let Some((per, cap)) = classes.iter().find_map(|c| match c.power {
+        crate::class::ClassPower::Expert(crate::expert::ExpertPower::ToldOnce {
+            per_curse,
+            cap,
+            standing,
+        }) => Some((per_curse.max(0) * (1 + standing.max(0)), cap.max(0))),
+        _ => None,
+    }) {
+        for f in start_enemies.iter_mut() {
+            f.told_per_curse = per;
+            f.told_cap = cap;
+            // **A threshold that is not there is not one anything can be
+            // pushed over**, so this seeds the Whisperer's own floor when
+            // nothing else has — the same self-containment `light_the_furnace`
+            // gives the six furnace experts, and for the same reason: you
+            // cannot hold Told Once without being a Whisperer, so a promise
+            // that waited for another power to be in the list beside it would
+            // be a promise about the pair rather than about the power.
+            let floor = f.max_health * 33 / 100;
+            f.unmade_at.get_or_insert(floor);
+        }
+    }
+    let start_enemies = start_enemies;
     let mut p = start_player.clone();
     let mut foes: Vec<Combatant> = start_enemies.clone();
     let mut log: Vec<LogEntry> = Vec::new();
@@ -5908,6 +6339,7 @@ pub fn simulate_party_holding(
                 let c = pick(&mut p, &mut foes, me);
                 let every = c.spin_every_ms.max(TICK_MS);
                 overwind(c, every);
+                stoke(c, me.who as u8, side, t, &mut log);
             }
             let count = pick(&mut p, &mut foes, me).items.len();
             for idx in 0..count {
@@ -6022,6 +6454,24 @@ pub fn simulate_party_holding(
                 // second — which would draw a shape the fight never had the
                 // moment anything slowed the item down.
                 if let Some((name, stacks, to)) = turned {
+                    // **Ponkey Boiler: the spin feeds the furnace.** Every turn
+                    // a spinning item banks is tenths of a stack, booked here
+                    // because this is where a turn is banked — and there is no
+                    // second place a turn happens.
+                    {
+                        let c = pick(&mut p, &mut foes, me);
+                        if let Some(crate::expert::ExpertPower::PonkeyBoiler {
+                            per_spin, ..
+                        }) = c.expert
+                        {
+                            c.boiler_tenths += per_spin.max(0);
+                            let whole = c.boiler_tenths / 10;
+                            if whole > 0 {
+                                c.boiler_tenths -= whole * 10;
+                                c.empowerment += whole as u32;
+                            }
+                        }
+                    }
                     let front = aim_of(&foes, p.aim);
                     log.push(LogEntry {
                         who: me.logged_as(front),
@@ -6205,6 +6655,24 @@ fn check_down(
     for (i, f) in foes.iter().enumerate() {
         if f.is_down() && !fallen.contains(&i) {
             fallen.push(i);
+            // **How it ended, before the fact that it did.** An unmaking is
+            // reported here rather than in `take_mind_pierced` because that is
+            // where the maximum falls and this is where a fall is *told*, and a
+            // second telling site is the thing this file has paid for six
+            // times. It is still a `Fell` underneath, because it is still down.
+            if let Some(floor) = f.unmade_at {
+                if f.max_health <= floor && f.max_health > 0 {
+                    log.push(LogEntry {
+                        who: i as u8,
+                        at_ms: t,
+                        event: Event::Unmade {
+                            side: Side::Enemy,
+                            at: f.max_health,
+                            under: floor,
+                        },
+                    });
+                }
+            }
             log.push(LogEntry { who: i as u8, at_ms: t, event: Event::Fell { side: Side::Enemy } });
         }
     }
@@ -6460,6 +6928,12 @@ fn pay_for_a_cast(me: &mut Combatant, t: u32) -> bool {
     // whole fighter: the pool being spent is not on this side of the fight.
     if me.mana >= SPELL_MANA_COST {
         me.mana -= SPELL_MANA_COST;
+        // **Fired Funnel: a cast refunds part of what it cost.** After the
+        // spend rather than instead of it, so a board with no mana still
+        // cannot cast — a refund is change, not credit.
+        if let Some(FiredFunnel { refund, .. }) = me.expert {
+            me.mana += SPELL_MANA_COST * refund.clamp(0, 100) / 100;
+        }
         return true;
     }
     // **Loud Calculation: pay the shortfall in strength.** Everything above
@@ -6493,7 +6967,31 @@ fn pay_for_a_cast(me: &mut Combatant, t: u32) -> bool {
             return true;
         }
     }
+    // **Requisitioned Silence: a cast you cannot pay for is said anyway.**
+    // Last, after everything that could still afford it has tried, because
+    // this is what happens when nothing can. It does not return `true` — the
+    // cast still does not go off; what it does is bank mind damage for the
+    // activation to land, which is the whole joke: the form was not signed and
+    // the word was said.
+    if let Some(RequisitionedSilence { rate, .. }) = me.expert {
+        if me.silent_left > 0 && rate > 0 {
+            me.silent_left -= 1;
+            me.silent_owed += SPELL_MANA_COST * rate / 100;
+        }
+    }
     false
+}
+
+/// **Cold Stoke: a curse you land is fuel.**
+///
+/// Called by whoever landed one, off the *lander* rather than the sufferer,
+/// which is the division `Curses::bite` already makes — a curse's tuning is set
+/// by whoever put it there.
+fn stoke_on_curse(c: &mut Combatant, deep: bool) {
+    if let Some(crate::expert::ExpertPower::ColdStoke { per_stack, standing, .. }) = c.expert {
+        let n = per_stack.max(0) * if deep { 1 + standing.max(0) } else { 1 };
+        c.empowerment += n.max(0) as u32;
+    }
 }
 
 fn land_curse(
@@ -7028,13 +7526,57 @@ fn activate(
         apply(p, foes, me, Action::Curse { kind, target: Target::Enemy }, t, log, Some(idx));
     }
 
-    if item.mind > 0 {
+    // **Four of M16's eleven say something on an activation**, and all four
+    // arrive here rather than each finding its own place to hit from: a mind
+    // hit is one thing, dealt once, and four ways of adding to it must not
+    // become four places that deal one.
+    let extra = {
+        let who_i_am = me;
+        let me = pick(p, foes, who_i_am);
+        let mut extra = 0;
+        match me.expert {
+            // **Said plainly.** Wearing little enough, strength counts.
+            Some(crate::expert::ExpertPower::LoudDoubt { worn, rate, .. })
+                if me.items.len() as i32 <= worn =>
+            {
+                extra += me.strength * rate.max(0) * 25 / 100;
+            }
+            // **Every point the furnace burned is also said**, at halves.
+            Some(crate::expert::ExpertPower::AshAndWhisper { rate, .. }) => {
+                extra += me.burned.iter().sum::<i32>() * rate.max(0) / 2;
+            }
+            _ => {}
+        }
+        // A silence that was banked is said on the next activation and once.
+        extra += std::mem::take(&mut pick(p, foes, who_i_am).silent_owed);
+        // And what the tree said, which is the character's rather than the
+        // item's — see `Held::mind`.
+        extra += pick(p, foes, who_i_am).said;
+        extra
+    };
+    // **The rumour, which is a share of what is left rather than a number.**
+    // Its own block because it is measured off the *target* and everything
+    // above is measured off the swinger.
+    let rumour = {
+        let pct = match pick(p, foes, me).expert {
+            Some(crate::expert::ExpertPower::LicensedRumour { pct, .. }) if item.enched => {
+                pct.max(0)
+            }
+            _ => 0,
+        };
+        if pct == 0 { 0 } else { pick(p, foes, me.other(front)).max_health * pct / 1000 }
+    };
+
+    if item.mind + extra + rumour > 0 {
         // Dread is the wearer's, so it is read off the swinger before the
         // blow leaves - the same shape as empowerment, which is picked up on
         // the way out rather than applied on arrival.
         let (raw, pierce) = {
             let me = pick(p, foes, me);
-            (me.wrong_sense_multiplied(item.mind + me.mind_bonus()), me.mind_pierce)
+            (
+                me.wrong_sense_multiplied(item.mind + extra + me.mind_bonus()) + rumour,
+                me.mind_pierce,
+            )
         };
         let target = pick(p, foes, me.other(front));
         let dealt = target.take_mind_pierced(raw, pierce);
@@ -7724,6 +8266,18 @@ fn apply(
             if stood {
                 pick(p, foes, me).facts_standing += 1;
             }
+            // **Cold Stoke: a curse you land is fuel**, and it is booked on
+            // the *lander* — the same side `facts_standing` is, for the same
+            // reason: a curse's tuning belongs to whoever put it there.
+            //
+            // `standing` reads a curse that has **stacked** rather than one
+            // that cannot expire. `PLAN-M16.md` §12.3 says *permanent*, and a
+            // permanent curse is Standing Fact's — which is a different expert,
+            // so a knob that only paid beside it would be a point you can only
+            // spend as somebody else. A second stack is the same idea and is
+            // reachable from this class's own chair.
+            let deep = pick(p, foes, on).curses.stacks_of(kind) > 1;
+            stoke_on_curse(pick(p, foes, me), deep);
             // A curse is the one thing a watcher counts that nobody activated,
             // and it is watched from both sides: the gear that landed it and
             // the gear wearing it both saw the same event.

@@ -6,11 +6,11 @@
 | # | Milestone | Deliverables | Status |
 |---|---|---|---|
 | **M16.0** | The fixture and the primitives | the run as a save; `common::from_save`; `Character::item_partition`; `quick` terrain; `MonsterSpec.enchs`; `stats::LANE_CAP` and a behavioural curse lint | **done** `288810c` · 919 passing |
-| **M16.1** | The gate and the Flat Below | `the-way-under-the-flat` on the Sands; `the-reefs-1`; nine stakes, three bands, six pockets, the sheet; floor 2 stubbed | **done** `846e0f4` · 927 passing |
-| **M16.2** | The Assay | `the-reefs-2`; three doors; the assay office; the repack measured off the run | **done** `6e53231` · 933 passing |
-| **M16.3** | The Needle Room and the Tenth Surveyor | `the-reefs-3`; four sinkholes, four levers, the plate; the boss wearing the run; the bracket | **done** `c024028` · 941 passing |
-| **M16.4** | Two more base classes | `ClassPower::Stoker`, `ClassPower::Whisperer`; `OFFERED` at seven; two nine-node trees; the fork at seven cards | — |
-| **M16.5** | Eleven experts | `EXPERTS` at twenty-one; eleven `ExpertPower` variants; eleven six-node trees; three new rules | — |
+| **M16.1** | The gate and the Flat Below | `the-way-under-the-flat` on the Sands; `the-reefs-1`; nine stakes, three bands, six pockets, the sheet; floor 2 stubbed | **done** `deed458` · 927 passing |
+| **M16.2** | The Assay | `the-reefs-2`; three doors; the assay office; the repack measured off the run | **done** `9301dcb` · 933 passing |
+| **M16.3** | The Needle Room and the Tenth Surveyor | `the-reefs-3`; four sinkholes, four levers, the plate; the boss wearing the run; the bracket | **done** `6cef332` · 941 passing |
+| **M16.4** | Two more base classes | `ClassPower::Stoker`, `::Whisperer`; `OFFERED` at seven; two nine-node trees; the fork at seven cards | **done** `651a932` · 950 passing |
+| **M16.5** | Eleven experts | `EXPERTS` at twenty-one; eleven `ExpertPower` variants; eleven six-node trees; three new rules | **done** `651a932` · with M16.4 |
 | **M16.6** | The M16 gate and walk | browser checks; the walk to the plate; `HANDOFF-M16.md`; `CLAUDE.md` | — |
 | **M17.0** | The table, in core | `shot.rs` — `Shot`, `Flight`, `Contact`, `shoot`; `traversal` on `TilesData`; integer physics | — |
 | **M17.1** | Obstacles | five `PlaceKind`s; parse lints; the Treyway as a table | — |

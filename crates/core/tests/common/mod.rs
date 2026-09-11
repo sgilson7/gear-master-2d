@@ -456,3 +456,45 @@ pub fn with_instrument(kind: &str) -> Character {
     );
     ch
 }
+
+/// One item that deals mind damage on every activation, and nothing else.
+///
+/// **A profile built by hand rather than a board packed for it**, which is what
+/// the mind lane needs: the catalogue's mind gear is the Threshold's shelf and
+/// `touches_insight` keeps it off every creature, so a board that reliably
+/// whispers is a board a fixture cannot shop for. `ItemProfile::default` plus
+/// two fields is the honest version — everything the fight reads is a field on
+/// the profile, and the ones left at zero are the ones that are meant to be.
+pub fn one_item_dealing_mind() -> Vec<gm2d_core::loadout::ItemProfile> {
+    use gm2d_core::loadout::ItemProfile;
+    let mut stats = gm2d_core::stats::Stats::ZERO;
+    stats.mind = 40;
+    vec![ItemProfile {
+        sigil_seed: 0,
+        pieces: Vec::new(),
+        name: "a word".to_string(),
+        full_name: "a word".to_string(),
+        core: "a word".to_string(),
+        slot: SlotKind::Helmet,
+        cooldown_ms: 1_000,
+        stats,
+        triggers: Vec::new(),
+        adjacent_assembled_same_slot: 0,
+        diagonal_items: Vec::new(),
+        open_cells: 0,
+        turn_cycle: Vec::new(),
+        spins: false,
+        fragile: false,
+        enched: false,
+        attracts_curses: false,
+        steady: false,
+        overtakes: false,
+        wrong_sense: false,
+        power: 100,
+        rating: 0,
+        power_bonus: 0,
+        casts: Vec::new(),
+        adjacent_items: Vec::new(),
+        aligned_items: Vec::new(),
+    }]
+}

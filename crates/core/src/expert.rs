@@ -104,6 +104,54 @@ pub enum ExpertPower {
     ///
     /// `beacon_pct` adds to `Rule::Beacon`, for the reason `harvest` does.
     FullBill { racks: i32, beacon_pct: i32 },
+
+    // ------------------------------------------------- M16's eleven
+    //
+    // **`C(7,2)` is twenty-one and the table held ten**, which is the whole of
+    // why these exist: a roster that grows leaves every pair it makes without a
+    // counter, and `every_pair_of_offered_classes_reaches_an_expert` said so on
+    // the commit that made the roster seven.
+    //
+    // Each one's knobs land on a field the fight already reads wherever they
+    // can, which is M13's rule and is what keeps eleven new powers from being
+    // eleven new mechanics. Where a field is new it is one field, read in one
+    // place, and the promise says what it does.
+
+    /// Stoker × Gorillathon. *An empty frame is a hopper that never empties.*
+    ///
+    /// `per_frame` is stacks at the bell per bare frame, in tenths.
+    BareFurnace { per_frame: i32, every_ms: i32, cap: i32 },
+    /// Stoker × Funnel Sergeant. *The furnace pays the funnel.* Every stack the
+    /// furnace buys is also `worth` mana.
+    FiredFunnel { worth: i32, per_fight: i32, refund: i32 },
+    /// Stoker × Worm-Fact Keeper. *A curse you land is fuel.* Every curse
+    /// landed buys `per_stack` stacks, and `standing` doubles it for a curse
+    /// that cannot expire.
+    ColdStoke { per_stack: i32, every_ms: i32, standing: i32 },
+    /// Stoker × Kaklon Patent. *The spin feeds the furnace.* Every turn a
+    /// spinning item banks is `per_spin` tenths of a stack.
+    PonkeyBoiler { per_spin: i32, keep: i32, licence: i32 },
+    /// Stoker × Top of the Bill. *Everything at once, and early.* `all_at_once`
+    /// percent of every pool is burned before the first tick.
+    FlashPowder { all_at_once: i32, until_ms: i32, pct: i32 },
+    /// Whisperer × Gorillathon. *Said plainly.* Wearing `worn` items or fewer,
+    /// strength counts toward mind damage at `rate` quarters.
+    LoudDoubt { worn: i32, rate: i32, third: i32 },
+    /// Whisperer × Funnel Sergeant. *A cast you cannot pay for is said anyway*,
+    /// as mind damage worth `rate` percent of what it would have cost.
+    RequisitionedSilence { rate: i32, per_fight: i32, third: i32 },
+    /// Whisperer × Worm-Fact Keeper. *Each curse standing on them raises the
+    /// threshold*, by `per_curse` points, up to `cap`.
+    ToldOnce { per_curse: i32, cap: i32, standing: i32 },
+    /// Whisperer × Kaklon Patent. *An enched component says something.* Every
+    /// activation of one eats `pct` tenths of a percent of their maximum.
+    LicensedRumour { pct: i32, racks: i32, third: i32 },
+    /// Whisperer × Top of the Bill. *A creature unmade inside the window pays
+    /// the Showstopper's cut `mult` percent again.*
+    CurtainLine { mult: i32, under_ms: i32, third: i32 },
+    /// Stoker × Whisperer. *Every point burned is also said*, as mind damage at
+    /// `rate` halves.
+    AshAndWhisper { rate: i32, third: i32, every_ms: i32 },
 }
 
 /// Tenths, printed. `20` is `2.0`.
@@ -132,6 +180,17 @@ impl ExpertPower {
             CursedLicence { .. } => &["stack"],
             EleventhSeason { .. } => &["pct", "count_cap", "distinct", "posthumous"],
             FullBill { .. } => &["racks", "beacon_pct"],
+            BareFurnace { .. } => &["per_frame", "every_ms", "cap"],
+            FiredFunnel { .. } => &["worth", "per_fight", "refund"],
+            ColdStoke { .. } => &["per_stack", "every_ms", "standing"],
+            PonkeyBoiler { .. } => &["per_spin", "keep", "licence"],
+            FlashPowder { .. } => &["all_at_once", "until_ms", "pct"],
+            LoudDoubt { .. } => &["worn", "rate", "third"],
+            RequisitionedSilence { .. } => &["rate", "per_fight", "third"],
+            ToldOnce { .. } => &["per_curse", "cap", "standing"],
+            LicensedRumour { .. } => &["pct", "racks", "third"],
+            CurtainLine { .. } => &["mult", "under_ms", "third"],
+            AshAndWhisper { .. } => &["rate", "third", "every_ms"],
         }
     }
 
@@ -154,6 +213,25 @@ impl ExpertPower {
             1000
         } else {
             1
+        }
+    }
+
+    /// The same, asked of **one power** rather than of a knob name.
+    ///
+    /// **M16's, and it is the same finding `ClassPower::step` is.** The rule is
+    /// *the smallest move a player can see*, and what a player can see depends
+    /// on how the owning power prints the number. A knob ending `_ms` is
+    /// printed in whole seconds by the two experts it was written for — so 500
+    /// costs two points and changes no sentence — and to a **tenth** by the
+    /// four furnace experts, where eight hundred is 4.0s becoming 3.2s.
+    ///
+    /// Read off `describe`'s own format string rather than off a list: the four
+    /// that print a tenth are the four whose clock is a furnace's.
+    pub fn step_of(self, knob: &str) -> i32 {
+        use ExpertPower::*;
+        match (self, knob) {
+            (BareFurnace { .. } | ColdStoke { .. } | AshAndWhisper { .. }, "every_ms") => 100,
+            _ => Self::step(knob),
         }
     }
 
@@ -195,6 +273,39 @@ impl ExpertPower {
             (EleventhSeason { posthumous, .. }, "posthumous") => posthumous,
             (FullBill { racks, .. }, "racks") => racks,
             (FullBill { beacon_pct, .. }, "beacon_pct") => beacon_pct,
+            (BareFurnace { per_frame, .. }, "per_frame") => per_frame,
+            (BareFurnace { every_ms, .. }, "every_ms") => every_ms,
+            (BareFurnace { cap, .. }, "cap") => cap,
+            (FiredFunnel { worth, .. }, "worth") => worth,
+            (FiredFunnel { per_fight, .. }, "per_fight") => per_fight,
+            (FiredFunnel { refund, .. }, "refund") => refund,
+            (ColdStoke { per_stack, .. }, "per_stack") => per_stack,
+            (ColdStoke { every_ms, .. }, "every_ms") => every_ms,
+            (ColdStoke { standing, .. }, "standing") => standing,
+            (PonkeyBoiler { per_spin, .. }, "per_spin") => per_spin,
+            (PonkeyBoiler { keep, .. }, "keep") => keep,
+            (PonkeyBoiler { licence, .. }, "licence") => licence,
+            (FlashPowder { all_at_once, .. }, "all_at_once") => all_at_once,
+            (FlashPowder { until_ms, .. }, "until_ms") => until_ms,
+            (FlashPowder { pct, .. }, "pct") => pct,
+            (LoudDoubt { worn, .. }, "worn") => worn,
+            (LoudDoubt { rate, .. }, "rate") => rate,
+            (LoudDoubt { third, .. }, "third") => third,
+            (RequisitionedSilence { rate, .. }, "rate") => rate,
+            (RequisitionedSilence { per_fight, .. }, "per_fight") => per_fight,
+            (RequisitionedSilence { third, .. }, "third") => third,
+            (ToldOnce { per_curse, .. }, "per_curse") => per_curse,
+            (ToldOnce { cap, .. }, "cap") => cap,
+            (ToldOnce { standing, .. }, "standing") => standing,
+            (LicensedRumour { pct, .. }, "pct") => pct,
+            (LicensedRumour { racks, .. }, "racks") => racks,
+            (LicensedRumour { third, .. }, "third") => third,
+            (CurtainLine { mult, .. }, "mult") => mult,
+            (CurtainLine { under_ms, .. }, "under_ms") => under_ms,
+            (CurtainLine { third, .. }, "third") => third,
+            (AshAndWhisper { rate, .. }, "rate") => rate,
+            (AshAndWhisper { third, .. }, "third") => third,
+            (AshAndWhisper { every_ms, .. }, "every_ms") => every_ms,
             _ => return None,
         })
     }
@@ -242,6 +353,39 @@ impl ExpertPower {
             (EleventhSeason { distinct, .. }, "distinct") => *distinct += by,
             (EleventhSeason { posthumous, .. }, "posthumous") => *posthumous += by,
             (FullBill { racks, .. }, "racks") => *racks += by,
+            (BareFurnace { per_frame, .. }, "per_frame") => *per_frame += by,
+            (BareFurnace { every_ms, .. }, "every_ms") => *every_ms += by,
+            (BareFurnace { cap, .. }, "cap") => *cap += by,
+            (FiredFunnel { worth, .. }, "worth") => *worth += by,
+            (FiredFunnel { per_fight, .. }, "per_fight") => *per_fight += by,
+            (FiredFunnel { refund, .. }, "refund") => *refund += by,
+            (ColdStoke { per_stack, .. }, "per_stack") => *per_stack += by,
+            (ColdStoke { every_ms, .. }, "every_ms") => *every_ms += by,
+            (ColdStoke { standing, .. }, "standing") => *standing += by,
+            (PonkeyBoiler { per_spin, .. }, "per_spin") => *per_spin += by,
+            (PonkeyBoiler { keep, .. }, "keep") => *keep += by,
+            (PonkeyBoiler { licence, .. }, "licence") => *licence += by,
+            (FlashPowder { all_at_once, .. }, "all_at_once") => *all_at_once += by,
+            (FlashPowder { until_ms, .. }, "until_ms") => *until_ms += by,
+            (FlashPowder { pct, .. }, "pct") => *pct += by,
+            (LoudDoubt { worn, .. }, "worn") => *worn += by,
+            (LoudDoubt { rate, .. }, "rate") => *rate += by,
+            (LoudDoubt { third, .. }, "third") => *third += by,
+            (RequisitionedSilence { rate, .. }, "rate") => *rate += by,
+            (RequisitionedSilence { per_fight, .. }, "per_fight") => *per_fight += by,
+            (RequisitionedSilence { third, .. }, "third") => *third += by,
+            (ToldOnce { per_curse, .. }, "per_curse") => *per_curse += by,
+            (ToldOnce { cap, .. }, "cap") => *cap += by,
+            (ToldOnce { standing, .. }, "standing") => *standing += by,
+            (LicensedRumour { pct, .. }, "pct") => *pct += by,
+            (LicensedRumour { racks, .. }, "racks") => *racks += by,
+            (LicensedRumour { third, .. }, "third") => *third += by,
+            (CurtainLine { mult, .. }, "mult") => *mult += by,
+            (CurtainLine { under_ms, .. }, "under_ms") => *under_ms += by,
+            (CurtainLine { third, .. }, "third") => *third += by,
+            (AshAndWhisper { rate, .. }, "rate") => *rate += by,
+            (AshAndWhisper { third, .. }, "third") => *third += by,
+            (AshAndWhisper { every_ms, .. }, "every_ms") => *every_ms += by,
             (FullBill { beacon_pct, .. }, "beacon_pct") => *beacon_pct += by,
             _ => {}
         }
@@ -280,6 +424,17 @@ impl ExpertPower {
     pub fn id(self) -> &'static str {
         use ExpertPower::*;
         match self {
+            BareFurnace { .. } => "BareFurnace",
+            FiredFunnel { .. } => "FiredFunnel",
+            ColdStoke { .. } => "ColdStoke",
+            PonkeyBoiler { .. } => "PonkeyBoiler",
+            FlashPowder { .. } => "FlashPowder",
+            LoudDoubt { .. } => "LoudDoubt",
+            RequisitionedSilence { .. } => "RequisitionedSilence",
+            ToldOnce { .. } => "ToldOnce",
+            LicensedRumour { .. } => "LicensedRumour",
+            CurtainLine { .. } => "CurtainLine",
+            AshAndWhisper { .. } => "AshAndWhisper",
             LoudCalculation { .. } => "LoudCalculation",
             StandingFact { .. } => "StandingFact",
             OverwoundArm { .. } => "OverwoundArm",
@@ -297,6 +452,17 @@ impl ExpertPower {
     pub fn short(self) -> String {
         use ExpertPower::*;
         match self {
+            BareFurnace { per_frame, .. } => format!("a bare frame is worth {} stacks at the bell", tenths(per_frame)),
+            FiredFunnel { worth, .. } => format!("every stack the furnace buys is {worth} mana"),
+            ColdStoke { per_stack, .. } => format!("a curse you land is {per_stack} stacks"),
+            PonkeyBoiler { per_spin, .. } => format!("every spin turn is {} of a stack", tenths(per_spin)),
+            FlashPowder { all_at_once, .. } => format!("{all_at_once}% of every pool burns before the first tick"),
+            LoudDoubt { rate, .. } => format!("bare-handed, {}% of strength counts as mind damage", rate * 25),
+            RequisitionedSilence { .. } => format!("a cast you cannot pay for is said anyway"),
+            ToldOnce { per_curse, .. } => format!("every curse on them raises the unmaking by {per_curse}"),
+            LicensedRumour { pct, .. } => format!("an enched activation eats {}% of their maximum", tenths(pct)),
+            CurtainLine { mult, .. } => format!("an unmaking inside the window pays {mult}% more"),
+            AshAndWhisper { rate, .. } => format!("{}% of what the furnace burns is also said", rate * 50),
             LoudCalculation { rate, .. } => {
                 format!("strength buys mana at {} the point", tenths(rate))
             }
@@ -340,6 +506,68 @@ impl ExpertPower {
     pub fn describe(self) -> String {
         use ExpertPower::*;
         match self {
+            // ------------------------------------------------- M16's eleven
+            BareFurnace { per_frame, every_ms, cap } => format!(
+                "Every frame you left bare is a hopper that never empties: you walk into every \
+                 fight with {} stacks of mana empowerment a bare frame, up to {cap}. The furnace \
+                 runs every {:.1} seconds.",
+                tenths(per_frame),
+                every_ms as f32 / 1000.0
+            ),
+            FiredFunnel { worth, per_fight, refund } => format!(
+                "Every stack the furnace buys is also {worth} mana, up to {per_fight} times a \
+                 fight, and a cast refunds {refund}% of what it cost.",
+            ),
+            ColdStoke { per_stack, every_ms, standing } => format!(
+                "Every curse you land is fuel: {per_stack} stacks of mana empowerment, and {} for \
+                 one that cannot expire. The furnace runs every {:.1} seconds.",
+                per_stack * (1 + standing.max(0)),
+                every_ms as f32 / 1000.0
+            ),
+            PonkeyBoiler { per_spin, keep, licence } => format!(
+                "Every turn a spinning item banks is {} of a stack of mana empowerment. A turning \
+                 item keeps {keep} of its turns when it goes off, and you may hold {licence} \
+                 enchs a component.",
+                tenths(per_spin)
+            ),
+            FlashPowder { all_at_once, until_ms, pct } => format!(
+                "{all_at_once}% of every pool you are holding is burned before the first tick. A \
+                 fight won inside {:.0} seconds pays {pct}% more.",
+                until_ms as f32 / 1000.0
+            ),
+            LoudDoubt { worn, rate, third } => format!(
+                "Wearing {worn} items or fewer, {}% of your strength is added to every mind hit \
+                 you land. Anything unmade at {third}% of its maximum health.",
+                rate * 25
+            ),
+            RequisitionedSilence { rate, per_fight, third } => format!(
+                "A cast you cannot pay for is said anyway, as mind damage worth {rate}% of what \
+                 it would have cost, up to {per_fight} times a fight. Anything unmade at {third}% \
+                 of its maximum health.",
+            ),
+            ToldOnce { per_curse, cap, standing } => format!(
+                "Every curse standing on them raises the unmaking by {per_curse} points, up to \
+                 {cap}, and one that cannot expire counts {}.",
+                1 + standing.max(0)
+            ),
+            LicensedRumour { pct, racks, third } => format!(
+                "Every activation of an enched component eats {}% of their maximum health. You \
+                 may hold {racks} enchs a component, and anything is unmade at {third}% of its \
+                 maximum.",
+                tenths(pct)
+            ),
+            CurtainLine { mult, under_ms, third } => format!(
+                "A creature unmade inside {:.0} seconds pays {mult}% more on top of whatever the \
+                 bill already was. Anything unmade at {third}% of its maximum health.",
+                under_ms as f32 / 1000.0
+            ),
+            AshAndWhisper { rate, third, every_ms } => format!(
+                "Every point the furnace burns is also said: {}% of it lands as mind damage. The \
+                 furnace runs every {:.1} seconds and anything is unmade at {third}% of its \
+                 maximum health.",
+                rate * 50,
+                every_ms as f32 / 1000.0
+            ),
             LoudCalculation { rate, cap, floor, rebate } => {
                 let mut s = format!(
                     "A cast you cannot afford is paid for in strength, at {} strength a point \
@@ -511,9 +739,9 @@ pub struct ExpertDef {
     pub power: ExpertPower,
 }
 
-/// The ten, one per pair of the five offered classes.
+/// The twenty-one, one per pair of the seven offered classes.
 ///
-/// **`C(5,2)` and no more.** `every_pair_of_offered_classes_reaches_an_expert`
+/// **`C(7,2)` and no more.** `every_pair_of_offered_classes_reaches_an_expert`
 /// is what says the table is complete and holds no pair twice — a list of ten
 /// written by hand is a list that can be nine.
 pub static EXPERTS: &[ExpertDef] = &[
@@ -570,6 +798,79 @@ pub static EXPERTS: &[ExpertDef] = &[
         name: "EleventhSeason",
         blurb: "Eleven seasons of it, and the billing department has stopped asking questions.",
         power: ExpertPower::EleventhSeason { pct: 10, count_cap: 4, distinct: 0, posthumous: 0 },
+    },
+    // ---- M16's eleven, which are what `C(7, 2)` costs ----------------------
+    //
+    // **Twenty-one, and the eleven are not a wish list.** Two classes on the
+    // fork is eleven new pairs, and a pair without a counter is a player who
+    // finishes two trees and is handed nothing —
+    // `every_pair_of_offered_classes_reaches_an_expert` went red on the commit
+    // that made the roster seven and is what says the table is complete.
+    ExpertDef {
+        pair: ("Berserker", "Stoker"),
+        name: "BareFurnace",
+        blurb: "An empty frame is a hopper, and nobody has ever explained why that works.",
+        power: ExpertPower::BareFurnace { per_frame: 10, every_ms: 4_000, cap: 1 },
+    },
+    ExpertDef {
+        pair: ("Hexweaver", "Stoker"),
+        name: "FiredFunnel",
+        blurb: "The funnel turns over the firebox and the paperwork says this is a kettle.",
+        power: ExpertPower::FiredFunnel { worth: 4, per_fight: 1, refund: 0 },
+    },
+    ExpertDef {
+        pair: ("Bloodletter", "Stoker"),
+        name: "ColdStoke",
+        blurb: "Nine facts, all of them true, all of them on fire.",
+        power: ExpertPower::ColdStoke { per_stack: 1, every_ms: 4_000, standing: 0 },
+    },
+    ExpertDef {
+        pair: ("Recycler", "Stoker"),
+        name: "PonkeyBoiler",
+        blurb: "The Ponkey Turn, geared down eleven to one, into a firebox.",
+        power: ExpertPower::PonkeyBoiler { per_spin: 2, keep: 0, licence: 1 },
+    },
+    ExpertDef {
+        pair: ("Showstopper", "Stoker"),
+        name: "FlashPowder",
+        blurb: "Everything you had, at once, in front of four thousand people.",
+        power: ExpertPower::FlashPowder { all_at_once: 25, until_ms: 10_000, pct: 0 },
+    },
+    ExpertDef {
+        pair: ("Berserker", "Whisperer"),
+        name: "LoudDoubt",
+        blurb: "A gorilla wearing nothing, saying one thing, very quietly, four times.",
+        power: ExpertPower::LoudDoubt { worn: 2, rate: 1, third: 33 },
+    },
+    ExpertDef {
+        pair: ("Hexweaver", "Whisperer"),
+        name: "RequisitionedSilence",
+        blurb: "Requisition denied. The Sergeant said it anyway and filed the form after.",
+        power: ExpertPower::RequisitionedSilence { rate: 50, per_fight: 2, third: 33 },
+    },
+    ExpertDef {
+        pair: ("Bloodletter", "Whisperer"),
+        name: "ToldOnce",
+        blurb: "Every fact you put on it is a thing it now has to carry.",
+        power: ExpertPower::ToldOnce { per_curse: 1, cap: 3, standing: 0 },
+    },
+    ExpertDef {
+        pair: ("Recycler", "Whisperer"),
+        name: "LicensedRumour",
+        blurb: "Page eleven of the licence permits saying things about people.",
+        power: ExpertPower::LicensedRumour { pct: 5, racks: 1, third: 33 },
+    },
+    ExpertDef {
+        pair: ("Showstopper", "Whisperer"),
+        name: "CurtainLine",
+        blurb: "The last line of the last act, and the hall is already standing.",
+        power: ExpertPower::CurtainLine { mult: 50, under_ms: 10_000, third: 33 },
+    },
+    ExpertDef {
+        pair: ("Stoker", "Whisperer"),
+        name: "AshAndWhisper",
+        blurb: "Ash in one ear and a word in the other, and nobody can tell which did it.",
+        power: ExpertPower::AshAndWhisper { rate: 1, third: 33, every_ms: 4_000 },
     },
     ExpertDef {
         pair: ("Recycler", "Showstopper"),

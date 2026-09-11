@@ -5558,8 +5558,10 @@ def check_the_second_fork_can_be_slept_on(page, name, fails):
         page.wait_for_selector("#fork", state="visible", timeout=8000)
         cards = page.evaluate(
             "() => [...document.querySelectorAll('#fork-choices .wares')].map(b => b.textContent)")
-        if len(cards) != 4:
-            fails.append(f"{name}: the second fork offered {len(cards)} cards, not four")
+        # **Six, and it is `OFFERED` minus what you already are.** Four until
+        # M16 put two more on the fork.
+        if len(cards) != 6:
+            fails.append(f"{name}: the second fork offered {len(cards)} cards, not six")
         blind = [c[:40] for c in cards if "eventually reaches" not in c]
         if blind:
             fails.append(f"{name}: a second-fork card names no expert: {blind}")
@@ -6175,17 +6177,16 @@ def walk_the_gate(browser, name, fails=None):
             fails.append(f"{name}: the fork opened at level {at}, before it is owed")
         if not any("Level 5" in r for r in BANKINGS):
             fails.append(f"{name}: no banking announced level five: {BANKINGS[-2:]}")
-        # **Five now.** Top of the Bill is the fifth, and its promise is the
-        # first one in the game that is about the purse rather than the fight —
-        # which is why M10.2's first deliverable was wiring it up rather than
-        # adding it. The count is core's; asserting a literal here would be the
-        # second copy of `class::OFFERED` all over again.
+        # **Seven now.** The Kettle-Stoker and the Whisperling are M16's, and
+        # they are the first two classes GM2D wrote rather than inherited. The
+        # count is core's; asserting a literal here would be the second copy of
+        # `class::OFFERED` all over again.
         offered = page.locator("#fork-choices .wares").count()
         want = page.evaluate("() => (window.__classOffer()?.classes ?? []).length")
         if offered != want:
             fails.append(f"{name}: core offers {want} classes and the screen drew {offered}")
-        if offered < 5:
-            fails.append(f"{name}: the fork offers {offered} classes, and there are five")
+        if offered < 7:
+            fails.append(f"{name}: the fork offers {offered} classes, and there are seven")
         promises = page.locator("#fork-choices .wares .promise").all_text_contents()
         if any(not p.strip() for p in promises):
             fails.append(f"{name}: a class promises nothing mechanical: {promises}")
@@ -6438,7 +6439,7 @@ def main():
     print("ok: a banked pool says what it pays, and the rates are core's")
     print("ok: what an item hits for climbs as fury banks, and the row says so")
     print("ok: three papers are drawn from the first visit, and the locked one counts")
-    print("ok: the second fork offers four, names what each pair reaches, and can be slept on")
+    print("ok: the second fork offers six, names what each pair reaches, and can be slept on")
     print("ok: two finished trees take the expert, and a point moves the promise at its tab")
     print("ok: a Full Bill's component holds two enchs, and everybody else's holds one")
     print("ok: the game talks in one place, and the history holds the sitting")

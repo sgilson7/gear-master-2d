@@ -440,6 +440,13 @@ pub fn settle(game: &mut Game, log: &CombatLog, difficulty: Difficulty) -> Optio
         curse_kinds: log.curse_bill.kinds.len() as u32,
         curses_expired: log.curse_bill.expired,
         streak: game.character.fast_wins,
+        // **Read off the log rather than inferred from the outcome**, which is
+        // the rule this file has kept since the first receipt: an unmaking is
+        // a `Victory` like any other and only the log says how it happened.
+        unmade: log
+            .entries
+            .iter()
+            .any(|e| matches!(e.event, crate::combat::Event::Unmade { .. })),
     };
     let gold = reward::bounty_with_class(log.outcome, spec.bounty, &worn, log.duration_ms, at);
     let rating = crate::rating::creature_rating(spec, difficulty);

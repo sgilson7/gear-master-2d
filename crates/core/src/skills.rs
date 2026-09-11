@@ -48,6 +48,13 @@ pub enum Effect {
         mind_resist: i32,
         #[serde(default)]
         curse_resist: i32,
+        /// Mind damage per activation.
+        ///
+        /// **M16's, and it is the field the Whisperer is built on.** It has
+        /// been on `Stats` since the fork and the tree could not grant it,
+        /// which was true for as long as nothing was built on the lane.
+        #[serde(default)]
+        mind: i32,
     },
     /// What the player is already holding when the bell goes.
     ///
@@ -59,6 +66,24 @@ pub enum Effect {
         armor: i32,
         #[serde(default)]
         mana: i32,
+        /// The three banked pools, and the two things that are spent.
+        ///
+        /// **M16's, and it is the same idea one step wider.** *What the player
+        /// is already holding when the bell goes* is exactly what a pool is:
+        /// every one of these starts at zero for everybody, and a pool is
+        /// banked between activations the way mana is. The Stoker needs
+        /// something in the hopper before the first tick and the Whisperer
+        /// needs the multiplier before the first word, and neither could say so.
+        #[serde(default)]
+        rage: i32,
+        #[serde(default)]
+        faith: i32,
+        #[serde(default)]
+        nature: i32,
+        #[serde(default)]
+        insight: i32,
+        #[serde(default)]
+        dread: i32,
     },
     /// Rows on one grid, out of the level rotation's turn.
     GrowSlotRows { slot: String, rows: u8 },
@@ -130,17 +155,46 @@ pub use crate::rule::Rule;
 impl Effect {
     pub fn line(&self) -> String {
         match self {
-            Effect::Stat { health, strength, regen, mind_resist, curse_resist } => join(&[
+            Effect::Stat { health, strength, regen, mind_resist, curse_resist, mind } => join(&[
                 num(*health, "max health", ""),
                 num(*strength, "strength", ""),
                 num(*regen, "health a second", ""),
+                num(*mind, "mind damage an activation", ""),
                 num(*mind_resist, "mind resist", "%"),
                 num(*curse_resist, "curse resist", "%"),
             ]),
-            Effect::StartWith { armor, mana } => join(&[
-                (*armor != 0).then(|| format!("start every fight with {armor} armor")),
-                (*mana != 0).then(|| format!("start every fight with {mana} mana")),
-            ]),
+            // **One `start every fight with`, however many things follow it.**
+            // Spelling it out per pool came to 127 characters on the Stoker's
+            // capstone, half again over what
+            // `a_mechanical_line_stays_short_enough_to_read_at_a_glance`
+            // allows — and a line nobody reads is a line that is not there.
+            // The same collapse `Node::line` makes for a row on every grid,
+            // and derived the same way, so a node that stops granting three
+            // goes back to naming what it does grant.
+            Effect::StartWith { armor, mana, rage, faith, nature, insight, dread } => {
+                let held: Vec<String> = [
+                    (*armor, "armor"),
+                    (*mana, "mana"),
+                    (*rage, "rage"),
+                    (*faith, "faith"),
+                    (*nature, "nature"),
+                    (*insight, "insight"),
+                    (*dread, "dread"),
+                ]
+                .iter()
+                .filter(|(n, _)| *n != 0)
+                .map(|(n, what)| format!("{n} {what}"))
+                .collect();
+                match held.len() {
+                    0 => String::new(),
+                    1 => format!("start every fight with {}", held[0]),
+                    n => format!(
+                        "start every fight with {} and {}",
+                        held[..n - 1].join(", "),
+                        held[n - 1]
+                    ),
+                }
+            }
             Effect::GrowSlotRows { slot, rows } => {
                 format!("+{rows} row{} on the {slot} grid", if *rows == 1 { "" } else { "s" })
             }
@@ -182,7 +236,14 @@ impl Effect {
     pub fn detail(&self) -> Vec<String> {
         let mut out = Vec::new();
         match self {
-            Effect::Stat { health, strength, regen, mind_resist, curse_resist } => {
+            Effect::Stat { health, strength, regen, mind_resist, curse_resist, mind } => {
+                if *mind != 0 {
+                    out.push(
+                        "Mind damage: handed over on every activation, and it takes *maximum* \
+                         health rather than health, so nothing heals it back."
+                            .into(),
+                    );
+                }
                 if *health != 0 {
                     out.push(
                         "Max health: damage comes off health, and you lose at zero.".into(),
@@ -213,7 +274,29 @@ impl Effect {
                     );
                 }
             }
-            Effect::StartWith { armor, mana } => {
+            Effect::StartWith { armor, mana, rage, faith, nature, insight, dread } => {
+                if *rage != 0 || *faith != 0 || *nature != 0 {
+                    out.push(
+                        "A banked pool pays you for holding it — rage sharpens a physical hit, \
+                         faith adds resistance of both types, nature adds regeneration — and \
+                         everybody starts a fight with none."
+                            .into(),
+                    );
+                }
+                if *insight != 0 {
+                    out.push(
+                        "Insight: what a mind attack is multiplied by. It is spent rather than \
+                         held, and everybody starts a fight with none."
+                            .into(),
+                    );
+                }
+                if *dread != 0 {
+                    out.push(
+                        "Dread: stacks that multiply mind damage. It starts at zero and is built \
+                         inside a fight, so having any before the bell is time you did not spend."
+                            .into(),
+                    );
+                }
                 if *armor != 0 {
                     out.push(
                         "Armor: absorbs damage before health does. Everybody starts a fight with \
@@ -275,6 +358,21 @@ impl Effect {
                     let mut after = e.power;
                     after.tune(knob, *by);
                     out.push(format!("{}: {}", e.name, after.describe()));
+                }
+                // **And the base classes, since M16**, which have knobs now.
+                // Two loops rather than one over a joined list, because an
+                // expert's knobs live on `EXPERTS` and a base class's on
+                // `CLASSES` and there is no third place that holds both.
+                //
+                // A knob name can belong to two powers — `per_stack` is the
+                // Stoker's *and* the Patented Funnel's — so both lines are
+                // printed, each naming its own class. A hover that guessed
+                // which one you meant would guess wrong for somebody.
+                for c in crate::class::CLASSES
+                    .iter()
+                    .filter(|c| c.power.knobs().contains(&knob.as_str()))
+                {
+                    out.push(format!("{}: {}", c.name, c.power.tune(knob, *by).describe()));
                 }
             }
             Effect::AssemblyPct { .. } => out.push(
@@ -542,9 +640,23 @@ impl SkillsData {
                     // wearing a new coat. This is what makes that no-op safe.
                     if let Effect::Tunes { knob, by } = e {
                         let owner = t.class.as_deref().unwrap_or("");
-                        let Some(power) = crate::expert::by_name(owner).map(|e| e.power) else {
+                        // **A base class has knobs too, since M16.** The two
+                        // it added are one number and two numbers, which is the
+                        // same shape an expert is, and a tree that could not
+                        // tune its own class's power would have had to say the
+                        // number twice. `ClassPower::knobs` is the one
+                        // vocabulary and it asks the expert for an expert's.
+                        let power = crate::expert::by_name(owner)
+                            .map(|e| crate::class::ClassPower::Expert(e.power))
+                            .or_else(|| {
+                                crate::class::CLASSES
+                                    .iter()
+                                    .find(|c| c.name == owner)
+                                    .map(|c| c.power)
+                            });
+                        let Some(power) = power.filter(|p| !p.knobs().is_empty()) else {
                             return Err(format!(
-                                "{}: {:?} tunes {knob:?}, and only an expert class has knobs",
+                                "{}: {:?} tunes {knob:?}, and {owner:?} has no knobs at all",
                                 n.id, t.id
                             ));
                         };
@@ -558,7 +670,13 @@ impl SkillsData {
                         // A tuning that tunes nothing is a point spent on
                         // nothing, exactly as `Rule::check` refuses a spin
                         // that banks no stacks.
-                        let step = crate::expert::ExpertPower::step(knob);
+                        //
+                        // **The power's own step, not the knob name's.** See
+                        // `ClassPower::step`: a Stoker prints `every_ms` to a
+                        // tenth of a second where an expert prints its to a
+                        // whole one, so the smallest visible move is different
+                        // for the same suffix.
+                        let step = power.step(knob);
                         if *by == 0 {
                             return Err(format!("{}: moves {knob:?} by nothing at all", n.id));
                         }
@@ -685,10 +803,13 @@ impl SkillsData {
         for id in taken {
             let Some(n) = self.node(id) else { continue };
             for e in &n.effects {
-                if let Effect::Stat { health, strength, regen, mind_resist, curse_resist } = e {
+                if let Effect::Stat { health, strength, regen, mind_resist, curse_resist, mind } =
+                    e
+                {
                     out.health += health;
                     out.strength += strength;
                     out.regen += regen;
+                    out.mind += mind;
                     out.mind_resist += mind_resist;
                     out.curse_resist += curse_resist;
                 }
@@ -725,9 +846,19 @@ impl SkillsData {
             let Some(n) = self.node(id) else { continue };
             for e in &n.effects {
                 match e {
-                    Effect::StartWith { armor, mana } => {
+                    // **`Stat`'s `mind` travels through `Held` as well**, and
+                    // it is the one stat that does: everything else on a
+                    // `Stats` is read off the character, and mind damage is
+                    // read off the *item*. See `combat::Held::mind`.
+                    Effect::Stat { mind, .. } => out.mind += mind,
+                    Effect::StartWith { armor, mana, rage, faith, nature, insight, dread } => {
                         out.armor += armor;
                         out.mana += mana;
+                        out.rage += rage;
+                        out.faith += faith;
+                        out.nature += nature;
+                        out.insight += insight;
+                        out.dread += dread;
                     }
                     // A granted rule goes through the same door and for the
                     // same reason: it is a fight input rather than a mutable
@@ -781,6 +912,34 @@ impl SkillsData {
     pub fn tunings_from(&self, taken: &[String]) -> Vec<(String, i32)> {
         taken
             .iter()
+            .filter_map(|id| self.node(id))
+            .flat_map(|n| &n.effects)
+            .filter_map(|e| match e {
+                Effect::Tunes { knob, by } => Some((knob.clone(), *by)),
+                _ => None,
+            })
+            .collect()
+    }
+
+    /// The same, **from one class's own tree only**.
+    ///
+    /// **Which it has to be, since M16.** A base class has knobs now, and
+    /// `per_stack` is both the Stoker's and the Patented Funnel's — so a
+    /// character who is both would have had each tree's tuning applied to the
+    /// other's power. That is exactly the collision the parse-time check was
+    /// written to make impossible (*`carry` is Standing Fact's and Overwound
+    /// Arm's, so a global vocabulary would let a Standing Fact node tune a knob
+    /// it has not got*), arriving from the other side: the check reads one
+    /// tree's knobs and the reader read every tree's tunings.
+    ///
+    /// Safe while there was one expert at a time and no base knobs at all,
+    /// which is why nothing caught it before there were.
+    pub fn tunings_for(&self, class: &str, taken: &[String]) -> Vec<(String, i32)> {
+        taken
+            .iter()
+            .filter(|id| {
+                self.tree_of(id).and_then(|t| t.class.as_deref()) == Some(class)
+            })
             .filter_map(|id| self.node(id))
             .flat_map(|n| &n.effects)
             .filter_map(|e| match e {

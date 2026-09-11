@@ -339,6 +339,51 @@ fn an_ench(want: fn(&gm2d_core::ench::Effect) -> bool) -> String {
         .clone()
 }
 
+/// A board with something in every hopper.
+///
+/// **The furnace experts need a pool to burn**, and a board that banks nothing
+/// asks the furnace nothing — which is `every_point_in_an_expert_tree_buys
+/// _something`'s own lesson from M13.6, where seven of ten read dead because
+/// the one fixture had no empty frame, no legendary and nothing that spun.
+fn stoking() -> Character {
+    let mut c = caster();
+    c.bought_licence = true;
+    // **Something in every hopper, and it is bought rather than planted.**
+    // A furnace with nothing to burn asks the furnace nothing, and a caster's
+    // board banks mana rather than pools — so the three nodes of the Stoker's
+    // own tree that fill the hoppers are taken, which is what a character who
+    // reached one of these experts has done.
+    for id in ["ks-firebox", "ks-damper", "ks-hundredweight"] {
+        c.skills_taken.push(id.to_string());
+    }
+    c
+}
+
+/// A board that says something, so the mind lane has a number to move.
+///
+/// The Whisperer's own first nodes, for the reason `stoking` takes the
+/// Stoker's: the mind lane's gear is the Threshold's shelf and
+/// `touches_insight` keeps it off every creature, so a board that reliably
+/// whispers is a board a fixture cannot shop for.
+fn whispering() -> Character {
+    let mut c = caster();
+    c.bought_licence = true;
+    // **The whole tree, not the first four.** A threshold is a thing a fight
+    // has to reach, and four nodes of mind damage against a board with fifteen
+    // hundred maximum health never reaches a third of it — so a node that moves
+    // the threshold reads dead for want of anything getting near it. This is
+    // M13.6's lesson in its own words: *a check that needs something to happen
+    // has to make sure it can.*
+    for t in &gm2d_core::data::skills().trees {
+        if t.class.as_deref() == Some("Whisperer") {
+            for n in &t.nodes {
+                c.skills_taken.push(n.id.clone());
+            }
+        }
+    }
+    c
+}
+
 /// Which board poses this expert's question.
 fn board_for(name: &str) -> Character {
     match name {
@@ -347,7 +392,63 @@ fn board_for(name: &str) -> Character {
         "OpeningNumber" => busker(),
         "PatentedFunnel" => spinning(),
         "CursedLicence" => bewitched(),
-        "FullBill" => enched(),
+        "FullBill" | "LicensedRumour" => enched(),
+
+        // ---- M16's eleven -------------------------------------------------
+        //
+        // **A board apiece, and most of them are boards that already exist**,
+        // which is the point of naming them: a fixture that asked eleven new
+        // questions of one board would be measuring the board.
+        //
+        // Everything with a furnace in it needs pools to burn, and a bare board
+        // banks none — so the furnace experts get the busy board with something
+        // in the hoppers, and the two whose promise is about what is *not* on
+        // the board get `bare`.
+        "BareFurnace" => {
+            let mut c = stoking();
+            for k in [SlotKind::Helmet, SlotKind::Gloves] {
+                c.loadout.slot_mut(k).clear();
+            }
+            c
+        }
+        "FiredFunnel" | "AshAndWhisper" => stoking(),
+        "ColdStoke" => {
+            let mut c = bewitched();
+            for id in ["ks-firebox", "ks-damper", "ks-hundredweight"] {
+                c.skills_taken.push(id.to_string());
+            }
+            c
+        }
+        // **Curses, and a mind lane that chips rather than deletes.** Told
+        // Once's knobs move a *threshold*, so the board has to spend time near
+        // it: the whole Whisperer tree takes a maximum from full to nothing in
+        // one blow, and a line something steps over in a single tick is a line
+        // nobody can watch move. Two nodes' worth of mind damage is enough to
+        // get there slowly.
+        "ToldOnce" => {
+            let mut c = bewitched();
+            for id in ["wh-a-word", "wh-second-word"] {
+                c.skills_taken.push(id.to_string());
+            }
+            c
+        }
+        "PonkeyBoiler" => {
+            let mut c = spinning();
+            for id in ["ks-firebox", "ks-damper", "ks-hundredweight"] {
+                c.skills_taken.push(id.to_string());
+            }
+            c
+        }
+        "FlashPowder" => stoking(),
+        // Said plainly: the promise is a board with almost nothing on it.
+        "LoudDoubt" => {
+            let mut c = whispering();
+            for k in [SlotKind::Helmet, SlotKind::Gloves, SlotKind::Greaves] {
+                c.loadout.slot_mut(k).clear();
+            }
+            c
+        }
+        "RequisitionedSilence" | "CurtainLine" => whispering(),
         other => panic!("no board poses {other}'s question"),
     }
 }
@@ -363,6 +464,17 @@ fn board_for(name: &str) -> Character {
 /// expert and their tree rather than about the board.
 fn as_the_expert(name: &str, nodes: &[String]) -> Character {
     let mut c = board_for(name);
+    // **The expert and nothing else, which is the sharpest question this file
+    // can ask.** A character holding one holds both parents too, and adding
+    // them was tried: it makes a Fired Funnel's furnace exist and it also
+    // buries five of the original ten's nodes under two parent powers' worth of
+    // noise, which is a fixture measuring the *board* rather than the point.
+    //
+    // What the furnace experts needed instead is in `apply_expert`: **an
+    // expert's power is self-contained.** A Fired Funnel is a Stoker — you
+    // cannot hold one otherwise — so seeding its own furnace is belt-and-braces
+    // rather than a behaviour change, and it is what lets the question be asked
+    // of the expert alone.
     c.expert = Some(name.to_string());
     c.skills_taken.extend(nodes.iter().cloned());
     rack_up(&mut c);
@@ -424,9 +536,18 @@ fn fight_of(c: &Character, against: &str) -> combat::CombatLog {
 /// how much was standing on the corpse.
 fn purse_sweep(name: &'static str, p: ExpertPower) -> String {
     let mut out = String::new();
-    for ms in [1_000u32, 9_000, 13_000, 17_000, 23_000, 31_000, 44_000] {
+    // **And whether it was unmade**, which is Curtain Line's and is the one
+    // fact about a fight the purse could not already read. Swept like the rest,
+    // so a knob that only moves an unmaking's bill still moves this string.
+    // **Eleven and fifteen are M16's**, and they are here because a two-second
+    // move has to be visible: Flash Powder's window opens at ten and its nodes
+    // widen it by two at a time, so a sweep that jumped 9,000 → 13,000 could
+    // not tell twelve from ten. `ExpertPower::step` says two seconds is a move
+    // a player can see; a sweep that cannot see it is the *compares zero with
+    // zero* failure with a stopwatch in it.
+    for ms in [1_000u32, 9_000, 11_000, 13_000, 15_000, 17_000, 23_000, 31_000, 44_000] {
         for standing in [0u32, 3, 6, 9, 12] {
-            for streak in [0u32, 4] {
+            for (streak, unmade) in [(0u32, false), (4, false), (0, true), (4, true)] {
                 let worn = [as_class(name, p)];
                 let at = reward::AtTheBell {
                     empty_frames: 3,
@@ -434,6 +555,7 @@ fn purse_sweep(name: &'static str, p: ExpertPower) -> String {
                     curse_kinds: 4,
                     curses_expired: 4,
                     streak,
+                    unmade,
                 };
                 out.push_str(&format!(
                     "{},",
@@ -712,4 +834,32 @@ fn an_extra_rack_holds_an_extra_ench() {
     };
     assert_eq!(*racks, 1);
     assert!(!what.is_empty(), "the refusal does not name what is on it");
+}
+
+/// Recon, printed: does the whispering board actually unmake anything?
+#[test]
+#[ignore]
+fn recon_does_the_whisper_land() {
+    for name in ["CurtainLine", "ToldOnce", "RequisitionedSilence"] {
+        let all = nodes_of(name);
+        let c = as_the_expert(name, &all);
+        for against in FOES {
+            let log = fight_of(&c, against);
+            let unmade = log
+                .entries
+                .iter()
+                .any(|e| matches!(e.event, combat::Event::Unmade { .. }));
+            let left = log
+                .entries
+                .iter()
+                .rev()
+                .find_map(|e| match e.event {
+                    combat::Event::MindHit { target_max_health, .. } => Some(target_max_health),
+                    _ => None,
+                })
+                .unwrap_or(-1);
+            println!("{name} vs {against}: {:?} in {}ms, unmade={unmade}, max left {left}",
+                log.outcome, log.duration_ms);
+        }
+    }
 }

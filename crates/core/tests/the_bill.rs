@@ -93,6 +93,45 @@ fn every_offered_class_reaches_something() {
                     "{name} says it reaches the purse and the purse is unchanged"
                 );
             }
+            // **The fight, over the whole fight rather than the bell.** M16's
+            // two are the first powers on the fork that change nothing a
+            // fighter *walks in* with: a furnace runs at the tick and an
+            // unmaking moves where the fight ends, so the three places above
+            // are all the same on both sides and the class is still real.
+            //
+            // The honest question for those is *did the fight differ* — which
+            // is what `experts_reach.rs::measure` already asks of twenty-one
+            // experts, and is what this should have been asking all along. The
+            // three narrower arms stay because each of them is a *stronger*
+            // statement about where its own power lands.
+            ClassPower::Stoker { .. } | ClassPower::Whisperer { .. } => {
+                let shape = |log: &gm2d_core::combat::CombatLog| {
+                    format!("{:?}|{}|{}", log.outcome, log.duration_ms, log.entries.len())
+                };
+                // Something in the hoppers and something to say, because a
+                // furnace with nothing to burn asks the furnace nothing.
+                let mut held = gm2d_core::combat::Held::default();
+                held.rage = 60;
+                held.faith = 40;
+                held.nature = 30;
+                held.mind = 30;
+                let run = |worn: &[gm2d_core::class::ClassDef]| {
+                    gm2d_core::combat::simulate_party_holding(
+                        ch.player_stats(),
+                        &ch.combat_items(),
+                        std::slice::from_ref(spec),
+                        Difficulty::Medium,
+                        worn,
+                        0,
+                        held.clone(),
+                    )
+                };
+                assert_ne!(
+                    shape(&run(&worn)),
+                    shape(&run(&[])),
+                    "{name} says it reaches the fight and the fight is the same one"
+                );
+            }
             // Anything else on the fork has not been argued about, and this is
             // where the argument goes.
             other => panic!(
@@ -108,7 +147,9 @@ fn every_offered_class_reaches_something() {
 /// The roster is core's, and there is one of it.
 #[test]
 fn the_roster_is_not_written_down_twice() {
-    assert_eq!(OFFERED.len(), 5, "the fork deals five");
+    // **Seven since M16**, and the two new ones are the first this game wrote
+    // rather than inherited.
+    assert_eq!(OFFERED.len(), 7, "the fork deals seven");
     for name in OFFERED {
         assert!(CLASSES.iter().any(|c| c.name == *name), "{name} is offered and is not a class");
         assert!(

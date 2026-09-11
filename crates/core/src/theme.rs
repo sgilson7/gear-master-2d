@@ -320,6 +320,18 @@ pub static PLAIN: Theme = Theme {
         ("CursedLicence", "Cursed Licence"),
         ("EleventhSeason", "Eleventh Season"),
         ("FullBill", "Full Bill"),
+        // ---- M16's eleven, for the same reason the ten above are here ------
+        ("BareFurnace", "Bare Furnace"),
+        ("FiredFunnel", "Fired Funnel"),
+        ("ColdStoke", "Cold Stoke"),
+        ("PonkeyBoiler", "Ponkey Boiler"),
+        ("FlashPowder", "Flash Powder"),
+        ("LoudDoubt", "Loud Doubt"),
+        ("RequisitionedSilence", "Requisitioned Silence"),
+        ("ToldOnce", "Told Once"),
+        ("LicensedRumour", "Licensed Rumour"),
+        ("CurtainLine", "Curtain Line"),
+        ("AshAndWhisper", "Ash and Whisper"),
     ],
     words: &[],
     vocabulary: &[],
@@ -406,6 +418,16 @@ pub static TURTLE_DICK: Theme = Theme {
         ("Unionized", "Gortball Organized"),
         // What Hanglo Chiemstar was called for eleven seasons, p. 31.
         ("Showstopper", "Top of the Bill"),
+        // ---- M16's two, and the first two GM2D wrote rather than inherited --
+        //
+        // The Kettleworks is the game's own foundry and the forty kettles are
+        // already on the first map; somebody has to keep them fed and the book
+        // has never said who. `PLAN-M16.md` §10 proposes the name and §9.5
+        // leaves it to the human.
+        ("Stoker", "Kettle-Stoker"),
+        // Marbulon's chain is about three Whisperlings and nobody has ever said
+        // what one is. This is the answer: not a monster, a job.
+        ("Whisperer", "Whisperling"),
         ("Avenged", "Sprocket Avenged"),
         ("Wanderer", "Plane Tourist"),          // half-tourist, half-catastrophe
         ("Warpriest", "Acolyte of Dobira"),     // the Master and Baylon, pp. 46-50
@@ -417,9 +439,9 @@ pub static TURTLE_DICK: Theme = Theme {
         // has always been a safe fall-through. These ten are not: their
         // canonical is the `class` key of a tree in `data/skills.json` and it
         // is written `LoudCalculation`, so a theme with no entry would put
-        // `LoudCalculation` on a screen. Both themes carry all ten for that
-        // reason — see `PLAIN`, where the ten are the only entries in a table
-        // that is otherwise deliberately empty.
+        // `LoudCalculation` on a screen. Both themes carry all **twenty-one**
+        // for that reason — see `PLAIN`, where they are the only entries in a
+        // table that is otherwise deliberately empty.
         ("LoudCalculation", "Loud Calculation"),
         ("StandingFact", "Standing Fact"),
         ("OverwoundArm", "Overwound Arm"),
@@ -430,6 +452,18 @@ pub static TURTLE_DICK: Theme = Theme {
         ("CursedLicence", "Cursed Licence"),
         ("EleventhSeason", "Eleventh Season"),
         ("FullBill", "Full Bill"),
+        // ---- M16's eleven, for the same reason the ten above are here ------
+        ("BareFurnace", "Bare Furnace"),
+        ("FiredFunnel", "Fired Funnel"),
+        ("ColdStoke", "Cold Stoke"),
+        ("PonkeyBoiler", "Ponkey Boiler"),
+        ("FlashPowder", "Flash Powder"),
+        ("LoudDoubt", "Loud Doubt"),
+        ("RequisitionedSilence", "Requisitioned Silence"),
+        ("ToldOnce", "Told Once"),
+        ("LicensedRumour", "Licensed Rumour"),
+        ("CurtainLine", "Curtain Line"),
+        ("AshAndWhisper", "Ash and Whisper"),
     ],
     pieces: &[
         // The catalogue, re-cast from the book. Grades are kept as grades: the

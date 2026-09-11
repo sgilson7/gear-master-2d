@@ -362,6 +362,40 @@ pub enum ClassPower {
     SlowTime(u32),
     /// A share of the damage you deal comes back as health, in percent.
     Leeching(i32),
+    /// Every `every_ms`, `per_stack` points come off your largest held pool and
+    /// go on as one stack of mana empowerment.
+    ///
+    /// **The class is built on a tension the engine already had and nobody
+    /// exploited.** A held pool pays a standing bonus through `held_bonus`, and
+    /// mana empowerment is bought with mana and scales off the mana left — so
+    /// stacking it hard drains the very pool it multiplies. The Stoker buys
+    /// empowerment with *somebody else's* pool.
+    ///
+    /// **The largest, and that is the whole design.** It reads rage, faith and
+    /// nature — the three `Combatant::pools_worth_holding` returns, checked
+    /// rather than assumed — and never mana or insight, which are spent already
+    /// and pay a wearer nothing for sitting on a pile. What you give up is the
+    /// standing bonus you were holding, so the class asks you to decide which
+    /// hopper to fill.
+    ///
+    /// **A creature is never a Stoker**, the same rule an expert follows.
+    Stoker { every_ms: u32, per_stack: i32 },
+    /// A creature whose maximum health you have eaten down to `third` percent
+    /// of what it was is unmade — dead, whatever is still in it.
+    ///
+    /// **An execute on the mind lane only.** Physical and magic damage move
+    /// `health`; mind damage eats `max_health`, which cannot be healed off, and
+    /// `Combatant::is_down` has fired at `max_health <= 0` since the fork. So a
+    /// mind build could already kill anything in principle and in practice
+    /// never did: it is the slowest lane in the game and nothing finished with
+    /// it. This changes where the fight ends, not how fast the number moves —
+    /// `mind_bonus` and `DREAD_DIVISOR` are untouched.
+    ///
+    /// **`mind_resist` is still the only answer**, and M16.0's `LANE_CAP` is
+    /// what makes that sentence true rather than a euphemism: at a hundred the
+    /// lane shut out completely and thirty-one creatures were there, every deep
+    /// boss among them. An unmaking at the cap is slow, not impossible.
+    Whisperer { third: i32 },
     /// Every point of a resource you are holding counts `n` times.
     Overflowing(i32),
     /// Every `n`th activation fires its payload twice.
@@ -523,6 +557,14 @@ impl ClassPower {
             // points of somebody's tuning is also not a thing a fountain
             // could mean.
             Expert(_) => return None,
+            // **Both doublable, and each doubles the thing it is about.** The
+            // Stoker's is the shovel — twice as many points a tick — rather
+            // than the clock, because a furnace stoked twice as often is a
+            // different class and a furnace fed twice as much is the same one
+            // louder. The Whisperer's is the threshold, which is the only
+            // number it has.
+            Stoker { every_ms, per_stack } => Stoker { every_ms, per_stack: per_stack * 2 },
+            Whisperer { third } => Whisperer { third: (third * 2).min(90) },
             // A town class is not something a fountain has in front of it, so
             // there is nothing for the doubling fountain to double.
             Piety { .. } | Tired { .. } | Ticket { .. } | Recycler { .. } => return None,
@@ -569,12 +611,96 @@ impl ClassPower {
     }
 
 
+    /// The knob names this power declares, if it declares any.
+    ///
+    /// **Base classes have knobs too, since M16**, and the vocabulary lives
+    /// with the power for the reason `ExpertPower::knobs` does: a second enum
+    /// listing every-ms-and-per-stack would be two lists to keep in step, and
+    /// this one is read by `SkillsData::parse` so a tree naming a knob its
+    /// class has not got does not load.
+    ///
+    /// Empty for the twenty-eight that have none, which is most of them — a
+    /// class whose power is one number nobody tunes has nothing to declare, and
+    /// a tree that tries gets the same refusal it always got.
+    pub fn knobs(self) -> &'static [&'static str] {
+        match self {
+            ClassPower::Stoker { .. } => &["every_ms", "per_stack"],
+            ClassPower::Whisperer { .. } => &["third"],
+            // **An expert's knobs are its own**, asked through the arm that
+            // wraps it rather than duplicated here.
+            ClassPower::Expert(e) => e.knobs(),
+            _ => &[],
+        }
+    }
+
+    /// The smallest move of one of this power's knobs that a player can
+    /// **see**.
+    ///
+    /// **Per power, not per name**, which is what M16 changed and why.
+    /// `ExpertPower::step` reads the suffix — a knob ending `_ms` is stored in
+    /// milliseconds and printed in whole seconds, so moving one by 500 costs
+    /// two points and changes no sentence. That is right for the two experts it
+    /// was written for and wrong for the Stoker, whose `describe` prints
+    /// `every_ms` to a **tenth** of a second: eight hundred milliseconds is
+    /// 4.0s becoming 3.2s, which is a sentence that moved.
+    ///
+    /// So the answer belongs to whoever prints the number. An expert defers to
+    /// its own, unchanged.
+    pub fn step(self, knob: &str) -> i32 {
+        match self {
+            ClassPower::Stoker { .. } if knob == "every_ms" => 100,
+            ClassPower::Expert(e) => e.step_of(knob),
+            _ => 1,
+        }
+    }
+
+    /// Move a knob, if this power has it.
+    pub fn tune(self, knob: &str, by: i32) -> ClassPower {
+        match self {
+            ClassPower::Stoker { every_ms, per_stack } => match knob {
+                // **Clamped at a tick, because a furnace that stokes faster
+                // than the clock is a furnace that stokes every tick** — and
+                // the knob would go on reading as though it did something.
+                "every_ms" => ClassPower::Stoker {
+                    every_ms: (every_ms as i32 + by).max(50) as u32,
+                    per_stack,
+                },
+                // Fewer points a stack is *better*: the pool goes down slower
+                // for the same empowerment, which is why every node that moves
+                // it moves it down. One is the floor — a furnace that burns
+                // nothing is not a furnace.
+                "per_stack" => {
+                    ClassPower::Stoker { every_ms, per_stack: (per_stack + by).max(1) }
+                }
+                _ => self,
+            },
+            ClassPower::Whisperer { third } => match knob {
+                // Ninety-nine and not a hundred: a threshold at the maximum is
+                // a creature that is unmade by being looked at.
+                "third" => ClassPower::Whisperer { third: (third + by).clamp(1, 99) },
+                _ => self,
+            },
+            ClassPower::Expert(mut e) => {
+                e.tune(knob, by);
+                ClassPower::Expert(e)
+            }
+            _ => self,
+        }
+    }
+
     /// A few words for the side panel, where there is one line and it must
     /// not shrink to nothing. The full sentence lives in `describe`, which is
     /// what the glossary and the hover card show.
     pub fn short(self) -> String {
         match self {
             ClassPower::Guilt => "you cannot heal".to_string(),
+            ClassPower::Stoker { every_ms, per_stack } => format!(
+                "burn {per_stack} of your biggest pool every {:.1}s",
+                every_ms as f32 / 1000.0
+            ),
+            ClassPower::Whisperer { third } => {
+                format!("unmade at {third}% of its maximum health")
+            }
             ClassPower::Recycler { pct } => format!("+{}% assembly bonuses", pct),
             ClassPower::Piety { faith } => format!("start with {} faith", faith),
             ClassPower::Tired { mana } => format!("start {} mana in debt", mana),
@@ -642,6 +768,21 @@ impl ClassPower {
             // sentence about carrying five of these describes a game the
             // player is not in — and this is the sentence somebody reads
             // before the one irreversible choice there is.
+            // **Two registers on one line, TONE 13a.** The pools are named in
+            // the engine's words rather than the theme's, because this is the
+            // sentence somebody reads before the one irreversible choice there
+            // is and a number wearing a joke has to be translated first.
+            ClassPower::Stoker { every_ms, per_stack } => format!(
+                "Every {:.1} seconds, {per_stack} points come off whichever of rage, faith and \
+                 nature you are holding most of, and go on as 1 stack of mana empowerment. The \
+                 pool goes down; the stacks stay for the fight.",
+                every_ms as f32 / 1000.0
+            ),
+            ClassPower::Whisperer { third } => format!(
+                "A creature whose maximum health you have eaten down to {third}% of what it was \
+                 is unmade, whatever is still in it. Only mind damage eats a maximum, so only \
+                 mind damage counts toward this."
+            ),
             ClassPower::Recycler { pct } => format!(
                 "Every assembly bonus on your boards counts {}% more. An assembly bonus \
                  is the lump a component pays only when its item comes together, so this \
@@ -852,6 +993,32 @@ pub static CLASSES: &[ClassDef] = &[
         requires: &[(Axis::Arcana, 50), (Axis::Sorcery, 50)],
         power: ClassPower::Echo(3),
     },
+    // **The sixth and seventh on the fork**, and the first two classes GM2D has
+    // written rather than inherited. Every class before them is upstream's with
+    // the theme talking, which was the right call while the powers were already
+    // tuned and already tested; these two are asked for by name and neither has
+    // an upstream to borrow from.
+    ClassDef {
+        name: "Stoker",
+        blurb: "Somebody has to keep it fed, and it is not going to be the fire.",
+        // **What it is about, on the two axes that measure it**: the pools it
+        // burns and the mana it burns them into. Three pools and one furnace,
+        // so `Wrath` stands for the three — the other two are its siblings and
+        // a class that named all four numbers would be naming its own tree.
+        requires: &[(Axis::Wrath, 40), (Axis::Attunement, 40)],
+        power: ClassPower::Stoker { every_ms: 4_000, per_stack: 10 },
+    },
+    ClassDef {
+        name: "Whisperer",
+        blurb: "You do not have to knock a thing down. You can talk it smaller.",
+        // **There is no mind axis**, which is itself the finding: the ranking
+        // has fifteen and none of them counts a maximum being eaten, because
+        // nothing was ever built on that lane. `Arcana` is the magic damage it
+        // rides in on and `Ward` is what it has to get through, which is as
+        // close as the existing fifteen come.
+        requires: &[(Axis::Arcana, 40), (Axis::Ward, 30)],
+        power: ClassPower::Whisperer { third: 33 },
+    },
     ClassDef {
         name: "Berserker",
         blurb: "Rage, and something heavy to spend it on.",
@@ -1046,23 +1213,34 @@ pub static CLASSES: &[ClassDef] = &[
     EXPERT_DEFS[7],
     EXPERT_DEFS[8],
     EXPERT_DEFS[9],
+    EXPERT_DEFS[10],
+    EXPERT_DEFS[11],
+    EXPERT_DEFS[12],
+    EXPERT_DEFS[13],
+    EXPERT_DEFS[14],
+    EXPERT_DEFS[15],
+    EXPERT_DEFS[16],
+    EXPERT_DEFS[17],
+    EXPERT_DEFS[18],
+    EXPERT_DEFS[19],
+    EXPERT_DEFS[20],
 ];
 
-/// The ten experts as `ClassDef`s, derived from `expert::EXPERTS`.
+/// The twenty-one experts as `ClassDef`s, derived from `expert::EXPERTS`.
 ///
 /// **Derived rather than typed twice.** A `const fn` over the table, so the
 /// name, the blurb and the power come from the one place they are written and
 /// a change there cannot leave this behind. It is spelled out index by index
 /// above because `CLASSES` is a slice literal and Rust has no splat.
-const EXPERT_DEFS: [ClassDef; 10] = {
+const EXPERT_DEFS: [ClassDef; crate::expert::EXPERTS.len()] = {
     let mut out = [ClassDef {
         name: "",
         blurb: "",
         requires: &[],
         power: ClassPower::Guilt,
-    }; 10];
+    }; crate::expert::EXPERTS.len()];
     let mut i = 0;
-    while i < 10 {
+    while i < crate::expert::EXPERTS.len() {
         let e = crate::expert::EXPERTS[i];
         out[i] = ClassDef {
             name: e.name,
@@ -1117,8 +1295,13 @@ pub struct Match {
 /// combat for any of them. `every_offered_class_reaches_something` is what
 /// stops a fifth being offered that does nothing — which is exactly what
 /// `Showstopper` was until M10.2: tuned, themed, and honoured nowhere.
+/// **Seven since M16**, and the order is the order the fork draws them in.
+///
+/// The two new ones go on the end rather than in the middle: the fork's cards
+/// are read left to right and a player who has seen the screen before should
+/// find the five they know where they left them.
 pub const OFFERED: &[&str] =
-    &["Berserker", "Hexweaver", "Bloodletter", "Recycler", "Showstopper"];
+    &["Berserker", "Hexweaver", "Bloodletter", "Recycler", "Showstopper", "Stoker", "Whisperer"];
 
 pub const TOWN_CLASSES: &[&str] = &["Piety", "Ticket to Ride", "Tired", "Recycler"];
 

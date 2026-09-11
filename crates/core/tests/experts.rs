@@ -20,8 +20,8 @@ fn every_pair_of_offered_classes_reaches_an_expert() {
             seen.push(e.name);
         }
     }
-    assert_eq!(seen.len(), 10, "five classes make ten pairs");
-    assert_eq!(EXPERTS.len(), 10, "and the table holds exactly those");
+    assert_eq!(seen.len(), 21, "seven classes make twenty-one pairs");
+    assert_eq!(EXPERTS.len(), 21, "and the table holds exactly those");
 }
 
 /// Order is a fact about your afternoon, not about the pair.
@@ -51,11 +51,11 @@ fn the_pairs_are_all_offered_classes() {
             assert!(OFFERED.contains(&side), "{} pairs on {side}, which is not offered", e.name);
         }
     }
-    // Each of the five is in four pairs — that is what `C(5,2)` looks like
+    // Each of the seven is in six pairs — that is what `C(7,2)` looks like
     // from one class's chair, and it is why nobody's fork is a dead end.
     for c in OFFERED {
         let n = EXPERTS.iter().filter(|e| e.pair.0 == *c || e.pair.1 == *c).count();
-        assert_eq!(n, 4, "{c} reaches {n} experts");
+        assert_eq!(n, OFFERED.len() - 1, "{c} reaches {n} experts");
     }
 }
 
@@ -135,11 +135,27 @@ fn a_knob_name_shared_by_two_experts_is_deliberate() {
             }
         }
     }
-    // Two, and both are the same idea: `carry` is how many of a thing survive,
-    // and `pct` is a percentage on a purse. Anything else appearing here is a
-    // collision to name or rename.
+    // **Twelve, and every one of them is the same idea in two places**, which
+    // is what a knob vocabulary is for: `third` is a threshold, `every_ms` is a
+    // furnace's clock, `cap` is a ceiling, `standing` is *a permanent curse
+    // counts double*, `racks` is enchs a component. A name meaning two things
+    // is what this refuses, and it is safe because `SkillsData::parse` checks a
+    // knob against **its own tree's class** — so `per_stack` on a Stoker node
+    // and `per_stack` on a Patented Funnel node are two knobs that share a word
+    // and can never be confused for one another.
+    //
+    // `Character::class_defs` reads `tunings_for(class, …)` for the same
+    // reason. Anything appearing here is a collision to name or rename, and
+    // twelve of twelve have been looked at.
     shared.sort_unstable();
-    assert_eq!(shared, vec!["carry", "pct"], "a new shared knob name wants a look");
+    assert_eq!(
+        shared,
+        vec![
+            "cap", "carry", "every_ms", "pct", "per_fight", "per_stack", "racks", "rate",
+            "standing", "third", "worn", "worth"
+        ],
+        "a new shared knob name wants a look"
+    );
 }
 
 // -------------------------------------------------------------- the promise
@@ -260,14 +276,27 @@ fn every_expert_knob_is_declared() {
     let bad = tree_with("\"FullBill\"", r#"{"tunes":{"knob":"vibes","by":1}}"#);
     assert!(SkillsData::parse(&bad).is_err());
 
-    // A base tree has no power to tune, so it may not carry a tuning at all.
+    // The base tree belongs to no class at all, so it has nothing to tune.
     let bad = tree_with("null", r#"{"tunes":{"knob":"rate","by":-4}}"#);
     let why = SkillsData::parse(&bad).unwrap_err();
-    assert!(why.contains("only an expert class has knobs"), "{why}");
+    assert!(why.contains("has no knobs at all"), "{why}");
 
-    // Nor may one of the five base classes.
+    // **Nor may a base class that has none**, which is five of the seven.
+    // This asserted *only an expert class has knobs* until M16, and that
+    // stopped being true: the Stoker and the Whisperer have two knobs and one,
+    // and their own trees turn them. What did not change is the rule the check
+    // is about — a tree may tune a knob its own class declares and nothing
+    // else — so the sentence moved and the guarantee did not.
     let bad = tree_with("\"Berserker\"", r#"{"tunes":{"knob":"rate","by":-4}}"#);
-    assert!(SkillsData::parse(&bad).is_err());
+    let why = SkillsData::parse(&bad).unwrap_err();
+    assert!(why.contains("has no knobs at all"), "{why}");
+
+    // And a base class that *does* have knobs may tune its own and no other.
+    let ok = tree_with("\"Stoker\"", r#"{"tunes":{"knob":"per_stack","by":-3}}"#);
+    assert!(SkillsData::parse(&ok).is_ok(), "{:?}", SkillsData::parse(&ok).err());
+    let bad = tree_with("\"Stoker\"", r#"{"tunes":{"knob":"rate","by":-4}}"#);
+    let why = SkillsData::parse(&bad).unwrap_err();
+    assert!(why.contains("rate") && why.contains("Stoker"), "{why}");
 }
 
 /// A tuning that tunes nothing is a point spent on nothing — and so is one
@@ -314,7 +343,11 @@ fn every_declared_knob_is_moved_by_some_node() {
         // pass silently is the whole of what it can honestly do.
         return;
     }
-    assert_eq!(landed.len(), 10, "some expert trees landed and some did not: {landed:?}");
+    assert_eq!(
+        landed.len(),
+        EXPERTS.len(),
+        "some expert trees landed and some did not: {landed:?}"
+    );
     for e in EXPERTS {
         let t = tree.tree_for_class(e.name).expect("checked above");
         let moved: Vec<String> = t.nodes.iter().flat_map(|n| n.tunings()).map(|(k, _)| k).collect();
@@ -373,9 +406,17 @@ fn expert_nodes_touch_only_the_expert() {
                             bad.push(format!("{}: {class} is no kin to {rule:?}", n.id));
                         }
                     }
-                    // An ench, and only for the class whose promise is racks.
+                    // **An ench, and only for a class whose promise is racks.**
+                    // Three of them since M16: `ench_racks` reads all three,
+                    // and a class that sells you room for a second ench and
+                    // hands you none is a promise with nothing behind it.
                     Effect::GivesEnch { .. } => {
-                        if !matches!(power, ExpertPower::FullBill { .. }) {
+                        if !matches!(
+                            power,
+                            ExpertPower::FullBill { .. }
+                                | ExpertPower::LicensedRumour { .. }
+                                | ExpertPower::PonkeyBoiler { .. }
+                        ) {
                             bad.push(format!("{}: {class} hands over an ench", n.id));
                         }
                     }
@@ -413,6 +454,26 @@ fn kin(class: &str, rule: &gm2d_core::rule::Rule) -> bool {
         ("CursedLicence", CurseOnActivate { .. } | Productivity { .. }) => true,
         // Two licences on one counter, and what one lends the next.
         ("FullBill", Beacon { .. }) => true,
+
+        // ---- M16's eleven -------------------------------------------------
+        //
+        // **Three new rules between them and each granted by more than one
+        // tree**, which is `PROMPT-M16.md`'s own constraint and is the shape
+        // `Spread` and `Beacon` already have: a rule granted by exactly one
+        // tree is a knob that has been given a second name.
+        //
+        // A furnace that keeps what it burned is kin to every furnace.
+        ("BareFurnace" | "AshAndWhisper", BurnKeepsBonus { .. }) => true,
+        // A furnace that is still warm at the next bell, likewise.
+        ("FiredFunnel" | "PonkeyBoiler", BurnCarries { .. }) => true,
+        // And a word that gets through is kin to every mind lane.
+        ("LoudDoubt" | "RequisitionedSilence" | "CurtainLine", MindPierce { .. }) => true,
+        // The Keeper's half of each of its two pairings is a curse on a frame,
+        // which is `CursedLicence`'s kinship arriving at the two classes that
+        // share a parent with it.
+        ("ColdStoke" | "ToldOnce", CurseOnActivate { .. }) => true,
+        // The Patent's half, likewise: what an enched component lends.
+        ("LicensedRumour", Beacon { .. }) => true,
         _ => false,
     }
 }
@@ -462,7 +523,12 @@ fn every_expert_node_moves_a_knob_it_can_be_seen_to_move() {
         let t = tree.tree_for_class(e.name).expect("a tree");
         for n in &t.nodes {
             for (knob, by) in n.tunings() {
-                let step = ExpertPower::step(&knob);
+                // **The power's own step, not the knob name's** — see
+                // `ExpertPower::step_of`. A furnace prints its clock to a tenth
+                // of a second and the two experts `step` was written for print
+                // theirs to a whole one, so the smallest *visible* move differs
+                // for the same suffix.
+                let step = e.power.step_of(&knob);
                 assert!(by != 0, "{}: moves {knob} by nothing", n.id);
                 assert_eq!(by % step, 0, "{}: moves {knob} by {by}, under its step of {step}", n.id);
             }

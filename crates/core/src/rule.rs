@@ -192,6 +192,35 @@ pub enum Rule {
     /// **For the fight, not for good**, like `Fragile`: `RunningItem` is
     /// rebuilt at every bell, so the slowdown is gone next time.
     Productivity { every: u32, slower_pct: u32 },
+    /// A pool the furnace burned still pays `pct` percent of its standing
+    /// bonus, for the rest of the fight.
+    ///
+    /// **The Stoker's only rule, and it is the trade made gentler rather than
+    /// removed.** What the class is, without it, is that the standing bonus you
+    /// were holding is exactly what you give up; a node that took the cost away
+    /// entirely would be a node that deleted the class. Read by
+    /// `Combatant::held_bonus`, off `Combatant::burned` — the furnace records
+    /// what it took, so a bonus can be paid by a pool that is no longer there.
+    BurnKeepsBonus { pct: u32 },
+    /// `pct` percent of the empowerment stacks the furnace bought survive to
+    /// the next fight.
+    ///
+    /// **The one thing in either M16 class that crosses a bell**, which is
+    /// `StandingFact::told`'s company and is why it is a capstone. Carried on
+    /// the character rather than derived, for the reason `fast_wins` and
+    /// `told_curses` are: it is a fact about the last *fight* and nothing about
+    /// a character can be read to get it back.
+    BurnCarries { pct: u32 },
+    /// `pct` percent of the target's mind resistance is walked straight
+    /// through.
+    ///
+    /// **The first mind pierce a class hands out that is not the
+    /// Showstopper's**, and it is deliberately a *rule* rather than a knob:
+    /// three of M16.5's expert trees grant it, and a rule granted by more than
+    /// one tree is the shape this project uses for exactly that — see
+    /// `Rule::Spread` and `Rule::Beacon`. Lands in `Combatant::mind_pierce`,
+    /// which `take_mind_pierced` already reads.
+    MindPierce { pct: u32 },
 }
 
 /// The three instruments, by name, in the order their recipes are written.
@@ -263,6 +292,17 @@ impl Rule {
             }
             // Twice as often as never is still never; and an upgrade with no
             // cost is not the trade this rule is entirely about.
+            // A rule that keeps nothing, carries nothing or pierces nothing is
+            // a node that costs a point and does nothing.
+            Rule::BurnKeepsBonus { pct } => (*pct > 0 && *pct <= 100)
+                .then_some(())
+                .ok_or_else(|| format!("{pct}% of a standing bonus is not a share of one")),
+            Rule::BurnCarries { pct } => (*pct > 0 && *pct <= 100)
+                .then_some(())
+                .ok_or_else(|| format!("{pct}% of a pile of stacks is not a share of one")),
+            Rule::MindPierce { pct } => (*pct > 0 && *pct <= 100)
+                .then_some(())
+                .ok_or_else(|| format!("{pct}% of a resistance is not a share of one")),
             Rule::Productivity { every, slower_pct } => {
                 if *every == 0 {
                     return Err("every no activations at all".into());
@@ -289,8 +329,7 @@ impl Rule {
             // actually works in — a spec with no number in it is the vagueness
             // this register exists to remove.
             Rule::SpinExtra { per_turn } => format!(
-                "a turning item banks {} more per turn, on top of the 1 it banks anyway",
-                per_turn
+                "a turning item banks {} more per turn, on top of the 1 it banks anyway", per_turn
             ),
             // Short on purpose: this line sits under a node's name and shares
             // the button with a second effect, and
@@ -300,10 +339,18 @@ impl Rule {
             Rule::SpinKeep { stacks } => {
                 format!("a turning item keeps {stacks} of its turns when it goes off")
             }
+            Rule::BurnKeepsBonus { pct } => {
+                format!("a pool the furnace burned still pays {pct}% of its standing bonus")
+            }
+            Rule::BurnCarries { pct } => {
+                format!("{pct}% of the empowerment the furnace bought is still on you next fight")
+            }
+            Rule::MindPierce { pct } => {
+                format!("{pct}% of their mind resist is walked through")
+            }
             Rule::SpinEvery { ms } => format!(
                 "a turning item turns every {:.1}s instead of every {:.1}s",
-                *ms as f32 / 1000.0,
-                crate::combat::SPIN_EVERY_MS as f32 / 1000.0,
+                *ms as f32 / 1000.0, crate::combat::SPIN_EVERY_MS as f32 / 1000.0,
             ),
             Rule::Scout => format!(
                 "read a region's danger and every tile's odds out of {}, on the map",
@@ -340,12 +387,25 @@ impl Rule {
     /// What the words in [`Rule::line`] mean, for the hover.
     pub fn detail(&self) -> Vec<String> {
         match self {
+            Rule::BurnKeepsBonus { pct } => vec![
+                "The furnace takes the pool and the pool is gone, which is what the class is."
+                    .into(), format!(
+                    "This keeps {pct}% of what that pool was paying you for standing still, for the rest of the fight. It does not give the points back."
+                ),
+            ],
+            Rule::BurnCarries { pct } => vec![
+                "Empowerment is bought inside a fight and is gone at the bell, like every other stack."
+                    .into(), format!("{pct}% of it is not. You walk into the next fight already warm."),
+            ],
+            Rule::MindPierce { pct } => vec![
+                "Mind damage eats maximum health, which cannot be healed off, and mind resistance is the only thing that answers it."
+                    .into(), format!("{pct}% of theirs is walked straight through."),
+            ],
             Rule::CurseOnActivate { curse, .. } => {
                 let k = crate::curse::CurseKind::by_name(curse);
                 vec![
                     format!(
-                        "Curse of {curse}: {}.",
-                        k.map(|k| k.describe().to_string()).unwrap_or_default()
+                        "Curse of {curse}: {}.", k.map(|k| k.describe().to_string()).unwrap_or_default()
                     ),
                     "It lands on top of whatever the item already does, and it stacks with \
                      the same curse off your own gear."
@@ -356,16 +416,14 @@ impl Rule {
                 format!(
                     "A turning item banks {}% of its own power a turn and spends the lot \
                      the moment it activates. It only turns where it has room to: an item \
-                     packed flush against its neighbours never moves and never banks.",
-                    crate::combat::SPIN_PCT_PER_TURN,
+                     packed flush against its neighbours never moves and never banks.", crate::combat::SPIN_PCT_PER_TURN,
                 ),
                 "This does nothing at all without something on the board that turns.".into(),
             ],
             Rule::Scout => vec![
                 format!(
                     "Danger is the mean rating of what a region holds. The odds are \
-                     per-mille per step — {} at the very worst, whatever the ground.",
-                    crate::world::MAX_ENCOUNTER_PER_MILLE,
+                     per-mille per step — {} at the very worst, whatever the ground.", crate::world::MAX_ENCOUNTER_PER_MILLE,
                 ),
                 "Nothing shows either until this is taken.".into(),
             ],
@@ -373,11 +431,9 @@ impl Rule {
                 format!(
                     "A {creature} that meets you does not fight: the bounty and the \
                      experience are paid on the spot and the encounter is over."
-                ),
-                format!(
+                ), format!(
                     "It costs no tiredness, because a fight is what costs {}% of your \
-                     maximum health and there was no fight.",
-                    crate::fatigue::PER_FIGHT,
+                     maximum health and there was no fight.", crate::fatigue::PER_FIGHT,
                 ),
                 "Nothing else is routed. Everything else in that region still fights."
                     .into(),
@@ -417,11 +473,9 @@ impl Rule {
                 "A row is full when every one of its cells is under something. The row \
                  is not disturbed: a filled row is a machine, and clearing it would be \
                  taking the machine apart."
-                    .into(),
-                format!(
+                    .into(), format!(
                     "Mana is what a casting item spends, {} a cast, and everybody else \
-                     starts a fight with none.",
-                    crate::combat::SPELL_MANA_COST
+                     starts a fight with none.", crate::combat::SPELL_MANA_COST
                 ),
             ],
             Rule::Beacon { .. } => vec![
@@ -437,8 +491,7 @@ impl Rule {
             Rule::Productivity { slower_pct, .. } => vec![
                 "Only an item with an ench bolted to one of its components. Counting \
                  rather than rolling, so the fight replays the same way twice."
-                    .into(),
-                format!(
+                    .into(), format!(
                     "The {slower_pct}% is paid for the rest of the fight and comes back at \
                      the next bell, like everything else about a running item."
                 ),

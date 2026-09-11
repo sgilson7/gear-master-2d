@@ -322,6 +322,50 @@
     [
       "FullBill",
       "Full Bill"
+    ],
+    [
+      "BareFurnace",
+      "Bare Furnace"
+    ],
+    [
+      "FiredFunnel",
+      "Fired Funnel"
+    ],
+    [
+      "ColdStoke",
+      "Cold Stoke"
+    ],
+    [
+      "PonkeyBoiler",
+      "Ponkey Boiler"
+    ],
+    [
+      "FlashPowder",
+      "Flash Powder"
+    ],
+    [
+      "LoudDoubt",
+      "Loud Doubt"
+    ],
+    [
+      "RequisitionedSilence",
+      "Requisitioned Silence"
+    ],
+    [
+      "ToldOnce",
+      "Told Once"
+    ],
+    [
+      "LicensedRumour",
+      "Licensed Rumour"
+    ],
+    [
+      "CurtainLine",
+      "Curtain Line"
+    ],
+    [
+      "AshAndWhisper",
+      "Ash and Whisper"
     ]
   ],
   "words": [],

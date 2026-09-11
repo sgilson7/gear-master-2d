@@ -4059,6 +4059,36 @@ table; a browser cannot say anything about that a hundred and fifty milliseconds
 of `cargo test` does not say better. What only the live page can answer is
 whether the counter is carrying them, which is what the list above is.
 
+**The deploy after M15 is four asks and two faults, and the second fault was a
+soft-lock somebody was standing in.** Ninety of the questions are the gate's, in
+three engines against the deployed page; the hand-written half is the four
+things a gate cannot ask.
+
+```
+live build b09d185a
+  index.html asks app.js?v=b09d185a   app.js carries BUILD='b09d185a'
+  chromium walked the gate    ok      firefox  walked the gate    ok
+  webkit   walked the gate    ok      90 ok lines, no failures
+  the bestiary                two met, two listed; the Iron Abbot's entry is
+                              six defences, four item cards and a board
+  the shore                   "…nobody has cut the tenth. It is THE NINE
+                              SURVEYS that opens it, through the edge of the
+                              Wextreen Reach."
+  the cart                    three stops in fourteen steps, which is the
+                              five-step stay
+  the weighed door            a save with the bottom option taken loads with
+                              `answered` empty, the card reopens, and "Set the
+                              counterweight off" takes and sets the flag
+  console errors: none
+```
+
+**Two faults were found by hand-checking a deploy that had already gone out**,
+which is the argument for the hand-written half of this table existing at all:
+the bestiary was printing *144% mind resist* against a fight that clamps at 100,
+and the Wextreen Sump's weighed door could be shut for good by the one choice in
+the game that does nothing. Neither is something the gate had a question for
+until it had happened.
+
 **M15's is the first table here whose hand-written half found a fault in the
 block that had just shipped.** Eighty-one of the questions are the gate's, in
 three engines against the deployed page, so what a person went and looked at is

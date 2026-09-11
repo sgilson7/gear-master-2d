@@ -90,6 +90,28 @@
       "id": "the-spinning-needle",
       "name": "",
       "prose": []
+    },
+    {
+      "at": [
+        11,
+        5
+      ],
+      "kind": "gate",
+      "id": "the-way-under-the-flat",
+      "name": "the way under the flat",
+      "hidden_until": "the-tenth-survey",
+      "needs_survey": true,
+      "shut": "The flat goes out past the low water for four hundred paces and then stops being flat. There is iron under it and it moves; without something to read it with you would be walking on a guess.",
+      "prose": [
+        "The crust gives under the heel of your hand and keeps giving, and what is under it is not sand.",
+        "Somebody has cut steps. They are cut for going down and not for coming back, which is a thing you can tell by looking at them."
+      ],
+      "floors": [
+        {
+          "map": "the-reefs-1",
+          "cleared": "stake-c-mid"
+        }
+      ]
     }
   ]
 }

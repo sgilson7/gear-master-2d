@@ -392,3 +392,58 @@ pub fn curse_resist_of(spec: &gm2d_core::combat::MonsterSpec) -> i32 {
     let (stats, _) = spec.outfit_at(gm2d_core::combat::Difficulty::Medium);
     stats.curse_resist
 }
+
+/// A character carrying one assembled instrument on the frame, and nothing else.
+///
+/// **The frame is six by three and outside `SlotKind::ALL`**, so this is not a
+/// board: nothing that asks what gear is worth counts any of it. What it is for
+/// is the handful of checks that need `Character::instrument` to answer, which
+/// is the one door every `Requirement::Surveying` goes through.
+///
+/// The parts come off the recipe table rather than a list of names — *ask the
+/// recipe table, never a list of kinds* — so a recipe that grows a part grows
+/// this too.
+pub fn with_instrument(kind: &str) -> Character {
+    use gm2d_core::piece::PieceKind;
+    let want: &[(PieceKind, usize)] = match kind {
+        "compass" => &[(PieceKind::Shard, 1), (PieceKind::Lens, 1), (PieceKind::Magnet, 1)],
+        "atlas" => &[
+            (PieceKind::Shard, 2),
+            (PieceKind::Lens, 1),
+            (PieceKind::Orb, 1),
+            (PieceKind::Alignment, 1),
+        ],
+        "golem" => &[(PieceKind::Shard, 3), (PieceKind::Earth, 2)],
+        other => panic!("{other} is not an instrument"),
+    };
+    let mut ch = Character::starting();
+    ch.clear_all();
+    let mut at = 0u8;
+    for &(k, n) in want {
+        let def = CATALOG
+            .iter()
+            .find(|d| d.kind == k && d.slot == SlotKind::Instrument)
+            .unwrap_or_else(|| panic!("the catalogue has no {k:?} for the frame"));
+        for _ in 0..n {
+            let id = ch.give(def.name).expect("a catalogue name");
+            let mut seated = false;
+            'cells: for y in 0..3u8 {
+                for x in 0..6u8 {
+                    if ch.equip(id, SlotKind::Instrument, x, y).is_ok() {
+                        seated = true;
+                        break 'cells;
+                    }
+                }
+            }
+            assert!(seated, "{} will not sit on the frame", def.name);
+            at += 1;
+        }
+    }
+    let _ = at;
+    assert_eq!(
+        ch.instrument(),
+        Some(kind),
+        "the frame did not come out as a {kind}"
+    );
+    ch
+}

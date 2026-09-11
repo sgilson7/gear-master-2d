@@ -73,6 +73,9 @@ pub const STAIR_4_JSON: &str = include_str!("../../../data/maps/the-silt-stair-4
 /// The country under the country. One town on it and the town is empty.
 pub const UNDERCOUNTRY_JSON: &str =
     include_str!("../../../data/maps/the-undercountry.tiles.json");
+/// The Eleven Reefs: three floors under the Wextreen Sands.
+pub const REEFS_1_JSON: &str = include_str!("../../../data/maps/the-reefs-1.tiles.json");
+pub const REEFS_2_JSON: &str = include_str!("../../../data/maps/the-reefs-2.tiles.json");
 pub const EVENTS_JSON: &str = include_str!("../../../data/events.json");
 pub const THEME_TD_JSON: &str = include_str!("../../../data/theme.td.json");
 pub const SKILLS_JSON: &str = include_str!("../../../data/skills.json");
@@ -113,6 +116,8 @@ pub const FILES: &[(&str, &str)] = &[
     ("maps/the-silt-stair-3.tiles.json", STAIR_3_JSON),
     ("maps/the-silt-stair-4.tiles.json", STAIR_4_JSON),
     ("maps/the-undercountry.tiles.json", UNDERCOUNTRY_JSON),
+    ("maps/the-reefs-1.tiles.json", REEFS_1_JSON),
+    ("maps/the-reefs-2.tiles.json", REEFS_2_JSON),
     ("events.json", EVENTS_JSON),
     ("theme.td.json", THEME_TD_JSON),
     ("skills.json", SKILLS_JSON),
@@ -156,6 +161,8 @@ pub const MAPS: &[(&str, &str)] = &[
     ("the-silt-stair-3", STAIR_3_JSON),
     ("the-silt-stair-4", STAIR_4_JSON),
     ("the-undercountry", UNDERCOUNTRY_JSON),
+    ("the-reefs-1", REEFS_1_JSON),
+    ("the-reefs-2", REEFS_2_JSON),
 ];
 
 /// One map by id, falling back to the overworld.

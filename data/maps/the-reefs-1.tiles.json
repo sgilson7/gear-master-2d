@@ -1,0 +1,424 @@
+{
+  "format": "gm2d-tiles",
+  "version": 1,
+  "id": "the-reefs-1",
+  "_note": "**The Flat Below — nine stakes, three bands, one sheet.** Three bands of quicksand, each cut into three segments walled off from one another, and below each band a corridor with three identical stakes in it. A stake drains one segment; the segments are not labelled. Above each band are three rooms, and exactly one of them has a neck in its ceiling that leads to the next corridor — **right, then left, then middle**, which changes per band so that a player who learns the first one learns nothing. The other two are slag pockets with something standing in them.\n\n`quick` is the terrain this floor exists for: M14 §1.1 is that flags only grow, so ground that *closes* is a stair a save cannot come back from. Quicksand can only be opened, so pulling all nine stakes opens everything and a blind walk can never strand — what it costs is forty-five fatigue and six fights for nothing, against `CAP`'s sixty.\n\n**The compass is offered at every stake and sets nothing**, which is not an oversight: the Sands' own prose says there is iron under it and a compass will tell you about every reef at once. A lie that paid would be a hint.",
+  "width": 16,
+  "height": 15,
+  "start": [
+    8,
+    13
+  ],
+  "rows": [
+    "^^^^^^^^^^^^^^^^",
+    "^ssssssssssssss^",
+    "^^^^^^^ss^^^^^^^",
+    "^%%%%^ssss^%%%%^",
+    "^qqqq^qqqq^qqqq^",
+    "^ssssssssssssss^",
+    "^^ss^^^^^^^^^^^^",
+    "^ssss^%%%%^%%%%^",
+    "^qqqq^qqqq^qqqq^",
+    "^ssssssssssssss^",
+    "^^^^^^^^^^^^ss^^",
+    "^%%%%^%%%%^ssss^",
+    "^qqqq^qqqq^qqqq^",
+    "^ssssssssssssss^",
+    "^^^^^^^^^^^^^^^^"
+  ],
+  "no_homeward": true,
+  "regions": [
+    {
+      "id": "the-reefs-1-floor",
+      "name": "The Flat Below",
+      "bounds": [
+        [
+          0,
+          0,
+          15,
+          14
+        ]
+      ],
+      "enemies": [
+        "Iron Abbot",
+        "Obsidian Colossus",
+        "Rimefather",
+        "The Rust Parliament"
+      ]
+    }
+  ],
+  "drains": [
+    {
+      "when": "stake-a-left",
+      "from": "quick",
+      "to": "silt",
+      "tiles": [
+        [
+          1,
+          12
+        ],
+        [
+          2,
+          12
+        ],
+        [
+          3,
+          12
+        ],
+        [
+          4,
+          12
+        ]
+      ]
+    },
+    {
+      "when": "stake-a-mid",
+      "from": "quick",
+      "to": "silt",
+      "tiles": [
+        [
+          6,
+          12
+        ],
+        [
+          7,
+          12
+        ],
+        [
+          8,
+          12
+        ],
+        [
+          9,
+          12
+        ]
+      ]
+    },
+    {
+      "when": "stake-a-right",
+      "from": "quick",
+      "to": "silt",
+      "tiles": [
+        [
+          11,
+          12
+        ],
+        [
+          12,
+          12
+        ],
+        [
+          13,
+          12
+        ],
+        [
+          14,
+          12
+        ]
+      ]
+    },
+    {
+      "when": "stake-b-left",
+      "from": "quick",
+      "to": "silt",
+      "tiles": [
+        [
+          1,
+          8
+        ],
+        [
+          2,
+          8
+        ],
+        [
+          3,
+          8
+        ],
+        [
+          4,
+          8
+        ]
+      ]
+    },
+    {
+      "when": "stake-b-mid",
+      "from": "quick",
+      "to": "silt",
+      "tiles": [
+        [
+          6,
+          8
+        ],
+        [
+          7,
+          8
+        ],
+        [
+          8,
+          8
+        ],
+        [
+          9,
+          8
+        ]
+      ]
+    },
+    {
+      "when": "stake-b-right",
+      "from": "quick",
+      "to": "silt",
+      "tiles": [
+        [
+          11,
+          8
+        ],
+        [
+          12,
+          8
+        ],
+        [
+          13,
+          8
+        ],
+        [
+          14,
+          8
+        ]
+      ]
+    },
+    {
+      "when": "stake-c-left",
+      "from": "quick",
+      "to": "silt",
+      "tiles": [
+        [
+          1,
+          4
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          4
+        ],
+        [
+          4,
+          4
+        ]
+      ]
+    },
+    {
+      "when": "stake-c-mid",
+      "from": "quick",
+      "to": "silt",
+      "tiles": [
+        [
+          6,
+          4
+        ],
+        [
+          7,
+          4
+        ],
+        [
+          8,
+          4
+        ],
+        [
+          9,
+          4
+        ]
+      ]
+    },
+    {
+      "when": "stake-c-right",
+      "from": "quick",
+      "to": "silt",
+      "tiles": [
+        [
+          11,
+          4
+        ],
+        [
+          12,
+          4
+        ],
+        [
+          13,
+          4
+        ],
+        [
+          14,
+          4
+        ]
+      ]
+    }
+  ],
+  "places": [
+    {
+      "at": [
+        11,
+        5
+      ],
+      "kind": "gate",
+      "id": "the-reefs-1-up",
+      "name": "the steps back up onto the flat",
+      "to": "the-wextreen-sands",
+      "at_to": [
+        11,
+        5
+      ]
+    },
+    {
+      "at": [
+        8,
+        1
+      ],
+      "kind": "gate",
+      "id": "the-reefs-1-stair",
+      "name": "the steps down",
+      "to": "the-reefs-2",
+      "at_to": [
+        1,
+        2
+      ],
+      "hidden_until": "stake-c-mid"
+    },
+    {
+      "at": [
+        14,
+        13
+      ],
+      "kind": "event",
+      "id": "the-tenth-sheet-again"
+    },
+    {
+      "at": [
+        2,
+        13
+      ],
+      "kind": "event",
+      "id": "the-stake-a-left"
+    },
+    {
+      "at": [
+        7,
+        13
+      ],
+      "kind": "event",
+      "id": "the-stake-a-mid"
+    },
+    {
+      "at": [
+        12,
+        13
+      ],
+      "kind": "event",
+      "id": "the-stake-a-right"
+    },
+    {
+      "at": [
+        2,
+        9
+      ],
+      "kind": "event",
+      "id": "the-stake-b-left"
+    },
+    {
+      "at": [
+        7,
+        9
+      ],
+      "kind": "event",
+      "id": "the-stake-b-mid"
+    },
+    {
+      "at": [
+        12,
+        9
+      ],
+      "kind": "event",
+      "id": "the-stake-b-right"
+    },
+    {
+      "at": [
+        2,
+        5
+      ],
+      "kind": "event",
+      "id": "the-stake-c-left"
+    },
+    {
+      "at": [
+        7,
+        5
+      ],
+      "kind": "event",
+      "id": "the-stake-c-mid"
+    },
+    {
+      "at": [
+        12,
+        5
+      ],
+      "kind": "event",
+      "id": "the-stake-c-right"
+    },
+    {
+      "at": [
+        3,
+        11
+      ],
+      "kind": "boss",
+      "id": "the-pocket-a-left",
+      "creature": "Iron Abbot"
+    },
+    {
+      "at": [
+        8,
+        11
+      ],
+      "kind": "boss",
+      "id": "the-pocket-a-mid",
+      "creature": "Obsidian Colossus"
+    },
+    {
+      "at": [
+        8,
+        7
+      ],
+      "kind": "boss",
+      "id": "the-pocket-b-mid",
+      "creature": "Rimefather"
+    },
+    {
+      "at": [
+        13,
+        7
+      ],
+      "kind": "boss",
+      "id": "the-pocket-b-right",
+      "creature": "The Rust Parliament"
+    },
+    {
+      "at": [
+        3,
+        3
+      ],
+      "kind": "boss",
+      "id": "the-pocket-c-left",
+      "creature": "Obsidian Colossus"
+    },
+    {
+      "at": [
+        13,
+        3
+      ],
+      "kind": "boss",
+      "id": "the-pocket-c-right",
+      "creature": "Iron Abbot"
+    }
+  ]
+}

@@ -20,6 +20,8 @@
 //! because a blind solver never takes a choice that does nothing: it is the one
 //! move a model of a good player will not make.
 
+mod common;
+
 use gm2d_core::combat::Difficulty;
 use gm2d_core::data;
 use gm2d_core::game::Game;
@@ -205,9 +207,19 @@ fn no_choice_that_does_nothing_spends_a_door() {
         }
         doors += 1;
         // Take the no-op and the door must still open.
+        //
+        // **A no-op can be behind a requirement**, which it was not when this
+        // was written: the Eleven Reefs offer a compass reading at every stake
+        // and the compass lies, so the outcome is `Nothing` and the choice
+        // wants an instrument on the frame. The rule is the same either way —
+        // taking it must not spend the card — so the game is handed whatever
+        // the choice asks for rather than the check skipping it.
         for label in &no_ops {
             let n = e.choices.iter().position(|c| c.label == *label).unwrap();
             let mut g = Game::new(1, "td");
+            if let gm2d_core::tile_event::Requirement::Surveying(kind) = &e.choices[n].requires {
+                g.character = common::with_instrument(kind);
+            }
             g.answer_event(&e.id, n, D).expect("the no-op can be taken");
             assert!(
                 !g.world.answered.iter().any(|a| a == &e.id),

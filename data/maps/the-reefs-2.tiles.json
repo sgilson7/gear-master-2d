@@ -1,0 +1,55 @@
+{
+  "format": "gm2d-tiles",
+  "version": 1,
+  "id": "the-reefs-2",
+  "_note": "**A stub, and it says so.** M16.1's job is the Flat Below, and a stair that leads nowhere is a gate `every_gate_leads_somewhere_you_can_stand` refuses — so this is a room with a way back up and nothing in it. M16.2 replaces the whole file with the Assay: four rooms, three doors, and the second door takes what the third one needs.",
+  "width": 8,
+  "height": 4,
+  "start": [
+    1,
+    2
+  ],
+  "rows": [
+    "^^^^^^^^",
+    "^ssssss^",
+    "^ssssss^",
+    "^^^^^^^^"
+  ],
+  "no_homeward": true,
+  "regions": [
+    {
+      "id": "the-reefs-2-floor",
+      "name": "The Assay",
+      "bounds": [
+        [
+          0,
+          0,
+          7,
+          3
+        ]
+      ],
+      "enemies": [
+        "Iron Abbot",
+        "Obsidian Colossus",
+        "Rimefather",
+        "The Rust Parliament"
+      ]
+    }
+  ],
+  "places": [
+    {
+      "at": [
+        6,
+        2
+      ],
+      "kind": "gate",
+      "id": "the-reefs-2-up",
+      "name": "the steps back up",
+      "to": "the-reefs-1",
+      "at_to": [
+        8,
+        1
+      ]
+    }
+  ]
+}

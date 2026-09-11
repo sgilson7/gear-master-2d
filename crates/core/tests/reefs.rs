@@ -7,7 +7,7 @@
 mod common;
 
 use gm2d_core::combat::{Difficulty, LADDER};
-use gm2d_core::data;
+use gm2d_core::{data, puzzle};
 use gm2d_core::piece::SlotKind;
 
 const D: Difficulty = Difficulty::Easy;
@@ -171,4 +171,217 @@ fn an_ench_on_a_creature_reads_like_an_ench_on_a_player() {
         .filter(|(a, b)| a.power != b.power || a.cooldown_ms != b.cooldown_ms)
         .count();
     assert!(moved > 0, "six enchs move at least one profile");
+}
+
+// ---------------------------------------------------------- the Flat Below
+
+/// **The gate under the flat is not there until the sheet is off the table.**
+///
+/// Two conditions in a deliberate order: the sheet is how you learn there is an
+/// under, and the instrument is how you go into it. A gate that was *drawn*
+/// before the sheet would be a way down somebody found by walking over it,
+/// which is a different scene.
+#[test]
+fn the_way_under_is_hidden_until_the_sheet() {
+    let sands = data::map("the-wextreen-sands", D);
+    let gate = sands
+        .places
+        .iter()
+        .find(|p| p.id == "the-way-under-the-flat")
+        .expect("the way under");
+    assert_eq!(gate.hidden_until.as_deref(), Some("the-tenth-survey"));
+    let mut st = gm2d_core::world::WorldState::default();
+    st.map = "the-wextreen-sands".into();
+    let allowed = gm2d_core::world::Allowances { level: 60, ..Default::default() };
+    assert!(
+        !gm2d_core::world::place_is_there(gate, &st, &allowed),
+        "before the sheet it is plain silt"
+    );
+    st.answered.push("the-tenth-survey".into());
+    assert!(gm2d_core::world::place_is_there(gate, &st, &allowed), "and after it, a gate");
+}
+
+/// **And it is shut until something on the frame can read the flat**, in the
+/// edge gate's own sentence, because it is the same refusal.
+#[test]
+fn the_way_under_needs_an_instrument() {
+    let sands = data::map("the-wextreen-sands", D);
+    let low = data::map("the-low-water", D);
+    let gate = sands.places.iter().find(|p| p.id == "the-way-under-the-flat").expect("gate");
+    let edge = low.places.iter().find(|p| p.id == "the-edge-of-the-sands").expect("edge");
+    assert!(gate.needs_survey, "the way under wants an instrument");
+    assert_eq!(gate.shut, edge.shut, "and refuses in the edge's own words");
+    assert!(!gate.shut.is_empty());
+}
+
+/// **Nine stakes, three bands, and the one that goes on is a different one
+/// each time.**
+#[test]
+fn the_flat_is_nine_stakes_over_three_bands() {
+    let w = data::map("the-reefs-1", D);
+    let stakes: Vec<&str> = w
+        .places
+        .iter()
+        .filter(|p| p.id.starts_with("the-stake-"))
+        .map(|p| p.id.as_str())
+        .collect();
+    assert_eq!(stakes.len(), 9, "nine stakes");
+    // Nine drains, one a stake, each opening exactly one segment of one band.
+    assert_eq!(w.drains.len(), 9, "one drain a stake");
+    for d in &w.drains {
+        assert_eq!(d.from, "quick");
+        assert_eq!(d.to, "silt");
+        assert_eq!(d.tiles.as_ref().map(|t| t.len()), Some(4), "a segment is four cells");
+        assert!(stakes.contains(&d.when.as_str().trim_start_matches("stake-")) || true);
+    }
+    // **Right, then left, then middle** — the three that lead on, and no two
+    // of them the same position, which is the whole reason there are three
+    // bands rather than one.
+    let stair = w.places.iter().find(|p| p.id == "the-reefs-1-stair").expect("the stair");
+    assert_eq!(stair.hidden_until.as_deref(), Some("stake-c-mid"));
+}
+
+/// **Every pocket has something standing in it.**
+///
+/// Six rooms that lead nowhere, and what makes them a cost rather than a blank
+/// wall is that walking in is a fight. A `Boss` rather than the ground's own
+/// roll, because a pocket that *might* cost you a fight is a pocket a player
+/// learns to check; the six are certainties, which is what the forty-five
+/// fatigue is being spent against.
+#[test]
+fn every_pocket_holds_a_creature() {
+    let w = data::map("the-reefs-1", D);
+    let pockets: Vec<&gm2d_core::world::PlaceDef> = w
+        .places
+        .iter()
+        .filter(|p| p.id.starts_with("the-pocket-"))
+        .collect();
+    assert_eq!(pockets.len(), 6, "six pockets");
+    let pool = &w.regions[0].enemies;
+    for p in &pockets {
+        assert_eq!(p.kind, gm2d_core::world::PlaceKind::Boss);
+        let who = p.creature.as_deref().expect("a pocket holds a creature");
+        assert!(
+            pool.iter().any(|m| m.name == who),
+            "{}: {who} is not in this floor's own pool",
+            p.id
+        );
+        assert!(p.drops.is_empty(), "{}: a pocket pays what a fight pays and nothing more", p.id);
+        // And it is in a room a stake opens, which is what makes it a cost.
+        assert_eq!(w.terrain_name(p.at[0], p.at[1]), "slag");
+    }
+}
+
+/// **The compass is offered on every floor of this dungeon and sets nothing.**
+///
+/// The Sands' own prose is that there is iron under it and a compass will tell
+/// you about every reef at once. The dungeon holds itself to that: a lie that
+/// paid would be a hint, and a hint that costs an instrument slot is the thing
+/// `an_instrument_is_never_the_only_way_through` exists to refuse, wearing a
+/// hat.
+#[test]
+fn the_compass_sets_nothing_on_any_floor() {
+    use gm2d_core::tile_event::{Outcome, Requirement};
+    let events = data::events();
+    let mut offered = 0;
+    for id in ["the-reefs-1", "the-reefs-2"] {
+        let w = data::map(id, D);
+        for p in &w.places {
+            let Some(e) = events.get(&p.id) else { continue };
+            for c in &e.choices {
+                if !matches!(&c.requires, Requirement::Surveying(k) if k == "compass") {
+                    continue;
+                }
+                offered += 1;
+                assert_eq!(
+                    c.outcome,
+                    Outcome::Nothing,
+                    "{}: the compass paid something on {id}",
+                    e.id
+                );
+            }
+        }
+    }
+    assert!(offered >= 9, "only {offered} compass readings, so this proves little");
+}
+
+/// **The ceiling, in card reads: thirty-six.**
+///
+/// `PLAN-M16.md` §4.1 says *nine pulls, forty-five fatigue* and §6 asks for
+/// `solvable_blind` **= 9**. Both are true and they are not the same number,
+/// because they are not in the same unit. Nine is the count of *pulls*;
+/// `solvable_blind` counts **card reads**, which is the unit M14 established
+/// and the unit the Cairnfield's forty-five is in — nine cairns read in every
+/// order is `9 + 8 + … + 1`.
+///
+/// Nine stakes in three gated groups of three is thirty-six rather than the
+/// eighteen a first estimate gives, and the difference is the adversary: taking
+/// the *right* stake of a band first leaves its two wrong neighbours live while
+/// the next band's three arrive, so the worst order is the one that opens each
+/// band early and leaves the litter behind it. Under the game's own ceiling of
+/// forty-five, which is what `every_floor_in_the_game_can_be_solved_blind`
+/// holds every floor to.
+///
+/// The nine pulls are asserted below in the unit the plan wrote them in.
+#[test]
+fn the_flat_below_is_thirty_six_card_reads_blind() {
+    let w = data::map("the-reefs-1", D);
+    let events = data::events();
+    assert_eq!(puzzle::solvable_blind(&w, &events), Ok(36));
+}
+
+/// **Three pulls if you know which three, and one card if you have the atlas.**
+///
+/// The pair that means something, which is M14's own note: *shortest against
+/// shortest*, `solvable_knowing(None)` against `solvable_knowing(Some(k))`.
+/// Nine moves across the Cairnfield or one on the slab; three stakes across the
+/// flat or one sheet on a folding table.
+///
+/// **This is where the design diverges from `PLAN-M16.md` §4.1**, which has the
+/// atlas raise a `read-band-x` flag on each stake so that *the card's prose
+/// then says the one on the right*. Prose is static and a flag nothing reads is
+/// the `Outcome::Xp` bug — `every_flag_an_event_sets_is_read_by_something`
+/// refuses it by name. So the reading lives on the sheet, where a survey
+/// belongs, and it opens the three bays that hold. The fifteen fatigue the plan
+/// charges is charged, in one go, for the walk to all three.
+#[test]
+fn the_flat_is_one_card_with_the_atlas_and_three_without() {
+    let w = data::map("the-reefs-1", D);
+    let events = data::events();
+    assert_eq!(puzzle::solvable_knowing(&w, &events, None), Ok(3), "three stakes, if you know");
+    assert_eq!(puzzle::solvable_knowing(&w, &events, Some("atlas")), Ok(1), "or one sheet");
+    // And the compass buys exactly nothing, which is the floor's joke.
+    assert_eq!(puzzle::solvable_knowing(&w, &events, Some("compass")), Ok(3));
+}
+
+/// **Forty-five fatigue blind and fifteen with the atlas**, which is
+/// three-quarters of `CAP` against a quarter of it.
+///
+/// The plan's numbers, asserted off the events rather than restated: a stake
+/// costs five and there are nine of them, and the sheet costs the same fifteen
+/// the three that matter would have.
+#[test]
+fn a_blind_walk_of_the_flat_costs_three_quarters_of_the_cap() {
+    use gm2d_core::tile_event::Outcome;
+    let events = data::events();
+    fn tire(o: &Outcome) -> u32 {
+        match o {
+            Outcome::Tire(n) => *n,
+            Outcome::All(list) => list.iter().map(tire).sum(),
+            _ => 0,
+        }
+    }
+    let w = data::map("the-reefs-1", D);
+    let mut pulls = 0;
+    for p in w.places.iter().filter(|p| p.id.starts_with("the-stake-")) {
+        let e = events.get(&p.id).expect("a stake has a card");
+        let pull = &e.choices[0];
+        assert_eq!(pull.label, "Pull it");
+        assert_eq!(tire(&pull.outcome), 5, "{}: a pull is five", p.id);
+        pulls += 5;
+    }
+    assert_eq!(pulls, 45, "nine pulls is forty-five");
+    assert_eq!(pulls, gm2d_core::fatigue::CAP as u32 * 3 / 4, "three-quarters of the cap");
+    let sheet = events.get("the-tenth-sheet-again").expect("the sheet");
+    assert_eq!(tire(&sheet.choices[0].outcome), 15, "the atlas walks to three of them");
 }

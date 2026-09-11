@@ -297,3 +297,76 @@ fn burn_for(pools: &[(&str, i32)], _ms: u32) -> combat::CombatLog {
         held,
     )
 }
+
+/// **The furnace reaches a board that swings, and for a milestone it did not.**
+///
+/// Reported from play: *"for the kettle stoker, mana empowerment ... seemingly
+/// does nothing for my attacks"*, and it was exactly right. Empowerment is
+/// upstream's **caster** mechanic — `magic_empower` scales a magic hit and
+/// nothing else — so every stack the furnace bought on a board holding a blade
+/// was a number that could never be read.
+///
+/// Measured against `common::geared_from`, which is what this repository means
+/// by *the board a player actually has*: a Stoker dealt **746** and a
+/// classless character dealt **746**, over one burn. Not close — identical.
+///
+/// `every_offered_class_reaches_something` passed it, and the reason is the
+/// failure this file has recorded before: **a fixture that casts is measuring
+/// a game the reporter is not playing.** So this asks the question of the
+/// shopped board instead, which is the one that found it.
+#[test]
+fn the_furnace_reaches_a_board_that_swings() {
+    use gm2d_core::class::ClassDef;
+    use gm2d_core::combat::{Event, Side};
+    let ch = common::geared_from(&["the-end-of-all-gears", "kettleworks"]);
+    let spec = combat::creature("The Curator").expect("a mid creature").clone();
+    let stoker = ClassDef {
+        name: "Stoker",
+        blurb: "",
+        requires: &[],
+        power: ClassPower::Stoker { every_ms: 4_000, per_stack: 10 },
+    };
+
+    let run = |classes: &[ClassDef]| {
+        combat::simulate_holding(
+            ch.player_stats(),
+            &ch.combat_items(),
+            &spec,
+            D,
+            classes,
+            0,
+            ch.start_with(),
+        )
+    };
+    let without = run(&[]);
+    let with = run(std::slice::from_ref(&stoker));
+
+    let burns = with
+        .entries
+        .iter()
+        .filter(|e| matches!(e.event, Event::Burned { .. }))
+        .count();
+    assert!(burns > 0, "the furnace never lit on the board a player has");
+
+    // **The fight has to differ**, which is the same question
+    // `every_offered_class_reaches_something` asks and the same answer it
+    // wants — asked here of a board that does not cast.
+    let hits = |log: &combat::CombatLog| -> i32 {
+        log.entries
+            .iter()
+            .filter_map(|e| match &e.event {
+                Event::Hit { by, damage, .. } if *by == Side::Player => Some(*damage),
+                _ => None,
+            })
+            .sum()
+    };
+    assert!(
+        with.duration_ms < without.duration_ms || hits(&with) > hits(&without),
+        "the furnace changed nothing on a board that swings: {}ms dealing {} against \
+         {}ms dealing {}",
+        with.duration_ms,
+        hits(&with),
+        without.duration_ms,
+        hits(&without)
+    );
+}

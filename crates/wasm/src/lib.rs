@@ -667,6 +667,94 @@ pub fn go_home() -> String {
     })
 }
 
+/// The long cart's timetable: every town this run has stood in but this one.
+///
+/// **The shim decides nothing here.** Which stops there are is `cart_stops`,
+/// the fare is `game::CART_FARE`, and whether a ride is allowed is
+/// `take_the_cart` — this moves four strings across the boundary.
+#[wasm_bindgen]
+pub fn cart_json() -> String {
+    with(|g| {
+        let theme = gm2d_core::theme::by_id(&g.theme);
+        let stops: Vec<serde_json::Value> = g
+            .cart_stops(DIFFICULTY)
+            .into_iter()
+            .map(|s| {
+                serde_json::json!({
+                    "id": s.id,
+                    "name": theme.retell(&s.name),
+                    "map": s.map,
+                })
+            })
+            .collect();
+        serde_json::json!({
+            "fare": gm2d_core::game::CART_FARE,
+            "gold": g.character.gold,
+            "stops": stops,
+        })
+        .to_string()
+    })
+}
+
+/// Ride it.
+#[wasm_bindgen]
+pub fn take_the_cart(town: &str) -> String {
+    with_mut(|g| match g.take_the_cart(town, DIFFICULTY) {
+        Ok(s) => serde_json::json!({
+            "town": gm2d_core::theme::by_id(&g.theme).retell(&s.name),
+            "id": s.id,
+            "fare": gm2d_core::game::CART_FARE,
+        })
+        .to_string(),
+        Err(why) => serde_json::json!({ "error": why }).to_string(),
+    })
+}
+
+/// Everything you need to know to play, in one place.
+///
+/// **The shim translates and decides nothing.** `glossary::shelves` is the
+/// whole of it, derived from the constants and the powers so that retuning a
+/// thing retunes what the glossary says about it. What happens here is the
+/// thing the shim is for: a **class's name** is the world's word and goes
+/// through the theme, and what it *does* stays the engine's, unthemed, with
+/// the numbers in it — TONE 13a, the same split the standing panel makes.
+#[wasm_bindgen]
+pub fn glossary_json() -> String {
+    with(|g| {
+        let theme = gm2d_core::theme::by_id(&g.theme);
+        let shelves: Vec<serde_json::Value> = gm2d_core::glossary::shelves()
+            .into_iter()
+            .map(|sh| {
+                let entries: Vec<serde_json::Value> = sh
+                    .entries
+                    .into_iter()
+                    .map(|e| {
+                        // **A class's name is the world's word.** `Entry::key`
+                        // is the canonical one, carried because the theme's
+                        // table is keyed on `&'static str` and an entry's term
+                        // is owned. Everything else is already the term a
+                        // player reads.
+                        let term = match e.key {
+                            Some(k) => theme.class(k).to_string(),
+                            None => e.term.clone(),
+                        };
+                        serde_json::json!({
+                            // A class's canonical name is a key; the player's
+                            // word for it is what goes on the chip.
+                            "term": term,
+                            "body": e.body,
+                            "aside": e.aside.iter().map(|a| theme.retell(a))
+                                .collect::<Vec<_>>(),
+                        })
+                    })
+                    .collect();
+                serde_json::json!({ "name": sh.name, "entries": entries })
+            })
+            .collect();
+        serde_json::json!({ "shelves": shelves }).to_string()
+    })
+}
+
 /// Put the player back at the start, as a loss will in M3.
 #[wasm_bindgen]
 pub fn to_last_town() {
@@ -1601,6 +1689,16 @@ pub fn fight_json() -> String {
         // balance because nothing had to gain it.
         let e0 = log.enemies.first();
         let (mut pa, mut ea) = (log.player.armor, e0.map(|c| c.armor).unwrap_or(0));
+        // **What the furnace has bought, per side.** Reported from play:
+        // *"mana empowerment does not show on the bar in battle"* — and it did
+        // not, because `Event::Burned` fell into this match's `_` arm the way
+        // `Cursed`, `Warded` and `Stunned` did before M8.2. A class whose whole
+        // identity is a number nothing prints is the *derived number with
+        // nowhere it is shown* failure, and this is the sixth time.
+        //
+        // Read and never derived, like everything else here: the event carries
+        // the stack count it took the total to.
+        let (mut pburn, mut eburn) = (0u32, 0u32);
         // mana, rage, faith, nature — the four a board actually banks.
         let mut pp = [log.player.mana, log.player.rage, log.player.faith, log.player.nature];
         let mut ep = e0
@@ -1779,6 +1877,14 @@ pub fn fight_json() -> String {
                     }
                     Event::Warded { side, item } => ("warded", *side, item.clone(), -1, 0),
                     Event::SuddenDeath { .. } => ("sudden", Side::Player, String::new(), -1, 0),
+                    // **The furnace, which had no arm at all.** `what` is the
+                    // pool it shovelled, `n` is how many points went in, and
+                    // the stack count is what the bar draws.
+                    Event::Burned { side, what, points, left, stacks } => {
+                        set_pool(*side, what, *left);
+                        if *side == Side::Player { pburn = *stacks; } else { eburn = *stacks; }
+                        ("burned", *side, (*what).to_string(), -1, *points as i64)
+                    }
                     _ => ("other", Side::Player, String::new(), -1, 0),
                 };
                 serde_json::json!({
@@ -1796,6 +1902,7 @@ pub fn fight_json() -> String {
                     "eh": eh.max(0), "emax": emax.max(1), "ea": ea.max(0),
                     "pp": pp, "ep": ep,
                     "pc": pchips.clone(), "ec": echips.clone(),
+                    "pburn": pburn, "eburn": eburn,
                 })
             })
             .collect();
@@ -3695,7 +3802,17 @@ fn contacts_json(flight: &gm2d_core::shot::Flight) -> serde_json::Value {
                 Some(serde_json::json!({ "kind": "sand", "at": [at.0, at.1] })),
             gm2d_core::shot::Contact::Sunk { at, .. } =>
                 Some(serde_json::json!({ "kind": "pocket", "at": [at.0, at.1] })),
-            _ => None,
+            // **What a diamond does**, and the arm that was missing for a
+            // milestone's worth of an afternoon: the preview knew where the
+            // ball stopped and not that a gate had caught it, so the arrow
+            // could not warn that a shot was about to take you off the map.
+            gm2d_core::shot::Contact::Caught { id, at } =>
+                Some(serde_json::json!({ "kind": "caught", "id": id, "at": [at.0, at.1] })),
+            // **Named rather than `_`**, so the next contact kind is a
+            // compile error here instead of a thing the page silently never
+            // hears about — which is exactly how `Caught` went missing.
+            gm2d_core::shot::Contact::Wall { .. }
+            | gm2d_core::shot::Contact::Crossed { .. } => None,
         })
         .collect::<Vec<_>>())
 }

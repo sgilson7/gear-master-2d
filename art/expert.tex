@@ -1,0 +1,93 @@
+% The expert paper — one drawing, twenty-one colourways.
+%
+% An expert is not a class you pick. It is what **two finished trees** reach:
+% you walk twenty-four points of one tree and twenty-four of another, and Spike
+% hands over a paper for nothing, because the points were the price. So the
+% figure is the paper, and what makes each of the twenty-one its own is the two
+% **seals** at the foot of it — one the colour of each parent class.
+%
+% That is the whole reason this is a family rather than twenty-one drawings:
+% the thing an expert *is* is a pair, so the drawing should be a pair, and
+% nothing about the sheet changes between them. Thirteen creature silhouettes
+% make sixty portraits the same way.
+%
+% Counting is the house tic. Seven ruled lines of clause, two seals, one
+% ribbon, and the stamp in the corner reads the number of the pair rather than
+% a mood.
+%
+% Written by filling in tikz_figure_prompt.md.
+%
+% Reads at 64px as a sheet with two coloured blobs at the bottom; at 4x the
+% ruling, the ribbon and the pressed rings in the wax come up.
+\documentclass[tikz,border=4pt]{standalone}
+\usetikzlibrary{calc}
+\newcommand{\Unit}{0.055cm}
+\newcommand{\Edge}{2.4pt}
+
+% The two seals, defined on the pdflatex command line — one colour per parent
+% class. The defaults are the paper's own brass, so a figure compiled with no
+% palette is still a paper rather than a hole.
+\providecommand{\SealA}{C8952F}
+\providecommand{\SealB}{9E2B3A}
+% How many clauses are ruled on it. A number, because a paper with a
+% indeterminate amount of writing on it is a prop.
+\providecommand{\Lines}{7}
+
+\definecolor{seala}{HTML}{\SealA}
+\definecolor{sealb}{HTML}{\SealB}
+\definecolor{sheet}{HTML}{E8DEC4}
+\definecolor{sheetdark}{HTML}{C9BC9A}
+\definecolor{rule}{HTML}{8A7F63}
+\definecolor{ink}{HTML}{101018}
+\definecolor{ribbon}{HTML}{B7B2A4}
+% The office's own ink. **Not one of the two seals**: the pair is the whole of
+% what makes an expert this expert, and a stamp wearing one parent's colour
+% would say the paper belongs to that half of it.
+\definecolor{office}{HTML}{8A6A2E}
+
+\begin{document}
+\begin{tikzpicture}[x=\Unit,y=\Unit, line join=round, line cap=round]
+
+  % ---- the sheet ----------------------------------------------------------
+  % Slightly off square and standing on its long edge, with the bottom-right
+  % corner turned up: a paper that has been in a coat pocket, which is where
+  % this one has been.
+  \fill[sheetdark,draw=ink,line width=\Edge]
+    (6,4) -- (62,4) -- (62,78) -- (6,78) -- cycle;
+  \fill[sheet,draw=ink,line width=\Edge]
+    (4,6) -- (60,6) -- (60,80) -- (4,80) -- cycle;
+
+  % The turned corner, bottom right. Drawn as the fold and the underside.
+  \fill[sheetdark,draw=ink,line width=1.8pt] (60,6) -- (60,18) -- (48,6) -- cycle;
+
+  % ---- the ruling ---------------------------------------------------------
+  % Seven clauses, the first one long and the rest ordinary, because the first
+  % line of a licence is what it licenses.
+  \draw[rule,line width=2.6pt] (11,72) -- (53,72);
+  \foreach \i in {1,...,\Lines} {
+    \draw[rule,line width=1.6pt] (11,{72 - 5*\i}) -- ({11 + 36 - mod(\i,3)*7},{72 - 5*\i});
+  }
+
+  % ---- the stamp ----------------------------------------------------------
+  % Top right, over the ruling: a pressed ring with a bar through it, in the
+  % office's own ink rather than either parent's. A licence with no office
+  % behind it would be a note.
+  \draw[office,line width=2.8pt] (49,74) circle (7);
+  \draw[office,line width=2.4pt] (42,74) -- (56,74);
+
+  % ---- the two seals ------------------------------------------------------
+  % The whole of what makes this expert *this* expert. Two blobs of wax at the
+  % foot, one per parent tree, each with a ring pressed into it and a tail of
+  % ribbon under them tying the pair together.
+  \draw[ribbon,line width=3pt] (20,20) .. controls (32,12) .. (44,20);
+
+  \fill[seala,draw=ink,line width=2pt] (20,20) circle (9);
+  \draw[ink,line width=1.6pt,opacity=.45] (20,20) circle (5.2);
+  \draw[ink,line width=1.6pt,opacity=.45] (16,20) -- (24,20);
+
+  \fill[sealb,draw=ink,line width=2pt] (44,20) circle (9);
+  \draw[ink,line width=1.6pt,opacity=.45] (44,20) circle (5.2);
+  \draw[ink,line width=1.6pt,opacity=.45] (40,20) -- (48,20);
+
+\end{tikzpicture}
+\end{document}

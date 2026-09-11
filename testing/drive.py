@@ -1105,6 +1105,177 @@ def check_reduced_motion_skips_the_flight(page, name, fails):
         plant(page, base, lambda body: None, stem="still-restore")
 
 
+def check_the_ball_slides_and_the_trail_grows_behind_it(page, name, fails):
+    """You can watch a shot happen.
+
+    **Reported from play: *"you should be able to watch the ball slide"*.** A
+    flight is 4 to 47 physics ticks and a median one is twenty, and the page
+    advanced *eight a frame* — so the ball was drawn about three times and the
+    whole thing was over in fifty milliseconds, with the full path painted
+    before it had travelled any of it.
+
+    Only a browser can answer this. Core's `Flight` was always right; what was
+    wrong is that nobody could see it happen. So: sample while it flies, and
+    the two things that make it a slide rather than a hop are that the ball is
+    drawn on many frames and that `flown` — how much of the trail is painted —
+    *grows* rather than arriving whole.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+    plant(page, base, lambda b: on_the_table(b, (13, 13)), stem="slide")
+    try:
+        page.evaluate("() => window.__shoot(30, 6)")
+        seen = []
+        for _ in range(45):
+            t = page.evaluate("() => { const t = window.__trail(); return [t.flown, !!t.ball]; }")
+            seen.append(t)
+            if len(seen) > 3 and not t[1] and not seen[-3][1]:
+                break
+            page.wait_for_timeout(40)
+        flying = [s for s in seen if s[1]]
+        if len(flying) < 6:
+            fails.append(f"{name}: the ball was drawn on {len(flying)} sampled frames, which is "
+                         f"not a slide")
+            return
+        grew = [s[0] for s in flying]
+        if grew[-1] <= grew[0]:
+            fails.append(f"{name}: the trail did not grow behind the ball: {grew[:8]}")
+            return
+        # And the whole path is there once it has landed, so looking back at
+        # the last shot shows all of it.
+        page.wait_for_timeout(500)
+        t = page.evaluate("() => window.__trail()")
+        if t["flown"] < len(t["trail"]):
+            fails.append(f"{name}: it landed with {t['flown']} of {len(t['trail'])} drawn")
+        else:
+            print(f"ok: the ball slides — drawn on {len(flying)} frames, the trail growing "
+                  f"{grew[0]} to {grew[-1]}")
+    finally:
+        clear_screens(page)
+        plant(page, base, lambda body: None, stem="slide-restore")
+
+
+def check_a_diamond_catches_the_ball(page, name, fails):
+    """Hitting a gate is entering it; you do not have to land on it.
+
+    **Reported from play: *"if you just simply hit the diamonds to enter a
+    zone, you should enter it, it shouldnt have to perfectly land on it"*.** A
+    cue that demanded a tile exactly is a cue that demanded a hole in one.
+
+    Core has `a_diamond_catches_the_ball_rather_than_needing_a_hole_in_one`;
+    what only a browser answers is that the *page* hears about it — the preview
+    has to carry the contact, or the arrow cannot warn that a shot is about to
+    take you off the map, and a shot that ends somewhere the page did not
+    expect is the stale-map bug in a new coat.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+    plant(page, base, lambda b: on_the_table(b, (13, 13)), stem="catch")
+    try:
+        found = page.evaluate("""() => {
+            for (let a = 0; a < 72; a++) for (let p = 1; p <= 10; p++) {
+                const f = window.__preview(a, p);
+                const c = (f.contacts || []).find(c => c.kind === 'caught');
+                if (c) return { a, p, at: c.at, rest: f.rest, id: c.id };
+            }
+            return null;
+        }""")
+        if not found:
+            fails.append(f"{name}: no shot on the Treyway is caught by a diamond")
+            return
+        if list(found["rest"]) != list(found["at"]):
+            fails.append(f"{name}: caught at {found['at']} and came to rest at {found['rest']}")
+        page.evaluate(f"() => window.__shoot({found['a']}, {found['p']})")
+        page.wait_for_timeout(1400)
+        # A gate that opened took you off the map, which is arriving; one that
+        # refused left you standing on it. Either is being caught.
+        if page.is_visible("#instrument"):
+            print(f"ok: a diamond catches the ball — {found['id']} at {found['at']}, and it "
+                  f"answered")
+            return
+        dismiss_card(page)
+        close_fight(page)
+        at = json.loads(page.evaluate("() => window.__position()"))
+        moved_off = at["map"] != "the-treyway"
+        if not moved_off and [at["x"], at["y"]] != list(found["at"]):
+            fails.append(f"{name}: caught by {found['id']} at {found['at']} and the game put "
+                         f"you at {[at['x'], at['y']]} on {at['map']}")
+        else:
+            where = at["map"] if moved_off else f"{found['at']}"
+            print(f"ok: a diamond catches the ball — {found['id']}, and it let you in to {where}")
+    finally:
+        clear_screens(page)
+        plant(page, base, lambda body: None, stem="catch-restore")
+
+
+def check_the_long_cart_runs_between_towns(page, name, fails):
+    """A ride between towns you have stood in, for a fare.
+
+    **Reported from play: *"there should be a way to teleport between
+    towns"*.** Core holds every clause — who may, what it costs, where it puts
+    you. What only a browser answers is the thing two towns are needed for:
+    that the timetable is the towns you have *been* and not a list, that the
+    fare comes off, and that the map the page is holding is re-read after a
+    ride. That last one is this file's oldest rule and a ride is the largest
+    change to a position there is short of a save being restored.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+
+    def been_to_both(body):
+        strip_the_boards(body)
+        w = body.setdefault("world", {})
+        w["map"] = "west-bambulon"
+        w["at"] = [2, 18]
+        w["counters"] = list(w.get("counters", [])) + [
+            ["stood:the-end-of-all-gears", 1], ["stood:kettleworks", 1]]
+        body["character"]["gold"] = 500
+
+    plant(page, base, been_to_both, stem="cart")
+    try:
+        page.keyboard.press("ArrowLeft")
+        page.wait_for_timeout(600)
+        close_fight(page)
+        if page.is_hidden("#town"):
+            fails.append(f"{name}: could not get into the pit to board")
+            return
+        page.click("#cart")
+        page.wait_for_selector("#cart-screen", state="visible", timeout=5000)
+        stops = page.evaluate(
+            "() => [...document.querySelectorAll('#cart-stops button')].map(b => b.innerText)")
+        # **The one you are standing in is not on it.** A timetable that offered
+        # the counter you are leaning on would be a fare for nothing.
+        if any("Gears" in s for s in stops):
+            fails.append(f"{name}: the cart offers the town you are standing in: {stops}")
+        if not any("Kettle" in s for s in stops):
+            fails.append(f"{name}: stood in two towns and the cart offers {stops}")
+            return
+        gold = page.evaluate("() => window.__character().gold")
+        page.locator("#cart-stops button").first.click()
+        page.wait_for_timeout(1000)
+        after = page.evaluate("() => window.__character().gold")
+        where = page.evaluate("() => window.__world().id")
+        if where != "kettleworks-field":
+            fails.append(f"{name}: the cart put you on {where!r}")
+        elif after >= gold:
+            fails.append(f"{name}: the ride was free — {gold} then {after}")
+        else:
+            # And the page is drawing the map it arrived on rather than the one
+            # it left, which is what a ride can break and a step cannot.
+            at = json.loads(page.evaluate("() => window.__position()"))
+            if at["map"] != where:
+                fails.append(f"{name}: the panel says {at['map']!r} and the world is {where!r}")
+            else:
+                print(f"ok: the long cart runs to a town you have stood in, for {gold - after} "
+                      f"Fnorp, and the page arrives with it")
+    finally:
+        clear_screens(page)
+        plant(page, base, lambda body: None, stem="cart-restore")
+
+
 def check_the_panel_says_what_a_pool_pays(page, name, fails):
     """A banked pool says what it is buying you.
 
@@ -6815,6 +6986,9 @@ def walk_the_gate(browser, name, fails=None):
     check_sunk_lands_you_in_town(page, name, fails)
     check_a_floor_still_steps(page, name, fails)
     check_reduced_motion_skips_the_flight(page, name, fails)
+    check_the_ball_slides_and_the_trail_grows_behind_it(page, name, fails)
+    check_a_diamond_catches_the_ball(page, name, fails)
+    check_the_long_cart_runs_between_towns(page, name, fails)
 
     # --- the log ---------------------------------------------------------------
     check_the_panel_says_what_a_pool_pays(page, name, fails)

@@ -1,0 +1,36 @@
+{
+  "_note": "The twenty-one expert papers, as colourways of art/expert.tex. An expert is what two finished trees reach, so the figure is the paper Spike hands over and what makes each one its own is the pair of seals at the foot of it — one per parent class. Twenty-one figures from one drawing, which is the thirteen-creature-families argument applied to a thing that is *literally* a pair. The pairs here must match `expert::EXPERTS` and `every_class_the_game_offers_has_a_figure` is what says so: a list of twenty-one written by hand is a list that can be twenty.",
+  "_classes": {
+    "_note": "One colour a class, chosen apart rather than taken from each figure's darkest ink — two muddy seals side by side are two blobs. Every pair of these is distinguishable, which twenty-one pairs from seven colours are by construction.",
+    "Berserker": "7A3B33",
+    "Hexweaver": "6E7450",
+    "Bloodletter": "9C5C60",
+    "Recycler": "2E6E8E",
+    "Showstopper": "B33146",
+    "Stoker": "E0742A",
+    "Whisperer": "7F8FC8"
+  },
+  "experts": {
+    "LoudCalculation": ["Berserker", "Hexweaver"],
+    "StandingFact": ["Berserker", "Bloodletter"],
+    "OverwoundArm": ["Berserker", "Recycler"],
+    "ShortProgramme": ["Berserker", "Showstopper"],
+    "CurseRequisition": ["Hexweaver", "Bloodletter"],
+    "PatentedFunnel": ["Hexweaver", "Recycler"],
+    "OpeningNumber": ["Hexweaver", "Showstopper"],
+    "CursedLicence": ["Bloodletter", "Recycler"],
+    "EleventhSeason": ["Bloodletter", "Showstopper"],
+    "BareFurnace": ["Berserker", "Stoker"],
+    "FiredFunnel": ["Hexweaver", "Stoker"],
+    "ColdStoke": ["Bloodletter", "Stoker"],
+    "PonkeyBoiler": ["Recycler", "Stoker"],
+    "FlashPowder": ["Showstopper", "Stoker"],
+    "LoudDoubt": ["Berserker", "Whisperer"],
+    "RequisitionedSilence": ["Hexweaver", "Whisperer"],
+    "ToldOnce": ["Bloodletter", "Whisperer"],
+    "LicensedRumour": ["Recycler", "Whisperer"],
+    "CurtainLine": ["Showstopper", "Whisperer"],
+    "AshAndWhisper": ["Stoker", "Whisperer"],
+    "FullBill": ["Recycler", "Showstopper"]
+  }
+}

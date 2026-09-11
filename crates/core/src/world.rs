@@ -632,6 +632,27 @@ impl PlaceKind {
                 | PlaceKind::Sand
         )
     }
+
+    /// Does hitting this one on a table stop the ball and let you in?
+    ///
+    /// **Reported from play: *"if you just simply hit the diamonds to enter a
+    /// zone, you should enter it, it shouldnt have to perfectly land on
+    /// it"*.** A gate and a boss are the two things the map draws as a
+    /// **diamond**, and they are the two that are a way *into* somewhere — so
+    /// on a shot map they catch the ball instead of being flown over. A cue
+    /// that demanded a tile exactly would be a cue that demanded a hole in
+    /// one, and `aim_at` finding a shot is not the same as a player finding
+    /// one.
+    ///
+    /// **Only these two, and the line is where they differ from the rest.** An
+    /// event, a bench and a caravan are things you stop *at*: a signpost you
+    /// can roll past is a signpost, and a cart that snatched the ball out of
+    /// the air would be a toll booth. A town is not one either — the
+    /// Undercountry's stands in the middle of its one fast lane, and a town
+    /// that caught every shot down that road would be a road nobody can use.
+    pub fn catches(self) -> bool {
+        matches!(self, PlaceKind::Gate | PlaceKind::Boss)
+    }
 }
 
 /// How a player crosses a map.

@@ -73,6 +73,7 @@
           <div class="row">
             <button id="skills" type="button">The tree</button>
             <button id="errands-open" type="button">Errands</button>
+            <button id="gloss-open" type="button" title="How to play (G)">How to play</button>
             <!-- **Only once something has been beaten five times.** A button
                  that opens an empty list is a feature reported as broken, which
                  is the rack's lesson and the van's: a screen you cannot use is
@@ -415,6 +416,29 @@
       </div>
     </div>
 
+    <div id="glossary" class="screen framed" hidden>
+      <div class="panel">
+        <h2>How to play</h2>
+        <div id="gloss-tabs" class="tabs"></div>
+        <div id="gloss-body" class="stages"></div>
+        <div class="actionbar">
+          <button id="gloss-close" type="button" class="primary">Back out</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="cart-screen" class="screen framed" hidden>
+      <div class="panel">
+        <h2>The long cart</h2>
+        <p id="cart-blurb" class="says"></p>
+        <div id="cart-stops" class="shelf"></div>
+        <p id="cart-says" class="says" hidden></p>
+        <div class="actionbar">
+          <button id="cart-close" type="button" class="primary">Back out</button>
+        </div>
+      </div>
+    </div>
+
     <div id="town" class="screen framed" hidden>
       <div class="screenbox">
         <header class="fighthead">
@@ -486,6 +510,7 @@
         <div class="actionbar">
           <button id="pack" type="button" class="primary advance">Inventory / Character Sheet</button>
           <button id="bank" type="button">Level up</button>
+          <button id="cart" type="button">Take the long cart</button>
           <button id="leave" type="button">Back out</button>
         </div>
       </div>

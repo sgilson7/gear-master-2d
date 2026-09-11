@@ -13,6 +13,7 @@
 
 pub mod character;
 pub mod class;
+pub mod glossary;
 pub mod combat;
 pub mod enemy_data;
 pub mod event;

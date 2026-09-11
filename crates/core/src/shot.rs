@@ -199,6 +199,8 @@ pub enum Contact {
     Sand { id: String, at: (u8, u8) },
     /// Came to rest in a pocket and sank.
     Sunk { id: String, at: (u8, u8) },
+    /// Ran into a gate or a boss, which caught it. The flight ends there.
+    Caught { id: String, at: (u8, u8) },
 }
 
 /// One shot, from a tile, run to rest.
@@ -377,6 +379,19 @@ pub fn shoot_with(
             .place_now(state, tx as u8, ty as u8, allowed)
             .filter(|p| p.kind.is_obstacle())
     };
+    // **What a diamond does.** `PlaceKind::catches` is gates and bosses, and
+    // they stop the ball rather than being flown over — reported from play as
+    // *it shouldnt have to perfectly land on it*. Not the tile the shot was
+    // taken from: a ball leaving a gate it has just been refused at must be
+    // able to leave.
+    let catcher = |tx: i32, ty: i32| -> Option<&crate::world::PlaceDef> {
+        if !world.in_bounds(tx, ty) || (tx, ty) == (from.0 as i32, from.1 as i32) {
+            return None;
+        }
+        world
+            .place_now(state, tx as u8, ty as u8, allowed)
+            .filter(|p| p.kind.catches())
+    };
     // A bumper is solid to the ball the way a wall is, and it is the only
     // place in the game that is.
     let solid = |tx: i32, ty: i32| -> bool {
@@ -462,6 +477,23 @@ pub fn shoot_with(
         x = nx;
         y = ny;
         path.push((x, y));
+
+        // **A diamond catches, and that is the end of the flight.** Before the
+        // obstacles, because being let into somewhere is not a thing the ball
+        // can then roll out of — and the ball is put on the tile's centre so
+        // that where it stopped is legibly *on* the thing it hit rather than
+        // wherever the tick happened to land.
+        if let Some(p) = catcher(x.div_euclid(SUB), y.div_euclid(SUB)) {
+            let at = (x.div_euclid(SUB) as u8, y.div_euclid(SUB) as u8);
+            contacts.push(Contact::Caught { id: p.id.clone(), at });
+            x = at.0 as i32 * SUB + SUB / 2;
+            y = at.1 as i32 * SUB + SUB / 2;
+            path.push((x, y));
+            // No need to stop the ball: the loop is over. Zeroing the velocity
+            // here would be two ways of saying the same thing and the compiler
+            // says so.
+            break;
+        }
 
         // **Three of the five happen where the ball *is*, and two of them end
         // the flight.** In this order because that is the order they happen in:

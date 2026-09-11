@@ -195,7 +195,8 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
    full-viewport overlay, `.screen.framed[hidden]` kept a hidden fight screen
    swallowing clicks, and this. All three were found by `elementFromPoint` and
    none of them by reading. `check_the_fork_is_on_top` is what stops a fourth. */
-#tree, #log, #ending, #history, #combat, #instrument, #instant, #bestiary { z-index: 30; }
+#tree, #log, #ending, #history, #combat, #instrument, #instant, #bestiary,
+#cart-screen, #glossary { z-index: 30; }
 /* The cart is a counter you walked onto, like the town and the van, so it
    sits on the tier those do — *where you are* rather than *what you
    opened from there*. */
@@ -770,3 +771,41 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
 #bestiary-list button { width: 100%; text-align: left; }
 #bestiary-entry { min-width: 0; }
 #bestiary-board { width: 100%; max-width: 420px; height: auto; }
+
+/* **The expert's paper, inline on the second fork's cards.** Small enough to
+   sit in a sentence and large enough that two of them are told apart by their
+   seals, which is the whole of what makes twenty-one papers twenty-one things.
+   Baseline-shifted rather than floated: it is a word in the line, not a
+   picture beside it. */
+.meta .seal {
+  height: 2.4em;
+  width: auto;
+  vertical-align: -0.9em;
+  margin-right: .35em;
+  image-rendering: auto;
+}
+
+
+/* **The glossary, and it is a reference rather than a screen you act on.**
+   Two columns where there is room, because the entries are short and a single
+   long column is a thing nobody scrolls to the bottom of. */
+#gloss-body { display: block; column-width: 22rem; column-gap: 1.6rem; }
+.gloss-entry {
+  break-inside: avoid;
+  margin: 0 0 1rem;
+  padding: .55rem .7rem;
+  border-left: 3px solid var(--line);
+  background: rgba(255, 255, 255, .02);
+}
+.gloss-entry h3 {
+  margin: 0 0 .3rem;
+  font-size: 13px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.gloss-entry p { margin: 0 0 .35rem; font-size: 12.5px; line-height: 1.45; }
+.gloss-entry .aside {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-3);
+}

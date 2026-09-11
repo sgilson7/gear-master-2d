@@ -918,3 +918,134 @@ fn aim_at_is_under_a_second() {
         "aim_at takes {each:?} a call, which is a walker that cannot afford to aim"
     );
 }
+
+// -------------------------------------------------- a diamond catches the ball
+
+/// **Hitting a gate is entering it, and landing exactly on it is not required.**
+///
+/// Reported from play: *"if you just simply hit the diamonds to enter a zone,
+/// you should enter it, it shouldnt have to perfectly land on it"*. A gate and
+/// a boss are the two things the map draws as a diamond and the two that are a
+/// way *into* somewhere, so on a table they catch the ball. A cue that demanded
+/// a tile exactly would be a cue that demanded a hole in one.
+///
+/// The measurement is the point: how many shots from the map's own start reach
+/// each gate, before and after. Landing-only was a handful; catching is every
+/// shot whose line crosses it.
+#[test]
+fn a_diamond_catches_the_ball_rather_than_needing_a_hole_in_one() {
+    let a = Allowances::default();
+    for id in ["the-treyway", "the-undercountry"] {
+        let w = data::map(id, D);
+        let mut state = gm2d_core::world::WorldState::default();
+        state.map = id.to_string();
+        let gates: Vec<_> = w
+            .places
+            .iter()
+            .filter(|p| p.kind.catches() && p.hidden_until.is_none() && p.hidden_until_all.is_empty())
+            .collect();
+        assert!(!gates.is_empty(), "{id}: no diamonds on it");
+
+        for g in &gates {
+            let mut caught = 0;
+            let mut landed = 0;
+            for from in [(w.start.0, w.start.1)] {
+                for angle in 0..STEPS as u16 {
+                    for power in 1..=10u8 {
+                        let f = shot::shoot_with(&w, &state, from, Shot::new(angle, power), &a);
+                        if f.contacts.iter().any(
+                            |c| matches!(c, Contact::Caught { id, .. } if *id == g.id),
+                        ) {
+                            caught += 1;
+                            assert_eq!(
+                                f.rest,
+                                (g.at[0], g.at[1]),
+                                "{id}: caught by {:?} and came to rest somewhere else",
+                                g.id
+                            );
+                        }
+                        if f.rest == (g.at[0], g.at[1]) {
+                            landed += 1;
+                        }
+                    }
+                }
+            }
+            println!(
+                "{id}: {:?} is hit by {caught} of 720 shots from the start ({landed} land on it)",
+                g.id
+            );
+            // **Every landing is a catch — except on the tile you shot from.**
+            // The Treyway's start *is* the door back to West Bambulon, so a
+            // ball that rolls home onto it was never caught: it left. That is
+            // the origin exemption stated from the other side, and it is the
+            // one case where the two numbers may differ.
+            if (g.at[0], g.at[1]) == (w.start.0, w.start.1) {
+                assert_eq!(
+                    caught, 0,
+                    "{id}: {:?} is the tile the shot came from and caught {caught}",
+                    g.id
+                );
+                continue;
+            }
+            assert_eq!(
+                caught, landed,
+                "{id}: {:?} was landed on {landed} times and caught {caught} - a diamond \
+                 you can come to rest on without being caught is a diamond with two rules",
+                g.id
+            );
+            // **A diamond on ground the ball cannot enter is not caught, and
+            // must not be.** The tide crossing stands on `tide` until the
+            // tenth cairn goes up two maps away; nothing can come to rest on
+            // it or fly into it, and what answers it is the beside-rule, which
+            // hands back its refusal. The two mechanisms are for the two
+            // cases and neither covers the other.
+            if !w.walkable(g.at[0], g.at[1], &a) {
+                assert_eq!(
+                    caught, 0,
+                    "{id}: {:?} is on ground nothing can enter and was caught {caught} times",
+                    g.id
+                );
+                continue;
+            }
+            assert!(caught > 0, "{id}: {:?} is hit by no shot from the start", g.id);
+        }
+    }
+}
+
+/// **A ball leaving a diamond is not caught by the one it is leaving.**
+///
+/// The gate you were just refused at is the tile you are standing on, so a
+/// catcher that did not exempt the shot's own origin would take every shot
+/// from there and put you straight back — a soft-lock made of one rule.
+#[test]
+fn the_diamond_you_are_standing_on_does_not_catch_you() {
+    let a = Allowances::default();
+    let w = treyway();
+    let mut state = gm2d_core::world::WorldState::default();
+    state.map = "the-treyway".into();
+    let gate = w
+        .places
+        .iter()
+        .find(|p| p.kind == gm2d_core::world::PlaceKind::Gate && w.walkable(p.at[0], p.at[1], &a))
+        .expect("the Treyway has a gate on ground");
+    let from = (gate.at[0], gate.at[1]);
+
+    let mut left = 0;
+    for angle in 0..STEPS as u16 {
+        for power in 1..=10u8 {
+            let f = shot::shoot_with(&w, &state, from, Shot::new(angle, power), &a);
+            assert!(
+                !f.contacts.iter().any(
+                    |c| matches!(c, Contact::Caught { id, .. } if *id == gate.id)
+                ),
+                "a shot from {:?}'s own tile was caught by it",
+                gate.id
+            );
+            if f.rest != from {
+                left += 1;
+            }
+        }
+    }
+    assert!(left > 0, "no shot from {:?} goes anywhere", gate.id);
+    println!("{:?}: {left} of 720 shots leave its tile", gate.id);
+}

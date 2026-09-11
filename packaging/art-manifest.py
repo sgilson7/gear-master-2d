@@ -22,6 +22,26 @@ def manifest() -> dict:
     return {k: v for k, v in raw.items() if not k.startswith("_")}
 
 
+def experts() -> tuple[dict, dict]:
+    """The expert papers: name -> (slug, TeX defines), and a colour a class.
+
+    **One drawing, twenty-one colourways**, which is the creature-family
+    argument applied to a thing that is literally a pair: an expert is what two
+    finished trees reach, so the figure is the paper and the two seals at the
+    foot of it are the two parents. Nothing about the sheet changes.
+    """
+    raw = json.loads((ROOT / "art" / "experts.json").read_text())
+    cols = {k: v for k, v in raw["_classes"].items() if not k.startswith("_")}
+    out = {}
+    for name, pair in raw["experts"].items():
+        a, b = pair
+        if a not in cols or b not in cols:
+            raise SystemExit(f"art/experts.json: {name} names a class with no colour")
+        out[name] = (f"expert-{slug(name)}",
+                     f"\\def\\SealA{{{cols[a]}}}\\def\\SealB{{{cols[b]}}}")
+    return out, cols
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--build", action="store_true",
@@ -45,6 +65,8 @@ def main() -> int:
                 for k in ("main", "dark", "accent") if k in spec
             )
             print(f"{slug(name)}\t{fam}\t{defs}")
+        for _, (out, defs) in experts()[0].items():
+            print(f"{out}\texpert\t{defs}")
         return 0
 
     if args.write_map:
@@ -59,6 +81,13 @@ def main() -> int:
                    else slug(name))
             for name, spec in m.items()
         }
+        # **The expert half of `classes`, and only that half.** The seven a
+        # player picks from are hand-drawn and hand-mapped; the twenty-one are
+        # colourways and are written from the manifest, so the map and the
+        # files it names cannot drift.
+        cls = art.setdefault("classes", {})
+        for name, (out, _) in experts()[0].items():
+            cls[name] = out
         path.write_text(json.dumps(art, indent=2) + "\n")
         return 0
 

@@ -54,6 +54,33 @@ fn bump(list: &mut Vec<(String, u32)>, key: &str) {
     }
 }
 
+/// What the long cart charges, in Fnorp.
+///
+/// **Two cheap tins**, which is the price of never being a wall and never
+/// being nothing. It is priced against the walk it sells rather than against
+/// the Drover's Stride: the Stride is a rescue and this is a convenience, and
+/// the reason the two do not collide is that this one only runs from a counter
+/// you are already safely standing at.
+pub const CART_FARE: i32 = 40;
+
+/// A town the long cart runs to.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CartStop {
+    pub id: String,
+    pub name: String,
+    pub map: String,
+    pub at: [u8; 2],
+}
+
+/// The counter that remembers a town was stood in.
+///
+/// A function rather than a format string at each site, for the reason
+/// `fight::beat_key` is one: two spellings of a counter key is two counters,
+/// and the second one is always empty.
+pub fn stood_key(town: &str) -> String {
+    format!("stood:{town}")
+}
+
 impl Game {
     /// A new session from a seed.
     ///
@@ -118,9 +145,98 @@ impl Game {
     /// and the shim decides nothing.
     pub fn arrive_in_town(&mut self, id: &str) -> i32 {
         self.world.last_town = id.to_string();
+        // **Where the cart will run to.** A counter rather than a field, which
+        // is the `beat:` and `met:` pattern a third time: counters already
+        // round-trip, so remembering every town a run has stood in costs no
+        // save seam at all. And it is read rather than mirrored — `cart_stops`
+        // works the list out fresh.
+        self.world.bump(&stood_key(id));
         let took = self.character.fatigue;
         self.character.fatigue = 0;
         took
+    }
+
+    /// Every town this run has stood in, other than the one it is standing in.
+    ///
+    /// Derived off the counters, so a town you walked into once is on the list
+    /// for ever and nothing writes a second copy of *where you have been*.
+    /// Ordered by `data::MAPS`, because a list that reorders itself as you
+    /// travel is a list you cannot find anything in twice.
+    pub fn cart_stops(&self, difficulty: crate::combat::Difficulty) -> Vec<CartStop> {
+        let here = self.world.map_id();
+        let mut out = Vec::new();
+        for (map, _) in crate::data::MAPS {
+            let w = crate::data::map(map, difficulty);
+            for p in &w.places {
+                if p.kind != crate::world::PlaceKind::Town {
+                    continue;
+                }
+                if self.world.count(&stood_key(&p.id)) == 0 {
+                    continue;
+                }
+                // Not the counter you are leaning on.
+                if *map == here && p.at == self.world.at {
+                    continue;
+                }
+                out.push(CartStop {
+                    id: p.id.clone(),
+                    name: p.name.clone(),
+                    map: map.to_string(),
+                    at: p.at,
+                });
+            }
+        }
+        out
+    }
+
+    /// Take the long cart to another town.
+    ///
+    /// **Reported from play: *"there should be a way to teleport between
+    /// towns"*.** It is a fare rather than a rule of the world, so every
+    /// clause of it is here: who may, what it costs, where it puts you, and
+    /// what it says when it refuses.
+    ///
+    /// **It does not undercut the Drover's Stride**, which is the thing this
+    /// had to be checked against. The Stride's job is getting you *out of the
+    /// wilderness* — it works from anywhere and costs a tin — and the cart
+    /// runs town to town only. You have to already be somewhere safe to take
+    /// it, so it can never be the thing that saves a run. What it sells is the
+    /// walk between counters, which is bookkeeping rather than a decision.
+    ///
+    /// **And it charges, because free fast travel is the one thing that would
+    /// flatten a map.** Forty Fnorp is two cheap tins: never a wall, never
+    /// nothing. `a_refusal_spends_nothing` is the other half — the first thing
+    /// anybody does with a refused button is press it again.
+    ///
+    /// Three refusals, each naming the thing in the way (`TONE.md` rule 12).
+    pub fn take_the_cart(
+        &mut self,
+        town: &str,
+        difficulty: crate::combat::Difficulty,
+    ) -> Result<CartStop, String> {
+        let stops = self.cart_stops(difficulty);
+        if stops.is_empty() {
+            return Err(
+                "The cart runs between towns you have stood in, and you have stood in this one."
+                    .into(),
+            );
+        }
+        let Some(stop) = stops.iter().find(|s| s.id == town).cloned() else {
+            return Err("The cart does not go there, or you have not been.".into());
+        };
+        if self.character.gold < CART_FARE {
+            return Err(format!(
+                "The fare is {CART_FARE} Fnorp and you have {}.",
+                self.character.gold
+            ));
+        }
+        self.character.gold -= CART_FARE;
+        self.warp_to(&stop.map, stop.at, difficulty);
+        // Arriving by cart is arriving: it is the same rule, so it mends you
+        // the same. Harmless by construction — you were in a town, so there
+        // was nothing to take off.
+        self.arrive_in_town(&stop.id);
+        Ok(stop)
     }
 
     /// Ask the gear to take you home, and pay it a tin.

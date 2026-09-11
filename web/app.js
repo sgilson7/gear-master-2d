@@ -11,6 +11,7 @@ import init, {
   quest_log_json, guide_json, pin_quest,
   character_json, skills_json, take_skill, pressure_json, pools_json,
   class_offer_json, choose_class, choose_second_class, class_name, all_trees_json,
+  cart_json, take_the_cart, glossary_json,
   try_shoot, preview_shot, aim_at,
   gold, piece_count, version, save_version,
   board_json, legal_anchors, place, pick_up, rotate, toggle_lock, undo, clear_board,
@@ -308,6 +309,86 @@ function draw() {
       g.fillStyle = pal.town[0];
       g.fillRect(x * TILE + 6, y * TILE + 6, TILE - 12, TILE - 12);
       g.strokeRect(x * TILE + 6, y * TILE + 6, TILE - 12, TILE - 12);
+    } else if (p.kind === 'bumper') {
+      // **The five obstacles are five shapes, and until now they were one.**
+      // Reported from play: *"there are a bunch more event diamonds, are they
+      // actual events or are they obstacles?"* — which is the question a
+      // player has to ask when five different physical behaviours wear the
+      // small diamond an event wears. `look.rs`'s rule is that a mark is a
+      // shape nothing else draws, and it had been kept for everything on the
+      // map except the things the ball actually hits.
+      //
+      // A bumper is a boulder: a filled disc with a ring round it, which is
+      // the one round *solid* thing here. It says "this will throw you".
+      const r = TILE / 2 - 5;
+      g.fillStyle = pal.rock[0];
+      g.beginPath(); g.arc(cx, cy, r, 0, Math.PI * 2); g.fill();
+      g.strokeStyle = ink(); g.lineWidth = 2.5;
+      g.stroke();
+      g.lineWidth = 1.5;
+      g.beginPath(); g.arc(cx, cy, r - 4, 0, Math.PI * 2); g.stroke();
+      g.lineWidth = 2;
+    } else if (p.kind === 'spike') {
+      // Teeth along the ground: a row of triangles standing on a line. The
+      // ball goes through and it costs you, so the mark is something you pass
+      // rather than something that stops you — open at the top, not a body.
+      const bot = y * TILE + TILE - 6, w = TILE - 10, x0 = x * TILE + 5;
+      g.strokeStyle = ink(); g.lineWidth = 2;
+      g.beginPath();
+      g.moveTo(x0, bot); g.lineTo(x0 + w, bot);
+      for (let i = 0; i < 3; i++) {
+        const sx = x0 + (w / 3) * i;
+        g.moveTo(sx, bot);
+        g.lineTo(sx + w / 6, bot - TILE / 2.4);
+        g.lineTo(sx + w / 3, bot);
+      }
+      g.stroke();
+    } else if (p.kind === 'pocket') {
+      // A hole: a dark disc with nothing in it and a rim on the near side.
+      // The inverse of the bumper on purpose — same circle, opposite fill —
+      // because one throws the ball away and the other keeps it.
+      const r = TILE / 2 - 6;
+      g.beginPath(); g.arc(cx, cy, r, 0, Math.PI * 2);
+      g.fillStyle = 'rgba(12,10,8,.88)'; g.fill();
+      g.strokeStyle = ink(); g.lineWidth = 2.5; g.stroke();
+      g.lineWidth = 2;
+      g.beginPath();
+      g.arc(cx, cy + 2, r - 2, Math.PI * 0.15, Math.PI * 0.85);
+      g.strokeStyle = 'rgba(232,217,168,.55)';
+      g.stroke();
+      g.strokeStyle = ink();
+    } else if (p.kind === 'chute') {
+      // A lane: two rails and an arrowhead. The only mark on any map that
+      // points, because it is the only thing that carries you somewhere with
+      // your speed and your heading intact.
+      const w = TILE - 14, h = TILE - 10;
+      const lx = cx - w / 2, rx = cx + w / 2, top = cy - h / 2, bot = cy + h / 2;
+      g.strokeStyle = ink(); g.lineWidth = 2.5;
+      g.beginPath();
+      g.moveTo(lx, bot); g.lineTo(lx, top);
+      g.moveTo(rx, bot); g.lineTo(rx, top);
+      g.moveTo(lx - 2, top + 6); g.lineTo(cx, top - 2); g.lineTo(rx + 2, top + 6);
+      g.stroke();
+      g.lineWidth = 2;
+    } else if (p.kind === 'sand') {
+      // Drifted grit: three broken lines banked up, and stipple over them.
+      // Low and horizontal, because what it does is stop the ball dead on the
+      // ground rather than stand in its way.
+      const x0 = x * TILE + 5, w = TILE - 10, bot = y * TILE + TILE - 7;
+      g.strokeStyle = ink(); g.lineWidth = 2;
+      g.beginPath();
+      for (let i = 0; i < 3; i++) {
+        const yy = bot - i * 5;
+        g.moveTo(x0 + i * 3, yy);
+        g.lineTo(x0 + w - i * 3, yy);
+      }
+      g.stroke();
+      g.fillStyle = ink();
+      for (const [dx, dy] of [[0.25, -0.42], [0.55, -0.5], [0.75, -0.38], [0.4, -0.58]]) {
+        g.beginPath();
+        g.arc(x * TILE + TILE * dx, bot + TILE * dy, 1.4, 0, Math.PI * 2);
+        g.fill();
+      }
     } else {
       g.beginPath();
       g.moveTo(cx, cy - 7); g.lineTo(cx + 7, cy); g.lineTo(cx, cy + 7); g.lineTo(cx - 7, cy);
@@ -485,7 +566,16 @@ function paintPanel() {
 /// went on drawing the generic figure afterwards would be the one screen in
 /// the game that had not noticed.
 function paintYou(canonical) {
-  const cls = canonical ?? JSON.parse(character_json()).class;
+  const c = JSON.parse(character_json());
+  // **The deepest thing you have become, not the first fork you took.**
+  // `classes` is what you *are*, in the order they were paid for — the level-
+  // five fork, Spike's second paper, and the expert the pair reaches — so the
+  // last of them is the one a portrait should be of. Reading `class` drew the
+  // level-five figure for somebody who had finished two trees and taken the
+  // paper, which is this repository's *a thing that works and cannot be seen*
+  // in the one place a player looks to find out what they are.
+  const deepest = (c.classes ?? []).at(-1)?.canonical;
+  const cls = canonical ?? deepest ?? c.class;
   const src = (cls && figure('classes', cls)) || (art.player ? `assets/${art.player}.svg` : null);
   portrait($('player-art'), src, cls ? class_name() : 'you');
 }
@@ -1798,6 +1888,15 @@ function offerClass({ paper = false } = {}) {
                   // the engine's own sentence, like the class's above it.
                   (c.reaches
                     ? `<span class="meta">with what you are, this eventually reaches ` +
+                      // **The paper itself, beside its name.** Every expert is
+                      // one drawing in its own pair of seals, so the two cards
+                      // on this screen are told apart by the thing they lead
+                      // to and not only by a sentence about it. The pairing is
+                      // the whole decision and this is the screen where it is
+                      // made.
+                      (figure('classes', c.reaches.canonical)
+                        ? `<img class="seal" src="${figure('classes', c.reaches.canonical)}" alt="">`
+                        : '') +
                       `<b>${c.reaches.name}</b> — ${c.reaches.promise}</span>`
                     : '') +
                   `<span class="meta">${c.nodes} skills of its own to spend points on</span>`;
@@ -2817,18 +2916,34 @@ function drawFlight(ctx, cell) {
   ctx.save();
   ctx.strokeStyle = 'rgba(200,162,74,.45)';
   ctx.lineWidth = Math.max(1.5, cell / 14);
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
   ctx.beginPath();
-  trail.forEach(([sx, sy], i) => {
-    const x = (sx / sub) * cell;
-    const y = (sy / sub) * cell;
+  // Only as far as the ball has got. `flown` is the whole path once it has
+  // landed, so looking back at the last shot still shows all of it.
+  const upto = Math.max(1, Math.min(trail.length, flown));
+  for (let i = 0; i < upto; i++) {
+    const x = (trail[i][0] / sub) * cell;
+    const y = (trail[i][1] / sub) * cell;
     if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-  });
+  }
+  if (ball) ctx.lineTo((ball[0] / sub) * cell, (ball[1] / sub) * cell);
   ctx.stroke();
   if (ball) {
+    const bx = (ball[0] / sub) * cell, by = (ball[1] / sub) * cell;
+    // A soft shadow under it, so the ball reads as a thing on the ground
+    // rather than a dot painted on the map.
     ctx.beginPath();
-    ctx.arc((ball[0] / sub) * cell, (ball[1] / sub) * cell, cell / 5, 0, Math.PI * 2);
+    ctx.arc(bx, by + cell / 14, cell / 5, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(0,0,0,.28)';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(bx, by, cell / 5, 0, Math.PI * 2);
     ctx.fillStyle = '#e8d9a8';
     ctx.fill();
+    ctx.lineWidth = Math.max(1, cell / 22);
+    ctx.strokeStyle = 'rgba(40,32,16,.7)';
+    ctx.stroke();
   }
   ctx.restore();
 }
@@ -2872,21 +2987,48 @@ function position_at() {
 /// **Reduced motion skips to rest with the trail drawn**, because a player who
 /// has asked for less movement has asked for less movement and not for less
 /// information.
+/// How long a flight takes to watch, in milliseconds a tick.
+///
+/// **A tick is a physics step, not a frame, and there are very few of them.**
+/// A shot on the Treyway is 4 to 47 ticks and a median one is twenty — so the
+/// first version, which advanced eight ticks a frame, drew the ball about
+/// three times and was over in fifty milliseconds. Reported as *you should be
+/// able to watch the ball slide*, which is exactly what it was not doing.
+///
+/// So the clock drives it rather than the frame counter: a tick is stretched
+/// over `TICK_MS` and the ball is drawn **between** ticks, which is what makes
+/// it slide rather than hop. Fifty-five milliseconds puts a median shot at
+/// about a second and a long one at two and a half, which is a putt.
+const TICK_MS = 55;
+const FLIGHT_MIN_MS = 320;
+const FLIGHT_MAX_MS = 2400;
+
 function flyAndLand(r, done) {
   const still = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
   trail = r.path || [];
   sub = r.sub || 16;
+  flown = 0;
   // **Reduced motion keeps the trail and skips the flight.** The path is the
   // whole of what a shot *said* — where it bounced, what it crossed — and a
   // setting that means *do not move things* is not one that means *tell me
   // less*. So the ball is at rest on the next frame with the line still drawn.
-  if (still || !trail.length) { ball = null; draw(); done(); return; }
-  let i = 0;
+  if (still || trail.length < 2) { ball = null; flown = trail.length; draw(); done(); return; }
+  const span = Math.min(FLIGHT_MAX_MS,
+                        Math.max(FLIGHT_MIN_MS, (trail.length - 1) * TICK_MS));
+  const began = performance.now();
   const step = () => {
-    i += 8;
-    if (i >= trail.length) { ball = null; draw(); done(); return; }
-    ball = trail[i];
+    const t = Math.min(1, (performance.now() - began) / span);
+    // Where along the path, as a fraction of a tick — so the ball is drawn
+    // between two physics steps rather than only on them.
+    const at = t * (trail.length - 1);
+    const i = Math.min(trail.length - 2, Math.floor(at));
+    const f = at - i;
+    const [ax, ay] = trail[i];
+    const [bx, by] = trail[i + 1];
+    ball = [ax + (bx - ax) * f, ay + (by - ay) * f];
+    flown = i + 1;
     draw();
+    if (t >= 1) { ball = null; flown = trail.length; draw(); done(); return; }
     requestAnimationFrame(step);
   };
   requestAnimationFrame(step);
@@ -2895,6 +3037,10 @@ function flyAndLand(r, done) {
 let trail = [];
 let ball = null;
 let sub = 16;
+// How much of the trail has actually been flown. The line grows *behind* the
+// ball: a path drawn in full before the ball has travelled it is a shot whose
+// answer you were given before you watched it happen.
+let flown = 0;
 
 /// Pull back to here, snapped to what core can be asked.
 ///
@@ -2918,10 +3064,115 @@ function aimAt([tx, ty]) {
   draw();
 }
 
+
+
+/// Everything you need to know to play, in one place.
+///
+/// **Reported from play**, and the example given was the argument: *"a game
+/// glossary that explains everything you need to play the game, with stuff
+/// like what mana empowerment does"*. Empowerment is `stacks x 5 x the mana
+/// you hold`, it scales one lane, and nothing in the game had ever said so —
+/// so a player watching the stacks climb could not tell a mechanic they did
+/// not understand from one that was broken.
+///
+/// **The page draws what core sent and works nothing out.** Every number in
+/// here is read from the constant that decides it and every class describes
+/// itself, so retuning a thing retunes what the glossary says about it.
+let glossShelf = 0;
+
+function openGlossary() {
+  const g = JSON.parse(glossary_json());
+  glossShelves = g.shelves;
+  const tabs = $('gloss-tabs');
+  tabs.innerHTML = '';
+  glossShelves.forEach((sh, i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = sh.name;
+    b.className = i === glossShelf ? 'on' : '';
+    b.onclick = () => { glossShelf = i; paintGlossary(); };
+    tabs.appendChild(b);
+  });
+  paintGlossary();
+  $('glossary').hidden = false;
+}
+
+let glossShelves = [];
+
+function paintGlossary() {
+  const sh = glossShelves[glossShelf];
+  if (!sh) return;
+  [...$('gloss-tabs').children].forEach((b, i) => {
+    b.className = i === glossShelf ? 'on' : '';
+  });
+  const box = $('gloss-body');
+  box.innerHTML = '';
+  for (const e of sh.entries) {
+    const d = document.createElement('div');
+    d.className = 'gloss-entry';
+    d.innerHTML = `<h3>${e.term}</h3>` +
+      e.body.map((b) => `<p>${b}</p>`).join('') +
+      e.aside.map((a) => `<p class="aside">${a}</p>`).join('');
+    box.appendChild(d);
+  }
+}
+
+function closeGlossary() { $('glossary').hidden = true; }
+
+/// The long cart: a ride between towns you have stood in.
+///
+/// **Opened from the town screen and nowhere else**, which is the whole reason
+/// a second kind of travel is allowed to exist beside the Drover's Stride: the
+/// Stride gets you out of the wilderness and this one runs counter to counter,
+/// so it can never be the thing that saves a run. The engine holds every
+/// clause — who may, what it costs, where it puts you — and this draws them.
+function openCart() {
+  const c = JSON.parse(cart_json());
+  $('cart-blurb').textContent = c.stops.length
+    ? `It runs to the towns you have stood in. ${c.fare} Fnorp a ride, and you have ${c.gold}.`
+    : 'It runs between towns you have stood in, and you have stood in this one.';
+  const box = $('cart-stops');
+  box.innerHTML = '';
+  for (const s of c.stops) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'wares';
+    b.disabled = c.gold < c.fare;
+    b.innerHTML = `<b>${s.name}</b><span class="meta">${c.fare} Fnorp</span>`;
+    b.onclick = () => {
+      const r = JSON.parse(take_the_cart(s.id));
+      if (r.error) {
+        const el = $('cart-says');
+        el.textContent = r.error; el.hidden = false; el.classList.add('bad');
+        return;
+      }
+      // **The map changed, so the page is told which map.** A ride is the
+      // largest change there is short of a save being restored, and the rule
+      // this repository has written down four times is that a page drawing a
+      // world has to be re-read every time it can have moved.
+      closeCart();
+      closeTown();
+      world = JSON.parse(world_json());
+      log(`The long cart, ${r.fare} Fnorp. It puts you down at ${r.town}.`);
+      paintPanel(); draw(); autosave();
+      openTown(r.id);
+    };
+    box.appendChild(b);
+  }
+  $('cart-says').hidden = true;
+  $('cart-screen').hidden = false;
+}
+
+function closeCart() {
+  $('cart-screen').hidden = true;
+  $('cart-says').hidden = true;
+}
+
 /// Fire.
 function shoot() {
   if (!cue) return;
   trail = [];
+  flown = 0;
   const r = JSON.parse(try_shoot(cue.angle, cue.power));
   cue = null;
   log(r.said);
@@ -3205,6 +3456,18 @@ async function main() {
   world = JSON.parse(world_json());
 
   addEventListener('keydown', (e) => {
+    // **G, wherever you are.** The glossary is the one screen you want *while*
+    // you are confused about something else, so it opens over whatever is up
+    // rather than only from the map — which is what `G` does in the original.
+    // The screens that own `g` for something else are handled below and return
+    // before this; the fork is the one screen that takes nothing at all.
+    if (e.key === 'g' || e.key === 'G') {
+      if ($('fork').hidden && $('glossary').hidden && !e.metaKey && !e.ctrlKey) {
+        e.preventDefault();
+        openGlossary();
+        return;
+      }
+    }
     if (!$('fight').hidden) {
       if (e.key === 'r' || e.key === 'R') { e.preventDefault(); board.rotateHeld(); }
       return;
@@ -3223,6 +3486,14 @@ async function main() {
       // have to turn things for, and a magnet is one by two.
       if (e.key === 'r' || e.key === 'R') { e.preventDefault(); kit?.rotateHeld(); return; }
       if (e.key === 'Escape') closeKit();
+      return;
+    }
+    if (!$('glossary').hidden) {
+      if (e.key === 'Escape' || e.key === 'g' || e.key === 'G') closeGlossary();
+      return;
+    }
+    if (!$('cart-screen').hidden) {
+      if (e.key === 'Escape') closeCart();
       return;
     }
     if (!$('log').hidden) {
@@ -3437,7 +3708,7 @@ async function main() {
   // ball is on it, and the scale. A check reads the *drawing* here and the
   // flight off `preview_shot`, which is the only way to catch a page that
   // animates somewhere core did not say.
-  window.__trail = () => ({ trail, ball, sub });
+  window.__trail = () => ({ trail, ball, sub, flown });
   // Standing still and letting the place answer again — the gesture behind
   // the instrument frame's Go in, reachable to a check that planted itself.
   window.__here = () => walk('here');
@@ -3518,6 +3789,10 @@ async function main() {
     walk('here');
     if ($('instrument').hidden) { paintPanel(); draw(); autosave(); $('map').focus(); }
   };
+  $('gloss-open').onclick = openGlossary;
+  $('gloss-close').onclick = closeGlossary;
+  $('cart').onclick = openCart;
+  $('cart-close').onclick = closeCart;
   $('tree-done').onclick = closeTree;
   $('vendor-close').onclick = closeVendor;
   $('errands-open').onclick = openLog;

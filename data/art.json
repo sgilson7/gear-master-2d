@@ -78,6 +78,27 @@
     "Recycler": "class-kaklon-patent",
     "Showstopper": "class-top-of-the-bill",
     "Stoker": "class-kettle-stoker",
-    "Whisperer": "class-whisperling"
+    "Whisperer": "class-whisperling",
+    "LoudCalculation": "expert-loudcalculation",
+    "StandingFact": "expert-standingfact",
+    "OverwoundArm": "expert-overwoundarm",
+    "ShortProgramme": "expert-shortprogramme",
+    "CurseRequisition": "expert-curserequisition",
+    "PatentedFunnel": "expert-patentedfunnel",
+    "OpeningNumber": "expert-openingnumber",
+    "CursedLicence": "expert-cursedlicence",
+    "EleventhSeason": "expert-eleventhseason",
+    "BareFurnace": "expert-barefurnace",
+    "FiredFunnel": "expert-firedfunnel",
+    "ColdStoke": "expert-coldstoke",
+    "PonkeyBoiler": "expert-ponkeyboiler",
+    "FlashPowder": "expert-flashpowder",
+    "LoudDoubt": "expert-louddoubt",
+    "RequisitionedSilence": "expert-requisitionedsilence",
+    "ToldOnce": "expert-toldonce",
+    "LicensedRumour": "expert-licensedrumour",
+    "CurtainLine": "expert-curtainline",
+    "AshAndWhisper": "expert-ashandwhisper",
+    "FullBill": "expert-fullbill"
   }
 }

@@ -4031,6 +4031,23 @@ pub struct Combatant {
     /// multiplies magic-typed hits and the shield reduces magic-typed damage;
     /// a physical swing is computed as though neither stack were there.
     pub empowerment: u32,
+    /// How many of those stacks the **furnace** bought.
+    ///
+    /// **Reported from play: *"mana empowerment ... seemingly does nothing for
+    /// my attacks"*, and it was exactly right.** Empowerment is upstream's
+    /// caster mechanic: `magic_empower` scales a **magic** hit and nothing
+    /// else, so a Kettle-Stoker swinging a blade got stacks that could never
+    /// be read. Measured against `common::geared_from` — the board a player
+    /// actually has — a Stoker dealt 746 and a classless character dealt 746.
+    ///
+    /// So the furnace's own stacks are counted apart and pay **both lanes**.
+    /// That is a change to what a *Stoker* gets and not to what empowerment
+    /// means: a Chronomancer's stacks are still the caster's, because nothing
+    /// but `stoke` ever puts a number here. The class is GM2D's own and
+    /// nothing obliged it to inherit a restriction its promise does not
+    /// mention — *shovel a pool into the firebox and swing harder* is what a
+    /// firebox is.
+    pub burn_stacks: u32,
     pub shield: u32,
     /// The mind lane's pool and its stack. Insight is fuel like mana - it pays
     /// nothing at all while held - and Dread is what turns it into damage.
@@ -4362,6 +4379,7 @@ impl Combatant {
             warded_count: 0,
             curses: Curses::new(),
             empowerment: 0,
+            burn_stacks: 0,
             shield: 0,
             insight: 0,
             dread: 0,
@@ -4514,6 +4532,7 @@ impl Combatant {
             warded_count: 0,
             curses: Curses::new(),
             empowerment: 0,
+            burn_stacks: 0,
             shield: 0,
             insight: 0,
             dread: 0,
@@ -4713,12 +4732,19 @@ impl Combatant {
         self.empowerment as i32 * 5 * self.mana.max(0)
     }
 
-    /// What Spellblade adds to a physical hit, in power-hundredths.
+    /// What Spellblade and the furnace add to a physical hit, in
+    /// power-hundredths.
     ///
-    /// Flat, and that is the design: half a multiplier a stack, whatever the
-    /// board is holding.
+    /// Spellblade's half is flat, and that is its design: half a multiplier a
+    /// stack, whatever the board is holding.
+    ///
+    /// **The furnace's half is the same sum `magic_empower` does**, and it is
+    /// here so that a Kettle-Stoker with a blade gets what its promise says.
+    /// See [`Combatant::burn_stacks`]: only `stoke` ever writes that, so this
+    /// changes nothing for any other source of empowerment.
     pub fn physical_empower(&self) -> i32 {
         self.spellblade as i32 * SPELLBLADE_POWER
+            + self.burn_stacks as i32 * 5 * self.mana.max(0)
     }
 
     /// Flat reduction the mana shield applies to an incoming **magic** hit.
@@ -5560,6 +5586,15 @@ fn stoke(c: &mut Combatant, who: u8, side: Side, t: u32, log: &mut Vec<LogEntry>
         c.set_pool(what, have - took);
         c.burned[at] += took;
         c.empowerment += 1;
+        c.burn_stacks += 1;
+        // **The furnace does not bank mana, and that is Fired Funnel's.**
+        // A first draft had it bank what it shovelled, which made the class
+        // work and quietly took the expert's whole promise — *every stack the
+        // furnace buys is also mana* is not a promise if the furnace already
+        // does it. `every_point_in_an_expert_tree_buys_something` said so on
+        // the next run, naming `ff-twice-through` as a point the tree sells
+        // and the engine never reads. **An expert's power is its own**, and
+        // the lint is the thing that keeps saying so.
         // **Fired Funnel: the furnace pays the funnel.** Every stack it buys
         // is also mana, up to a budget the fight starts with — here rather
         // than at the cast, because what is being exchanged is the *stack*

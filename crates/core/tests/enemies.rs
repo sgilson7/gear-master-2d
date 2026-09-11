@@ -142,3 +142,58 @@ fn every_creature_has_a_figure_and_every_figure_has_a_file() {
     }
     assert!(bad.is_empty(), "the art map and the ladder disagree:\n  {}", bad.join("\n  "));
 }
+
+/// Every class a player can *be* has a figure, experts included.
+///
+/// Reported from play: *"there should be a sprite for all classes and all
+/// expert classes"* — and there were seven, against twenty-eight things a
+/// character can end up being. So the panel drew a base class's portrait for
+/// somebody who had become an expert, and the second fork named what each
+/// pairing reaches and showed nothing of it.
+///
+/// **The twenty-one are one drawing in twenty-one colourways**, which is the
+/// thirteen-creature-families argument applied to a thing that is literally a
+/// pair: an expert is what two finished trees reach, so the figure is the
+/// paper Spike hands over and the two seals at the foot of it are the two
+/// parents. `art/experts.json` is the manifest and `make art` writes the map
+/// from it, so the file and the names cannot drift.
+///
+/// **Offered classes and experts only.** `class::CLASSES` is the inherited
+/// roster and carries names GM2D offers from nowhere — drawing a portrait for
+/// a class no player can take is art shipped for nobody, which is the failure
+/// the creature half of this file exists for, upside down.
+#[test]
+fn every_class_the_game_offers_has_a_figure() {
+    let art: serde_json::Value =
+        serde_json::from_str(include_str!("../../../data/art.json")).unwrap();
+    let classes = art["classes"].as_object().expect("art.json has classes");
+    let path = concat!(env!("CARGO_MANIFEST_DIR"), "/../../web/assets/");
+
+    let mut want: Vec<String> =
+        gm2d_core::class::OFFERED.iter().map(|c| c.to_string()).collect();
+    want.extend(gm2d_core::expert::EXPERTS.iter().map(|e| e.name.to_string()));
+
+    let mut bad = Vec::new();
+    for name in &want {
+        match classes.get(name) {
+            None => bad.push(format!("{name}: no figure")),
+            Some(f) => {
+                let f = f.as_str().unwrap_or_default();
+                if !std::path::Path::new(&format!("{path}{f}.svg")).exists() {
+                    bad.push(format!("{name}: names {f}.svg, which is not there"));
+                }
+            }
+        }
+    }
+    for name in classes.keys() {
+        if !want.iter().any(|w| w == name) {
+            bad.push(format!("{name}: in the art map and is nothing a player can be"));
+        }
+    }
+    assert!(
+        bad.is_empty(),
+        "the art map and the classes disagree ({} wanted):\n  {}",
+        want.len(),
+        bad.join("\n  ")
+    );
+}

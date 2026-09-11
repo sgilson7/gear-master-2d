@@ -70,12 +70,12 @@ export class Replay {
     // `Stunned`, which carry the stack count and the whole time left; nothing
     // here works one out.
     this.track = {
-      player: [[0, p.max_health, p.max_health, p.armor ?? 0, p.pools ?? zero, []]],
-      enemy: [[0, e?.max_health ?? 1, e?.max_health ?? 1, e?.armor ?? 0, e?.pools ?? zero, []]],
+      player: [[0, p.max_health, p.max_health, p.armor ?? 0, p.pools ?? zero, [], 0]],
+      enemy: [[0, e?.max_health ?? 1, e?.max_health ?? 1, e?.armor ?? 0, e?.pools ?? zero, [], 0]],
     };
     for (const x of log.entries) {
-      this.track.player.push([x.at, x.ph, x.pmax, x.pa, x.pp, x.pc ?? []]);
-      this.track.enemy.push([x.at, x.eh, x.emax, x.ea, x.ep, x.ec ?? []]);
+      this.track.player.push([x.at, x.ph, x.pmax, x.pa, x.pp, x.pc ?? [], x.pburn ?? 0]);
+      this.track.enemy.push([x.at, x.eh, x.emax, x.ea, x.ep, x.ec ?? [], x.eburn ?? 0]);
     }
     this.buildRows('player', this.you, log.player?.items ?? []);
     this.buildRows('enemy', this.them, e?.items ?? []);
@@ -213,7 +213,7 @@ export class Replay {
     let v = track[0];
     for (const row of track) { if (row[0] <= this.t) v = row; else break; }
     return { health: v[1], max: v[2], armor: v[3], pools: v[4] ?? [0, 0, 0, 0],
-             chips: v[5] ?? [] };
+             chips: v[5] ?? [], burn: v[6] ?? 0 };
   }
 
   /// The canvas sizes its own backing store to its box.
@@ -315,7 +315,13 @@ export class Replay {
 
     /// The four pools, each behind its own dot, and only the ones there are
     /// any of. A row of zeroes is a row nobody reads.
-    const pools = (y, held) => {
+    // **What the furnace has bought, on the row with everything else you are
+    // holding.** Reported from play: *"mana empowerment does not show on the
+    // bar in battle"*. It is drawn beside the pools rather than as a chip,
+    // because a chip is a thing that is *on* you with a clock running and
+    // empowerment is a thing you have — it does not expire and it multiplies
+    // what you swing.
+    const pools = (y, held, burn) => {
       let x = 0;
       const names = this.log.pools ?? ['the Funny', 'fury', 'devotion', 'harvest'];
       held.forEach((v, i) => {
@@ -328,6 +334,16 @@ export class Replay {
         g.fillText(text, x + 14, y);
         x += 14 + g.measureText(text).width + 18;
       });
+      if (burn > 0) {
+        const text = `empowerment x${burn}`;
+        g.fillStyle = '#E0742A';
+        g.beginPath();
+        g.arc(x + 5, y - 4, 5, 0, Math.PI * 2);
+        g.fill();
+        g.fillStyle = ink;
+        g.fillText(text, x + 14, y);
+        x += 14 + g.measureText(text).width + 18;
+      }
       if (x === 0) {
         g.fillStyle = ink3;
         g.fillText('nothing banked', 0, y);
@@ -375,7 +391,7 @@ export class Replay {
     health(16, [P.health, P.max], verd);
     armour(39, P.armor, P.max);
     g.fillStyle = ink;
-    pools(70, P.pools);
+    pools(70, P.pools, P.burn);
     chips(88, P.chips);
 
     g.fillStyle = ink3;
@@ -383,7 +399,7 @@ export class Replay {
     health(116, [E.health, E.max], rust);
     armour(139, E.armor, E.max);
     g.fillStyle = ink;
-    pools(170, E.pools);
+    pools(170, E.pools, E.burn);
     chips(188, E.chips);
 
     g.fillStyle = ink3;

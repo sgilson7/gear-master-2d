@@ -78,7 +78,7 @@
 //! answering yes: a floor with two doors wanting the same footprint costs two
 //! components, and a model that could not tell would call it free.
 
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::{BTreeMap, BTreeSet, VecDeque};
 
 use crate::tile_event::{EventsData, Outcome, Requirement};
 use crate::world::{PlaceDef, World};
@@ -319,6 +319,85 @@ fn takeable(r: &Requirement, pos: &Position, kit: &Carrying) -> bool {
         Requirement::Surveying(kind) => kit.instrument.as_deref() == Some(kind.as_str()),
         Requirement::All(list) => list.iter().all(|r| takeable(r, pos, kit)),
     }
+}
+
+/// The fewest steps that put a stone on every mark, or `None` if nothing does.
+///
+/// **A second solver, because there is a second kind of puzzle.**
+/// [`solvable_blind`] models somebody reading cards and is the right model for
+/// every floor built out of flags; a floor built out of stones is a different
+/// question with a different answer, and asking the first one about the second
+/// gets *"this floor has no puzzle on it"*.
+///
+/// **In core for the reason that one is**: a number a design stakes itself on,
+/// worked out by the thing measuring it, is the page recomputing a total one
+/// level up. The Gallery's twenty-five steps are quoted in its own map file and
+/// this is what makes that quotable.
+///
+/// The model is the rule in `world::step` and not a copy of it in spirit: you
+/// walk, a stone in the way moves one further if the tile beyond is walkable,
+/// empty of stones **and not a place** — a chain under a boulder is a chain
+/// nobody can pull.
+///
+/// **The world must be handed over as the puzzle is played on it.** The
+/// Gallery's stones are under water until it is drained, so a caller asks
+/// `data::map_now` with the flag already raised; a solver given the flooded
+/// room would correctly report that there is nowhere to stand.
+pub fn stones_solvable(world: &World) -> Option<usize> {
+    let d = &world.blocks;
+    if d.at.is_empty() || d.marks.is_empty() {
+        return None;
+    }
+    let allowed = crate::world::Allowances::default();
+    let free = |x: i32, y: i32| {
+        world.in_bounds(x, y) && world.walkable(x as u8, y as u8, &allowed)
+    };
+    let start = (world.start.0, world.start.1);
+    let sorted = |v: &[[u8; 2]]| {
+        let mut v = v.to_vec();
+        v.sort();
+        v
+    };
+    let done = |at: &[[u8; 2]]| d.marks.iter().all(|m| at.contains(m));
+
+    let first = sorted(&d.at);
+    if done(&first) {
+        return Some(0);
+    }
+    let mut seen: BTreeSet<((u8, u8), Vec<[u8; 2]>)> = BTreeSet::new();
+    seen.insert((start, first.clone()));
+    let mut queue: VecDeque<((u8, u8), Vec<[u8; 2]>, usize)> = VecDeque::new();
+    queue.push_back((start, first, 0));
+    while let Some((at, stones, steps)) = queue.pop_front() {
+        for (dx, dy) in [(0i32, -1i32), (0, 1), (-1, 0), (1, 0)] {
+            let (nx, ny) = (at.0 as i32 + dx, at.1 as i32 + dy);
+            if !free(nx, ny) {
+                continue;
+            }
+            let (nx, ny) = (nx as u8, ny as u8);
+            let mut moved = stones.clone();
+            if let Some(i) = stones.iter().position(|s| *s == [nx, ny]) {
+                let (bx, by) = (nx as i32 + dx, ny as i32 + dy);
+                if !free(bx, by) {
+                    continue;
+                }
+                let (bx, by) = (bx as u8, by as u8);
+                if stones.iter().any(|s| *s == [bx, by]) || world.place_at(bx, by).is_some() {
+                    continue;
+                }
+                moved[i] = [bx, by];
+                moved.sort();
+            }
+            if done(&moved) {
+                return Some(steps + 1);
+            }
+            let key = ((nx, ny), moved.clone());
+            if seen.insert(key) {
+                queue.push_back(((nx, ny), moved, steps + 1));
+            }
+        }
+    }
+    None
 }
 
 /// The worst-case number of card reads a blind solver needs on this floor.

@@ -309,6 +309,13 @@ pub fn world_json() -> String {
             rows.push(row);
             walk.push(can);
         }
+        // **Where the stones are standing on this visit.** Reseeded by
+        // `stones_now` when the floor is a different one, which is the whole
+        // safety argument for a pushing puzzle and is therefore never the
+        // page's to remember.
+        let stones = gm2d_core::world::stones_now(w, &g.world);
+        let marks: Vec<[u8; 2]> =
+            if stones.is_empty() { Vec::new() } else { w.blocks.marks.clone() };
         // **Only what is there.** A hidden place is not drawn, which is half
         // of what makes it hidden — the other half is `world::step` refusing
         // to walk onto one.
@@ -378,6 +385,11 @@ pub fn world_json() -> String {
             "width": w.width, "height": w.height, "rows": rows, "walk": walk,
             "scouting": scouting,
             "chances": chances, "places": places, "regions": regions,
+            // **The stones, and the marks they go on.** Both drawn, because a
+            // puzzle you cannot see the goal of is a puzzle nobody solves —
+            // and these are read off core rather than remembered by the page,
+            // which matters here more than usual: the stones move under you.
+            "stones": stones, "marks": marks,
         })
         .to_string()
     })})
@@ -601,7 +613,7 @@ pub fn try_step(dir: &str) -> String {
                             // doorway, so coming back does not put you one
                             // keypress from going straight back through.
                             g.world.remember_at(stepped_from);
-                            g.world.map = to.clone();
+                            g.world.go_to(&to);
                             g.world.at = landing;
                             // Repaired on the far side: a gate whose landing
                             // tile is not walkable would strand somebody on a
@@ -2101,7 +2113,7 @@ fn walk_home(g: &mut gm2d_core::game::Game) {
         map_in(id, &marks, |w| {
             if !moved {
                 if let Some(p) = w.places.iter().find(|p| p.id == want) {
-                    g.world.map = w.id.clone();
+                    g.world.go_to(&w.id);
                     g.world.at = p.at;
                     moved = true;
                 }
@@ -2121,7 +2133,7 @@ fn walk_home(g: &mut gm2d_core::game::Game) {
         // somewhere you can stand.
         let over = gm2d_core::world::overworld();
         map_in(&over, &marks, |w| {
-            g.world.map = w.id.clone();
+            g.world.go_to(&w.id);
             g.world.at = [w.start.0, w.start.1];
         });
     }

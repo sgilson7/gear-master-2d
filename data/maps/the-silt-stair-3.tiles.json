@@ -88,7 +88,17 @@
         5,
         10
       ],
-      "hidden_until": "gallery-drained"
+      "hidden_until": "the-gallery-is-set"
+    },
+    {
+      "at": [
+        2,
+        9
+      ],
+      "kind": "event",
+      "id": "the-three-stones",
+      "name": "",
+      "prose": []
     }
   ],
   "drains": [
@@ -554,5 +564,38 @@
         ]
       ]
     }
-  ]
+  ],
+  "blocks": {
+    "at": [
+      [
+        3,
+        6
+      ],
+      [
+        6,
+        4
+      ],
+      [
+        8,
+        7
+      ]
+    ],
+    "marks": [
+      [
+        3,
+        2
+      ],
+      [
+        8,
+        2
+      ],
+      [
+        5,
+        8
+      ]
+    ],
+    "when_set": "the-gallery-is-set",
+    "until": "gallery-drained"
+  },
+  "_blocks": "**The one puzzle in this game you can lock yourself out of, and the reason it is safe.** Every other floor is monotone — flags only grow, so no move makes the way on unreachable — and a stone pushed into a corner is exactly the move that does. So the stones are not a fact about the run: `WorldState::blocks` carries the floor they belong to, and walking up the stair and back down reseeds them from `at` above. Twenty-five steps and fourteen pushes is the shortest solution, measured rather than guessed, and `every_floor_of_stones_can_be_pushed_into_place` proves one exists over every map that has them."
 }

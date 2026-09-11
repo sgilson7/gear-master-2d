@@ -2705,6 +2705,131 @@ def check_running_away_costs_you(page, name, fails, base):
     print("ok: running away costs you, past what a fight can, and the pack holds three kinds")
 
 
+def check_the_stones_push_and_come_back(page, name, fails, base):
+    """**The one puzzle in this game you can lock yourself out of, and the trip
+    that undoes it.**
+
+    Asked for as *"when you flood the room then pull the other chain, there
+    should be a block pushing puzzle you have to solve on the newly frozen
+    section to unlock the final floor."*
+
+    `cargo test` proves a solution exists in twenty-five steps and that the
+    stones reseed. What only a browser can say is that they are **drawn** — a
+    Sokoban you cannot see is not a puzzle — that pushing one moves it on the
+    map rather than only in the save, and that a stone against a wall refuses
+    the step rather than sliding through it.
+    """
+    def in_the_gallery(body):
+        strip_the_boards(body)
+        body["character"]["class"] = "Berserker"
+        body["character"]["xp"] = 4000
+        w = body.setdefault("world", {})
+        w["map"] = "the-silt-stair-3"
+        w["at"] = [5, 10]
+        # `chair-done` too, or the way back *down* from the floor above is
+        # shut and the trip that undoes a jam cannot be walked.
+        w["flags"] = list(w.get("flags", [])) + ["gallery-flooded", "gallery-drained",
+                                                 "chair-done"]
+        w.pop("blocks", None)
+
+    plant(page, base, in_the_gallery, stem="stones")
+    dismiss_card(page)
+    close_fight(page)
+    page.evaluate("() => document.getElementById('map').focus()")
+
+    shown = page.evaluate("() => ({ stones: window.__world().stones ?? [],"
+                          "          marks: window.__world().marks ?? [] })")
+    if len(shown["stones"]) != 3 or len(shown["marks"]) != 3:
+        fails.append(f"{name}: the gallery draws {len(shown['stones'])} stones and "
+                     f"{len(shown['marks'])} marks, and there are three of each")
+        return
+    # **The stair is not there yet**, which is the thing the puzzle gates.
+    if page.evaluate("""() => (window.__world().places ?? [])
+            .some(p => p.id === 'the-silt-stair-3-stair')"""):
+        fails.append(f"{name}: the way down is there before the stones are set")
+
+    # --- push one, and watch it move on the map -----------------------------
+    # The stone at [3, 6] goes north when you stand at [3, 7] and press up.
+    page.evaluate("(at) => window.__standHere(at)", [3, 7])
+    page.wait_for_timeout(250)
+    before = page.evaluate("() => window.__world().stones.map(s => s.join(',')).sort()")
+    page.keyboard.press("ArrowUp")
+    page.wait_for_timeout(300)
+    dismiss_card(page)
+    close_fight(page)
+    after = page.evaluate("() => window.__world().stones.map(s => s.join(',')).sort()")
+    if after == before:
+        fails.append(f"{name}: pushed a stone and nothing on the map moved: {before!r}")
+    where = page.text_content("#coords").strip()
+    if where != "3, 6":
+        fails.append(f"{name}: pushed a stone and did not follow it in: at {where!r}")
+
+    # --- a stone against the wall refuses the step ---------------------------
+    # Push it north until it is against row 1, then once more.
+    for _ in range(6):
+        page.keyboard.press("ArrowUp")
+        page.wait_for_timeout(120)
+        dismiss_card(page)
+        close_fight(page)
+    stuck_at = page.text_content("#coords").strip()
+    page.keyboard.press("ArrowUp")
+    page.wait_for_timeout(200)
+    if page.text_content("#coords").strip() != stuck_at:
+        fails.append(f"{name}: a stone against the north wall let the player through it")
+    # **Asserted on the stones, not on the player.** The first version watched
+    # the player's coordinates over one extra press and was **vacuous**: by then
+    # the stone is against the wall either way, so the press is refused by the
+    # map's edge whether or not the wall check works, and deleting the check
+    # left the test green. Where a stone *is* cannot be dodged like that.
+    landed = page.evaluate("""() => {
+        const w = window.__world();
+        return (w.stones ?? []).map(([x, y]) => ({
+            at: [x, y], on: w.rows[y][x], walk: w.walk[y][x],
+        }));
+    }""")
+    for st in landed:
+        if not st["walk"]:
+            fails.append(f"{name}: a stone is standing on {st['on']} at {st['at']}, "
+                         f"which nobody can walk on")
+    seen = [tuple(st["at"]) for st in landed]
+    if len(set(seen)) != len(seen):
+        fails.append(f"{name}: two stones are on one tile: {seen!r}")
+    said = last_said(page)
+
+    # --- and walking out and back reseeds them ------------------------------
+    moved = page.evaluate("() => window.__world().stones.map(s => s.join(',')).sort()")
+    if moved == before:
+        fails.append(f"{name}: six pushes and the stones are where they started")
+    # **Stood beside it and stepped on**, because a gate is walked onto: putting
+    # the player on its tile from outside is not an arrival and opens nothing.
+    page.evaluate("(at) => window.__standHere(at)", [4, 10])
+    page.wait_for_timeout(200)
+    # Up the stair and straight back down.
+    page.keyboard.press("ArrowRight")
+    page.wait_for_timeout(500)
+    dismiss_card(page)
+    close_fight(page)
+    if page.evaluate("() => window.__world().id") != "the-silt-stair-2":
+        fails.append(f"{name}: could not walk up out of the gallery")
+    else:
+        # Down the stair on the floor above, which is at [5, 4] and wants
+        # `chair-done`.
+        page.evaluate("(at) => window.__standHere(at)", [5, 3])
+        page.wait_for_timeout(200)
+        page.keyboard.press("ArrowDown")
+        page.wait_for_timeout(600)
+        dismiss_card(page)
+        close_fight(page)
+        back = page.evaluate("() => (window.__world().stones ?? []).map(s => s.join(',')).sort()")
+        if page.evaluate("() => window.__world().id") != "the-silt-stair-3":
+            fails.append(f"{name}: could not walk back down into the gallery")
+        elif back != before:
+            fails.append(f"{name}: came back down and the stones are still where they were "
+                         f"pushed ({back!r}), so a jam is a dead end")
+    _ = said
+    print("ok: the gallery's stones push, refuse a wall, and come back when you do")
+
+
 def check_the_sump_refuses_without_an_instrument(page, name, fails, base):
     """**The lip of the Sump is the Reach's door in a second place.**
 
@@ -5906,6 +6031,7 @@ def walk_the_gate(browser, name, fails=None):
     check_the_cart_is_somewhere_and_then_somewhere_else(page, name, fails, path)
     check_the_sands_read_the_other_way_round(page, name, fails, path)
     check_running_away_costs_you(page, name, fails, path)
+    check_the_stones_push_and_come_back(page, name, fails, path)
     check_the_sump_refuses_without_an_instrument(page, name, fails, path)
     check_a_wheel_says_what_it_wants(page, name, fails, path)
     check_the_chair_refuses_the_wrong_move(page, name, fails, path)

@@ -28,14 +28,18 @@ mod common;
 /// | the Chair Room | **3** | 27 |
 /// | the Drowned Gallery | **3** | 3 |
 ///
-/// The Gallery agrees. The other two do not, and the Chair Room's is the
-/// divergence this milestone is named for — see
-/// `the_chair_is_three_moves_and_not_nine`.
+/// The Gallery agreed, and it has since stopped being this kind of puzzle: the
+/// chains still flood and drain it in the same three reads, and what opens the
+/// stair now is the stones. See `the_gallery_is_two_puzzles_now`.
 #[test]
 fn each_stair_floor_is_solvable_blind_at_its_number() {
     let events = data::events();
-    for (id, n) in [("the-silt-stair-1", 1usize), ("the-silt-stair-2", 3), ("the-silt-stair-3", 3)]
-    {
+    // **The Gallery is not on this list any more**, and that is the change
+    // rather than a gap: its way on is three stones pushed onto three marks,
+    // not a flag off a card, so `solvable_blind` correctly reports that
+    // nothing on the floor opens the stair. What is still true of it —
+    // both halves — is `the_gallery_is_two_puzzles_now`.
+    for (id, n) in [("the-silt-stair-1", 1usize), ("the-silt-stair-2", 3)] {
         let w = data::map(id, D);
         let got = puzzle::solvable_blind(&w, &events)
             .unwrap_or_else(|why| panic!("{id} cannot be solved blind: {why}"));
@@ -365,4 +369,81 @@ fn nothing_rides_home_out_of_the_stair() {
         .expect("the door");
     assert_eq!(door.to.as_deref(), Some("the-silt-stair-1"));
     assert!(lake.no_homeward, "the lake stopped being the lake");
+}
+
+
+/// **The Gallery is two puzzles now, and the stair is behind the second.**
+///
+/// The chains are unchanged — A floods it, B drains what A made, and B will not
+/// move in a dry room — and draining it no longer opens the way down. What does
+/// is three stones on three marks, on the silt the water left.
+///
+/// **Pushing is the one shape this engine's rule forbids**, which is the whole
+/// reason the floor is built the way it is: every other puzzle here is monotone
+/// because flags only grow, and *a stone pushed into a corner is exactly the
+/// move that makes the way on unreachable*. So the stones are a fact about this
+/// visit rather than about the run — walk up the stair and back down and the
+/// room is as it was — and that is what `the_stones_come_back_when_you_do`
+/// holds.
+#[test]
+fn the_gallery_is_two_puzzles_now() {
+    let allowed = gm2d_core::world::Allowances::default();
+    let stair = |st: &gm2d_core::world::WorldState| {
+        let w = data::map_now("the-silt-stair-3", D, st);
+        w.places
+            .iter()
+            .find(|p| p.id == "the-silt-stair-3-stair")
+            .map(|p| gm2d_core::world::place_is_there(p, st, &allowed))
+            .unwrap_or(false)
+    };
+
+    // Draining it is no longer enough.
+    let mut st = gm2d_core::world::WorldState::default();
+    st.map = "the-silt-stair-3".into();
+    assert!(!stair(&st), "the stair is there in a dry gallery");
+    st.flags.push("gallery-flooded".into());
+    st.flags.push("gallery-drained".into());
+    assert!(!stair(&st), "draining the gallery still opens the stair on its own");
+
+    // The stones do it, and they are pushable.
+    let w = data::map_now("the-silt-stair-3", D, &st);
+    assert_eq!(
+        puzzle::stones_solvable(&w),
+        Some(25),
+        "the Gallery's stones no longer go into place in twenty-five steps"
+    );
+    st.flags.push(w.blocks.when_set.clone());
+    assert!(stair(&st), "every mark has a stone on it and the stair is still not there");
+}
+
+/// **The stones come back when you do**, which is what makes a pushing puzzle
+/// safe in a game whose every other puzzle is monotone.
+#[test]
+fn the_stones_come_back_when_you_do() {
+    let mut st = gm2d_core::world::WorldState::default();
+    st.map = "the-silt-stair-3".into();
+    st.flags.push("gallery-drained".into());
+    let w = data::map_now("the-silt-stair-3", D, &st);
+
+    let first = gm2d_core::world::stones_now(&w, &st);
+    assert_eq!(first, w.blocks.at, "the stones did not start where the map file puts them");
+
+    // Jam one somewhere useless, the way a player can.
+    st.blocks = Some(gm2d_core::world::Blocks {
+        map: "the-silt-stair-3".into(),
+        at: vec![[2, 2], [2, 3], [3, 2]],
+    });
+    assert_eq!(gm2d_core::world::stones_now(&w, &st).len(), 3, "a jam lost a stone");
+
+    // Walk out — any other floor — and back in. **Through `go_to`**, which is
+    // the one door onto a map and is where leaving is noticed: setting `map`
+    // by hand is what six of the seven callers used to do and is exactly the
+    // bug this test found.
+    st.go_to("the-silt-stair-2");
+    st.go_to("the-silt-stair-3");
+    assert_eq!(
+        gm2d_core::world::stones_now(&w, &st),
+        w.blocks.at,
+        "coming back down left the stones where they were jammed, so the floor is a dead end"
+    );
 }

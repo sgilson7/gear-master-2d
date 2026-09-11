@@ -163,7 +163,15 @@ fn an_instrument_is_never_the_only_way_through() {
         // Answering a card writes its own id down, and a boss its tile.
         open.extend(events.events.iter().map(|e| e.id.clone()));
         for (id, _) in data::MAPS {
-            open.extend(data::map(id, D).places.iter().map(|p| p.id.clone()));
+            let w = data::map(id, D);
+            open.extend(w.places.iter().map(|p| p.id.clone()));
+            // **And stones pushed onto marks**, which want no instrument at
+            // all — so a stair behind them is emphatically not one only a
+            // survey opens. The third source of a flag, after a card and a
+            // place, and the second lint to be told about it.
+            if !w.blocks.when_set.is_empty() {
+                open.insert(w.blocks.when_set.clone());
+            }
         }
         if open.len() == before {
             break;

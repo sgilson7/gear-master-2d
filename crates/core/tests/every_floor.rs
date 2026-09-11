@@ -12,7 +12,7 @@ use gm2d_core::combat::Difficulty;
 use gm2d_core::data;
 use gm2d_core::piece::{PieceKind, CATALOG};
 use gm2d_core::puzzle;
-use gm2d_core::world::PlaceKind;
+use gm2d_core::world::{Allowances, PlaceKind};
 
 const D: Difficulty = Difficulty::Easy;
 
@@ -71,7 +71,12 @@ fn every_floor_in_the_game_can_be_solved_blind() {
             .unwrap_or_else(|why| panic!("{id} cannot be solved blind: {why}"));
         worst = worst.max(n);
     }
-    assert_eq!(walked, 6, "{walked} floors in the game have a puzzle on them, not six");
+    // **Five, and it was six.** The Drowned Gallery's way on is no longer a
+    // flag off a card — it is three stones pushed onto three marks — so it is
+    // not this solver's question any more and it has one of its own:
+    // `every_floor_of_stones_can_be_pushed_into_place`, over the other kind of
+    // puzzle this game now has.
+    assert_eq!(walked, 5, "{walked} floors in the game have a card puzzle on them, not five");
     // **The ceiling `PLAN-M14.md` §1.2 builds the whole design on**, asserted
     // over every floor rather than over the one it was worked out for: nine
     // cairns visited in every order is 45, and no floor may cost more.
@@ -184,4 +189,85 @@ fn the_two_bottoms_make_a_golem_out_of_certainties() {
         2,
         "the two bottoms do not drop two Living Earth between them"
     );
+}
+
+
+// -------------------------------------------------------------- the stones
+
+/// **Every floor of stones can be pushed into place**, and the shortest way is
+/// measured rather than hoped for.
+///
+/// The analogue of `every_floor_in_the_game_can_be_solved_blind` for the other
+/// kind of puzzle. A list of one written by hand is a list that becomes two the
+/// next time somebody draws a room with boulders in it, so this walks every map
+/// there is.
+///
+/// **The world is built as the puzzle is played on it.** The Gallery's stones
+/// are under water until it is drained, so a solver handed the flooded room
+/// would correctly report there is nowhere to stand — which is a fact about the
+/// question rather than about the floor.
+#[test]
+fn every_floor_of_stones_can_be_pushed_into_place() {
+    let mut floors = 0;
+    for (id, _) in data::MAPS {
+        let plain = data::map(id, D);
+        if plain.blocks.at.is_empty() {
+            continue;
+        }
+        floors += 1;
+        let d = plain.blocks.clone();
+        assert!(!d.marks.is_empty(), "{id}: stones and nothing to push them onto");
+        assert!(!d.when_set.is_empty(), "{id}: stones that set nothing when they are in place");
+        assert_eq!(
+            d.at.len(),
+            d.marks.len(),
+            "{id}: {} stones and {} marks, so one of them is unreachable or spare",
+            d.at.len(),
+            d.marks.len()
+        );
+
+        // As it is when the stones are out.
+        let mut st = gm2d_core::world::WorldState::default();
+        st.map = id.to_string();
+        if !d.until.is_empty() {
+            st.flags.push(d.until.clone());
+        }
+        let w = data::map_now(id, D, &st);
+
+        // Nothing starts on a mark — a puzzle with a free square is a puzzle
+        // that is already part-solved and nobody meant it to be.
+        for a in &d.at {
+            assert!(!d.marks.contains(a), "{id}: a stone starts on a mark at {a:?}");
+            assert!(w.walkable(a[0], a[1], &Allowances::default()), "{id}: a stone is in a wall");
+            assert!(w.place_at(a[0], a[1]).is_none(), "{id}: a stone starts on a place");
+        }
+        for m in &d.marks {
+            assert!(w.walkable(m[0], m[1], &Allowances::default()), "{id}: a mark is in a wall");
+            assert!(w.place_at(m[0], m[1]).is_none(), "{id}: a mark is under a place");
+        }
+
+        let steps = puzzle::stones_solvable(&w)
+            .unwrap_or_else(|| panic!("{id}: the stones cannot be pushed into place at all"));
+        // **A number rather than a bound**, the way the blind counts are:
+        // a ceiling nobody can hit is a ceiling nobody checked.
+        assert_eq!(steps, 25, "{id}: the shortest solution is {steps} steps");
+    }
+    assert_eq!(floors, 1, "{floors} floors have stones on them, not one");
+}
+
+/// **And it is not already solved**, which is the check that would catch a
+/// layout edited into triviality.
+#[test]
+fn the_stones_do_not_start_in_place() {
+    for (id, _) in data::MAPS {
+        let plain = data::map(id, D);
+        let d = &plain.blocks;
+        if d.at.is_empty() {
+            continue;
+        }
+        assert!(
+            !d.marks.iter().all(|m| d.at.contains(m)),
+            "{id}: every mark already has a stone on it"
+        );
+    }
 }

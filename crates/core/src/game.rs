@@ -394,7 +394,7 @@ impl Game {
     /// makes a warp safe even where the data is wrong.
     pub fn warp_to(&mut self, map: &str, at: [u8; 2], difficulty: crate::combat::Difficulty) {
         self.world.remember_at(self.world.at);
-        self.world.map = map.to_string();
+        self.world.go_to(map);
         self.world.at = at;
         let allowed = self.character.allowances();
         let id = self.world.map_id();
@@ -760,7 +760,7 @@ impl Game {
             let w = crate::data::map_now(id, difficulty, &self.world);
             if let Some(p) = w.places.iter().find(|p| p.id == town) {
                 self.world.remember();
-                self.world.map = w.id.clone();
+                self.world.go_to(&w.id);
                 self.world.at = p.at;
                 moved = Some(w.id.clone());
                 break;
@@ -996,7 +996,7 @@ impl Game {
             let w = crate::data::map_now(mid, difficulty, &self.world);
             if let Some(p) = w.places.iter().find(|p| p.id == town) {
                 self.world.remember();
-                self.world.map = w.id.clone();
+                self.world.go_to(&w.id);
                 self.world.at = p.at;
                 moved = true;
                 break;

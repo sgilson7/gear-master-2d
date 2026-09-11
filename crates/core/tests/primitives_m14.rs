@@ -591,6 +591,15 @@ fn no_flag_is_waited_on_forever() {
             // paragraph writes itself down when the paragraph is read.
             raised.insert(p.id.clone());
         }
+        // **And a floor of stones raises one when they are all on their
+        // marks.** The third thing that raises a flag, after a card and a
+        // place — this lint went red the moment the Drowned Gallery stopped
+        // being a card puzzle, which is it asking the right question about a
+        // source it had not been told about. Teaching it beats exempting the
+        // flag: the next floor of stones gets this for nothing.
+        if !w.blocks.when_set.is_empty() {
+            raised.insert(w.blocks.when_set.clone());
+        }
     }
 
     let mut orphans: Vec<String> = Vec::new();

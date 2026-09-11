@@ -179,6 +179,32 @@ function draw() {
     g.lineDashOffset = 0;
   }
 
+  // **The marks, under everything.** A puzzle whose goal you cannot see is a
+  // puzzle nobody solves, and a chiselled square in the floor is what these
+  // are — so they are drawn into the ground rather than on top of it, and a
+  // stone standing on one covers it.
+  for (const m of world.marks ?? []) {
+    const mx = m[0] * TILE, my = m[1] * TILE;
+    g.strokeStyle = ink();
+    g.lineWidth = 1.5;
+    g.setLineDash([4, 3]);
+    g.strokeRect(mx + 7, my + 7, TILE - 14, TILE - 14);
+    g.setLineDash([]);
+  }
+  // **And the stones on top of them.** Its own shape and nothing else's: a
+  // block with a shaded face, which is the one thing on any map drawn as a
+  // solid the player can move.
+  for (const b of world.stones ?? []) {
+    const bx = b[0] * TILE, by = b[1] * TILE;
+    g.fillStyle = '#8b8378';
+    g.fillRect(bx + 5, by + 5, TILE - 10, TILE - 10);
+    g.fillStyle = '#6f675e';
+    g.fillRect(bx + 5, by + TILE - 12, TILE - 10, 7);
+    g.strokeStyle = ink();
+    g.lineWidth = 2;
+    g.strokeRect(bx + 5, by + 5, TILE - 10, TILE - 10);
+  }
+
   // Places. A town is a filled square with a ring; an event is a small mark —
   // deliberately not a letter, because a letter on a 32px tile is a letter
   // nobody reads.
@@ -2783,6 +2809,11 @@ function walk(dir) {
   // a map you never left — so the page went on drawing the stop it had cached
   // and the cart was nowhere. Found by the browser check: *0 carts are on the
   // field, and there is one cart.*
+  // **A pushed stone is a different world.** The same rule as the cart, and
+  // the fifth instance of it: `paintPanel` re-reads only when the map *id*
+  // moves, and a stone you shoved is a place on this map that is somewhere
+  // else now. Cheap to ask and wrong to skip.
+  if ((world.stones ?? []).length) { world = JSON.parse(world_json()); draw(); }
   if (r.cart_at !== cartAt) {
     cartAt = r.cart_at ?? null;
     world = JSON.parse(world_json());

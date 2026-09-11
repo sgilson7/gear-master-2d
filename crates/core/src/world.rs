@@ -569,6 +569,39 @@ pub struct TilesData {
     /// the floor's boss puts you, and it is where a save taken inside reopens.
     #[serde(default)]
     pub outside: Option<String>,
+    /// The stones you push, and where they start.
+    ///
+    /// **Content, like every other thing on a floor.** Where they *are* is
+    /// `WorldState::blocks`, which is this run's, and it is reseeded from here
+    /// every time you come back down — see [`Blocks`].
+    #[serde(default)]
+    pub blocks: BlocksDef,
+}
+
+/// A floor's stone-pushing puzzle, as the map file writes it.
+///
+/// **Absent on twenty-one of the twenty-two maps**, which is what `default`
+/// means here: no stones, no marks, nothing to solve.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct BlocksDef {
+    /// Where each stone starts. Reseeded from this on every entry.
+    #[serde(default)]
+    pub at: Vec<[u8; 2]>,
+    /// The tiles they have to end on. Order does not matter — a stone is a
+    /// stone, and which one is on which mark is not a thing anybody can see.
+    #[serde(default)]
+    pub marks: Vec<[u8; 2]>,
+    /// Raised when every mark has a stone on it.
+    #[serde(default)]
+    pub when_set: String,
+    /// The stones are not there until this is in `answered` or `flags`.
+    ///
+    /// The Gallery's are under water until it is drained, which is the whole
+    /// reason the field exists: a stone you cannot see and cannot push is a
+    /// stone that would still block a step.
+    #[serde(default)]
+    pub until: String,
 }
 
 // ------------------------------------------------------------------ resolved
@@ -603,6 +636,8 @@ pub struct World {
     pub outside: Option<String>,
     /// What empties, and when. See [`TilesData::drains`].
     pub drains: Vec<Drain>,
+    /// The stones you push. See [`BlocksDef`].
+    pub blocks: BlocksDef,
     /// The gear cannot take you home from here. See [`TilesData::no_homeward`].
     pub no_homeward: bool,
     /// The instrument this map was read through, if it was read through one.
@@ -749,6 +784,7 @@ impl World {
             places: tl.places,
             outside: tl.outside.clone(),
             drains: tl.drains.clone(),
+            blocks: tl.blocks.clone(),
             no_homeward: tl.no_homeward,
             survey: crate::survey::SurveyMod::none(),
         };
@@ -1487,6 +1523,33 @@ pub struct WorldState {
     /// map that has stops puts it somewhere, so nothing has to be seeded.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub caravan: Option<CaravanAt>,
+    /// Where the stones are standing, on the floor you are standing on.
+    ///
+    /// **Reseeded on every entry, and that is what makes a pushing puzzle
+    /// safe.** Every other puzzle in this game is monotone — flags only grow,
+    /// so no move can make the way on unreachable — and **a stone you pushed
+    /// into a corner is exactly the move that can.** Sokoban is the one shape
+    /// this engine's own rule forbids.
+    ///
+    /// So the stones are not a fact about the run, they are a fact about *this
+    /// visit*: the map id is carried beside them and anything that reads them
+    /// reseeds when it does not match. Walk up the stair and back down and the
+    /// room is as it was. That is the same answer `GOLEM_SPENT` gives — *what
+    /// it records is this entry, and an entry begins at the gate* — and it is
+    /// why every floor of the Silt Stair has a stair back up.
+    ///
+    /// A save taken mid-puzzle keeps them, so you can put the game down in the
+    /// middle of one.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub blocks: Option<Blocks>,
+}
+
+/// The stones as this visit has left them.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Blocks {
+    /// Which floor they belong to. A different one and they are reseeded.
+    pub map: String,
+    pub at: Vec<[u8; 2]>,
 }
 
 /// Where the cart is, and how many more of your steps it stays for.
@@ -1570,6 +1633,26 @@ impl WorldState {
         self.positions.retain(|(k, _)| k != map);
     }
 
+    /// Stand on a different map.
+    ///
+    /// **The one door onto `map`**, and it exists because there are seven
+    /// callers: a gate, a warp, two walks home, a defeat, a floor's kick and a
+    /// charm. Anything that has to be forgotten when you leave a floor is
+    /// forgotten here, and the next thing that has to be cannot be forgotten in
+    /// six places out of seven.
+    ///
+    /// **The stones are the first such thing.** Reseeding them when the *map
+    /// id* differs is not enough and a test caught it: walk up the stair and
+    /// back down and the id is the same one, so a jam survived exactly the trip
+    /// that is supposed to undo it. What matters is that you **left**, and this
+    /// is where leaving happens.
+    pub fn go_to(&mut self, map: &str) {
+        if self.map != map {
+            self.blocks = None;
+        }
+        self.map = map.to_string();
+    }
+
     pub fn bump(&mut self, what: &str) {
         self.add(what, 1);
     }
@@ -1616,7 +1699,7 @@ pub fn leave_the_sitting(state: &mut WorldState, difficulty: Difficulty) -> Opti
     state.remember();
     let dest = crate::data::map_now(&out, difficulty, state);
     state.at = dest.arrival(state);
-    state.map = out.clone();
+    state.go_to(&out);
     Some(out)
 }
 
@@ -1831,6 +1914,80 @@ pub fn reopen_doors_a_no_op_shut(state: &mut WorldState, events: &crate::tile_ev
     state.answered.retain(|a| !reopen.contains(a));
 }
 
+/// Whether the stones are on this floor at all yet.
+fn stones_are_out(world: &World, state: &WorldState) -> bool {
+    let d = &world.blocks;
+    if d.at.is_empty() {
+        return false;
+    }
+    d.until.is_empty() || marks_have(state, &d.until)
+}
+
+/// Where the stones are, reseeding them if this is a new visit.
+///
+/// **The reseed is the whole safety argument**, so it happens on read rather
+/// than on some entry hook somebody can forget to call: anything that asks
+/// where the stones are gets this visit's answer or a fresh floor.
+pub fn stones_now(world: &World, state: &WorldState) -> Vec<[u8; 2]> {
+    if !stones_are_out(world, state) {
+        return Vec::new();
+    }
+    match &state.blocks {
+        // This visit's, as you have left them.
+        Some(b) if b.map == world.id => b.at.clone(),
+        // **A different floor, so a fresh one.** Nothing is written here:
+        // reading where the stones are must not move them, and the answer is
+        // the same whether or not it has been persisted — only a push writes,
+        // and a push writes the whole arrangement. A stale entry from another
+        // floor is harmless and is overwritten by the first shove.
+        _ => world.blocks.at.clone(),
+    }
+}
+
+/// Every mark has a stone on it.
+fn stones_are_set(world: &World, at: &[[u8; 2]]) -> bool {
+    !world.blocks.marks.is_empty()
+        && world.blocks.marks.iter().all(|m| at.contains(m))
+}
+
+/// Push the stone on `onto` one further in the same direction, if it will go.
+///
+/// `None` when there is no stone there — the ordinary case, and not an error.
+/// `Some(false)` when there is one and it will not move, which is a refused
+/// step: the tile beyond is a wall, or the edge, or another stone.
+fn shove(
+    world: &World,
+    state: &mut WorldState,
+    onto: (u8, u8),
+    d: (i32, i32),
+    allowed: &Allowances,
+) -> Option<bool> {
+    let mut at = stones_now(world, state);
+    let i = at.iter().position(|s| *s == [onto.0, onto.1])?;
+    let (bx, by) = (onto.0 as i32 + d.0, onto.1 as i32 + d.1);
+    if !world.in_bounds(bx, by) {
+        return Some(false);
+    }
+    let (bx, by) = (bx as u8, by as u8);
+    if !world.walkable(bx, by, allowed) || at.iter().any(|s| *s == [bx, by]) {
+        return Some(false);
+    }
+    // **A stone never goes onto a place.** A chain under a boulder is a chain
+    // nobody can pull, and the floor's own way out is a place.
+    if world.place_at(bx, by).is_some() {
+        return Some(false);
+    }
+    at[i] = [bx, by];
+    if stones_are_set(world, &at) && !world.blocks.when_set.is_empty() {
+        let flag = world.blocks.when_set.clone();
+        if !state.flags.iter().any(|f| *f == flag) {
+            state.flags.push(flag);
+        }
+    }
+    state.blocks = Some(Blocks { map: world.id.clone(), at });
+    Some(true)
+}
+
 /// How many of your steps the cart stays at a stop.
 ///
 /// The human's number: *"appears in a random area for 5 movements then teleports
@@ -2020,6 +2177,17 @@ pub fn step(
         let mut out = Step::nowhere(&why);
         out.refused_by = world.crossing_into(state, nx, ny, allowed).map(|c| c.id.clone());
         return out;
+    }
+
+    // **A stone in the way moves, or you do not.** Pushing happens before the
+    // step lands, so a refused shove is a step that never happened — the same
+    // rule a cliff obeys, and the reason a blocked step draws no encounter.
+    match shove(world, state, (nx, ny), (dx, dy), allowed) {
+        Some(true) => {}
+        Some(false) => {
+            return Step::nowhere("the stone will not go any further that way");
+        }
+        None => {}
     }
 
     state.at = [nx, ny];

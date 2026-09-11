@@ -2629,6 +2629,82 @@ def check_the_sands_read_the_other_way_round(page, name, fails, base):
     print("ok: the sands are a second surveyable map, and a compass is the wrong one there")
 
 
+def check_running_away_costs_you(page, name, fails, base):
+    """**Nothing is free any more, and the strip says what it cost.**
+
+    Asked for as *"you should not be able to run away from enemies anymore for
+    free; if you run away, you lose 20% tiredness, which can go beyond the 60%
+    normal threshold"* — plus the two items that answer it.
+
+    `cargo test` proves the arithmetic and the caps. What only a browser can say
+    is that **Walk away is still the button it always was** and now charges, and
+    that the pack draws three kinds of thing where it used to draw one — a charm
+    that looked like a tin and did nothing when pressed would be the feature
+    reported as broken.
+    """
+    def tired(body, at, supplies=None):
+        strip_the_boards(body)
+        body["character"]["class"] = "Berserker"
+        body["character"]["xp"] = 4000
+        body["character"]["fatigue"] = at
+        body["character"]["gold"] = 50_000
+        if supplies is not None:
+            body["character"]["supplies"] = supplies
+        w = body.setdefault("world", {})
+        w["map"] = ""
+        w["at"] = [4, 16]
+        w["last_town"] = "the-end-of-all-gears"
+
+    # --- the pack draws three kinds -----------------------------------------
+    plant(page, base, lambda b: tired(b, 30, [["cork-tea", 1], ["the-quiet-word", 1],
+                                              ["the-short-way-back", 1]]), stem="pack")
+    dismiss_card(page)
+    close_fight(page)
+    kinds = page.evaluate(
+        r"() => [...document.querySelectorAll('#kit .tin')].map(b => b.innerText.replace(/\s+/g,' '))")
+    if len(kinds) != 3:
+        fails.append(f"{name}: the pack draws {len(kinds)} things and there are three: {kinds!r}")
+    else:
+        blob = " ".join(kinds).lower()
+        for want in ("takes", "run", "town"):
+            if want not in blob:
+                fails.append(f"{name}: no line in the pack says {want!r}: {kinds!r}")
+
+    # --- the way home is a button that works --------------------------------
+    page.click("#kit .tin:nth-child(3)")
+    page.wait_for_timeout(400)
+    where = page.evaluate("() => document.getElementById('coords').textContent.trim()")
+    said = last_said(page)
+    if "End of All Gears" not in (page.text_content("#region") or "") and "1, 18" not in where:
+        fails.append(f"{name}: the Short Way Back left you at {where!r}: {said!r}")
+    if page.evaluate("() => window.__character().fatigue") != 0:
+        fails.append(f"{name}: arriving by the short way did not mend you")
+
+    # --- running away charges, and the strip says so ------------------------
+    plant(page, base, lambda b: tired(b, 58, []), stem="flee")
+    dismiss_card(page)
+    close_fight(page)
+    page.evaluate("() => document.getElementById('map').focus()")
+    if not walk_until_a_fight(page, limit=240):
+        fails.append(f"{name}: no fight in 240 steps, so running away was never tried")
+        return
+    before = page.evaluate("() => window.__character().fatigue")
+    page.click("#run")
+    page.wait_for_selector("#fight", state="hidden", timeout=8000)
+    after = page.evaluate("() => window.__character().fatigue")
+    if after <= before:
+        fails.append(f"{name}: ran away and it cost nothing ({before} -> {after})")
+    # **Past the sixty a fight stops at**, which is the half that needed a
+    # second cap.
+    if after <= 60:
+        fails.append(f"{name}: ran away from 58% and landed at {after}%, which is inside the "
+                     f"cap a fight stops at")
+    said = last_said(page)
+    if str(after) not in said and "tired" not in said.lower():
+        fails.append(f"{name}: running away said nothing about what it cost: {said!r}")
+    print("ok: running away costs you, past what a fight can, and the pack holds three kinds")
+
+
 def check_the_sump_refuses_without_an_instrument(page, name, fails, base):
     """**The lip of the Sump is the Reach's door in a second place.**
 
@@ -5829,6 +5905,7 @@ def walk_the_gate(browser, name, fails=None):
     check_the_bestiary_holds_what_you_have_met(page, name, fails, path)
     check_the_cart_is_somewhere_and_then_somewhere_else(page, name, fails, path)
     check_the_sands_read_the_other_way_round(page, name, fails, path)
+    check_running_away_costs_you(page, name, fails, path)
     check_the_sump_refuses_without_an_instrument(page, name, fails, path)
     check_a_wheel_says_what_it_wants(page, name, fails, path)
     check_the_chair_refuses_the_wrong_move(page, name, fails, path)

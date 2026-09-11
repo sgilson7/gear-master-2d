@@ -533,6 +533,11 @@ pub fn try_step(dir: &str) -> String {
             // them" is finished by standing there, so this is where it is
             // noticed — on the step, rather than when some screen opens. A
             // player who walks over the tile and keeps going has still been.
+            // **The walk, charged once, where a card is opened by a step.**
+            // Core decides whether there was anything on it for you — the
+            // question needs the bag and the purse, which a `World` is
+            // deliberately never given.
+            let toll = s.event.as_deref().map(|id| g.read_event(id)).unwrap_or(0);
             let mut spoke = Vec::new();
             if s.moved {
                 if let Some(p) = w.place_now(&g.world, g.world.at[0], g.world.at[1], &allowed) {
@@ -723,6 +728,9 @@ pub fn try_step(dir: &str) -> String {
                 "blocked": s.blocked,
                 "mended": mended,
                 "event": s.event,
+                // What reading it cost, when there was nothing on it you could
+                // do. Zero is dropped by the page rather than printed.
+                "toll": toll,
                 "spent": s.spent,
                 "town": s.town,
                 "spoke": spoke,
@@ -2279,10 +2287,36 @@ pub fn buy_caravan(index: usize) -> String {
     })
 }
 
-/// Walk away without fighting. The creature is forgotten and the tile is not.
+/// Walk away without fighting, and pay for it.
+///
+/// **Core's rule and core's price.** Running away used to clear the encounter
+/// here and cost nothing; what it costs is a rule, and a rule decided in the
+/// shim is a rule the fast suite cannot reach.
 #[wasm_bindgen]
-pub fn flee() {
-    with_mut(|g| g.encounter = None);
+pub fn flee() -> String {
+    with_mut(|g| match g.flee() {
+        Err(why) => serde_json::json!({ "ok": false, "says": why }).to_string(),
+        Ok(cost) => serde_json::json!({
+            "ok": true,
+            // `null` when a charm paid, so the page can say which happened
+            // rather than working it out from a number being zero.
+            "tired": cost,
+            "fatigue": g.character.fatigue,
+        })
+        .to_string(),
+    })
+}
+
+/// Spend a Short Way Back.
+#[wasm_bindgen]
+pub fn warp_home() -> String {
+    with_mut(|g| match g.warp_home(DIFFICULTY) {
+        Err(why) => serde_json::json!({ "ok": false, "says": why }).to_string(),
+        Ok(h) => serde_json::json!({
+            "ok": true, "town": h.town, "fare": h.fare, "mended": h.mended,
+        })
+        .to_string(),
+    })
 }
 
 // ---------------------------------------------------------------- the shop
@@ -2478,6 +2512,8 @@ pub fn shop_json() -> String {
                 serde_json::json!({
                     "id": s.id, "name": s.name, "blurb": s.blurb,
                     "restores": s.restores, "price": s.price,
+                    "does": format!("{:?}", s.does).to_lowercase(),
+                    "line": s.line(),
                     "afford": g.character.gold >= s.price,
                     "have": g.character.supply_count(&s.id),
                 })
@@ -3369,6 +3405,9 @@ pub fn character_json() -> String {
             "fatigue": c.fatigue,
             "rested_health": c.rested_stats().health,
             "fatigue_cap": gm2d_core::fatigue::CAP,
+            // **Two caps since the penalties.** A bar that stopped at sixty
+            // would draw a character at ninety-nine as though they were fine.
+            "fatigue_hard_cap": gm2d_core::fatigue::HARD_CAP,
             "supplies": c.supplies.iter().map(|(id, n)| {
                 let all = gm2d_core::data::supplies();
                 let def = all.get(id);
@@ -3377,6 +3416,12 @@ pub fn character_json() -> String {
                     "name": def.map(|d| d.name.clone()).unwrap_or_else(|| id.clone()),
                     "blurb": def.map(|d| d.blurb.clone()).unwrap_or_default(),
                     "restores": def.map(|d| d.restores).unwrap_or(0),
+                    // What kind of thing it is and what it says it does, both
+                    // core's: the page draws three kinds of button and decides
+                    // nothing about what any of them is for.
+                    "does": def.map(|d| format!("{:?}", d.does).to_lowercase())
+                        .unwrap_or_else(|| "restore".into()),
+                    "line": def.map(|d| d.line()).unwrap_or_default(),
                 })
             }).collect::<Vec<_>>(),
             // What the tree says you begin every fight already holding.

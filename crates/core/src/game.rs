@@ -895,6 +895,122 @@ impl Game {
         })
     }
 
+    /// Read a card, and pay for it if there was nothing on it for you.
+    ///
+    /// **The toll is charged here because `can_take` is here.** A `World` is
+    /// given a handful of bools and asked about the ground — it does not know
+    /// about gold, or items, or which flags a choice wants — so *is there
+    /// anything on this card I can do* is the game's question and not the
+    /// map's, and `world::step` is the wrong place for it.
+    ///
+    /// Called once per visit, by the one line in the shim that opens a card.
+    /// Returns what it cost, so the page can say so: a percentage that moved
+    /// with no sentence beside it is a number a player reports as a bug.
+    pub fn read_event(&mut self, id: &str) -> i32 {
+        let events = crate::data::events();
+        let Some(e) = events.get(id) else { return 0 };
+        if e.toll <= 0 || e.choices.is_empty() {
+            return 0;
+        }
+        // Already answered is already paid for: the card reopens so you can
+        // read it again, and re-reading a thing you finished is not a walk.
+        if self.world.answered.iter().any(|a| a == id) {
+            return 0;
+        }
+        if e.choices.iter().any(|c| self.can_take(c)) {
+            return 0;
+        }
+        let before = self.character.fatigue;
+        self.character.tire_hard(e.toll);
+        self.character.fatigue - before
+    }
+
+    // ------------------------------------------------------- running away
+
+    /// Walk away from a fight, and what that costs.
+    ///
+    /// **Running away used to be free**, and that was the whole of what was
+    /// wrong with it: fatigue is the only thing a fight spends for good, so a
+    /// player who fled every encounter paid nothing for a map they had walked
+    /// the length of. Asked for in as many words — *"you should not be able to
+    /// run away from enemies anymore for free; if you run away, you lose 20%
+    /// tiredness."*
+    ///
+    /// **It is `tire_hard`**, so it goes past the sixty a fight stops at. That
+    /// is the point of there being two caps: wear is a budget and this is not
+    /// wear, it is what you do instead of spending the budget.
+    ///
+    /// **A Quiet Word is spent instead**, and holding one *is* the state —
+    /// there is no flag on the character saying the next flight is free, so
+    /// there is no new field and no seam. The cheapest is taken, like the
+    /// Drover's Stride's fare.
+    ///
+    /// Returns what it cost: `Ok(None)` when a charm paid, `Ok(Some(pct))` when
+    /// you did. Refuses only when there is nothing to run from.
+    pub fn flee(&mut self) -> Result<Option<i32>, String> {
+        if self.encounter.is_none() {
+            return Err("there is nothing to run from".into());
+        }
+        self.encounter = None;
+        // **The charm first**, because a player carrying one bought it for
+        // exactly this and would not thank the game for charging them anyway.
+        if let Some(id) = self.character.cheapest_supply(crate::fatigue::SupplyDoes::Flight) {
+            self.character.take_supply(&id, 1);
+            return Ok(None);
+        }
+        let before = self.character.fatigue;
+        self.character.tire_hard(crate::fatigue::RUNNING_AWAY);
+        Ok(Some(self.character.fatigue - before))
+    }
+
+    /// Spend a Short Way Back and be in your last town.
+    ///
+    /// **`go_home`'s destination, and not its fare.** That one is the Drover's
+    /// Stride — a set bonus that drinks a tin — and this is a thing you bought.
+    /// What they share is where you end up and every reason you might not be
+    /// allowed to: no town yet, and **not from under the lake**, which is the
+    /// one map where the walk *is* the content and an item that undercut it
+    /// would delete what the early way costs.
+    ///
+    /// A refusal spends nothing, which is the reroll's rule and the bank's.
+    pub fn warp_home(
+        &mut self,
+        difficulty: crate::combat::Difficulty,
+    ) -> Result<Homeward, String> {
+        let Some(id) = self.character.cheapest_supply(crate::fatigue::SupplyDoes::Home) else {
+            return Err("you have nothing in your pack that knows the way".into());
+        };
+        let town = self.world.last_town.clone();
+        if town.is_empty() {
+            return Err("you have not been to a town yet, so there is nowhere to go back to".into());
+        }
+        let here = crate::data::map_now(&self.world.map_id(), difficulty, &self.world);
+        if here.no_homeward {
+            return Err("not from down here. Whatever it is doing, it is doing it upwards, and \
+                        there are two hundred and six steps of rock in the way"
+                .into());
+        }
+        let name = crate::data::supplies().get(&id).map(|d| d.name.clone()).unwrap_or(id.clone());
+        let mut moved = false;
+        for (mid, _) in crate::data::MAPS {
+            let w = crate::data::map_now(mid, difficulty, &self.world);
+            if let Some(p) = w.places.iter().find(|p| p.id == town) {
+                self.world.remember();
+                self.world.map = w.id.clone();
+                self.world.at = p.at;
+                moved = true;
+                break;
+            }
+        }
+        if !moved {
+            return Err("the town you came from is not on any map this build has".into());
+        }
+        // **Spent after the last refusal and not before it.**
+        self.character.take_supply(&id, 1);
+        let mended = self.arrive_in_town(&town);
+        Ok(Homeward { town, fare: name, mended })
+    }
+
     // ------------------------------------------------------------ what you met
 
     /// Start an encounter, and write down that you have seen this creature.

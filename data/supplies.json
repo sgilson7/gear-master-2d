@@ -1,7 +1,7 @@
 {
   "format": "gm2d-supplies",
   "version": 1,
-  "_note": "What a town sells to take the tiredness off. Fatigue is the only thing a fight spends for good, so these are the only thing in the game you buy to undo something rather than to become something — and they are priced against a bounty rather than against gear, because that is the trade being offered: a fight's pay for a fight's wear. Cheaper since a town takes the tiredness off for nothing — a tin no longer buys back a fight, it buys the walk home.",
+  "_note": "What a town sells to take the tiredness off. Fatigue is the only thing a fight spends for good, so these are the only thing in the game you buy to undo something rather than to become something — and they are priced against a bounty rather than against gear, because that is the trade being offered: a fight's pay for a fight's wear. Cheaper since a town takes the tiredness off for nothing — a tin no longer buys back a fight, it buys the walk home. **Two of them are not tins**, since the human asked for *an item you can use to allow you to run away from the next battle for free* and *an item that lets you warp back to town instantly*. They are here rather than in the catalogue for the three reasons a tin is: no shape, no grid, spent rather than worn. `does` says which of the three a line is, and it defaults to `restore` so the tins above did not have to move.",
   "supplies": [
     {
       "id": "cork-tea",
@@ -23,6 +23,20 @@
       "blurb": "One tin, one sitting, and the next four hours are not yours.",
       "restores": 60,
       "price": 140
+    },
+    {
+      "id": "the-quiet-word",
+      "name": "The Quiet Word",
+      "blurb": "Whatever is in the envelope, you hand it over and the thing lets you past. Once.",
+      "does": "flight",
+      "price": 40
+    },
+    {
+      "id": "the-short-way-back",
+      "name": "The Short Way Back",
+      "blurb": "A folded paper with your own town written on it in your own hand, which you do not remember doing.",
+      "does": "home",
+      "price": 260
     }
   ]
 }

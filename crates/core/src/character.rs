@@ -1624,6 +1624,40 @@ impl Character {
         self.fatigue = (self.fatigue + by).clamp(0, crate::fatigue::CAP);
     }
 
+    /// Wear that is not a fight's, and does not stop where a fight's does.
+    ///
+    /// **The difference between the two is the whole of what a penalty is.**
+    /// `tire` is what a battle costs and it stops at [`fatigue::CAP`] because a
+    /// fight is a budget. Running away and walking off a cairn are not wear —
+    /// they are what you do to *dodge* the thing the budget is for — so they go
+    /// on past it to [`fatigue::HARD_CAP`].
+    ///
+    /// It never reaches a hundred, and it is never a dead end: walking costs
+    /// nothing and a town takes all of it off.
+    ///
+    /// [`fatigue::CAP`]: crate::fatigue::CAP
+    /// [`fatigue::HARD_CAP`]: crate::fatigue::HARD_CAP
+    pub fn tire_hard(&mut self, by: i32) {
+        self.fatigue = (self.fatigue + by).clamp(0, crate::fatigue::HARD_CAP);
+    }
+
+    /// The cheapest thing of this kind in the pack, if there is one.
+    ///
+    /// **Cheapest, like the Drover's Stride's fare**, and for the same reason:
+    /// a player spending a charm pays it out of small change, and choosing
+    /// which of two to burn is a decision nobody wants to make twice a session.
+    pub fn cheapest_supply(&self, does: crate::fatigue::SupplyDoes) -> Option<String> {
+        let supplies = crate::data::supplies();
+        let mut carried: Vec<(String, i32)> = self
+            .supplies
+            .iter()
+            .filter(|(_, n)| *n > 0)
+            .filter_map(|(id, _)| supplies.get(id).filter(|d| d.does == does).map(|d| (id.clone(), d.price)))
+            .collect();
+        carried.sort_by(|a, b| a.1.cmp(&b.1).then(a.0.cmp(&b.0)));
+        carried.first().map(|(id, _)| id.clone())
+    }
+
     /// How many of a restorative are in the pack.
     pub fn supply_count(&self, id: &str) -> u32 {
         self.supplies.iter().find(|(s, _)| s == id).map(|(_, n)| *n).unwrap_or(0)
@@ -1757,6 +1791,13 @@ impl Character {
         let Some(def) = supplies.get(id) else { return Err("there is no such thing".into()) };
         if self.supply_count(id) == 0 {
             return Err(format!("You have no {}.", def.name));
+        }
+        // **Only a tin is drunk.** The other two kinds are spent by doing the
+        // thing they are for — a Quiet Word goes when you run and a Short Way
+        // Back is `Game::warp_home`'s to spend — so drinking one here would be
+        // a second door onto the same item with a different answer behind it.
+        if def.does != crate::fatigue::SupplyDoes::Restore {
+            return Err(format!("{} is not something you drink.", def.name));
         }
         if self.fatigue == 0 {
             return Err("You are not tired.".into());

@@ -15,7 +15,7 @@ import init, {
   board_json, legal_anchors, place, pick_up, rotate, toggle_lock, undo, clear_board,
   look_json, look_over,
   encounter_json, fight_json, settle_fight, flee,
-  errand_marks_json, go_home,
+  errand_marks_json, go_home, warp_home,
   ench_rack_json, attach_ench, detach_ench, toggle_ench,
   bank_json, bank_put, bank_take,
   kit_json, kit_reading_json,
@@ -386,7 +386,9 @@ function paintPanel() {
   // number the next step out of town is weighed against.
   $('carrying-panel').textContent = c.carried > 0 ? `${c.carried} at risk` : 'nothing';
   $('fatigue').textContent = c.fatigue > 0
-    ? `${c.fatigue}%${c.fatigue >= c.fatigue_cap ? ' — all of it' : ''}` : 'not at all';
+    ? `${c.fatigue}%${c.fatigue >= c.fatigue_hard_cap ? ' — all of it there is'
+        : c.fatigue > c.fatigue_cap ? ' — past what a fight can do'
+        : c.fatigue >= c.fatigue_cap ? ' — all a fight can do' : ''}` : 'not at all';
   paintPack(c);
   $('points').textContent = c.points;
   $('skills').classList.toggle('primary', c.points > 0);
@@ -470,10 +472,30 @@ function paintPack(c) {
     const b = document.createElement('button');
     b.type = 'button';
     b.className = 'tin';
-    b.disabled = c.fatigue === 0;
-    b.innerHTML = `<b>${t.name} ×${t.n}</b><span class="meta">takes off ${t.restores}%</span>`;
+    // **Three kinds in the pack now, and only one of them is drunk.** The
+    // spec under the name is core's `Supply::line`, derived from the kind, so
+    // a tin that is retuned retunes what its button promises.
+    const kind = t.does ?? 'restore';
+    b.disabled = kind === 'restore' && c.fatigue === 0;
+    b.innerHTML = `<b>${t.name} ×${t.n}</b><span class="meta">${t.line}</span>`;
     b.title = t.blurb;
     b.onclick = () => {
+      if (kind === 'home') {
+        // The one that moves you, which means the page is drawing a different
+        // world afterwards — the rule this project has now met five times.
+        const r = JSON.parse(warp_home());
+        if (!r.ok) { log(r.says, true); return; }
+        world = JSON.parse(world_json());
+        log(`${r.fare}. You are in ${r.town}, and ${r.mended}% of you comes back.`);
+        paintPanel(); draw(); autosave();
+        return;
+      }
+      if (kind === 'flight') {
+        // Carried rather than drunk: it is spent by running, and saying so is
+        // better than a button that does nothing when you press it.
+        log(`${t.name} is not something you drink. It goes when you run from a fight.`, true);
+        return;
+      }
       const r = JSON.parse(use_supply(t.id));
       log(r.error || `${t.name}. ${r.took}% of it comes off; ${r.fatigue}% left.`, !!r.error);
       paintPanel(); draw(); autosave();
@@ -2386,7 +2408,9 @@ function paintTins() {
     b.className = 'wares';
     b.disabled = !t.afford;
     b.innerHTML = `<b>${t.name}</b>` +
-      `<span class="spec">takes off ${t.restores}% of the tiredness</span>` +
+      // Core's own sentence, derived from the kind — the shelf sells three
+      // things now and only one of them takes tiredness off.
+      `<span class="spec">${t.line}</span>` +
       `<span class="flavour">${t.blurb}</span>` +
       `<span class="cost">${t.price} Fnorp${t.have ? ` · ${t.have} in the pack` : ''}</span>`;
     b.onclick = () => {
@@ -2749,6 +2773,11 @@ function walk(dir) {
   // Arriving is the doing: an errand that says "go and talk to them" is
   // finished by standing there, and core says so on the step.
   if ((r.spoke ?? []).length) log(`You have been. ${r.spoke.join(', ')}.`);
+  // **What reading a card cost when there was nothing on it for you.** A
+  // percentage that moved with no sentence beside it is a number reported as a
+  // bug — which is why core hands back what it charged rather than the page
+  // noticing the bar dropped.
+  if (r.toll > 0) log(`Nothing here for you, and the walk cost ${r.toll}%.`, true);
   // **The cart moved, so the map is a different map.** `paintPanel` re-reads
   // only when the map *id* changes, and a caravan teleports between places on
   // a map you never left — so the page went on drawing the stop it had cached
@@ -3249,7 +3278,18 @@ async function main() {
   $('clear').onclick = () => { clear_board(); board.refresh(); };
   $('run').onclick = () => {
     if (packingOnly) { packingOnly = false; $('run').textContent = 'Walk away'; }
-    else flee();
+    else {
+      // **Running away is not free any more.** Core charges it and says what
+      // it charged; the page prints the sentence and works nothing out — it
+      // does not know what fleeing costs and must not learn.
+      const r = JSON.parse(flee());
+      if (r.ok) {
+        log(r.tired === null || r.tired === undefined
+          ? `You hand the envelope over and the thing lets you past. The Quiet Word is gone.`
+          : `You run. ${r.tired}% more tired, and ${r.fatigue}% of you is missing.`, r.tired > 0);
+      }
+      paintPanel();
+    }
     closeFight();
   };
   $('skip').onclick = () => replay.finish();

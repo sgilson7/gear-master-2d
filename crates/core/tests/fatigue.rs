@@ -126,8 +126,16 @@ fn a_full_expedition_is_a_budget_and_not_a_wall() {
 #[test]
 fn a_restorative_is_spent_and_says_what_it_took() {
     let supplies = data::supplies();
-    let small = supplies.supplies.iter().min_by_key(|s| s.restores).expect("a small one");
-    let big = supplies.supplies.iter().max_by_key(|s| s.restores).expect("a big one");
+    // **Tins only.** The pack holds three kinds since the charms, and two of
+    // them restore nothing — `min_by_key(restores)` picked a Quiet Word and
+    // asked it to be drunk.
+    let tins: Vec<&_> = supplies
+        .supplies
+        .iter()
+        .filter(|s| s.does == gm2d_core::fatigue::SupplyDoes::Restore)
+        .collect();
+    let small = tins.iter().min_by_key(|s| s.restores).expect("a small tin");
+    let big = tins.iter().max_by_key(|s| s.restores).expect("a big one");
 
     let mut c = Character::starting();
     assert!(c.use_supply(&small.id).is_err(), "drank one without having one");
@@ -204,7 +212,7 @@ fn a_restorative_costs_less_than_the_walk_home() {
     /// What a fight pays somebody far enough in to be buying tins. The pit's
     /// six is the floor of the game and not its income.
     const A_FIGHT_IS_WORTH: i32 = 20;
-    for s in &supplies.supplies {
+    for s in supplies.supplies.iter().filter(|s| s.does == fatigue::SupplyDoes::Restore) {
         let fights = (s.restores + fatigue::PER_FIGHT - 1) / fatigue::PER_FIGHT;
         assert!(
             s.price <= fights * A_FIGHT_IS_WORTH,
@@ -215,5 +223,92 @@ fn a_restorative_costs_less_than_the_walk_home() {
         // And not so cheap that carrying six is free. A tin has to be a
         // purchase or the decision it exists to create is not one.
         assert!(s.price >= fights, "{} is {} Fnorp, which is nothing", s.id, s.price);
+    }
+}
+
+
+// ------------------------------------------------------------------ the charms
+
+/// **A charm has to be worth buying, and the arithmetic says when.**
+///
+/// Running away costs [`fatigue::RUNNING_AWAY`] — twenty percent — and a Quiet
+/// Word is what stops it costing you that. So it is worth exactly what undoing
+/// twenty percent is worth, and if it costs **more** than the cheapest tin that
+/// covers twenty percent then nobody buys one: you flee, you drink, and you are
+/// better off.
+///
+/// It shipped at ninety against a Long Shift Tin at fifty-five, which is that
+/// mistake exactly; it is forty now. **The check is the arithmetic rather than
+/// the number**, so retuning either the tins or what running away costs moves
+/// the ceiling with it.
+#[test]
+fn a_quiet_word_is_cheaper_than_taking_the_tiredness() {
+    let supplies = data::supplies();
+    let cover = supplies
+        .supplies
+        .iter()
+        .filter(|s| s.does == fatigue::SupplyDoes::Restore)
+        .filter(|s| s.restores >= fatigue::RUNNING_AWAY)
+        .min_by_key(|s| s.price)
+        .expect("no tin covers what running away costs, so fleeing has no alternative");
+    for c in supplies.supplies.iter().filter(|s| s.does == fatigue::SupplyDoes::Flight) {
+        assert!(
+            c.price < cover.price,
+            "{} costs {} and {} undoes what running away does for {}, so nobody buys one",
+            c.id,
+            c.price,
+            cover.id,
+            cover.price
+        );
+    }
+}
+
+/// **And the way home is dearer than any tin**, because it does more than all
+/// of them: arriving in a town takes *every* point of tiredness off, and no tin
+/// in the game does that from ninety-nine.
+#[test]
+fn the_way_home_costs_more_than_drinking() {
+    let supplies = data::supplies();
+    let dearest = supplies
+        .supplies
+        .iter()
+        .filter(|s| s.does == fatigue::SupplyDoes::Restore)
+        .max_by_key(|s| s.price)
+        .expect("a tin");
+    for c in supplies.supplies.iter().filter(|s| s.does == fatigue::SupplyDoes::Home) {
+        assert!(
+            c.price > dearest.price,
+            "{} costs {} and the dearest tin is {}, and it mends more than the tin does",
+            c.id,
+            c.price,
+            dearest.price
+        );
+    }
+}
+
+/// Every kind in the file is one something reads.
+#[test]
+fn every_supply_kind_has_a_user() {
+    let supplies = data::supplies();
+    for want in [
+        fatigue::SupplyDoes::Restore,
+        fatigue::SupplyDoes::Flight,
+        fatigue::SupplyDoes::Home,
+    ] {
+        assert!(
+            supplies.supplies.iter().any(|s| s.does == want),
+            "nothing in the game is a {want:?}, so the arm that handles one is unreachable"
+        );
+    }
+    // And each says what it does, in the engine's words, with its number in it.
+    for s in &supplies.supplies {
+        assert!(!s.line().is_empty(), "{} says nothing about itself", s.id);
+        if s.does == fatigue::SupplyDoes::Restore {
+            assert!(
+                s.line().contains(&s.restores.to_string()),
+                "{}: the line does not carry the number it restores",
+                s.id
+            );
+        }
     }
 }

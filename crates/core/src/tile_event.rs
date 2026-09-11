@@ -454,6 +454,24 @@ pub struct TileEvent {
     /// which is exactly what a puzzle is made of.
     #[serde(default)]
     pub repeats: bool,
+    /// What walking away from this card costs, in percent of maximum health.
+    ///
+    /// **Charged on a visit where nothing on the card can be taken**, which is
+    /// what *walking away* actually is: you came, you read it, and there was
+    /// nothing here for you. Zero everywhere but the Cairnfield, whose nine
+    /// heaps are the one puzzle in the game a player solves by guessing — the
+    /// blind solution is forty-five card reads and thirty-six of them are a
+    /// refusal, so a floor that charged nothing for a wrong guess was a floor
+    /// where guessing was free.
+    ///
+    /// It goes through `Character::tire_hard`, so it does not stop at
+    /// `fatigue::CAP`. That is the whole of what makes the room dangerous, and
+    /// it is why the ninth clipboard and the survey golem are worth having.
+    ///
+    /// **Not charged when you can act.** Adding the right stone costs nothing,
+    /// so the toll is a price on being wrong rather than a price on the floor.
+    #[serde(default)]
+    pub toll: i32,
 }
 
 impl TileEvent {

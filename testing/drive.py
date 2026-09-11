@@ -6324,6 +6324,14 @@ def walk_the_gate(browser, name, fails=None):
     check_the_sheet_says_every_class(page, name, fails)
     check_a_full_bill_holds_two_enchs(page, name, fails)
 
+    # --- the Eleven Reefs, and the two classes under the Sands ---------------
+    check_the_way_under_is_not_drawn_before_the_sheet(page, name, fails)
+    check_a_stake_says_pull_read_or_lie(page, name, fails)
+    check_a_sinkhole_moves_you(page, name, fails)
+    check_she_is_wearing_it(page, name, fails)
+    check_the_fork_is_seven_wide(page, name, fails)
+    check_the_furnace_line_moves(page, name, fails)
+
     # --- the log ---------------------------------------------------------------
     check_the_panel_says_what_a_pool_pays(page, name, fails)
     check_the_game_talks_in_one_place(page, name, fails)
@@ -6334,6 +6342,280 @@ def walk_the_gate(browser, name, fails=None):
     if offsite:
         fails.append(f"{name}: the page left the origin:\n  " + "\n  ".join(sorted(set(offsite))))
     return fails
+
+
+
+
+# ------------------------------------------------------------ the Eleven Reefs
+
+
+def check_the_way_under_is_not_drawn_before_the_sheet(page, name, fails):
+    """[11, 5] on the Sands is plain silt until the sheet is off the table.
+
+    **Two conditions in an order, and only a browser can say what is drawn.**
+    `hidden_until` is answered in core and `place_is_there` is tested there; what
+    this asks is whether the *map* draws a gate on a tile that has one and
+    nothing on a tile that does not — which is the `paintPanel` question this
+    project has now got wrong four times.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+
+    def onto(body):
+        body["world"]["map"] = "the-wextreen-sands"
+        body["world"]["at"] = [11, 5]
+        body["world"]["answered"] = []
+
+    plant(page, base, onto, stem="sands-before")
+    before = page.evaluate(
+        "() => (window.__world().places ?? []).filter(p => p.id === 'the-way-under-the-flat').length")
+    if before != 0:
+        fails.append(f"{name}: the way under is drawn before the sheet is taken")
+
+    def sheeted(body):
+        body["world"]["map"] = "the-wextreen-sands"
+        body["world"]["at"] = [11, 5]
+        body["world"]["answered"] = ["the-tenth-survey"]
+
+    plant(page, base, sheeted, stem="sands-after")
+    after = page.evaluate(
+        "() => (window.__world().places ?? []).find(p => p.id === 'the-way-under-the-flat')")
+    if not after:
+        fails.append(f"{name}: the sheet was taken and the way under is still not there")
+        return
+    if after.get("kind") != "gate":
+        fails.append(f"{name}: the way under is a {after.get('kind')} rather than a gate")
+    print("ok: the way under the flat is silt until the tenth survey is off the table")
+
+
+def check_a_stake_says_pull_read_or_lie(page, name, fails):
+    """A stake's card draws three choices, and the compass one buys nothing.
+
+    The Sands' own prose is that there is iron under it and a compass tells you
+    about every reef at once. **A lie that paid would be a hint**, so the card
+    has to offer the reading and the reading has to be worth nothing — and the
+    thing only a browser can say is that all three are *drawn*, because a choice
+    core refuses is a choice the page may or may not put on the screen.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+
+    # **Stand beside it and step in.** [2,12] is quicksand and [2,13] is the
+    # corridor the stake is driven into, which is the whole shape of the floor.
+    def onto(body):
+        body["world"]["map"] = "the-reefs-1"
+        body["world"]["at"] = [3, 13]
+
+    plant(page, base, onto, stem="stake-probe")
+    page.keyboard.press("ArrowLeft")
+    page.wait_for_timeout(400)
+    if page.is_hidden("#card"):
+        fails.append(f"{name}: stepping onto a stake opened no card")
+        return
+    labels = page.locator("#card-choices button").all_text_contents()
+    if len(labels) != 2:
+        fails.append(f"{name}: a stake drew {len(labels)} choices: {labels}")
+    if not any("compass" in l.lower() for l in labels):
+        fails.append(f"{name}: a stake offers no compass reading: {labels}")
+    if not any("pull" in l.lower() for l in labels):
+        fails.append(f"{name}: a stake cannot be pulled: {labels}")
+    leave_the_card(page)
+    print("ok: a stake offers the pull and the compass, and the compass is a lie")
+
+
+def check_a_sinkhole_moves_you(page, name, fails):
+    """Falling down a hole puts you somewhere else on the same floor.
+
+    **`Outcome::Warp` as a lock rather than as a shortcut**, which is the first
+    time this game has used one that way. What only a browser answers is whether
+    the map screen *follows*: a warp sets `world.at` and the page has gone on
+    drawing the old tile three times in this project's history.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+
+    # On the ring, one east of the north sinkhole. The square inside the ring
+    # is quicksand until four levers are over, so the only approach is along it.
+    def onto(body):
+        body["world"]["map"] = "the-reefs-3"
+        body["world"]["at"] = [9, 2]
+        body["character"]["fatigue"] = 0
+
+    plant(page, base, onto, stem="sinkhole-probe")
+    page.keyboard.press("ArrowLeft")
+    page.wait_for_timeout(400)
+    if page.is_hidden("#card"):
+        fails.append(f"{name}: stepping onto the north sinkhole opened no card")
+        return
+    page.locator("#card-choices button").first.click()
+    page.wait_for_timeout(500)
+    leave_the_card(page)
+    where = json.loads(page.evaluate("() => window.__position()"))
+    at = [where.get("x"), where.get("y")]
+    if at != [15, 1]:
+        fails.append(f"{name}: the north sinkhole put the player at {at}, not the north-east alcove")
+    print(f"ok: a sinkhole drops you in an alcove nothing walks into ({at})")
+
+
+def check_she_is_wearing_it(page, name, fails):
+    """The fight screen lists the Tenth Surveyor's items by the run's own names.
+
+    **She is wearing a real player's board**, and the half of that only a
+    browser can see is the enemy panel: `side_slots` builds it, `theirs.js`
+    draws it, and a creature whose board came out as loose components would look
+    exactly like one whose board came out right until somebody counted the
+    cards.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+
+    def onto(body):
+        body["encounter"] = {"enemy": "The Tenth Surveyor", "at": body["world"]["at"]}
+
+    plant(page, base, onto, stem="tenth-probe")
+    page.wait_for_timeout(600)
+    if page.is_hidden("#tab-theirs"):
+        fails.append(f"{name}: planting her fight did not open the fight screen")
+        return
+    page.click("#tab-theirs")
+    page.wait_for_timeout(400)
+    cards = page.locator("#theirs-cards .made-item").count()
+    if cards < 8:
+        fails.append(f"{name}: her panel drew {cards} item cards, and her board makes eleven")
+    said = page.locator("#theirs-title").inner_text()
+    if "STAYED" not in said.upper() and "Tenth" not in said:
+        fails.append(f"{name}: the enemy panel does not name her: {said[:120]!r}")
+    print(f"ok: the Tenth Surveyor's panel draws {cards} item cards off the run's own board")
+    # **Put the fight away, or the next check clicks into a screen nobody can
+    # see** — which is the rule this file has written down twice. The encounter
+    # is in the save, so the way out is to plant one without it rather than to
+    # look for a button: a fight you were *given* has no "leave" on it.
+    plant(page, base, lambda body: body.pop("encounter", None), stem="tenth-done")
+    page.wait_for_timeout(300)
+
+
+def check_the_fork_is_seven_wide(page, name, fails):
+    """Seven cards, two rows, and Escape still does nothing.
+
+    **The fork has drawn five since M5** and its grid, its Escape refusal and
+    its own browser check all assumed five. Seven is two rows, and a row of one
+    would be a screen whose whole job is to be compared across.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+    # **Home first.** The checks before this one leave the player under the
+    # Sands, and `__world()` answers about the map the page is holding — so the
+    # town this looks for is a town on whatever floor it happens to be standing
+    # on, which is no town at all.
+    plant(page, base, lambda body: body["world"].update({"map": "", "at": [4, 4]}),
+          stem="seven-home")
+    page.wait_for_timeout(300)
+    town = page.evaluate("""() => (window.__world().places ?? []).find(p => p.kind === 'town')""")
+    if not town:
+        fails.append(f"{name}: no town on the overworld to bank a level in")
+        return
+
+    def owed(body):
+        body["character"]["class"] = None
+        body["character"]["xp"] = 0
+        body["character"]["carried"] = 600
+        body["world"]["at"] = [town["at"][0] + 1, town["at"][1]]
+        body["world"]["map"] = ""
+
+    plant(page, base, owed, stem="seven-probe")
+    page.keyboard.press("ArrowLeft")
+    page.wait_for_timeout(300)
+    if not page.is_visible("#town"):
+        fails.append(f"{name}: could not get into a town to bank a level")
+        return
+    page.click("#bank")
+    page.wait_for_timeout(400)
+    if page.is_hidden("#fork"):
+        fails.append(f"{name}: banked past level five and was never asked")
+        return
+    n = page.locator("#fork-choices .wares").count()
+    if n != 7:
+        fails.append(f"{name}: the fork drew {n} cards, not seven")
+    # **Two rows, measured.** Seven cards over three rows would put one alone.
+    rows = page.evaluate(
+        "() => new Set([...document.querySelectorAll('#fork-choices .wares')]"
+        ".map(b => Math.round(b.getBoundingClientRect().top))).size")
+    if rows != 2:
+        fails.append(f"{name}: seven cards came out in {rows} rows, not two")
+    # And every one of them is clickable where it is drawn.
+    buried = page.evaluate(
+        "() => [...document.querySelectorAll('#fork-choices .wares')].filter(b => {"
+        "  const r = b.getBoundingClientRect();"
+        "  const mid = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);"
+        "  return !b.contains(mid);"
+        "}).length")
+    if buried:
+        fails.append(f"{name}: {buried} of the seven fork cards are under something")
+    page.keyboard.press("Escape")
+    page.wait_for_timeout(300)
+    if page.is_hidden("#fork"):
+        fails.append(f"{name}: Escape closed the level-five fork, which does not come off")
+        return
+    page.locator("#fork-choices .wares").first.click()
+    page.wait_for_selector("#fork", state="hidden", timeout=8000)
+    if page.is_visible("#tree"):
+        page.click("#tree-done")
+        page.wait_for_selector("#tree", state="hidden", timeout=8000)
+    if page.is_visible("#town"):
+        page.click("#leave")
+        page.wait_for_selector("#town", state="hidden", timeout=5000)
+    print(f"ok: the fork draws seven cards in {rows} rows and still refuses Escape")
+
+
+def check_the_furnace_line_moves(page, name, fails):
+    """A Stoker's replay shows the pool fall and the stacks rise on one line.
+
+    **`Event::Burned` carries both numbers on purpose**, so the replay can draw
+    them on the tick they happened rather than inferring one from the other —
+    which is *the page draws numbers core sent it*, stated for a number that
+    moves twice. The only place to see that it reached a screen is a screen.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+
+    def stoker(body):
+        body["character"]["class"] = "Stoker"
+        body["character"]["xp"] = 2000
+        # **Something in the hoppers, or this proves nothing.** A furnace with
+        # nothing to burn logs nothing, and a check that reports "no pool to
+        # burn" cannot tell that from a `Burned` event nobody writes — which is
+        # the *compares zero with zero* failure, and it is what this check did
+        # until the negative test found it could not fail.
+        body["character"]["skills_taken"] = list(
+            dict.fromkeys(body["character"].get("skills_taken", [])
+                          + ["ks-firebox", "ks-damper", "ks-hundredweight"]))
+        body["character"]["skill_points"] = 0
+        body["encounter"] = {"enemy": "Iron Sentinel", "at": body["world"]["at"]}
+
+    plant(page, base, stoker, stem="stoker-probe")
+    page.wait_for_timeout(500)
+    if not page.is_visible("#run"):
+        fails.append(f"{name}: planting a fight did not open the fight screen")
+        return
+    said = page.evaluate(
+        "() => JSON.stringify(window.__fightJson?.() ?? {})")
+    burned = "shovel" in said or "furnace" in said
+    # **Put the fight away on every path out**, which is this file's own rule
+    # and the reason the check after it could not reach the download button.
+    plant(page, base, lambda body: body.pop("encounter", None), stem="stoker-done")
+    page.wait_for_timeout(300)
+    if not burned:
+        fails.append(
+            f"{name}: a Stoker with three full hoppers fought and the log says nothing "
+            "about a furnace")
+        return
+    print("ok: a Stoker's replay says what the furnace took and what it bought")
 
 
 def main():

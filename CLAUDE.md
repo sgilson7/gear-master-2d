@@ -64,7 +64,37 @@ events that pay something and say what they pay — added on the human's ask.
 `PLAN-M9.md`, `PLAN-M10.md` and `PLAN-M11.md` are done; `PLAN.md` §6d is what
 M11 left open, §6c is M10.3's, §6b is M9.4's and §6a is M8.8's.
 
-**M15 is done and not yet deployed** — six milestones and one fault reported
+**M16 is done and live**, deployed at `e3a2193f` and verified the way this file
+has demanded since M8: `GM2D_ORIGIN=… drive.py` walked **all seventy-eight
+checks against the deployed page**, and the pair agrees — `index.html` asks for
+`app.js?v=e3a2193f` and that `app.js` carries `BUILD='e3a2193f'`. Seven
+milestones, `288810c` through the gate, and the block is **three maps, two base
+classes, eleven experts and no new components**.
+
+**The Eleven Reefs** is the shape: three floors under the Wextreen Sands behind
+a gate that is not there until you have taken the tenth surveyor's sheet and is
+shut until something on the frame can read the flat. Nine stakes over three
+bands where the one that leads on is a different one each time; three doors of
+which the second **takes what the third needs**; four sinkholes, two of them
+false, and four levers that open each other's alcoves. On the plate at the
+bottom is **the Tenth Surveyor, wearing a real player's board** — thirty-eight
+components in the cells the human seated them in and all six of that character's
+enchs, which is the first creature in the game to carry one.
+
+**And the block's largest finding is one the plan could not have had: no board
+this game hands a player reaches Rare.** `PLAN-M16.md` §4.2 hangs two doors on
+`AssembledOfRarity`; the level-45 run tops out at an item rating of **50**
+against a `RARE_AT` of 90, and Auto-packing everything it owns does not move it.
+`geared_from` — both shelves and every errand, at level ten — reaches **135, which
+is Epic**. So a door at legendary would have been a wall with a sentence on it
+and a door at epic would have refused the deep board while passing the shallow
+one. See *No board a player can build reaches Rare*.
+
+`PLAN-M16.md` is the frame, `HANDOFF-M16.md` is the block's own record and
+`SECOND-ORDER-M16.md` is its notebook — **forty-one rows**, and the last
+milestone is that notebook executed.
+
+**M15 is done and live** — six milestones and one fault reported
 from play, `745ba01` through the notebook, and **three asks from the human**:
 
 | | |
@@ -1010,6 +1040,8 @@ the rename was cheaper before the nine than after.
 | **the-sump-1 … -4** | 12×12 each | the Wextreen Sump: three puzzles and the Ninth Surveyor |
 | **the-silt-stair-1 … -4** | 12×12 each | the Silt Stair: three puzzles and what Marbulon faced away from |
 | **the-undercountry** | 20×20 | the country under the country, and one town with nothing in it |
+| **the-wextreen-sands** | 18×12 | the second surveyable map, where the needle is no use and the paper survey is |
+| **the-reefs-1 … -3** | 16×15, 16×8, 17×12 | the Eleven Reefs: nine stakes, three doors, four sinkholes and the Tenth Surveyor |
 
 - **The Treyway brackets levels twelve to sixteen, not five to nine.** The plan
   asked for five to nine and that number was written before anybody counted the
@@ -1372,6 +1404,284 @@ one you finish shows you a sealed door with the other dungeon's name in the
 refusal — `Game::sealed_because`, two registers on one line, `shut` from the
 map file and *which dungeon is still standing* derived off the places so it
 cannot go stale when a boss is renamed.
+
+
+## No board a player can build reaches Rare
+
+**The largest thing M16 found, and it is a measurement rather than a bug.**
+`PLAN-M16.md` §4.2 hangs the Assay's first door on `AssembledOfRarity("epic")`
+and its third on `"legendary"`, on the strength of M14's note that *the board a
+player actually has holds exactly one epic item and twenty commons*. That note
+is about the Shelf and it is not what the numbers say.
+
+| board | best item | rarity |
+|---|---|---|
+| the run, as the human left it | 50 | Common |
+| the run, Auto-packed out of everything it owns | 50 | Common |
+| `geared_from` — both shelves, every errand | 135 | **Epic** |
+
+`RARE_AT` is 90, `EPIC_AT` 130 and `LEGENDARY_AT` 170, and **562 of the 568
+components rate Common on their own.** The thresholds *are* reachable — the best
+item on the whole creature ladder is Francis's at 343, and 76 creature items are
+Rare or better — because a creature's board is packed with the best components
+in the game and a player's is what they could buy.
+
+So a door at legendary is a wall with a sentence on it, and a door at epic
+refuses a **level-45 caster board** while passing a level-ten shopper's. The
+Assay asks in footprints and money, and keeps `epic` on door one as the
+*shortcut* rather than the lock. `no_board_a_player_can_build_reaches_rare` is
+the lint, and it exists so the next door is not written against a tier nobody
+reaches.
+
+**The question underneath it is the human's**: `Rarity` describes creature
+boards and not player boards, because `item_rating` prices pieces and cadence and
+an Ink is a multiplier that rates nothing on its own. Nothing in the game turns
+on it today — the Shelf's shipped epic door is passable by `geared_from` — and it
+is the kind of thing that is wrong the day somebody hangs a fifth door on it.
+
+## A lane you can commit to is never one you can be shut out of
+
+`RESIST_CAP` has been 95 since the fork, with its reason written beside it:
+*enough to matter against a build that has committed to one resistance, and
+never enough to make committing pointless.* `MIND_CAP` was a hundred, with the
+opposite reason: *those two lanes can be shut out completely, and full immunity
+is a thing a creature is allowed to have.*
+
+Both were true, and the second was written when **nothing in the game was built
+on either lane**. Then M16 measured it:
+
+- **twenty-three of the sixty creatures** are at or past a hundred curse resist,
+  base plus gear, up to Nine of Ashes at 233;
+- **thirty-one** are at or past a hundred mind resist, **every deep boss among
+  them** — What Marbulon Faced Away From at 128, the Ninth Surveyor at 126, The
+  Rust Parliament at 200.
+
+At a hundred, `landing_ms` returns **zero milliseconds** and
+`mind_damage_after_resist` returns **nothing**. So the Whisperer — a base class
+whose whole promise is the mind lane — and four curse-shaped experts would have
+dealt exactly nothing at the bottom of every dungeon in the game. That is
+`every_offered_class_reaches_something` failing one level up: a class that
+reaches something against a rat and nothing against the fight it was bought for.
+
+**`stats::LANE_CAP` is 95** and nothing under ninety-five moved, so no creature
+was retuned. `PLAN-M16.md` §5.3 asks for the two M14 bosses to be brought under
+the cap by **re-dressing**; the recon found twenty-three rather than two and
+neither of the plan's numbers, and re-dressing a quarter of the ladder to move a
+constant is *ease a pool, not a creature* two levels up.
+
+- **`no_creature_is_immune_to_a_curse_or_a_whisper` calls rather than
+  declares.** It asks `landing_ms` and `mind_damage_after_resist` with each
+  creature's own summed resistance, over all four curse kinds, rather than
+  reading a number off a sheet. Broken by putting the cap back, it names **124
+  shut creature-lanes**.
+- **Three unit tests pinned *fully resisted, never lands*** and were updated
+  rather than deleted, each with the reason where it stands. A test that pins
+  the behaviour you are changing is a test to change in the commit that changes
+  it.
+- **`MIND_CAP` keeps the job it is actually right for**, which is piercing and
+  hardening: a hundred percent of those means something.
+
+## Quicksand, and why a floor that opens can be monotone
+
+M14's rule is that `flags` and `answered` only ever grow, so a puzzle whose
+wrong move locks the right one is a puzzle the save cannot come back from. The
+Flat Below wants terrain that *closes* — that is what sand does — and it cannot
+have it.
+
+**`quick` is the terrain that can only be opened.** Impassable, rolls nothing,
+and `a_quick_cell_only_ever_drains_to_silt` refuses a drain that makes it, over
+every map there is. Nine stakes each open one segment of one band and pulling all
+nine opens everything, so a blind walk can never strand. What it costs is
+forty-five fatigue — three-quarters of `CAP`, asserted against it — and six
+fights in pockets that lead nowhere.
+
+**The compass is offered at every stake and sets nothing**, which is a lint
+rather than an oversight: the Sands' own prose says there is iron under it and a
+compass will tell you about every reef at once. *A lie that paid would be a
+hint.*
+
+**And the blind ceilings are in card reads, not in moves.** `PLAN-M16.md` counts
+*pulls* and *drops*; `puzzle::solvable_blind` counts card reads, which is M14's
+unit and the unit the Cairnfield's forty-five is in. The Flat Below is **36**
+against the plan's 9 — thirty-six rather than the eighteen a first estimate
+gives, because the adversary opens each band *early* and leaves its two wrong
+neighbours live while the next band's three arrive. The Assay is **3**, exactly
+as written. The Needle Room is **7** against 8.
+
+## A warp is a lock, and an alcove is two tiles
+
+`PROMPT-M16.md` asks for it to be reported first if `Outcome::Warp` cannot land
+you in a walled alcove. **It can.** What could not see it was
+`puzzle::reachable`, which floods terrain — so the Needle Room, whose four
+alcoves touch the ring only on the diagonal, measured `Stuck`. It follows a warp
+now, **on an unconditional choice only** — whether a gated one can be taken is a
+question about a `Position` that function has not got — and **only onto the map
+it is already on**, because a warp to another map is a way out rather than a way
+across.
+
+What nearly shipped instead is a lever nobody could ever pull. **`warp_to`
+resolves no place on the landing tile**, and it is right not to: every other warp
+in the game lands you on ground. So a one-tile alcove with the lever *on* the
+tile you fall onto is a card that opens for nobody — you land, nothing opens it,
+and there is nowhere to step off and back on. `an_event_that_asks_something
+_still_reopens` caught it looking for a walkable neighbour and finding none.
+
+**An alcove is two tiles**, the one you land on and the one the lever is on.
+Fixed in the map; `warp_to` is untouched. The general shape is worth keeping:
+there are three kinds of arrival in this game — a step, a gate and *being put
+down by something that is neither* — and only the first two resolve a place.
+
+**And the sinkholes do not repeat**, which `PLAN-M16.md` §4.3 says they should.
+`a_repeating_event_may_never_pay` refuses a repeating warp, for a reason that is
+still right. They do not need to: both ungated levers sit behind a true
+sinkhole, each lever drains the way out of its own alcove, so each hole is
+needed exactly once and no order strands anybody.
+
+## A creature wearing a real player's board
+
+The Tenth Surveyor is thirty-eight components in the cells the human seated them
+in and all six of that character's enchs — `MonsterSpec.enchs`, and the first
+creature in the game to carry one. `the_tenth_surveyor_wears_the_run` compares
+her board against `common::from_save`'s by name and count per slot.
+
+- **`MonsterSpec.items` is a chunk list, so the gear array is in *item*
+  order** — which a board's placement order is not. The run's first helmet item
+  is board entries 0, 3 and 5 and its second is 1, 2 and 4.
+  `Character::item_partition` returns the pair, because *the boss's `items` field
+  is not a number anyone should type* is true of the order as well.
+- **An ench lands on the profiles and nowhere else**, through `ench::apply` —
+  the door the player's go through, because two answers to *what an ench does* is
+  the mistake this project has paid for six times. A creature gets no `enched`
+  flag and no beacon: those are read by rules a character holds.
+- **`data/enemies.json` went lossy the moment a creature carried one**, and
+  `the_bestiary_file_reads_back` passed anyway because `EnemyData` had no such
+  field. It has one now, added in the commit that made it necessary.
+
+**Her numbers are found, and the plan's method could not have found them.**
+`PLAN-M16.md` §5.2 asks for a win rate between 55% and 70% *over a loop of
+seeds*, and **combat has no RNG** — a loop over seeds counts the same fight every
+time, which is why a mid-fight save carries a creature name and a tile. What
+varies between two players meeting her is the **board**, so the bracket is over
+boards. Against `common::geared_from`:
+
+| | deals | |
+|---|---|---|
+| The Ninth Surveyor | 122.1/s | Victory |
+| What Marbulon Faced Away From | 138.7/s | Victory |
+| **The Tenth Surveyor** | **221.2/s** | **Victory** |
+| Gilt | 428.3/s | Defeat |
+| Nine of Ashes | 531.0/s | Defeat |
+
+Her first draft was 236 strength and dealt **807.9/s**, which killed that board
+in three seconds. **Health barely moves a fight at this depth and strength is the
+whole dial**, which is the Kettleworks finding a third time: across a sweep of
+5,200 to 8,800 health not one outcome changed, and across 40 to 100 strength it
+went from a win at the buzzer to a loss at fourteen seconds.
+
+**And the run loses to her.** `geared_from` is twice the board the reconstruction
+is — 1,942 health and 21 items against 974 and 11 — and beats both M14 bosses
+while the run beats neither. The run's gear is cheap early components packed into
+a caster board, so *"an almost finished run that is very powerful"* is not what
+§5.1 transcribes. The block is bracketed against the board that can actually
+reach her.
+
+## The two classes GM2D wrote
+
+Every class before M16 is upstream's with the theme talking, which was the right
+call while the powers were already tuned and already tested. The **Kettle-Stoker**
+and the **Whisperling** are the first two written here, and neither has an
+upstream to borrow from.
+
+- **The Stoker buys empowerment with somebody else's pool.** A held pool pays a
+  standing bonus and mana empowerment scales off the mana left, so stacking it
+  hard drains the very pool it multiplies. The Stoker burns rage, faith or
+  nature instead — **the largest one**, which is what makes the class a decision
+  about which hopper to fill rather than a number that goes up.
+  `pools_worth_holding` was checked rather than assumed: it returns exactly
+  those three.
+- **The Whisperer makes the mind lane a way to finish.** `Combatant::is_down`
+  has fired at `max_health <= 0` since the fork, so a mind build could already
+  kill anything in principle and in practice never did. The class moves where
+  the line is rather than inventing a second way to die — and it is only true at
+  all because of `LANE_CAP`.
+
+**A base class has knobs now**, which is the widening M16 needed and the first
+thing it found: `Effect::Tunes` was checked against `ExpertPower::knobs` and
+refused everything else, so a tree could not tune its own class's power.
+`ClassPower::knobs` and `::tune` are the fix, and `Character::class_defs` tunes
+a base power the way it tunes an expert's — **M13.6's thirty-eight dead nodes,
+one level down**.
+
+- **And widening it opened a collision the old reader could not see.**
+  `per_stack` is the Stoker's *and* the Patented Funnel's, so a character who was
+  both would have had each tree's tuning applied to the other's power — exactly
+  what the parse-time check exists to make impossible, arriving from the other
+  side. `tunings_for(class, taken)` is scoped to the tree; `tunings_from` stays
+  for the callers that mean all of them.
+- **`ExpertPower::step` read the knob's *name* and needed to read the power.** A
+  knob ending `_ms` is printed in whole seconds by the two experts it was written
+  for and to a **tenth** by the four furnace ones, where eight hundred
+  milliseconds is 4.0s becoming 3.2s.
+
+## The tree could not grant a pool, and `Stat { mind }` was dead as written
+
+`Effect::Stat` read five fields and `Effect::StartWith` two, so
+`stat { nature: 20 }` and `start_with { insight: 20 }` would have parsed, cost
+points and changed nothing — the *eight skill nodes* failure, caught by
+`every_effect_key_is_one_the_engine_actually_reads` before it shipped. `Stat`
+grows `mind`; `StartWith` grows rage, faith, nature, insight and dread, which is
+what *what you are already holding when the bell goes* has always meant.
+
+**And `Effect::Stat { mind }` was dead the moment it was added.** Mind damage is
+read off `ItemProfile::stats.mind` and a character-level `Stats.mind` reaches no
+item. It cannot be read off `player_stats` either, which sums every item's stats
+and would pay the board's own mind damage once per item. It travels through
+**`Held::mind`** — the one door for *what the character contributes, once, beside
+the item*, which is where the tree's armour, its mana and its granted rules
+already go. Found by `every_point_in_an_expert_tree_buys_something`, which is the
+lint that exists to find exactly this.
+
+## Twenty-one experts, and what it cost to make every point buy something
+
+`C(7,2)` is twenty-one and the table held ten. The eleven grant three new rules
+between them — `burn_keeps_bonus`, `burn_carries`, `mind_pierce` — and **each is
+granted by more than one tree**, which is the shape `Spread` and `Beacon` already
+have: a rule granted by exactly one tree is a knob that has been given a second
+name.
+
+**An expert's power is self-contained**, and six of these would not have been. A
+Fired Funnel's promise is *every stack the furnace buys is also mana*, and a
+furnace is the Stoker's — so without one the whole tree read dead.
+`light_the_furnace` gives all six their own; you cannot hold one without being a
+Stoker, so it is belt-and-braces, and it is what lets the lint ask its question
+of the expert **alone**. Giving the *fixture* both parents instead was tried and
+buried five of the original ten under two parent powers' worth of noise.
+
+The lint then found five more things and every one of them was real:
+
+- **three tuning defaults chosen so the knob never bound** — Bare Furnace's
+  `cap` was never reached by two bare frames' worth of stacks, Fired Funnel's
+  `per_fight` was never spent, and Told Once's `per_curse` and `cap` were **raw
+  health points** where the plan means percentage points of a maximum;
+- **`purse_sweep` could not see a two-second move**, so Flash Powder's window at
+  ten and at twelve were the same string — the *compares zero with zero* failure
+  with a stopwatch in it;
+- and **a board that deletes a maximum in one blow cannot watch a threshold
+  move**, so Told Once's board takes two of the Whisperer's nodes rather than all
+  nine. The general form: *a fixture strong enough to win instantly is a fixture
+  that measures nothing.*
+
+**`every_offered_class_reaches_something` grew a fourth arm**, and it had to:
+M16's two are the first powers on the fork that change nothing a fighter *walks
+in* with — a furnace runs at the tick and an unmaking moves where a fight ends —
+so the three places that power could be honoured were all the same on both sides
+and the class was still real. The honest question for those is *did the fight
+differ*, which is what `experts_reach.rs` has asked of the experts all along.
+
+**The fork draws seven cards in two rows of four and three**, measured in a
+browser at 1280×720, and still refuses Escape. Three tracks would have wrapped
+seven as 3 / 3 / 1 — three rows, the last of them one card wide, on a screen
+whose whole job is to be compared across.
 
 ## The Wextreen Reach, and reading a map through what you carry
 
@@ -4169,6 +4479,37 @@ map file and nothing else.**
 *A lint that forces content into existence has to be sure the content can be
 reached* is the general form, and it is new here.
 
+**M16's is the first table here where every question was the gate's.** Seventy-
+eight checks in chromium against the deployed page, six of them the block's own
+and every one negative-tested; what a person went and looked at afterwards is
+the part a gate cannot be, which is whether the numbers under the floor are the
+numbers the block claims.
+
+```
+live build e3a2193f
+  index.html asks app.js?v=e3a2193f   app.js carries BUILD='e3a2193f'
+  chromium walked the gate    ok      78 ok lines, no failures
+  the way under the flat      not drawn at all before THE TENTH SURVEY is
+                              answered; a gate on [11,5] after it
+  a stake                     two choices — "Pull it" and "Read the flat with
+                              the compass" — and the compass sets nothing
+  the north sinkhole          put the player at [15, 1], which is an alcove
+                              with no walkable neighbour but the lever beside it
+  the Tenth Surveyor          her panel drew 12 item cards off the run's own
+                              thirty-eight components
+  the fork                    seven cards in 2 rows, every one clickable where
+                              it is drawn, and Escape still does nothing
+  a Stoker's replay           said what the furnace took and what it bought
+  console errors: none                off-origin requests: none
+```
+
+**Three numbers a person checked by hand**, because they are claims about a
+fight rather than about a screen: the run repacked out of everything it owns
+still tops out at an item rating of **50**, `geared_from` reaches **135**, and
+the Tenth Surveyor deals **221.2 damage a second** against that board — between
+Marbulon's 138.7 and Gilt's 428.3, which is the band where a fight is a fight
+rather than a wall.
+
 **M14's is the first table here whose hand-written half is a walk rather than a
 list.** Seventy-eight of the questions are the gate's, in three engines against
 the deployed page, so what a person went and looked at is the thing a gate
@@ -4555,6 +4896,12 @@ Every figure below was re-measured for M12.6 rather than carried forward.
 | M14.5: five browser checks, and both of the things they found were real | 828 passing |
 | M14.6: the notebook executed, and six floors became every floor | 831 passing |
 | **M14.8: two dungeons walked end to end, and the floors were the thing that was wrong** | **832 passing** |
+| M15: the bestiary, the cart, the sands, instant battle, the curve | 913 passing |
+| M16.0: the run as a fixture, and two lanes nobody could be shut out of | 919 passing |
+| M16.1: the way under the flat, and nine stakes that are not labelled | 927 passing |
+| M16.2: the Assay, and two doors the plan hung above what this game builds | 933 passing |
+| M16.3: the Needle Room, and something on the plate wearing your own board | 941 passing |
+| **M16.4 + M16.5: two classes GM2D wrote, and the twenty-one pairs they make** | **950 passing** |
 
 **M13.5 adds none and M13.7 and M13.8 add none, and all three are honest.**
 M13.5 lands ten trees into a data file and the three lints it needed were
@@ -4578,17 +4925,17 @@ content*, and one check now measures what a range used to guess at.
 | Catalogue | **568 components, and neither M12 nor M13 moved it** — every save that opened on M11 opens on M13. M11's two seams (544 → 550 → 568) are the last there have been. **Prices are ×5 as of M12.6** and that is seam-free: `catalog_fingerprint` hashes names only |
 | Pieces that apply a curse | 59 of 568, 4 kinds, 2 on the starting shelf |
 | Sets | **9**, of three components each bar the Toad Frame's two — every piece `EVENT_ONLY`, off one creature **or one stack of floors**, in one grid |
-| Ladder | **60 creatures**, rated 16 to 2958, and the two new ones are the deepest fights in the game — the Ninth Surveyor at 2053 and What Marbulon Faced Away From at 2123. **Both were dressed by damage a second against `common::geared_from` and not by rating**, because that board beats a 2958 and loses to a 1141; see *A rating predicts nothing*. Six are stepped down: the Kettleworks field's five and The Gearwright, at `gear_offset: -2` plus a body trim where the footprint families ran out — 12 to 16% each |
+| Ladder | **61 creatures**, and the newest is wearing a real player's board — the Tenth Surveyor, thirty-eight components in the cells the human seated them in and all six of that character's enchs, at 15,000 health and 64 strength because **strength is the whole dial at this depth and health barely moves a fight**. Before her: **60 creatures**, rated 16 to 2958, and the two new ones are the deepest fights in the game — the Ninth Surveyor at 2053 and What Marbulon Faced Away From at 2123. **Both were dressed by damage a second against `common::geared_from` and not by rating**, because that board beats a 2958 and loses to a 1141; see *A rating predicts nothing*. Six are stepped down: the Kettleworks field's five and The Gearwright, at `gear_offset: -2` plus a body trim where the footprint families ran out — 12 to 16% each |
 | `crates/core` | **~49k lines**, down from ~50k at the fork and up 1.5k over M14 — `wc -l` over every `.rs` under `crates/core/src`. The method is named because the figure carried here through M12.6 was 42.4k while the code had moved under it |
 | wasm | **1660 KB**, up from 1539 KB at M13 — `dist/web/pkg/gm2d_wasm_bg.wasm` after `make web`. CI builds its own and the two are not bit-identical, which is why the *stamp* is checked against itself and never against a number |
 | Save format | v1. **No seam, still, and M14 adds no field at all** — nine maps, eight floors, two creatures, two terrains and four new `Requirement`/`Outcome` arms, and not one of them is in the save: a map is content, an event's shape is content, and what a run has done was already `answered` and `flags`. Every save that opened on M11 opens on this. Before it: **M13 is the first block to take a field *out*.** Five new `Character` fields, every one `#[serde(default)]` and skipped when empty — `second_class`, `expert`, `second_paper`, `fast_wins`, `told_curses` — so an older file opens as one class with no paper and nothing following it out of the last fight, which is what those characters had. **`assembly_pct` is gone from the file**: it was written and then thrown away on the way in, and *a number that is stored and ignored is a number somebody will one day believe*. A save now carries **six boards**; one naming five gets an instrument frame at the base height, and `repair_boards` lifts an old build's instrument out of the weapon grid on the way in — the loader is where a field carried across a build change is caught. `banked`, `commissions`, `rolled_barrel`, `rolled_ledgers`, `rerolls` and `bought_licence` all default the same way |
-| Maps | **22**, in `data/maps/*.tiles.json` — west-bambulon 20×20, the-great-gear-cave 9×5, the-treyway 16×16, kettleworks-field 20×20, five Drambus Stack floors 10×10, under-the-lake 13×9, the-reach 20×20, **the-low-water 16×11, four Wextreen Sump floors 12×12, four Silt Stair floors 12×12, the-undercountry 20×20** |
+| Maps | **25**, in `data/maps/*.tiles.json` — west-bambulon 20×20, the-great-gear-cave 9×5, the-treyway 16×16, kettleworks-field 20×20, five Drambus Stack floors 10×10, under-the-lake 13×9, the-reach 20×20, **the-low-water 16×11, four Wextreen Sump floors 12×12, four Silt Stair floors 12×12, the-undercountry 20×20** |
 | Places | **129 over twenty maps**: 3 towns, 80 events, 33 gates, 9 bosses, 2 crossings, 1 bench, **1 door** — 41 of the events are the Kettleworks field alone, and the one door is the last screen in the game, on the Undercountry |
 | Events | **80 placed: 64 ask something and 16 are notes, over 102 choices.** **21 chains from 10 roots**, every root choice handing over an errand. **One of the eighty repeats** — the chair at the bottom of the Silt Stair, which is three moves at one object and the only event in the game that is not spent when it is answered |
 | `PlaceKind` | 7: town, event, gate, boss, door, crossing, bench — **unchanged**; the Stack is `PlaceDef::floors` on a gate, not an eighth kind |
 | Effect kinds | **7**: stat, start_with, grow_slot_rows, assembly_pct, grants, gives_ench, **tunes** — the seventh is M13.2's, and the knob it names is checked at parse time against the tree's own class |
 | Ench effect kinds | 4: power, haste, spin, fragile — **unchanged** |
-| `Rule` kinds | **13**: curse_on_activate, spin_extra, spin_keep, spin_every, scout, rout, wade, survey, homeward, **spread**, **row_harvest**, **beacon**, **productivity**. The four new ones are M13.3's and are the first since M9 that needed code in the fight rather than a translation at the bell |
+| `Rule` kinds | **16**: curse_on_activate, spin_extra, spin_keep, spin_every, scout, rout, wade, survey, homeward, **spread**, **row_harvest**, **beacon**, **productivity**, **burn_keeps_bonus**, **burn_carries**, **mind_pierce**. The last three are M16's and each is granted by more than one expert tree; the four before them are M13.3's and are the first since M9 that needed code in the fight rather than a translation at the bell |
 | Surveyable maps | **2** — the Wextreen Reach and **the Wextreen Sands**, and `survey::mods_for`'s `map` argument is finally read. There is iron under the sand, so **the instrument that reads the Reach best reads the Sands worst**: a compass quiets the Reach by 20% and is 25% *louder* on the flat, and the atlas is the other way round. That is the whole return on a second one — *which* instrument you built becomes a question about where you are going. The door states the trade in these numbers before you take it, because `kit_reading_json` runs `mods_for` against the map on the far side |
 | Instruments | 3 — compass, atlas, survey golem, all three on **their own frame**: `SlotKind::Instrument`, six by three, outside `SlotKind::ALL` so nothing that asks what a board is worth ever counts it. It never grows, and one instrument is what it holds |
 | Data files | **29** — 9 in `data/` and 20 in `data/maps/`; `data::FILES` is the list `data_is_current` walks, and adding a file to it is the second half of adding one to `data::MAPS` |
@@ -4612,14 +4959,14 @@ content*, and one check now measures what a range used to guess at.
 | The bestiary | **Meet something once and it is in the book for good.** `met:<canonical>` beside `beat:`, and deliberately a second counter rather than a reading of the first: a creature that killed you four times is one you have met four times and beaten none. `Game::encounter_with` is **the one door** — an encounter was set in two places in the shim and a book populated at one of them is a book with no bosses in it. The entry is `creature_json`, which is **one builder for two screens**, so the glossary cannot disagree with the fight panel about what a creature is. Ordered by the ladder, because a list that reorders itself as you fight is a list you cannot find anything in twice |
 | What a creature resists | **Shown, since the bestiary.** `physical_resist`, `magic_resist`, `mind_resist`, `curse_resist`, both pierces, both hardenings and `reflect` have been on `Stats` since the fork and **nothing had ever printed one** — reported as *"currently you cannot see enemies stats / resists"*. Zeroes are dropped rather than printed: on a defence, nought is the ordinary case rather than a claim. Sixth time *a derived number needs somewhere it is shown* has been the answer here |
 | Instant Battle | **Beat something five times and you may stop watching it.** `fight::instant` is `run` then `settle` with nothing drawn — no new settlement code, because a second answer to what a win pays is the mistake this project has paid for six times. It pays the speed bonus, rolls the drops, ticks the order book and costs the four percent, all of which `fight::rout` deliberately does none of. The tally is one `bump` in `pay_a_win` and the mark is one `#[serde(default)]` field on `WorldState`, so **no seam**. **The boss refusal is the tile's and not the name's**: eight of the nine creatures on a boss tile also stand in a region pool |
-| Skill trees | **16 trees, 124 nodes.** The base's **22 over nine tiers**, the five classes' 8 / 8 / 10 / 8 / 8, and **ten expert trees of six each** — two roots, three, and a capstone, every node of which must reach that expert's own power. **11 of the base's grow a row** — M12.3's seven, plus a five-tier spine at 3/4/5/6/7 points that walks every frame to the original **six by eight**. Twenty-eight points for that ladder alone, against a `MAX_LEVEL` of **60** since M15.3 — it was 32, and a table that stops at 32 stops nine levels before the curve changes shape. An expert node costs **2** |
-| Classes offered | **5 on the fork, 15 in the game.** The ten experts are `C(5,2)`, one a pair, and none is on any list a player picks from — you finish two trees and the pair decides. **Every one of the fifteen reaches something and so does every one of the sixty expert nodes**, and both are lints that *call* rather than declare |
-| Experts | **10**, carrying **31 knobs**. Six are read at the tick, two settle in the purse, one is the board's, one crosses a fight boundary. A character holds **up to three classes** and all three are live |
+| Skill trees | **29 trees, 208 nodes.** The base's 22, seven classes' 8 / 8 / 10 / 8 / 8 / 9 / 9, and **twenty-one expert trees of six each**. (Was: **16 trees, 124 nodes.**) The base's **22 over nine tiers**, the five classes' 8 / 8 / 10 / 8 / 8, and **ten expert trees of six each** — two roots, three, and a capstone, every node of which must reach that expert's own power. **11 of the base's grow a row** — M12.3's seven, plus a five-tier spine at 3/4/5/6/7 points that walks every frame to the original **six by eight**. Twenty-eight points for that ladder alone, against a `MAX_LEVEL` of **60** since M15.3 — it was 32, and a table that stops at 32 stops nine levels before the curve changes shape. An expert node costs **2** |
+| Classes offered | **7 on the fork, 28 in the game.** The Kettle-Stoker and the Whisperling are M16's and are **the first two classes GM2D wrote rather than inherited**; the twenty-one experts are `C(7,2)`, one a pair, and none is on any list a player picks from. **Every one of the twenty-eight reaches something and so does every one of the 126 expert nodes**, and both are lints that *call* rather than declare. (Was: **5 on the fork, 15 in the game.**) The ten experts are `C(5,2)`, one a pair, and none is on any list a player picks from — you finish two trees and the pair decides. **Every one of the fifteen reaches something and so does every one of the sixty expert nodes**, and both are lints that *call* rather than declare |
+| Experts | **21**, carrying **64 knobs**. Eleven are M16's and they grant three new rules between them — `burn_keeps_bonus`, `burn_carries`, `mind_pierce` — each granted by more than one tree, which is the shape `Spread` and `Beacon` already have. Six of them are about a furnace, and every one of the six carries its own: *an expert's power is self-contained*. (Was: **10**, carrying **31 knobs**.) Six are read at the tick, two settle in the purse, one is the board's, one crosses a fight boundary. A character holds **up to three classes** and all three are live |
 | The papers | **3** on Spike's van, all drawn from the first visit: the Patent's licence at 5,000, **the Second Paper at 5,000 behind nothing at all**, and the expert paper at **nothing** behind two finished trees — the twenty-four points are the price, which is what keeps a free paper from being a fourth class on the fork. M15.4 took the tree gate off the second paper on the human's ask; the level that puts the van on the road is what is left |
 | Figures | 27 `.tex` → **83 SVGs** (13 family drawings, 4 drawn for themselves, 5 classes, 3 towns, you) |
 | Art coverage | **60 of 60 creatures**, 3 of 3 towns, 5 of 5 classes, and you. The set pieces, the instruments and the enchs have no art and want none — a component has never had a figure |
-| Browser gate | **96 `ok:` lines over 3 engines** — which is 67 in any one of them, not 81; the count is a total and reading it as per-engine is wrong by fourteen. The newest is M15.2's, and it is the only one that can answer a *negative*: that a fight you have already had is settled and **never drawn**. The newest five are M14.5's: the tide is drawn before it goes out and walkable after, the lip of the Sump refuses in the Reach's words and opens the frame, a wheel that keeps what you feed it says what shape it wants, the chair is three moves in an order **and comes back**, and the third town is empty with the screen after it saying so. **All five were negative-tested, and two of the five found faults on a green build** — see *A stack gate that wants an instrument* |
-| The suite | **913 passing, and ~33 seconds warm** after M15, the bestiary, the cart and the sands; **832 and 27.5s** after M14 — measured after M14, and the ten slowest files are the ten that were slow at M13: `drops.rs` at 11.0s and `experts_reach.rs` at 6.3s, neither of them M14's, and nothing this block added is above 0.4s. **`SECOND-ORDER-M14.md` row 17 was written claiming it had slowed to minutes and is corrected there**: what is minutes is rebuilding sixty test binaries after a change to `combat.rs`, which is a fact about editing the engine. Before M14 it was **788 passing, and 34 seconds warm.** It was a minute through most of M13 and `rules_m13.rs` was 29.6s of it: `beacon_board` ran Auto-pack over the whole catalogue on twenty-row grids, four times, because it was the only fixture in the repository with two items that touch. `common::items_in_a_row` is what replaced it — **0.03s** — and `experts_reach.rs` went 9.6s → 6.5s by measuring once per *set* of nodes rather than once per question. `drops.rs` at 11.3s is now the slowest file and is untouched. `[profile.test] opt-level = 2` since M12.6, with debug assertions and overflow checks still on — this is the `test` profile, not `--release` |
+| Browser gate | **78 `ok:` lines in one engine**, six of them M16's and every one negative-tested — the way under is silt until the sheet, a stake offers the pull and a compass that lies, a sinkhole drops you in an alcove nothing walks into, the Tenth Surveyor's panel draws the run's own items, the fork is seven cards in two rows, and a Stoker's replay says what the furnace took. Before it: **96 `ok:` lines over 3 engines** — which is 67 in any one of them, not 81; the count is a total and reading it as per-engine is wrong by fourteen. The newest is M15.2's, and it is the only one that can answer a *negative*: that a fight you have already had is settled and **never drawn**. The newest five are M14.5's: the tide is drawn before it goes out and walkable after, the lip of the Sump refuses in the Reach's words and opens the frame, a wheel that keeps what you feed it says what shape it wants, the chair is three moves in an order **and comes back**, and the third town is empty with the screen after it saying so. **All five were negative-tested, and two of the five found faults on a green build** — see *A stack gate that wants an instrument* |
+| The suite | **950 passing** after M16 — and **ten minutes cold**, because every map file is an `include_str!` and any change under `data/` relinks sixty test binaries. `SECOND-ORDER-M14.md` row 17 says the same of `combat.rs`; this is the same fact about a different file. Before it: **913 passing, and ~33 seconds warm** after M15, the bestiary, the cart and the sands; **832 and 27.5s** after M14 — measured after M14, and the ten slowest files are the ten that were slow at M13: `drops.rs` at 11.0s and `experts_reach.rs` at 6.3s, neither of them M14's, and nothing this block added is above 0.4s. **`SECOND-ORDER-M14.md` row 17 was written claiming it had slowed to minutes and is corrected there**: what is minutes is rebuilding sixty test binaries after a change to `combat.rs`, which is a fact about editing the engine. Before M14 it was **788 passing, and 34 seconds warm.** It was a minute through most of M13 and `rules_m13.rs` was 29.6s of it: `beacon_board` ran Auto-pack over the whole catalogue on twenty-row grids, four times, because it was the only fixture in the repository with two items that touch. `common::items_in_a_row` is what replaced it — **0.03s** — and `experts_reach.rs` went 9.6s → 6.5s by measuring once per *set* of nodes rather than once per question. `drops.rs` at 11.3s is now the slowest file and is untouched. `[profile.test] opt-level = 2` since M12.6, with debug assertions and overflow checks still on — this is the `test` profile, not `--release` |
 | Floors with a puzzle | **6**, and floors with a boss **2**. Every one is monotone — flags only grow, so no move can make the way on unreachable — and `puzzle::solvable_blind` counts the worst case rather than the plan asserting it |
 | Blind-solution ceilings | Sump **8 / 1 / 45**, Stair **1 / 3 / 3**. The plan guessed 10 / 11 / 45 and 2 / 27 / 3; **the Cairnfield's forty-five came back exactly**, which is the reason to believe the other five. `every_floor_in_the_game_can_be_solved_blind` holds every floor there is under 45 |
 | `Requirement` kinds | **8**: none, gold, flag, holding, **loose_item_of_size**, **assembled_of_rarity**, **surveying**, **all**. Three of them are ported from `event::Requirement`, which is the cut campaign's type — `PLAN-M14.md` §1.1 names them and they were unreachable from a data file |

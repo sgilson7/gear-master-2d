@@ -1,0 +1,421 @@
+  started from testing/saves/at-the-reefs.json
+
+--- a walk in progress --------------------------------------------------
+  level 45 · 8,13 in The Flat Below · 33904 Fnorp · carrying 0 · worn 0% · Berserker
+  probe: level 45 · fill 43% (helmet 35% chest 47% gloves 35% greaves 37% weapon 62%) · bench 0 · from nothing yet
+  town at —, gate at [11, 5]
+
+--- the road ------------------------------------------------------------
+
+--- boss ----------------------------------------------------------------
+  level 45 · 8,13 in The Flat Below · 33904 Fnorp · carrying 0 · worn 0% · Berserker
+  fight: Emperor of Dobira (rates 1129) with 12 items -> It stops moving
+         +262 Fnorp
+         +225 experience, carried
+         225 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  card: THE RIGHT-HAND STAKE
+        The right-hand stake, and the sand is banked a hand's depth higher against this one than against the other two
+        chose: Pull it
+        5% more tired
+        +12 experience, carried
+  card: THE SECOND SHEET
+        A folding table, the legs pushed through the crust, and a sheet of paper weighted at the four corners with sla
+        chose: Read the flat with the compass
+        Nothing you could point to
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 11) is not reachable yet — 4% more tired. 4% of you is missing until you take something for it.
+
+--- and then it loops --------------------------------------------------
+
+  The rest of this run is one line, repeated: `shut: (3, 11) is not reachable
+  yet`. The walker's destination is a place in a slag pocket behind a band of
+  quicksand, and the thing that opens that band is a **card two tiles away that
+  it read once and did not answer**.
+
+  **That is `PLAN.md` §6d row 3 for the third time** — M11.9's run looped 240
+  cycles walking out of the pit and back, M14's plateaued at level eleven
+  against the Stack's fourth floor, and this one walks into a wall. The general
+  form was written down then and is still right: *a walker with a destination
+  stops being a player.* M9.4 taught it that a road refused three times is a
+  road you stop walking at; nothing has taught it that a road refused three
+  times might be a road a card opens.
+
+  What proves the floor is solvable is `puzzle::solvable_blind`, which measures
+  it at **36 card reads** blind and **3** for somebody who knows which three
+  stakes hold. What proves it is *playable* is the browser gate, which plants a
+  character on each floor and reads what happens. `make play` cannot do either,
+  and that is a fact about the instrument rather than about the floor.

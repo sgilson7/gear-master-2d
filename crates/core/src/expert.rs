@@ -155,6 +155,23 @@ pub enum ExpertPower {
 }
 
 /// Tenths, printed. `20` is `2.0`.
+/// `1 ench` or `2 enchs`, because a rack's size is printed in two promises and
+/// **a promise is a player-facing string**.
+///
+/// One of them read *"you may hold 1 enchs a component"*, which is the kind of
+/// thing nobody notices in a match arm and everybody notices on a screen. A
+/// function rather than two `if`s, because a third promise about racks is
+/// coming the day somebody writes one.
+fn enchs(n: i32) -> String {
+    if n == 1 { "1 ench".into() } else { format!("{n} enchs") }
+}
+
+/// `1 stack` or `2 stacks`. Same argument as [`enchs`], and the lint written
+/// for that one found this the moment it existed.
+fn stacks(n: i32) -> String {
+    if n == 1 { "1 stack".into() } else { format!("{n} stacks") }
+}
+
 fn tenths(n: i32) -> String {
     format!("{}.{}", n / 10, (n % 10).abs())
 }
@@ -490,7 +507,9 @@ impl ExpertPower {
             EleventhSeason { pct, count_cap, .. } => {
                 format!("+{pct}% a curse on the fallen, up to {count_cap}")
             }
-            FullBill { racks, .. } => format!("{racks} enchs a component, off either list"),
+            FullBill { racks, .. } => {
+                format!("{} a component, off either list", enchs(racks))
+            }
         }
     }
 
@@ -519,16 +538,18 @@ impl ExpertPower {
                  fight, and a cast refunds {refund}% of what it cost.",
             ),
             ColdStoke { per_stack, every_ms, standing } => format!(
-                "Every curse you land is fuel: {per_stack} stacks of mana empowerment, and {} for \
-                 one that cannot expire. The furnace runs every {:.1} seconds.",
+                "Every curse you land is fuel: {} of mana empowerment, and {} for one that \
+                 cannot expire. The furnace runs every {:.1} seconds.",
+                stacks(per_stack),
                 per_stack * (1 + standing.max(0)),
                 every_ms as f32 / 1000.0
             ),
             PonkeyBoiler { per_spin, keep, licence } => format!(
                 "Every turn a spinning item banks is {} of a stack of mana empowerment. A turning \
-                 item keeps {keep} of its turns when it goes off, and you may hold {licence} \
-                 enchs a component.",
-                tenths(per_spin)
+                 item keeps {keep} of its turns when it goes off, and you may hold {} a \
+                 component.",
+                tenths(per_spin),
+                enchs(licence)
             ),
             FlashPowder { all_at_once, until_ms, pct } => format!(
                 "{all_at_once}% of every pool you are holding is burned before the first tick. A \
@@ -552,9 +573,9 @@ impl ExpertPower {
             ),
             LicensedRumour { pct, racks, third } => format!(
                 "Every activation of an enched component eats {}% of their maximum health. You \
-                 may hold {racks} enchs a component, and anything is unmade at {third}% of its \
-                 maximum.",
-                tenths(pct)
+                 may hold {} a component, and anything is unmade at {third}% of its maximum.",
+                tenths(pct),
+                enchs(racks)
             ),
             CurtainLine { mult, under_ms, third } => format!(
                 "A creature unmade inside {:.0} seconds pays {mult}% more on top of whatever the \

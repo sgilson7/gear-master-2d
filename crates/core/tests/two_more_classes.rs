@@ -370,3 +370,38 @@ fn the_furnace_reaches_a_board_that_swings() {
         hits(&without)
     );
 }
+
+/// **A promise is a player-facing string, and one of them said "1 enchs".**
+///
+/// Three expert promises print a rack's size and two of them read *"you may
+/// hold 1 enchs a component"* — the kind of thing nobody notices in a match
+/// arm and everybody notices on a screen. Found by reading the glossary, which
+/// is the first screen in this game that prints all twenty-eight promises
+/// together.
+///
+/// `expert::enchs` is the one answer now. This is the lint, over **every**
+/// promise rather than the three that happened to be wrong: a list of three
+/// written by hand is a list that can be two, and a fourth promise about racks
+/// is coming the day somebody writes one.
+#[test]
+fn no_promise_is_ungrammatical_about_a_count() {
+    let mut bad = Vec::new();
+    let mut said = |who: &str, d: String| {
+        for one in ["1 enchs", "1 stacks", "1 turns", "1 curses", "1 seconds", "1 items"] {
+            if d.contains(one) {
+                bad.push(format!("{who}: {one:?} — {d}"));
+            }
+        }
+    };
+    for e in gm2d_core::expert::EXPERTS {
+        said(e.name, e.power.describe());
+    }
+    for c in gm2d_core::class::CLASSES {
+        said(c.name, c.power.describe());
+    }
+    assert!(
+        bad.is_empty(),
+        "a promise is the sentence somebody reads before an irreversible choice:\n  {}",
+        bad.join("\n  ")
+    );
+}

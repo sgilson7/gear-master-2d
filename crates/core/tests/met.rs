@@ -259,13 +259,14 @@ fn the_ladder_is_carrying_defences_worth_printing() {
 /// glossary of is worse than no glossary.
 #[test]
 fn no_defence_is_printed_above_what_the_fight_will_use() {
-    use gm2d_core::stats::{MIND_CAP, RESIST_CAP};
+    use gm2d_core::stats::{LANE_CAP, MIND_CAP, RESIST_CAP};
     let mut capped = 0;
     for m in gm2d_core::combat::LADDER {
         let (s, _) = m.outfit_at(D);
         for d in gm2d_core::explain::defences_of(&s) {
             let cap = match d.what {
                 "physical resist" | "magic resist" => RESIST_CAP,
+                "mind resist" | "curse resist" => LANE_CAP,
                 "reflect" => i32::MAX,
                 _ => MIND_CAP,
             };
@@ -291,14 +292,17 @@ fn no_defence_is_printed_above_what_the_fight_will_use() {
 /// same constant rather than from a second copy of the number.
 #[test]
 fn the_printed_cap_is_the_fights_own() {
-    use gm2d_core::stats::{Stats, MIND_CAP, RESIST_CAP};
+    use gm2d_core::stats::{Stats, LANE_CAP, RESIST_CAP};
     let s = Stats { physical_resist: 400, mind_resist: 400, ..Stats::new(10, 0, 0, 100) };
     let rows = gm2d_core::explain::defences_of(&s);
     let by = |w: &str| rows.iter().find(|d| d.what == w).expect("row").value;
     assert_eq!(by("physical resist"), RESIST_CAP);
-    assert_eq!(by("mind resist"), MIND_CAP);
-    // And the fight agrees, asked directly.
-    assert_eq!(gm2d_core::curse::mind_damage_after_resist(100, 400), 0);
+    assert_eq!(by("mind resist"), LANE_CAP);
+    // And the fight agrees, asked directly. **Five, not nothing** — see
+    // `stats::LANE_CAP`: a lane you can commit to must never be one you can be
+    // shut out of, which is `RESIST_CAP`'s argument arriving at the two lanes
+    // that now have classes behind them.
+    assert_eq!(gm2d_core::curse::mind_damage_after_resist(100, 400), 5);
     let dealt = gm2d_core::stats::after_defences(1000, 400, 0, 0);
     assert_eq!(dealt, 1000 * (100 - RESIST_CAP) / 100, "the fight's own clamp is not {RESIST_CAP}");
 }

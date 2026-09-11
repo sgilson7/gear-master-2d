@@ -51,6 +51,7 @@ const PUNCHER: MonsterSpec = MonsterSpec {
     rank: Rank::Ordinary,
     drops: &[],
     items: &[],
+    enchs: &[],
 };
 
 /// A sandbag, so a swing can be measured without anything answering it.

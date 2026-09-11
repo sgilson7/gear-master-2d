@@ -12,5 +12,17 @@ rust-version.workspace = true
 name = "dress"
 path = "src/dress.rs"
 
+# **The fixture generator, and it is here for the reason `dress` is.** The run
+# this block is bracketed against did not arrive as a file; `PLAN-M16.md` §5.1
+# transcribes it, and this writes that transcription out as a save. Authoring
+# bench, not game.
+[[bin]]
+name = "mkrun"
+path = "src/mkrun.rs"
+
 [dependencies]
 gm2d-core = { path = "../core" }
+
+[[bin]]
+name = "probe"
+path = "src/probe.rs"

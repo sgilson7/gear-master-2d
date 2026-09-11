@@ -73,13 +73,52 @@ pub struct Stats {
 /// place it is applied and this is the one place it is written.
 pub const RESIST_CAP: i32 = 95;
 
-/// And the most a mind or curse resistance is worth.
+/// The ceiling on a percentage that is not a resistance: piercing, hardening.
 ///
-/// A hundred rather than ninety-five, and the difference is real: those two
-/// lanes *can* be shut out completely — `curse::mind_damage_after_resist` and
-/// `curse::lands_after_resist` both clamp here, and full immunity is a thing a
-/// creature is allowed to have.
+/// A hundred, because those two *can* be total and mean something when they
+/// are: piercing a hundred percent of a resistance is piercing all of it, and
+/// hardening a hundred percent of a piercing cancels it. Nothing is shut out by
+/// either — they are the answer to somebody else's number rather than a wall of
+/// their own.
+///
+/// **It used to be the mind and curse cap as well, and that is what changed.**
+/// See [`LANE_CAP`].
 pub const MIND_CAP: i32 = 100;
+
+/// The most a mind or curse resistance is worth.
+///
+/// **Ninety-five, since M16, and it was a hundred.** The old doc said those two
+/// lanes *can* be shut out completely and that full immunity is a thing a
+/// creature is allowed to have — which was true, and was written when nothing
+/// in the game was built on either lane.
+///
+/// Then it was measured. **Thirty-one of the sixty creatures are at or past a
+/// hundred mind resist and twenty-three are past it on curse**, every deep boss
+/// among them: What Marbulon Faced Away From at 128 mind, the Ninth Surveyor at
+/// 126, The Rust Parliament at 200, Gilt at 190 and 195. Nobody chose that —
+/// almost all of it is gear, the same way almost all of what a creature *rates*
+/// is gear, and nobody had summed the base and the board.
+///
+/// What it cost: the Whisperer is a base class whose whole promise is the mind
+/// lane, four of the twenty-one experts are curse-shaped, and every one of them
+/// deals **exactly nothing** at the bottom of every dungeon in the game. That
+/// is `every_offered_class_reaches_something` failing one level up — a class
+/// that reaches something against a rat and nothing against the fight it was
+/// bought for.
+///
+/// So it is [`RESIST_CAP`]'s argument, applied to the two lanes that now have
+/// classes behind them: *enough to matter against a build that has committed to
+/// one resistance, and never enough to make committing pointless.* At
+/// ninety-five a curse lands for a twentieth of its duration and a whisper eats
+/// a twentieth of a maximum, which is slow and is not zero.
+///
+/// **Nothing under ninety-five moved**, which is most of the ladder, so this is
+/// not a retune. `PLAN-M16.md` §5.3 asked for the two M14 bosses to be brought
+/// under the cap by re-dressing; the recon found twenty-three creatures rather
+/// than two and neither of the plan's numbers, and re-dressing a quarter of the
+/// ladder to move a constant is the thing `CLAUDE.md` means by *ease a pool,
+/// not a creature*, two levels up.
+pub const LANE_CAP: i32 = 95;
 
 /// A character with no gear at all. An unequipped run is a losing run — that
 /// is deliberate, it is what makes assembling gear matter.

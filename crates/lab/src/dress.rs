@@ -302,6 +302,7 @@ fn dressed(health: i32, gear: &[GearPlacement], target: i32) -> &'static Monster
         rank: gm2d_core::combat::Rank::Ordinary,
         drops: &[],
         items: &[],
+        enchs: &[],
     })
 }
 

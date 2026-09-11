@@ -145,7 +145,7 @@ impl CurseKind {
     /// on the item it stopped - but it still answers to resistance the same
     /// way everything else does.
     pub fn landing_ms(self, curse_resist: i32) -> u32 {
-        let resist = curse_resist.clamp(0, crate::stats::MIND_CAP);
+        let resist = curse_resist.clamp(0, crate::stats::LANE_CAP);
         let scaled = (self.base_duration_ms() as i64 * (100 - resist) as i64 / 100) as u32;
         scaled / TICK_MS * TICK_MS
     }
@@ -365,7 +365,7 @@ impl Curses {
 /// Mind damage after the target's mind resistance. Mind damage eats *maximum*
 /// health, so it can't be healed off — resistance is the only defence.
 pub fn mind_damage_after_resist(raw: i32, mind_resist: i32) -> i32 {
-    let resist = mind_resist.clamp(0, crate::stats::MIND_CAP);
+    let resist = mind_resist.clamp(0, crate::stats::LANE_CAP);
     (raw as i64 * (100 - resist) as i64 / 100) as i32
 }
 
@@ -388,13 +388,22 @@ mod tests {
         assert_eq!(c.dot_millidamage_per_tick() * (1000 / TICK_MS as i32) / 1000, 10);
     }
 
+    /// **Shortens, and never to nothing.** This test asserted the opposite
+    /// until M16 — *a fully resisted curse never lands* — which was true and
+    /// was written when nothing in the game was built on the curse lane.
+    /// Twenty-three of the sixty creatures sum to a hundred or more, every deep
+    /// boss among them, so four expert classes dealt exactly zero at the bottom
+    /// of every dungeon. [`crate::stats::LANE_CAP`] is the fix and this is the
+    /// contract it changed: a lane you can commit to must never be one you can
+    /// be shut out of, which is `RESIST_CAP`'s own argument.
     #[test]
-    fn curse_resistance_shortens_the_curse() {
+    fn curse_resistance_shortens_the_curse_and_never_to_nothing() {
         let mut half = Curses::new();
         assert_eq!(half.apply(CurseKind::Searing, 50), 5_000);
         let mut full = Curses::new();
-        assert_eq!(full.apply(CurseKind::Searing, 100), 0, "fully resisted");
-        assert!(full.is_empty(), "a fully resisted curse never lands");
+        let landed = full.apply(CurseKind::Searing, 400);
+        assert_eq!(landed, 500, "a twentieth of it, however high the resistance goes");
+        assert!(!full.is_empty(), "the most resistant thing in the game still takes a curse");
     }
 
     #[test]
@@ -448,7 +457,10 @@ mod tests {
         // choice of item are combat's business; see `curses_in_combat`.
         assert_eq!(CurseKind::Stun.landing_ms(0), STUN_MS);
         assert_eq!(CurseKind::Stun.landing_ms(50), STUN_MS / 2);
-        assert_eq!(CurseKind::Stun.landing_ms(100), 0, "fully resisted, never lands");
+        // And a twentieth at the ceiling, not nothing — see `stats::LANE_CAP`.
+        // Fifty rather than sixty because `landing_ms` rounds down to whole
+        // ticks, which is what keeps duration arithmetic exact.
+        assert_eq!(CurseKind::Stun.landing_ms(400), 50);
     }
 
     #[test]

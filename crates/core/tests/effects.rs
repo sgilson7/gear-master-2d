@@ -832,6 +832,7 @@ const DUMMY: MonsterSpec = MonsterSpec {
     rank: gm2d_core::combat::Rank::Ordinary,
     drops: &[],
     items: &[],
+    enchs: &[],
 };
 
 /// A player who can stand there while a mechanic is measured.

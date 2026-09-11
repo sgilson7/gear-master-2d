@@ -40,6 +40,7 @@ const DUMMY: MonsterSpec = MonsterSpec {
     rank: gm2d_core::combat::Rank::Ordinary,
     drops: &[],
     items: &[],
+    enchs: &[],
 };
 
 fn item(name: &str, slot: SlotKind, cooldown_ms: u32) -> ItemProfile {

@@ -238,6 +238,7 @@ fn armour_the_tree_grants_is_armour_the_fight_starts_with() {
         rank: gm2d_core::combat::Rank::Ordinary,
         drops: &[],
         items: &[],
+        enchs: &[],
     };
     let stats = Stats::new(200, 0, 0, 100);
     // What armour *soaks*, not what the enemy swings for. Armour makes the

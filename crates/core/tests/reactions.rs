@@ -26,6 +26,7 @@ const DUMMY: MonsterSpec = MonsterSpec {
     rank: gm2d_core::combat::Rank::Ordinary,
     drops: &[],
     items: &[],
+    enchs: &[],
 };
 
 fn item(name: &str, slot: SlotKind, cooldown_ms: u32, stats: Stats) -> ItemProfile {
@@ -272,6 +273,7 @@ const TICKER: MonsterSpec = MonsterSpec {
     rank: gm2d_core::combat::Rank::Ordinary,
     drops: &[],
     items: &[],
+    enchs: &[],
 };
 
 fn foe_swings(log: &gm2d_core::combat::CombatLog) -> Vec<u32> {

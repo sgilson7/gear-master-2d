@@ -313,6 +313,24 @@ pub struct MonsterSpec {
     /// over-full item unless each is locked before the next goes down. Empty
     /// means "work it out", which is right for the loose boards.
     pub items: &'static [usize],
+    /// Enchs bolted to this creature's gear: the ench's id, and the index into
+    /// `gear` of the component it is on.
+    ///
+    /// **The first creature in the game that carries one**, and it is a
+    /// creature wearing a real player's board, so the alternative was a boss
+    /// whose numbers quietly did not match the save they were copied from.
+    ///
+    /// An index into `gear` rather than a component name, for the reason the
+    /// save uses a registry index: this board holds three Quicksilver Inks and
+    /// a name cannot say which of them the Band is on.
+    ///
+    /// **Applied to the profiles, never to the board**, which is the division
+    /// `Character::combat_items` already makes: a profile is the board's answer
+    /// to what these cells made and an ench is the *wearer's*. A loadout that
+    /// knew about enchs would be a loadout that knew about a licence — and a
+    /// creature has no licence, which is exactly why this is a field on the
+    /// spec and not a rule anywhere.
+    pub enchs: &'static [(&'static str, usize)],
 }
 
 /// The component this one becomes `step` rungs up its own kind.
@@ -752,7 +770,51 @@ impl MonsterSpec {
                 stats.magic_harden += h;
             }
         }
-        (stats, loadout.combat_items(&reg))
+        let mut profiles = loadout.combat_items(&reg);
+        // **The enchs, on the profiles and nowhere else.** Same door the
+        // player's go through — `ench::apply` over the profiles, reading the
+        // same `data/enchs.json` — because two answers to *what an ench does*
+        // is exactly the thing this project has paid for six times. A creature
+        // gets no `enched` flag and no beacon: those are read by rules a
+        // character holds, and a creature holds none.
+        if !self.enchs.is_empty() {
+            let data = crate::data::enchs();
+            crate::ench::apply(&mut profiles, &self.enchs_at(difficulty), &data);
+        }
+        (stats, profiles)
+    }
+
+    /// This creature's enchs, resolved to the piece ids `loadout_at` allocated.
+    ///
+    /// **An index into `gear`, turned into a `PieceId` the same way
+    /// `loadout_at` allocates them** — in order, skipping any name the
+    /// catalogue has not got, which is the one case where the two would
+    /// otherwise drift. Nothing ships with such a name (`unassembled` refuses
+    /// it and `tests/enemies.rs` runs over the whole ladder), and counting it
+    /// honestly here costs one line and removes a way for a boss to wear
+    /// somebody else's ench.
+    pub fn enchs_at(&self, difficulty: Difficulty) -> Vec<crate::ench::Ench> {
+        let gear = self.gear_at(difficulty);
+        let mut id_of = Vec::with_capacity(gear.len());
+        let mut next = 0u32;
+        for &(name, _, _, _, _) in gear.iter() {
+            if crate::piece::CATALOG.iter().any(|d| d.name == name) {
+                id_of.push(Some(crate::piece::PieceId(next)));
+                next += 1;
+            } else {
+                id_of.push(None);
+            }
+        }
+        self.enchs
+            .iter()
+            .filter_map(|&(id, at)| {
+                id_of.get(at).copied().flatten().map(|on| crate::ench::Ench {
+                    on,
+                    id: id.to_string(),
+                    active: true,
+                })
+            })
+            .collect()
     }
 
     /// Which of its gear failed to assemble, if any. A monster whose loadout
@@ -999,6 +1061,7 @@ pub const RUST_GOLEM: MonsterSpec = MonsterSpec {
     rank: Rank::Ordinary,
     drops: &[],
     items: &[4],
+    enchs: &[],
 };
 
 /// The monster ladder, easiest first.
@@ -1090,6 +1153,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[],
+        enchs: &[],
     },
     MonsterSpec {
         name: "Bog Toad",
@@ -1114,6 +1178,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[2, 2],
+        enchs: &[],
     },
     MonsterSpec {
         name: "Bone Archer",
@@ -1140,6 +1205,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[4, 2],
+        enchs: &[],
     },
     RUST_GOLEM,
     MonsterSpec {
@@ -1166,6 +1232,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[3, 2],
+        enchs: &[],
     },
     MonsterSpec {
         name: "Plague Hound",
@@ -1191,6 +1258,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[3, 2],
+        enchs: &[],
     },
     MonsterSpec {
         name: "The Iron Warden",
@@ -1222,6 +1290,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[3, 2, 2],
+        enchs: &[],
     },
     MonsterSpec {
         name: "Iron Sentinel",
@@ -1248,6 +1317,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[2, 2, 2],
+        enchs: &[],
     },
     MonsterSpec {
         name: "Whisperling",
@@ -1284,6 +1354,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Mini,
         drops: &["Asker's Monocle"],
         items: &[4, 2, 2, 2, 2, 2, 2],
+        enchs: &[],
     },
     MonsterSpec {
         name: "Warded Idol",
@@ -1310,6 +1381,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[2, 2, 2],
+        enchs: &[],
     },
     MonsterSpec {
         name: "Mirror Fiend",
@@ -1336,6 +1408,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[3, 2, 2],
+        enchs: &[],
     },
     MonsterSpec {
         name: "Rust Colossus",
@@ -1369,6 +1442,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[],
+        enchs: &[],
     },
     MonsterSpec {
         name: "Ashen Marshal",
@@ -1404,6 +1478,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[3, 3, 2, 5, 2],
+        enchs: &[],
     },
     MonsterSpec {
         name: "Grave Chorus",
@@ -1434,6 +1509,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[4, 3, 3],
+        enchs: &[],
     },
     MonsterSpec {
         name: "The Hollow King",
@@ -1471,6 +1547,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Boss,
         drops: &["Henpeck's Cell Keys"],
         items: &[5, 2, 2, 2, 2, 2, 2],
+        enchs: &[],
     },
     // The buyer Henpeck names as he goes down. The player has been buying
     // gear off this one since rung one without ever asking where a shop that
@@ -1505,6 +1582,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[4, 3, 3, 2],
+        enchs: &[],
     },
     MonsterSpec {
         name: "Salt Idol",
@@ -1538,6 +1616,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[5, 3, 3, 2],
+        enchs: &[],
     },
     MonsterSpec {
         name: "Pale Twin",
@@ -1571,6 +1650,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[5, 2, 3, 3],
+        enchs: &[],
     },
     MonsterSpec {
         name: "Ruin Hound",
@@ -1606,6 +1686,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[4, 2, 3, 3, 3],
+        enchs: &[],
     },
     MonsterSpec {
         name: "Bone Cantor",
@@ -1642,6 +1723,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Mini,
         drops: &["Toolwright's Grip"],
         items: &[5, 3, 2, 4, 2],
+        enchs: &[],
     },
     MonsterSpec {
         name: "Ember Wisp",
@@ -1679,6 +1761,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[2, 3, 2, 2, 2, 4, 2],
+        enchs: &[],
     },
     MonsterSpec {
         name: "Slag Warden",
@@ -1717,6 +1800,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[2, 3, 3, 2, 2, 4, 2],
+        enchs: &[],
     },
     MonsterSpec {
         name: "The Gearwright",
@@ -1757,6 +1841,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Mini,
         drops: &["Kaklon's Patent"],
         items: &[4, 2, 2, 3, 2, 3, 2],
+        enchs: &[],
     },
     // ---- past the Gearwright ----
     //
@@ -1802,6 +1887,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Mini,
         drops: &["Eighth Ray Crown"],
         items: &[3, 4, 2, 3, 3, 3, 2],
+        enchs: &[],
     },
     MonsterSpec {
         name: "Cog Priest",
@@ -1842,6 +1928,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[2, 3, 3, 4, 4, 2, 2],
+        enchs: &[],
     },
     MonsterSpec {
         name: "Mire Behemoth",
@@ -1884,6 +1971,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[2, 3, 3, 4, 4, 4, 2],
+        enchs: &[],
     },
     MonsterSpec {
         name: "Vermin Sovereign",
@@ -1927,6 +2015,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[3, 3, 2, 3, 4, 2, 4, 2],
+        enchs: &[],
     },
     MonsterSpec {
         name: "Obsidian Colossus",
@@ -1970,6 +2059,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[3, 3, 3, 2, 4, 4, 4],
+        enchs: &[],
     },
     MonsterSpec {
         name: "Null Sentinel",
@@ -2004,6 +2094,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[3, 3, 4, 4],
+        enchs: &[],
     },
     MonsterSpec {
         name: "Silence",
@@ -2038,6 +2129,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[4, 3, 4, 3],
+        enchs: &[],
     },
     MonsterSpec {
         name: "Weeping Idol",
@@ -2084,6 +2176,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Boss,
         drops: &["The Seeker's Tears"],
         items: &[4, 3, 2, 3, 4, 2, 4, 2, 2],
+        enchs: &[],
     },
     MonsterSpec {
         name: "The Long Mirror",
@@ -2119,6 +2212,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[4, 3, 2, 3, 3],
+        enchs: &[],
     },
     MonsterSpec {
         name: "Iron Abbot",
@@ -2155,6 +2249,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[5, 3, 4, 4],
+        enchs: &[],
     },
     MonsterSpec {
         name: "The Last Gearwright",
@@ -2201,6 +2296,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[5, 4, 3, 4, 4, 3, 3],
+        enchs: &[],
     },
     MonsterSpec {
         name: "Rimefather",
@@ -2236,6 +2332,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[5, 3, 4, 4],
+        enchs: &[],
     },
     MonsterSpec {
         name: "The Tallow Saint",
@@ -2271,6 +2368,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[5, 2, 4, 3, 2],
+        enchs: &[],
     },
     MonsterSpec {
         name: "Hollowmarch",
@@ -2315,6 +2413,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[4, 4, 2, 2, 2, 2, 3, 2, 2, 2],
+        enchs: &[],
     },
     MonsterSpec {
         name: "The Iron Choir",
@@ -2360,6 +2459,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[2, 4, 4, 4, 2, 4, 4, 2],
+        enchs: &[],
     },
     MonsterSpec {
         name: "Gallowglass",
@@ -2406,6 +2506,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Mini,
         drops: &["Assassin's Hemline"],
         items: &[4, 2, 4, 4, 4, 4, 2, 3],
+        enchs: &[],
     },
     MonsterSpec {
         name: "The Rust Parliament",
@@ -2453,6 +2554,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[4, 2, 4, 2, 4, 2, 3, 3, 2, 2],
+        enchs: &[],
     },
     MonsterSpec {
         name: "Sootmother",
@@ -2500,6 +2602,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[4, 4, 2, 2, 4, 2, 3, 4, 3],
+        enchs: &[],
     },
     MonsterSpec {
         name: "The Quiet Hour",
@@ -2547,6 +2650,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[4, 4, 4, 2, 2, 2, 4, 3, 3],
+        enchs: &[],
     },
     MonsterSpec {
         name: "Verdigris",
@@ -2595,6 +2699,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Mini,
         drops: &["Handman's Peel"],
         items: &[4, 4, 4, 4, 4, 3, 3, 3],
+        enchs: &[],
     },
     MonsterSpec {
         name: "The Drowned Court",
@@ -2643,6 +2748,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[4, 4, 4, 4, 4, 3, 3, 3],
+        enchs: &[],
     },
     MonsterSpec {
         name: "Anvilheart",
@@ -2684,6 +2790,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[],
+        enchs: &[],
     },
     MonsterSpec {
         name: "The Salt Wedding",
@@ -2723,6 +2830,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[],
+        enchs: &[],
     },
     MonsterSpec {
         name: "Nine of Ashes",
@@ -2793,6 +2901,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Boss,
         drops: &["Tetrahedron Shard"],
         items: &[3, 4, 4, 4, 3, 3, 4, 3, 4, 3, 3, 3, 4, 3, 3],
+        enchs: &[],
     },
     MonsterSpec {
         name: "The Last Light",
@@ -2832,6 +2941,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[],
+        enchs: &[],
     },
     MonsterSpec {
         name: "Gilt",
@@ -2886,6 +2996,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Mini,
         drops: &["Gilded Offcuts"],
         items: &[3, 3, 3, 4, 4, 4, 3, 3, 4, 4],
+        enchs: &[],
     },
     // The top of the ladder. Everything above the Gearwright wears the best
     // the shop can sell; Francis wears something it never could.
@@ -2956,6 +3067,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[3, 4, 4, 2, 4, 2, 2, 4, 2, 4, 2, 3, 3, 3, 2],
+        enchs: &[],
     },
     // ---- M11.9's eight, and the new maps stop borrowing --------------------
     //
@@ -3000,6 +3112,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[],
+        enchs: &[],
     },
     // **The Hooper's Dog** — rates 643. It has been round the hoop store nine times this morning and it is not looking
     // for anything. The hooper has stopped calling it.
@@ -3045,6 +3158,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[],
+        enchs: &[],
     },
     // **What Comes Off At Dusk** — rates 731. The Stack sheds at dusk and not all of what comes off it lands. Four of the six
     // surveys of the smell line mention this and none of the six writes it down as a
@@ -3079,6 +3193,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[],
+        enchs: &[],
     },
     // **The Wall Somebody Built** — rates 856. Four feet high, ninety feet long, running from nothing to nothing. It is a very
     // good wall, which is the part people come to see, and it is nine feet further
@@ -3121,6 +3236,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[],
+        enchs: &[],
     },
     // **The Tenth Surveyor** — rates 970. Nine surveys of the reach and nine cairns where nine people gave up. The tenth
     // did not give up.
@@ -3162,6 +3278,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[],
+        enchs: &[],
     },
     // **The Nine Who Stopped** — rates 1141. One for each survey, each one built on the spot the surveyor was standing. They
     // have got up.
@@ -3216,6 +3333,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Mini,
         drops: &[],
         items: &[],
+        enchs: &[],
     },
     // **What Was Left On Five** — rates 892. The fifth floor's, and the reason the fifth floor is two hundred feet across and
     // four feet high: something has been walking about up there.
@@ -3265,6 +3383,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[],
+        enchs: &[],
     },
     // **What The Stack Was Standing On** — rates 1507. Two hundred and ten feet of the Drambus Stack stood on this for as long as
     // anybody has been counting, and the tally shed has six years of nothing to say
@@ -3317,6 +3436,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Boss,
         drops: &[],
         items: &[],
+        enchs: &[],
     },
     // **The Ninth Surveyor** — rates above Sootmother, and the number was set by
     // measurement rather than by adding to hers. `PLAN-M14.md` §4.4 says *by DPS
@@ -3386,6 +3506,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Boss,
         drops: &[],
         items: &[],
+        enchs: &[],
     },
     // **What Marbulon Faced Away From** — the deeper of the two by one map's
     // worth of walking, and the last thing between a player and the country
@@ -3455,6 +3576,7 @@ pub const LADDER: &[MonsterSpec] = &[
         rank: Rank::Boss,
         drops: &[],
         items: &[],
+        enchs: &[],
     },
 ];
 
@@ -7870,6 +7992,7 @@ pub const ALTERNATES: &[MonsterSpec] = &[
         rank: Rank::Boss,
         drops: &["The Idiot's Gift"],
         items: &[2, 2, 2, 3, 2, 2, 3, 2, 4, 3, 3, 2, 5],
+        enchs: &[],
     },
     // ---- Bunko's Cavern, pp. 84-85 ------------------------------------------
     //
@@ -7924,6 +8047,7 @@ pub const ALTERNATES: &[MonsterSpec] = &[
         rank: Rank::Mini,
         drops: &["Bulwark Bead"],
         items: &[2, 3, 2, 2, 4, 4, 2, 3, 4, 5],
+        enchs: &[],
     },
     // Floor two: the train the dissenters were loaded onto, still running.
     MonsterSpec {
@@ -7971,6 +8095,7 @@ pub const ALTERNATES: &[MonsterSpec] = &[
         rank: Rank::Mini,
         drops: &["Grimoire Rack"],
         items: &[2, 3, 2, 2, 4, 3, 2, 2, 4, 3],
+        enchs: &[],
     },
     // Floor three: the old gods, watching in horror as he ascends.
     MonsterSpec {
@@ -8031,6 +8156,7 @@ pub const ALTERNATES: &[MonsterSpec] = &[
         rank: Rank::Boss,
         drops: &["The Split Wisdom"],
         items: &[3, 3, 3, 2, 2, 3, 3, 2, 4, 2, 2, 3, 3, 2, 3],
+        enchs: &[],
     },
 
     // --------------------------------------------------- the Unwinding
@@ -8075,6 +8201,7 @@ pub const ALTERNATES: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &["Iron Plating"],
         items: &[4, 3, 2],
+        enchs: &[],
     },
     MonsterSpec {
         name: "THE STAIR THAT LISTENS",
@@ -8112,6 +8239,7 @@ pub const ALTERNATES: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &["Vicegrip Mold"],
         items: &[3, 3, 4, 3, 3, 2],
+        enchs: &[],
     },
     MonsterSpec {
         name: "THE LAST LANDING",
@@ -8153,6 +8281,7 @@ pub const ALTERNATES: &[MonsterSpec] = &[
         rank: Rank::Mini,
         drops: &["Coven Crest"],
         items: &[4, 4, 2, 3, 3, 2, 4],
+        enchs: &[],
     },
     // The Herald is two of them at once, which is the first party fight in the
     // game outside the casino - your shadow, and what your shadow carries.
@@ -8205,6 +8334,7 @@ pub const ALTERNATES: &[MonsterSpec] = &[
         rank: Rank::Mini,
         drops: &["Overflow Plate"],
         items: &[4, 4, 2, 4, 4, 4, 4, 2],
+        enchs: &[],
     },
     MonsterSpec {
         name: "THE LANTERN",
@@ -8252,6 +8382,7 @@ pub const ALTERNATES: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &["Martyr's Crest"],
         items: &[4, 4, 2, 4, 2, 3, 3, 3, 3],
+        enchs: &[],
     },
     // THE UNDER-MINE, two floors of Wardens who dug in and stayed.
     MonsterSpec {
@@ -8289,6 +8420,7 @@ pub const ALTERNATES: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &["The Empty Crown"],
         items: &[5, 3, 3, 3, 3],
+        enchs: &[],
     },
     MonsterSpec {
         name: "WHAT THE SEAM HID",
@@ -8338,6 +8470,7 @@ pub const ALTERNATES: &[MonsterSpec] = &[
         rank: Rank::Mini,
         drops: &["Ring of Tides"],
         items: &[5, 2, 3, 3, 3, 2, 2, 2, 2, 2, 4],
+        enchs: &[],
     },
     // THE UNDERTOW, where the water sets the pace.
     MonsterSpec {
@@ -8374,6 +8507,7 @@ pub const ALTERNATES: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &["Overflow Plate"],
         items: &[5, 3, 3, 3, 2],
+        enchs: &[],
     },
     MonsterSpec {
         name: "THE THING ON THE HOOK",
@@ -8424,6 +8558,7 @@ pub const ALTERNATES: &[MonsterSpec] = &[
         rank: Rank::Mini,
         drops: &["Channeling Mold"],
         items: &[5, 4, 4, 4, 4, 2, 2, 2, 2, 2],
+        enchs: &[],
     },
     // DEN RIVALS, which is exactly what the exhibit promised.
     MonsterSpec {
@@ -8460,6 +8595,7 @@ pub const ALTERNATES: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &["Martyr's Crest"],
         items: &[5, 4, 4, 3],
+        enchs: &[],
     },
     MonsterSpec {
         name: "THE THOUSANDTH BEAR",
@@ -8507,6 +8643,7 @@ pub const ALTERNATES: &[MonsterSpec] = &[
         rank: Rank::Mini,
         drops: &["Flaying Mold"],
         items: &[4, 4, 2, 4, 2, 2, 2, 4, 2, 2],
+        enchs: &[],
     },
     // WUMPUS WORLD. Something in the dark already knows your footsteps.
     MonsterSpec {
@@ -8543,6 +8680,7 @@ pub const ALTERNATES: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &["Consecrated Plating"],
         items: &[5, 4, 4, 3],
+        enchs: &[],
     },
     MonsterSpec {
         name: "THE WUMPUS",
@@ -8590,6 +8728,7 @@ pub const ALTERNATES: &[MonsterSpec] = &[
         rank: Rank::Mini,
         drops: &["Flaying Mold"],
         items: &[5, 2, 3, 4, 2, 2, 4, 4, 2],
+        enchs: &[],
     },
     // The birds. Annoying before deadly, which is the whole of a swarm: no
     // one of them is the problem and the aim moving along is.
@@ -8634,6 +8773,7 @@ pub const ALTERNATES: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &["Warding Ring"],
         items: &[3, 3, 2, 3, 2, 2, 2, 2, 4],
+        enchs: &[],
     },
     // Rung fifty-one, and the only creature in the game that is not on the
     // road until a run has earned the road twice: the chain finished and the
@@ -8714,6 +8854,7 @@ pub const ALTERNATES: &[MonsterSpec] = &[
         rank: Rank::Boss,
         drops: &["Harvest Crest"],
         items: &[5, 4, 4, 2, 2, 4, 4, 2, 3, 3, 3, 3, 4, 4, 3, 2],
+        enchs: &[],
     },
 
     // ---- THE SWITCHYARD, nine floors ------------------------------------
@@ -8779,6 +8920,7 @@ pub const ALTERNATES: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[3, 3, 3, 3, 4, 2, 4, 2],
+        enchs: &[],
     },
     // Many small blows, the rail put back as fast as it is lifted.
     MonsterSpec {
@@ -8815,6 +8957,7 @@ pub const ALTERNATES: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[5, 3, 3, 3, 2],
+        enchs: &[],
     },
     // What came up out of the pit with the ballast. A wall, and the one weapon a
     // wall carries.
@@ -8852,6 +8995,7 @@ pub const ALTERNATES: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[5, 4, 4, 3],
+        enchs: &[],
     },
     // The heap is warm. Searing on the clock rather than on the swing.
     MonsterSpec {
@@ -8887,6 +9031,7 @@ pub const ALTERNATES: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[5, 4, 3, 3],
+        enchs: &[],
     },
     // The tank sets the pace and has nothing much of its own.
     MonsterSpec {
@@ -8923,6 +9068,7 @@ pub const ALTERNATES: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[5, 3, 4, 4],
+        enchs: &[],
     },
     // Eleven arms, eleven casts. Bursty and mana-gated.
     MonsterSpec {
@@ -8959,6 +9105,7 @@ pub const ALTERNATES: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[5, 4, 4, 3],
+        enchs: &[],
     },
     // Every lamp lit and burning. Kills on the clock, not the swing.
     MonsterSpec {
@@ -8996,6 +9143,7 @@ pub const ALTERNATES: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[5, 4, 4, 4],
+        enchs: &[],
     },
     // The clerk keeps the accounts, yours included.
     MonsterSpec {
@@ -9033,6 +9181,7 @@ pub const ALTERNATES: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[5, 4, 4, 4],
+        enchs: &[],
     },
     // It is in steam. Strength, health, and no trick at all.
     MonsterSpec {
@@ -9069,6 +9218,7 @@ pub const ALTERNATES: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &[],
         items: &[5, 3, 3, 2, 3],
+        enchs: &[],
     },
 
     // ---------------------------------------------------- THE HUNDRED's five
@@ -9123,6 +9273,7 @@ pub const ALTERNATES: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &["Trig Pillar"],
         items: &[5, 2, 4, 3, 2],
+        enchs: &[],
     },
     MonsterSpec {
         // THE DROVE ROADS, and the half of it that is a man.
@@ -9172,6 +9323,7 @@ pub const ALTERNATES: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &["Drove Way"],
         items: &[4, 4, 4, 4, 4, 3, 3, 3],
+        enchs: &[],
     },
     MonsterSpec {
         // And the half that is not. A drover without a herd is a man on a
@@ -9220,6 +9372,7 @@ pub const ALTERNATES: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &["Drover's Orb"],
         items: &[4, 2, 4, 4, 4, 4, 2, 3],
+        enchs: &[],
     },
     MonsterSpec {
         // THE ENCLOSURE, standing at the end of the corner the pale opens.
@@ -9269,6 +9422,7 @@ pub const ALTERNATES: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &["The Common Ground"],
         items: &[4, 4, 4, 4, 4, 3, 3, 3],
+        enchs: &[],
     },
     MonsterSpec {
         // THE PERAMBULATION's end. Band fifty and over: the county has spent
@@ -9322,6 +9476,7 @@ pub const ALTERNATES: &[MonsterSpec] = &[
         rank: Rank::Ordinary,
         drops: &["Surveyor's Orb"],
         items: &[5, 4, 4, 4, 4, 2, 2, 2, 2, 2],
+        enchs: &[],
     },
 ];
 
@@ -9426,13 +9581,22 @@ mod stun_aim_tests {
         assert_eq!(c.items[0].stun_ms, 0, "the aimed stun never wandered off its target");
     }
 
+    /// **The most resistant thing in the game is still stunned, briefly.**
+    ///
+    /// This asserted *never* until M16, and the reason it changed is in
+    /// [`crate::stats::LANE_CAP`]: at a hundred the curse lane shut out
+    /// completely, and twenty-three creatures were there. What is still pinned
+    /// is the part that was the point — the aim does not wander, and a stun
+    /// that lands on the resistant target lands on the item it was aimed at.
     #[test]
-    fn a_fully_resistant_target_is_never_stunned() {
+    fn a_fully_resistant_target_is_stunned_for_a_twentieth() {
         let mut c = victim(&[10, 90]);
-        c.curse_resist = 100;
-        assert!(land_stun(&mut c, StunAim::Strongest, 0).is_none());
-        assert!(land_stun(&mut c, StunAim::Unaimed, 0).is_none());
-        assert!(c.items.iter().all(|i| i.stun_ms == 0));
+        c.curse_resist = 400;
+        let (item, ms) = land_stun(&mut c, StunAim::Strongest, 0).expect("a twentieth is not none");
+        assert_eq!(item, 1, "the aimed stun lands on the strongest item");
+        // One tick: a twentieth of 1200ms, floored to the 50ms grid.
+        assert_eq!(ms, 50);
+        assert_eq!(c.items[0].stun_ms, 0, "and not on the other one");
     }
 
     #[test]

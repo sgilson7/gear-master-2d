@@ -168,9 +168,12 @@ pub struct Defence {
 /// What a stat block does to a blow, as the fight will use it.
 ///
 /// **In core because the caps are**, and they are not one number: a physical or
-/// magic resistance tops out at [`stats::RESIST_CAP`] and the mind and curse
-/// lanes at [`stats::MIND_CAP`], because those two *can* be shut out completely
-/// and the other two never can.
+/// magic resistance tops out at [`stats::RESIST_CAP`], the mind and curse lanes
+/// at [`stats::LANE_CAP`], and piercing and hardening at [`stats::MIND_CAP`] —
+/// three ceilings, because they answer three different questions. **The mind
+/// and curse lanes used to sit at a hundred and it reached a screen**: the
+/// bestiary printed *144% mind resist* against a fight that clamped at 100, and
+/// now it prints 95 against a fight that clamps at 95.
 ///
 /// **Found on the live page.** The bestiary's first version built this list in
 /// the shim off the raw stat block, and the Iron Abbot's entry read *"144% mind
@@ -186,15 +189,15 @@ pub struct Defence {
 /// Zeroes are left out. On a defence, nought is the ordinary case rather than a
 /// claim, so it is absence rather than a row saying nothing.
 pub fn defences_of(s: &crate::stats::Stats) -> Vec<Defence> {
-    use crate::stats::{MIND_CAP, RESIST_CAP};
+    use crate::stats::{LANE_CAP, MIND_CAP, RESIST_CAP};
     // `None` is a lane with no ceiling at all — piercing and hardening are
     // already clamped against each other where they are used, and `reflect`
     // pays a share rather than taking one away.
     let rows: [(&'static str, i32, Option<i32>); 9] = [
         ("physical resist", s.physical_resist, Some(RESIST_CAP)),
         ("magic resist", s.magic_resist, Some(RESIST_CAP)),
-        ("mind resist", s.mind_resist, Some(MIND_CAP)),
-        ("curse resist", s.curse_resist, Some(MIND_CAP)),
+        ("mind resist", s.mind_resist, Some(LANE_CAP)),
+        ("curse resist", s.curse_resist, Some(LANE_CAP)),
         ("physical pierce", s.physical_pierce, Some(MIND_CAP)),
         ("magic pierce", s.magic_pierce, Some(MIND_CAP)),
         ("physical hardening", s.physical_harden, Some(MIND_CAP)),

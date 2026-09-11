@@ -1580,6 +1580,50 @@ impl Character {
 
     // ------------------------------------------------------------ readings
 
+    /// This board as a creature would have to wear it: the placements in
+    /// **item order**, and the `items` chunk list that goes with them.
+    ///
+    /// **`MonsterSpec.items` is a chunk list, so the gear array has to be in
+    /// item order, and a board's placement order is not.** That is the finding
+    /// this function exists to carry: `PLAN-M16.md` §5.1 transcribes the run in
+    /// the order its boards hold the pieces, and the run's own first helmet item
+    /// is gear entries 0, 3 and 5 while its second is 1, 2 and 4 — interleaved,
+    /// and therefore not expressible as *"three, then three"* over that order.
+    /// Reordering is free and changes nothing, because a placement carries its
+    /// own absolute cell; the order is only which pieces go down together.
+    ///
+    /// So the answer is the pair and not the list. *The boss's `items` field is
+    /// not a number anyone should type* is the plan's sentence, and the gear
+    /// order is not a thing anyone should type either.
+    ///
+    /// Read off `report`, which is where the answer to *what did these cells
+    /// make* has always lived — never off `locks`, which is one discipline's
+    /// record of it and empty on a board nobody locked.
+    pub fn item_partition(&self) -> (Vec<crate::combat::GearPlacement>, Vec<usize>) {
+        let mut gear = Vec::new();
+        let mut items = Vec::new();
+        for kind in SlotKind::ALL {
+            for item in self.report(kind).items {
+                let mut n = 0;
+                for &p in &item.pieces {
+                    let Some((x, y)) = self.loadout.slot(kind).anchor_of(p) else { continue };
+                    gear.push((
+                        self.registry.def(p).name,
+                        kind,
+                        x,
+                        y,
+                        self.registry.rotation(p),
+                    ));
+                    n += 1;
+                }
+                if n > 0 {
+                    items.push(n);
+                }
+            }
+        }
+        (gear, items)
+    }
+
     pub fn reports(&self) -> Vec<SlotReport> {
         self.loadout.reports(&self.registry)
     }

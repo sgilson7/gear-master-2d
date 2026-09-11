@@ -58,6 +58,7 @@ const DUMMY: MonsterSpec = MonsterSpec {
     rank: Rank::Ordinary,
     drops: &[],
     items: &[],
+    enchs: &[],
 };
 
 /// What the card says a weapon hits for is what the log says it hit for.

@@ -349,3 +349,46 @@ pub fn two_items_that_touch(ch: &mut Character) {
 /// the sixth time this project has paid for a hand-written list and the first
 /// time it was caught before it was written twice.
 pub const UNWRITTEN: &[&str] = &["the-third-town"];
+
+/// **The run**, off disk, as a `Character`.
+///
+/// `PLAN-M16.md` §1.1: this block is bracketed against a real save at level
+/// forty-five, not against a walker's board. `HANDOFF-M14.md` §2.7 is why — *a
+/// level-22 board is not a board this game produces*, and the two M14 bosses
+/// were rated against one. [`geared_from`] stays, and is still the right
+/// yardstick for the early game; this is the deep one.
+///
+/// **It refuses loudly rather than patching.** A save whose catalogue
+/// fingerprint has moved is a save this build cannot open, and the one thing a
+/// fixture must never do is quietly open a different character from the one it
+/// names — so the panic carries `save::parse`'s own sentence, which names both
+/// catalogues.
+///
+/// Path is relative to the crate root, which is where `cargo test` runs.
+pub fn from_save(path: &str) -> Character {
+    let here = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("..")
+        .join("..")
+        .join(path);
+    let text = std::fs::read_to_string(&here)
+        .unwrap_or_else(|e| panic!("{}: {e}", here.display()));
+    let game = gm2d_core::save::load(&text)
+        .unwrap_or_else(|e| panic!("{}: {e}", here.display()));
+    game.character
+}
+
+/// The one save this block is bracketed against.
+pub const THE_RUN: &str = "testing/saves/the-run-20260910.json";
+
+/// Everything a creature resists a curse with: its own number **plus its
+/// gear's**.
+///
+/// The sum is the point. `Combatant` adds the two before anything asks, so a
+/// creature written at 90 whose helmet carries another 30 resists at 120 — and
+/// `CurseKind::landing_ms` clamps at [`gm2d_core::stats::MIND_CAP`], which is
+/// 100, so every curse in the game lands on it for **zero**. Nobody had summed
+/// them.
+pub fn curse_resist_of(spec: &gm2d_core::combat::MonsterSpec) -> i32 {
+    let (stats, _) = spec.outfit_at(gm2d_core::combat::Difficulty::Medium);
+    stats.curse_resist
+}

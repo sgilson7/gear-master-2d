@@ -36,6 +36,7 @@ const NIBBLER: MonsterSpec = MonsterSpec {
     rank: gm2d_core::combat::Rank::Ordinary,
     drops: &[],
     items: &[],
+    enchs: &[],
 };
 
 /// A blade, and a helmet that banks fury every time it comes round.

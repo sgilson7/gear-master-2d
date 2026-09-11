@@ -11,8 +11,8 @@
 | **M16.3** | The Needle Room and the Tenth Surveyor | `the-reefs-3`; four sinkholes, four levers, the plate; the boss wearing the run; the bracket | **done** `6cef332` · 941 passing |
 | **M16.4** | Two more base classes | `ClassPower::Stoker`, `::Whisperer`; `OFFERED` at seven; two nine-node trees; the fork at seven cards | **done** `651a932` · 950 passing |
 | **M16.5** | Eleven experts | `EXPERTS` at twenty-one; eleven `ExpertPower` variants; eleven six-node trees; three new rules | **done** `651a932` · with M16.4 |
-| **M16.6** | The M16 gate and walk | browser checks; the walk to the plate; `HANDOFF-M16.md`; `CLAUDE.md` | — |
-| **M17.0** | The table, in core | `shot.rs` — `Shot`, `Flight`, `Contact`, `shoot`; `traversal` on `TilesData`; integer physics | — |
+| **M16.6** | The M16 gate and walk | six browser checks; the walk; `HANDOFF-M16.md`; `CLAUDE.md` | **done** `56134d8` · 950 passing |
+| **M17.0** | The table, in core | `shot.rs` — `Shot`, `Flight`, `Contact`, `shoot`; `traversal` on `TilesData`; integer physics | **done** `d5c86cc` · 960 passing |
 | **M17.1** | Obstacles | five `PlaceKind`s; parse lints; the Treyway as a table | — |
 | **M17.2** | Landing | `Game::shoot`; `Step`'s resolution at rest; the landing roll; the tape | — |
 | **M17.3** | The cue | the drag, the keyboard, the arrow, the flight, the strip, reduced motion | — |

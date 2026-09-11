@@ -41,6 +41,7 @@ pub mod quest;
 pub mod shop;
 pub mod skills;
 pub mod shape;
+pub mod shot;
 pub mod slot;
 pub mod survey;
 pub mod stats;

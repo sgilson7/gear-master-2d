@@ -579,6 +579,28 @@ pub struct TilesData {
     /// every time you come back down — see [`Blocks`].
     #[serde(default)]
     pub blocks: BlocksDef,
+    /// How a player moves on this map: one tile at a time, or one shot.
+    ///
+    /// **`"step"` by default, so twenty-three of the twenty-five maps say
+    /// nothing.** A puzzle floor is a floor because you stand on one tile and
+    /// read the one next to it, and a table with nine stakes on it is a floor
+    /// nobody can solve — so this is per map rather than a mode, and the two
+    /// country maps are the only ones big enough and empty enough to be shot
+    /// across.
+    #[serde(default)]
+    pub traversal: Traversal,
+}
+
+/// How a player crosses a map.
+#[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Traversal {
+    /// One tile at a time, which is every map until M17.
+    #[default]
+    Step,
+    /// Pull back, aim, and fire. `shot::shoot` runs it to rest and where it
+    /// stops is where you are.
+    Shot,
 }
 
 /// A floor's stone-pushing puzzle, as the map file writes it.
@@ -643,6 +665,8 @@ pub struct World {
     pub blocks: BlocksDef,
     /// The gear cannot take you home from here. See [`TilesData::no_homeward`].
     pub no_homeward: bool,
+    /// How a player crosses this map. See [`TilesData::traversal`].
+    pub traversal: Traversal,
     /// The instrument this map was read through, if it was read through one.
     ///
     /// **Never in a map file**, which is the architectural half of M11.6: a
@@ -789,6 +813,7 @@ impl World {
             drains: tl.drains.clone(),
             blocks: tl.blocks.clone(),
             no_homeward: tl.no_homeward,
+            traversal: tl.traversal,
             survey: crate::survey::SurveyMod::none(),
         };
 

@@ -24,7 +24,7 @@
 | **M18.3** | The dead axis says so | `Axis` and `ClassDef::requires` are read by nothing; documented rather than grown (M16 row 34) | ✓ |
 | **M18.4** | The third kind of arrival | four doors onto a tile, named; `a_warp_resolves_no_place` (M16 row 28) | ✓ |
 | **M18.5** | The walker reads before it bars | a road refused three times might be a road a card opens (M16 row 42) | ✓ |
-| **M18.6** | The relink cost, measured | the **relink** is 127 seconds; the run is a separate cost. `include_str!` is not where it goes — the fix, if ever wanted, is fewer test binaries (M16 row 17) | ✓ |
+| **M18.6** | The relink cost, measured | **127s relinking + 47s running ≈ three minutes**, not ten. `include_str!` is not where it goes — the fix, if ever wanted, is fewer test binaries (M16 row 17) | ✓ |
 | **M18.7** | The two the builder may not decide | rarity's thresholds (row 14) and what a rating describes (row 24), written up as the human's | ✓ |
 | **M18.8** | The gate's webkit find | a drag clamped off-viewport; `pull_to` measures both ends. 85 checks green in all three engines | `94efff9` · 976 |
 | — | **Live** | `fac56a16`, deployed from `34f2dcd`; `GM2D_ORIGIN` walked all 85 against the deployed page | ✓ |

@@ -13,17 +13,18 @@
 | **M16.5** | Eleven experts | `EXPERTS` at twenty-one; eleven `ExpertPower` variants; eleven six-node trees; three new rules | **done** `651a932` · with M16.4 |
 | **M16.6** | The M16 gate and walk | six browser checks; the walk; `HANDOFF-M16.md`; `CLAUDE.md` | **done** `56134d8` · 950 passing |
 | **M17.0** | The table, in core | `shot.rs` — `Shot`, `Flight`, `Contact`, `shoot`; `traversal` on `TilesData`; integer physics | **done** `d5c86cc` · 960 passing |
-| **M17.1** | Obstacles | five `PlaceKind`s; parse lints; the Treyway as a table | `b7e0dc4` · 921 |
-| **M17.2** | Landing | `Game::shoot`; `Step`'s resolution at rest; the landing roll; the tape | `b7e0dc4` · 921 |
-| **M17.3** | The cue | the drag, the keyboard, the arrow, the flight, the strip, reduced motion | `b7e0dc4` · 921 · **deploy** |
-| **M17.4** | The walker aims | `shot::aim_at`; the reachability lint; `playthrough.py` shooting | `b7e0dc4` · 921 — the Treyway crosses in **3** shots against the plan's 9 |
-| **M17.5** | The Undercountry, and the handoff | the second table; `HANDOFF-M17.md`; `CLAUDE.md` | `b7e0dc4` · 921 · **deploy** (handoff to follow) |
+| **M17.1** | Obstacles | five `PlaceKind`s; parse lints; the Treyway as a table | `084b955` · 976 |
+| **M17.2** | Landing | `Game::shoot`; `Step`'s resolution at rest; the landing roll; the tape | `084b955` · 976 |
+| **M17.3** | The cue | the drag, the keyboard, the arrow, the flight, the strip, reduced motion | `084b955` · 976 · **deploy** |
+| **M17.4** | The walker aims | `shot::aim_at`; the reachability lint; `playthrough.py` shooting | `084b955` · 976 — the Treyway crosses in **3** shots against the plan's 9 |
+| **M17.5** | The Undercountry, and the handoff | the second table; `HANDOFF-M17.md`; `CLAUDE.md` | `084b955` · 976 · **deploy** (handoff to follow) |
 | **M18.0** | The scratch binary earns a name | `probe.rs` → `fan.rs`: how many distinct tiles a shot reaches, per power, per map (M16 row 7) | ✓ |
 | **M18.1** | A pocket is a boss tile | `a_pocket_is_a_boss_tile_and_cannot_be_farmed_for_a_mark` (M16 row 12) | ✓ |
 | **M18.2** | A fall is not a free ride | `a_warp_that_stays_on_its_own_map_is_a_fall_and_not_a_ride` — the map-aware lint (M16 row 22) | ✓ |
 | **M18.3** | The dead axis says so | `Axis` and `ClassDef::requires` are read by nothing; documented rather than grown (M16 row 34) | ✓ |
 | **M18.4** | The third kind of arrival | four doors onto a tile, named; `a_warp_resolves_no_place` (M16 row 28) | ✓ |
 | **M18.5** | The walker reads before it bars | a road refused three times might be a road a card opens (M16 row 42) | ✓ |
-| **M18.6** | The relink cost, measured | **127 seconds, not ten minutes** — and the fix, if ever wanted, is fewer test binaries rather than `include_str!` (M16 row 17) | ✓ |
+| **M18.6** | The relink cost, measured | the **relink** is 127 seconds; the run is a separate cost. `include_str!` is not where it goes — the fix, if ever wanted, is fewer test binaries (M16 row 17) | ✓ |
 | **M18.7** | The two the builder may not decide | rarity's thresholds (row 14) and what a rating describes (row 24), written up as the human's | ✓ |
-| **M18.8** | The gate's webkit find | a drag clamped off-viewport; `pull_to` measures both ends. 85 checks green in all three engines | ✓ · **deploy** |
+| **M18.8** | The gate's webkit find | a drag clamped off-viewport; `pull_to` measures both ends. 85 checks green in all three engines | `94efff9` · 976 |
+| — | **Live** | `fac56a16`, deployed from `34f2dcd`; `GM2D_ORIGIN` walked all 85 against the deployed page | ✓ |

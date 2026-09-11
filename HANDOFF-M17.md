@@ -122,6 +122,54 @@ It asks two sharper questions now:
 | browser gate | **85** `ok:` lines in one engine, seven of them this block's |
 | save format | **no seam.** `shots-taken` is a counter and counters already round-trip; `traversal` is in the map file, which is content |
 
+## The deploy, and the one it cost
+
+**M17 is the first deploy this project has had stopped by its own gate**, which
+is the argument for the gate in one line. The first attempt failed at
+`FAIL: webkit: pulling the cue back drew nothing` — one engine of three, on a
+check that passes standalone in webkit. `page.mouse.move` takes **viewport**
+coordinates, so after seventy-eight checks have scrolled the page an end of the
+drag is off-screen, webkit clamps it and chromium does not, the pull lands
+under the threshold and no cue is drawn. `pull_to` scrolls the map into view
+and refuses the drag outright if either end is outside the window, with the
+numbers in the message.
+
+Live at **`fac56a16`**, deployed from `34f2dcd`, verified the way this file has
+demanded since M8: `GM2D_ORIGIN=… drive.py` walked **all eighty-five checks
+against the deployed page**, and the pair agrees.
+
+Two things about the plumbing, both cheap to avoid next time:
+
+- **A push during a deploy cancels it.** `94efff9`'s Pages run went
+  `cancelled` when `34f2dcd` landed on top of it. It cost one three-browser
+  walk and nothing else — both commits carry identical engine and page code.
+- **Read the run you mean.** `gh run list --limit 1` returns the most recent
+  run of *any* workflow, which here was `test`; a watcher pointed at it
+  reported a green deploy while the deploy was still building. Same shape as
+  *read the exit code, and never a pipeline's*, with a second workflow in it.
+
+## M18 — the notebooks executed
+
+`SECOND-ORDER-M16.md` had nine open worklist rows. Seven are closed and two are
+escalated as the human's, and the seven are worth reading as a set because
+three of them were the row's own premise being wrong.
+
+| row | what it asked | what happened |
+|---|---|---|
+| 7 | name the scratch binary or delete it | `fan.rs`, and it measures the number row 3 says means something for a cue |
+| 12 | does a pocket boss break the instant-battle mark | no, and both halves are a test |
+| 17 | is `include_str!` what costs ten minutes | **no** — the relink is 127s and the run is separate |
+| 22 | a map-aware lint could tell a fall from a ride | it does: **four falls and one ride** |
+| 28 | the third kind of arrival has no resolution path | it has one now, and it is M17's `arrive_at` |
+| 34 | should `Axis` grow a mind axis | **no** — `Axis` is read by nothing at all |
+| 42 | the walker cannot pass a floor whose way on is behind a card | it can now, and it took three guards |
+
+**And M17.4 had put the walker's refusal bookkeeping behind the wrong
+condition** — inserting the shot counter turned `if moved / elif refused` into
+`if moved / if table / elif refused`, so it barred tiles it had just walked
+onto. Found by the notebook sending me back into that function, which is the
+argument for keeping one.
+
 ## What is open
 
 - **`SECOND-ORDER-M17.md` has twenty-nine rows** and every one is closed. The

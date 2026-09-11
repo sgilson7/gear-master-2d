@@ -64,14 +64,18 @@ events that pay something and say what they pay — added on the human's ask.
 `PLAN-M9.md`, `PLAN-M10.md` and `PLAN-M11.md` are done; `PLAN.md` §6d is what
 M11 left open, §6c is M10.3's, §6b is M9.4's and §6a is M8.8's.
 
-**M17 is done: the overworld is a table.** The Treyway and the Undercountry
+**M17 is done and live**, deployed at `fac56a16` and verified the way this file
+has demanded since M8: `GM2D_ORIGIN=… drive.py` walked **all eighty-five checks
+against the deployed page**, and the pair agrees. **The overworld is a table.** The Treyway and the Undercountry
 carry `traversal: "shot"` — the arrow keys aim a cue, space fires, the ball
 runs to rest under integer physics in `core::shot`, and *where you stop is
 where you are*. Every other map is still walked a tile a press. Six
 milestones, `PLAN-M17.md` is the frame, `HANDOFF-M17.md` is the block's record,
-and `SECOND-ORDER-M17.md` is its notebook — **twenty-nine rows, all closed**,
-and rows 16 to 19 are what the one worklist row turned into once it was built
-and found to be wrong. See *Two countries are tables* in Part one.
+and `SECOND-ORDER-M17.md` is its notebook — **forty rows, all closed**, and
+rows 16 to 19 are what the one worklist row turned into once it was built and
+found to be wrong. **M18 is the notebooks executed**: every worklist row in
+`SECOND-ORDER-M16.md` is resolved or marked as the human's, and there are two
+of the second kind. See *Two countries are tables* in Part one.
 
 **The block's own fault was found by the browser gate and not by `cargo test`**,
 which is the argument for the gate in one sentence: a gate offered from beside
@@ -4612,6 +4616,42 @@ map file and nothing else.**
 *A lint that forces content into existence has to be sure the content can be
 reached* is the general form, and it is new here.
 
+**M17's is the first deploy this project has had *stopped by its own gate*,
+and the second table here where every question was the gate's.** Eighty-five
+checks in three browsers against the deployed page, and what a person went and
+looked at afterwards is the pair and nothing else, because the gate asked all
+of it.
+
+```
+live build fac56a16
+  index.html asks app.js?v=fac56a16   app.js carries BUILD='fac56a16'
+  chromium walked the gate    ok      85 ok lines, no failures
+                                      (the same 85 green in firefox and
+                                       webkit before the push)
+  the first attempt            FAILED — and it never reached the page:
+                               "FAIL: webkit: pulling the cue back drew
+                               nothing", one engine of three, on a check
+                               that passes standalone in that engine
+```
+
+**The webkit failure is the block's best finding and it is about the harness.**
+`page.mouse.move` takes **viewport** coordinates, so after seventy-eight checks
+have scrolled the page an end of the cue drag is off-screen — **webkit clamps
+it and chromium does not** — the pull lands under the drag threshold, and no
+cue is drawn. Standalone, in either engine, it passes. `pull_to` scrolls the
+map into view and refuses the drag outright if either end is outside the
+window, with the numbers in the message. *Measure, do not assume*, which is the
+same sentence the playback controls earned.
+
+**And a push during a deploy cancels it.** `94efff9`'s Pages run was
+`cancelled` when `34f2dcd` was pushed on top of it, which cost one three-browser
+walk and nothing else — both commits carry identical engine and page code. The
+deployed sha is the later one. **Read the run you mean**: `gh run list --limit
+1` returns the most recent run of *any* workflow, which here was `test`, and a
+watcher pointed at it reported a green deploy while the deploy was still
+building. That is the *read the exit code, and never a pipeline's* rule with a
+second workflow in it.
+
 **M16's is the first table here where every question was the gate's.** Seventy-
 eight checks in chromium against the deployed page, six of them the block's own
 and every one negative-tested; what a person went and looked at afterwards is
@@ -5037,7 +5077,7 @@ Every figure below was re-measured for M12.6 rather than carried forward.
 | **M16.4 + M16.5: two classes GM2D wrote, and the twenty-one pairs they make** | **950 passing** |
 | M16.6: six browser checks, a walk that loops, and the block written down | 950 passing |
 | M17.0: a table nobody can see yet, and a cue you could not have aimed | 960 passing |
-| **M17.1–M17.5: the overworld is a table, and you shoot across it** | **NNN passing** |
+| **M17.1–M17.5 + M18: the overworld is a table, and the notebooks executed** | **976 passing** |
 
 **M13.5 adds none and M13.7 and M13.8 add none, and all three are honest.**
 M13.5 lands ten trees into a data file and the three lints it needed were
@@ -5103,7 +5143,7 @@ content*, and one check now measures what a range used to guess at.
 | Figures | 27 `.tex` → **83 SVGs** (13 family drawings, 4 drawn for themselves, 5 classes, 3 towns, you) |
 | Art coverage | **60 of 60 creatures**, 3 of 3 towns, 5 of 5 classes, and you. The set pieces, the instruments and the enchs have no art and want none — a component has never had a figure |
 | Browser gate | **85 `ok:` lines in one engine**, seven of them M17's and every one negative-tested — the cue snaps to what core takes and pulling further pulls harder, a shot flies the path core returned, four keys aim and space fires with no pointer, a spike takes its percent and says so, a ball in the pocket wakes up in town, a floor still steps and draws no cue, and reduced motion is at rest with the trail still drawn. **The hardest of the seven to break is the floor one**: every lie about *the arrows mean two things now* takes the whole gate down before the check runs. Before it: **78 `ok:` lines**, six of them M16's and every one negative-tested — the way under is silt until the sheet, a stake offers the pull and a compass that lies, a sinkhole drops you in an alcove nothing walks into, the Tenth Surveyor's panel draws the run's own items, the fork is seven cards in two rows, and a Stoker's replay says what the furnace took. Before it: **96 `ok:` lines over 3 engines** — which is 67 in any one of them, not 81; the count is a total and reading it as per-engine is wrong by fourteen. The newest is M15.2's, and it is the only one that can answer a *negative*: that a fight you have already had is settled and **never drawn**. The newest five are M14.5's: the tide is drawn before it goes out and walkable after, the lip of the Sump refuses in the Reach's words and opens the frame, a wheel that keeps what you feed it says what shape it wants, the chair is three moves in an order **and comes back**, and the third town is empty with the screen after it saying so. **All five were negative-tested, and two of the five found faults on a green build** — see *A stack gate that wants an instrument* |
-| The suite | **950 passing** after M16 — and **ten minutes cold**, because every map file is an `include_str!` and any change under `data/` relinks sixty test binaries. `SECOND-ORDER-M14.md` row 17 says the same of `combat.rs`; this is the same fact about a different file. Before it: **913 passing, and ~33 seconds warm** after M15, the bestiary, the cart and the sands; **832 and 27.5s** after M14 — measured after M14, and the ten slowest files are the ten that were slow at M13: `drops.rs` at 11.0s and `experts_reach.rs` at 6.3s, neither of them M14's, and nothing this block added is above 0.4s. **`SECOND-ORDER-M14.md` row 17 was written claiming it had slowed to minutes and is corrected there**: what is minutes is rebuilding sixty test binaries after a change to `combat.rs`, which is a fact about editing the engine. Before M14 it was **788 passing, and 34 seconds warm.** It was a minute through most of M13 and `rules_m13.rs` was 29.6s of it: `beacon_board` ran Auto-pack over the whole catalogue on twenty-row grids, four times, because it was the only fixture in the repository with two items that touch. `common::items_in_a_row` is what replaced it — **0.03s** — and `experts_reach.rs` went 9.6s → 6.5s by measuring once per *set* of nodes rather than once per question. `drops.rs` at 11.3s is now the slowest file and is untouched. `[profile.test] opt-level = 2` since M12.6, with debug assertions and overflow checks still on — this is the `test` profile, not `--release` |
+| The suite | **976 passing** after M18, and the *cold* cost is two things rather than one. **Touching a map file and relinking is 127 seconds** — 83 test binaries, measured — and the run follows it; a cold `--workspace` adds the lab and the shim on top of both. `include_str!` is not the thing to change — loading from disk in the test profile would make the tested path differ from the shipped one, which is two rulebooks — and the fix, if one is ever wanted, is **fewer test binaries**, which is a trade against one file per concern that nobody should make to save two minutes. `SECOND-ORDER-M16.md` row 17 is where that is measured. Before it: **950 passing** after M16. Before it: **913 passing, and ~33 seconds warm** after M15, the bestiary, the cart and the sands; **832 and 27.5s** after M14 — measured after M14, and the ten slowest files are the ten that were slow at M13: `drops.rs` at 11.0s and `experts_reach.rs` at 6.3s, neither of them M14's, and nothing this block added is above 0.4s. **`SECOND-ORDER-M14.md` row 17 was written claiming it had slowed to minutes and is corrected there**: what is minutes is rebuilding sixty test binaries after a change to `combat.rs`, which is a fact about editing the engine. Before M14 it was **788 passing, and 34 seconds warm.** It was a minute through most of M13 and `rules_m13.rs` was 29.6s of it: `beacon_board` ran Auto-pack over the whole catalogue on twenty-row grids, four times, because it was the only fixture in the repository with two items that touch. `common::items_in_a_row` is what replaced it — **0.03s** — and `experts_reach.rs` went 9.6s → 6.5s by measuring once per *set* of nodes rather than once per question. `drops.rs` at 11.3s is now the slowest file and is untouched. `[profile.test] opt-level = 2` since M12.6, with debug assertions and overflow checks still on — this is the `test` profile, not `--release` |
 | Floors with a puzzle | **6**, and floors with a boss **2**. Every one is monotone — flags only grow, so no move can make the way on unreachable — and `puzzle::solvable_blind` counts the worst case rather than the plan asserting it |
 | Blind-solution ceilings | Sump **8 / 1 / 45**, Stair **1 / 3 / 3**. The plan guessed 10 / 11 / 45 and 2 / 27 / 3; **the Cairnfield's forty-five came back exactly**, which is the reason to believe the other five. `every_floor_in_the_game_can_be_solved_blind` holds every floor there is under 45 |
 | `Requirement` kinds | **8**: none, gold, flag, holding, **loose_item_of_size**, **assembled_of_rarity**, **surveying**, **all**. Three of them are ported from `event::Requirement`, which is the cut campaign's type — `PLAN-M14.md` §1.1 names them and they were unreachable from a data file |

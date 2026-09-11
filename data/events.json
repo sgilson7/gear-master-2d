@@ -3267,6 +3267,375 @@
      "outcome": "nothing"
     }
    ]
+  },
+  {
+   "id": "the-sinkhole-north",
+   "title": "THE NORTH SINKHOLE",
+   "prose": [
+    "A hole in the ring where the silt has gone down into something, three feet across, with the edges packed hard by whatever fell through them last.",
+    "It is nine feet to the bottom and the bottom is dry. You can see a bracket on the wall down there and something hanging off it."
+   ],
+   "choices": [
+    {
+     "label": "Go down it",
+     "blurb": "Costs nothing but the drop.",
+     "requires": "none",
+     "outcome": {
+      "all": [
+       {
+        "warp": {
+         "map": "the-reefs-3",
+         "at": [
+          15,
+          1
+         ]
+        }
+       },
+       {
+        "xp": 15
+       }
+      ]
+     },
+     "unmet": ""
+    },
+    {
+     "label": "Read the room with the compass",
+     "blurb": "Costs a minute. It is doing what it has been doing for eleven years.",
+     "requires": {
+      "surveying": "compass"
+     },
+     "unmet": "There is no compass on the frame, and the one on the cord is not lending.",
+     "outcome": "nothing"
+    }
+   ]
+  },
+  {
+   "id": "the-sinkhole-south",
+   "title": "THE SOUTH SINKHOLE",
+   "prose": [
+    "The same hole in the other wall of the ring, packed the same way, and nine feet down.",
+    "There is a bracket at the bottom of this one too. Whoever cut these cut four and meant two of them."
+   ],
+   "choices": [
+    {
+     "label": "Go down it",
+     "blurb": "Costs nothing but the drop.",
+     "requires": "none",
+     "outcome": {
+      "all": [
+       {
+        "warp": {
+         "map": "the-reefs-3",
+         "at": [
+          1,
+          9
+         ]
+        }
+       },
+       {
+        "xp": 15
+       }
+      ]
+     },
+     "unmet": ""
+    },
+    {
+     "label": "Read the room with the compass",
+     "blurb": "Costs a minute. It is doing what it has been doing for eleven years.",
+     "requires": {
+      "surveying": "compass"
+     },
+     "unmet": "There is no compass on the frame, and the one on the cord is not lending.",
+     "outcome": "nothing"
+    }
+   ]
+  },
+  {
+   "id": "the-sinkhole-east",
+   "title": "THE EAST SINKHOLE",
+   "prose": [
+    "A hole three feet across on the east arm of the ring, and the edges of this one are not packed at all.",
+    "Nothing has fallen through it and stayed. It runs back under the floor and comes out at the stair, which you find out the way everybody finds it out."
+   ],
+   "choices": [
+    {
+     "label": "Go down it",
+     "blurb": "Costs 8% tiredness.",
+     "requires": "none",
+     "outcome": {
+      "all": [
+       {
+        "warp": {
+         "map": "the-reefs-3",
+         "at": [
+          7,
+          10
+         ]
+        }
+       },
+       {
+        "tire": 8
+       },
+       {
+        "xp": 15
+       }
+      ]
+     },
+     "unmet": ""
+    },
+    {
+     "label": "Look first",
+     "blurb": "Costs a minute. The paper already said where this one comes out.",
+     "requires": {
+      "flag": "read-the-needle"
+     },
+     "unmet": "Nothing you are carrying says where this one comes out, so the only way to find out is the drop.",
+     "outcome": "nothing"
+    },
+    {
+     "label": "Read the room with the compass",
+     "blurb": "Costs a minute. It is doing what it has been doing for eleven years.",
+     "requires": {
+      "surveying": "compass"
+     },
+     "unmet": "There is no compass on the frame, and the one on the cord is not lending.",
+     "outcome": "nothing"
+    }
+   ]
+  },
+  {
+   "id": "the-sinkhole-west",
+   "title": "THE WEST SINKHOLE",
+   "prose": [
+    "The fourth hole. It is cut to the same three feet as the others and the same nine feet down, and the wall of it is smooth all the way round.",
+    "Eleven years and four holes, and two of them go somewhere."
+   ],
+   "choices": [
+    {
+     "label": "Go down it",
+     "blurb": "Costs 8% tiredness.",
+     "requires": "none",
+     "outcome": {
+      "all": [
+       {
+        "warp": {
+         "map": "the-reefs-3",
+         "at": [
+          7,
+          10
+         ]
+        }
+       },
+       {
+        "tire": 8
+       },
+       {
+        "xp": 15
+       }
+      ]
+     },
+     "unmet": ""
+    },
+    {
+     "label": "Look first",
+     "blurb": "Costs a minute. The paper already said where this one comes out.",
+     "requires": {
+      "flag": "read-the-needle"
+     },
+     "unmet": "Nothing you are carrying says where this one comes out, so the only way to find out is the drop.",
+     "outcome": "nothing"
+    },
+    {
+     "label": "Read the room with the compass",
+     "blurb": "Costs a minute. It is doing what it has been doing for eleven years.",
+     "requires": {
+      "surveying": "compass"
+     },
+     "unmet": "There is no compass on the frame, and the one on the cord is not lending.",
+     "outcome": "nothing"
+    }
+   ]
+  },
+  {
+   "id": "the-lever-north-east",
+   "title": "THE NORTH EAST LEVER",
+   "prose": [
+    "A bracket on the wall of an alcove you could not have walked into, and a lever on the bracket with a counterweight the size of a barrel.",
+    "There are four of these and this is the first one anybody has stood at in eleven years. It is set up to be pulled by somebody standing exactly here, which is somebody who fell."
+   ],
+   "choices": [
+    {
+     "label": "Haul it over",
+     "blurb": "Costs nothing. The north-east quarter of the square goes, and so does the wall down the outside to the other alcove on this side.",
+     "outcome": {
+      "all": [
+       {
+        "flag": "lever-ne"
+       },
+       {
+        "xp": 40
+       }
+      ]
+     },
+     "requires": "none",
+     "unmet": ""
+    },
+    {
+     "label": "Read the room with the compass",
+     "blurb": "Costs a minute. It is doing what it has been doing for eleven years.",
+     "requires": {
+      "surveying": "compass"
+     },
+     "unmet": "There is no compass on the frame, and the one on the cord is not lending.",
+     "outcome": "nothing"
+    }
+   ]
+  },
+  {
+   "id": "the-lever-south-east",
+   "title": "THE SOUTH EAST LEVER",
+   "prose": [
+    "The second bracket on this side, at the bottom of the wall you have just walked down.",
+    "The counterweight on this one is already up. Somebody hauled it and did not get to the next one."
+   ],
+   "choices": [
+    {
+     "label": "Haul it over",
+     "blurb": "Costs nothing. The south-east quarter goes.",
+     "outcome": {
+      "all": [
+       {
+        "flag": "lever-se"
+       },
+       {
+        "xp": 40
+       }
+      ]
+     },
+     "requires": {
+      "flag": "lever-ne"
+     },
+     "unmet": "The wall down the outside is still a wall. The lever in the north-east alcove is what takes it away, and it has not been hauled over."
+    },
+    {
+     "label": "Read the room with the compass",
+     "blurb": "Costs a minute. It is doing what it has been doing for eleven years.",
+     "requires": {
+      "surveying": "compass"
+     },
+     "unmet": "There is no compass on the frame, and the one on the cord is not lending.",
+     "outcome": "nothing"
+    }
+   ]
+  },
+  {
+   "id": "the-lever-south-west",
+   "title": "THE SOUTH WEST LEVER",
+   "prose": [
+    "A bracket, a lever and a barrel of counterweight, in an alcove with two sets of initials cut into the slag beside it and neither of them finished.",
+    "Nine feet up there is a hole with light in it, which is the one you came down."
+   ],
+   "choices": [
+    {
+     "label": "Haul it over",
+     "blurb": "Costs nothing. The south-west quarter of the square goes, and so does the wall up the outside to the alcove above.",
+     "outcome": {
+      "all": [
+       {
+        "flag": "lever-sw"
+       },
+       {
+        "xp": 40
+       }
+      ]
+     },
+     "requires": "none",
+     "unmet": ""
+    },
+    {
+     "label": "Read the room with the compass",
+     "blurb": "Costs a minute. It is doing what it has been doing for eleven years.",
+     "requires": {
+      "surveying": "compass"
+     },
+     "unmet": "There is no compass on the frame, and the one on the cord is not lending.",
+     "outcome": "nothing"
+    }
+   ]
+  },
+  {
+   "id": "the-lever-north-west",
+   "title": "THE NORTH WEST LEVER",
+   "prose": [
+    "The fourth bracket, and the last one. The counterweight has rusted into a single piece and it still moves.",
+    "From here you can see all four quarters of the square at once, which is the first time anybody has been able to."
+   ],
+   "choices": [
+    {
+     "label": "Haul it over",
+     "blurb": "Costs nothing. The north-west quarter goes, and the plate is under the last of it.",
+     "outcome": {
+      "all": [
+       {
+        "flag": "lever-nw"
+       },
+       {
+        "xp": 40
+       }
+      ]
+     },
+     "requires": {
+      "flag": "lever-sw"
+     },
+     "unmet": "The wall up the outside is still a wall. The lever in the south-west alcove is what takes it away, and it has not been hauled over."
+    },
+    {
+     "label": "Read the room with the compass",
+     "blurb": "Costs a minute. It is doing what it has been doing for eleven years.",
+     "requires": {
+      "surveying": "compass"
+     },
+     "unmet": "There is no compass on the frame, and the one on the cord is not lending.",
+     "outcome": "nothing"
+    }
+   ]
+  },
+  {
+   "id": "the-needle-again",
+   "title": "THE NEEDLE, AGAIN",
+   "prose": [
+    "A second stake, driven into the east arm of the ring, and a second compass hanging off it on a second cord. This one has not worn through.",
+    "It is turning at about one revolution in four seconds and has been doing that since somebody hung it there. Above it, cut into the slag: ELEVEN YEARS. STILL TURNING. — and under that, in a different hand, SO AM I."
+   ],
+   "choices": [
+    {
+     "label": "Read the room with the atlas",
+     "blurb": "Costs nothing. The paper says which two of the four holes go somewhere.",
+     "requires": {
+      "surveying": "atlas"
+     },
+     "unmet": "It is a plan of four holes in shorthand and there is no atlas on the frame to read shorthand with.",
+     "outcome": {
+      "all": [
+       {
+        "flag": "read-the-needle"
+       },
+       {
+        "xp": 35
+       }
+      ]
+     }
+    },
+    {
+     "label": "Read the room with the compass",
+     "blurb": "Costs a minute. It is doing what it has been doing for eleven years.",
+     "requires": {
+      "surveying": "compass"
+     },
+     "unmet": "There is no compass on the frame, and the one on the cord is not lending.",
+     "outcome": "nothing"
+    }
+   ]
   }
  ]
 }

@@ -1,0 +1,80 @@
+% Whisperling — the seventh class. Whisperer: a creature whose maximum health
+% you have eaten down to a third of what it was is unmade, so the figure is
+% the eating rather than the blow. Three of them at an ear, and the head is
+% already coming apart along the line they have been working on.
+%
+% **The mind lane takes maximum health and it cannot be healed off**, which is
+% why nothing here is a weapon and nothing is bleeding: the damage is that
+% there is less of the thing than there was. Marbulon's chain is about three
+% Whisperlings and nobody has ever said what one is, so this is the answer —
+% small, patient, and exactly three of them.
+%
+% Rule 2: nobody is described being crunched. The head is a plaster bust and
+% what is happening to it is a crack.
+%
+% Written by filling in tikz_figure_prompt.md.
+\documentclass[tikz,border=4pt]{standalone}
+\usetikzlibrary{calc}
+\newcommand{\Unit}{0.055cm}
+\newcommand{\Edge}{2.4pt}
+\newcommand{\Three}{3}
+\newcommand{\Flakes}{7}
+
+\definecolor{plaster}{HTML}{D8D2C2}
+\definecolor{plasterdark}{HTML}{8E887A}
+\definecolor{wisp}{HTML}{7F8FC8}
+\definecolor{wispdark}{HTML}{3C4670}
+\definecolor{gap}{HTML}{1A1A22}
+\definecolor{brass}{HTML}{C8A24A}
+\definecolor{ink}{HTML}{101018}
+
+\begin{document}
+\begin{tikzpicture}[x=\Unit,y=\Unit, line join=round, line cap=round]
+
+  % ---- the plinth ---------------------------------------------------------
+  \fill[plasterdark,draw=ink,line width=\Edge] (14,0) rectangle (50,8);
+  \fill[plasterdark,draw=ink,line width=1.8pt] (18,8) rectangle (46,12);
+
+  % ---- the bust -----------------------------------------------------------
+  \fill[plaster,draw=ink,line width=\Edge]
+    (20,12) -- (44,12) -- (42,34) -- (38,44) -- (26,44) -- (22,34) -- cycle;
+
+  % ---- the crack, which is the damage -------------------------------------
+  % One line, from the ear down, and it is open rather than drawn: what the
+  % lane takes is the maximum, so the figure is a piece that is not there.
+  \fill[gap,draw=ink,line width=1.6pt]
+    (34,42) -- (37,36) -- (33,30) -- (36,22) -- (32,13) -- (30,13)
+    -- (33,22) -- (30,30) -- (34,36) -- (31,42) -- cycle;
+  % And seven flakes off it, on the plinth.
+  \foreach \i in {1,...,\Flakes} {
+    \pgfmathsetmacro\x{22+(\i-1)*4.1}
+    \pgfmathsetmacro\y{12.6+mod(\i,2)*1.6}
+    \fill[plasterdark,draw=ink,line width=1.0pt] (\x,\y) circle (1.1);
+  }
+
+  % ---- three of them, at the ear ------------------------------------------
+  % Small, and all three facing the same way, which is the thing about them.
+  \foreach \i in {1,...,\Three} {
+    \pgfmathsetmacro\x{50+(\i-1)*7}
+    \pgfmathsetmacro\y{32+mod(\i,2)*7}
+    \fill[wisp,draw=ink,line width=1.8pt]
+      (\x,\y) -- ({\x+5},{\y+3}) -- ({\x+9},{\y-1}) -- ({\x+5},{\y-6}) -- cycle;
+    \fill[wispdark,draw=ink,line width=1.2pt] ({\x+5.6},{\y+0.4}) circle (1.3);
+    % the trail back, so they read as coming from somewhere
+    \draw[wispdark,line width=1.4pt] ({\x+9},{\y-1}) -- ({\x+15},{\y-3});
+  }
+
+  % ---- the word, going in -------------------------------------------------
+  % Three short strokes into the ear and nothing else. A whisper is not drawn
+  % as a speech balloon.
+  \foreach \i in {0,1,2} {
+    \pgfmathsetmacro\y{30+\i*4}
+    \draw[brass,line width=1.6pt] ({46-\i},\y) -- ({40-\i*0.5},\y);
+  }
+
+  % ---- the ear ------------------------------------------------------------
+  \fill[plaster,draw=ink,line width=1.8pt] (40,28) ellipse (3.2 and 4.6);
+  \fill[gap] (40.4,28) ellipse (1.2 and 2.0);
+
+\end{tikzpicture}
+\end{document}

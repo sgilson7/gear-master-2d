@@ -486,6 +486,64 @@ fn reachable(world: &World, marks: &[String], events: &[&crate::tile_event::Tile
             }
         }
     }
+    // **And a warp is a way to walk.**
+    //
+    // The Needle Room's four alcoves touch the ring only on the diagonal; the
+    // one way into one is to fall down the right sinkhole, and a sinkhole is
+    // an `Outcome::Warp`. A flood that reads terrain only reports that floor
+    // `Stuck` — which it did, and which is the first thing `PROMPT-M16.md`
+    // asks to be reported if `Warp` cannot be used as a lock. It can; the
+    // solver could not see it.
+    //
+    // **Unconditional choices only.** A warp behind a requirement is a way on
+    // for somebody who has met it, and whether they have is a question about a
+    // `Position` this function has not got — so following one here would
+    // report a floor reachable for a solver who cannot get there. Every
+    // sinkhole in the game is a hole in the floor and asks nothing.
+    //
+    // **And only onto this map.** A warp to another map is a way *out*, not a
+    // way across, and the floor it lands on has its own reachability.
+    let mut landed: Vec<(u8, u8)> = Vec::new();
+    loop {
+        let mut added = false;
+        for e in events.iter() {
+            let Some(p) = world.places.iter().find(|p| p.id == e.id) else { continue };
+            if !seen.contains(&(p.at[0], p.at[1])) {
+                continue;
+            }
+            for c in &e.choices {
+                if !matches!(c.requires, Requirement::None) {
+                    continue;
+                }
+                let mut to = Vec::new();
+                warps_to(&c.outcome, &w.id, &mut to);
+                for at in to {
+                    if seen.insert(at) {
+                        landed.push(at);
+                        added = true;
+                    }
+                }
+            }
+        }
+        // Flood on from wherever the warps put us.
+        while let Some((x, y)) = landed.pop() {
+            for (dx, dy) in [(0i32, -1i32), (0, 1), (1, 0), (-1, 0)] {
+                let (nx, ny) = (x as i32 + dx, y as i32 + dy);
+                if !w.in_bounds(nx, ny) {
+                    continue;
+                }
+                let (nx, ny) = (nx as u8, ny as u8);
+                if w.walkable(nx, ny, &allowed) && seen.insert((nx, ny)) {
+                    landed.push((nx, ny));
+                    added = true;
+                }
+            }
+        }
+        if !added {
+            break;
+        }
+    }
+
     events
         .iter()
         .filter(|e| {
@@ -496,6 +554,16 @@ fn reachable(world: &World, marks: &[String], events: &[&crate::tile_event::Tile
         })
         .map(|e| e.id.clone())
         .collect()
+}
+
+/// Every tile on `map` this outcome can put you down on.
+fn warps_to(o: &crate::tile_event::Outcome, map: &str, out: &mut Vec<(u8, u8)>) {
+    use crate::tile_event::Outcome;
+    match o {
+        Outcome::Warp { map: to, at } if to == map => out.push((at[0], at[1])),
+        Outcome::All(list) => list.iter().for_each(|o| warps_to(o, map, out)),
+        _ => {}
+    }
 }
 
 #[allow(clippy::too_many_arguments)]

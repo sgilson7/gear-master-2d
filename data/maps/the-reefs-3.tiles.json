@@ -2,18 +2,26 @@
   "format": "gm2d-tiles",
   "version": 1,
   "id": "the-reefs-3",
-  "_note": "**A stub, and it says so.** M16.2's job is the Assay, and a stair that leads nowhere is a gate `every_gate_leads_somewhere_you_can_stand` refuses. M16.3 replaces the whole file with the Needle Room: a ring of silt round a square of quicksand, four alcoves that touch the ring only on the diagonal, four sinkholes and four levers, and the Tenth Surveyor on the plate in the middle. The alcoves are deliberately walled, which is why this is a stub rather than the geometry — a room only a warp can reach is a room `the_whole_map_is_reachable_from_the_start` is right to refuse until the levers that open it exist.",
-  "width": 8,
-  "height": 4,
+  "_note": "**The Needle Room — four sinkholes, four levers, one plate.** A ring of silt round a square of quicksand, and in the middle of the square the plate the needle has been turning on for eleven years. The four corner alcoves touch the ring only on the **diagonal**, which is a corner and not a way in: the one way into one is to fall down the right sinkhole.\n\nTwo of the four sinkholes are true and two are false. A true one drops you in an alcove with a lever in it; a false one drops you back at the stair eight percent more tired. Each true alcove's lever is **ungated**, which is what stops a fall being a trap — the lever is the way out, and what it drains is a wall down the outside of the ring to the *other* alcove on its side. So two sinkholes reach two alcoves and two levers reach two more, and the second lever on each side is behind the first.\n\n**An alcove is two tiles and that is load-bearing.** A warp sets `world.at` and repairs, and nothing resolves the landing tile's place — which is right, because every other warp in the game lands you on ground. So a sinkhole drops you on the outer tile and you *step* onto the lever, the way you step onto every other card in the game. A one-tile alcove would have been a lever nobody could ever pull, and the browser would have been the only place it showed.\n\nThe four quadrants of the quicksand are what the four levers take away, and the plate is under them. `hidden_until_all` rather than `needs_all`: the plate is not a door you are refused at, it is a plate under three feet of sand, and the drains are what uncover it.",
+  "width": 17,
+  "height": 12,
   "start": [
-    1,
-    2
+    7,
+    10
   ],
   "rows": [
-    "^^^^^^^^",
-    "^ssssss^",
-    "^ssssss^",
-    "^^^^^^^^"
+    "^^^^^^^^^^^^^^^^^",
+    "^ss^^^^^^^^^^^ss^",
+    "^^^sssssssssss^^^",
+    "^^^sqqqqqqqqqs^^^",
+    "^^^sqqqqqqqqqs^^^",
+    "^^^sqqqqsqqqqs^^^",
+    "^^^sqqqqqqqqqs^^^",
+    "^^^sqqqqqqqqqs^^^",
+    "^^^sssssssssss^^^",
+    "^ss^^^^^s^^^^^ss^",
+    "^^^^^^^ss^^^^^^^^",
+    "^^^^^^^^^^^^^^^^^"
   ],
   "no_homeward": true,
   "regions": [
@@ -24,8 +32,8 @@
         [
           0,
           0,
-          7,
-          3
+          16,
+          11
         ]
       ],
       "enemies": [
@@ -36,11 +44,287 @@
       ]
     }
   ],
+  "drains": [
+    {
+      "when": "lever-ne",
+      "from": "quick",
+      "to": "silt",
+      "tiles": [
+        [
+          8,
+          3
+        ],
+        [
+          9,
+          3
+        ],
+        [
+          10,
+          3
+        ],
+        [
+          11,
+          3
+        ],
+        [
+          12,
+          3
+        ],
+        [
+          8,
+          4
+        ],
+        [
+          9,
+          4
+        ],
+        [
+          10,
+          4
+        ],
+        [
+          11,
+          4
+        ],
+        [
+          12,
+          4
+        ],
+        [
+          9,
+          5
+        ],
+        [
+          10,
+          5
+        ],
+        [
+          11,
+          5
+        ],
+        [
+          12,
+          5
+        ]
+      ]
+    },
+    {
+      "when": "lever-ne",
+      "from": "rock",
+      "to": "silt",
+      "tiles": [
+        [
+          14,
+          2
+        ],
+        [
+          14,
+          3
+        ],
+        [
+          14,
+          4
+        ],
+        [
+          14,
+          5
+        ],
+        [
+          14,
+          6
+        ],
+        [
+          14,
+          7
+        ],
+        [
+          14,
+          8
+        ]
+      ]
+    },
+    {
+      "when": "lever-se",
+      "from": "quick",
+      "to": "silt",
+      "tiles": [
+        [
+          8,
+          6
+        ],
+        [
+          9,
+          6
+        ],
+        [
+          10,
+          6
+        ],
+        [
+          11,
+          6
+        ],
+        [
+          12,
+          6
+        ],
+        [
+          8,
+          7
+        ],
+        [
+          9,
+          7
+        ],
+        [
+          10,
+          7
+        ],
+        [
+          11,
+          7
+        ],
+        [
+          12,
+          7
+        ]
+      ]
+    },
+    {
+      "when": "lever-sw",
+      "from": "quick",
+      "to": "silt",
+      "tiles": [
+        [
+          4,
+          6
+        ],
+        [
+          5,
+          6
+        ],
+        [
+          6,
+          6
+        ],
+        [
+          7,
+          6
+        ],
+        [
+          4,
+          7
+        ],
+        [
+          5,
+          7
+        ],
+        [
+          6,
+          7
+        ],
+        [
+          7,
+          7
+        ]
+      ]
+    },
+    {
+      "when": "lever-sw",
+      "from": "rock",
+      "to": "silt",
+      "tiles": [
+        [
+          2,
+          2
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          2,
+          5
+        ],
+        [
+          2,
+          6
+        ],
+        [
+          2,
+          7
+        ],
+        [
+          2,
+          8
+        ]
+      ]
+    },
+    {
+      "when": "lever-nw",
+      "from": "quick",
+      "to": "silt",
+      "tiles": [
+        [
+          4,
+          3
+        ],
+        [
+          5,
+          3
+        ],
+        [
+          6,
+          3
+        ],
+        [
+          7,
+          3
+        ],
+        [
+          4,
+          4
+        ],
+        [
+          5,
+          4
+        ],
+        [
+          6,
+          4
+        ],
+        [
+          7,
+          4
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          5,
+          5
+        ],
+        [
+          6,
+          5
+        ],
+        [
+          7,
+          5
+        ]
+      ]
+    }
+  ],
   "places": [
     {
       "at": [
-        6,
-        2
+        8,
+        10
       ],
       "kind": "gate",
       "id": "the-reefs-3-up",
@@ -49,6 +333,99 @@
       "at_to": [
         14,
         3
+      ]
+    },
+    {
+      "at": [
+        8,
+        2
+      ],
+      "kind": "event",
+      "id": "the-sinkhole-north"
+    },
+    {
+      "at": [
+        8,
+        8
+      ],
+      "kind": "event",
+      "id": "the-sinkhole-south"
+    },
+    {
+      "at": [
+        13,
+        5
+      ],
+      "kind": "event",
+      "id": "the-sinkhole-east"
+    },
+    {
+      "at": [
+        3,
+        5
+      ],
+      "kind": "event",
+      "id": "the-sinkhole-west"
+    },
+    {
+      "at": [
+        14,
+        1
+      ],
+      "kind": "event",
+      "id": "the-lever-north-east"
+    },
+    {
+      "at": [
+        14,
+        9
+      ],
+      "kind": "event",
+      "id": "the-lever-south-east"
+    },
+    {
+      "at": [
+        2,
+        9
+      ],
+      "kind": "event",
+      "id": "the-lever-south-west"
+    },
+    {
+      "at": [
+        2,
+        1
+      ],
+      "kind": "event",
+      "id": "the-lever-north-west"
+    },
+    {
+      "at": [
+        13,
+        4
+      ],
+      "kind": "event",
+      "id": "the-needle-again"
+    },
+    {
+      "at": [
+        8,
+        5
+      ],
+      "kind": "boss",
+      "id": "the-tenth-surveyor",
+      "name": "the plate",
+      "creature": "The Tenth Surveyor",
+      "hidden_until_all": [
+        "lever-ne",
+        "lever-se",
+        "lever-sw",
+        "lever-nw"
+      ],
+      "drops": [
+        "Surveyor's Orb",
+        "Nine-Plane Lens",
+        "Glass Lens"
       ]
     }
   ]

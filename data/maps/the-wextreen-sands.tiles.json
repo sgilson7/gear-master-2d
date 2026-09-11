@@ -114,6 +114,10 @@
         {
           "map": "the-reefs-2",
           "cleared": "assay-three"
+        },
+        {
+          "map": "the-reefs-3",
+          "cleared": "the-tenth-surveyor"
         }
       ]
     }

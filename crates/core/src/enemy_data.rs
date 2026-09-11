@@ -64,6 +64,15 @@ pub struct EnemyData {
     /// fights bare; **anything with gear and no items is a typo**, which is
     /// what `tests/enemies.rs` is for.
     pub items: usize,
+    /// Enchs bolted to its gear: the ench's id and the index into `gear`.
+    ///
+    /// **One creature carries any**, and she is the reason this field exists:
+    /// the file is *the thing a person opens to ask what a creature wears*, and
+    /// a creature whose teeth are six enchs and whose file does not mention
+    /// them is a file that is wrong about the fight. It went in the moment the
+    /// first one was written, rather than the milestone after somebody noticed.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub enchs: Vec<(String, usize)>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -116,6 +125,7 @@ impl EnemyData {
             rank: format!("{:?}", spec.rank).to_lowercase(),
             rating: crate::rating::creature_rating(spec, difficulty),
             items: lo.combat_items(&reg).len(),
+            enchs: spec.enchs.iter().map(|&(id, at)| (id.to_string(), at)).collect(),
         }
     }
 }

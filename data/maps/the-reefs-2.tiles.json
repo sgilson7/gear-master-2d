@@ -133,8 +133,8 @@
       "name": "the steps down",
       "to": "the-reefs-3",
       "at_to": [
-        1,
-        2
+        7,
+        10
       ],
       "hidden_until": "assay-three"
     }

@@ -9118,6 +9118,310 @@ LADDER[59] What Marbulon Faced Away From INSANE Greaves 4,0 r0
     Ridge Runner
 LADDER[59] What Marbulon Faced Away From INSANE Greaves 2,1 r0
     Overflow Plate
+LADDER[60] The Tenth Surveyor EASY Helmet 0,0 r3
+    Bone Crown
+LADDER[60] The Tenth Surveyor EASY Helmet 1,1 r2
+    Bone Scale
+LADDER[60] The Tenth Surveyor EASY Helmet 2,2 r3
+    Bone Fletch
+LADDER[60] The Tenth Surveyor EASY Helmet 3,0 r0
+    Idol's Crest
+LADDER[60] The Tenth Surveyor EASY Helmet 4,1 r0
+    Tin Frame
+LADDER[60] The Tenth Surveyor EASY Helmet 4,0 r0
+    Tin Plating
+LADDER[60] The Tenth Surveyor EASY Chest 0,0 r1
+    Chorister's Base
+LADDER[60] The Tenth Surveyor EASY Chest 2,0 r0
+    Chorister's Weave
+LADDER[60] The Tenth Surveyor EASY Chest 2,1 r0
+    Chorister's Layer
+LADDER[60] The Tenth Surveyor EASY Chest 0,3 r0
+    Runed Lining
+LADDER[60] The Tenth Surveyor EASY Chest 4,1 r0
+    Layered Core
+LADDER[60] The Tenth Surveyor EASY Chest 4,3 r0
+    Sprocketman's Gratitude
+LADDER[60] The Tenth Surveyor EASY Gloves 0,0 r0
+    Rimeglove Material
+LADDER[60] The Tenth Surveyor EASY Gloves 2,0 r0
+    Bramble Mold
+LADDER[60] The Tenth Surveyor EASY Gloves 1,2 r0
+    Iron Band
+LADDER[60] The Tenth Surveyor EASY Gloves 2,2 r0
+    Rat Signet
+LADDER[60] The Tenth Surveyor EASY Gloves 3,1 r0
+    Ring of Tides
+LADDER[60] The Tenth Surveyor EASY Gloves 4,0 r0
+    Mage's Wrapping
+LADDER[60] The Tenth Surveyor EASY Gloves 3,2 r0
+    Witch's Thimble
+LADDER[60] The Tenth Surveyor EASY Gloves 4,2 r0
+    Featherweight Mold
+LADDER[60] The Tenth Surveyor EASY Greaves 0,0 r0
+    Racing Sole
+LADDER[60] The Tenth Surveyor EASY Greaves 0,1 r0
+    Ratskin Material
+LADDER[60] The Tenth Surveyor EASY Greaves 2,0 r1
+    Spun Material
+LADDER[60] The Tenth Surveyor EASY Greaves 4,0 r0
+    Greave Mold
+LADDER[60] The Tenth Surveyor EASY Greaves 2,1 r3
+    Spun Material
+LADDER[60] The Tenth Surveyor EASY Greaves 4,1 r0
+    Pilgrim's Sole
+LADDER[60] The Tenth Surveyor EASY Weapon 0,0 r0
+    Hymnal
+LADDER[60] The Tenth Surveyor EASY Weapon 1,0 r2
+    Bulwark Vial
+LADDER[60] The Tenth Surveyor EASY Weapon 0,2 r2
+    Runewash Ink
+LADDER[60] The Tenth Surveyor EASY Weapon 2,2 r0
+    Emberburst
+LADDER[60] The Tenth Surveyor EASY Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[60] The Tenth Surveyor EASY Weapon 2,1 r1
+    Cinderscript Ink
+LADDER[60] The Tenth Surveyor EASY Weapon 3,0 r0
+    The Bog Census
+LADDER[60] The Tenth Surveyor EASY Weapon 4,2 r1
+    Census Bolt
+LADDER[60] The Tenth Surveyor EASY Weapon 5,0 r1
+    Cinderscript Ink
+LADDER[60] The Tenth Surveyor EASY Weapon 0,4 r1
+    Flywheel Cog
+LADDER[60] The Tenth Surveyor EASY Weapon 2,4 r0
+    Cinderscript Ink
+LADDER[60] The Tenth Surveyor EASY Weapon 4,4 r0
+    Azure Alignment
+LADDER[60] The Tenth Surveyor MEDIUM Helmet 0,0 r3
+    Bone Crown
+LADDER[60] The Tenth Surveyor MEDIUM Helmet 1,1 r2
+    Bone Scale
+LADDER[60] The Tenth Surveyor MEDIUM Helmet 2,2 r3
+    Bone Fletch
+LADDER[60] The Tenth Surveyor MEDIUM Helmet 3,0 r0
+    Idol's Crest
+LADDER[60] The Tenth Surveyor MEDIUM Helmet 4,1 r0
+    Bronze Frame
+LADDER[60] The Tenth Surveyor MEDIUM Helmet 4,0 r0
+    Bronze Plating
+LADDER[60] The Tenth Surveyor MEDIUM Chest 0,0 r1
+    Chorister's Base
+LADDER[60] The Tenth Surveyor MEDIUM Chest 2,0 r0
+    Chorister's Weave
+LADDER[60] The Tenth Surveyor MEDIUM Chest 2,1 r0
+    Chorister's Layer
+LADDER[60] The Tenth Surveyor MEDIUM Chest 0,3 r0
+    Chain Layer
+LADDER[60] The Tenth Surveyor MEDIUM Chest 4,1 r0
+    Brigandine Base
+LADDER[60] The Tenth Surveyor MEDIUM Chest 4,3 r0
+    Sprocketman's Gratitude
+LADDER[60] The Tenth Surveyor MEDIUM Gloves 0,0 r0
+    Rimeglove Material
+LADDER[60] The Tenth Surveyor MEDIUM Gloves 2,0 r0
+    Gripping Mold
+LADDER[60] The Tenth Surveyor MEDIUM Gloves 1,2 r0
+    Oathring
+LADDER[60] The Tenth Surveyor MEDIUM Gloves 2,2 r0
+    Rat Signet
+LADDER[60] The Tenth Surveyor MEDIUM Gloves 3,1 r0
+    Tin Band
+LADDER[60] The Tenth Surveyor MEDIUM Gloves 4,0 r0
+    Mage's Wrapping
+LADDER[60] The Tenth Surveyor MEDIUM Gloves 3,2 r0
+    Witch's Thimble
+LADDER[60] The Tenth Surveyor MEDIUM Gloves 4,2 r0
+    Padded Mold
+LADDER[60] The Tenth Surveyor MEDIUM Greaves 0,0 r0
+    Plain Sole
+LADDER[60] The Tenth Surveyor MEDIUM Greaves 0,1 r0
+    Ratskin Material
+LADDER[60] The Tenth Surveyor MEDIUM Greaves 2,0 r1
+    Spun Material
+LADDER[60] The Tenth Surveyor MEDIUM Greaves 4,0 r0
+    Greave Mold
+LADDER[60] The Tenth Surveyor MEDIUM Greaves 2,1 r3
+    Spun Material
+LADDER[60] The Tenth Surveyor MEDIUM Greaves 4,1 r0
+    Sapling Mold
+LADDER[60] The Tenth Surveyor MEDIUM Weapon 0,0 r0
+    Herbal
+LADDER[60] The Tenth Surveyor MEDIUM Weapon 1,0 r2
+    Chain Coil
+LADDER[60] The Tenth Surveyor MEDIUM Weapon 0,2 r2
+    Runewash Ink
+LADDER[60] The Tenth Surveyor MEDIUM Weapon 2,2 r0
+    Emberburst
+LADDER[60] The Tenth Surveyor MEDIUM Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[60] The Tenth Surveyor MEDIUM Weapon 2,1 r1
+    Quicksilver Ink
+LADDER[60] The Tenth Surveyor MEDIUM Weapon 3,0 r0
+    The Bog Census
+LADDER[60] The Tenth Surveyor MEDIUM Weapon 4,2 r1
+    Census Bolt
+LADDER[60] The Tenth Surveyor MEDIUM Weapon 5,0 r1
+    Quicksilver Ink
+LADDER[60] The Tenth Surveyor MEDIUM Weapon 0,4 r1
+    Ratchet Cog
+LADDER[60] The Tenth Surveyor MEDIUM Weapon 2,4 r0
+    Quicksilver Ink
+LADDER[60] The Tenth Surveyor MEDIUM Weapon 4,4 r0
+    Azure Alignment
+LADDER[60] The Tenth Surveyor HARD Helmet 0,0 r3
+    Bone Crown
+LADDER[60] The Tenth Surveyor HARD Helmet 1,1 r2
+    Bone Scale
+LADDER[60] The Tenth Surveyor HARD Helmet 2,2 r3
+    Bone Fletch
+LADDER[60] The Tenth Surveyor HARD Helmet 3,0 r0
+    Idol's Crest
+LADDER[60] The Tenth Surveyor HARD Helmet 4,1 r0
+    Warded Frame
+LADDER[60] The Tenth Surveyor HARD Helmet 4,0 r0
+    Layered Plating
+LADDER[60] The Tenth Surveyor HARD Chest 0,0 r1
+    Chorister's Base
+LADDER[60] The Tenth Surveyor HARD Chest 2,0 r0
+    Chorister's Weave
+LADDER[60] The Tenth Surveyor HARD Chest 2,1 r0
+    Chorister's Layer
+LADDER[60] The Tenth Surveyor HARD Chest 0,3 r0
+    Woven Underlayer
+LADDER[60] The Tenth Surveyor HARD Chest 4,1 r0
+    Brigandine Base
+LADDER[60] The Tenth Surveyor HARD Chest 4,3 r0
+    Sprocketman's Gratitude
+LADDER[60] The Tenth Surveyor HARD Gloves 0,0 r0
+    Rimeglove Material
+LADDER[60] The Tenth Surveyor HARD Gloves 2,0 r0
+    Ravener's Mold
+LADDER[60] The Tenth Surveyor HARD Gloves 1,2 r0
+    Emberloop
+LADDER[60] The Tenth Surveyor HARD Gloves 2,2 r0
+    Rat Signet
+LADDER[60] The Tenth Surveyor HARD Gloves 3,1 r0
+    Signet of Iron
+LADDER[60] The Tenth Surveyor HARD Gloves 4,0 r0
+    Leather Material
+LADDER[60] The Tenth Surveyor HARD Gloves 3,2 r0
+    Witch's Thimble
+LADDER[60] The Tenth Surveyor HARD Gloves 4,2 r0
+    Braced Mold
+LADDER[60] The Tenth Surveyor HARD Greaves 0,0 r0
+    Sprung Sole
+LADDER[60] The Tenth Surveyor HARD Greaves 0,1 r0
+    Ratskin Material
+LADDER[60] The Tenth Surveyor HARD Greaves 2,0 r1
+    Sanctified Material
+LADDER[60] The Tenth Surveyor HARD Greaves 4,0 r0
+    Warded Sabatons
+LADDER[60] The Tenth Surveyor HARD Greaves 2,1 r3
+    Sanctified Material
+LADDER[60] The Tenth Surveyor HARD Greaves 4,1 r0
+    Widow's Sole
+LADDER[60] The Tenth Surveyor HARD Weapon 0,0 r0
+    Herbal
+LADDER[60] The Tenth Surveyor HARD Weapon 1,0 r2
+    Grimoire Rack
+LADDER[60] The Tenth Surveyor HARD Weapon 0,2 r2
+    Bloodletter's Ink
+LADDER[60] The Tenth Surveyor HARD Weapon 2,2 r0
+    Emberburst
+LADDER[60] The Tenth Surveyor HARD Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[60] The Tenth Surveyor HARD Weapon 2,1 r1
+    Quicksilver Ink
+LADDER[60] The Tenth Surveyor HARD Weapon 3,0 r0
+    The Bog Census
+LADDER[60] The Tenth Surveyor HARD Weapon 4,2 r1
+    Census Bolt
+LADDER[60] The Tenth Surveyor HARD Weapon 5,0 r1
+    Quicksilver Ink
+LADDER[60] The Tenth Surveyor HARD Weapon 0,4 r1
+    Bulwark Vial
+LADDER[60] The Tenth Surveyor HARD Weapon 2,4 r0
+    Quicksilver Ink
+LADDER[60] The Tenth Surveyor HARD Weapon 4,4 r0
+    Crimson Alignment
+LADDER[60] The Tenth Surveyor INSANE Helmet 0,0 r3
+    Bone Crown
+LADDER[60] The Tenth Surveyor INSANE Helmet 1,1 r2
+    Bone Scale
+LADDER[60] The Tenth Surveyor INSANE Helmet 2,2 r3
+    Bone Fletch
+LADDER[60] The Tenth Surveyor INSANE Helmet 3,0 r0
+    Idol's Crest
+LADDER[60] The Tenth Surveyor INSANE Helmet 4,1 r0
+    Warded Frame
+LADDER[60] The Tenth Surveyor INSANE Helmet 4,0 r0
+    Scarred Plating
+LADDER[60] The Tenth Surveyor INSANE Chest 0,0 r1
+    Chorister's Base
+LADDER[60] The Tenth Surveyor INSANE Chest 2,0 r0
+    Chorister's Weave
+LADDER[60] The Tenth Surveyor INSANE Chest 2,1 r0
+    Chorister's Layer
+LADDER[60] The Tenth Surveyor INSANE Chest 0,3 r0
+    Plate Layer
+LADDER[60] The Tenth Surveyor INSANE Chest 4,1 r0
+    Brigandine Base
+LADDER[60] The Tenth Surveyor INSANE Chest 4,3 r0
+    Sprocketman's Gratitude
+LADDER[60] The Tenth Surveyor INSANE Gloves 0,0 r0
+    Rimeglove Material
+LADDER[60] The Tenth Surveyor INSANE Gloves 2,0 r0
+    Flaying Mold
+LADDER[60] The Tenth Surveyor INSANE Gloves 1,2 r0
+    Signet of Ash
+LADDER[60] The Tenth Surveyor INSANE Gloves 2,2 r0
+    Rat Signet
+LADDER[60] The Tenth Surveyor INSANE Gloves 3,1 r0
+    Iron Band
+LADDER[60] The Tenth Surveyor INSANE Gloves 4,0 r0
+    Anchor Material
+LADDER[60] The Tenth Surveyor INSANE Gloves 3,2 r0
+    Witch's Thimble
+LADDER[60] The Tenth Surveyor INSANE Gloves 4,2 r0
+    Deft Mold
+LADDER[60] The Tenth Surveyor INSANE Greaves 0,0 r0
+    Fumbler's Mold
+LADDER[60] The Tenth Surveyor INSANE Greaves 0,1 r0
+    Ratskin Material
+LADDER[60] The Tenth Surveyor INSANE Greaves 2,0 r1
+    Sanctified Material
+LADDER[60] The Tenth Surveyor INSANE Greaves 4,0 r0
+    Warded Sabatons
+LADDER[60] The Tenth Surveyor INSANE Greaves 2,1 r3
+    Sanctified Material
+LADDER[60] The Tenth Surveyor INSANE Greaves 4,1 r0
+    Widow's Sole
+LADDER[60] The Tenth Surveyor INSANE Weapon 0,0 r0
+    Herbal
+LADDER[60] The Tenth Surveyor INSANE Weapon 1,0 r2
+    Grimoire Rack
+LADDER[60] The Tenth Surveyor INSANE Weapon 0,2 r2
+    Bloodletter's Ink
+LADDER[60] The Tenth Surveyor INSANE Weapon 2,2 r0
+    Emberburst
+LADDER[60] The Tenth Surveyor INSANE Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[60] The Tenth Surveyor INSANE Weapon 2,1 r1
+    Quicksilver Ink
+LADDER[60] The Tenth Surveyor INSANE Weapon 3,0 r0
+    The Bog Census
+LADDER[60] The Tenth Surveyor INSANE Weapon 4,2 r1
+    Census Bolt
+LADDER[60] The Tenth Surveyor INSANE Weapon 5,0 r1
+    Quicksilver Ink
+LADDER[60] The Tenth Surveyor INSANE Weapon 0,4 r1
+    Chain Coil
+LADDER[60] The Tenth Surveyor INSANE Weapon 2,4 r0
+    Quicksilver Ink
+LADDER[60] The Tenth Surveyor INSANE Weapon 4,4 r0
+    Crimson Alignment
 ALTERNATES[0] The Dreaming Idiot EASY Helmet 0,0 r0
     Reliquary Frame of Nine
 ALTERNATES[0] The Dreaming Idiot EASY Helmet 3,0 r0

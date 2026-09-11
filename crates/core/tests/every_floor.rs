@@ -76,10 +76,10 @@ fn every_floor_in_the_game_can_be_solved_blind() {
     // not this solver's question any more and it has one of its own:
     // `every_floor_of_stones_can_be_pushed_into_place`, over the other kind of
     // puzzle this game now has.
-    // **Seven since M16**, and the two new ones are the Flat Below and the Assay.
+    // **Eight since M16**, and the three new ones are the Eleven Reefs.
     // A list of five written by hand is a list that can be four, which is the
     // eighth time this project has said that sentence.
-    assert_eq!(walked, 7, "{walked} floors in the game have a card puzzle on them, not seven");
+    assert_eq!(walked, 8, "{walked} floors in the game have a card puzzle on them, not eight");
     // **The ceiling `PLAN-M14.md` §1.2 builds the whole design on**, asserted
     // over every floor rather than over the one it was worked out for: nine
     // cairns visited in every order is 45, and no floor may cost more.

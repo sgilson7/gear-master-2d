@@ -3578,6 +3578,120 @@ pub const LADDER: &[MonsterSpec] = &[
         items: &[],
         enchs: &[],
     },
+    // **The Tenth Surveyor** — on the plate in the middle of the Needle Room,
+    // under three feet of sand and eleven years of a compass turning over her.
+    //
+    // **She is wearing the run.** Thirty-eight components in the cells the
+    // human seated them in, and all six of that character's enchs — the first
+    // creature in the game to carry one. `the_tenth_surveyor_wears_the_run`
+    // compares her `outfit()` against `common::from_save`'s `reports()` by name
+    // and count per slot, so if a placement stops seating, the gear block is
+    // wrong and not the board.
+    //
+    // **The gear is in item order and not board order**, which is
+    // `Character::item_partition`'s whole reason to exist: `items` is a chunk
+    // list, and the run's first helmet item is board entries 0, 3 and 5 while
+    // its second is 1, 2 and 4. Reordering costs nothing, because a placement
+    // carries its own absolute cell.
+    //
+    // **No instrument frame.** A creature has no survey — and §5.1 does not
+    // transcribe one either, which is the same decision arrived at from two
+    // directions.
+    //
+    // The body numbers are found rather than typed: see
+    // `the_run_beats_her_and_the_shopper_does_not`. `PLAN-M16.md` §5.2 asks for
+    // a win rate between 55% and 70% "over a loop of seeds", and **combat has
+    // no RNG** — a loop over seeds counts the same fight every time. What
+    // varies between two players meeting her is the *board*, so the bracket is
+    // over boards, which is M11.7's `common::geared_from` rule stated twice.
+    MonsterSpec {
+        name: "The Tenth Surveyor",
+        // **Found, not typed.** Health barely moves this fight and strength is
+        // the whole dial, which is the Kettleworks finding a third time: what
+        // decides a fight at this depth is damage a second. Measured against
+        // `common::geared_from` — the board a player actually has when they get
+        // here — the deep ladder deals
+        //
+        //   The Ninth Surveyor          122.1/s   Victory
+        //   What Marbulon Faced Away    138.7/s   Victory
+        //   Gilt                        428.3/s   Defeat
+        //   Nine of Ashes               531.0/s   Defeat
+        //
+        // so the band where a fight is a fight rather than a wall is between a
+        // hundred and forty and four hundred. She deals **221.2/s** and that
+        // board beats her in forty-three seconds, past the sudden-death clock.
+        // Her first draft was 236 strength and dealt **807.9/s**, which killed
+        // it in three.
+        //
+        // Fifteen thousand health is the largest number in the game and it is
+        // doing work: everything at this depth is settled after `SUDDEN_DEATH
+        // _MS`, and what health buys is how long she stands in it.
+        health: 15_000,
+        strength: 64,
+        regen: 15,
+        mind_resist: 74,
+        curse_resist: 70,
+        physical_resist: 66,
+        magic_resist: 70,
+        attacks: &[],
+        gear: &[
+        ("Bone Crown", SlotKind::Helmet, 0, 0, 3),
+        ("Bone Scale", SlotKind::Helmet, 1, 1, 2),
+        ("Bone Fletch", SlotKind::Helmet, 2, 2, 3),
+        ("Idol's Crest", SlotKind::Helmet, 3, 0, 0),
+        ("Bronze Frame", SlotKind::Helmet, 4, 1, 0),
+        ("Bronze Plating", SlotKind::Helmet, 4, 0, 0),
+        ("Chorister's Base", SlotKind::Chest, 0, 0, 1),
+        ("Chorister's Weave", SlotKind::Chest, 2, 0, 0),
+        ("Chorister's Layer", SlotKind::Chest, 2, 1, 0),
+        ("Chain Layer", SlotKind::Chest, 0, 3, 0),
+        ("Brigandine Base", SlotKind::Chest, 4, 1, 0),
+        ("Sprocketman's Gratitude", SlotKind::Chest, 4, 3, 0),
+        ("Rimeglove Material", SlotKind::Gloves, 0, 0, 0),
+        ("Gripping Mold", SlotKind::Gloves, 2, 0, 0),
+        ("Oathring", SlotKind::Gloves, 1, 2, 0),
+        ("Rat Signet", SlotKind::Gloves, 2, 2, 0),
+        ("Tin Band", SlotKind::Gloves, 3, 1, 0),
+        ("Mage's Wrapping", SlotKind::Gloves, 4, 0, 0),
+        ("Witch's Thimble", SlotKind::Gloves, 3, 2, 0),
+        ("Padded Mold", SlotKind::Gloves, 4, 2, 0),
+        ("Plain Sole", SlotKind::Greaves, 0, 0, 0),
+        ("Ratskin Material", SlotKind::Greaves, 0, 1, 0),
+        ("Spun Material", SlotKind::Greaves, 2, 0, 1),
+        ("Greave Mold", SlotKind::Greaves, 4, 0, 0),
+        ("Spun Material", SlotKind::Greaves, 2, 1, 3),
+        ("Sapling Mold", SlotKind::Greaves, 4, 1, 0),
+        ("Herbal", SlotKind::Weapon, 0, 0, 0),
+        ("Chain Coil", SlotKind::Weapon, 1, 0, 2),
+        ("Runewash Ink", SlotKind::Weapon, 0, 2, 2),
+        ("Emberburst", SlotKind::Weapon, 2, 2, 0),
+        ("Cosmic Alignment", SlotKind::Weapon, 2, 0, 0),
+        ("Quicksilver Ink", SlotKind::Weapon, 2, 1, 1),
+        ("The Bog Census", SlotKind::Weapon, 3, 0, 0),
+        ("Census Bolt", SlotKind::Weapon, 4, 2, 1),
+        ("Quicksilver Ink", SlotKind::Weapon, 5, 0, 1),
+        ("Ratchet Cog", SlotKind::Weapon, 0, 4, 1),
+        ("Quicksilver Ink", SlotKind::Weapon, 2, 4, 0),
+        ("Azure Alignment", SlotKind::Weapon, 4, 4, 0),
+        ],
+        items: &[3, 3, 4, 2, 4, 4, 2, 2, 2, 4, 5, 3],
+        // The six, by index into `gear` above — an index and not a name,
+        // because this board holds three Quicksilver Inks and a name cannot
+        // say which of them the Band is on.
+        enchs: &[
+        ("the-yodregar-index", 28),  // Runewash Ink
+        ("the-wextreen-correction", 29),  // Emberburst
+        ("the-chonga-swing", 10),  // Brigandine Base
+        ("sneel-bearing", 26),  // Herbal
+        ("plug-energy-tap", 27),  // Chain Coil
+        ("grungo-elastic-band", 31),  // Quicksilver Ink
+        ],
+        gear_offset: 0,
+        bounty: 486,
+        sprite: MonsterSprite::Sentinel,
+        rank: Rank::Boss,
+        drops: &[],
+    },
 ];
 
 // ----------------------------------------------------------- combatants

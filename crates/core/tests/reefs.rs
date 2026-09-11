@@ -601,3 +601,340 @@ fn index_of(g: &gm2d_core::game::Game, event: &str, label: &str) -> usize {
         .position(|c| c.label == label)
         .unwrap_or_else(|| panic!("{event} has no choice {label:?}"))
 }
+
+// ------------------------------------------------------- the Needle Room
+
+/// **Four sinkholes, four levers, and the alcoves touch the ring only on the
+/// diagonal.**
+///
+/// The floor's geometry as a property rather than a picture: if an alcove ever
+/// grows an orthogonal neighbour on the ring, the sinkhole that reaches it
+/// stops being the way in and the floor is a corridor.
+#[test]
+fn the_alcoves_are_reachable_by_nothing_but_a_fall() {
+    let w = data::map("the-reefs-3", D);
+    let allowed = gm2d_core::world::Allowances::default();
+    // **An alcove is two tiles**: the one you land on and the one the lever is
+    // on. A warp sets `world.at` and repairs and nothing resolves the landing
+    // tile's place — which is right, because every other warp in the game lands
+    // you on ground — so a one-tile alcove would have been a lever nobody could
+    // ever pull. You fall onto the outer tile and step onto the lever.
+    for (outer, inner) in [((1u8, 1u8), (2u8, 1u8)), ((15, 1), (14, 1)), ((1, 9), (2, 9)), ((15, 9), (14, 9))] {
+        for (x, y) in [outer, inner] {
+            assert!(w.walkable(x, y, &allowed), "[{x},{y}] is an alcove and you stand in it");
+        }
+        let neighbours = |x: u8, y: u8| {
+            [(0i32, -1i32), (0, 1), (1, 0), (-1, 0)]
+                .iter()
+                .filter(|(dx, dy)| {
+                    let (nx, ny) = (x as i32 + dx, y as i32 + dy);
+                    w.in_bounds(nx, ny) && w.walkable(nx as u8, ny as u8, &allowed)
+                })
+                .count()
+        };
+        // Each tile of the pair reaches only the other one, so the pair is an
+        // island and the sinkhole is the way in.
+        assert_eq!(neighbours(outer.0, outer.1), 1, "{outer:?} is not walled off");
+        assert_eq!(neighbours(inner.0, inner.1), 1, "{inner:?} is not walled off");
+    }
+}
+
+/// **Two sinkholes go somewhere and two come back here, and neither strands
+/// anybody.**
+///
+/// The false ones cost eight percent each — sixteen between them, which is what
+/// a blind walk of this floor pays. What makes a fall safe is that the lever in
+/// each true alcove is **ungated**: the way out of a hole is the thing you fell
+/// in to find.
+#[test]
+fn a_false_sinkhole_costs_eight_and_strands_nobody() {
+    use gm2d_core::tile_event::{Outcome, Requirement};
+    let events = data::events();
+    let mut true_holes = 0;
+    let mut false_holes = 0;
+    for who in ["north", "south", "east", "west"] {
+        let e = events.get(&format!("the-sinkhole-{who}")).expect("a sinkhole");
+        let drop = &e.choices[0];
+        assert_eq!(drop.requires, Requirement::None, "{who}: a hole in the floor asks nothing");
+        let mut to = None;
+        let mut tire = 0;
+        fn walk(o: &Outcome, to: &mut Option<[u8; 2]>, tire: &mut u32) {
+            match o {
+                Outcome::Warp { map, at } => {
+                    assert_eq!(map, "the-reefs-3", "a sinkhole leaves the floor");
+                    *to = Some(*at);
+                }
+                Outcome::Tire(n) => *tire += n,
+                Outcome::All(l) => l.iter().for_each(|o| walk(o, to, tire)),
+                _ => {}
+            }
+        }
+        walk(&drop.outcome, &mut to, &mut tire);
+        let at = to.expect("a sinkhole puts you somewhere");
+        if at == [7, 10] {
+            assert_eq!(tire, 8, "{who}: a false sinkhole costs eight");
+            false_holes += 1;
+        } else {
+            assert_eq!(tire, 0, "{who}: a true sinkhole costs the drop and nothing else");
+            // And the alcove it lands you in has an ungated lever **next to
+            // it**, or the fall is a trap. Next to, not under: a warp lands you
+            // on ground and you step onto the card, which is how every other
+            // warp in the game works.
+            let lever = w_places()
+                .into_iter()
+                .find(|(pat, id)| {
+                    id.starts_with("the-lever-")
+                        && (pat[0] as i32 - at[0] as i32).abs()
+                            + (pat[1] as i32 - at[1] as i32).abs()
+                            == 1
+                })
+                .map(|(_, id)| id)
+                .unwrap_or_else(|| panic!("{who} lands with no lever beside it"));
+            let l = events.get(&lever).expect("a lever");
+            assert_eq!(
+                l.choices[0].requires,
+                Requirement::None,
+                "{lever} is gated, so falling into its alcove is a trap"
+            );
+            true_holes += 1;
+        }
+    }
+    assert_eq!((true_holes, false_holes), (2, 2), "two of the four go somewhere");
+}
+
+fn w_places() -> Vec<([u8; 2], String)> {
+    data::map("the-reefs-3", D).places.iter().map(|p| (p.at, p.id.clone())).collect()
+}
+
+/// **The levers chain through the drains**, and the second on each side is
+/// behind the first.
+///
+/// NE opens the wall down the outside to SE; SW opens the wall up the outside
+/// to NW. So two sinkholes reach two alcoves and two levers reach two more,
+/// which is the floor.
+#[test]
+fn the_levers_chain_through_the_drains() {
+    use gm2d_core::tile_event::Requirement;
+    let w = data::map("the-reefs-3", D);
+    let events = data::events();
+    for (id, needs) in [
+        ("the-lever-north-east", None),
+        ("the-lever-south-west", None),
+        ("the-lever-south-east", Some("lever-ne")),
+        ("the-lever-north-west", Some("lever-sw")),
+    ] {
+        let e = events.get(id).expect(id);
+        match needs {
+            None => assert_eq!(e.choices[0].requires, Requirement::None, "{id} is ungated"),
+            Some(f) => assert_eq!(
+                e.choices[0].requires,
+                Requirement::Flag(f.into()),
+                "{id} waits on the lever before it"
+            ),
+        }
+    }
+    // The two ungated levers each open a wall of rock, which is the way out of
+    // their own alcove and the way into the next.
+    for flag in ["lever-ne", "lever-sw"] {
+        assert!(
+            w.drains.iter().any(|d| d.when == flag && d.from == "rock"),
+            "{flag} opens no wall, so its alcove has no way out"
+        );
+    }
+    // And all four take quicksand off the plate.
+    let quick: usize = w
+        .drains
+        .iter()
+        .filter(|d| d.from == "quick")
+        .map(|d| d.tiles.as_ref().map(|t| t.len()).unwrap_or(0))
+        .sum();
+    assert_eq!(quick, 44, "the square is nine by five and the plate is the one cell left");
+}
+
+/// **The plate is not there until all four levers are over.**
+///
+/// `hidden_until_all` rather than `needs_all`, which is a divergence from
+/// M14.4's own argument and is right here: the plate is not a door you are
+/// refused at, it is a plate under three feet of sand, and the four drains are
+/// what uncover it. There is nothing to say and nobody to say it to.
+#[test]
+fn the_plate_is_under_the_last_of_the_sand() {
+    let w = data::map("the-reefs-3", D);
+    let plate = w.places.iter().find(|p| p.id == "the-tenth-surveyor").expect("the plate");
+    assert_eq!(plate.kind, gm2d_core::world::PlaceKind::Boss);
+    let mut want = plate.hidden_until_all.clone();
+    want.sort();
+    assert_eq!(want, vec!["lever-ne", "lever-nw", "lever-se", "lever-sw"]);
+    assert_eq!(plate.creature.as_deref(), Some("The Tenth Surveyor"));
+    assert_eq!(plate.drops.len(), 3, "three drops");
+    for d in &plate.drops {
+        assert!(
+            gm2d_core::piece::CATALOG.iter().any(|c| c.name == *d),
+            "{d} is not in the catalogue, and this block adds no components"
+        );
+        assert!(gm2d_core::piece::is_event_only(d), "{d} can be bought, so beating her is shopping");
+    }
+}
+
+/// **Seven card reads blind**, against `PLAN-M16.md` §4.3's eight.
+///
+/// The same unit mismatch as the Flat Below: eight is the plan's count of
+/// *drops and pulls* — two false falls and four levers — and `solvable_blind`
+/// counts **card reads that could raise a flag**, which a sinkhole is not. Two
+/// live levers at a time, then the last one alone: `2 + 2 + 2 + 1`.
+///
+/// **And the floor measured `Stuck` before `puzzle::reachable` learned to
+/// follow a warp**, which is the first thing `PROMPT-M16.md` asks to be
+/// reported. `Outcome::Warp` works perfectly well as a lock; the solver flooded
+/// terrain only, so an alcove nothing walks into was an alcove nothing could
+/// reach. The plan's fallback — a `needs` gate on each alcove keyed to its
+/// sinkhole's flag — is not needed.
+#[test]
+fn the_needle_room_is_seven_card_reads_blind() {
+    let w = data::map("the-reefs-3", D);
+    let events = data::events();
+    assert_eq!(puzzle::solvable_blind(&w, &events), Ok(7));
+    assert_eq!(puzzle::solvable_knowing(&w, &events, None), Ok(4), "four levers, if you know");
+}
+
+// -------------------------------------------------- the Tenth Surveyor
+
+/// **She is wearing the run.**
+///
+/// Compared by item, not by placement: her `outfit()` against the save's own
+/// `reports()`, the same component names in the same counts in the same grids.
+/// If a placement stops seating, the gear block is wrong and not the board —
+/// which is the whole reason this is a test rather than a comment.
+#[test]
+fn the_tenth_surveyor_wears_the_run() {
+    use gm2d_core::combat::{self, Difficulty};
+    let ch = common::from_save(common::THE_RUN);
+    let spec = combat::creature("The Tenth Surveyor").expect("her");
+    let (reg, lo) = spec.loadout_at(Difficulty::Medium);
+    let mine: Vec<String> = ch
+        .reports()
+        .iter()
+        .flat_map(|r| r.items.iter().flat_map(|i| i.pieces.iter()))
+        .map(|&p| ch.registry.def(p).name.to_string())
+        .collect();
+    let theirs: Vec<String> = lo
+        .reports(&reg)
+        .iter()
+        .flat_map(|r| r.items.iter().flat_map(|i| i.pieces.iter()))
+        .map(|&p| reg.def(p).name.to_string())
+        .collect();
+    let tally = |v: &[String]| {
+        let mut m = std::collections::BTreeMap::new();
+        for n in v {
+            *m.entry(n.clone()).or_insert(0usize) += 1;
+        }
+        m
+    };
+    assert_eq!(tally(&mine), tally(&theirs), "she is not wearing what the run is wearing");
+    assert_eq!(theirs.len(), 38, "thirty-eight pieces");
+    // **And the same number of items out of them**, which is the half that
+    // matters: what a board is worth is mostly how many items it makes.
+    let items: usize = lo.reports(&reg).iter().map(|r| r.items.len()).sum();
+    let mine_items: usize = ch.reports().iter().map(|r| r.items.len()).sum();
+    assert_eq!(items, mine_items, "her board makes a different number of items");
+}
+
+/// **The six enchs are on her, and they do what they do on a player.**
+///
+/// One answer to *what an ench does* — `ench::apply` over the profiles, the
+/// door the player's go through. A creature gets no `enched` flag and no
+/// beacon, because those are read by rules a character holds and a creature
+/// holds none.
+#[test]
+fn she_carries_the_runs_six_enchs() {
+    use gm2d_core::combat::{self, Difficulty};
+    let spec = combat::creature("The Tenth Surveyor").expect("her");
+    assert_eq!(spec.enchs.len(), 6);
+    let data = data::enchs();
+    for (id, at) in spec.enchs {
+        assert!(data.get(id).is_some(), "{id} is not an ench");
+        assert!(*at < spec.gear.len(), "{id} names gear[{at}] and there are {}", spec.gear.len());
+    }
+    let resolved = spec.enchs_at(Difficulty::Medium);
+    assert_eq!(resolved.len(), 6, "every one resolves to a piece");
+    // The profiles move: six enchs on eleven items is not nothing.
+    let (_, with) = spec.outfit_at(Difficulty::Medium);
+    let mut bare = spec.clone();
+    bare.enchs = &[];
+    let (_, without) = bare.outfit_at(Difficulty::Medium);
+    let moved = with
+        .iter()
+        .zip(without.iter())
+        .filter(|(a, b)| a.power != b.power || a.cooldown_ms != b.cooldown_ms)
+        .count();
+    // **Three items, not six**, and that is the run's own board rather than a
+    // shortfall: four of the six enchs sit on pieces of the *same* weapon item
+    // — the Bearing on the Herbal, the Tap on the Chain Coil, the Index on the
+    // Runewash Ink and the Correction on the Emberburst, which the run packed
+    // into one thing. An ench names a piece and an item is however many pieces
+    // touch.
+    assert_eq!(moved, 3, "{moved} of her items feel an ench");
+}
+
+/// **The bracket: she is a fight the board wins, and she is the deepest one.**
+///
+/// `PLAN-M16.md` §5.2 asks for a win rate between 55% and 70% *"over a loop of
+/// seeds"*. **Combat has no RNG** — a loop over seeds counts the same fight
+/// every time, which is why a mid-fight save carries a creature name and a tile
+/// and nothing else. What varies between two players meeting her is the
+/// *board*, so the bracket is over boards, which is M11.7's rule stated twice.
+///
+/// The measurement is damage a second, as M14's is, against
+/// `common::geared_from`:
+///
+/// | | deals | |
+/// |---|---|---|
+/// | The Ninth Surveyor | 122.1/s | Victory |
+/// | What Marbulon Faced Away From | 138.7/s | Victory |
+/// | **The Tenth Surveyor** | **221.2/s** | **Victory** |
+/// | Gilt | 428.3/s | Defeat |
+/// | Nine of Ashes | 531.0/s | Defeat |
+///
+/// **The run itself loses to her**, and that is in register rather than a
+/// failure: the reconstruction is a caster board with 974 health against a
+/// shopper's 1942, and she is wearing its gear on a boss's body.
+#[test]
+fn the_run_meets_something_wearing_its_own_board() {
+    use gm2d_core::combat::{self, Outcome, Side};
+    let mut shopper = common::geared_from(&["the-end-of-all-gears", "kettleworks"]);
+    shopper.pack_what_you_own();
+    let dps = |name: &str| -> (Outcome, f64) {
+        let m = combat::creature(name).unwrap_or_else(|| panic!("no {name}"));
+        let log =
+            combat::simulate_at(shopper.player_stats(), &shopper.combat_items(), m, D);
+        let ms = log.entries.last().map(|e| e.at_ms).unwrap_or(1).max(1);
+        let dealt: i64 = log
+            .entries
+            .iter()
+            .filter_map(|e| match e.event {
+                combat::Event::Hit { by: Side::Enemy, damage, absorbed, .. } => {
+                    Some((damage - absorbed).max(0) as i64)
+                }
+                _ => None,
+            })
+            .sum();
+        (log.outcome, dealt as f64 * 1000.0 / ms as f64)
+    };
+    let (out, hers) = dps("The Tenth Surveyor");
+    assert_eq!(out, Outcome::Victory, "nothing behind her can ever be reached");
+    let (_, marbulon) = dps("What Marbulon Faced Away From");
+    assert!(hers > marbulon, "she deals {hers:.1}/s against {marbulon:.1}/s, so she is not deeper");
+    let (gilt_out, gilt) = dps("Gilt");
+    assert_eq!(gilt_out, Outcome::Defeat, "Gilt stopped beating this board, so the bracket moved");
+    assert!(hers < gilt, "she deals {hers:.1}/s against Gilt's {gilt:.1}/s, which is a wall");
+
+    // And the run, which she is wearing, does not stand in front of her.
+    let run = common::from_save(common::THE_RUN);
+    let log = combat::simulate_at(
+        run.player_stats(),
+        &run.combat_items(),
+        combat::creature("The Tenth Surveyor").expect("her"),
+        D,
+    );
+    assert_eq!(log.outcome, Outcome::Defeat, "the run beats a boss wearing its own board");
+}

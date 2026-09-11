@@ -1144,6 +1144,7 @@ pub static TURTLE_DICK: Theme = Theme {
         ("Sootmother", "Marbulon"),
         ("The Ninth Surveyor", "THE ONE WHO WENT DOWN"),
         ("What Marbulon Faced Away From", "WHAT SHE FACED AWAY FROM"),
+        ("The Tenth Surveyor", "THE ONE WHO STAYED"),
         ("The Quiet Hour", "The Grand Calculation"),
         ("Verdigris", "Gappy Handman"),
         ("The Drowned Court", "The Sea of Cleveland"),

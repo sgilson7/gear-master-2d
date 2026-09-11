@@ -3011,6 +3011,262 @@
      "outcome": "nothing"
     }
    ]
+  },
+  {
+   "id": "the-first-door",
+   "title": "THE FIRST DOOR",
+   "prose": [
+    "A wall of slag across the hall with a gap in it, and the gap is shut by a slab on a runner. Beside the slab there is a plate cut two by two, and a brass strip above it with one word stamped on it, which is ASSAY.",
+    "Three people have been weighed here. Two of them left something in the plate and one of them did not, and you can tell which by the wear on the runner."
+   ],
+   "choices": [
+    {
+     "label": "Walk through wearing it",
+     "blurb": "Costs nothing. The runner comes up for a board that has made something worth weighing.",
+     "requires": {
+      "assembled_of_rarity": "epic"
+     },
+     "unmet": "The runner wants something epic standing on the board and nothing you have made is.",
+     "outcome": {
+      "all": [
+       {
+        "flag": "assay-one"
+       },
+       {
+        "xp": 40
+       }
+      ]
+     }
+    },
+    {
+     "label": "Lay a two-by-two in the plate",
+     "blurb": "Costs the piece. The plate keeps it and the slab comes up.",
+     "requires": {
+      "loose_item_of_size": {
+       "w": 2,
+       "h": 2
+      }
+     },
+     "unmet": "The plate is two by two and nothing loose on you is that shape.",
+     "outcome": {
+      "all": [
+       {
+        "give_up": {
+         "w": 2,
+         "h": 2
+        }
+       },
+       {
+        "flag": "assay-one"
+       },
+       {
+        "xp": 30
+       }
+      ]
+     }
+    },
+    {
+     "label": "Read the door with the compass",
+     "blurb": "Costs a minute. The needle is doing what the needle does down here.",
+     "requires": {
+      "surveying": "compass"
+     },
+     "unmet": "There is no compass on the frame, and under this much iron that is the same thing.",
+     "outcome": "nothing"
+    }
+   ]
+  },
+  {
+   "id": "the-assay-office",
+   "title": "THE ASSAY OFFICE",
+   "prose": [
+    "An alcove off the second room with a counter in it, a set of scales, and eleven years of ledgers stacked to the ceiling in a hand that stops halfway through the ninth.",
+    "The last complete entry reads: two doors past this one, and both of them want the same thing, and I did not find that out until the second."
+   ],
+   "choices": [
+    {
+     "label": "Read the ledger with the atlas",
+     "blurb": "Costs nothing. It reads your own tray back to you, and the rate at the next door halves.",
+     "requires": {
+      "surveying": "atlas"
+     },
+     "unmet": "It is eleven years of shorthand and there is no atlas on the frame to read shorthand with.",
+     "outcome": {
+      "all": [
+       {
+        "flag": "read-the-assay"
+       },
+       {
+        "xp": 35
+       }
+      ]
+     }
+    },
+    {
+     "label": "Read the door with the compass",
+     "blurb": "Costs a minute. The needle is doing what the needle does down here.",
+     "requires": {
+      "surveying": "compass"
+     },
+     "unmet": "There is no compass on the frame, and under this much iron that is the same thing.",
+     "outcome": "nothing"
+    }
+   ]
+  },
+  {
+   "id": "the-second-door",
+   "title": "THE SECOND DOOR",
+   "prose": [
+    "The same slab on the same runner, and the slot cut through this one is two by three. Below it, in the same stamped brass, a figure: 9,000.",
+    "Somebody has written under the figure, by hand, with something sharp: and again."
+   ],
+   "choices": [
+    {
+     "label": "Lay it in the door",
+     "blurb": "Costs the piece. The slot keeps it and does not give it back.",
+     "requires": {
+      "loose_item_of_size": {
+       "w": 2,
+       "h": 3
+      }
+     },
+     "unmet": "The slot is two by three and nothing loose on you is that shape.",
+     "outcome": {
+      "all": [
+       {
+        "give_up": {
+         "w": 2,
+         "h": 3
+        }
+       },
+       {
+        "flag": "assay-two"
+       },
+       {
+        "xp": 34
+       }
+      ]
+     }
+    },
+    {
+     "label": "Pay the assay",
+     "blurb": "Costs 9,000 Fnorp. The board stays exactly as it is.",
+     "requires": {
+      "gold": 9000
+     },
+     "unmet": "Nine thousand Fnorp, and you have not got it.",
+     "outcome": {
+      "all": [
+       {
+        "gold": -9000
+       },
+       {
+        "flag": "assay-two"
+       },
+       {
+        "xp": 34
+       }
+      ]
+     }
+    },
+    {
+     "label": "Pay the assayed rate",
+     "blurb": "Costs 4,500 Fnorp. The office has already weighed you, so the counter does not have to.",
+     "requires": {
+      "flag": "read-the-assay"
+     },
+     "unmet": "The office has not weighed you, so the counter has to, and the counter charges the full rate.",
+     "outcome": {
+      "all": [
+       {
+        "gold": -4500
+       },
+       {
+        "flag": "assay-two"
+       },
+       {
+        "xp": 34
+       }
+      ]
+     }
+    },
+    {
+     "label": "Read the door with the compass",
+     "blurb": "Costs a minute. The needle is doing what the needle does down here.",
+     "requires": {
+      "surveying": "compass"
+     },
+     "unmet": "There is no compass on the frame, and under this much iron that is the same thing.",
+     "outcome": "nothing"
+    }
+   ]
+  },
+  {
+   "id": "the-third-door",
+   "title": "THE THIRD DOOR",
+   "prose": [
+    "The third slab, and the slot through it is two by three, which you have seen before and have one fewer of than you did.",
+    "The figure under it is 9,000. Nobody has written anything under this one."
+   ],
+   "choices": [
+    {
+     "label": "Lay it in the door",
+     "blurb": "Costs the piece. The same shape as the last one, and this slot keeps it too.",
+     "requires": {
+      "loose_item_of_size": {
+       "w": 2,
+       "h": 3
+      }
+     },
+     "unmet": "The slot is two by three and nothing loose on you is that shape, which is what the ledger was about.",
+     "outcome": {
+      "all": [
+       {
+        "give_up": {
+         "w": 2,
+         "h": 3
+        }
+       },
+       {
+        "flag": "assay-three"
+       },
+       {
+        "xp": 40
+       }
+      ]
+     }
+    },
+    {
+     "label": "Pay the assay",
+     "blurb": "Costs 9,000 Fnorp. The board stays exactly as it is.",
+     "requires": {
+      "gold": 9000
+     },
+     "unmet": "Nine thousand Fnorp, and you have not got it.",
+     "outcome": {
+      "all": [
+       {
+        "gold": -9000
+       },
+       {
+        "flag": "assay-three"
+       },
+       {
+        "xp": 40
+       }
+      ]
+     }
+    },
+    {
+     "label": "Read the door with the compass",
+     "blurb": "Costs a minute. The needle is doing what the needle does down here.",
+     "requires": {
+      "surveying": "compass"
+     },
+     "unmet": "There is no compass on the frame, and under this much iron that is the same thing.",
+     "outcome": "nothing"
+    }
+   ]
   }
  ]
 }

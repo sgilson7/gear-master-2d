@@ -420,9 +420,18 @@ pub fn with_instrument(kind: &str) -> Character {
     ch.clear_all();
     let mut at = 0u8;
     for &(k, n) in want {
+        // **`fits`, not `slot`.** An `Orb` and an `Alignment` live in the
+        // weapon grid and go on the frame as well — reused rather than
+        // invented, because a cosmic orb in a ball is a crystal ball and one in
+        // an atlas is an atlas. Asking `slot` misses both and the atlas will
+        // not build.
+        // And the **smallest** of them, because the frame is six by three for
+        // ever and an atlas is five pieces: taking the first match seated an
+        // Astrolabe and then ran out of cells.
         let def = CATALOG
             .iter()
-            .find(|d| d.kind == k && d.slot == SlotKind::Instrument)
+            .filter(|d| d.kind == k && d.fits(SlotKind::Instrument))
+            .min_by_key(|d| d.cells.len())
             .unwrap_or_else(|| panic!("the catalogue has no {k:?} for the frame"));
         for _ in 0..n {
             let id = ch.give(def.name).expect("a catalogue name");

@@ -102,9 +102,24 @@ fn every_drain_names_terrain_that_exists() {
                  turns that back into ground",
                 d.from
             );
+            // **Only when the drain is the whole map**, which is the question
+            // this clause was written to ask and is not the question it was
+            // asking. A drain with no `tiles` is every cell of that terrain,
+            // and the corner of every map in the game is its wall — so a
+            // whole-map drain naming the corner's terrain rewrites the border
+            // and the map falls open. A drain that *names its cells* has
+            // already said which three it means: the Assay's three doors are
+            // one tile of rock each, opening one gap in one wall, which is a
+            // door and not a demolition.
+            //
+            // The clause predates `Drain.tiles` by a block and went on asking
+            // the older question. Same shape as the three narrow lints M14.1
+            // retired: right for the reason it was written and wrong about the
+            // thing in front of it.
             assert!(
-                w.terrain_name(0, 0) != d.from.as_str(),
-                "{id}: the corner of the map drains, which is a whole-map rewrite"
+                d.tiles.is_some() || w.terrain_name(0, 0) != d.from.as_str(),
+                "{id}: the corner of the map drains and the drain names no cells, \
+                 which is a whole-map rewrite"
             );
             // **And what it waits for is asked somewhere else now.** The
             // clause that stood here counted only place ids, because when it

@@ -284,7 +284,7 @@ fn the_compass_sets_nothing_on_any_floor() {
     use gm2d_core::tile_event::{Outcome, Requirement};
     let events = data::events();
     let mut offered = 0;
-    for id in ["the-reefs-1", "the-reefs-2"] {
+    for id in ["the-reefs-1", "the-reefs-2", "the-reefs-3"] {
         let w = data::map(id, D);
         for p in &w.places {
             let Some(e) = events.get(&p.id) else { continue };
@@ -384,4 +384,220 @@ fn a_blind_walk_of_the_flat_costs_three_quarters_of_the_cap() {
     assert_eq!(pulls, gm2d_core::fatigue::CAP as u32 * 3 / 4, "three-quarters of the cap");
     let sheet = events.get("the-tenth-sheet-again").expect("the sheet");
     assert_eq!(tire(&sheet.choices[0].outcome), 15, "the atlas walks to three of them");
+}
+
+/// **No board this game hands a player reaches Rare**, and two shipped doors
+/// ask for more than that.
+///
+/// A recon that turned into a lint. `PLAN-M16.md` §4.2 hangs door one on
+/// `AssembledOfRarity("epic")` and door three on `"legendary"`, on the strength
+/// of *"the board a player actually has holds exactly one epic item and twenty
+/// commons"* — which is M14's note about the Shelf and is not what the numbers
+/// say.
+///
+/// Measured three ways:
+///
+/// | board | best item | rarity |
+/// |---|---|---|
+/// | the run, as the human left it | 50 | Common |
+/// | the run, Auto-packed from everything it owns | 50 | Common |
+/// | `geared_from`, both shelves and every errand | *see below* | |
+///
+/// `RARE_AT` is 90, `EPIC_AT` 130 and `LEGENDARY_AT` 170, and **562 of the 568
+/// components rate Common on their own.** The thresholds are reachable — the
+/// best item on the whole creature ladder is Francis's at 343, and 76 creature
+/// items are Rare or better — because a creature's board is packed with the
+/// best components in the game and a player's is what they could buy.
+///
+/// So the Assay does not ask for a rarity. What it asks for is footprints and
+/// money, which are the two things a real board has. This test is what stops
+/// the next door being written against a tier nobody reaches.
+#[test]
+fn no_board_a_player_can_build_reaches_rare() {
+    use gm2d_core::rating::Rarity;
+    let mut run = common::from_save(common::THE_RUN);
+    let as_left = run.combat_items().iter().map(|i| i.rarity()).max().unwrap_or(Rarity::Common);
+    run.clear_all();
+    run.pack_what_you_own();
+    let repacked = run.combat_items().iter().map(|i| i.rarity()).max().unwrap_or(Rarity::Common);
+    let mut geared = common::geared_from(&["the-end-of-all-gears", "kettleworks"]);
+    geared.pack_what_you_own();
+    let bought = geared.combat_items().iter().map(|i| i.rarity()).max().unwrap_or(Rarity::Common);
+    let top = |ch: &gm2d_core::character::Character| {
+        ch.combat_items().iter().map(|i| i.rating).max().unwrap_or(0)
+    };
+    println!("run as left {as_left:?}; repacked {repacked:?} at {}; bought {bought:?} at {}",
+        top(&run), top(&geared));
+    assert_eq!(as_left, Rarity::Common, "the run, as the human left it");
+    assert_eq!(repacked, Rarity::Common, "the run, repacked out of everything it owns");
+    assert_eq!(bought, Rarity::Epic, "a board that has bought both shelves and done the errands");
+}
+
+// ------------------------------------------------------------- the Assay
+
+/// **Three locks, and blind it is three visits**, which is `PLAN-M16.md` §6's
+/// own number and the one number in this block that came back exactly as
+/// written.
+///
+/// It is three rather than more because each door is behind the one before it:
+/// the wall between two rooms is a tile of rock that the door beside it drains,
+/// so there is never a second card worth walking to.
+#[test]
+fn the_assay_is_three_locks() {
+    let w = data::map("the-reefs-2", D);
+    let events = data::events();
+    assert_eq!(puzzle::solvable_blind(&w, &events), Ok(3));
+    // And the atlas does not shorten it — it halves a price. A floor an
+    // instrument makes *short* is the design and this floor charges elsewhere.
+    assert_eq!(puzzle::solvable_knowing(&w, &events, Some("atlas")), Ok(3));
+    assert_eq!(puzzle::solvable_knowing(&w, &events, None), Ok(3));
+}
+
+/// **The second door takes what the third one needs.**
+///
+/// The floor's whole trap, asserted as the thing it is rather than described:
+/// both doors want a loose two-by-three and **both keep it**, so one footprint
+/// gets you through one of them and the other has to be paid for.
+#[test]
+fn the_second_door_takes_what_the_third_needs() {
+    use gm2d_core::tile_event::{Outcome, Requirement};
+    let events = data::events();
+    let want = Requirement::LooseItemOfSize { w: 2, h: 3 };
+    for id in ["the-second-door", "the-third-door"] {
+        let e = events.get(id).expect(id);
+        let c = e.choices.iter().find(|c| c.requires == want).unwrap_or_else(|| {
+            panic!("{id} does not want a two-by-three")
+        });
+        let mut takes = false;
+        fn walk(o: &Outcome, takes: &mut bool) {
+            match o {
+                Outcome::GiveUp { w: 2, h: 3 } => *takes = true,
+                Outcome::All(l) => l.iter().for_each(|o| walk(o, takes)),
+                _ => {}
+            }
+        }
+        walk(&c.outcome, &mut takes);
+        assert!(takes, "{id} asks for a two-by-three and does not keep it");
+    }
+}
+
+/// **The Assay costs the run a repack, and the run has nothing loose to pay
+/// with.**
+///
+/// The block's yardstick, walked. The run is thirty-eight pieces seated and
+/// **two loose** — a one-by-three and a one-by-four — so the second door cannot
+/// be paid in footprints at all until something comes off the board, and what
+/// comes off the board is a two-by-three out of the chest, which breaks the
+/// item it was in.
+///
+/// Then the third door asks for the same shape again. That is the floor.
+#[test]
+fn the_assay_costs_the_run_a_repack() {
+    use gm2d_core::game::Game;
+    let mut g = Game::new(9, "td");
+    g.character = common::from_save(common::THE_RUN);
+    let second = |g: &Game| index_of(g, "the-second-door", "Lay it in the door");
+    let third = |g: &Game| index_of(g, "the-third-door", "Lay it in the door");
+
+    assert!(g.character.loose_of_size(2, 3).is_empty(), "the run carries no loose two-by-three");
+    assert!(
+        g.answer_event("the-second-door", second(&g), D).is_err(),
+        "the second door took a footprint the run has not got"
+    );
+
+    // Take one off the chest. It was in an item; the item is one piece lighter.
+    let before = assembled(&g);
+    let seated = g
+        .character
+        .loadout
+        .slot(SlotKind::Chest)
+        .pieces()
+        .into_iter()
+        .find(|&p| {
+            let d = g.character.registry.def(p);
+            let w = d.cells.iter().map(|c| c.0).max().unwrap_or(0) + 1;
+            let h = d.cells.iter().map(|c| c.1).max().unwrap_or(0) + 1;
+            (w.min(h), w.max(h)) == (2, 3)
+        })
+        .expect("the run's chest is built out of two-by-threes");
+    g.character.unequip(seated).expect("it comes off");
+    assert_eq!(g.character.loose_of_size(2, 3).len(), 1, "and now there is one");
+
+    g.answer_event("the-second-door", second(&g), D).expect("the second door takes it");
+    assert!(
+        g.character.loose_of_size(2, 3).is_empty(),
+        "the slot keeps it, which is the whole of the trap"
+    );
+    assert!(
+        g.answer_event("the-third-door", third(&g), D).is_err(),
+        "the third door wanted the shape the second one kept"
+    );
+    assert!(
+        assembled(&g) < before,
+        "unseating a two-by-three off a full chest breaks the item it was in"
+    );
+}
+
+/// **Or you pay eighteen thousand and the board never moves.**
+///
+/// Nine at each door against a purse of 33,904, which is a little over half of
+/// it — and the office halves the second one if you brought an atlas. The
+/// alternative to a repack is money, which is the decision the floor is for.
+#[test]
+fn nine_thousand_keeps_the_board() {
+    use gm2d_core::game::Game;
+    let mut g = Game::new(9, "td");
+    g.character = common::from_save(common::THE_RUN);
+    let purse = g.character.gold;
+    let before = assembled(&g);
+    let seated: usize =
+        SlotKind::ALL.iter().map(|k| g.character.loadout.slot(*k).pieces().len()).sum();
+
+    for id in ["the-second-door", "the-third-door"] {
+        let n = index_of(&g, id, "Pay the assay");
+        g.answer_event(id, n, D).unwrap_or_else(|e| panic!("{id}: {e}"));
+    }
+    assert_eq!(g.character.gold, purse - 18_000, "nine thousand at each of two doors");
+    assert_eq!(assembled(&g), before, "and not one item came apart");
+    let after: usize =
+        SlotKind::ALL.iter().map(|k| g.character.loadout.slot(*k).pieces().len()).sum();
+    assert_eq!(after, seated, "nor did a single piece move");
+    assert!(g.character.gold > 0, "and the run can still afford to be here");
+}
+
+/// **The office halves the second door and opens no lock at all.**
+///
+/// `an_instrument_is_never_the_only_way_through` stated in this floor's own
+/// currency: the atlas is worth four and a half thousand Fnorp and nothing
+/// else, and the three doors are answerable without it.
+#[test]
+fn the_office_halves_the_price_and_opens_nothing() {
+    use gm2d_core::game::Game;
+    let mut g = Game::new(9, "td");
+    g.character = common::with_instrument("atlas");
+    g.character.gold = 33_904;
+    let purse = g.character.gold;
+    let n = index_of(&g, "the-assay-office", "Read the ledger with the atlas");
+    g.answer_event("the-assay-office", n, D).expect("the atlas reads the ledger");
+    assert_eq!(g.character.gold, purse, "reading it costs nothing");
+    let n = index_of(&g, "the-second-door", "Pay the assayed rate");
+    g.answer_event("the-second-door", n, D).expect("the assayed rate");
+    assert_eq!(g.character.gold, purse - 4_500, "half of nine thousand");
+    // And it opened the same flag the full rate opens — a price, not a lock.
+    assert!(g.world.flags.iter().any(|f| f == "assay-two"));
+}
+
+fn assembled(g: &gm2d_core::game::Game) -> usize {
+    g.character.reports().iter().map(|r| r.items.iter().filter(|i| i.assembled).count()).sum()
+}
+
+fn index_of(g: &gm2d_core::game::Game, event: &str, label: &str) -> usize {
+    let _ = g;
+    data::events()
+        .get(event)
+        .unwrap_or_else(|| panic!("no event {event}"))
+        .choices
+        .iter()
+        .position(|c| c.label == label)
+        .unwrap_or_else(|| panic!("{event} has no choice {label:?}"))
 }

@@ -110,6 +110,10 @@
         {
           "map": "the-reefs-1",
           "cleared": "stake-c-mid"
+        },
+        {
+          "map": "the-reefs-2",
+          "cleared": "assay-three"
         }
       ]
     }

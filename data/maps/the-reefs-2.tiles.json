@@ -2,18 +2,22 @@
   "format": "gm2d-tiles",
   "version": 1,
   "id": "the-reefs-2",
-  "_note": "**A stub, and it says so.** M16.1's job is the Flat Below, and a stair that leads nowhere is a gate `every_gate_leads_somewhere_you_can_stand` refuses — so this is a room with a way back up and nothing in it. M16.2 replaces the whole file with the Assay: four rooms, three doors, and the second door takes what the third one needs.",
-  "width": 8,
-  "height": 4,
+  "_note": "**The Assay — three doors, and the second takes what the third needs.** A hall of four rooms with a wall of slag between each pair, and the one gap in each wall opens when the door beside it is answered. Door one is a board lock: pack something epic and walk through, or lay a two-by-two in the plate. Door two and door three both want a **two-by-three, and both keep it** — so the cheapest way across is one footprint and nine thousand Fnorp, the no-repack way is eighteen thousand, and two footprints off a full board is two items broken.\n\nThe assay office in the alcove off room two reads the board back to you with an atlas, and what that buys is the **price** and not the lock: the assayed rate at door two is half. A floor an instrument makes *short* is the design; a floor it makes *possible* is what `an_instrument_is_never_the_only_way_through` refuses.\n\n**What it does not ask for is a legendary.** `PLAN-M16.md` §4.2 hangs door three on one; nothing in this game builds an item over 135 and `LEGENDARY_AT` is 170, so that door would have been a wall with a sentence on it. See `no_board_a_player_can_build_reaches_rare`.",
+  "width": 16,
+  "height": 8,
   "start": [
     1,
-    2
+    6
   ],
   "rows": [
-    "^^^^^^^^",
-    "^ssssss^",
-    "^ssssss^",
-    "^^^^^^^^"
+    "^^^^^^^^^^^^^^^^",
+    "^sss^sss^sss^ss^",
+    "^sss^sss^sss^ss^",
+    "^s^^^ss^^^^^^ss^",
+    "^s^^^s^^^^^^^^^^",
+    "^s^^^^^^^^^^^^^^",
+    "^ssssssssssssss^",
+    "^^^^^^^^^^^^^^^^"
   ],
   "no_homeward": true,
   "regions": [
@@ -24,8 +28,8 @@
         [
           0,
           0,
-          7,
-          3
+          15,
+          7
         ]
       ],
       "enemies": [
@@ -36,11 +40,46 @@
       ]
     }
   ],
+  "drains": [
+    {
+      "when": "assay-one",
+      "from": "rock",
+      "to": "silt",
+      "tiles": [
+        [
+          4,
+          2
+        ]
+      ]
+    },
+    {
+      "when": "assay-two",
+      "from": "rock",
+      "to": "silt",
+      "tiles": [
+        [
+          8,
+          2
+        ]
+      ]
+    },
+    {
+      "when": "assay-three",
+      "from": "rock",
+      "to": "silt",
+      "tiles": [
+        [
+          12,
+          2
+        ]
+      ]
+    }
+  ],
   "places": [
     {
       "at": [
-        6,
-        2
+        14,
+        6
       ],
       "kind": "gate",
       "id": "the-reefs-2-up",
@@ -50,6 +89,54 @@
         8,
         1
       ]
+    },
+    {
+      "at": [
+        3,
+        2
+      ],
+      "kind": "event",
+      "id": "the-first-door"
+    },
+    {
+      "at": [
+        5,
+        4
+      ],
+      "kind": "event",
+      "id": "the-assay-office"
+    },
+    {
+      "at": [
+        7,
+        2
+      ],
+      "kind": "event",
+      "id": "the-second-door"
+    },
+    {
+      "at": [
+        11,
+        2
+      ],
+      "kind": "event",
+      "id": "the-third-door",
+      "hidden_until": "assay-two"
+    },
+    {
+      "at": [
+        14,
+        3
+      ],
+      "kind": "gate",
+      "id": "the-reefs-2-stair",
+      "name": "the steps down",
+      "to": "the-reefs-3",
+      "at_to": [
+        1,
+        2
+      ],
+      "hidden_until": "assay-three"
     }
   ]
 }

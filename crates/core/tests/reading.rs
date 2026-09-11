@@ -112,6 +112,15 @@ fn an_event_that_asks_something_still_reopens() {
         let mut state = WorldState::at_start(&w);
         // Pretend it was answered.
         state.answered.push(id.clone());
+        // **And that whatever makes it *there* has happened**, which this did
+        // not do and did not need to until the Assay: a card behind a
+        // `hidden_until` is not on the map at all, so stepping onto its tile
+        // reports nothing and the check read that as a card that had stopped
+        // reporting itself. Marking the event answered is not the same as
+        // marking the place present, and the two had never come apart before.
+        for k in place.hidden_until.iter().chain(place.hidden_until_all.iter()) {
+            state.flags.push(k.clone());
+        }
         let mut rng = Rng::new(7);
         let allowed = world::Allowances::default();
         let seen = step_onto(&w, &mut state, &mut rng, &allowed, at);

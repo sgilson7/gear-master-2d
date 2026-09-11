@@ -4071,6 +4071,37 @@ table; a browser cannot say anything about that a hundred and fifty milliseconds
 of `cargo test` does not say better. What only the live page can answer is
 whether the counter is carrying them, which is what the list above is.
 
+**The deploy after that is five asks and nothing is free any more.** Ninety-six
+of the questions are the gate's, in three engines against the deployed page.
+
+```
+live build e44f5a7b
+  index.html asks app.js?v=e44f5a7b   app.js carries BUILD='e44f5a7b'
+  chromium walked the gate    ok      firefox  walked the gate    ok
+  webkit   walked the gate    ok      96 ok lines, no failures
+  the pack, three kinds       Cork Tea — Takes 10% of the tiredness off.
+                              The Quiet Word — Running from the next fight
+                                costs you nothing. Spent when you run.
+                              The Short Way Back — Puts you in the last town
+                                you stood in.
+  the Drowned Gallery         stones [[3,6],[6,4],[8,7]] on marks
+                              [[3,2],[8,2],[5,8]]; the stair is not there; one
+                              push moves a stone to [3,5] and the player in
+                              behind it
+  the Cairnfield              walked onto a cairn you cannot use: 55% -> 65%,
+                              which is past the sixty a fight stops at, and the
+                              strip says "Nothing here for you, and the walk
+                              cost 10%."
+  console errors: none
+```
+
+**The Gallery's line is the one worth reading twice.** It is the only puzzle in
+this game that is not monotone — a stone in a corner is exactly the move the
+rule forbids — and what makes it safe is that the room forgets: `go_to` is the
+one door onto a map and it drops the stones, so walking up the stair and back
+down reseeds them. Reseeding on the map *id* was not enough, and a test caught
+it before a player could.
+
 **The deploy after M15 is four asks and two faults, and the second fault was a
 soft-lock somebody was standing in.** Ninety of the questions are the gate's, in
 three engines against the deployed page; the hand-written half is the four

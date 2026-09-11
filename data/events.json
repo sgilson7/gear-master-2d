@@ -2545,6 +2545,66 @@
           }
         }
       ]
+    },
+    {
+      "id": "the-iron-under-the-sand",
+      "title": "THE IRON UNDER THE SAND",
+      "prose": [
+        "A reef of slag standing a foot out of the flat, with the sand drawn up against its north side in a ridge and scoured away on the south.",
+        "There are eleven more of them under here that you cannot see, and a compass in your hand will tell you about every one of them at once."
+      ]
+    },
+    {
+      "id": "the-spinning-needle",
+      "title": "THE SPINNING NEEDLE",
+      "prose": [
+        "Somebody has driven a stake in and hung a compass off it on a cord, at the exact middle of the flat, where it has been turning for eleven years.",
+        "The card has worn through at the pivot. It is not pointing anywhere and it never was; whoever hung it up knew that, which is why they hung it up rather than carried it."
+      ],
+      "choices": [
+        {
+          "label": "Take the needle off the cord",
+          "blurb": "It is a magnet and a worn pivot. The pivot is no loss.",
+          "requires": "none",
+          "outcome": {
+            "all": [
+              {
+                "give": "Magnet"
+              },
+              {
+                "xp": 30
+              }
+            ]
+          },
+          "unmet": ""
+        }
+      ]
+    },
+    {
+      "id": "the-tenth-survey",
+      "title": "THE TENTH SURVEY",
+      "prose": [
+        "A folding table with the legs pushed into the sand and a sheet of paper weighted at the four corners with slag.",
+        "It is a survey of this flat, and it is right. Nobody has signed it. Under the north arrow, in the same hand as the note beneath the third cairn: the needle is no use down here, so I have used my eyes."
+      ],
+      "choices": [
+        {
+          "label": "Take the sheet",
+          "blurb": "Four corners of slag off it and it rolls. Nobody is coming back for it.",
+          "requires": "none",
+          "outcome": {
+            "all": [
+              {
+                "give": "Map Shard"
+              },
+              {
+                "xp": 45
+              }
+            ]
+          },
+          "unmet": ""
+        }
+      ]
     }
   ]
 }

@@ -47,6 +47,15 @@ pub const REACH_JSON: &str = include_str!("../../../data/maps/the-reach.tiles.js
 /// squashed. Reported from play as *"the resolution for the overworld looks all
 /// messed up"*.
 pub const LOW_WATER_JSON: &str = include_str!("../../../data/maps/the-low-water.tiles.json");
+/// The flat past the low water, and **the second surveyable map**.
+///
+/// `survey::mods_for` has taken a `map` argument since M11.6 and never read
+/// it — its own doc says a second one is meant to be *a data drop plus an arm
+/// here*, and this is the data drop. There is iron under the sand, so the
+/// instrument that reads the Reach best reads this worst: a compass is loud
+/// here and an atlas is the quiet one. That is what makes *which instrument you
+/// built* a question about where you are going.
+pub const SANDS_JSON: &str = include_str!("../../../data/maps/the-wextreen-sands.tiles.json");
 /// The Wextreen Sump, top down. Four floors, a puzzle each, and **not** one
 /// sitting: the Stack's budget is fatigue and this one's is what you brought,
 /// so every floor has a stair back up and none of them names an `outside`.
@@ -94,6 +103,7 @@ pub const FILES: &[(&str, &str)] = &[
     ("maps/under-the-lake.tiles.json", UNDER_LAKE_JSON),
     ("maps/the-reach.tiles.json", REACH_JSON),
     ("maps/the-low-water.tiles.json", LOW_WATER_JSON),
+    ("maps/the-wextreen-sands.tiles.json", SANDS_JSON),
     ("maps/the-sump-1.tiles.json", SUMP_1_JSON),
     ("maps/the-sump-2.tiles.json", SUMP_2_JSON),
     ("maps/the-sump-3.tiles.json", SUMP_3_JSON),
@@ -136,6 +146,7 @@ pub const MAPS: &[(&str, &str)] = &[
     ("under-the-lake", UNDER_LAKE_JSON),
     ("the-reach", REACH_JSON),
     ("the-low-water", LOW_WATER_JSON),
+    ("the-wextreen-sands", SANDS_JSON),
     ("the-sump-1", SUMP_1_JSON),
     ("the-sump-2", SUMP_2_JSON),
     ("the-sump-3", SUMP_3_JSON),

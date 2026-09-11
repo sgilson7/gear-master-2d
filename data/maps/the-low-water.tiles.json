@@ -105,6 +105,26 @@
           "cleared": "the-ninth-surveyor"
         }
       ]
+    },
+    {
+      "at": [
+        8,
+        9
+      ],
+      "kind": "gate",
+      "id": "the-edge-of-the-sands",
+      "name": "the edge of the Wextreen Sands",
+      "to": "the-wextreen-sands",
+      "at_to": [
+        8,
+        1
+      ],
+      "needs_survey": true,
+      "shut": "The flat goes out past the low water for four hundred paces and then stops being flat. There is iron under it and it moves; without something to read it with you would be walking on a guess.",
+      "prose": [
+        "Whatever you are carrying settles, and the sand acquires an order it did not have from the shore.",
+        "It is four hundred paces of it, with slag reefs standing out of it where the tide has scoured, and a stake in the middle with something hanging off it."
+      ]
     }
   ]
 }

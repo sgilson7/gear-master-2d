@@ -1,0 +1,95 @@
+{
+  "format": "gm2d-tiles",
+  "version": 1,
+  "id": "the-wextreen-sands",
+  "_note": "**The second surveyable map, and the first that reads a compass badly.** `survey::mods_for` has taken a `map` argument since M11.6 and never read it — its own doc says why: *a second surveyable map is meant to be a data drop plus an arm here, and a signature that could not tell two maps apart would have to change to become one that could.* This is that data drop. There is iron under the sand, so the needle is no use and the paper survey is: on the Reach a compass quiets the ground and an atlas is loud, and here it is the other way round. That is the whole point of a second one — it makes *which instrument you built* a question about where you are going rather than a question with one answer. The door states the trade before you walk through it, in core's own numbers, because `kit_reading_json` runs `mods_for` against the map on the far side.",
+  "width": 18,
+  "height": 12,
+  "start": [
+    8,
+    1
+  ],
+  "rows": [
+    "SSSSSSSS:SSSSSSSSS",
+    "S::::::::::::::::S",
+    "S:ssssssssssssss:S",
+    "S:ssssssssssssss:S",
+    "S:sss%%sssss%%ss:S",
+    "S:sss%sssssss%ss:S",
+    "S:ssssssssssssss:S",
+    "S:s^sssss%ssss^s:S",
+    "S:s^ssss%%ssssss:S",
+    "S:ssssssssssssss:S",
+    "S::::::::::::::::S",
+    "SSSSSSSSSSSSSSSSSS"
+  ],
+  "regions": [
+    {
+      "id": "the-wextreen-sands",
+      "name": "The Wextreen Sands",
+      "bounds": [
+        [
+          0,
+          0,
+          17,
+          11
+        ]
+      ],
+      "enemies": [
+        "Iron Abbot",
+        "Obsidian Colossus",
+        "Rimefather",
+        "The Rust Parliament"
+      ]
+    }
+  ],
+  "places": [
+    {
+      "at": [
+        8,
+        0
+      ],
+      "kind": "gate",
+      "id": "the-way-back-off-the-sands",
+      "name": "the way back off the sands",
+      "to": "the-low-water",
+      "at_to": [
+        8,
+        9
+      ],
+      "prose": [
+        "Up the shingle and onto ground that stays where it is."
+      ]
+    },
+    {
+      "at": [
+        4,
+        3
+      ],
+      "kind": "event",
+      "id": "the-iron-under-the-sand",
+      "name": "",
+      "prose": []
+    },
+    {
+      "at": [
+        13,
+        8
+      ],
+      "kind": "event",
+      "id": "the-tenth-survey",
+      "name": "",
+      "prose": []
+    },
+    {
+      "at": [
+        8,
+        6
+      ],
+      "kind": "event",
+      "id": "the-spinning-needle",
+      "name": "",
+      "prose": []
+    }
+  ]
+}

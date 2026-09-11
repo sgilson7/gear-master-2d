@@ -2526,6 +2526,91 @@ def check_the_cart_is_somewhere_and_then_somewhere_else(page, name, fails, base)
     print("ok: the cart is somewhere, sells survey gear, and is somewhere else after five steps")
 
 
+def check_the_sands_read_the_other_way_round(page, name, fails, base):
+    """**A second surveyable map, and it is the first that reads a compass
+    badly.**
+
+    Asked for as *"one more surveyable map that can be accessed from the
+    southern openworld area."* `survey::mods_for` has taken a `map` argument
+    since M11.6 and never read it; this is the arm its own doc said would come.
+
+    `cargo test` proves the numbers. What only a browser can say is that **the
+    door states the trade before you take it** — `kit_reading_json` runs
+    `mods_for` against the map on the far side, so the frame you build the
+    instrument on is the screen that tells you a compass is the wrong one here.
+    A player who found that out by walking into it would have been sold a
+    surprise rather than a decision.
+    """
+    def below_the_low_water(body, instrument=None):
+        strip_the_boards(body)
+        if instrument:
+            seat_a_set(body, instrument, "instrument")
+        w = body.setdefault("world", {})
+        w["map"] = "the-low-water"
+        w["at"] = [8, 8]
+        w["flags"] = list(w.get("flags", [])) + ["built-the-tenth"]
+        body["character"]["class"] = "Berserker"
+        body["character"]["xp"] = 4000
+
+    # --- with nothing: the edge refuses, in its own words, and opens the frame
+    plant(page, base, lambda b: below_the_low_water(b), stem="sands-bare")
+    dismiss_card(page)
+    close_fight(page)
+    page.evaluate("() => document.getElementById('map').focus()")
+    page.keyboard.press("ArrowDown")
+    page.wait_for_timeout(400)
+    if not page.is_visible("#instrument"):
+        fails.append(f"{name}: the edge of the sands did not open the instrument frame")
+        return
+    try:
+        shut = page.text_content("#instrument-shut") or ""
+        if "iron" not in shut.lower():
+            fails.append(f"{name}: the edge refuses in somebody else's words: {shut[:90]!r}")
+    finally:
+        page.click("#instrument-done")
+        page.wait_for_selector("#instrument", state="hidden", timeout=5000)
+
+    # --- with a compass: it opens, and the same instrument reads the two maps
+    # --- opposite ways ------------------------------------------------------
+    # **This is the whole point of the map**, and the door is not where it is
+    # said — with an instrument the gate simply opens, which is correct and is
+    # what the frame exists to make possible. What has to be true is that the
+    # *reading* differs, and that the frame would have said so: `kit_reading_json`
+    # is the same call the screen makes.
+    plant(page, base, lambda b: below_the_low_water(b, COMPASS), stem="sands-compass")
+    dismiss_card(page)
+    close_fight(page)
+    reads = page.evaluate("""() => ({
+        kind: JSON.parse(window.__kitReading('the-wextreen-sands')).kind,
+        here: JSON.parse(window.__kitReading('the-wextreen-sands')).reads,
+        reach: JSON.parse(window.__kitReading('the-reach')).reads,
+    })""")
+    if reads["kind"] != "compass":
+        fails.append(f"{name}: the planted compass is not assembled: {reads['kind']!r}")
+        return
+    here = (reads["here"] or {}).get("encounter_pct", 0)
+    reach = (reads["reach"] or {}).get("encounter_pct", 0)
+    if not (here > 0 > reach):
+        fails.append(f"{name}: the same compass reads the sands {here} and the reach {reach}, "
+                     f"and they are meant to be opposite")
+
+    page.evaluate("() => document.getElementById('map').focus()")
+    page.keyboard.press("ArrowDown")
+    page.wait_for_timeout(500)
+    dismiss_card(page)
+    close_fight(page)
+    where = page.evaluate("() => window.__world().id")
+    if where != "the-wextreen-sands":
+        fails.append(f"{name}: carrying a compass, walking into the edge arrived on {where!r}")
+    else:
+        # And the panel says what it is being read with, on the map itself.
+        said = (page.text_content("#survey") or "").lower()
+        if "compass" not in said:
+            fails.append(f"{name}: on the sands the panel does not say what is reading it: "
+                         f"{said!r}")
+    print("ok: the sands are a second surveyable map, and a compass is the wrong one there")
+
+
 def check_the_sump_refuses_without_an_instrument(page, name, fails, base):
     """**The lip of the Sump is the Reach's door in a second place.**
 
@@ -5725,6 +5810,7 @@ def walk_the_gate(browser, name, fails=None):
     check_a_fight_you_have_had_is_not_drawn(page, name, fails, path)
     check_the_bestiary_holds_what_you_have_met(page, name, fails, path)
     check_the_cart_is_somewhere_and_then_somewhere_else(page, name, fails, path)
+    check_the_sands_read_the_other_way_round(page, name, fails, path)
     check_the_sump_refuses_without_an_instrument(page, name, fails, path)
     check_a_wheel_says_what_it_wants(page, name, fails, path)
     check_the_chair_refuses_the_wrong_move(page, name, fails, path)

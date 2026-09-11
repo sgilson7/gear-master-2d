@@ -3160,6 +3160,9 @@ async function main() {
   // paints — a trap this project has written down and the key check
   // shipped vacuous against twice.
   window.__bag = () => JSON.parse(save_json()).state.character.owned.length;
+  // What a map would be read with, for a check that the frame states the
+  // trade before the door is taken.
+  window.__kitReading = (map) => kit_reading_json(map);
   window.__standHere = (at) => standOn(at, null);
   // Layout is the one claim reading the source cannot settle, so the gate has
   // to be able to put the fight screen on each stage and measure it.

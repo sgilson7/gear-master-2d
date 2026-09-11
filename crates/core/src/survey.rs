@@ -65,6 +65,19 @@ pub const COMPASS_PER_ITEM_PCT: i32 = -3;
 /// the compass a way of switching the game off rather than a way of reading it.
 pub const COMPASS_FLOOR_PCT: i32 = -45;
 
+/// The map with iron under it.
+///
+/// Named here rather than matched as a literal in two places, which is the
+/// difference between a constant and a string somebody will one day retype.
+pub const SANDS: &str = "the-wextreen-sands";
+/// What a compass does on the Sands: the needle finds every reef at once, and
+/// **louder than an atlas is on the Reach**, because it is actively wrong here
+/// rather than merely unhelpful.
+pub const SANDS_NEEDLE_PCT: i32 = 25;
+/// And what the paper survey does: the Reach's compass number, because the
+/// honest read is the honest read whichever instrument is doing it.
+pub const SANDS_PAPER_PCT: i32 = COMPASS_QUIET_PCT;
+
 /// What an atlas adds to every drop roll on the map it is pointed at.
 pub const ATLAS_DROPS_PER_MILLE: i32 = 120;
 /// And to what a win pays.
@@ -79,7 +92,42 @@ pub const ATLAS_LOUD_PCT: i32 = 10;
 /// to be a data drop plus an arm here, and a signature that could not tell two
 /// maps apart would have to change to become one that could.
 pub fn mods_for(map: &str, kind: &str, items_assembled: usize) -> SurveyMod {
-    let _ = map;
+    // **The map is read now, and this is what the argument was for.** It has
+    // been taken and ignored since M11.6, with a doc comment saying a second
+    // surveyable map would be *a data drop plus an arm here* — the Wextreen
+    // Sands is the data drop and this is the arm.
+    //
+    // There is iron under the sand, so the needle is no use and the paper
+    // survey is: **the instrument that reads the Reach best reads this
+    // worst.** A compass is loud here and an atlas is the quiet one, which is
+    // the whole return on having a second map to read — it makes *which
+    // instrument you built* a question about where you are going rather than a
+    // question with one answer.
+    //
+    // The player is not made to find this out by walking into it: the door
+    // opens the frame and `kit_reading_json` runs this function against the map
+    // on the far side, so the trade is stated in these numbers before it is
+    // taken.
+    if map == SANDS {
+        return match kind {
+            // The needle spins over the reefs, and you walk into things.
+            "compass" => SurveyMod { encounter_pct: SANDS_NEEDLE_PCT, ..SurveyMod::none() },
+            // The survey on the folding table is right, and it is quiet.
+            "atlas" => SurveyMod {
+                encounter_pct: (SANDS_PAPER_PCT + COMPASS_PER_ITEM_PCT * items_assembled as i32)
+                    .max(COMPASS_FLOOR_PCT),
+                drops_per_mille: ATLAS_DROPS_PER_MILLE,
+                xp_pct: ATLAS_XP_PCT,
+                golem: false,
+            },
+            // **Unchanged.** A golem is a thing that walked in with you and has
+            // no opinion about magnetism, so it reads every map the same — and
+            // an arm that varied it would be varying a fight rather than a
+            // reading.
+            "golem" => SurveyMod { golem: true, ..SurveyMod::none() },
+            _ => SurveyMod::none(),
+        };
+    }
     match kind {
         // **The honest read.** Fewer things stop you, and how many fewer is
         // what is on your board.

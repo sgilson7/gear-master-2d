@@ -201,15 +201,19 @@ fn the_third_town_has_no_shelves_and_says_so() {
     );
 }
 
-/// **Twelve maps became twenty-one, and every walkable tile of every one of
+/// **Twelve maps became twenty-two, and every walkable tile of every one of
 /// them is still reachable from where you arrive.**
 ///
 /// The M11.7 lesson stated over the new maps: a content block needs a
 /// reachability *measurement*, and the measurement has to name the tile it
 /// starts from.
 #[test]
-fn reachability_derives_over_twenty_one_maps() {
-    assert_eq!(data::MAPS.len(), 21, "the game ships {} maps", data::MAPS.len());
+fn reachability_derives_over_every_map() {
+    // **A count rather than a name**, and it moves when a map is added — which
+    // is the point: the loop below is the check and this is what stops it
+    // silently walking a shorter list. The twenty-second is the Wextreen
+    // Sands.
+    assert_eq!(data::MAPS.len(), 22, "the game ships {} maps", data::MAPS.len());
     for (id, _) in data::MAPS {
         let mut opened = WorldState::default();
         opened.map = (*id).to_string();

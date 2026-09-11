@@ -2266,6 +2266,37 @@ identical.
   **Sixth time** *a derived number needs somewhere it is shown* has been the
   answer here.
 
+## A glossary is a proofreading surface
+
+The unintended half of the last section, and it earned its place on the first
+read. **The glossary is the first screen in this game that prints all
+twenty-eight promises together**, and four of them turned out to be
+ungrammatical: *"you may hold 1 enchs a component"*, *"1 stacks of mana
+empowerment"*. That is the kind of thing nobody notices in a match arm and
+everybody notices in a column.
+
+`expert::enchs` and `expert::stacks` are the one answer, and
+`no_promise_is_ungrammatical_about_a_count` is over **every** promise rather
+than the three that happened to be wrong — **it found the fourth the moment it
+existed**. A list of three written by hand is a list that can be two, and this
+is that argument settled in about ninety seconds.
+
+**And it called one class two names.** An expert's aside said *what Berserker
+and Stoker reach together* under an entry titled **Gorillathon** — a canonical
+engine name on a player-facing screen. `Theme::retell` swaps whole words and
+does not cover the class table, so the pair travels beside the sentence on
+`Entry::pair` and the shim puts the player's word in: core writes the sentence,
+the shim translates the names in it. Found by *looking at it*, which is what
+`make art`'s *draw it, then look at it* says about anything drawn — and a
+screen is drawn.
+
+**One thing is left as it is and is the human's.** Three expert promises read
+oddly at their *untuned* values — *"a cast refunds 0% of what it cost"* —
+because the knob is zero until points are spent in its tree. Accurate for
+somebody who has just taken it, and it reads as broken. `describe` is shared
+with the fork card and the tree tab, where naming a knob at zero is how you
+know the knob is there, so hiding it is a decision rather than a tidy-up.
+
 ## Everything you need to play, in one place
 
 `crates/core/src/glossary.rs`, on **G** or a button. Five shelves in the order
@@ -4831,6 +4862,28 @@ deployed sha is the later one. **Read the run you mean**: `gh run list --limit
 watcher pointed at it reported a green deploy while the deploy was still
 building. That is the *read the exit code, and never a pipeline's* rule with a
 second workflow in it.
+
+**M19's is five things reported from play, and the table is one line per ask
+because the gate asked all of them.** Ninety checks against the deployed page.
+
+```
+live build d2bc84c1
+  index.html asks app.js?v=d2bc84c1   app.js carries BUILD='d2bc84c1'
+  chromium walked the gate    ok      90 ok lines, no failures
+  the ball slides             drawn on 19 frames, the trail growing 1 to 15
+  a diamond catches           the-road-west, and it let you in to
+                              kettleworks-field
+  the long cart               runs to a town you have stood in, 40 Fnorp, and
+                              the page arrives with it
+  the furnace on the bar      10 burns off faith, up to x10
+  the glossary                opens on G — 5 shelves, 29 things you can become,
+                              and the fight shelf says what empowerment does
+  console errors: none
+```
+
+**Three of the five were bugs rather than missing features**, and the worst of
+them was invisible for a milestone: the Kettle-Stoker dealt **746** against a
+classless character's **746**.
 
 **M16's is the first table here where every question was the gate's.** Seventy-
 eight checks in chromium against the deployed page, six of them the block's own

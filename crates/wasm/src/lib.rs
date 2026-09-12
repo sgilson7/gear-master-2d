@@ -516,52 +516,7 @@ pub fn try_step(dir: &str) -> String {
                 let at = g.world.at;
                 g.encounter_with(m.name, at);
             }
-            // **Something that will not fight you.** Core's answer, and it
-            // takes the encounter with it: a routed creature never reaches the
-            // fight screen, because there is no fight and a replay would have
-            // nothing to draw. The receipt is core's too — the page prints what
-            // it was paid rather than working it out.
-            let routed = gm2d_core::fight::rout(g).map(|r| {
-                serde_json::json!({
-                    "name": g.theme_name(
-                        gm2d_core::combat::creature(&r.creature).map(|m| m.name).unwrap_or("")
-                    ),
-                    "gold": r.gold,
-                    "xp": r.xp,
-                    "carried": r.carried,
-                    "receipt": r.receipt,
-                })
-            });
-            // **A fight you have already had.** The third shape, after a rout
-            // and an encounter, and it differs from the rout in the one respect
-            // that matters: *the fight happened*, so it paid the speed bonus,
-            // rolled the drops, ticked the order book and cost the four
-            // percent — because it went through `fight::settle` like every
-            // other fight, which is the whole of the design and the reason
-            // there is no settlement code here.
-            //
-            // Asked **after** the rout, so a set that talks a creature out of
-            // fighting beats a mark that would have fought it. That is the
-            // cheaper of the two for the player — a rout costs no tiredness —
-            // and it is what they paid three drops for.
-            //
-            // `routed.is_none()` is not a guard: a rout takes the encounter, so
-            // there is nothing left for `instant` to find.
-            let instant = gm2d_core::fight::instant(g, DIFFICULTY).map(|s| {
-                // A defeat walks you home whether or not anybody watched it.
-                // One answer, and it is `walk_home`'s.
-                if s.sent_home.is_some() {
-                    walk_home(g);
-                }
-                serde_json::json!({
-                    "outcome": format!("{:?}", s.outcome).to_lowercase(),
-                    "gold": s.gold,
-                    "xp": s.xp,
-                    "carried": s.carried,
-                    "sent_home": s.sent_home,
-                    "receipt": s.receipt,
-                })
-            });
+            let (routed, instant) = settle_without_a_screen(g);
             // **Arriving is the doing.** An errand that says "go and talk to
             // them" is finished by standing there, so this is where it is
             // noticed — on the step, rather than when some screen opens. A
@@ -3762,6 +3717,11 @@ pub fn try_shoot(angle: u16, power: u8) -> String {
             let at = g.world.at;
             g.encounter_with(m.name, at);
         }
+        // **And the same two fights a step never draws.** A rout and a mark
+        // are answers to *what happens when you meet something*, and a landing
+        // meets things exactly as a step does — see `settle_without_a_screen`,
+        // which is one answer because for a milestone there were two.
+        let (routed, instant) = settle_without_a_screen(g);
         // **The same gate the step goes through**, and the same payload. A
         // shot that comes to rest on a gate — or beside one on ground nobody
         // can stand on — opens the same door, because there is one answer to
@@ -3776,7 +3736,8 @@ pub fn try_shoot(angle: u16, power: u8) -> String {
             .map(|id| gm2d_core::quest::on_arrival(g, id))
             .unwrap_or_default();
         let mut out = report_step(
-            g, &s, mended, toll, spoke, &went, shut, wants_instrument, turned, ending, None, None,
+            g, &s, mended, toll, spoke, &went, shut, wants_instrument, turned, ending, routed,
+            instant,
         );
         out["said"] = serde_json::Value::String(said);
         out["sunk"] = serde_json::Value::Bool(flight.sunk().is_some());
@@ -3893,6 +3854,74 @@ pub fn preview_shot(angle: u16, power: u8) -> String {
 /// same arrival, so it is the same payload. A second builder would be a second
 /// answer to *what happened*, and the page would have two shapes to read.
 #[allow(clippy::too_many_arguments)]
+/// A fight that does not get drawn: a rout, or one you have already had.
+///
+/// **Extracted because it was written once and needed twice.** `try_step` ran
+/// these two and `try_shoot` did not, so on a table a set that talks a creature
+/// out of fighting was inert and a creature you had *marked* opened the fight
+/// screen anyway. Reported from play: *"the auto battle doesnt work on the
+/// overworld when pinballing"*.
+///
+/// That is M17.2's own lesson arriving late. A landing is the same arrival as a
+/// step, which is why `world::arrive_at` and `answer_the_gate` were pulled out
+/// of `try_step` when the table was built — and these two were left behind, so
+/// there were two answers to *what happens when you meet something* and only
+/// one of them knew about marks.
+///
+/// Returns `(routed, instant)` for the payload; both are `None` when an
+/// ordinary fight is about to open.
+fn settle_without_a_screen(
+    g: &mut gm2d_core::game::Game,
+) -> (Option<serde_json::Value>, Option<serde_json::Value>) {
+            // **Something that will not fight you.** Core's answer, and it
+    // takes the encounter with it: a routed creature never reaches the
+    // fight screen, because there is no fight and a replay would have
+    // nothing to draw. The receipt is core's too — the page prints what
+    // it was paid rather than working it out.
+    let routed = gm2d_core::fight::rout(g).map(|r| {
+        serde_json::json!({
+            "name": g.theme_name(
+                gm2d_core::combat::creature(&r.creature).map(|m| m.name).unwrap_or("")
+            ),
+            "gold": r.gold,
+            "xp": r.xp,
+            "carried": r.carried,
+            "receipt": r.receipt,
+        })
+    });
+    // **A fight you have already had.** The third shape, after a rout
+    // and an encounter, and it differs from the rout in the one respect
+    // that matters: *the fight happened*, so it paid the speed bonus,
+    // rolled the drops, ticked the order book and cost the four
+    // percent — because it went through `fight::settle` like every
+    // other fight, which is the whole of the design and the reason
+    // there is no settlement code here.
+    //
+    // Asked **after** the rout, so a set that talks a creature out of
+    // fighting beats a mark that would have fought it. That is the
+    // cheaper of the two for the player — a rout costs no tiredness —
+    // and it is what they paid three drops for.
+    //
+    // `routed.is_none()` is not a guard: a rout takes the encounter, so
+    // there is nothing left for `instant` to find.
+    let instant = gm2d_core::fight::instant(g, DIFFICULTY).map(|s| {
+        // A defeat walks you home whether or not anybody watched it.
+        // One answer, and it is `walk_home`'s.
+        if s.sent_home.is_some() {
+            walk_home(g);
+        }
+        serde_json::json!({
+            "outcome": format!("{:?}", s.outcome).to_lowercase(),
+            "gold": s.gold,
+            "xp": s.xp,
+            "carried": s.carried,
+            "sent_home": s.sent_home,
+            "receipt": s.receipt,
+        })
+    });
+    (routed, instant)
+}
+
 fn report_step(
     g: &mut gm2d_core::game::Game,
     s: &gm2d_core::world::Step,
@@ -4106,11 +4135,26 @@ fn answer_the_gate(
                         });
                     }
                 } else {
-                    shut = Some(if p.shut.is_empty() {
-                        "It is locked.".to_string()
-                    } else {
-                        p.shut.clone()
-                    });
+                    // **A door that is waiting on something says what.**
+                    // `Game::sealed_because` composes the two registers —
+                    // the map file's sentence about the place, and the
+                    // engine's naming the mark it wants, looked up among
+                    // the places so it cannot go stale when one is renamed.
+                    //
+                    // **It was called by nothing at all.** Written in M14
+                    // for *a sealed door with the other dungeon's name in
+                    // the refusal*, defined in core, and never wired — so
+                    // every `needs_all` gate in the game refused with the
+                    // bare `shut` and the naming half went nowhere. That is
+                    // `Outcome::Xp`'s shape a second time: a derived
+                    // sentence with nowhere it is shown.
+                    //
+                    // Found when the way under the flat was changed from
+                    // hidden to shut, and a player reported standing on the
+                    // Sands unable to see the dungeon at all.
+                    shut = Some(g.sealed_because(&p, DIFFICULTY).unwrap_or_else(|| {
+                        if p.shut.is_empty() { "It is locked.".to_string() } else { p.shut.clone() }
+                    }));
                     // **A gate that wants an instrument is not a wall, it
                     // is a bench.** It is the one kind of shut door whose
                     // answer the player is carrying the parts for, so the
@@ -4160,11 +4204,26 @@ fn answer_the_gate(
                         "prose": p.prose,
                     }));
                 } else {
-                    shut = Some(if p.shut.is_empty() {
-                        "It is locked.".to_string()
-                    } else {
-                        p.shut.clone()
-                    });
+                    // **A door that is waiting on something says what.**
+                    // `Game::sealed_because` composes the two registers —
+                    // the map file's sentence about the place, and the
+                    // engine's naming the mark it wants, looked up among
+                    // the places so it cannot go stale when one is renamed.
+                    //
+                    // **It was called by nothing at all.** Written in M14
+                    // for *a sealed door with the other dungeon's name in
+                    // the refusal*, defined in core, and never wired — so
+                    // every `needs_all` gate in the game refused with the
+                    // bare `shut` and the naming half went nowhere. That is
+                    // `Outcome::Xp`'s shape a second time: a derived
+                    // sentence with nowhere it is shown.
+                    //
+                    // Found when the way under the flat was changed from
+                    // hidden to shut, and a player reported standing on the
+                    // Sands unable to see the dungeon at all.
+                    shut = Some(g.sealed_because(&p, DIFFICULTY).unwrap_or_else(|| {
+                        if p.shut.is_empty() { "It is locked.".to_string() } else { p.shut.clone() }
+                    }));
                 }
             }
         }

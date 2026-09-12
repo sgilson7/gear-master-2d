@@ -8,6 +8,7 @@ makes, made for a human.
 | file | where it puts you |
 |---|---|
 | `on-the-table.json` | **the Treyway, which is a table.** Pull back from the ball with the mouse, or aim with ← → and ↑ ↓ and press space |
+| `on-the-sands.json` | **a reported save**: standing on the Wextreen Sands with THE TENTH SURVEY finished and the way under not yet open. The gate wanted the *event* of that name, two hundred paces east, and was hidden so it could not say so |
 | `at-the-lip.json` | the Low Water, at the mouth of the Wextreen Sump |
 | `at-the-reefs.json` | the first floor of the Eleven Reefs |
 | `under-the-lake.json` | what the lake was on top of |

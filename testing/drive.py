@@ -7212,7 +7212,7 @@ def walk_the_gate(browser, name, fails=None):
     check_a_full_bill_holds_two_enchs(page, name, fails)
 
     # --- the Eleven Reefs, and the two classes under the Sands ---------------
-    check_the_way_under_is_not_drawn_before_the_sheet(page, name, fails)
+    check_the_way_under_is_drawn_and_shut_before_the_sheet(page, name, fails)
     check_a_stake_says_pull_read_or_lie(page, name, fails)
     check_a_sinkhole_moves_you(page, name, fails)
     check_she_is_wearing_it(page, name, fails)
@@ -7252,44 +7252,82 @@ def walk_the_gate(browser, name, fails=None):
 # ------------------------------------------------------------ the Eleven Reefs
 
 
-def check_the_way_under_is_not_drawn_before_the_sheet(page, name, fails):
-    """[11, 5] on the Sands is plain silt until the sheet is off the table.
+def check_the_way_under_is_drawn_and_shut_before_the_sheet(page, name, fails):
+    """[11, 5] on the Sands is a door you can see and cannot open yet.
 
-    **Two conditions in an order, and only a browser can say what is drawn.**
-    `hidden_until` is answered in core and `place_is_there` is tested there; what
-    this asks is whether the *map* draws a gate on a tile that has one and
-    nothing on a tile that does not — which is the `paintPanel` question this
-    project has now got wrong four times.
+    **It used to be nothing at all, and that was the bug.** `hidden_until` hid
+    the gate until the tenth surveyor's sheet was off the table, and a hidden
+    door cannot say what it is waiting for — so somebody who had finished the
+    *errand* called THE TENTH SURVEY stood on the flat, saw bare silt, and
+    reported the dungeon as not opening. The mark the gate wants is an **event**
+    of the same name, two hundred paces east.
+
+    M14 made this exact call in the other direction for the two dungeon
+    bottoms: *a door at the bottom of a dungeon that is not there is a room you
+    walk out of thinking the dungeon ended*. Two fields, two jobs — one decides
+    whether a place is **there** and the other whether it **opens**.
+
+    Only a browser can say what is drawn, which is the `paintPanel` question
+    this project has now got wrong four times.
     """
     with page.expect_download(timeout=20000) as dl:
         page.click("#download")
     base = dl.value.path()
 
-    def onto(body):
-        body["world"]["map"] = "the-wextreen-sands"
-        body["world"]["at"] = [11, 5]
-        body["world"]["answered"] = []
+    def onto(body, answered):
+        strip_the_boards(body)
+        w = body.setdefault("world", {})
+        w["map"] = "the-wextreen-sands"
+        w["at"] = [11, 6]
+        w["answered"] = list(answered)
 
-    plant(page, base, onto, stem="sands-before")
-    before = page.evaluate(
-        "() => (window.__world().places ?? []).filter(p => p.id === 'the-way-under-the-flat').length")
-    if before != 0:
-        fails.append(f"{name}: the way under is drawn before the sheet is taken")
+    plant(page, base, lambda b: onto(b, []), stem="sands-before")
+    try:
+        drawn = page.evaluate(
+            "() => (window.__world().places ?? [])"
+            ".find(p => p.id === 'the-way-under-the-flat')")
+        if not drawn:
+            fails.append(f"{name}: the way under is not drawn before the sheet — a door "
+                         f"nobody can see cannot say what it wants")
+            return
+        if drawn.get("kind") != "gate":
+            fails.append(f"{name}: the way under is a {drawn.get('kind')} rather than a gate")
 
-    def sheeted(body):
-        body["world"]["map"] = "the-wextreen-sands"
-        body["world"]["at"] = [11, 5]
-        body["world"]["answered"] = ["the-tenth-survey"]
+        # **And walking into it says what it is waiting on, by name.** The
+        # sentence is two registers: the map file's about the flat, and the
+        # engine's naming the mark — which is why the sheet's place has a name
+        # at all. Without one the refusal read "the tenth survey", which is
+        # also the errand this player had already finished.
+        page.keyboard.press("ArrowUp")
+        page.wait_for_timeout(500)
+        dismiss_card(page)
+        close_fight(page)
+        # **Wherever the gate puts it.** This one also wants a survey
+        # instrument, so it opens the frame and writes its refusal there rather
+        # than on the strip — *a gate that wants an instrument is a bench, not
+        # a wall*. A check that only read the tape would be asking the wrong
+        # screen, which is the mistake the last two negative tests here made.
+        said = (page.text_content("#instrument-shut") or "") if page.is_visible("#instrument") \
+            else " ".join(tape(page))
+        if "sheet" not in said.lower():
+            fails.append(f"{name}: the shut way under does not name the sheet: {said[-180:]!r}")
+            return
+    finally:
+        clear_screens(page)
 
-    plant(page, base, sheeted, stem="sands-after")
-    after = page.evaluate(
-        "() => (window.__world().places ?? []).find(p => p.id === 'the-way-under-the-flat')")
-    if not after:
-        fails.append(f"{name}: the sheet was taken and the way under is still not there")
-        return
-    if after.get("kind") != "gate":
-        fails.append(f"{name}: the way under is a {after.get('kind')} rather than a gate")
-    print("ok: the way under the flat is silt until the tenth survey is off the table")
+    plant(page, base, lambda b: onto(b, ["the-tenth-survey"]), stem="sands-after")
+    try:
+        after = page.evaluate(
+            "() => (window.__world().places ?? [])"
+            ".find(p => p.id === 'the-way-under-the-flat')")
+        if not after:
+            fails.append(f"{name}: the sheet was taken and the way under vanished")
+        else:
+            print("ok: the way under the flat is drawn and shut until the sheet is taken, "
+                  "and the refusal names it")
+    finally:
+        clear_screens(page)
+        plant(page, base, lambda body: None, stem="sands-restore")
 
 
 def check_a_stake_says_pull_read_or_lie(page, name, fails):

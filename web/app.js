@@ -3293,6 +3293,20 @@ function shoot() {
     else if (r.refused_by) log(r.blocked, true);
     if (r.ending) openEnding(r.ending);
     if (r.mended > 0) log(`Somebody puts a chair out. ${r.mended}% of you comes back.`);
+    // **The two fights that never get drawn, on a landing as on a step.**
+    // Reported from play: *"the auto battle doesnt work on the overworld when
+    // pinballing"* — and it did not, because `try_shoot` ran neither. The
+    // engine half is `settle_without_a_screen`; this is the same two lines
+    // `walk` has, for the same reasons, printed and never worked out.
+    if (r.routed) log(r.routed.receipt.join(' '));
+    if (r.instant) {
+      log(r.instant.receipt.join(' '));
+      // A defeat walks you home across maps, and the panel above was painted
+      // against the map the ball landed on. A page that draws a world has to
+      // be told which world every time it can have changed.
+      if (r.instant.sent_home) { world = JSON.parse(world_json()); paintPanel(); draw(); }
+      autosave();
+    }
     if (r.town) openTown(r.town);
     else if (r.bench) openVendor();
     else if (r.caravan) openCaravan();

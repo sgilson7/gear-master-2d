@@ -2313,30 +2313,87 @@ identical.
   **Sixth time** *a derived number needs somewhere it is shown* has been the
   answer here.
 
+## A sealed door that could not say what it wanted
+
+Reported from play with a save attached: *"I have the tenth survey completed
+and i do not see the dungeon opening."* Two faults, and the second is older and
+worse.
+
+**The names collide.** The way under the flat waits on `the-tenth-survey`,
+which is an **event** — the tenth surveyor's sheet on a folding table two
+hundred paces east — and the *errand* of the same name writes
+`word:the-tenth-survey`. Somebody who had finished the errand had every reason
+to expect the door.
+
+**And a hidden door cannot tell them apart.** It was `hidden_until`, so the
+player stood on bare silt. M14 made this exact call in the other direction for
+the two dungeon bottoms — *a door at the bottom of a dungeon that is not there
+is a room you walk out of thinking the dungeon ended* — and this one got the
+wrong field. It is `needs_all` now: drawn, shut, and naming what it wants.
+`hidden_until` decides whether a place is **there**; `needs_all` whether it
+**opens**.
+
+**`Game::sealed_because` was called by nothing at all.** Written in M14 for *a
+sealed door with the other dungeon's name in the refusal*, defined in core, and
+never wired — so **every** `needs_all` gate in the game, both dungeon bottoms
+included, refused with the bare `shut` and the half that names the mark went
+nowhere. That is `Outcome::Xp`'s shape a second time: a derived sentence with
+nowhere it is shown, found four blocks later by somebody standing in it.
+
+- **The mark needs a name.** `sealed_because` looks one up among the places and
+  falls back to the id with its hyphens removed — which here was *"the tenth
+  survey"*, the errand's own name. The sheet's tile is named now, so the
+  refusal says *"It is waiting on the tenth surveyor's sheet."*
+- **The refusal goes where the gate speaks.** This one also wants an
+  instrument, so it opens the frame and writes its sentence there rather than
+  on the strip — *a gate that wants an instrument is a bench, not a wall*. A
+  check that only read the tape would be asking the wrong screen.
+- **The save is a check.** `testing/saves/on-the-sands.json`, and
+  `the_way_under_the_flat_is_shut_and_says_what_it_wants` loads it. *A bug
+  reported with a save attached should never be fixed without that save
+  becoming a check.*
+
+## The two fights a shot never settled
+
+Reported from play: *"the auto battle doesnt work on the overworld when
+pinballing."* `try_step` ran `fight::rout` and `fight::instant`; **`try_shoot`
+passed `None, None` for both.** So on a table a set that talks a creature out
+of fighting was inert, and a creature you had *marked* opened the fight screen
+anyway.
+
+That is M17.2's own lesson arriving a milestone late. A landing is the same
+arrival as a step, which is exactly why `world::arrive_at` and
+`answer_the_gate` were pulled out of `try_step` when the table was built —
+and these two were left behind, so there were two answers to *what happens when
+you meet something* and only one of them knew about marks.
+`settle_without_a_screen` is one answer, called from both.
+
 ## A number nobody can reproduce is not a number
 
-**1,137 went into three commit messages as the engine suite's size. It is
-993.** Confirmed by an independent re-run — 87 test binaries, nought failing —
-and by arithmetic: M18 was 976 and the block adds about fourteen tests.
+**The suite total was quoted three times as 1,137 and could never be got
+back.** Chasing it turned up the cause, and it is cargo's own output: test
+binaries and their threads write to one stream, so summary lines are cut in
+half. This is one real line from one real run:
 
-**And the first correction was wrong too.** It said a shared `/tmp/gm-done`
-between two runner scripts had let a *workspace* run's total be read as the
-engine's. That is a real hazard and it is fixed; it is not what happened.
-`cargo test --workspace` is 92 binaries and **also 993**, because the shim and
-the authoring bench carry no tests of their own. So 1,137 is the output of
-neither command and the mechanism is unknown.
+```
+test result: ok. 28 passtest every_place_on_a_shot_map_is_reachable_by_shots ... ok
+```
 
-Two things come out of it and the second is the one worth keeping:
+Summing the fourth field across those gives a different answer every time the
+regex changes — **978, 1,025 and 1,053 from the same run**, and 1,137 is the
+same failure with a different parse.
 
-- **A number nobody can reproduce is not a number.** It was published three
-  times before anybody tried to get it back.
-- **An explanation that sounds right is not a measurement.** The shared
-  done-file story was written down *before* `--workspace` had been run, and
-  running it took four minutes and disproved it. This file is full of places
-  where measuring first was the whole of the finding — *when a test disagrees
-  with a cost, suspect the test's idea of income first*, the 40%-too-high
-  experience target, the Kettleworks gear that was not the body numbers — and
-  this is that rule failing in the one place it should be cheapest to obey.
+**What is trustworthy is the exit code and the absence of `FAILED`.** A total
+needs the binaries run serially and summed, which nothing here does, so **no
+precise figure is quoted in this file until a method gives the same number
+twice.** `SECOND-ORDER-M17.md` row 60 is the open worklist row.
+
+And the first correction was wrong as well: it blamed a shared `/tmp/gm-done`
+between two runner scripts, which is a real hazard and is fixed, and is not
+this. `cargo test --workspace` came back 993 too. **An explanation that sounds
+right is not a measurement** — twice over, on one number, in a repository whose
+own rules are *measure before you tune* and *break a new check and watch it
+fail*.
 
 ## A glossary is a proofreading surface
 
@@ -5383,7 +5440,7 @@ Every figure below was re-measured for M12.6 rather than carried forward.
 | M16.6: six browser checks, a walk that loops, and the block written down | 950 passing |
 | M17.0: a table nobody can see yet, and a cue you could not have aimed | 960 passing |
 | M17.1–M17.5 + M18: the overworld is a table, and the notebooks executed | 976 passing |
-| **M19: a ball you can watch, a diamond you can hit, and a glossary** | **993 passing** |
+| **M19: a ball you can watch, a diamond you can hit, and a glossary** | **green; see *A number nobody can reproduce*** |
 
 **M13.5 adds none and M13.7 and M13.8 add none, and all three are honest.**
 M13.5 lands ten trees into a data file and the three lints it needed were

@@ -33,14 +33,16 @@
 
 | # | Milestone | Deliverables | Ships |
 |---|---|---|---|
-| **M19.0** | The ball slides | clock-driven and interpolated between ticks; the trail grows behind it | `27d0542` · 993 |
-| **M19.1** | A diamond catches the ball | `PlaceKind::catches`, `Contact::Caught`; hitting a gate is entering it | `27d0542` · 993 |
-| **M19.2** | Five obstacles, five marks | a boulder, a hole, teeth, a drift and a lane — nine places had worn the event mark | `27d0542` · 993 |
-| **M19.3** | The long cart | a ride between towns you have stood in, 40 Fnorp, from the town screen | `27d0542` · 993 |
-| **M19.4** | The furnace reaches a board that swings | the Stoker dealt 746 against a classless 746; its stacks pay both lanes now | `27d0542` · 993 |
-| **M19.5** | The furnace on the bar | `Event::Burned` was in the replay's `_` arm and nothing drew it | `27d0542` · 993 |
-| **M19.6** | The glossary | five shelves on **G**, every number read from the constant that decides it | `27d0542` · 993 |
-| **M19.7** | Twenty-one expert papers | one drawing, twenty-one colourways — an expert is a pair, so the figure is | `27d0542` · 993 |
-| **M19.8** | Two browser checks | the furnace on the bar, and the glossary. 90 green | `f2196a0` · 993 |
+| **M19.0** | The ball slides | clock-driven and interpolated between ticks; the trail grows behind it | `27d0542` · green |
+| **M19.1** | A diamond catches the ball | `PlaceKind::catches`, `Contact::Caught`; hitting a gate is entering it | `27d0542` · green |
+| **M19.2** | Five obstacles, five marks | a boulder, a hole, teeth, a drift and a lane — nine places had worn the event mark | `27d0542` · green |
+| **M19.3** | The long cart | a ride between towns you have stood in, 40 Fnorp, from the town screen | `27d0542` · green |
+| **M19.4** | The furnace reaches a board that swings | the Stoker dealt 746 against a classless 746; its stacks pay both lanes now | `27d0542` · green |
+| **M19.5** | The furnace on the bar | `Event::Burned` was in the replay's `_` arm and nothing drew it | `27d0542` · green |
+| **M19.6** | The glossary | five shelves on **G**, every number read from the constant that decides it | `27d0542` · green |
+| **M19.7** | Twenty-one expert papers | one drawing, twenty-one colourways — an expert is a pair, so the figure is | `27d0542` · green |
+| **M19.8** | Two browser checks | the furnace on the bar, and the glossary. 90 green | `f2196a0` · green |
 | **M19.9** | The cue draws the road ahead | the whole predicted path, the tile it stops on, and a box round what it hits — because an event is one tile and nothing helped you aim | ✓ |
 | **M19.10** | A shot prints a refusal | `shoot` threw `blocked`/`refused_by` away; `walk` has printed them since M15. The third *"the land is pink"* | ✓ |
+| **M19.11** | Instant battle on a table | `try_shoot` ran neither `rout` nor `instant`; one `settle_without_a_screen` called from both | ✓ |
+| **M19.12** | A sealed door that says what it wants | `needs_all` rather than `hidden_until` on the way under the flat — and `sealed_because` had been called by nothing since M14 | ✓ |

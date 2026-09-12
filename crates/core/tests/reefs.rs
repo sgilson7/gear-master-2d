@@ -175,30 +175,53 @@ fn an_ench_on_a_creature_reads_like_an_ench_on_a_player() {
 
 // ---------------------------------------------------------- the Flat Below
 
-/// **The gate under the flat is not there until the sheet is off the table.**
+/// **The gate under the flat is drawn and shut until the sheet is off the
+/// table**, and for a milestone it was not drawn at all.
 ///
-/// Two conditions in a deliberate order: the sheet is how you learn there is an
-/// under, and the instrument is how you go into it. A gate that was *drawn*
-/// before the sheet would be a way down somebody found by walking over it,
-/// which is a different scene.
+/// The old shape was `hidden_until`, on the grounds that *a gate drawn before
+/// the sheet would be a way down somebody found by walking over it, which is a
+/// different scene*. That is a real argument and it lost to a report: somebody
+/// finished the errand **THE TENTH SURVEY**, stood on the flat, saw nothing,
+/// and could not tell a door they had not earned from a door that was broken.
+///
+/// The mark the gate wants is an **event** of the same name — the tenth
+/// surveyor's sheet — and the errand writes `word:the-tenth-survey` instead. So
+/// the one thing that could have told them apart was a door that says what it
+/// is waiting for, and a hidden door cannot. M14 made this exact call in the
+/// other direction for the two dungeon bottoms; `hidden_until` decides whether
+/// a place is **there** and `needs_all` whether it **opens**.
 #[test]
-fn the_way_under_is_hidden_until_the_sheet() {
+fn the_way_under_is_drawn_and_sealed_until_the_sheet() {
     let sands = data::map("the-wextreen-sands", D);
     let gate = sands
         .places
         .iter()
         .find(|p| p.id == "the-way-under-the-flat")
         .expect("the way under");
-    assert_eq!(gate.hidden_until.as_deref(), Some("the-tenth-survey"));
+    assert_eq!(gate.hidden_until, None, "it is drawn from the first visit");
+    assert_eq!(gate.needs_all, vec!["the-tenth-survey".to_string()]);
+
     let mut st = gm2d_core::world::WorldState::default();
     st.map = "the-wextreen-sands".into();
     let allowed = gm2d_core::world::Allowances { level: 60, ..Default::default() };
     assert!(
-        !gm2d_core::world::place_is_there(gate, &st, &allowed),
-        "before the sheet it is plain silt"
+        gm2d_core::world::place_is_there(gate, &st, &allowed),
+        "a door you cannot see cannot say what it wants"
     );
-    st.answered.push("the-tenth-survey".into());
-    assert!(gm2d_core::world::place_is_there(gate, &st, &allowed), "and after it, a gate");
+
+    // **And the mark it waits on has a name**, or the refusal reads "the tenth
+    // survey" — which is the errand this player had already finished, and the
+    // whole of what made the report possible.
+    let sheet = sands
+        .places
+        .iter()
+        .find(|p| p.id == "the-tenth-survey")
+        .expect("the sheet is on the flat");
+    assert!(
+        !sheet.name.is_empty() && sheet.name.contains("sheet"),
+        "the sheet's tile is called {:?}, so the refusal will name the errand",
+        sheet.name
+    );
 }
 
 /// **And it is shut until something on the frame can read the flat**, in the
@@ -937,4 +960,65 @@ fn the_run_meets_something_wearing_its_own_board() {
         D,
     );
     assert_eq!(log.outcome, Outcome::Defeat, "the run beats a boss wearing its own board");
+}
+
+/// **The way under the flat is drawn and shut, not absent.**
+///
+/// Reported from play with a save attached: *"I have the tenth survey
+/// completed and i do not see the dungeon opening"* — and the save is
+/// `testing/saves/on-the-sands.json`, standing on the Sands with the errand
+/// **THE TENTH SURVEY** finished and nothing at `[11, 5]` at all.
+///
+/// Two things were wrong and the naming is the first. The gate waits on
+/// `the-tenth-survey`, which is an **event** — the tenth surveyor's sheet, on a
+/// folding table two hundred paces east — and the errand of that name writes
+/// `word:the-tenth-survey` instead. A player who finished the errand had every
+/// reason to expect the door.
+///
+/// The second is that **a hidden door cannot say what it is waiting for.** M14
+/// made this exact call in the other direction for the two dungeon bottoms:
+/// *a door at the bottom of a dungeon that is not there is a room you walk out
+/// of thinking the dungeon ended.* Two fields, two jobs — `hidden_until`
+/// decides whether a place is **there** and `needs_all` whether it **opens**.
+///
+/// A bug reported with a save attached should never be fixed without that save
+/// becoming a check.
+#[test]
+fn the_way_under_the_flat_is_shut_and_says_what_it_wants() {
+    let save = include_str!("../../../testing/saves/on-the-sands.json");
+    let mut g = gm2d_core::save::load(save).expect("the reported save loads");
+    let a = g.character.allowances();
+    let w = gm2d_core::data::map_now("the-wextreen-sands", D, &g.world);
+
+    // The state the report was made in: the errand done, the sheet not taken.
+    assert!(
+        g.world.answered.iter().any(|m| m == "word:the-tenth-survey"),
+        "the reported save has not finished the errand"
+    );
+    assert!(
+        !g.world.answered.iter().any(|m| m == "the-tenth-survey"),
+        "the reported save has already taken the sheet"
+    );
+
+    let gate = w
+        .place_now(&g.world, 11, 5, &a)
+        .expect("the way under is drawn before the sheet is taken");
+    assert_eq!(gate.kind, gm2d_core::world::PlaceKind::Gate);
+
+    // **And it says what it is waiting on, by name.** `sealed_because` was
+    // written in M14 and called by nothing at all, so every `needs_all` gate in
+    // the game refused with the bare `shut` and the naming half went nowhere —
+    // `Outcome::Xp`'s shape a second time.
+    let why = g.sealed_because(&gate, D).expect("a shut door says why");
+    assert!(
+        why.contains("sheet"),
+        "the refusal does not name the sheet, so it names the errand instead: {why}"
+    );
+
+    // Taking the sheet opens it.
+    g.world.answered.push("the-tenth-survey".into());
+    assert!(
+        g.sealed_because(&gate, D).is_none(),
+        "the sheet was taken and the way under is still sealed"
+    );
 }

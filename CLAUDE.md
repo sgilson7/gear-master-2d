@@ -623,6 +623,7 @@ something cost a day.
     make dress         # search the catalogue for a creature near a rating
     make read          # print an existing creature's board and its rating
     make test-ui-setup # one-time: venv + headless chromium
+    packaging/count-tests.sh  # how many tests there are, countably
 
 **Two environment variables, both added in M11 and both about *which page*.**
 
@@ -2383,10 +2384,15 @@ Summing the fourth field across those gives a different answer every time the
 regex changes — **978, 1,025 and 1,053 from the same run**, and 1,137 is the
 same failure with a different parse.
 
-**What is trustworthy is the exit code and the absence of `FAILED`.** A total
-needs the binaries run serially and summed, which nothing here does, so **no
-precise figure is quoted in this file until a method gives the same number
-twice.** `SECOND-ORDER-M17.md` row 60 is the open worklist row.
+**So the binaries are asked instead.** `packaging/count-tests.sh` builds them,
+finds them off `--message-format=json` — the one part of cargo's output that is
+machine-readable by design — and runs each with `--list`, which prints one line
+a test and no summary to garble. Nothing is executed; it counts, and
+`cargo test` decides whether they pass.
+
+**1,004 tests in 86 binaries, the same three times running.** That is the
+figure this file quotes from now on, and the way to get it back is one
+command.
 
 And the first correction was wrong as well: it blamed a shared `/tmp/gm-done`
 between two runner scripts, which is a real hazard and is fixed, and is not
@@ -5440,7 +5446,7 @@ Every figure below was re-measured for M12.6 rather than carried forward.
 | M16.6: six browser checks, a walk that loops, and the block written down | 950 passing |
 | M17.0: a table nobody can see yet, and a cue you could not have aimed | 960 passing |
 | M17.1–M17.5 + M18: the overworld is a table, and the notebooks executed | 976 passing |
-| **M19: a ball you can watch, a diamond you can hit, and a glossary** | **green; see *A number nobody can reproduce*** |
+| **M19: a ball you can watch, a diamond you can hit, and a glossary** | **1,004 tests** (`packaging/count-tests.sh`) |
 
 **M13.5 adds none and M13.7 and M13.8 add none, and all three are honest.**
 M13.5 lands ten trees into a data file and the three lints it needed were

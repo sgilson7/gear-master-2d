@@ -1036,6 +1036,13 @@ def check_the_bench_brews_a_pair(page, name, fails):
     line under it. `cargo test` can say what a pair is worth; it cannot say
     whether anybody can reach the bench.
     """
+    # **Whatever the check before left up, cleared before anything is
+    # clicked.** A shot can end on any screen and the check before this one
+    # lands on a town — and the *first* click here is `#download`, so a guard
+    # placed after the plant is a guard placed after the timeout. Green
+    # locally and red in CI, which is the shape of every ordering bug this
+    # harness has had.
+    clear_screens(page)
     with page.expect_download(timeout=20000) as dl:
         page.click("#download")
     base = dl.value.path()
@@ -1053,11 +1060,13 @@ def check_the_bench_brews_a_pair(page, name, fails):
 
     plant(page, base, stocked, stem="bench")
     try:
-        # **Whatever the check before left up.** A shot can end on any screen,
-        # and the one before this one lands on a town — so a click on the map
-        # times out against a screen this check never opened.
+        # **Focus rather than click.** A click hit-tests, so it times out
+        # against any screen still up — and a timeout ends a check with a
+        # Playwright traceback instead of the sentence that says what is
+        # wrong, which is this harness's oldest rule. Focusing cannot miss,
+        # and the keyboard is what the check is actually after.
         clear_screens(page)
-        page.click("#map")
+        page.evaluate("() => document.getElementById('map').focus()")
         for _ in range(4):
             if page.is_visible("#town"):
                 break
@@ -1067,7 +1076,9 @@ def check_the_bench_brews_a_pair(page, name, fails):
             close_fight(page)
         if not page.is_visible("#town"):
             at = page.evaluate("() => window.__position()")
-            fails.append(f"{name}: could not get into a town at all ({at})")
+            up = page.evaluate("() => Array.from(document.querySelectorAll('.screen'))"
+                               ".filter(e => !e.hidden).map(e => e.id)")
+            fails.append(f"{name}: could not get into a town at all ({at}; screens up: {up})")
             return
         page.click("#bench")
         page.wait_for_selector("#brewbench", state="visible", timeout=4000)
@@ -1103,6 +1114,13 @@ def check_the_area_says_its_name(page, name, fails):
     a change the page notices for itself, and it goes away on a clock. Nothing
     in `cargo test` can see any of the three.
     """
+    # **Whatever the check before left up, cleared before anything is
+    # clicked.** A shot can end on any screen and the check before this one
+    # lands on a town — and the *first* click here is `#download`, so a guard
+    # placed after the plant is a guard placed after the timeout. Green
+    # locally and red in CI, which is the shape of every ordering bug this
+    # harness has had.
+    clear_screens(page)
     with page.expect_download(timeout=20000) as dl:
         page.click("#download")
     base = dl.value.path()
@@ -1115,16 +1133,13 @@ def check_the_area_says_its_name(page, name, fails):
 
     plant(page, base, in_the_pit, stem="area")
     try:
-        # **Whatever the check before left up.** A shot can end on any screen,
-        # and the one before this one lands on a town — so a click on the map
-        # times out against a screen this check never opened.
-        clear_screens(page)
         # A save being restored is not an arrival, so nothing is up yet.
         page.wait_for_timeout(400)
         if page.is_visible("#area"):
             fails.append(f"{name}: the card was up before anybody had moved")
             return
-        page.click("#map")
+        clear_screens(page)
+        page.evaluate("() => document.getElementById('map').focus()")
         was = page.evaluate("() => JSON.parse(window.__position()).region")
         seen, region, moved = None, was, False
         # **Until the region actually changes.** A card that is not shown while
@@ -1170,6 +1185,13 @@ def check_the_errand_log_is_a_tree(page, name, fails):
     counted seventeen paths was green through it. So this measures — the svg has
     a width, the rows are more than one, and no wire sits at the origin.
     """
+    # **Whatever the check before left up, cleared before anything is
+    # clicked.** A shot can end on any screen and the check before this one
+    # lands on a town — and the *first* click here is `#download`, so a guard
+    # placed after the plant is a guard placed after the timeout. Green
+    # locally and red in CI, which is the shape of every ordering bug this
+    # harness has had.
+    clear_screens(page)
     with page.expect_download(timeout=20000) as dl:
         page.click("#download")
     base = dl.value.path()
@@ -1187,10 +1209,6 @@ def check_the_errand_log_is_a_tree(page, name, fails):
 
     plant(page, base, with_a_chain, stem="log-tree")
     try:
-        # **Whatever the check before left up.** A shot can end on any screen,
-        # and the one before this one lands on a town — so a click on the map
-        # times out against a screen this check never opened.
-        clear_screens(page)
         page.click("#errands-open")
         page.wait_for_selector("#log", state="visible", timeout=4000)
         rows = page.eval_on_selector_all("#log-list .chainrow", "els => els.length")
@@ -1229,6 +1247,13 @@ def check_a_word_errand_lands_on_a_table(page, name, fails):
     Nothing in `cargo test` can see it: both halves are the shim's, and the two
     halves agreed about every map that is walked.
     """
+    # **Whatever the check before left up, cleared before anything is
+    # clicked.** A shot can end on any screen and the check before this one
+    # lands on a town — and the *first* click here is `#download`, so a guard
+    # placed after the plant is a guard placed after the timeout. Green
+    # locally and red in CI, which is the shape of every ordering bug this
+    # harness has had.
+    clear_screens(page)
     with page.expect_download(timeout=20000) as dl:
         page.click("#download")
     base = dl.value.path()

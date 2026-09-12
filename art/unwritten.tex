@@ -1,0 +1,64 @@
+% The Unwritten — the thing standing in the country the writing stopped in.
+%
+% The Undercountry has one town and the town is empty, with a screen one tile
+% south of the counter saying the writing stops here. The town's own sign is a
+% post with no name on it (`common::UNWRITTEN`). So this is that post, standing
+% up: a face planed flat with **nothing cut into it**, which is the one figure
+% in this game whose subject is an absence.
+%
+% **The blank face is the whole drawing**, so everything else is kept low and
+% dark: a wedge of ground, a bracket, and the grain of the post behind. The
+% face takes the accent because the accent is the eye everywhere else in the
+% set, and here there is nothing to look back.
+%
+% Counting is the house tic: four nails where a board would be fixed, and not
+% one line of writing.
+%
+% Written by filling in tikz_figure_prompt.md.
+%
+% Reads at 64px as a pale slab on a dark post; at 4x the planed edge, the
+% nails and the unfinished grain come up.
+\documentclass[tikz,border=4pt]{standalone}
+\usetikzlibrary{calc}
+\providecommand{\Main}{4A4640}
+\providecommand{\Dark}{22201D}
+\providecommand{\Accent}{D8D2C2}
+
+\newcommand{\Unit}{0.055cm}
+\newcommand{\Edge}{2.4pt}
+\newcommand{\Nails}{4}
+
+\definecolor{main}{HTML}{\Main}
+\definecolor{dark}{HTML}{\Dark}
+\definecolor{accent}{HTML}{\Accent}
+\definecolor{ink}{HTML}{101018}
+
+\begin{document}
+\begin{tikzpicture}[x=\Unit,y=\Unit, line join=round, line cap=round]
+
+  % ---- the ground it is driven into --------------------------------------
+  \fill[dark,draw=ink,line width=\Edge] (6,2) -- (58,2) -- (50,14) -- (14,14) -- cycle;
+
+  % ---- the post ----------------------------------------------------------
+  \fill[main,draw=ink,line width=\Edge] (26,8) rectangle (38,78);
+  % Grain, stopping partway up the way an unfinished thing does.
+  \foreach \i in {0,1,2} {
+    \draw[dark,line width=1.6pt] ({29+\i*3},12) -- ({29+\i*3},{40+\i*8});
+  }
+
+  % ---- the bracket -------------------------------------------------------
+  \draw[dark,line width=3.2pt] (26,50) -- (16,42);
+  \draw[dark,line width=3.2pt] (38,50) -- (48,42);
+
+  % ---- the face, planed flat, with nothing on it -------------------------
+  % Drawn last and largest. The plane mark along the top edge is the only line
+  % on it, and it is a mark of *preparation* rather than of writing.
+  \fill[accent,draw=ink,line width=\Edge] (10,48) rectangle (54,76);
+  \draw[dark,line width=1.8pt] (13,72) -- (51,72);
+  \foreach \i in {1,...,\Nails} {
+    \pgfmathsetmacro\x{14+(\i-1)*12}
+    \fill[ink] ({\x},52) circle (1.6);
+  }
+
+\end{tikzpicture}
+\end{document}

@@ -1022,3 +1022,78 @@ fn the_way_under_the_flat_is_shut_and_says_what_it_wants() {
         "the sheet was taken and the way under is still sealed"
     );
 }
+
+/// **The deep is lethal on purpose, and this is the number.**
+///
+/// Asked for in as many words: *"I want the wextreen sands and the dungeon
+/// inside to be extremely unbelievelably dangerous."* So this does not assert
+/// that the pools are winnable — they are deliberately not — it asserts that
+/// they are **as dangerous as they were meant to be**, against
+/// `common::geared_from`, which is this repository's answer to *the board a
+/// player actually has*.
+///
+/// Written down rather than left to a play session, because a content decision
+/// this sharp is one somebody will later mistake for a tuning accident. The
+/// ten wear the Tenth Surveyor's own board in part; she is beatable by that
+/// board and nine of the ten are not.
+///
+/// **The boards are hers, and that is what makes them safe to write.** Nothing
+/// here invents a component, so nothing here can turn up to a fight in an empty
+/// frame — which is the failure `every_creature_that_wears_gear_assembles_it`
+/// exists for and which no amount of danger-tuning would have revealed.
+#[test]
+fn the_deep_is_as_dangerous_as_it_was_asked_to_be() {
+    use gm2d_core::combat::{self, Event, Outcome, Side};
+    let ch = common::geared_from(&["the-end-of-all-gears", "kettleworks"]);
+    let stats = ch.player_stats();
+    let items = ch.combat_items();
+
+    // **The Unwritten is not in this list, and that is the design.** A boss is
+    // the one creature a player *must* beat to get past it, so
+    // `every_region_has_a_fight_you_can_win_and_every_boss_can_be_beaten`
+    // requires it — and it is right to. Its first draft wore the whole board
+    // and killed this one in 8.9 seconds whatever else was tuned; it wears two
+    // slots now and is the longest fight in the game rather than an unwinnable
+    // one. **A boss nobody can beat is a wall with a sentence on it.**
+    let deep = [
+        "Chainman", "Backsight", "The Eleventh Notch", "Iron Under It",
+        "The Levelling Staff", "What the Flat Kept", "The Closing Error",
+        "The Benchmark", "Datum", "The Traverse",
+    ];
+    let mut kills = 0;
+    let mut lines = Vec::new();
+    for name in deep {
+        let spec = combat::creature(name).unwrap_or_else(|| panic!("{name} is on the ladder"));
+        let log = combat::simulate_holding(stats, &items, spec, D, &[], 0, ch.start_with());
+        let theirs: i32 = log
+            .entries
+            .iter()
+            .filter_map(|e| match &e.event {
+                Event::Hit { by, damage, .. } if *by == Side::Enemy => Some(*damage),
+                _ => None,
+            })
+            .sum();
+        let dps = theirs as f32 / (log.duration_ms.max(1) as f32 / 1000.0);
+        if log.outcome == Outcome::Defeat {
+            kills += 1;
+        }
+        lines.push(format!("{name}: {:?}, they deal {dps:.0}/s", log.outcome));
+    }
+    for l in &lines {
+        println!("  {l}");
+    }
+    // Ten of the eleven kill it. The one that does not is the shallowest thing
+    // on the Sands, which is the surface and is meant to be survivable.
+    // **And the pools keep the beatable creatures beside them**, because
+    // `draw_enemy` makes a pool's easiest member its commonest and its hardest
+    // its rarest. The deep is mostly survivable with rare lethal draws, which
+    // is a dangerous place; a pool whose commonest member kills you is a
+    // region nobody can stand in, and the reachability lint says so.
+    assert!(
+        kills >= 9,
+        "the deep was asked to be extremely dangerous and {kills} of {} beat the board a \
+         player actually has:\n  {}",
+        deep.len(),
+        lines.join("\n  ")
+    );
+}

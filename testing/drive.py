@@ -1395,6 +1395,45 @@ def check_a_shut_crossing_says_so_when_you_land_beside_it(page, name, fails):
         plant(page, base, lambda body: None, stem="shut-bar-restore")
 
 
+def check_every_terrain_has_a_colour(page, name, fails):
+    """No tile on any map is drawn magenta.
+
+    **Reported twice.** `draw` falls back to `['#f0f','#f0f']` for a terrain the
+    palette has no entry for, and three of them had none — `quick`, `silt` and
+    `tide`, added in M14 and M16 and never given one. So the Reefs' quicksand
+    bands, every silt floor in two dungeons and the bar of shingle all came out
+    **pink**: *"the land is pink and it says no way through"*, and later *"make
+    the tiles in the dungeon less pink, there is so much pink it hurts my eyes
+    and is hard to tell what is going on."*
+
+    The first report was answered with a refusal sentence, which was a real bug
+    and **not the one about the colour**. A fallback that draws *something* is a
+    fallback nobody notices in review and everybody notices on a screen.
+
+    Only a browser can answer this: the palette is the page's and
+    `data/terrain.json` is the engine's, so nothing in `cargo test` can hold
+    them against each other.
+    """
+    # **The engine's list, not a fetch.** `data/` is compiled into the wasm and
+    # only `art.json` is served, so the names come off an export.
+    missing = page.evaluate("""() => {
+        const names = window.__terrains();
+        const out = { light: [], dark: [] };
+        for (const [mode, list] of [['light', out.light], ['dark', out.dark]]) {
+            for (const n of names) {
+                const pair = window.__palette(mode)[n];
+                if (!pair || String(pair[0]).toLowerCase() === '#f0f') list.push(n);
+            }
+        }
+        return out;
+    }""")
+    bad = sorted(set(missing["light"]) | set(missing["dark"]))
+    if bad:
+        fails.append(f"{name}: terrain drawn magenta because the palette has no entry: {bad}")
+        return
+    print(f"ok: every terrain has a colour in both palettes, so nothing draws magenta")
+
+
 def check_the_furnace_shows_on_the_bar(page, name, fails):
     """A Kettle-Stoker can see what the furnace bought.
 
@@ -3490,14 +3529,35 @@ def check_the_sands_read_the_other_way_round(page, name, fails, base):
         fails.append(f"{name}: the same compass reads the sands {here} and the reach {reach}, "
                      f"and they are meant to be opposite")
 
+    # **A surveying door asks every time now, even carrying one.** Reported from
+    # play: *"I was never reprompted with the survey window when I got to the
+    # wextreen sands, it just took the old survey stats from the wextreen
+    # reach."* `Game::unlock` shuts a survey gate only when you carry *no*
+    # instrument, so anybody who built a compass for the Reach walked into the
+    # Sands with it and was never offered the choice — on the one map where the
+    # compass is the wrong tool. The frame opens on the way in and `Go in`
+    # crosses.
     page.evaluate("() => document.getElementById('map').focus()")
     page.keyboard.press("ArrowDown")
-    page.wait_for_timeout(500)
+    page.wait_for_timeout(600)
+    dismiss_card(page)
+    close_fight(page)
+    if page.is_hidden("#instrument"):
+        fails.append(f"{name}: carrying a compass, the edge let you through without asking")
+    else:
+        # **And it says which door it is.** `#instrument-where` was static HTML
+        # reading "the Wextreen Reach"; four doors open this frame and three of
+        # them were lying about where they went.
+        said = (page.text_content("#instrument-where") or "").lower()
+        if "sands" not in said:
+            fails.append(f"{name}: the edge of the Sands calls itself {said!r}")
+        page.click("#instrument-go")
+        page.wait_for_timeout(700)
     dismiss_card(page)
     close_fight(page)
     where = page.evaluate("() => window.__world().id")
     if where != "the-wextreen-sands":
-        fails.append(f"{name}: carrying a compass, walking into the edge arrived on {where!r}")
+        fails.append(f"{name}: carrying a compass, Go in arrived on {where!r}")
     else:
         # And the panel says what it is being read with, on the map itself.
         said = (page.text_content("#survey") or "").lower()
@@ -4690,7 +4750,13 @@ def check_the_reach_reads_through_what_you_carry(page, name, fails):
     # --- with a compass -------------------------------------------------------
     plant(page, base, lambda b: at_the_edge(b, COMPASS), stem="reach-compass")
     cross(page, edge[0], edge[1])
-    page.wait_for_timeout(400)
+    page.wait_for_timeout(500)
+    # **The frame asks even when you are carrying one.** Which instrument you
+    # brought is the decision the whole system is about, and the door is where
+    # it is made — so *Go in* is the second half of crossing now.
+    if page.is_visible("#instrument"):
+        page.click("#instrument-go")
+        page.wait_for_timeout(600)
     dismiss_card(page)
     close_fight(page)
     if page.evaluate("() => window.__world().id") != "the-reach":
@@ -4714,7 +4780,10 @@ def check_the_reach_reads_through_what_you_carry(page, name, fails):
     # --- and a different instrument is a different map ------------------------
     plant(page, base, lambda b: at_the_edge(b, GOLEM), stem="reach-golem")
     cross(page, edge[0], edge[1])
-    page.wait_for_timeout(400)
+    page.wait_for_timeout(500)
+    if page.is_visible("#instrument"):
+        page.click("#instrument-go")
+        page.wait_for_timeout(600)
     dismiss_card(page)
     close_fight(page)
     second = page.evaluate("() => window.__world().survey")
@@ -7230,6 +7299,7 @@ def walk_the_gate(browser, name, fails=None):
     check_the_ball_slides_and_the_trail_grows_behind_it(page, name, fails)
     check_a_diamond_catches_the_ball(page, name, fails)
     check_the_long_cart_runs_between_towns(page, name, fails)
+    check_every_terrain_has_a_colour(page, name, fails)
     check_the_cue_shows_where_the_ball_will_stop(page, name, fails)
     check_a_shut_crossing_says_so_when_you_land_beside_it(page, name, fails)
     check_the_furnace_shows_on_the_bar(page, name, fails)

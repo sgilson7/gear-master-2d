@@ -1,0 +1,77 @@
+% A drowned surveyor — the family the Wextreen deep is cut from. Ten creatures
+% share this silhouette and not one shares a palette.
+%
+% **They were surveyors and the flat kept them.** The Reach has nine cairns
+% where nine people gave up; the Sands has iron under it that moves, and the
+% reefs stand out of it where the tide has scoured. So the figure is a levelling
+% staff still held upright by something that has become part of what it was
+% measuring: a slab of accreted slag with a staff through it, and the staff is
+% the only straight line on the drawing.
+%
+% **Counting is the house tic.** Five bands on the staff, because a levelling
+% staff is banded and because five is what you can read at 64px; the reef
+% behind it is three plates, and the eye is one.
+%
+% Written by filling in tikz_figure_prompt.md.
+%
+% Reads at 64px as an upright banded pole in a dark mass; at 4x the plates of
+% the reef, the notch cut into the staff and the single lamp come up.
+\documentclass[tikz,border=4pt]{standalone}
+\usetikzlibrary{calc}
+\providecommand{\Main}{6E6455}
+\providecommand{\Dark}{39332B}
+\providecommand{\Accent}{C9D8E6}
+
+\newcommand{\Unit}{0.055cm}
+\newcommand{\Edge}{2.2pt}
+\newcommand{\Bands}{5}          % on the levelling staff
+\newcommand{\Plates}{3}         % of reef behind it
+
+\definecolor{main}{HTML}{\Main}
+\definecolor{dark}{HTML}{\Dark}
+\definecolor{accent}{HTML}{\Accent}
+\definecolor{ink}{HTML}{101018}
+
+\begin{document}
+\begin{tikzpicture}[x=\Unit,y=\Unit, line join=round, line cap=round]
+
+  % ---- the reef it has become --------------------------------------------
+  % Three plates, each a little proud of the one behind, so the mass reads as
+  % something accreted rather than something carved.
+  % Stepped *outward* as they go back, so each one is visible past the next.
+  % Drawn behind, in the dark, and the near face over them in the creature's
+  % own colour — three shapes and two values, which is what makes the mass read
+  % as accreted at 64px rather than as one blob.
+  \foreach \i in {1,...,\Plates} {
+    \pgfmathsetmacro\o{(\i-1)*7}
+    \pgfmathsetmacro\w{20+(\i-1)*7}
+    \fill[dark,draw=ink,line width=\Edge]
+      ({32-\w},{4}) -- ({32+\w},{4}) -- ({32+\w-4},{20+\o}) -- ({32-\w+4},{20+\o}) -- cycle;
+  }
+  \fill[main,draw=ink,line width=\Edge]
+    (14,4) -- (50,4) -- (45,26) -- (19,26) -- cycle;
+
+  % Scour lines the tide left, on the near face only.
+  \foreach \i in {0,1} {
+    \draw[dark,line width=1.8pt] ({17+\i*2},{10+\i*7}) -- ({47-\i*2},{10+\i*7});
+  }
+
+  % ---- the staff, still upright ------------------------------------------
+  % The one straight line on the figure, and the thing it was holding when it
+  % stopped. Banded, because a levelling staff is.
+  \fill[accent,draw=ink,line width=\Edge] (29,14) rectangle (35,84);
+  \foreach \i in {1,...,\Bands} {
+    \pgfmathsetmacro\y{22+(\i-1)*12}
+    \fill[ink] (29,\y) rectangle (35,{\y+5});
+  }
+  % The notch somebody cut and nobody came back to read.
+  \fill[main,draw=ink,line width=1.4pt] (35,74) -- (42,70) -- (35,66) -- cycle;
+
+  % ---- one lamp, which is the only thing still looking -------------------
+  % Hung off the staff rather than set in the mass, so it reads as carried.
+  \draw[dark,line width=2.4pt] (29,50) -- (20,46);
+  \fill[accent,draw=ink,line width=1.8pt] (18,44) circle (5.5);
+  \fill[ink] (18,44) circle (2.2);
+
+\end{tikzpicture}
+\end{document}

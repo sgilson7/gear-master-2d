@@ -9257,6 +9257,2254 @@
           31
         ]
       ]
+    },
+    {
+      "name": "Chainman",
+      "health": 9000,
+      "strength": 70,
+      "regen": 12,
+      "mind_resist": 78,
+      "curse_resist": 74,
+      "physical_resist": 62,
+      "magic_resist": 66,
+      "gear": [
+        [
+          "War Ledger",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Ratchet Cog",
+          "weapon",
+          1,
+          0,
+          2
+        ],
+        [
+          "Runewash Ink",
+          "weapon",
+          0,
+          2,
+          2
+        ],
+        [
+          "Emberburst",
+          "weapon",
+          2,
+          2,
+          0
+        ],
+        [
+          "Cosmic Alignment",
+          "weapon",
+          2,
+          0,
+          0
+        ],
+        [
+          "Prismatic Ink",
+          "weapon",
+          2,
+          1,
+          1
+        ],
+        [
+          "The Bog Census",
+          "weapon",
+          3,
+          0,
+          0
+        ],
+        [
+          "Census Bolt",
+          "weapon",
+          4,
+          2,
+          1
+        ],
+        [
+          "Prismatic Ink",
+          "weapon",
+          5,
+          0,
+          1
+        ],
+        [
+          "Flywheel Cog",
+          "weapon",
+          0,
+          4,
+          1
+        ],
+        [
+          "Prismatic Ink",
+          "weapon",
+          2,
+          4,
+          0
+        ],
+        [
+          "Azure Alignment",
+          "weapon",
+          4,
+          4,
+          0
+        ],
+        [
+          "Rimeglove Material",
+          "gloves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Coven Mold",
+          "gloves",
+          2,
+          0,
+          0
+        ],
+        [
+          "Signet of Iron",
+          "gloves",
+          1,
+          2,
+          0
+        ],
+        [
+          "Rat Signet",
+          "gloves",
+          2,
+          2,
+          0
+        ],
+        [
+          "Grasping Ring",
+          "gloves",
+          3,
+          1,
+          0
+        ],
+        [
+          "Mage's Wrapping",
+          "gloves",
+          4,
+          0,
+          0
+        ],
+        [
+          "Witch's Thimble",
+          "gloves",
+          3,
+          2,
+          0
+        ],
+        [
+          "Featherweight Mold",
+          "gloves",
+          4,
+          2,
+          0
+        ]
+      ],
+      "bounty": 520,
+      "rank": "ordinary",
+      "rating": 1624,
+      "items": 4
+    },
+    {
+      "name": "Backsight",
+      "health": 10500,
+      "strength": 76,
+      "regen": 12,
+      "mind_resist": 80,
+      "curse_resist": 76,
+      "physical_resist": 64,
+      "magic_resist": 68,
+      "gear": [
+        [
+          "War Ledger",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Ratchet Cog",
+          "weapon",
+          1,
+          0,
+          2
+        ],
+        [
+          "Runewash Ink",
+          "weapon",
+          0,
+          2,
+          2
+        ],
+        [
+          "Emberburst",
+          "weapon",
+          2,
+          2,
+          0
+        ],
+        [
+          "Cosmic Alignment",
+          "weapon",
+          2,
+          0,
+          0
+        ],
+        [
+          "Prismatic Ink",
+          "weapon",
+          2,
+          1,
+          1
+        ],
+        [
+          "The Bog Census",
+          "weapon",
+          3,
+          0,
+          0
+        ],
+        [
+          "Census Bolt",
+          "weapon",
+          4,
+          2,
+          1
+        ],
+        [
+          "Prismatic Ink",
+          "weapon",
+          5,
+          0,
+          1
+        ],
+        [
+          "Flywheel Cog",
+          "weapon",
+          0,
+          4,
+          1
+        ],
+        [
+          "Prismatic Ink",
+          "weapon",
+          2,
+          4,
+          0
+        ],
+        [
+          "Azure Alignment",
+          "weapon",
+          4,
+          4,
+          0
+        ],
+        [
+          "Bone Crown",
+          "helmet",
+          0,
+          0,
+          3
+        ],
+        [
+          "Bone Scale",
+          "helmet",
+          1,
+          1,
+          2
+        ],
+        [
+          "Bone Fletch",
+          "helmet",
+          2,
+          2,
+          3
+        ],
+        [
+          "Idol's Crest",
+          "helmet",
+          3,
+          0,
+          0
+        ],
+        [
+          "Tin Frame",
+          "helmet",
+          4,
+          1,
+          0
+        ],
+        [
+          "Tin Plating",
+          "helmet",
+          4,
+          0,
+          0
+        ]
+      ],
+      "bounty": 560,
+      "rank": "ordinary",
+      "rating": 1807,
+      "items": 4
+    },
+    {
+      "name": "The Eleventh Notch",
+      "health": 12000,
+      "strength": 82,
+      "regen": 14,
+      "mind_resist": 82,
+      "curse_resist": 78,
+      "physical_resist": 68,
+      "magic_resist": 70,
+      "gear": [
+        [
+          "War Ledger",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Ratchet Cog",
+          "weapon",
+          1,
+          0,
+          2
+        ],
+        [
+          "Runewash Ink",
+          "weapon",
+          0,
+          2,
+          2
+        ],
+        [
+          "Emberburst",
+          "weapon",
+          2,
+          2,
+          0
+        ],
+        [
+          "Cosmic Alignment",
+          "weapon",
+          2,
+          0,
+          0
+        ],
+        [
+          "Prismatic Ink",
+          "weapon",
+          2,
+          1,
+          1
+        ],
+        [
+          "The Bog Census",
+          "weapon",
+          3,
+          0,
+          0
+        ],
+        [
+          "Census Bolt",
+          "weapon",
+          4,
+          2,
+          1
+        ],
+        [
+          "Prismatic Ink",
+          "weapon",
+          5,
+          0,
+          1
+        ],
+        [
+          "Flywheel Cog",
+          "weapon",
+          0,
+          4,
+          1
+        ],
+        [
+          "Prismatic Ink",
+          "weapon",
+          2,
+          4,
+          0
+        ],
+        [
+          "Azure Alignment",
+          "weapon",
+          4,
+          4,
+          0
+        ],
+        [
+          "Frostbite Mold",
+          "greaves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Ratskin Material",
+          "greaves",
+          0,
+          1,
+          0
+        ],
+        [
+          "Spun Material",
+          "greaves",
+          2,
+          0,
+          1
+        ],
+        [
+          "Greave Mold",
+          "greaves",
+          4,
+          0,
+          0
+        ],
+        [
+          "Spun Material",
+          "greaves",
+          2,
+          1,
+          3
+        ],
+        [
+          "Stumblefoot Mold",
+          "greaves",
+          4,
+          1,
+          0
+        ],
+        [
+          "Rimeglove Material",
+          "gloves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Coven Mold",
+          "gloves",
+          2,
+          0,
+          0
+        ],
+        [
+          "Signet of Iron",
+          "gloves",
+          1,
+          2,
+          0
+        ],
+        [
+          "Rat Signet",
+          "gloves",
+          2,
+          2,
+          0
+        ],
+        [
+          "Grasping Ring",
+          "gloves",
+          3,
+          1,
+          0
+        ],
+        [
+          "Mage's Wrapping",
+          "gloves",
+          4,
+          0,
+          0
+        ],
+        [
+          "Witch's Thimble",
+          "gloves",
+          3,
+          2,
+          0
+        ],
+        [
+          "Featherweight Mold",
+          "gloves",
+          4,
+          2,
+          0
+        ]
+      ],
+      "bounty": 610,
+      "rank": "ordinary",
+      "rating": 2045,
+      "items": 7
+    },
+    {
+      "name": "Iron Under It",
+      "health": 13500,
+      "strength": 88,
+      "regen": 14,
+      "mind_resist": 84,
+      "curse_resist": 80,
+      "physical_resist": 72,
+      "magic_resist": 72,
+      "gear": [
+        [
+          "War Ledger",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Ratchet Cog",
+          "weapon",
+          1,
+          0,
+          2
+        ],
+        [
+          "Runewash Ink",
+          "weapon",
+          0,
+          2,
+          2
+        ],
+        [
+          "Emberburst",
+          "weapon",
+          2,
+          2,
+          0
+        ],
+        [
+          "Cosmic Alignment",
+          "weapon",
+          2,
+          0,
+          0
+        ],
+        [
+          "Prismatic Ink",
+          "weapon",
+          2,
+          1,
+          1
+        ],
+        [
+          "The Bog Census",
+          "weapon",
+          3,
+          0,
+          0
+        ],
+        [
+          "Census Bolt",
+          "weapon",
+          4,
+          2,
+          1
+        ],
+        [
+          "Prismatic Ink",
+          "weapon",
+          5,
+          0,
+          1
+        ],
+        [
+          "Flywheel Cog",
+          "weapon",
+          0,
+          4,
+          1
+        ],
+        [
+          "Prismatic Ink",
+          "weapon",
+          2,
+          4,
+          0
+        ],
+        [
+          "Azure Alignment",
+          "weapon",
+          4,
+          4,
+          0
+        ],
+        [
+          "Chorister's Base",
+          "chest",
+          0,
+          0,
+          1
+        ],
+        [
+          "Chorister's Weave",
+          "chest",
+          2,
+          0,
+          0
+        ],
+        [
+          "Chorister's Layer",
+          "chest",
+          2,
+          1,
+          0
+        ],
+        [
+          "Runed Lining",
+          "chest",
+          0,
+          3,
+          0
+        ],
+        [
+          "Quilted Base",
+          "chest",
+          4,
+          1,
+          0
+        ],
+        [
+          "Sprocketman's Gratitude",
+          "chest",
+          4,
+          3,
+          0
+        ],
+        [
+          "Bone Crown",
+          "helmet",
+          0,
+          0,
+          3
+        ],
+        [
+          "Bone Scale",
+          "helmet",
+          1,
+          1,
+          2
+        ],
+        [
+          "Bone Fletch",
+          "helmet",
+          2,
+          2,
+          3
+        ],
+        [
+          "Idol's Crest",
+          "helmet",
+          3,
+          0,
+          0
+        ],
+        [
+          "Tin Frame",
+          "helmet",
+          4,
+          1,
+          0
+        ],
+        [
+          "Tin Plating",
+          "helmet",
+          4,
+          0,
+          0
+        ]
+      ],
+      "bounty": 660,
+      "rank": "ordinary",
+      "rating": 2265,
+      "items": 6
+    },
+    {
+      "name": "The Levelling Staff",
+      "health": 16000,
+      "strength": 95,
+      "regen": 16,
+      "mind_resist": 86,
+      "curse_resist": 82,
+      "physical_resist": 74,
+      "magic_resist": 74,
+      "gear": [
+        [
+          "War Ledger",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Ratchet Cog",
+          "weapon",
+          1,
+          0,
+          2
+        ],
+        [
+          "Runewash Ink",
+          "weapon",
+          0,
+          2,
+          2
+        ],
+        [
+          "Emberburst",
+          "weapon",
+          2,
+          2,
+          0
+        ],
+        [
+          "Cosmic Alignment",
+          "weapon",
+          2,
+          0,
+          0
+        ],
+        [
+          "Prismatic Ink",
+          "weapon",
+          2,
+          1,
+          1
+        ],
+        [
+          "The Bog Census",
+          "weapon",
+          3,
+          0,
+          0
+        ],
+        [
+          "Census Bolt",
+          "weapon",
+          4,
+          2,
+          1
+        ],
+        [
+          "Prismatic Ink",
+          "weapon",
+          5,
+          0,
+          1
+        ],
+        [
+          "Flywheel Cog",
+          "weapon",
+          0,
+          4,
+          1
+        ],
+        [
+          "Prismatic Ink",
+          "weapon",
+          2,
+          4,
+          0
+        ],
+        [
+          "Azure Alignment",
+          "weapon",
+          4,
+          4,
+          0
+        ],
+        [
+          "Chorister's Base",
+          "chest",
+          0,
+          0,
+          1
+        ],
+        [
+          "Chorister's Weave",
+          "chest",
+          2,
+          0,
+          0
+        ],
+        [
+          "Chorister's Layer",
+          "chest",
+          2,
+          1,
+          0
+        ],
+        [
+          "Runed Lining",
+          "chest",
+          0,
+          3,
+          0
+        ],
+        [
+          "Quilted Base",
+          "chest",
+          4,
+          1,
+          0
+        ],
+        [
+          "Sprocketman's Gratitude",
+          "chest",
+          4,
+          3,
+          0
+        ],
+        [
+          "Rimeglove Material",
+          "gloves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Coven Mold",
+          "gloves",
+          2,
+          0,
+          0
+        ],
+        [
+          "Signet of Iron",
+          "gloves",
+          1,
+          2,
+          0
+        ],
+        [
+          "Rat Signet",
+          "gloves",
+          2,
+          2,
+          0
+        ],
+        [
+          "Grasping Ring",
+          "gloves",
+          3,
+          1,
+          0
+        ],
+        [
+          "Mage's Wrapping",
+          "gloves",
+          4,
+          0,
+          0
+        ],
+        [
+          "Witch's Thimble",
+          "gloves",
+          3,
+          2,
+          0
+        ],
+        [
+          "Featherweight Mold",
+          "gloves",
+          4,
+          2,
+          0
+        ]
+      ],
+      "bounty": 720,
+      "rank": "ordinary",
+      "rating": 2588,
+      "items": 6
+    },
+    {
+      "name": "What the Flat Kept",
+      "health": 18000,
+      "strength": 102,
+      "regen": 16,
+      "mind_resist": 88,
+      "curse_resist": 84,
+      "physical_resist": 76,
+      "magic_resist": 76,
+      "gear": [
+        [
+          "War Ledger",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Ratchet Cog",
+          "weapon",
+          1,
+          0,
+          2
+        ],
+        [
+          "Runewash Ink",
+          "weapon",
+          0,
+          2,
+          2
+        ],
+        [
+          "Emberburst",
+          "weapon",
+          2,
+          2,
+          0
+        ],
+        [
+          "Cosmic Alignment",
+          "weapon",
+          2,
+          0,
+          0
+        ],
+        [
+          "Prismatic Ink",
+          "weapon",
+          2,
+          1,
+          1
+        ],
+        [
+          "The Bog Census",
+          "weapon",
+          3,
+          0,
+          0
+        ],
+        [
+          "Census Bolt",
+          "weapon",
+          4,
+          2,
+          1
+        ],
+        [
+          "Prismatic Ink",
+          "weapon",
+          5,
+          0,
+          1
+        ],
+        [
+          "Flywheel Cog",
+          "weapon",
+          0,
+          4,
+          1
+        ],
+        [
+          "Prismatic Ink",
+          "weapon",
+          2,
+          4,
+          0
+        ],
+        [
+          "Azure Alignment",
+          "weapon",
+          4,
+          4,
+          0
+        ],
+        [
+          "Bone Crown",
+          "helmet",
+          0,
+          0,
+          3
+        ],
+        [
+          "Bone Scale",
+          "helmet",
+          1,
+          1,
+          2
+        ],
+        [
+          "Bone Fletch",
+          "helmet",
+          2,
+          2,
+          3
+        ],
+        [
+          "Idol's Crest",
+          "helmet",
+          3,
+          0,
+          0
+        ],
+        [
+          "Tin Frame",
+          "helmet",
+          4,
+          1,
+          0
+        ],
+        [
+          "Tin Plating",
+          "helmet",
+          4,
+          0,
+          0
+        ],
+        [
+          "Frostbite Mold",
+          "greaves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Ratskin Material",
+          "greaves",
+          0,
+          1,
+          0
+        ],
+        [
+          "Spun Material",
+          "greaves",
+          2,
+          0,
+          1
+        ],
+        [
+          "Greave Mold",
+          "greaves",
+          4,
+          0,
+          0
+        ],
+        [
+          "Spun Material",
+          "greaves",
+          2,
+          1,
+          3
+        ],
+        [
+          "Stumblefoot Mold",
+          "greaves",
+          4,
+          1,
+          0
+        ]
+      ],
+      "bounty": 780,
+      "rank": "ordinary",
+      "rating": 2794,
+      "items": 7
+    },
+    {
+      "name": "The Closing Error",
+      "health": 20000,
+      "strength": 110,
+      "regen": 18,
+      "mind_resist": 88,
+      "curse_resist": 86,
+      "physical_resist": 78,
+      "magic_resist": 78,
+      "gear": [
+        [
+          "War Ledger",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Ratchet Cog",
+          "weapon",
+          1,
+          0,
+          2
+        ],
+        [
+          "Runewash Ink",
+          "weapon",
+          0,
+          2,
+          2
+        ],
+        [
+          "Emberburst",
+          "weapon",
+          2,
+          2,
+          0
+        ],
+        [
+          "Cosmic Alignment",
+          "weapon",
+          2,
+          0,
+          0
+        ],
+        [
+          "Prismatic Ink",
+          "weapon",
+          2,
+          1,
+          1
+        ],
+        [
+          "The Bog Census",
+          "weapon",
+          3,
+          0,
+          0
+        ],
+        [
+          "Census Bolt",
+          "weapon",
+          4,
+          2,
+          1
+        ],
+        [
+          "Prismatic Ink",
+          "weapon",
+          5,
+          0,
+          1
+        ],
+        [
+          "Flywheel Cog",
+          "weapon",
+          0,
+          4,
+          1
+        ],
+        [
+          "Prismatic Ink",
+          "weapon",
+          2,
+          4,
+          0
+        ],
+        [
+          "Azure Alignment",
+          "weapon",
+          4,
+          4,
+          0
+        ],
+        [
+          "Chorister's Base",
+          "chest",
+          0,
+          0,
+          1
+        ],
+        [
+          "Chorister's Weave",
+          "chest",
+          2,
+          0,
+          0
+        ],
+        [
+          "Chorister's Layer",
+          "chest",
+          2,
+          1,
+          0
+        ],
+        [
+          "Runed Lining",
+          "chest",
+          0,
+          3,
+          0
+        ],
+        [
+          "Quilted Base",
+          "chest",
+          4,
+          1,
+          0
+        ],
+        [
+          "Sprocketman's Gratitude",
+          "chest",
+          4,
+          3,
+          0
+        ],
+        [
+          "Rimeglove Material",
+          "gloves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Coven Mold",
+          "gloves",
+          2,
+          0,
+          0
+        ],
+        [
+          "Signet of Iron",
+          "gloves",
+          1,
+          2,
+          0
+        ],
+        [
+          "Rat Signet",
+          "gloves",
+          2,
+          2,
+          0
+        ],
+        [
+          "Grasping Ring",
+          "gloves",
+          3,
+          1,
+          0
+        ],
+        [
+          "Mage's Wrapping",
+          "gloves",
+          4,
+          0,
+          0
+        ],
+        [
+          "Witch's Thimble",
+          "gloves",
+          3,
+          2,
+          0
+        ],
+        [
+          "Featherweight Mold",
+          "gloves",
+          4,
+          2,
+          0
+        ],
+        [
+          "Bone Crown",
+          "helmet",
+          0,
+          0,
+          3
+        ],
+        [
+          "Bone Scale",
+          "helmet",
+          1,
+          1,
+          2
+        ],
+        [
+          "Bone Fletch",
+          "helmet",
+          2,
+          2,
+          3
+        ],
+        [
+          "Idol's Crest",
+          "helmet",
+          3,
+          0,
+          0
+        ],
+        [
+          "Tin Frame",
+          "helmet",
+          4,
+          1,
+          0
+        ],
+        [
+          "Tin Plating",
+          "helmet",
+          4,
+          0,
+          0
+        ]
+      ],
+      "bounty": 850,
+      "rank": "ordinary",
+      "rating": 3127,
+      "items": 8
+    },
+    {
+      "name": "The Benchmark",
+      "health": 22500,
+      "strength": 118,
+      "regen": 18,
+      "mind_resist": 90,
+      "curse_resist": 88,
+      "physical_resist": 80,
+      "magic_resist": 80,
+      "gear": [
+        [
+          "War Ledger",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Ratchet Cog",
+          "weapon",
+          1,
+          0,
+          2
+        ],
+        [
+          "Runewash Ink",
+          "weapon",
+          0,
+          2,
+          2
+        ],
+        [
+          "Emberburst",
+          "weapon",
+          2,
+          2,
+          0
+        ],
+        [
+          "Cosmic Alignment",
+          "weapon",
+          2,
+          0,
+          0
+        ],
+        [
+          "Prismatic Ink",
+          "weapon",
+          2,
+          1,
+          1
+        ],
+        [
+          "The Bog Census",
+          "weapon",
+          3,
+          0,
+          0
+        ],
+        [
+          "Census Bolt",
+          "weapon",
+          4,
+          2,
+          1
+        ],
+        [
+          "Prismatic Ink",
+          "weapon",
+          5,
+          0,
+          1
+        ],
+        [
+          "Flywheel Cog",
+          "weapon",
+          0,
+          4,
+          1
+        ],
+        [
+          "Prismatic Ink",
+          "weapon",
+          2,
+          4,
+          0
+        ],
+        [
+          "Azure Alignment",
+          "weapon",
+          4,
+          4,
+          0
+        ],
+        [
+          "Chorister's Base",
+          "chest",
+          0,
+          0,
+          1
+        ],
+        [
+          "Chorister's Weave",
+          "chest",
+          2,
+          0,
+          0
+        ],
+        [
+          "Chorister's Layer",
+          "chest",
+          2,
+          1,
+          0
+        ],
+        [
+          "Runed Lining",
+          "chest",
+          0,
+          3,
+          0
+        ],
+        [
+          "Quilted Base",
+          "chest",
+          4,
+          1,
+          0
+        ],
+        [
+          "Sprocketman's Gratitude",
+          "chest",
+          4,
+          3,
+          0
+        ],
+        [
+          "Frostbite Mold",
+          "greaves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Ratskin Material",
+          "greaves",
+          0,
+          1,
+          0
+        ],
+        [
+          "Spun Material",
+          "greaves",
+          2,
+          0,
+          1
+        ],
+        [
+          "Greave Mold",
+          "greaves",
+          4,
+          0,
+          0
+        ],
+        [
+          "Spun Material",
+          "greaves",
+          2,
+          1,
+          3
+        ],
+        [
+          "Stumblefoot Mold",
+          "greaves",
+          4,
+          1,
+          0
+        ],
+        [
+          "Rimeglove Material",
+          "gloves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Coven Mold",
+          "gloves",
+          2,
+          0,
+          0
+        ],
+        [
+          "Signet of Iron",
+          "gloves",
+          1,
+          2,
+          0
+        ],
+        [
+          "Rat Signet",
+          "gloves",
+          2,
+          2,
+          0
+        ],
+        [
+          "Grasping Ring",
+          "gloves",
+          3,
+          1,
+          0
+        ],
+        [
+          "Mage's Wrapping",
+          "gloves",
+          4,
+          0,
+          0
+        ],
+        [
+          "Witch's Thimble",
+          "gloves",
+          3,
+          2,
+          0
+        ],
+        [
+          "Featherweight Mold",
+          "gloves",
+          4,
+          2,
+          0
+        ]
+      ],
+      "bounty": 920,
+      "rank": "ordinary",
+      "rating": 3432,
+      "items": 9
+    },
+    {
+      "name": "Datum",
+      "health": 25000,
+      "strength": 126,
+      "regen": 20,
+      "mind_resist": 92,
+      "curse_resist": 90,
+      "physical_resist": 82,
+      "magic_resist": 82,
+      "gear": [
+        [
+          "War Ledger",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Ratchet Cog",
+          "weapon",
+          1,
+          0,
+          2
+        ],
+        [
+          "Runewash Ink",
+          "weapon",
+          0,
+          2,
+          2
+        ],
+        [
+          "Emberburst",
+          "weapon",
+          2,
+          2,
+          0
+        ],
+        [
+          "Cosmic Alignment",
+          "weapon",
+          2,
+          0,
+          0
+        ],
+        [
+          "Prismatic Ink",
+          "weapon",
+          2,
+          1,
+          1
+        ],
+        [
+          "The Bog Census",
+          "weapon",
+          3,
+          0,
+          0
+        ],
+        [
+          "Census Bolt",
+          "weapon",
+          4,
+          2,
+          1
+        ],
+        [
+          "Prismatic Ink",
+          "weapon",
+          5,
+          0,
+          1
+        ],
+        [
+          "Flywheel Cog",
+          "weapon",
+          0,
+          4,
+          1
+        ],
+        [
+          "Prismatic Ink",
+          "weapon",
+          2,
+          4,
+          0
+        ],
+        [
+          "Azure Alignment",
+          "weapon",
+          4,
+          4,
+          0
+        ],
+        [
+          "Bone Crown",
+          "helmet",
+          0,
+          0,
+          3
+        ],
+        [
+          "Bone Scale",
+          "helmet",
+          1,
+          1,
+          2
+        ],
+        [
+          "Bone Fletch",
+          "helmet",
+          2,
+          2,
+          3
+        ],
+        [
+          "Idol's Crest",
+          "helmet",
+          3,
+          0,
+          0
+        ],
+        [
+          "Tin Frame",
+          "helmet",
+          4,
+          1,
+          0
+        ],
+        [
+          "Tin Plating",
+          "helmet",
+          4,
+          0,
+          0
+        ],
+        [
+          "Chorister's Base",
+          "chest",
+          0,
+          0,
+          1
+        ],
+        [
+          "Chorister's Weave",
+          "chest",
+          2,
+          0,
+          0
+        ],
+        [
+          "Chorister's Layer",
+          "chest",
+          2,
+          1,
+          0
+        ],
+        [
+          "Runed Lining",
+          "chest",
+          0,
+          3,
+          0
+        ],
+        [
+          "Quilted Base",
+          "chest",
+          4,
+          1,
+          0
+        ],
+        [
+          "Sprocketman's Gratitude",
+          "chest",
+          4,
+          3,
+          0
+        ],
+        [
+          "Rimeglove Material",
+          "gloves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Coven Mold",
+          "gloves",
+          2,
+          0,
+          0
+        ],
+        [
+          "Signet of Iron",
+          "gloves",
+          1,
+          2,
+          0
+        ],
+        [
+          "Rat Signet",
+          "gloves",
+          2,
+          2,
+          0
+        ],
+        [
+          "Grasping Ring",
+          "gloves",
+          3,
+          1,
+          0
+        ],
+        [
+          "Mage's Wrapping",
+          "gloves",
+          4,
+          0,
+          0
+        ],
+        [
+          "Witch's Thimble",
+          "gloves",
+          3,
+          2,
+          0
+        ],
+        [
+          "Featherweight Mold",
+          "gloves",
+          4,
+          2,
+          0
+        ],
+        [
+          "Frostbite Mold",
+          "greaves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Ratskin Material",
+          "greaves",
+          0,
+          1,
+          0
+        ],
+        [
+          "Spun Material",
+          "greaves",
+          2,
+          0,
+          1
+        ],
+        [
+          "Greave Mold",
+          "greaves",
+          4,
+          0,
+          0
+        ],
+        [
+          "Spun Material",
+          "greaves",
+          2,
+          1,
+          3
+        ],
+        [
+          "Stumblefoot Mold",
+          "greaves",
+          4,
+          1,
+          0
+        ]
+      ],
+      "bounty": 1000,
+      "rank": "ordinary",
+      "rating": 3779,
+      "items": 11
+    },
+    {
+      "name": "The Traverse",
+      "health": 28000,
+      "strength": 136,
+      "regen": 22,
+      "mind_resist": 94,
+      "curse_resist": 92,
+      "physical_resist": 84,
+      "magic_resist": 84,
+      "gear": [
+        [
+          "War Ledger",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Ratchet Cog",
+          "weapon",
+          1,
+          0,
+          2
+        ],
+        [
+          "Runewash Ink",
+          "weapon",
+          0,
+          2,
+          2
+        ],
+        [
+          "Emberburst",
+          "weapon",
+          2,
+          2,
+          0
+        ],
+        [
+          "Cosmic Alignment",
+          "weapon",
+          2,
+          0,
+          0
+        ],
+        [
+          "Prismatic Ink",
+          "weapon",
+          2,
+          1,
+          1
+        ],
+        [
+          "The Bog Census",
+          "weapon",
+          3,
+          0,
+          0
+        ],
+        [
+          "Census Bolt",
+          "weapon",
+          4,
+          2,
+          1
+        ],
+        [
+          "Prismatic Ink",
+          "weapon",
+          5,
+          0,
+          1
+        ],
+        [
+          "Flywheel Cog",
+          "weapon",
+          0,
+          4,
+          1
+        ],
+        [
+          "Prismatic Ink",
+          "weapon",
+          2,
+          4,
+          0
+        ],
+        [
+          "Azure Alignment",
+          "weapon",
+          4,
+          4,
+          0
+        ],
+        [
+          "Bone Crown",
+          "helmet",
+          0,
+          0,
+          3
+        ],
+        [
+          "Bone Scale",
+          "helmet",
+          1,
+          1,
+          2
+        ],
+        [
+          "Bone Fletch",
+          "helmet",
+          2,
+          2,
+          3
+        ],
+        [
+          "Idol's Crest",
+          "helmet",
+          3,
+          0,
+          0
+        ],
+        [
+          "Tin Frame",
+          "helmet",
+          4,
+          1,
+          0
+        ],
+        [
+          "Tin Plating",
+          "helmet",
+          4,
+          0,
+          0
+        ],
+        [
+          "Chorister's Base",
+          "chest",
+          0,
+          0,
+          1
+        ],
+        [
+          "Chorister's Weave",
+          "chest",
+          2,
+          0,
+          0
+        ],
+        [
+          "Chorister's Layer",
+          "chest",
+          2,
+          1,
+          0
+        ],
+        [
+          "Runed Lining",
+          "chest",
+          0,
+          3,
+          0
+        ],
+        [
+          "Quilted Base",
+          "chest",
+          4,
+          1,
+          0
+        ],
+        [
+          "Sprocketman's Gratitude",
+          "chest",
+          4,
+          3,
+          0
+        ],
+        [
+          "Rimeglove Material",
+          "gloves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Coven Mold",
+          "gloves",
+          2,
+          0,
+          0
+        ],
+        [
+          "Signet of Iron",
+          "gloves",
+          1,
+          2,
+          0
+        ],
+        [
+          "Rat Signet",
+          "gloves",
+          2,
+          2,
+          0
+        ],
+        [
+          "Grasping Ring",
+          "gloves",
+          3,
+          1,
+          0
+        ],
+        [
+          "Mage's Wrapping",
+          "gloves",
+          4,
+          0,
+          0
+        ],
+        [
+          "Witch's Thimble",
+          "gloves",
+          3,
+          2,
+          0
+        ],
+        [
+          "Featherweight Mold",
+          "gloves",
+          4,
+          2,
+          0
+        ],
+        [
+          "Frostbite Mold",
+          "greaves",
+          0,
+          0,
+          0
+        ],
+        [
+          "Ratskin Material",
+          "greaves",
+          0,
+          1,
+          0
+        ],
+        [
+          "Spun Material",
+          "greaves",
+          2,
+          0,
+          1
+        ],
+        [
+          "Greave Mold",
+          "greaves",
+          4,
+          0,
+          0
+        ],
+        [
+          "Spun Material",
+          "greaves",
+          2,
+          1,
+          3
+        ],
+        [
+          "Stumblefoot Mold",
+          "greaves",
+          4,
+          1,
+          0
+        ]
+      ],
+      "bounty": 1100,
+      "rank": "ordinary",
+      "rating": 4157,
+      "items": 11
+    },
+    {
+      "name": "The Unwritten",
+      "health": 12000,
+      "strength": 80,
+      "regen": 18,
+      "mind_resist": 62,
+      "curse_resist": 62,
+      "physical_resist": 42,
+      "magic_resist": 46,
+      "gear": [
+        [
+          "War Ledger",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Ratchet Cog",
+          "weapon",
+          1,
+          0,
+          2
+        ],
+        [
+          "Runewash Ink",
+          "weapon",
+          0,
+          2,
+          2
+        ],
+        [
+          "Emberburst",
+          "weapon",
+          2,
+          2,
+          0
+        ],
+        [
+          "Cosmic Alignment",
+          "weapon",
+          2,
+          0,
+          0
+        ],
+        [
+          "Prismatic Ink",
+          "weapon",
+          2,
+          1,
+          1
+        ],
+        [
+          "The Bog Census",
+          "weapon",
+          3,
+          0,
+          0
+        ],
+        [
+          "Census Bolt",
+          "weapon",
+          4,
+          2,
+          1
+        ],
+        [
+          "Prismatic Ink",
+          "weapon",
+          5,
+          0,
+          1
+        ],
+        [
+          "Flywheel Cog",
+          "weapon",
+          0,
+          4,
+          1
+        ],
+        [
+          "Prismatic Ink",
+          "weapon",
+          2,
+          4,
+          0
+        ],
+        [
+          "Azure Alignment",
+          "weapon",
+          4,
+          4,
+          0
+        ],
+        [
+          "Bone Crown",
+          "helmet",
+          0,
+          0,
+          3
+        ],
+        [
+          "Bone Scale",
+          "helmet",
+          1,
+          1,
+          2
+        ],
+        [
+          "Bone Fletch",
+          "helmet",
+          2,
+          2,
+          3
+        ],
+        [
+          "Idol's Crest",
+          "helmet",
+          3,
+          0,
+          0
+        ],
+        [
+          "Tin Frame",
+          "helmet",
+          4,
+          1,
+          0
+        ],
+        [
+          "Tin Plating",
+          "helmet",
+          4,
+          0,
+          0
+        ]
+      ],
+      "bounty": 1400,
+      "rank": "boss",
+      "rating": 1949,
+      "items": 4
     }
   ]
 }

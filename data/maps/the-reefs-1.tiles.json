@@ -2,7 +2,7 @@
   "format": "gm2d-tiles",
   "version": 1,
   "id": "the-reefs-1",
-  "_note": "**The Flat Below — nine stakes, three bands, one sheet.** Three bands of quicksand, each cut into three segments walled off from one another, and below each band a corridor with three identical stakes in it. A stake drains one segment; the segments are not labelled. Above each band are three rooms, and exactly one of them has a neck in its ceiling that leads to the next corridor — **right, then left, then middle**, which changes per band so that a player who learns the first one learns nothing. The other two are slag pockets with something standing in them.\n\n`quick` is the terrain this floor exists for: M14 §1.1 is that flags only grow, so ground that *closes* is a stair a save cannot come back from. Quicksand can only be opened, so pulling all nine stakes opens everything and a blind walk can never strand — what it costs is forty-five fatigue and six fights for nothing, against `CAP`'s sixty.\n\n**The compass is offered at every stake and sets nothing**, which is not an oversight: the Sands' own prose says there is iron under it and a compass will tell you about every reef at once. A lie that paid would be a hint.",
+  "_note": "**The Flat Below \u2014 nine stakes, three bands, one sheet.** Three bands of quicksand, each cut into three segments walled off from one another, and below each band a corridor with three identical stakes in it. A stake drains one segment; the segments are not labelled. Above each band are three rooms, and exactly one of them has a neck in its ceiling that leads to the next corridor \u2014 **right, then left, then middle**, which changes per band so that a player who learns the first one learns nothing. The other two are slag pockets with something standing in them.\n\n`quick` is the terrain this floor exists for: M14 \u00a71.1 is that flags only grow, so ground that *closes* is a stair a save cannot come back from. Quicksand can only be opened, so pulling all nine stakes opens everything and a blind walk can never strand \u2014 what it costs is forty-five fatigue and six fights for nothing, against `CAP`'s sixty.\n\n**The compass is offered at every stake and sets nothing**, which is not an oversight: the Sands' own prose says there is iron under it and a compass will tell you about every reef at once. A lie that paid would be a hint.",
   "width": 16,
   "height": 15,
   "start": [
@@ -43,7 +43,11 @@
         "Iron Abbot",
         "Obsidian Colossus",
         "Rimefather",
-        "The Rust Parliament"
+        "The Rust Parliament",
+        "The Eleventh Notch",
+        "Iron Under It",
+        "The Levelling Staff",
+        "What the Flat Kept"
       ]
     }
   ],

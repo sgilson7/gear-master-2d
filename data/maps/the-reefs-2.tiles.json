@@ -2,7 +2,7 @@
   "format": "gm2d-tiles",
   "version": 1,
   "id": "the-reefs-2",
-  "_note": "**The Assay — three doors, and the second takes what the third needs.** A hall of four rooms with a wall of slag between each pair, and the one gap in each wall opens when the door beside it is answered. Door one is a board lock: pack something epic and walk through, or lay a two-by-two in the plate. Door two and door three both want a **two-by-three, and both keep it** — so the cheapest way across is one footprint and nine thousand Fnorp, the no-repack way is eighteen thousand, and two footprints off a full board is two items broken.\n\nThe assay office in the alcove off room two reads the board back to you with an atlas, and what that buys is the **price** and not the lock: the assayed rate at door two is half. A floor an instrument makes *short* is the design; a floor it makes *possible* is what `an_instrument_is_never_the_only_way_through` refuses.\n\n**What it does not ask for is a legendary.** `PLAN-M16.md` §4.2 hangs door three on one; nothing in this game builds an item over 135 and `LEGENDARY_AT` is 170, so that door would have been a wall with a sentence on it. See `no_board_a_player_can_build_reaches_rare`.",
+  "_note": "**The Assay \u2014 three doors, and the second takes what the third needs.** A hall of four rooms with a wall of slag between each pair, and the one gap in each wall opens when the door beside it is answered. Door one is a board lock: pack something epic and walk through, or lay a two-by-two in the plate. Door two and door three both want a **two-by-three, and both keep it** \u2014 so the cheapest way across is one footprint and nine thousand Fnorp, the no-repack way is eighteen thousand, and two footprints off a full board is two items broken.\n\nThe assay office in the alcove off room two reads the board back to you with an atlas, and what that buys is the **price** and not the lock: the assayed rate at door two is half. A floor an instrument makes *short* is the design; a floor it makes *possible* is what `an_instrument_is_never_the_only_way_through` refuses.\n\n**What it does not ask for is a legendary.** `PLAN-M16.md` \u00a74.2 hangs door three on one; nothing in this game builds an item over 135 and `LEGENDARY_AT` is 170, so that door would have been a wall with a sentence on it. See `no_board_a_player_can_build_reaches_rare`.",
   "width": 16,
   "height": 8,
   "start": [
@@ -36,7 +36,11 @@
         "Iron Abbot",
         "Obsidian Colossus",
         "Rimefather",
-        "The Rust Parliament"
+        "The Rust Parliament",
+        "The Levelling Staff",
+        "What the Flat Kept",
+        "The Closing Error",
+        "The Benchmark"
       ]
     }
   ],
@@ -133,7 +137,7 @@
       "name": "the steps down",
       "to": "the-reefs-3",
       "at_to": [
-        7,
+        8,
         10
       ],
       "hidden_until": "assay-three"

@@ -63,7 +63,18 @@
     "Trig Sentinel": "trig-sentinel",
     "Curd Sentinel": "curd-sentinel",
     "Cairn Chorus": "cairn-chorus",
-    "The Ground Floor": "the-ground-floor"
+    "The Ground Floor": "the-ground-floor",
+    "Chainman": "chainman",
+    "Backsight": "backsight",
+    "The Eleventh Notch": "the-eleventh-notch",
+    "Iron Under It": "iron-under-it",
+    "The Levelling Staff": "the-levelling-staff",
+    "What the Flat Kept": "what-the-flat-kept",
+    "The Closing Error": "the-closing-error",
+    "The Benchmark": "the-benchmark",
+    "Datum": "datum",
+    "The Traverse": "the-traverse",
+    "The Unwritten": "the-unwritten"
   },
   "places": {
     "the-end-of-all-gears": "town-the-end-of-all-gears",

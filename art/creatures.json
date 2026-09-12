@@ -81,5 +81,20 @@
   "Trig Sentinel":       { "family": "sentinel",  "main": "5D6E7C", "dark": "36424C", "accent": "C0AE72" },
   "Curd Sentinel":       { "family": "sentinel",  "main": "C8B45E", "dark": "7E7032", "accent": "F4E9B0" },
   "Cairn Chorus":        { "family": "bone",      "main": "CFCABA", "dark": "888372", "accent": "7EA6C8" },
-  "The Ground Floor":    { "family": "idol",      "main": "6A5F52", "dark": "3C352C", "accent": "D0B85A" }
+  "The Ground Floor":    { "family": "idol",      "main": "6A5F52", "dark": "3C352C", "accent": "D0B85A" },
+
+  "_deep": "The Wextreen deep: ten creatures wearing the Tenth Surveyor's own board in part, and one family drawing between them. They were surveyors and the flat kept them, so the figure is a levelling staff still held upright by something that has become part of what it was measuring.",
+  "Chainman":                { "family": "drowned",  "main": "8C8370", "dark": "463F32", "accent": "D8CBA6" },
+  "Backsight":               { "family": "drowned",  "main": "7C8A84", "dark": "3C453F", "accent": "CBE0D6" },
+  "The Eleventh Notch":      { "family": "drowned",  "main": "8A7A64", "dark": "42382A", "accent": "E2C98A" },
+  "Iron Under It":           { "family": "drowned",  "main": "6E6B78", "dark": "33313C", "accent": "A9B6D4" },
+  "The Levelling Staff":     { "family": "drowned",  "main": "7A6A55", "dark": "3A3123", "accent": "E6D9B4" },
+  "What the Flat Kept":      { "family": "drowned",  "main": "5F6B6E", "dark": "2B3335", "accent": "9FC4CC" },
+  "The Closing Error":       { "family": "drowned",  "main": "705E6A", "dark": "352B32", "accent": "D3A8C4" },
+  "The Benchmark":           { "family": "drowned",  "main": "5A6350", "dark": "292E23", "accent": "B9CE93" },
+  "Datum":                   { "family": "drowned",  "main": "4E5A6B", "dark": "232933", "accent": "8FB2E0" },
+  "The Traverse":            { "family": "drowned",  "main": "5A4A4A", "dark": "281F1F", "accent": "E09A86" },
+
+  "_unwritten": "The Undercountry's boss, and the one figure in this game whose subject is an absence: the town's own sign is a post with no name on it, and this is that post standing up.",
+  "The Unwritten":        { "family": "unwritten", "main": "4A4640", "dark": "22201D", "accent": "D8D2C2" }
 }

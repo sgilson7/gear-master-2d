@@ -9422,6 +9422,2374 @@ LADDER[60] The Tenth Surveyor INSANE Weapon 2,4 r0
     Quicksilver Ink
 LADDER[60] The Tenth Surveyor INSANE Weapon 4,4 r0
     Crimson Alignment
+LADDER[61] Chainman EASY Weapon 0,0 r0
+    War Ledger
+LADDER[61] Chainman EASY Weapon 1,0 r2
+    Ratchet Cog
+LADDER[61] Chainman EASY Weapon 0,2 r2
+    Runewash Ink
+LADDER[61] Chainman EASY Weapon 2,2 r0
+    Emberburst
+LADDER[61] Chainman EASY Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[61] Chainman EASY Weapon 2,1 r1
+    Prismatic Ink
+LADDER[61] Chainman EASY Weapon 3,0 r0
+    The Bog Census
+LADDER[61] Chainman EASY Weapon 4,2 r1
+    Census Bolt
+LADDER[61] Chainman EASY Weapon 5,0 r1
+    Prismatic Ink
+LADDER[61] Chainman EASY Weapon 0,4 r1
+    Flywheel Cog
+LADDER[61] Chainman EASY Weapon 2,4 r0
+    Prismatic Ink
+LADDER[61] Chainman EASY Weapon 4,4 r0
+    Azure Alignment
+LADDER[61] Chainman EASY Gloves 0,0 r0
+    Rimeglove Material
+LADDER[61] Chainman EASY Gloves 2,0 r0
+    Coven Mold
+LADDER[61] Chainman EASY Gloves 1,2 r0
+    Signet of Iron
+LADDER[61] Chainman EASY Gloves 2,2 r0
+    Rat Signet
+LADDER[61] Chainman EASY Gloves 3,1 r0
+    Grasping Ring
+LADDER[61] Chainman EASY Gloves 4,0 r0
+    Mage's Wrapping
+LADDER[61] Chainman EASY Gloves 3,2 r0
+    Witch's Thimble
+LADDER[61] Chainman EASY Gloves 4,2 r0
+    Featherweight Mold
+LADDER[61] Chainman MEDIUM Weapon 0,0 r0
+    Hymnal
+LADDER[61] Chainman MEDIUM Weapon 1,0 r2
+    Bulwark Vial
+LADDER[61] Chainman MEDIUM Weapon 0,2 r2
+    Runewash Ink
+LADDER[61] Chainman MEDIUM Weapon 2,2 r0
+    Emberburst
+LADDER[61] Chainman MEDIUM Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[61] Chainman MEDIUM Weapon 2,1 r1
+    Cinderscript Ink
+LADDER[61] Chainman MEDIUM Weapon 3,0 r0
+    The Bog Census
+LADDER[61] Chainman MEDIUM Weapon 4,2 r1
+    Census Bolt
+LADDER[61] Chainman MEDIUM Weapon 5,0 r1
+    Cinderscript Ink
+LADDER[61] Chainman MEDIUM Weapon 0,4 r1
+    Flywheel Cog
+LADDER[61] Chainman MEDIUM Weapon 2,4 r0
+    Cinderscript Ink
+LADDER[61] Chainman MEDIUM Weapon 4,4 r0
+    Azure Alignment
+LADDER[61] Chainman MEDIUM Gloves 0,0 r0
+    Rimeglove Material
+LADDER[61] Chainman MEDIUM Gloves 2,0 r0
+    Bramble Mold
+LADDER[61] Chainman MEDIUM Gloves 1,2 r0
+    Iron Band
+LADDER[61] Chainman MEDIUM Gloves 2,2 r0
+    Rat Signet
+LADDER[61] Chainman MEDIUM Gloves 3,1 r0
+    Ring of Tides
+LADDER[61] Chainman MEDIUM Gloves 4,0 r0
+    Mage's Wrapping
+LADDER[61] Chainman MEDIUM Gloves 3,2 r0
+    Witch's Thimble
+LADDER[61] Chainman MEDIUM Gloves 4,2 r0
+    Featherweight Mold
+LADDER[61] Chainman HARD Weapon 0,0 r0
+    Herbal
+LADDER[61] Chainman HARD Weapon 1,0 r2
+    Chain Coil
+LADDER[61] Chainman HARD Weapon 0,2 r2
+    Bloodletter's Ink
+LADDER[61] Chainman HARD Weapon 2,2 r0
+    Emberburst
+LADDER[61] Chainman HARD Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[61] Chainman HARD Weapon 2,1 r1
+    Quicksilver Ink
+LADDER[61] Chainman HARD Weapon 3,0 r0
+    The Bog Census
+LADDER[61] Chainman HARD Weapon 4,2 r1
+    Census Bolt
+LADDER[61] Chainman HARD Weapon 5,0 r1
+    Quicksilver Ink
+LADDER[61] Chainman HARD Weapon 0,4 r1
+    Ratchet Cog
+LADDER[61] Chainman HARD Weapon 2,4 r0
+    Quicksilver Ink
+LADDER[61] Chainman HARD Weapon 4,4 r0
+    Crimson Alignment
+LADDER[61] Chainman HARD Gloves 0,0 r0
+    Rimeglove Material
+LADDER[61] Chainman HARD Gloves 2,0 r0
+    Gripping Mold
+LADDER[61] Chainman HARD Gloves 1,2 r0
+    Oathring
+LADDER[61] Chainman HARD Gloves 2,2 r0
+    Rat Signet
+LADDER[61] Chainman HARD Gloves 3,1 r0
+    Tin Band
+LADDER[61] Chainman HARD Gloves 4,0 r0
+    Leather Material
+LADDER[61] Chainman HARD Gloves 3,2 r0
+    Witch's Thimble
+LADDER[61] Chainman HARD Gloves 4,2 r0
+    Padded Mold
+LADDER[61] Chainman INSANE Weapon 0,0 r0
+    Herbal
+LADDER[61] Chainman INSANE Weapon 1,0 r2
+    Grimoire Rack
+LADDER[61] Chainman INSANE Weapon 0,2 r2
+    Bloodletter's Ink
+LADDER[61] Chainman INSANE Weapon 2,2 r0
+    Emberburst
+LADDER[61] Chainman INSANE Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[61] Chainman INSANE Weapon 2,1 r1
+    Quicksilver Ink
+LADDER[61] Chainman INSANE Weapon 3,0 r0
+    The Bog Census
+LADDER[61] Chainman INSANE Weapon 4,2 r1
+    Census Bolt
+LADDER[61] Chainman INSANE Weapon 5,0 r1
+    Quicksilver Ink
+LADDER[61] Chainman INSANE Weapon 0,4 r1
+    Bulwark Vial
+LADDER[61] Chainman INSANE Weapon 2,4 r0
+    Quicksilver Ink
+LADDER[61] Chainman INSANE Weapon 4,4 r0
+    Crimson Alignment
+LADDER[61] Chainman INSANE Gloves 0,0 r0
+    Rimeglove Material
+LADDER[61] Chainman INSANE Gloves 2,0 r0
+    Ravener's Mold
+LADDER[61] Chainman INSANE Gloves 1,2 r0
+    Emberloop
+LADDER[61] Chainman INSANE Gloves 2,2 r0
+    Rat Signet
+LADDER[61] Chainman INSANE Gloves 3,1 r0
+    Signet of Iron
+LADDER[61] Chainman INSANE Gloves 4,0 r0
+    Anchor Material
+LADDER[61] Chainman INSANE Gloves 3,2 r0
+    Witch's Thimble
+LADDER[61] Chainman INSANE Gloves 4,2 r0
+    Braced Mold
+LADDER[62] Backsight EASY Weapon 0,0 r0
+    War Ledger
+LADDER[62] Backsight EASY Weapon 1,0 r2
+    Ratchet Cog
+LADDER[62] Backsight EASY Weapon 0,2 r2
+    Runewash Ink
+LADDER[62] Backsight EASY Weapon 2,2 r0
+    Emberburst
+LADDER[62] Backsight EASY Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[62] Backsight EASY Weapon 2,1 r1
+    Prismatic Ink
+LADDER[62] Backsight EASY Weapon 3,0 r0
+    The Bog Census
+LADDER[62] Backsight EASY Weapon 4,2 r1
+    Census Bolt
+LADDER[62] Backsight EASY Weapon 5,0 r1
+    Prismatic Ink
+LADDER[62] Backsight EASY Weapon 0,4 r1
+    Flywheel Cog
+LADDER[62] Backsight EASY Weapon 2,4 r0
+    Prismatic Ink
+LADDER[62] Backsight EASY Weapon 4,4 r0
+    Azure Alignment
+LADDER[62] Backsight EASY Helmet 0,0 r3
+    Bone Crown
+LADDER[62] Backsight EASY Helmet 1,1 r2
+    Bone Scale
+LADDER[62] Backsight EASY Helmet 2,2 r3
+    Bone Fletch
+LADDER[62] Backsight EASY Helmet 3,0 r0
+    Idol's Crest
+LADDER[62] Backsight EASY Helmet 4,1 r0
+    Tin Frame
+LADDER[62] Backsight EASY Helmet 4,0 r0
+    Tin Plating
+LADDER[62] Backsight MEDIUM Weapon 0,0 r0
+    Hymnal
+LADDER[62] Backsight MEDIUM Weapon 1,0 r2
+    Bulwark Vial
+LADDER[62] Backsight MEDIUM Weapon 0,2 r2
+    Runewash Ink
+LADDER[62] Backsight MEDIUM Weapon 2,2 r0
+    Emberburst
+LADDER[62] Backsight MEDIUM Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[62] Backsight MEDIUM Weapon 2,1 r1
+    Cinderscript Ink
+LADDER[62] Backsight MEDIUM Weapon 3,0 r0
+    The Bog Census
+LADDER[62] Backsight MEDIUM Weapon 4,2 r1
+    Census Bolt
+LADDER[62] Backsight MEDIUM Weapon 5,0 r1
+    Cinderscript Ink
+LADDER[62] Backsight MEDIUM Weapon 0,4 r1
+    Flywheel Cog
+LADDER[62] Backsight MEDIUM Weapon 2,4 r0
+    Cinderscript Ink
+LADDER[62] Backsight MEDIUM Weapon 4,4 r0
+    Azure Alignment
+LADDER[62] Backsight MEDIUM Helmet 0,0 r3
+    Bone Crown
+LADDER[62] Backsight MEDIUM Helmet 1,1 r2
+    Bone Scale
+LADDER[62] Backsight MEDIUM Helmet 2,2 r3
+    Bone Fletch
+LADDER[62] Backsight MEDIUM Helmet 3,0 r0
+    Idol's Crest
+LADDER[62] Backsight MEDIUM Helmet 4,1 r0
+    Tin Frame
+LADDER[62] Backsight MEDIUM Helmet 4,0 r0
+    Tin Plating
+LADDER[62] Backsight HARD Weapon 0,0 r0
+    Herbal
+LADDER[62] Backsight HARD Weapon 1,0 r2
+    Chain Coil
+LADDER[62] Backsight HARD Weapon 0,2 r2
+    Bloodletter's Ink
+LADDER[62] Backsight HARD Weapon 2,2 r0
+    Emberburst
+LADDER[62] Backsight HARD Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[62] Backsight HARD Weapon 2,1 r1
+    Quicksilver Ink
+LADDER[62] Backsight HARD Weapon 3,0 r0
+    The Bog Census
+LADDER[62] Backsight HARD Weapon 4,2 r1
+    Census Bolt
+LADDER[62] Backsight HARD Weapon 5,0 r1
+    Quicksilver Ink
+LADDER[62] Backsight HARD Weapon 0,4 r1
+    Ratchet Cog
+LADDER[62] Backsight HARD Weapon 2,4 r0
+    Quicksilver Ink
+LADDER[62] Backsight HARD Weapon 4,4 r0
+    Crimson Alignment
+LADDER[62] Backsight HARD Helmet 0,0 r3
+    Bone Crown
+LADDER[62] Backsight HARD Helmet 1,1 r2
+    Bone Scale
+LADDER[62] Backsight HARD Helmet 2,2 r3
+    Bone Fletch
+LADDER[62] Backsight HARD Helmet 3,0 r0
+    Idol's Crest
+LADDER[62] Backsight HARD Helmet 4,1 r0
+    Bronze Frame
+LADDER[62] Backsight HARD Helmet 4,0 r0
+    Bronze Plating
+LADDER[62] Backsight INSANE Weapon 0,0 r0
+    Herbal
+LADDER[62] Backsight INSANE Weapon 1,0 r2
+    Grimoire Rack
+LADDER[62] Backsight INSANE Weapon 0,2 r2
+    Bloodletter's Ink
+LADDER[62] Backsight INSANE Weapon 2,2 r0
+    Emberburst
+LADDER[62] Backsight INSANE Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[62] Backsight INSANE Weapon 2,1 r1
+    Quicksilver Ink
+LADDER[62] Backsight INSANE Weapon 3,0 r0
+    The Bog Census
+LADDER[62] Backsight INSANE Weapon 4,2 r1
+    Census Bolt
+LADDER[62] Backsight INSANE Weapon 5,0 r1
+    Quicksilver Ink
+LADDER[62] Backsight INSANE Weapon 0,4 r1
+    Bulwark Vial
+LADDER[62] Backsight INSANE Weapon 2,4 r0
+    Quicksilver Ink
+LADDER[62] Backsight INSANE Weapon 4,4 r0
+    Crimson Alignment
+LADDER[62] Backsight INSANE Helmet 0,0 r3
+    Bone Crown
+LADDER[62] Backsight INSANE Helmet 1,1 r2
+    Bone Scale
+LADDER[62] Backsight INSANE Helmet 2,2 r3
+    Bone Fletch
+LADDER[62] Backsight INSANE Helmet 3,0 r0
+    Idol's Crest
+LADDER[62] Backsight INSANE Helmet 4,1 r0
+    Warded Frame
+LADDER[62] Backsight INSANE Helmet 4,0 r0
+    Layered Plating
+LADDER[63] The Eleventh Notch EASY Weapon 0,0 r0
+    War Ledger
+LADDER[63] The Eleventh Notch EASY Weapon 1,0 r2
+    Ratchet Cog
+LADDER[63] The Eleventh Notch EASY Weapon 0,2 r2
+    Runewash Ink
+LADDER[63] The Eleventh Notch EASY Weapon 2,2 r0
+    Emberburst
+LADDER[63] The Eleventh Notch EASY Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[63] The Eleventh Notch EASY Weapon 2,1 r1
+    Prismatic Ink
+LADDER[63] The Eleventh Notch EASY Weapon 3,0 r0
+    The Bog Census
+LADDER[63] The Eleventh Notch EASY Weapon 4,2 r1
+    Census Bolt
+LADDER[63] The Eleventh Notch EASY Weapon 5,0 r1
+    Prismatic Ink
+LADDER[63] The Eleventh Notch EASY Weapon 0,4 r1
+    Flywheel Cog
+LADDER[63] The Eleventh Notch EASY Weapon 2,4 r0
+    Prismatic Ink
+LADDER[63] The Eleventh Notch EASY Weapon 4,4 r0
+    Azure Alignment
+LADDER[63] The Eleventh Notch EASY Greaves 0,0 r0
+    Frostbite Mold
+LADDER[63] The Eleventh Notch EASY Greaves 0,1 r0
+    Ratskin Material
+LADDER[63] The Eleventh Notch EASY Greaves 2,0 r1
+    Spun Material
+LADDER[63] The Eleventh Notch EASY Greaves 4,0 r0
+    Greave Mold
+LADDER[63] The Eleventh Notch EASY Greaves 2,1 r3
+    Spun Material
+LADDER[63] The Eleventh Notch EASY Greaves 4,1 r0
+    Stumblefoot Mold
+LADDER[63] The Eleventh Notch EASY Gloves 0,0 r0
+    Rimeglove Material
+LADDER[63] The Eleventh Notch EASY Gloves 2,0 r0
+    Coven Mold
+LADDER[63] The Eleventh Notch EASY Gloves 1,2 r0
+    Signet of Iron
+LADDER[63] The Eleventh Notch EASY Gloves 2,2 r0
+    Rat Signet
+LADDER[63] The Eleventh Notch EASY Gloves 3,1 r0
+    Grasping Ring
+LADDER[63] The Eleventh Notch EASY Gloves 4,0 r0
+    Mage's Wrapping
+LADDER[63] The Eleventh Notch EASY Gloves 3,2 r0
+    Witch's Thimble
+LADDER[63] The Eleventh Notch EASY Gloves 4,2 r0
+    Featherweight Mold
+LADDER[63] The Eleventh Notch MEDIUM Weapon 0,0 r0
+    Hymnal
+LADDER[63] The Eleventh Notch MEDIUM Weapon 1,0 r2
+    Bulwark Vial
+LADDER[63] The Eleventh Notch MEDIUM Weapon 0,2 r2
+    Runewash Ink
+LADDER[63] The Eleventh Notch MEDIUM Weapon 2,2 r0
+    Emberburst
+LADDER[63] The Eleventh Notch MEDIUM Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[63] The Eleventh Notch MEDIUM Weapon 2,1 r1
+    Cinderscript Ink
+LADDER[63] The Eleventh Notch MEDIUM Weapon 3,0 r0
+    The Bog Census
+LADDER[63] The Eleventh Notch MEDIUM Weapon 4,2 r1
+    Census Bolt
+LADDER[63] The Eleventh Notch MEDIUM Weapon 5,0 r1
+    Cinderscript Ink
+LADDER[63] The Eleventh Notch MEDIUM Weapon 0,4 r1
+    Flywheel Cog
+LADDER[63] The Eleventh Notch MEDIUM Weapon 2,4 r0
+    Cinderscript Ink
+LADDER[63] The Eleventh Notch MEDIUM Weapon 4,4 r0
+    Azure Alignment
+LADDER[63] The Eleventh Notch MEDIUM Greaves 0,0 r0
+    Racing Sole
+LADDER[63] The Eleventh Notch MEDIUM Greaves 0,1 r0
+    Ratskin Material
+LADDER[63] The Eleventh Notch MEDIUM Greaves 2,0 r1
+    Spun Material
+LADDER[63] The Eleventh Notch MEDIUM Greaves 4,0 r0
+    Greave Mold
+LADDER[63] The Eleventh Notch MEDIUM Greaves 2,1 r3
+    Spun Material
+LADDER[63] The Eleventh Notch MEDIUM Greaves 4,1 r0
+    Pilgrim's Sole
+LADDER[63] The Eleventh Notch MEDIUM Gloves 0,0 r0
+    Rimeglove Material
+LADDER[63] The Eleventh Notch MEDIUM Gloves 2,0 r0
+    Bramble Mold
+LADDER[63] The Eleventh Notch MEDIUM Gloves 1,2 r0
+    Iron Band
+LADDER[63] The Eleventh Notch MEDIUM Gloves 2,2 r0
+    Rat Signet
+LADDER[63] The Eleventh Notch MEDIUM Gloves 3,1 r0
+    Ring of Tides
+LADDER[63] The Eleventh Notch MEDIUM Gloves 4,0 r0
+    Mage's Wrapping
+LADDER[63] The Eleventh Notch MEDIUM Gloves 3,2 r0
+    Witch's Thimble
+LADDER[63] The Eleventh Notch MEDIUM Gloves 4,2 r0
+    Featherweight Mold
+LADDER[63] The Eleventh Notch HARD Weapon 0,0 r0
+    Herbal
+LADDER[63] The Eleventh Notch HARD Weapon 1,0 r2
+    Chain Coil
+LADDER[63] The Eleventh Notch HARD Weapon 0,2 r2
+    Bloodletter's Ink
+LADDER[63] The Eleventh Notch HARD Weapon 2,2 r0
+    Emberburst
+LADDER[63] The Eleventh Notch HARD Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[63] The Eleventh Notch HARD Weapon 2,1 r1
+    Quicksilver Ink
+LADDER[63] The Eleventh Notch HARD Weapon 3,0 r0
+    The Bog Census
+LADDER[63] The Eleventh Notch HARD Weapon 4,2 r1
+    Census Bolt
+LADDER[63] The Eleventh Notch HARD Weapon 5,0 r1
+    Quicksilver Ink
+LADDER[63] The Eleventh Notch HARD Weapon 0,4 r1
+    Ratchet Cog
+LADDER[63] The Eleventh Notch HARD Weapon 2,4 r0
+    Quicksilver Ink
+LADDER[63] The Eleventh Notch HARD Weapon 4,4 r0
+    Crimson Alignment
+LADDER[63] The Eleventh Notch HARD Greaves 0,0 r0
+    Plain Sole
+LADDER[63] The Eleventh Notch HARD Greaves 0,1 r0
+    Ratskin Material
+LADDER[63] The Eleventh Notch HARD Greaves 2,0 r1
+    Sanctified Material
+LADDER[63] The Eleventh Notch HARD Greaves 4,0 r0
+    Warded Sabatons
+LADDER[63] The Eleventh Notch HARD Greaves 2,1 r3
+    Sanctified Material
+LADDER[63] The Eleventh Notch HARD Greaves 4,1 r0
+    Sapling Mold
+LADDER[63] The Eleventh Notch HARD Gloves 0,0 r0
+    Rimeglove Material
+LADDER[63] The Eleventh Notch HARD Gloves 2,0 r0
+    Gripping Mold
+LADDER[63] The Eleventh Notch HARD Gloves 1,2 r0
+    Oathring
+LADDER[63] The Eleventh Notch HARD Gloves 2,2 r0
+    Rat Signet
+LADDER[63] The Eleventh Notch HARD Gloves 3,1 r0
+    Tin Band
+LADDER[63] The Eleventh Notch HARD Gloves 4,0 r0
+    Leather Material
+LADDER[63] The Eleventh Notch HARD Gloves 3,2 r0
+    Witch's Thimble
+LADDER[63] The Eleventh Notch HARD Gloves 4,2 r0
+    Padded Mold
+LADDER[63] The Eleventh Notch INSANE Weapon 0,0 r0
+    Herbal
+LADDER[63] The Eleventh Notch INSANE Weapon 1,0 r2
+    Grimoire Rack
+LADDER[63] The Eleventh Notch INSANE Weapon 0,2 r2
+    Bloodletter's Ink
+LADDER[63] The Eleventh Notch INSANE Weapon 2,2 r0
+    Emberburst
+LADDER[63] The Eleventh Notch INSANE Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[63] The Eleventh Notch INSANE Weapon 2,1 r1
+    Quicksilver Ink
+LADDER[63] The Eleventh Notch INSANE Weapon 3,0 r0
+    The Bog Census
+LADDER[63] The Eleventh Notch INSANE Weapon 4,2 r1
+    Census Bolt
+LADDER[63] The Eleventh Notch INSANE Weapon 5,0 r1
+    Quicksilver Ink
+LADDER[63] The Eleventh Notch INSANE Weapon 0,4 r1
+    Bulwark Vial
+LADDER[63] The Eleventh Notch INSANE Weapon 2,4 r0
+    Quicksilver Ink
+LADDER[63] The Eleventh Notch INSANE Weapon 4,4 r0
+    Crimson Alignment
+LADDER[63] The Eleventh Notch INSANE Greaves 0,0 r0
+    Sprung Sole
+LADDER[63] The Eleventh Notch INSANE Greaves 0,1 r0
+    Ratskin Material
+LADDER[63] The Eleventh Notch INSANE Greaves 2,0 r1
+    Sanctified Material
+LADDER[63] The Eleventh Notch INSANE Greaves 4,0 r0
+    Warded Sabatons
+LADDER[63] The Eleventh Notch INSANE Greaves 2,1 r3
+    Sanctified Material
+LADDER[63] The Eleventh Notch INSANE Greaves 4,1 r0
+    Widow's Sole
+LADDER[63] The Eleventh Notch INSANE Gloves 0,0 r0
+    Rimeglove Material
+LADDER[63] The Eleventh Notch INSANE Gloves 2,0 r0
+    Ravener's Mold
+LADDER[63] The Eleventh Notch INSANE Gloves 1,2 r0
+    Emberloop
+LADDER[63] The Eleventh Notch INSANE Gloves 2,2 r0
+    Rat Signet
+LADDER[63] The Eleventh Notch INSANE Gloves 3,1 r0
+    Signet of Iron
+LADDER[63] The Eleventh Notch INSANE Gloves 4,0 r0
+    Anchor Material
+LADDER[63] The Eleventh Notch INSANE Gloves 3,2 r0
+    Witch's Thimble
+LADDER[63] The Eleventh Notch INSANE Gloves 4,2 r0
+    Braced Mold
+LADDER[64] Iron Under It EASY Weapon 0,0 r0
+    War Ledger
+LADDER[64] Iron Under It EASY Weapon 1,0 r2
+    Ratchet Cog
+LADDER[64] Iron Under It EASY Weapon 0,2 r2
+    Runewash Ink
+LADDER[64] Iron Under It EASY Weapon 2,2 r0
+    Emberburst
+LADDER[64] Iron Under It EASY Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[64] Iron Under It EASY Weapon 2,1 r1
+    Prismatic Ink
+LADDER[64] Iron Under It EASY Weapon 3,0 r0
+    The Bog Census
+LADDER[64] Iron Under It EASY Weapon 4,2 r1
+    Census Bolt
+LADDER[64] Iron Under It EASY Weapon 5,0 r1
+    Prismatic Ink
+LADDER[64] Iron Under It EASY Weapon 0,4 r1
+    Flywheel Cog
+LADDER[64] Iron Under It EASY Weapon 2,4 r0
+    Prismatic Ink
+LADDER[64] Iron Under It EASY Weapon 4,4 r0
+    Azure Alignment
+LADDER[64] Iron Under It EASY Chest 0,0 r1
+    Chorister's Base
+LADDER[64] Iron Under It EASY Chest 2,0 r0
+    Chorister's Weave
+LADDER[64] Iron Under It EASY Chest 2,1 r0
+    Chorister's Layer
+LADDER[64] Iron Under It EASY Chest 0,3 r0
+    Runed Lining
+LADDER[64] Iron Under It EASY Chest 4,1 r0
+    Quilted Base
+LADDER[64] Iron Under It EASY Chest 4,3 r0
+    Sprocketman's Gratitude
+LADDER[64] Iron Under It EASY Helmet 0,0 r3
+    Bone Crown
+LADDER[64] Iron Under It EASY Helmet 1,1 r2
+    Bone Scale
+LADDER[64] Iron Under It EASY Helmet 2,2 r3
+    Bone Fletch
+LADDER[64] Iron Under It EASY Helmet 3,0 r0
+    Idol's Crest
+LADDER[64] Iron Under It EASY Helmet 4,1 r0
+    Tin Frame
+LADDER[64] Iron Under It EASY Helmet 4,0 r0
+    Tin Plating
+LADDER[64] Iron Under It MEDIUM Weapon 0,0 r0
+    Hymnal
+LADDER[64] Iron Under It MEDIUM Weapon 1,0 r2
+    Bulwark Vial
+LADDER[64] Iron Under It MEDIUM Weapon 0,2 r2
+    Runewash Ink
+LADDER[64] Iron Under It MEDIUM Weapon 2,2 r0
+    Emberburst
+LADDER[64] Iron Under It MEDIUM Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[64] Iron Under It MEDIUM Weapon 2,1 r1
+    Cinderscript Ink
+LADDER[64] Iron Under It MEDIUM Weapon 3,0 r0
+    The Bog Census
+LADDER[64] Iron Under It MEDIUM Weapon 4,2 r1
+    Census Bolt
+LADDER[64] Iron Under It MEDIUM Weapon 5,0 r1
+    Cinderscript Ink
+LADDER[64] Iron Under It MEDIUM Weapon 0,4 r1
+    Flywheel Cog
+LADDER[64] Iron Under It MEDIUM Weapon 2,4 r0
+    Cinderscript Ink
+LADDER[64] Iron Under It MEDIUM Weapon 4,4 r0
+    Azure Alignment
+LADDER[64] Iron Under It MEDIUM Chest 0,0 r1
+    Chorister's Base
+LADDER[64] Iron Under It MEDIUM Chest 2,0 r0
+    Chorister's Weave
+LADDER[64] Iron Under It MEDIUM Chest 2,1 r0
+    Chorister's Layer
+LADDER[64] Iron Under It MEDIUM Chest 0,3 r0
+    Runed Lining
+LADDER[64] Iron Under It MEDIUM Chest 4,1 r0
+    Layered Core
+LADDER[64] Iron Under It MEDIUM Chest 4,3 r0
+    Sprocketman's Gratitude
+LADDER[64] Iron Under It MEDIUM Helmet 0,0 r3
+    Bone Crown
+LADDER[64] Iron Under It MEDIUM Helmet 1,1 r2
+    Bone Scale
+LADDER[64] Iron Under It MEDIUM Helmet 2,2 r3
+    Bone Fletch
+LADDER[64] Iron Under It MEDIUM Helmet 3,0 r0
+    Idol's Crest
+LADDER[64] Iron Under It MEDIUM Helmet 4,1 r0
+    Tin Frame
+LADDER[64] Iron Under It MEDIUM Helmet 4,0 r0
+    Tin Plating
+LADDER[64] Iron Under It HARD Weapon 0,0 r0
+    Herbal
+LADDER[64] Iron Under It HARD Weapon 1,0 r2
+    Chain Coil
+LADDER[64] Iron Under It HARD Weapon 0,2 r2
+    Bloodletter's Ink
+LADDER[64] Iron Under It HARD Weapon 2,2 r0
+    Emberburst
+LADDER[64] Iron Under It HARD Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[64] Iron Under It HARD Weapon 2,1 r1
+    Quicksilver Ink
+LADDER[64] Iron Under It HARD Weapon 3,0 r0
+    The Bog Census
+LADDER[64] Iron Under It HARD Weapon 4,2 r1
+    Census Bolt
+LADDER[64] Iron Under It HARD Weapon 5,0 r1
+    Quicksilver Ink
+LADDER[64] Iron Under It HARD Weapon 0,4 r1
+    Ratchet Cog
+LADDER[64] Iron Under It HARD Weapon 2,4 r0
+    Quicksilver Ink
+LADDER[64] Iron Under It HARD Weapon 4,4 r0
+    Crimson Alignment
+LADDER[64] Iron Under It HARD Chest 0,0 r1
+    Chorister's Base
+LADDER[64] Iron Under It HARD Chest 2,0 r0
+    Chorister's Weave
+LADDER[64] Iron Under It HARD Chest 2,1 r0
+    Chorister's Layer
+LADDER[64] Iron Under It HARD Chest 0,3 r0
+    Chain Layer
+LADDER[64] Iron Under It HARD Chest 4,1 r0
+    Brigandine Base
+LADDER[64] Iron Under It HARD Chest 4,3 r0
+    Sprocketman's Gratitude
+LADDER[64] Iron Under It HARD Helmet 0,0 r3
+    Bone Crown
+LADDER[64] Iron Under It HARD Helmet 1,1 r2
+    Bone Scale
+LADDER[64] Iron Under It HARD Helmet 2,2 r3
+    Bone Fletch
+LADDER[64] Iron Under It HARD Helmet 3,0 r0
+    Idol's Crest
+LADDER[64] Iron Under It HARD Helmet 4,1 r0
+    Bronze Frame
+LADDER[64] Iron Under It HARD Helmet 4,0 r0
+    Bronze Plating
+LADDER[64] Iron Under It INSANE Weapon 0,0 r0
+    Herbal
+LADDER[64] Iron Under It INSANE Weapon 1,0 r2
+    Grimoire Rack
+LADDER[64] Iron Under It INSANE Weapon 0,2 r2
+    Bloodletter's Ink
+LADDER[64] Iron Under It INSANE Weapon 2,2 r0
+    Emberburst
+LADDER[64] Iron Under It INSANE Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[64] Iron Under It INSANE Weapon 2,1 r1
+    Quicksilver Ink
+LADDER[64] Iron Under It INSANE Weapon 3,0 r0
+    The Bog Census
+LADDER[64] Iron Under It INSANE Weapon 4,2 r1
+    Census Bolt
+LADDER[64] Iron Under It INSANE Weapon 5,0 r1
+    Quicksilver Ink
+LADDER[64] Iron Under It INSANE Weapon 0,4 r1
+    Bulwark Vial
+LADDER[64] Iron Under It INSANE Weapon 2,4 r0
+    Quicksilver Ink
+LADDER[64] Iron Under It INSANE Weapon 4,4 r0
+    Crimson Alignment
+LADDER[64] Iron Under It INSANE Chest 0,0 r1
+    Chorister's Base
+LADDER[64] Iron Under It INSANE Chest 2,0 r0
+    Chorister's Weave
+LADDER[64] Iron Under It INSANE Chest 2,1 r0
+    Chorister's Layer
+LADDER[64] Iron Under It INSANE Chest 0,3 r0
+    Woven Underlayer
+LADDER[64] Iron Under It INSANE Chest 4,1 r0
+    Brigandine Base
+LADDER[64] Iron Under It INSANE Chest 4,3 r0
+    Sprocketman's Gratitude
+LADDER[64] Iron Under It INSANE Helmet 0,0 r3
+    Bone Crown
+LADDER[64] Iron Under It INSANE Helmet 1,1 r2
+    Bone Scale
+LADDER[64] Iron Under It INSANE Helmet 2,2 r3
+    Bone Fletch
+LADDER[64] Iron Under It INSANE Helmet 3,0 r0
+    Idol's Crest
+LADDER[64] Iron Under It INSANE Helmet 4,1 r0
+    Warded Frame
+LADDER[64] Iron Under It INSANE Helmet 4,0 r0
+    Layered Plating
+LADDER[65] The Levelling Staff EASY Weapon 0,0 r0
+    War Ledger
+LADDER[65] The Levelling Staff EASY Weapon 1,0 r2
+    Ratchet Cog
+LADDER[65] The Levelling Staff EASY Weapon 0,2 r2
+    Runewash Ink
+LADDER[65] The Levelling Staff EASY Weapon 2,2 r0
+    Emberburst
+LADDER[65] The Levelling Staff EASY Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[65] The Levelling Staff EASY Weapon 2,1 r1
+    Prismatic Ink
+LADDER[65] The Levelling Staff EASY Weapon 3,0 r0
+    The Bog Census
+LADDER[65] The Levelling Staff EASY Weapon 4,2 r1
+    Census Bolt
+LADDER[65] The Levelling Staff EASY Weapon 5,0 r1
+    Prismatic Ink
+LADDER[65] The Levelling Staff EASY Weapon 0,4 r1
+    Flywheel Cog
+LADDER[65] The Levelling Staff EASY Weapon 2,4 r0
+    Prismatic Ink
+LADDER[65] The Levelling Staff EASY Weapon 4,4 r0
+    Azure Alignment
+LADDER[65] The Levelling Staff EASY Chest 0,0 r1
+    Chorister's Base
+LADDER[65] The Levelling Staff EASY Chest 2,0 r0
+    Chorister's Weave
+LADDER[65] The Levelling Staff EASY Chest 2,1 r0
+    Chorister's Layer
+LADDER[65] The Levelling Staff EASY Chest 0,3 r0
+    Runed Lining
+LADDER[65] The Levelling Staff EASY Chest 4,1 r0
+    Quilted Base
+LADDER[65] The Levelling Staff EASY Chest 4,3 r0
+    Sprocketman's Gratitude
+LADDER[65] The Levelling Staff EASY Gloves 0,0 r0
+    Rimeglove Material
+LADDER[65] The Levelling Staff EASY Gloves 2,0 r0
+    Coven Mold
+LADDER[65] The Levelling Staff EASY Gloves 1,2 r0
+    Signet of Iron
+LADDER[65] The Levelling Staff EASY Gloves 2,2 r0
+    Rat Signet
+LADDER[65] The Levelling Staff EASY Gloves 3,1 r0
+    Grasping Ring
+LADDER[65] The Levelling Staff EASY Gloves 4,0 r0
+    Mage's Wrapping
+LADDER[65] The Levelling Staff EASY Gloves 3,2 r0
+    Witch's Thimble
+LADDER[65] The Levelling Staff EASY Gloves 4,2 r0
+    Featherweight Mold
+LADDER[65] The Levelling Staff MEDIUM Weapon 0,0 r0
+    Hymnal
+LADDER[65] The Levelling Staff MEDIUM Weapon 1,0 r2
+    Bulwark Vial
+LADDER[65] The Levelling Staff MEDIUM Weapon 0,2 r2
+    Runewash Ink
+LADDER[65] The Levelling Staff MEDIUM Weapon 2,2 r0
+    Emberburst
+LADDER[65] The Levelling Staff MEDIUM Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[65] The Levelling Staff MEDIUM Weapon 2,1 r1
+    Cinderscript Ink
+LADDER[65] The Levelling Staff MEDIUM Weapon 3,0 r0
+    The Bog Census
+LADDER[65] The Levelling Staff MEDIUM Weapon 4,2 r1
+    Census Bolt
+LADDER[65] The Levelling Staff MEDIUM Weapon 5,0 r1
+    Cinderscript Ink
+LADDER[65] The Levelling Staff MEDIUM Weapon 0,4 r1
+    Flywheel Cog
+LADDER[65] The Levelling Staff MEDIUM Weapon 2,4 r0
+    Cinderscript Ink
+LADDER[65] The Levelling Staff MEDIUM Weapon 4,4 r0
+    Azure Alignment
+LADDER[65] The Levelling Staff MEDIUM Chest 0,0 r1
+    Chorister's Base
+LADDER[65] The Levelling Staff MEDIUM Chest 2,0 r0
+    Chorister's Weave
+LADDER[65] The Levelling Staff MEDIUM Chest 2,1 r0
+    Chorister's Layer
+LADDER[65] The Levelling Staff MEDIUM Chest 0,3 r0
+    Runed Lining
+LADDER[65] The Levelling Staff MEDIUM Chest 4,1 r0
+    Layered Core
+LADDER[65] The Levelling Staff MEDIUM Chest 4,3 r0
+    Sprocketman's Gratitude
+LADDER[65] The Levelling Staff MEDIUM Gloves 0,0 r0
+    Rimeglove Material
+LADDER[65] The Levelling Staff MEDIUM Gloves 2,0 r0
+    Bramble Mold
+LADDER[65] The Levelling Staff MEDIUM Gloves 1,2 r0
+    Iron Band
+LADDER[65] The Levelling Staff MEDIUM Gloves 2,2 r0
+    Rat Signet
+LADDER[65] The Levelling Staff MEDIUM Gloves 3,1 r0
+    Ring of Tides
+LADDER[65] The Levelling Staff MEDIUM Gloves 4,0 r0
+    Mage's Wrapping
+LADDER[65] The Levelling Staff MEDIUM Gloves 3,2 r0
+    Witch's Thimble
+LADDER[65] The Levelling Staff MEDIUM Gloves 4,2 r0
+    Featherweight Mold
+LADDER[65] The Levelling Staff HARD Weapon 0,0 r0
+    Herbal
+LADDER[65] The Levelling Staff HARD Weapon 1,0 r2
+    Chain Coil
+LADDER[65] The Levelling Staff HARD Weapon 0,2 r2
+    Bloodletter's Ink
+LADDER[65] The Levelling Staff HARD Weapon 2,2 r0
+    Emberburst
+LADDER[65] The Levelling Staff HARD Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[65] The Levelling Staff HARD Weapon 2,1 r1
+    Quicksilver Ink
+LADDER[65] The Levelling Staff HARD Weapon 3,0 r0
+    The Bog Census
+LADDER[65] The Levelling Staff HARD Weapon 4,2 r1
+    Census Bolt
+LADDER[65] The Levelling Staff HARD Weapon 5,0 r1
+    Quicksilver Ink
+LADDER[65] The Levelling Staff HARD Weapon 0,4 r1
+    Ratchet Cog
+LADDER[65] The Levelling Staff HARD Weapon 2,4 r0
+    Quicksilver Ink
+LADDER[65] The Levelling Staff HARD Weapon 4,4 r0
+    Crimson Alignment
+LADDER[65] The Levelling Staff HARD Chest 0,0 r1
+    Chorister's Base
+LADDER[65] The Levelling Staff HARD Chest 2,0 r0
+    Chorister's Weave
+LADDER[65] The Levelling Staff HARD Chest 2,1 r0
+    Chorister's Layer
+LADDER[65] The Levelling Staff HARD Chest 0,3 r0
+    Chain Layer
+LADDER[65] The Levelling Staff HARD Chest 4,1 r0
+    Brigandine Base
+LADDER[65] The Levelling Staff HARD Chest 4,3 r0
+    Sprocketman's Gratitude
+LADDER[65] The Levelling Staff HARD Gloves 0,0 r0
+    Rimeglove Material
+LADDER[65] The Levelling Staff HARD Gloves 2,0 r0
+    Gripping Mold
+LADDER[65] The Levelling Staff HARD Gloves 1,2 r0
+    Oathring
+LADDER[65] The Levelling Staff HARD Gloves 2,2 r0
+    Rat Signet
+LADDER[65] The Levelling Staff HARD Gloves 3,1 r0
+    Tin Band
+LADDER[65] The Levelling Staff HARD Gloves 4,0 r0
+    Leather Material
+LADDER[65] The Levelling Staff HARD Gloves 3,2 r0
+    Witch's Thimble
+LADDER[65] The Levelling Staff HARD Gloves 4,2 r0
+    Padded Mold
+LADDER[65] The Levelling Staff INSANE Weapon 0,0 r0
+    Herbal
+LADDER[65] The Levelling Staff INSANE Weapon 1,0 r2
+    Grimoire Rack
+LADDER[65] The Levelling Staff INSANE Weapon 0,2 r2
+    Bloodletter's Ink
+LADDER[65] The Levelling Staff INSANE Weapon 2,2 r0
+    Emberburst
+LADDER[65] The Levelling Staff INSANE Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[65] The Levelling Staff INSANE Weapon 2,1 r1
+    Quicksilver Ink
+LADDER[65] The Levelling Staff INSANE Weapon 3,0 r0
+    The Bog Census
+LADDER[65] The Levelling Staff INSANE Weapon 4,2 r1
+    Census Bolt
+LADDER[65] The Levelling Staff INSANE Weapon 5,0 r1
+    Quicksilver Ink
+LADDER[65] The Levelling Staff INSANE Weapon 0,4 r1
+    Bulwark Vial
+LADDER[65] The Levelling Staff INSANE Weapon 2,4 r0
+    Quicksilver Ink
+LADDER[65] The Levelling Staff INSANE Weapon 4,4 r0
+    Crimson Alignment
+LADDER[65] The Levelling Staff INSANE Chest 0,0 r1
+    Chorister's Base
+LADDER[65] The Levelling Staff INSANE Chest 2,0 r0
+    Chorister's Weave
+LADDER[65] The Levelling Staff INSANE Chest 2,1 r0
+    Chorister's Layer
+LADDER[65] The Levelling Staff INSANE Chest 0,3 r0
+    Woven Underlayer
+LADDER[65] The Levelling Staff INSANE Chest 4,1 r0
+    Brigandine Base
+LADDER[65] The Levelling Staff INSANE Chest 4,3 r0
+    Sprocketman's Gratitude
+LADDER[65] The Levelling Staff INSANE Gloves 0,0 r0
+    Rimeglove Material
+LADDER[65] The Levelling Staff INSANE Gloves 2,0 r0
+    Ravener's Mold
+LADDER[65] The Levelling Staff INSANE Gloves 1,2 r0
+    Emberloop
+LADDER[65] The Levelling Staff INSANE Gloves 2,2 r0
+    Rat Signet
+LADDER[65] The Levelling Staff INSANE Gloves 3,1 r0
+    Signet of Iron
+LADDER[65] The Levelling Staff INSANE Gloves 4,0 r0
+    Anchor Material
+LADDER[65] The Levelling Staff INSANE Gloves 3,2 r0
+    Witch's Thimble
+LADDER[65] The Levelling Staff INSANE Gloves 4,2 r0
+    Braced Mold
+LADDER[66] What the Flat Kept EASY Weapon 0,0 r0
+    War Ledger
+LADDER[66] What the Flat Kept EASY Weapon 1,0 r2
+    Ratchet Cog
+LADDER[66] What the Flat Kept EASY Weapon 0,2 r2
+    Runewash Ink
+LADDER[66] What the Flat Kept EASY Weapon 2,2 r0
+    Emberburst
+LADDER[66] What the Flat Kept EASY Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[66] What the Flat Kept EASY Weapon 2,1 r1
+    Prismatic Ink
+LADDER[66] What the Flat Kept EASY Weapon 3,0 r0
+    The Bog Census
+LADDER[66] What the Flat Kept EASY Weapon 4,2 r1
+    Census Bolt
+LADDER[66] What the Flat Kept EASY Weapon 5,0 r1
+    Prismatic Ink
+LADDER[66] What the Flat Kept EASY Weapon 0,4 r1
+    Flywheel Cog
+LADDER[66] What the Flat Kept EASY Weapon 2,4 r0
+    Prismatic Ink
+LADDER[66] What the Flat Kept EASY Weapon 4,4 r0
+    Azure Alignment
+LADDER[66] What the Flat Kept EASY Helmet 0,0 r3
+    Bone Crown
+LADDER[66] What the Flat Kept EASY Helmet 1,1 r2
+    Bone Scale
+LADDER[66] What the Flat Kept EASY Helmet 2,2 r3
+    Bone Fletch
+LADDER[66] What the Flat Kept EASY Helmet 3,0 r0
+    Idol's Crest
+LADDER[66] What the Flat Kept EASY Helmet 4,1 r0
+    Tin Frame
+LADDER[66] What the Flat Kept EASY Helmet 4,0 r0
+    Tin Plating
+LADDER[66] What the Flat Kept EASY Greaves 0,0 r0
+    Frostbite Mold
+LADDER[66] What the Flat Kept EASY Greaves 0,1 r0
+    Ratskin Material
+LADDER[66] What the Flat Kept EASY Greaves 2,0 r1
+    Spun Material
+LADDER[66] What the Flat Kept EASY Greaves 4,0 r0
+    Greave Mold
+LADDER[66] What the Flat Kept EASY Greaves 2,1 r3
+    Spun Material
+LADDER[66] What the Flat Kept EASY Greaves 4,1 r0
+    Stumblefoot Mold
+LADDER[66] What the Flat Kept MEDIUM Weapon 0,0 r0
+    Hymnal
+LADDER[66] What the Flat Kept MEDIUM Weapon 1,0 r2
+    Bulwark Vial
+LADDER[66] What the Flat Kept MEDIUM Weapon 0,2 r2
+    Runewash Ink
+LADDER[66] What the Flat Kept MEDIUM Weapon 2,2 r0
+    Emberburst
+LADDER[66] What the Flat Kept MEDIUM Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[66] What the Flat Kept MEDIUM Weapon 2,1 r1
+    Cinderscript Ink
+LADDER[66] What the Flat Kept MEDIUM Weapon 3,0 r0
+    The Bog Census
+LADDER[66] What the Flat Kept MEDIUM Weapon 4,2 r1
+    Census Bolt
+LADDER[66] What the Flat Kept MEDIUM Weapon 5,0 r1
+    Cinderscript Ink
+LADDER[66] What the Flat Kept MEDIUM Weapon 0,4 r1
+    Flywheel Cog
+LADDER[66] What the Flat Kept MEDIUM Weapon 2,4 r0
+    Cinderscript Ink
+LADDER[66] What the Flat Kept MEDIUM Weapon 4,4 r0
+    Azure Alignment
+LADDER[66] What the Flat Kept MEDIUM Helmet 0,0 r3
+    Bone Crown
+LADDER[66] What the Flat Kept MEDIUM Helmet 1,1 r2
+    Bone Scale
+LADDER[66] What the Flat Kept MEDIUM Helmet 2,2 r3
+    Bone Fletch
+LADDER[66] What the Flat Kept MEDIUM Helmet 3,0 r0
+    Idol's Crest
+LADDER[66] What the Flat Kept MEDIUM Helmet 4,1 r0
+    Tin Frame
+LADDER[66] What the Flat Kept MEDIUM Helmet 4,0 r0
+    Tin Plating
+LADDER[66] What the Flat Kept MEDIUM Greaves 0,0 r0
+    Racing Sole
+LADDER[66] What the Flat Kept MEDIUM Greaves 0,1 r0
+    Ratskin Material
+LADDER[66] What the Flat Kept MEDIUM Greaves 2,0 r1
+    Spun Material
+LADDER[66] What the Flat Kept MEDIUM Greaves 4,0 r0
+    Greave Mold
+LADDER[66] What the Flat Kept MEDIUM Greaves 2,1 r3
+    Spun Material
+LADDER[66] What the Flat Kept MEDIUM Greaves 4,1 r0
+    Pilgrim's Sole
+LADDER[66] What the Flat Kept HARD Weapon 0,0 r0
+    Herbal
+LADDER[66] What the Flat Kept HARD Weapon 1,0 r2
+    Chain Coil
+LADDER[66] What the Flat Kept HARD Weapon 0,2 r2
+    Bloodletter's Ink
+LADDER[66] What the Flat Kept HARD Weapon 2,2 r0
+    Emberburst
+LADDER[66] What the Flat Kept HARD Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[66] What the Flat Kept HARD Weapon 2,1 r1
+    Quicksilver Ink
+LADDER[66] What the Flat Kept HARD Weapon 3,0 r0
+    The Bog Census
+LADDER[66] What the Flat Kept HARD Weapon 4,2 r1
+    Census Bolt
+LADDER[66] What the Flat Kept HARD Weapon 5,0 r1
+    Quicksilver Ink
+LADDER[66] What the Flat Kept HARD Weapon 0,4 r1
+    Ratchet Cog
+LADDER[66] What the Flat Kept HARD Weapon 2,4 r0
+    Quicksilver Ink
+LADDER[66] What the Flat Kept HARD Weapon 4,4 r0
+    Crimson Alignment
+LADDER[66] What the Flat Kept HARD Helmet 0,0 r3
+    Bone Crown
+LADDER[66] What the Flat Kept HARD Helmet 1,1 r2
+    Bone Scale
+LADDER[66] What the Flat Kept HARD Helmet 2,2 r3
+    Bone Fletch
+LADDER[66] What the Flat Kept HARD Helmet 3,0 r0
+    Idol's Crest
+LADDER[66] What the Flat Kept HARD Helmet 4,1 r0
+    Bronze Frame
+LADDER[66] What the Flat Kept HARD Helmet 4,0 r0
+    Bronze Plating
+LADDER[66] What the Flat Kept HARD Greaves 0,0 r0
+    Plain Sole
+LADDER[66] What the Flat Kept HARD Greaves 0,1 r0
+    Ratskin Material
+LADDER[66] What the Flat Kept HARD Greaves 2,0 r1
+    Sanctified Material
+LADDER[66] What the Flat Kept HARD Greaves 4,0 r0
+    Warded Sabatons
+LADDER[66] What the Flat Kept HARD Greaves 2,1 r3
+    Sanctified Material
+LADDER[66] What the Flat Kept HARD Greaves 4,1 r0
+    Sapling Mold
+LADDER[66] What the Flat Kept INSANE Weapon 0,0 r0
+    Herbal
+LADDER[66] What the Flat Kept INSANE Weapon 1,0 r2
+    Grimoire Rack
+LADDER[66] What the Flat Kept INSANE Weapon 0,2 r2
+    Bloodletter's Ink
+LADDER[66] What the Flat Kept INSANE Weapon 2,2 r0
+    Emberburst
+LADDER[66] What the Flat Kept INSANE Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[66] What the Flat Kept INSANE Weapon 2,1 r1
+    Quicksilver Ink
+LADDER[66] What the Flat Kept INSANE Weapon 3,0 r0
+    The Bog Census
+LADDER[66] What the Flat Kept INSANE Weapon 4,2 r1
+    Census Bolt
+LADDER[66] What the Flat Kept INSANE Weapon 5,0 r1
+    Quicksilver Ink
+LADDER[66] What the Flat Kept INSANE Weapon 0,4 r1
+    Bulwark Vial
+LADDER[66] What the Flat Kept INSANE Weapon 2,4 r0
+    Quicksilver Ink
+LADDER[66] What the Flat Kept INSANE Weapon 4,4 r0
+    Crimson Alignment
+LADDER[66] What the Flat Kept INSANE Helmet 0,0 r3
+    Bone Crown
+LADDER[66] What the Flat Kept INSANE Helmet 1,1 r2
+    Bone Scale
+LADDER[66] What the Flat Kept INSANE Helmet 2,2 r3
+    Bone Fletch
+LADDER[66] What the Flat Kept INSANE Helmet 3,0 r0
+    Idol's Crest
+LADDER[66] What the Flat Kept INSANE Helmet 4,1 r0
+    Warded Frame
+LADDER[66] What the Flat Kept INSANE Helmet 4,0 r0
+    Layered Plating
+LADDER[66] What the Flat Kept INSANE Greaves 0,0 r0
+    Sprung Sole
+LADDER[66] What the Flat Kept INSANE Greaves 0,1 r0
+    Ratskin Material
+LADDER[66] What the Flat Kept INSANE Greaves 2,0 r1
+    Sanctified Material
+LADDER[66] What the Flat Kept INSANE Greaves 4,0 r0
+    Warded Sabatons
+LADDER[66] What the Flat Kept INSANE Greaves 2,1 r3
+    Sanctified Material
+LADDER[66] What the Flat Kept INSANE Greaves 4,1 r0
+    Widow's Sole
+LADDER[67] The Closing Error EASY Weapon 0,0 r0
+    War Ledger
+LADDER[67] The Closing Error EASY Weapon 1,0 r2
+    Ratchet Cog
+LADDER[67] The Closing Error EASY Weapon 0,2 r2
+    Runewash Ink
+LADDER[67] The Closing Error EASY Weapon 2,2 r0
+    Emberburst
+LADDER[67] The Closing Error EASY Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[67] The Closing Error EASY Weapon 2,1 r1
+    Prismatic Ink
+LADDER[67] The Closing Error EASY Weapon 3,0 r0
+    The Bog Census
+LADDER[67] The Closing Error EASY Weapon 4,2 r1
+    Census Bolt
+LADDER[67] The Closing Error EASY Weapon 5,0 r1
+    Prismatic Ink
+LADDER[67] The Closing Error EASY Weapon 0,4 r1
+    Flywheel Cog
+LADDER[67] The Closing Error EASY Weapon 2,4 r0
+    Prismatic Ink
+LADDER[67] The Closing Error EASY Weapon 4,4 r0
+    Azure Alignment
+LADDER[67] The Closing Error EASY Chest 0,0 r1
+    Chorister's Base
+LADDER[67] The Closing Error EASY Chest 2,0 r0
+    Chorister's Weave
+LADDER[67] The Closing Error EASY Chest 2,1 r0
+    Chorister's Layer
+LADDER[67] The Closing Error EASY Chest 0,3 r0
+    Runed Lining
+LADDER[67] The Closing Error EASY Chest 4,1 r0
+    Quilted Base
+LADDER[67] The Closing Error EASY Chest 4,3 r0
+    Sprocketman's Gratitude
+LADDER[67] The Closing Error EASY Gloves 0,0 r0
+    Rimeglove Material
+LADDER[67] The Closing Error EASY Gloves 2,0 r0
+    Coven Mold
+LADDER[67] The Closing Error EASY Gloves 1,2 r0
+    Signet of Iron
+LADDER[67] The Closing Error EASY Gloves 2,2 r0
+    Rat Signet
+LADDER[67] The Closing Error EASY Gloves 3,1 r0
+    Grasping Ring
+LADDER[67] The Closing Error EASY Gloves 4,0 r0
+    Mage's Wrapping
+LADDER[67] The Closing Error EASY Gloves 3,2 r0
+    Witch's Thimble
+LADDER[67] The Closing Error EASY Gloves 4,2 r0
+    Featherweight Mold
+LADDER[67] The Closing Error EASY Helmet 0,0 r3
+    Bone Crown
+LADDER[67] The Closing Error EASY Helmet 1,1 r2
+    Bone Scale
+LADDER[67] The Closing Error EASY Helmet 2,2 r3
+    Bone Fletch
+LADDER[67] The Closing Error EASY Helmet 3,0 r0
+    Idol's Crest
+LADDER[67] The Closing Error EASY Helmet 4,1 r0
+    Tin Frame
+LADDER[67] The Closing Error EASY Helmet 4,0 r0
+    Tin Plating
+LADDER[67] The Closing Error MEDIUM Weapon 0,0 r0
+    Hymnal
+LADDER[67] The Closing Error MEDIUM Weapon 1,0 r2
+    Bulwark Vial
+LADDER[67] The Closing Error MEDIUM Weapon 0,2 r2
+    Runewash Ink
+LADDER[67] The Closing Error MEDIUM Weapon 2,2 r0
+    Emberburst
+LADDER[67] The Closing Error MEDIUM Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[67] The Closing Error MEDIUM Weapon 2,1 r1
+    Cinderscript Ink
+LADDER[67] The Closing Error MEDIUM Weapon 3,0 r0
+    The Bog Census
+LADDER[67] The Closing Error MEDIUM Weapon 4,2 r1
+    Census Bolt
+LADDER[67] The Closing Error MEDIUM Weapon 5,0 r1
+    Cinderscript Ink
+LADDER[67] The Closing Error MEDIUM Weapon 0,4 r1
+    Flywheel Cog
+LADDER[67] The Closing Error MEDIUM Weapon 2,4 r0
+    Cinderscript Ink
+LADDER[67] The Closing Error MEDIUM Weapon 4,4 r0
+    Azure Alignment
+LADDER[67] The Closing Error MEDIUM Chest 0,0 r1
+    Chorister's Base
+LADDER[67] The Closing Error MEDIUM Chest 2,0 r0
+    Chorister's Weave
+LADDER[67] The Closing Error MEDIUM Chest 2,1 r0
+    Chorister's Layer
+LADDER[67] The Closing Error MEDIUM Chest 0,3 r0
+    Runed Lining
+LADDER[67] The Closing Error MEDIUM Chest 4,1 r0
+    Layered Core
+LADDER[67] The Closing Error MEDIUM Chest 4,3 r0
+    Sprocketman's Gratitude
+LADDER[67] The Closing Error MEDIUM Gloves 0,0 r0
+    Rimeglove Material
+LADDER[67] The Closing Error MEDIUM Gloves 2,0 r0
+    Bramble Mold
+LADDER[67] The Closing Error MEDIUM Gloves 1,2 r0
+    Iron Band
+LADDER[67] The Closing Error MEDIUM Gloves 2,2 r0
+    Rat Signet
+LADDER[67] The Closing Error MEDIUM Gloves 3,1 r0
+    Ring of Tides
+LADDER[67] The Closing Error MEDIUM Gloves 4,0 r0
+    Mage's Wrapping
+LADDER[67] The Closing Error MEDIUM Gloves 3,2 r0
+    Witch's Thimble
+LADDER[67] The Closing Error MEDIUM Gloves 4,2 r0
+    Featherweight Mold
+LADDER[67] The Closing Error MEDIUM Helmet 0,0 r3
+    Bone Crown
+LADDER[67] The Closing Error MEDIUM Helmet 1,1 r2
+    Bone Scale
+LADDER[67] The Closing Error MEDIUM Helmet 2,2 r3
+    Bone Fletch
+LADDER[67] The Closing Error MEDIUM Helmet 3,0 r0
+    Idol's Crest
+LADDER[67] The Closing Error MEDIUM Helmet 4,1 r0
+    Tin Frame
+LADDER[67] The Closing Error MEDIUM Helmet 4,0 r0
+    Tin Plating
+LADDER[67] The Closing Error HARD Weapon 0,0 r0
+    Herbal
+LADDER[67] The Closing Error HARD Weapon 1,0 r2
+    Chain Coil
+LADDER[67] The Closing Error HARD Weapon 0,2 r2
+    Bloodletter's Ink
+LADDER[67] The Closing Error HARD Weapon 2,2 r0
+    Emberburst
+LADDER[67] The Closing Error HARD Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[67] The Closing Error HARD Weapon 2,1 r1
+    Quicksilver Ink
+LADDER[67] The Closing Error HARD Weapon 3,0 r0
+    The Bog Census
+LADDER[67] The Closing Error HARD Weapon 4,2 r1
+    Census Bolt
+LADDER[67] The Closing Error HARD Weapon 5,0 r1
+    Quicksilver Ink
+LADDER[67] The Closing Error HARD Weapon 0,4 r1
+    Ratchet Cog
+LADDER[67] The Closing Error HARD Weapon 2,4 r0
+    Quicksilver Ink
+LADDER[67] The Closing Error HARD Weapon 4,4 r0
+    Crimson Alignment
+LADDER[67] The Closing Error HARD Chest 0,0 r1
+    Chorister's Base
+LADDER[67] The Closing Error HARD Chest 2,0 r0
+    Chorister's Weave
+LADDER[67] The Closing Error HARD Chest 2,1 r0
+    Chorister's Layer
+LADDER[67] The Closing Error HARD Chest 0,3 r0
+    Chain Layer
+LADDER[67] The Closing Error HARD Chest 4,1 r0
+    Brigandine Base
+LADDER[67] The Closing Error HARD Chest 4,3 r0
+    Sprocketman's Gratitude
+LADDER[67] The Closing Error HARD Gloves 0,0 r0
+    Rimeglove Material
+LADDER[67] The Closing Error HARD Gloves 2,0 r0
+    Gripping Mold
+LADDER[67] The Closing Error HARD Gloves 1,2 r0
+    Oathring
+LADDER[67] The Closing Error HARD Gloves 2,2 r0
+    Rat Signet
+LADDER[67] The Closing Error HARD Gloves 3,1 r0
+    Tin Band
+LADDER[67] The Closing Error HARD Gloves 4,0 r0
+    Leather Material
+LADDER[67] The Closing Error HARD Gloves 3,2 r0
+    Witch's Thimble
+LADDER[67] The Closing Error HARD Gloves 4,2 r0
+    Padded Mold
+LADDER[67] The Closing Error HARD Helmet 0,0 r3
+    Bone Crown
+LADDER[67] The Closing Error HARD Helmet 1,1 r2
+    Bone Scale
+LADDER[67] The Closing Error HARD Helmet 2,2 r3
+    Bone Fletch
+LADDER[67] The Closing Error HARD Helmet 3,0 r0
+    Idol's Crest
+LADDER[67] The Closing Error HARD Helmet 4,1 r0
+    Bronze Frame
+LADDER[67] The Closing Error HARD Helmet 4,0 r0
+    Bronze Plating
+LADDER[67] The Closing Error INSANE Weapon 0,0 r0
+    Herbal
+LADDER[67] The Closing Error INSANE Weapon 1,0 r2
+    Grimoire Rack
+LADDER[67] The Closing Error INSANE Weapon 0,2 r2
+    Bloodletter's Ink
+LADDER[67] The Closing Error INSANE Weapon 2,2 r0
+    Emberburst
+LADDER[67] The Closing Error INSANE Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[67] The Closing Error INSANE Weapon 2,1 r1
+    Quicksilver Ink
+LADDER[67] The Closing Error INSANE Weapon 3,0 r0
+    The Bog Census
+LADDER[67] The Closing Error INSANE Weapon 4,2 r1
+    Census Bolt
+LADDER[67] The Closing Error INSANE Weapon 5,0 r1
+    Quicksilver Ink
+LADDER[67] The Closing Error INSANE Weapon 0,4 r1
+    Bulwark Vial
+LADDER[67] The Closing Error INSANE Weapon 2,4 r0
+    Quicksilver Ink
+LADDER[67] The Closing Error INSANE Weapon 4,4 r0
+    Crimson Alignment
+LADDER[67] The Closing Error INSANE Chest 0,0 r1
+    Chorister's Base
+LADDER[67] The Closing Error INSANE Chest 2,0 r0
+    Chorister's Weave
+LADDER[67] The Closing Error INSANE Chest 2,1 r0
+    Chorister's Layer
+LADDER[67] The Closing Error INSANE Chest 0,3 r0
+    Woven Underlayer
+LADDER[67] The Closing Error INSANE Chest 4,1 r0
+    Brigandine Base
+LADDER[67] The Closing Error INSANE Chest 4,3 r0
+    Sprocketman's Gratitude
+LADDER[67] The Closing Error INSANE Gloves 0,0 r0
+    Rimeglove Material
+LADDER[67] The Closing Error INSANE Gloves 2,0 r0
+    Ravener's Mold
+LADDER[67] The Closing Error INSANE Gloves 1,2 r0
+    Emberloop
+LADDER[67] The Closing Error INSANE Gloves 2,2 r0
+    Rat Signet
+LADDER[67] The Closing Error INSANE Gloves 3,1 r0
+    Signet of Iron
+LADDER[67] The Closing Error INSANE Gloves 4,0 r0
+    Anchor Material
+LADDER[67] The Closing Error INSANE Gloves 3,2 r0
+    Witch's Thimble
+LADDER[67] The Closing Error INSANE Gloves 4,2 r0
+    Braced Mold
+LADDER[67] The Closing Error INSANE Helmet 0,0 r3
+    Bone Crown
+LADDER[67] The Closing Error INSANE Helmet 1,1 r2
+    Bone Scale
+LADDER[67] The Closing Error INSANE Helmet 2,2 r3
+    Bone Fletch
+LADDER[67] The Closing Error INSANE Helmet 3,0 r0
+    Idol's Crest
+LADDER[67] The Closing Error INSANE Helmet 4,1 r0
+    Warded Frame
+LADDER[67] The Closing Error INSANE Helmet 4,0 r0
+    Layered Plating
+LADDER[68] The Benchmark EASY Weapon 0,0 r0
+    War Ledger
+LADDER[68] The Benchmark EASY Weapon 1,0 r2
+    Ratchet Cog
+LADDER[68] The Benchmark EASY Weapon 0,2 r2
+    Runewash Ink
+LADDER[68] The Benchmark EASY Weapon 2,2 r0
+    Emberburst
+LADDER[68] The Benchmark EASY Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[68] The Benchmark EASY Weapon 2,1 r1
+    Prismatic Ink
+LADDER[68] The Benchmark EASY Weapon 3,0 r0
+    The Bog Census
+LADDER[68] The Benchmark EASY Weapon 4,2 r1
+    Census Bolt
+LADDER[68] The Benchmark EASY Weapon 5,0 r1
+    Prismatic Ink
+LADDER[68] The Benchmark EASY Weapon 0,4 r1
+    Flywheel Cog
+LADDER[68] The Benchmark EASY Weapon 2,4 r0
+    Prismatic Ink
+LADDER[68] The Benchmark EASY Weapon 4,4 r0
+    Azure Alignment
+LADDER[68] The Benchmark EASY Chest 0,0 r1
+    Chorister's Base
+LADDER[68] The Benchmark EASY Chest 2,0 r0
+    Chorister's Weave
+LADDER[68] The Benchmark EASY Chest 2,1 r0
+    Chorister's Layer
+LADDER[68] The Benchmark EASY Chest 0,3 r0
+    Runed Lining
+LADDER[68] The Benchmark EASY Chest 4,1 r0
+    Quilted Base
+LADDER[68] The Benchmark EASY Chest 4,3 r0
+    Sprocketman's Gratitude
+LADDER[68] The Benchmark EASY Greaves 0,0 r0
+    Frostbite Mold
+LADDER[68] The Benchmark EASY Greaves 0,1 r0
+    Ratskin Material
+LADDER[68] The Benchmark EASY Greaves 2,0 r1
+    Spun Material
+LADDER[68] The Benchmark EASY Greaves 4,0 r0
+    Greave Mold
+LADDER[68] The Benchmark EASY Greaves 2,1 r3
+    Spun Material
+LADDER[68] The Benchmark EASY Greaves 4,1 r0
+    Stumblefoot Mold
+LADDER[68] The Benchmark EASY Gloves 0,0 r0
+    Rimeglove Material
+LADDER[68] The Benchmark EASY Gloves 2,0 r0
+    Coven Mold
+LADDER[68] The Benchmark EASY Gloves 1,2 r0
+    Signet of Iron
+LADDER[68] The Benchmark EASY Gloves 2,2 r0
+    Rat Signet
+LADDER[68] The Benchmark EASY Gloves 3,1 r0
+    Grasping Ring
+LADDER[68] The Benchmark EASY Gloves 4,0 r0
+    Mage's Wrapping
+LADDER[68] The Benchmark EASY Gloves 3,2 r0
+    Witch's Thimble
+LADDER[68] The Benchmark EASY Gloves 4,2 r0
+    Featherweight Mold
+LADDER[68] The Benchmark MEDIUM Weapon 0,0 r0
+    Hymnal
+LADDER[68] The Benchmark MEDIUM Weapon 1,0 r2
+    Bulwark Vial
+LADDER[68] The Benchmark MEDIUM Weapon 0,2 r2
+    Runewash Ink
+LADDER[68] The Benchmark MEDIUM Weapon 2,2 r0
+    Emberburst
+LADDER[68] The Benchmark MEDIUM Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[68] The Benchmark MEDIUM Weapon 2,1 r1
+    Cinderscript Ink
+LADDER[68] The Benchmark MEDIUM Weapon 3,0 r0
+    The Bog Census
+LADDER[68] The Benchmark MEDIUM Weapon 4,2 r1
+    Census Bolt
+LADDER[68] The Benchmark MEDIUM Weapon 5,0 r1
+    Cinderscript Ink
+LADDER[68] The Benchmark MEDIUM Weapon 0,4 r1
+    Flywheel Cog
+LADDER[68] The Benchmark MEDIUM Weapon 2,4 r0
+    Cinderscript Ink
+LADDER[68] The Benchmark MEDIUM Weapon 4,4 r0
+    Azure Alignment
+LADDER[68] The Benchmark MEDIUM Chest 0,0 r1
+    Chorister's Base
+LADDER[68] The Benchmark MEDIUM Chest 2,0 r0
+    Chorister's Weave
+LADDER[68] The Benchmark MEDIUM Chest 2,1 r0
+    Chorister's Layer
+LADDER[68] The Benchmark MEDIUM Chest 0,3 r0
+    Runed Lining
+LADDER[68] The Benchmark MEDIUM Chest 4,1 r0
+    Layered Core
+LADDER[68] The Benchmark MEDIUM Chest 4,3 r0
+    Sprocketman's Gratitude
+LADDER[68] The Benchmark MEDIUM Greaves 0,0 r0
+    Racing Sole
+LADDER[68] The Benchmark MEDIUM Greaves 0,1 r0
+    Ratskin Material
+LADDER[68] The Benchmark MEDIUM Greaves 2,0 r1
+    Spun Material
+LADDER[68] The Benchmark MEDIUM Greaves 4,0 r0
+    Greave Mold
+LADDER[68] The Benchmark MEDIUM Greaves 2,1 r3
+    Spun Material
+LADDER[68] The Benchmark MEDIUM Greaves 4,1 r0
+    Pilgrim's Sole
+LADDER[68] The Benchmark MEDIUM Gloves 0,0 r0
+    Rimeglove Material
+LADDER[68] The Benchmark MEDIUM Gloves 2,0 r0
+    Bramble Mold
+LADDER[68] The Benchmark MEDIUM Gloves 1,2 r0
+    Iron Band
+LADDER[68] The Benchmark MEDIUM Gloves 2,2 r0
+    Rat Signet
+LADDER[68] The Benchmark MEDIUM Gloves 3,1 r0
+    Ring of Tides
+LADDER[68] The Benchmark MEDIUM Gloves 4,0 r0
+    Mage's Wrapping
+LADDER[68] The Benchmark MEDIUM Gloves 3,2 r0
+    Witch's Thimble
+LADDER[68] The Benchmark MEDIUM Gloves 4,2 r0
+    Featherweight Mold
+LADDER[68] The Benchmark HARD Weapon 0,0 r0
+    Herbal
+LADDER[68] The Benchmark HARD Weapon 1,0 r2
+    Chain Coil
+LADDER[68] The Benchmark HARD Weapon 0,2 r2
+    Bloodletter's Ink
+LADDER[68] The Benchmark HARD Weapon 2,2 r0
+    Emberburst
+LADDER[68] The Benchmark HARD Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[68] The Benchmark HARD Weapon 2,1 r1
+    Quicksilver Ink
+LADDER[68] The Benchmark HARD Weapon 3,0 r0
+    The Bog Census
+LADDER[68] The Benchmark HARD Weapon 4,2 r1
+    Census Bolt
+LADDER[68] The Benchmark HARD Weapon 5,0 r1
+    Quicksilver Ink
+LADDER[68] The Benchmark HARD Weapon 0,4 r1
+    Ratchet Cog
+LADDER[68] The Benchmark HARD Weapon 2,4 r0
+    Quicksilver Ink
+LADDER[68] The Benchmark HARD Weapon 4,4 r0
+    Crimson Alignment
+LADDER[68] The Benchmark HARD Chest 0,0 r1
+    Chorister's Base
+LADDER[68] The Benchmark HARD Chest 2,0 r0
+    Chorister's Weave
+LADDER[68] The Benchmark HARD Chest 2,1 r0
+    Chorister's Layer
+LADDER[68] The Benchmark HARD Chest 0,3 r0
+    Chain Layer
+LADDER[68] The Benchmark HARD Chest 4,1 r0
+    Brigandine Base
+LADDER[68] The Benchmark HARD Chest 4,3 r0
+    Sprocketman's Gratitude
+LADDER[68] The Benchmark HARD Greaves 0,0 r0
+    Plain Sole
+LADDER[68] The Benchmark HARD Greaves 0,1 r0
+    Ratskin Material
+LADDER[68] The Benchmark HARD Greaves 2,0 r1
+    Sanctified Material
+LADDER[68] The Benchmark HARD Greaves 4,0 r0
+    Warded Sabatons
+LADDER[68] The Benchmark HARD Greaves 2,1 r3
+    Sanctified Material
+LADDER[68] The Benchmark HARD Greaves 4,1 r0
+    Sapling Mold
+LADDER[68] The Benchmark HARD Gloves 0,0 r0
+    Rimeglove Material
+LADDER[68] The Benchmark HARD Gloves 2,0 r0
+    Gripping Mold
+LADDER[68] The Benchmark HARD Gloves 1,2 r0
+    Oathring
+LADDER[68] The Benchmark HARD Gloves 2,2 r0
+    Rat Signet
+LADDER[68] The Benchmark HARD Gloves 3,1 r0
+    Tin Band
+LADDER[68] The Benchmark HARD Gloves 4,0 r0
+    Leather Material
+LADDER[68] The Benchmark HARD Gloves 3,2 r0
+    Witch's Thimble
+LADDER[68] The Benchmark HARD Gloves 4,2 r0
+    Padded Mold
+LADDER[68] The Benchmark INSANE Weapon 0,0 r0
+    Herbal
+LADDER[68] The Benchmark INSANE Weapon 1,0 r2
+    Grimoire Rack
+LADDER[68] The Benchmark INSANE Weapon 0,2 r2
+    Bloodletter's Ink
+LADDER[68] The Benchmark INSANE Weapon 2,2 r0
+    Emberburst
+LADDER[68] The Benchmark INSANE Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[68] The Benchmark INSANE Weapon 2,1 r1
+    Quicksilver Ink
+LADDER[68] The Benchmark INSANE Weapon 3,0 r0
+    The Bog Census
+LADDER[68] The Benchmark INSANE Weapon 4,2 r1
+    Census Bolt
+LADDER[68] The Benchmark INSANE Weapon 5,0 r1
+    Quicksilver Ink
+LADDER[68] The Benchmark INSANE Weapon 0,4 r1
+    Bulwark Vial
+LADDER[68] The Benchmark INSANE Weapon 2,4 r0
+    Quicksilver Ink
+LADDER[68] The Benchmark INSANE Weapon 4,4 r0
+    Crimson Alignment
+LADDER[68] The Benchmark INSANE Chest 0,0 r1
+    Chorister's Base
+LADDER[68] The Benchmark INSANE Chest 2,0 r0
+    Chorister's Weave
+LADDER[68] The Benchmark INSANE Chest 2,1 r0
+    Chorister's Layer
+LADDER[68] The Benchmark INSANE Chest 0,3 r0
+    Woven Underlayer
+LADDER[68] The Benchmark INSANE Chest 4,1 r0
+    Brigandine Base
+LADDER[68] The Benchmark INSANE Chest 4,3 r0
+    Sprocketman's Gratitude
+LADDER[68] The Benchmark INSANE Greaves 0,0 r0
+    Sprung Sole
+LADDER[68] The Benchmark INSANE Greaves 0,1 r0
+    Ratskin Material
+LADDER[68] The Benchmark INSANE Greaves 2,0 r1
+    Sanctified Material
+LADDER[68] The Benchmark INSANE Greaves 4,0 r0
+    Warded Sabatons
+LADDER[68] The Benchmark INSANE Greaves 2,1 r3
+    Sanctified Material
+LADDER[68] The Benchmark INSANE Greaves 4,1 r0
+    Widow's Sole
+LADDER[68] The Benchmark INSANE Gloves 0,0 r0
+    Rimeglove Material
+LADDER[68] The Benchmark INSANE Gloves 2,0 r0
+    Ravener's Mold
+LADDER[68] The Benchmark INSANE Gloves 1,2 r0
+    Emberloop
+LADDER[68] The Benchmark INSANE Gloves 2,2 r0
+    Rat Signet
+LADDER[68] The Benchmark INSANE Gloves 3,1 r0
+    Signet of Iron
+LADDER[68] The Benchmark INSANE Gloves 4,0 r0
+    Anchor Material
+LADDER[68] The Benchmark INSANE Gloves 3,2 r0
+    Witch's Thimble
+LADDER[68] The Benchmark INSANE Gloves 4,2 r0
+    Braced Mold
+LADDER[69] Datum EASY Weapon 0,0 r0
+    War Ledger
+LADDER[69] Datum EASY Weapon 1,0 r2
+    Ratchet Cog
+LADDER[69] Datum EASY Weapon 0,2 r2
+    Runewash Ink
+LADDER[69] Datum EASY Weapon 2,2 r0
+    Emberburst
+LADDER[69] Datum EASY Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[69] Datum EASY Weapon 2,1 r1
+    Prismatic Ink
+LADDER[69] Datum EASY Weapon 3,0 r0
+    The Bog Census
+LADDER[69] Datum EASY Weapon 4,2 r1
+    Census Bolt
+LADDER[69] Datum EASY Weapon 5,0 r1
+    Prismatic Ink
+LADDER[69] Datum EASY Weapon 0,4 r1
+    Flywheel Cog
+LADDER[69] Datum EASY Weapon 2,4 r0
+    Prismatic Ink
+LADDER[69] Datum EASY Weapon 4,4 r0
+    Azure Alignment
+LADDER[69] Datum EASY Helmet 0,0 r3
+    Bone Crown
+LADDER[69] Datum EASY Helmet 1,1 r2
+    Bone Scale
+LADDER[69] Datum EASY Helmet 2,2 r3
+    Bone Fletch
+LADDER[69] Datum EASY Helmet 3,0 r0
+    Idol's Crest
+LADDER[69] Datum EASY Helmet 4,1 r0
+    Tin Frame
+LADDER[69] Datum EASY Helmet 4,0 r0
+    Tin Plating
+LADDER[69] Datum EASY Chest 0,0 r1
+    Chorister's Base
+LADDER[69] Datum EASY Chest 2,0 r0
+    Chorister's Weave
+LADDER[69] Datum EASY Chest 2,1 r0
+    Chorister's Layer
+LADDER[69] Datum EASY Chest 0,3 r0
+    Runed Lining
+LADDER[69] Datum EASY Chest 4,1 r0
+    Quilted Base
+LADDER[69] Datum EASY Chest 4,3 r0
+    Sprocketman's Gratitude
+LADDER[69] Datum EASY Gloves 0,0 r0
+    Rimeglove Material
+LADDER[69] Datum EASY Gloves 2,0 r0
+    Coven Mold
+LADDER[69] Datum EASY Gloves 1,2 r0
+    Signet of Iron
+LADDER[69] Datum EASY Gloves 2,2 r0
+    Rat Signet
+LADDER[69] Datum EASY Gloves 3,1 r0
+    Grasping Ring
+LADDER[69] Datum EASY Gloves 4,0 r0
+    Mage's Wrapping
+LADDER[69] Datum EASY Gloves 3,2 r0
+    Witch's Thimble
+LADDER[69] Datum EASY Gloves 4,2 r0
+    Featherweight Mold
+LADDER[69] Datum EASY Greaves 0,0 r0
+    Frostbite Mold
+LADDER[69] Datum EASY Greaves 0,1 r0
+    Ratskin Material
+LADDER[69] Datum EASY Greaves 2,0 r1
+    Spun Material
+LADDER[69] Datum EASY Greaves 4,0 r0
+    Greave Mold
+LADDER[69] Datum EASY Greaves 2,1 r3
+    Spun Material
+LADDER[69] Datum EASY Greaves 4,1 r0
+    Stumblefoot Mold
+LADDER[69] Datum MEDIUM Weapon 0,0 r0
+    Hymnal
+LADDER[69] Datum MEDIUM Weapon 1,0 r2
+    Bulwark Vial
+LADDER[69] Datum MEDIUM Weapon 0,2 r2
+    Runewash Ink
+LADDER[69] Datum MEDIUM Weapon 2,2 r0
+    Emberburst
+LADDER[69] Datum MEDIUM Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[69] Datum MEDIUM Weapon 2,1 r1
+    Cinderscript Ink
+LADDER[69] Datum MEDIUM Weapon 3,0 r0
+    The Bog Census
+LADDER[69] Datum MEDIUM Weapon 4,2 r1
+    Census Bolt
+LADDER[69] Datum MEDIUM Weapon 5,0 r1
+    Cinderscript Ink
+LADDER[69] Datum MEDIUM Weapon 0,4 r1
+    Flywheel Cog
+LADDER[69] Datum MEDIUM Weapon 2,4 r0
+    Cinderscript Ink
+LADDER[69] Datum MEDIUM Weapon 4,4 r0
+    Azure Alignment
+LADDER[69] Datum MEDIUM Helmet 0,0 r3
+    Bone Crown
+LADDER[69] Datum MEDIUM Helmet 1,1 r2
+    Bone Scale
+LADDER[69] Datum MEDIUM Helmet 2,2 r3
+    Bone Fletch
+LADDER[69] Datum MEDIUM Helmet 3,0 r0
+    Idol's Crest
+LADDER[69] Datum MEDIUM Helmet 4,1 r0
+    Tin Frame
+LADDER[69] Datum MEDIUM Helmet 4,0 r0
+    Tin Plating
+LADDER[69] Datum MEDIUM Chest 0,0 r1
+    Chorister's Base
+LADDER[69] Datum MEDIUM Chest 2,0 r0
+    Chorister's Weave
+LADDER[69] Datum MEDIUM Chest 2,1 r0
+    Chorister's Layer
+LADDER[69] Datum MEDIUM Chest 0,3 r0
+    Runed Lining
+LADDER[69] Datum MEDIUM Chest 4,1 r0
+    Layered Core
+LADDER[69] Datum MEDIUM Chest 4,3 r0
+    Sprocketman's Gratitude
+LADDER[69] Datum MEDIUM Gloves 0,0 r0
+    Rimeglove Material
+LADDER[69] Datum MEDIUM Gloves 2,0 r0
+    Bramble Mold
+LADDER[69] Datum MEDIUM Gloves 1,2 r0
+    Iron Band
+LADDER[69] Datum MEDIUM Gloves 2,2 r0
+    Rat Signet
+LADDER[69] Datum MEDIUM Gloves 3,1 r0
+    Ring of Tides
+LADDER[69] Datum MEDIUM Gloves 4,0 r0
+    Mage's Wrapping
+LADDER[69] Datum MEDIUM Gloves 3,2 r0
+    Witch's Thimble
+LADDER[69] Datum MEDIUM Gloves 4,2 r0
+    Featherweight Mold
+LADDER[69] Datum MEDIUM Greaves 0,0 r0
+    Racing Sole
+LADDER[69] Datum MEDIUM Greaves 0,1 r0
+    Ratskin Material
+LADDER[69] Datum MEDIUM Greaves 2,0 r1
+    Spun Material
+LADDER[69] Datum MEDIUM Greaves 4,0 r0
+    Greave Mold
+LADDER[69] Datum MEDIUM Greaves 2,1 r3
+    Spun Material
+LADDER[69] Datum MEDIUM Greaves 4,1 r0
+    Pilgrim's Sole
+LADDER[69] Datum HARD Weapon 0,0 r0
+    Herbal
+LADDER[69] Datum HARD Weapon 1,0 r2
+    Chain Coil
+LADDER[69] Datum HARD Weapon 0,2 r2
+    Bloodletter's Ink
+LADDER[69] Datum HARD Weapon 2,2 r0
+    Emberburst
+LADDER[69] Datum HARD Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[69] Datum HARD Weapon 2,1 r1
+    Quicksilver Ink
+LADDER[69] Datum HARD Weapon 3,0 r0
+    The Bog Census
+LADDER[69] Datum HARD Weapon 4,2 r1
+    Census Bolt
+LADDER[69] Datum HARD Weapon 5,0 r1
+    Quicksilver Ink
+LADDER[69] Datum HARD Weapon 0,4 r1
+    Ratchet Cog
+LADDER[69] Datum HARD Weapon 2,4 r0
+    Quicksilver Ink
+LADDER[69] Datum HARD Weapon 4,4 r0
+    Crimson Alignment
+LADDER[69] Datum HARD Helmet 0,0 r3
+    Bone Crown
+LADDER[69] Datum HARD Helmet 1,1 r2
+    Bone Scale
+LADDER[69] Datum HARD Helmet 2,2 r3
+    Bone Fletch
+LADDER[69] Datum HARD Helmet 3,0 r0
+    Idol's Crest
+LADDER[69] Datum HARD Helmet 4,1 r0
+    Bronze Frame
+LADDER[69] Datum HARD Helmet 4,0 r0
+    Bronze Plating
+LADDER[69] Datum HARD Chest 0,0 r1
+    Chorister's Base
+LADDER[69] Datum HARD Chest 2,0 r0
+    Chorister's Weave
+LADDER[69] Datum HARD Chest 2,1 r0
+    Chorister's Layer
+LADDER[69] Datum HARD Chest 0,3 r0
+    Chain Layer
+LADDER[69] Datum HARD Chest 4,1 r0
+    Brigandine Base
+LADDER[69] Datum HARD Chest 4,3 r0
+    Sprocketman's Gratitude
+LADDER[69] Datum HARD Gloves 0,0 r0
+    Rimeglove Material
+LADDER[69] Datum HARD Gloves 2,0 r0
+    Gripping Mold
+LADDER[69] Datum HARD Gloves 1,2 r0
+    Oathring
+LADDER[69] Datum HARD Gloves 2,2 r0
+    Rat Signet
+LADDER[69] Datum HARD Gloves 3,1 r0
+    Tin Band
+LADDER[69] Datum HARD Gloves 4,0 r0
+    Leather Material
+LADDER[69] Datum HARD Gloves 3,2 r0
+    Witch's Thimble
+LADDER[69] Datum HARD Gloves 4,2 r0
+    Padded Mold
+LADDER[69] Datum HARD Greaves 0,0 r0
+    Plain Sole
+LADDER[69] Datum HARD Greaves 0,1 r0
+    Ratskin Material
+LADDER[69] Datum HARD Greaves 2,0 r1
+    Sanctified Material
+LADDER[69] Datum HARD Greaves 4,0 r0
+    Warded Sabatons
+LADDER[69] Datum HARD Greaves 2,1 r3
+    Sanctified Material
+LADDER[69] Datum HARD Greaves 4,1 r0
+    Sapling Mold
+LADDER[69] Datum INSANE Weapon 0,0 r0
+    Herbal
+LADDER[69] Datum INSANE Weapon 1,0 r2
+    Grimoire Rack
+LADDER[69] Datum INSANE Weapon 0,2 r2
+    Bloodletter's Ink
+LADDER[69] Datum INSANE Weapon 2,2 r0
+    Emberburst
+LADDER[69] Datum INSANE Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[69] Datum INSANE Weapon 2,1 r1
+    Quicksilver Ink
+LADDER[69] Datum INSANE Weapon 3,0 r0
+    The Bog Census
+LADDER[69] Datum INSANE Weapon 4,2 r1
+    Census Bolt
+LADDER[69] Datum INSANE Weapon 5,0 r1
+    Quicksilver Ink
+LADDER[69] Datum INSANE Weapon 0,4 r1
+    Bulwark Vial
+LADDER[69] Datum INSANE Weapon 2,4 r0
+    Quicksilver Ink
+LADDER[69] Datum INSANE Weapon 4,4 r0
+    Crimson Alignment
+LADDER[69] Datum INSANE Helmet 0,0 r3
+    Bone Crown
+LADDER[69] Datum INSANE Helmet 1,1 r2
+    Bone Scale
+LADDER[69] Datum INSANE Helmet 2,2 r3
+    Bone Fletch
+LADDER[69] Datum INSANE Helmet 3,0 r0
+    Idol's Crest
+LADDER[69] Datum INSANE Helmet 4,1 r0
+    Warded Frame
+LADDER[69] Datum INSANE Helmet 4,0 r0
+    Layered Plating
+LADDER[69] Datum INSANE Chest 0,0 r1
+    Chorister's Base
+LADDER[69] Datum INSANE Chest 2,0 r0
+    Chorister's Weave
+LADDER[69] Datum INSANE Chest 2,1 r0
+    Chorister's Layer
+LADDER[69] Datum INSANE Chest 0,3 r0
+    Woven Underlayer
+LADDER[69] Datum INSANE Chest 4,1 r0
+    Brigandine Base
+LADDER[69] Datum INSANE Chest 4,3 r0
+    Sprocketman's Gratitude
+LADDER[69] Datum INSANE Gloves 0,0 r0
+    Rimeglove Material
+LADDER[69] Datum INSANE Gloves 2,0 r0
+    Ravener's Mold
+LADDER[69] Datum INSANE Gloves 1,2 r0
+    Emberloop
+LADDER[69] Datum INSANE Gloves 2,2 r0
+    Rat Signet
+LADDER[69] Datum INSANE Gloves 3,1 r0
+    Signet of Iron
+LADDER[69] Datum INSANE Gloves 4,0 r0
+    Anchor Material
+LADDER[69] Datum INSANE Gloves 3,2 r0
+    Witch's Thimble
+LADDER[69] Datum INSANE Gloves 4,2 r0
+    Braced Mold
+LADDER[69] Datum INSANE Greaves 0,0 r0
+    Sprung Sole
+LADDER[69] Datum INSANE Greaves 0,1 r0
+    Ratskin Material
+LADDER[69] Datum INSANE Greaves 2,0 r1
+    Sanctified Material
+LADDER[69] Datum INSANE Greaves 4,0 r0
+    Warded Sabatons
+LADDER[69] Datum INSANE Greaves 2,1 r3
+    Sanctified Material
+LADDER[69] Datum INSANE Greaves 4,1 r0
+    Widow's Sole
+LADDER[70] The Traverse EASY Weapon 0,0 r0
+    War Ledger
+LADDER[70] The Traverse EASY Weapon 1,0 r2
+    Ratchet Cog
+LADDER[70] The Traverse EASY Weapon 0,2 r2
+    Runewash Ink
+LADDER[70] The Traverse EASY Weapon 2,2 r0
+    Emberburst
+LADDER[70] The Traverse EASY Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[70] The Traverse EASY Weapon 2,1 r1
+    Prismatic Ink
+LADDER[70] The Traverse EASY Weapon 3,0 r0
+    The Bog Census
+LADDER[70] The Traverse EASY Weapon 4,2 r1
+    Census Bolt
+LADDER[70] The Traverse EASY Weapon 5,0 r1
+    Prismatic Ink
+LADDER[70] The Traverse EASY Weapon 0,4 r1
+    Flywheel Cog
+LADDER[70] The Traverse EASY Weapon 2,4 r0
+    Prismatic Ink
+LADDER[70] The Traverse EASY Weapon 4,4 r0
+    Azure Alignment
+LADDER[70] The Traverse EASY Helmet 0,0 r3
+    Bone Crown
+LADDER[70] The Traverse EASY Helmet 1,1 r2
+    Bone Scale
+LADDER[70] The Traverse EASY Helmet 2,2 r3
+    Bone Fletch
+LADDER[70] The Traverse EASY Helmet 3,0 r0
+    Idol's Crest
+LADDER[70] The Traverse EASY Helmet 4,1 r0
+    Tin Frame
+LADDER[70] The Traverse EASY Helmet 4,0 r0
+    Tin Plating
+LADDER[70] The Traverse EASY Chest 0,0 r1
+    Chorister's Base
+LADDER[70] The Traverse EASY Chest 2,0 r0
+    Chorister's Weave
+LADDER[70] The Traverse EASY Chest 2,1 r0
+    Chorister's Layer
+LADDER[70] The Traverse EASY Chest 0,3 r0
+    Runed Lining
+LADDER[70] The Traverse EASY Chest 4,1 r0
+    Quilted Base
+LADDER[70] The Traverse EASY Chest 4,3 r0
+    Sprocketman's Gratitude
+LADDER[70] The Traverse EASY Gloves 0,0 r0
+    Rimeglove Material
+LADDER[70] The Traverse EASY Gloves 2,0 r0
+    Coven Mold
+LADDER[70] The Traverse EASY Gloves 1,2 r0
+    Signet of Iron
+LADDER[70] The Traverse EASY Gloves 2,2 r0
+    Rat Signet
+LADDER[70] The Traverse EASY Gloves 3,1 r0
+    Grasping Ring
+LADDER[70] The Traverse EASY Gloves 4,0 r0
+    Mage's Wrapping
+LADDER[70] The Traverse EASY Gloves 3,2 r0
+    Witch's Thimble
+LADDER[70] The Traverse EASY Gloves 4,2 r0
+    Featherweight Mold
+LADDER[70] The Traverse EASY Greaves 0,0 r0
+    Frostbite Mold
+LADDER[70] The Traverse EASY Greaves 0,1 r0
+    Ratskin Material
+LADDER[70] The Traverse EASY Greaves 2,0 r1
+    Spun Material
+LADDER[70] The Traverse EASY Greaves 4,0 r0
+    Greave Mold
+LADDER[70] The Traverse EASY Greaves 2,1 r3
+    Spun Material
+LADDER[70] The Traverse EASY Greaves 4,1 r0
+    Stumblefoot Mold
+LADDER[70] The Traverse MEDIUM Weapon 0,0 r0
+    Hymnal
+LADDER[70] The Traverse MEDIUM Weapon 1,0 r2
+    Bulwark Vial
+LADDER[70] The Traverse MEDIUM Weapon 0,2 r2
+    Runewash Ink
+LADDER[70] The Traverse MEDIUM Weapon 2,2 r0
+    Emberburst
+LADDER[70] The Traverse MEDIUM Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[70] The Traverse MEDIUM Weapon 2,1 r1
+    Cinderscript Ink
+LADDER[70] The Traverse MEDIUM Weapon 3,0 r0
+    The Bog Census
+LADDER[70] The Traverse MEDIUM Weapon 4,2 r1
+    Census Bolt
+LADDER[70] The Traverse MEDIUM Weapon 5,0 r1
+    Cinderscript Ink
+LADDER[70] The Traverse MEDIUM Weapon 0,4 r1
+    Flywheel Cog
+LADDER[70] The Traverse MEDIUM Weapon 2,4 r0
+    Cinderscript Ink
+LADDER[70] The Traverse MEDIUM Weapon 4,4 r0
+    Azure Alignment
+LADDER[70] The Traverse MEDIUM Helmet 0,0 r3
+    Bone Crown
+LADDER[70] The Traverse MEDIUM Helmet 1,1 r2
+    Bone Scale
+LADDER[70] The Traverse MEDIUM Helmet 2,2 r3
+    Bone Fletch
+LADDER[70] The Traverse MEDIUM Helmet 3,0 r0
+    Idol's Crest
+LADDER[70] The Traverse MEDIUM Helmet 4,1 r0
+    Tin Frame
+LADDER[70] The Traverse MEDIUM Helmet 4,0 r0
+    Tin Plating
+LADDER[70] The Traverse MEDIUM Chest 0,0 r1
+    Chorister's Base
+LADDER[70] The Traverse MEDIUM Chest 2,0 r0
+    Chorister's Weave
+LADDER[70] The Traverse MEDIUM Chest 2,1 r0
+    Chorister's Layer
+LADDER[70] The Traverse MEDIUM Chest 0,3 r0
+    Runed Lining
+LADDER[70] The Traverse MEDIUM Chest 4,1 r0
+    Layered Core
+LADDER[70] The Traverse MEDIUM Chest 4,3 r0
+    Sprocketman's Gratitude
+LADDER[70] The Traverse MEDIUM Gloves 0,0 r0
+    Rimeglove Material
+LADDER[70] The Traverse MEDIUM Gloves 2,0 r0
+    Bramble Mold
+LADDER[70] The Traverse MEDIUM Gloves 1,2 r0
+    Iron Band
+LADDER[70] The Traverse MEDIUM Gloves 2,2 r0
+    Rat Signet
+LADDER[70] The Traverse MEDIUM Gloves 3,1 r0
+    Ring of Tides
+LADDER[70] The Traverse MEDIUM Gloves 4,0 r0
+    Mage's Wrapping
+LADDER[70] The Traverse MEDIUM Gloves 3,2 r0
+    Witch's Thimble
+LADDER[70] The Traverse MEDIUM Gloves 4,2 r0
+    Featherweight Mold
+LADDER[70] The Traverse MEDIUM Greaves 0,0 r0
+    Racing Sole
+LADDER[70] The Traverse MEDIUM Greaves 0,1 r0
+    Ratskin Material
+LADDER[70] The Traverse MEDIUM Greaves 2,0 r1
+    Spun Material
+LADDER[70] The Traverse MEDIUM Greaves 4,0 r0
+    Greave Mold
+LADDER[70] The Traverse MEDIUM Greaves 2,1 r3
+    Spun Material
+LADDER[70] The Traverse MEDIUM Greaves 4,1 r0
+    Pilgrim's Sole
+LADDER[70] The Traverse HARD Weapon 0,0 r0
+    Herbal
+LADDER[70] The Traverse HARD Weapon 1,0 r2
+    Chain Coil
+LADDER[70] The Traverse HARD Weapon 0,2 r2
+    Bloodletter's Ink
+LADDER[70] The Traverse HARD Weapon 2,2 r0
+    Emberburst
+LADDER[70] The Traverse HARD Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[70] The Traverse HARD Weapon 2,1 r1
+    Quicksilver Ink
+LADDER[70] The Traverse HARD Weapon 3,0 r0
+    The Bog Census
+LADDER[70] The Traverse HARD Weapon 4,2 r1
+    Census Bolt
+LADDER[70] The Traverse HARD Weapon 5,0 r1
+    Quicksilver Ink
+LADDER[70] The Traverse HARD Weapon 0,4 r1
+    Ratchet Cog
+LADDER[70] The Traverse HARD Weapon 2,4 r0
+    Quicksilver Ink
+LADDER[70] The Traverse HARD Weapon 4,4 r0
+    Crimson Alignment
+LADDER[70] The Traverse HARD Helmet 0,0 r3
+    Bone Crown
+LADDER[70] The Traverse HARD Helmet 1,1 r2
+    Bone Scale
+LADDER[70] The Traverse HARD Helmet 2,2 r3
+    Bone Fletch
+LADDER[70] The Traverse HARD Helmet 3,0 r0
+    Idol's Crest
+LADDER[70] The Traverse HARD Helmet 4,1 r0
+    Bronze Frame
+LADDER[70] The Traverse HARD Helmet 4,0 r0
+    Bronze Plating
+LADDER[70] The Traverse HARD Chest 0,0 r1
+    Chorister's Base
+LADDER[70] The Traverse HARD Chest 2,0 r0
+    Chorister's Weave
+LADDER[70] The Traverse HARD Chest 2,1 r0
+    Chorister's Layer
+LADDER[70] The Traverse HARD Chest 0,3 r0
+    Chain Layer
+LADDER[70] The Traverse HARD Chest 4,1 r0
+    Brigandine Base
+LADDER[70] The Traverse HARD Chest 4,3 r0
+    Sprocketman's Gratitude
+LADDER[70] The Traverse HARD Gloves 0,0 r0
+    Rimeglove Material
+LADDER[70] The Traverse HARD Gloves 2,0 r0
+    Gripping Mold
+LADDER[70] The Traverse HARD Gloves 1,2 r0
+    Oathring
+LADDER[70] The Traverse HARD Gloves 2,2 r0
+    Rat Signet
+LADDER[70] The Traverse HARD Gloves 3,1 r0
+    Tin Band
+LADDER[70] The Traverse HARD Gloves 4,0 r0
+    Leather Material
+LADDER[70] The Traverse HARD Gloves 3,2 r0
+    Witch's Thimble
+LADDER[70] The Traverse HARD Gloves 4,2 r0
+    Padded Mold
+LADDER[70] The Traverse HARD Greaves 0,0 r0
+    Plain Sole
+LADDER[70] The Traverse HARD Greaves 0,1 r0
+    Ratskin Material
+LADDER[70] The Traverse HARD Greaves 2,0 r1
+    Sanctified Material
+LADDER[70] The Traverse HARD Greaves 4,0 r0
+    Warded Sabatons
+LADDER[70] The Traverse HARD Greaves 2,1 r3
+    Sanctified Material
+LADDER[70] The Traverse HARD Greaves 4,1 r0
+    Sapling Mold
+LADDER[70] The Traverse INSANE Weapon 0,0 r0
+    Herbal
+LADDER[70] The Traverse INSANE Weapon 1,0 r2
+    Grimoire Rack
+LADDER[70] The Traverse INSANE Weapon 0,2 r2
+    Bloodletter's Ink
+LADDER[70] The Traverse INSANE Weapon 2,2 r0
+    Emberburst
+LADDER[70] The Traverse INSANE Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[70] The Traverse INSANE Weapon 2,1 r1
+    Quicksilver Ink
+LADDER[70] The Traverse INSANE Weapon 3,0 r0
+    The Bog Census
+LADDER[70] The Traverse INSANE Weapon 4,2 r1
+    Census Bolt
+LADDER[70] The Traverse INSANE Weapon 5,0 r1
+    Quicksilver Ink
+LADDER[70] The Traverse INSANE Weapon 0,4 r1
+    Bulwark Vial
+LADDER[70] The Traverse INSANE Weapon 2,4 r0
+    Quicksilver Ink
+LADDER[70] The Traverse INSANE Weapon 4,4 r0
+    Crimson Alignment
+LADDER[70] The Traverse INSANE Helmet 0,0 r3
+    Bone Crown
+LADDER[70] The Traverse INSANE Helmet 1,1 r2
+    Bone Scale
+LADDER[70] The Traverse INSANE Helmet 2,2 r3
+    Bone Fletch
+LADDER[70] The Traverse INSANE Helmet 3,0 r0
+    Idol's Crest
+LADDER[70] The Traverse INSANE Helmet 4,1 r0
+    Warded Frame
+LADDER[70] The Traverse INSANE Helmet 4,0 r0
+    Layered Plating
+LADDER[70] The Traverse INSANE Chest 0,0 r1
+    Chorister's Base
+LADDER[70] The Traverse INSANE Chest 2,0 r0
+    Chorister's Weave
+LADDER[70] The Traverse INSANE Chest 2,1 r0
+    Chorister's Layer
+LADDER[70] The Traverse INSANE Chest 0,3 r0
+    Woven Underlayer
+LADDER[70] The Traverse INSANE Chest 4,1 r0
+    Brigandine Base
+LADDER[70] The Traverse INSANE Chest 4,3 r0
+    Sprocketman's Gratitude
+LADDER[70] The Traverse INSANE Gloves 0,0 r0
+    Rimeglove Material
+LADDER[70] The Traverse INSANE Gloves 2,0 r0
+    Ravener's Mold
+LADDER[70] The Traverse INSANE Gloves 1,2 r0
+    Emberloop
+LADDER[70] The Traverse INSANE Gloves 2,2 r0
+    Rat Signet
+LADDER[70] The Traverse INSANE Gloves 3,1 r0
+    Signet of Iron
+LADDER[70] The Traverse INSANE Gloves 4,0 r0
+    Anchor Material
+LADDER[70] The Traverse INSANE Gloves 3,2 r0
+    Witch's Thimble
+LADDER[70] The Traverse INSANE Gloves 4,2 r0
+    Braced Mold
+LADDER[70] The Traverse INSANE Greaves 0,0 r0
+    Sprung Sole
+LADDER[70] The Traverse INSANE Greaves 0,1 r0
+    Ratskin Material
+LADDER[70] The Traverse INSANE Greaves 2,0 r1
+    Sanctified Material
+LADDER[70] The Traverse INSANE Greaves 4,0 r0
+    Warded Sabatons
+LADDER[70] The Traverse INSANE Greaves 2,1 r3
+    Sanctified Material
+LADDER[70] The Traverse INSANE Greaves 4,1 r0
+    Widow's Sole
+LADDER[71] The Unwritten EASY Weapon 0,0 r0
+    War Ledger
+LADDER[71] The Unwritten EASY Weapon 1,0 r2
+    Ratchet Cog
+LADDER[71] The Unwritten EASY Weapon 0,2 r2
+    Runewash Ink
+LADDER[71] The Unwritten EASY Weapon 2,2 r0
+    Emberburst
+LADDER[71] The Unwritten EASY Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[71] The Unwritten EASY Weapon 2,1 r1
+    Prismatic Ink
+LADDER[71] The Unwritten EASY Weapon 3,0 r0
+    The Bog Census
+LADDER[71] The Unwritten EASY Weapon 4,2 r1
+    Census Bolt
+LADDER[71] The Unwritten EASY Weapon 5,0 r1
+    Prismatic Ink
+LADDER[71] The Unwritten EASY Weapon 0,4 r1
+    Flywheel Cog
+LADDER[71] The Unwritten EASY Weapon 2,4 r0
+    Prismatic Ink
+LADDER[71] The Unwritten EASY Weapon 4,4 r0
+    Azure Alignment
+LADDER[71] The Unwritten EASY Helmet 0,0 r3
+    Bone Crown
+LADDER[71] The Unwritten EASY Helmet 1,1 r2
+    Bone Scale
+LADDER[71] The Unwritten EASY Helmet 2,2 r3
+    Bone Fletch
+LADDER[71] The Unwritten EASY Helmet 3,0 r0
+    Idol's Crest
+LADDER[71] The Unwritten EASY Helmet 4,1 r0
+    Tin Frame
+LADDER[71] The Unwritten EASY Helmet 4,0 r0
+    Tin Plating
+LADDER[71] The Unwritten MEDIUM Weapon 0,0 r0
+    Hymnal
+LADDER[71] The Unwritten MEDIUM Weapon 1,0 r2
+    Bulwark Vial
+LADDER[71] The Unwritten MEDIUM Weapon 0,2 r2
+    Runewash Ink
+LADDER[71] The Unwritten MEDIUM Weapon 2,2 r0
+    Emberburst
+LADDER[71] The Unwritten MEDIUM Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[71] The Unwritten MEDIUM Weapon 2,1 r1
+    Cinderscript Ink
+LADDER[71] The Unwritten MEDIUM Weapon 3,0 r0
+    The Bog Census
+LADDER[71] The Unwritten MEDIUM Weapon 4,2 r1
+    Census Bolt
+LADDER[71] The Unwritten MEDIUM Weapon 5,0 r1
+    Cinderscript Ink
+LADDER[71] The Unwritten MEDIUM Weapon 0,4 r1
+    Flywheel Cog
+LADDER[71] The Unwritten MEDIUM Weapon 2,4 r0
+    Cinderscript Ink
+LADDER[71] The Unwritten MEDIUM Weapon 4,4 r0
+    Azure Alignment
+LADDER[71] The Unwritten MEDIUM Helmet 0,0 r3
+    Bone Crown
+LADDER[71] The Unwritten MEDIUM Helmet 1,1 r2
+    Bone Scale
+LADDER[71] The Unwritten MEDIUM Helmet 2,2 r3
+    Bone Fletch
+LADDER[71] The Unwritten MEDIUM Helmet 3,0 r0
+    Idol's Crest
+LADDER[71] The Unwritten MEDIUM Helmet 4,1 r0
+    Tin Frame
+LADDER[71] The Unwritten MEDIUM Helmet 4,0 r0
+    Tin Plating
+LADDER[71] The Unwritten HARD Weapon 0,0 r0
+    Herbal
+LADDER[71] The Unwritten HARD Weapon 1,0 r2
+    Chain Coil
+LADDER[71] The Unwritten HARD Weapon 0,2 r2
+    Bloodletter's Ink
+LADDER[71] The Unwritten HARD Weapon 2,2 r0
+    Emberburst
+LADDER[71] The Unwritten HARD Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[71] The Unwritten HARD Weapon 2,1 r1
+    Quicksilver Ink
+LADDER[71] The Unwritten HARD Weapon 3,0 r0
+    The Bog Census
+LADDER[71] The Unwritten HARD Weapon 4,2 r1
+    Census Bolt
+LADDER[71] The Unwritten HARD Weapon 5,0 r1
+    Quicksilver Ink
+LADDER[71] The Unwritten HARD Weapon 0,4 r1
+    Ratchet Cog
+LADDER[71] The Unwritten HARD Weapon 2,4 r0
+    Quicksilver Ink
+LADDER[71] The Unwritten HARD Weapon 4,4 r0
+    Crimson Alignment
+LADDER[71] The Unwritten HARD Helmet 0,0 r3
+    Bone Crown
+LADDER[71] The Unwritten HARD Helmet 1,1 r2
+    Bone Scale
+LADDER[71] The Unwritten HARD Helmet 2,2 r3
+    Bone Fletch
+LADDER[71] The Unwritten HARD Helmet 3,0 r0
+    Idol's Crest
+LADDER[71] The Unwritten HARD Helmet 4,1 r0
+    Bronze Frame
+LADDER[71] The Unwritten HARD Helmet 4,0 r0
+    Bronze Plating
+LADDER[71] The Unwritten INSANE Weapon 0,0 r0
+    Herbal
+LADDER[71] The Unwritten INSANE Weapon 1,0 r2
+    Grimoire Rack
+LADDER[71] The Unwritten INSANE Weapon 0,2 r2
+    Bloodletter's Ink
+LADDER[71] The Unwritten INSANE Weapon 2,2 r0
+    Emberburst
+LADDER[71] The Unwritten INSANE Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[71] The Unwritten INSANE Weapon 2,1 r1
+    Quicksilver Ink
+LADDER[71] The Unwritten INSANE Weapon 3,0 r0
+    The Bog Census
+LADDER[71] The Unwritten INSANE Weapon 4,2 r1
+    Census Bolt
+LADDER[71] The Unwritten INSANE Weapon 5,0 r1
+    Quicksilver Ink
+LADDER[71] The Unwritten INSANE Weapon 0,4 r1
+    Bulwark Vial
+LADDER[71] The Unwritten INSANE Weapon 2,4 r0
+    Quicksilver Ink
+LADDER[71] The Unwritten INSANE Weapon 4,4 r0
+    Crimson Alignment
+LADDER[71] The Unwritten INSANE Helmet 0,0 r3
+    Bone Crown
+LADDER[71] The Unwritten INSANE Helmet 1,1 r2
+    Bone Scale
+LADDER[71] The Unwritten INSANE Helmet 2,2 r3
+    Bone Fletch
+LADDER[71] The Unwritten INSANE Helmet 3,0 r0
+    Idol's Crest
+LADDER[71] The Unwritten INSANE Helmet 4,1 r0
+    Warded Frame
+LADDER[71] The Unwritten INSANE Helmet 4,0 r0
+    Layered Plating
 ALTERNATES[0] The Dreaming Idiot EASY Helmet 0,0 r0
     Reliquary Frame of Nine
 ALTERNATES[0] The Dreaming Idiot EASY Helmet 3,0 r0

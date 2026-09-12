@@ -534,7 +534,7 @@ pub fn try_step(dir: &str) -> String {
                 }
             }
             let (went, shut, wants_instrument, turned, ending) =
-                answer_the_gate(g, &s, stepped_from);
+                answer_the_gate(g, &s, stepped_from, !standing);
             let mended = s.town.as_ref().map(|t| g.arrive_in_town(t)).unwrap_or(0);
 
             report_step(g, &s, mended, toll, spoke, &went, shut, wants_instrument,
@@ -663,6 +663,28 @@ pub fn take_the_cart(town: &str) -> String {
         .to_string(),
         Err(why) => serde_json::json!({ "error": why }).to_string(),
     })
+}
+
+/// Every terrain the game has, by name.
+///
+/// **So a check can hold the page's palette against the engine's list.** The
+/// two live in different languages — `data/terrain.json` is compiled into the
+/// wasm and the colours are in `app.js` — so nothing in `cargo test` can see a
+/// terrain nobody gave a colour to. `draw` falls back to magenta, and three of
+/// them had no entry for two blocks: the Reefs' quicksand, every silt floor
+/// and the bar of shingle all came out pink, reported twice.
+#[wasm_bindgen]
+pub fn terrain_names() -> String {
+    // Read off the shipped file itself rather than through a loader: what the
+    // palette owes a colour to is every name in `terrain.json`, whether or not
+    // any map happens to use it today.
+    let v: serde_json::Value = serde_json::from_str(gm2d_core::data::TERRAIN_JSON)
+        .expect("the shipped terrain file parses");
+    let names: Vec<String> = v["terrain"]
+        .as_object()
+        .map(|o| o.keys().cloned().collect())
+        .unwrap_or_default();
+    serde_json::json!(names).to_string()
 }
 
 /// Everything you need to know to play, in one place.
@@ -1244,8 +1266,30 @@ pub fn kit_reading_json(map: &str) -> String {
             .map(|r| r.assembled_count())
             .sum::<usize>();
         let m = gm2d_core::survey::mods_for(map, kind, items);
+        // **Which map this frame is about.** Reported from play: *"I was never
+        // reprompted with the survey window when I got to the wextreen sands,
+        // it just took the old survey stats from the wextreen reach"* — and the
+        // screen did say the Reach, because `#instrument-where` was **static
+        // HTML** reading "the Wextreen Reach" and no line of code ever set it.
+        // Four doors open that frame and three of them were lying about where
+        // they went.
+        //
+        // The name is the *gate's*, not the map's: a door is named for the
+        // threshold you are standing at, and "the edge of the Wextreen Sands"
+        // is what the map file calls this one.
+        let door = gm2d_core::data::all_maps(DIFFICULTY)
+            .iter()
+            .flat_map(|w| w.places.iter())
+            .find(|p| {
+                p.needs_survey
+                    && (p.to.as_deref() == Some(map)
+                        || p.floors.iter().any(|f| f.map == map))
+            })
+            .map(|p| (p.name.clone(), p.prose.clone()));
         serde_json::json!({
             "kind": kind,
+            "where": door.as_ref().map(|(n, _)| n.clone()),
+            "prose": door.as_ref().map(|(_, pr)| pr.clone()).unwrap_or_default(),
             "reads": {
                 "encounter_pct": m.encounter_pct,
                 "drops_per_mille": m.drops_per_mille,
@@ -3727,7 +3771,7 @@ pub fn try_shoot(angle: u16, power: u8) -> String {
         // can stand on — opens the same door, because there is one answer to
         // whether it opens and it is not the shim's.
         let (went, shut, wants_instrument, turned, ending) =
-            answer_the_gate(g, &s, fired_from);
+            answer_the_gate(g, &s, fired_from, true);
         let mended = s.town.as_ref().map(|t| g.arrive_in_town(t)).unwrap_or(0);
         let toll = s.event.as_deref().map(|id| g.read_event(id)).unwrap_or(0);
         let spoke = s
@@ -4021,6 +4065,10 @@ fn answer_the_gate(
     g: &mut gm2d_core::game::Game,
     s: &gm2d_core::world::Step,
     stepped_from: [u8; 2],
+    // Whether this is an arrival rather than *standing still and asking
+    // again*. A surveying gate opens its frame on the way in and crosses on
+    // the way out, and `here` is the way out — see the `needs_survey` arm.
+    arriving: bool,
 ) -> (
     Option<(String, String, Vec<String>)>,
     Option<String>,
@@ -4063,7 +4111,33 @@ fn answer_the_gate(
                 if let gm2d_core::game::Unlocked::Spent { key } = &opened {
                     turned = Some(g.theme_piece(key));
                 }
-                if opened != gm2d_core::game::Unlocked::Shut {
+                // **A surveying gate asks every time, not only when it
+                // refuses.** Reported from play: *"I was never reprompted
+                // with the survey window when I got to the wextreen
+                // sands, it just took the old survey stats from the
+                // wextreen reach."*
+                //
+                // `Game::unlock` shuts a survey gate only when you are
+                // carrying **no** instrument, so anybody who had built a
+                // compass for the Reach walked into the Sands with it and
+                // was never offered the choice — on the one map in the
+                // game where the compass is the *wrong* tool. The whole
+                // design is that what you carry changes what you read, and
+                // the moment that decision is made is the door.
+                //
+                // So the frame opens on the way **in** and `here` is the
+                // way out: pressing *Go in* comes back through this with
+                // `arriving` false and crosses. That is the same
+                // stand-still-and-ask-again path the refused case has used
+                // since M11.6, doing one more job.
+                let offer_the_frame = arriving
+                    && p.needs_survey
+                    && opened != gm2d_core::game::Unlocked::Shut
+                    && surveyable(p.opens_onto(&g.world).unwrap_or_default());
+                if offer_the_frame {
+                    wants_instrument = p.opens_onto(&g.world).map(|s| s.to_string());
+                    shut = None;
+                } else if opened != gm2d_core::game::Unlocked::Shut {
                     // **Which map a gate opens onto is core's**, and for a
                     // stack of floors it is a question about what has been
                     // answered. `None` here is not a locked door: it is a
@@ -4197,7 +4271,33 @@ fn answer_the_gate(
                 if let gm2d_core::game::Unlocked::Spent { key } = &opened {
                     turned = Some(g.theme_piece(key));
                 }
-                if opened != gm2d_core::game::Unlocked::Shut {
+                // **A surveying gate asks every time, not only when it
+                // refuses.** Reported from play: *"I was never reprompted
+                // with the survey window when I got to the wextreen
+                // sands, it just took the old survey stats from the
+                // wextreen reach."*
+                //
+                // `Game::unlock` shuts a survey gate only when you are
+                // carrying **no** instrument, so anybody who had built a
+                // compass for the Reach walked into the Sands with it and
+                // was never offered the choice — on the one map in the
+                // game where the compass is the *wrong* tool. The whole
+                // design is that what you carry changes what you read, and
+                // the moment that decision is made is the door.
+                //
+                // So the frame opens on the way **in** and `here` is the
+                // way out: pressing *Go in* comes back through this with
+                // `arriving` false and crosses. That is the same
+                // stand-still-and-ask-again path the refused case has used
+                // since M11.6, doing one more job.
+                let offer_the_frame = arriving
+                    && p.needs_survey
+                    && opened != gm2d_core::game::Unlocked::Shut
+                    && surveyable(p.opens_onto(&g.world).unwrap_or_default());
+                if offer_the_frame {
+                    wants_instrument = p.opens_onto(&g.world).map(|s| s.to_string());
+                    shut = None;
+                } else if opened != gm2d_core::game::Unlocked::Shut {
                     ending = Some(serde_json::json!({
                         "id": p.id,
                         "name": p.name,

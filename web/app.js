@@ -11,7 +11,7 @@ import init, {
   quest_log_json, guide_json, pin_quest,
   character_json, skills_json, take_skill, pressure_json, pools_json,
   class_offer_json, choose_class, choose_second_class, class_name, all_trees_json,
-  cart_json, take_the_cart, glossary_json,
+  cart_json, take_the_cart, glossary_json, terrain_names,
   try_shoot, preview_shot, aim_at,
   gold, piece_count, version, save_version,
   board_json, legal_anchors, place, pick_up, rotate, toggle_lock, undo, clear_board,
@@ -80,6 +80,22 @@ const LIGHT = {
   // What is under the lake once the Stack comes down. Drawn in no map file:
   // it is what `water` becomes.
   lakebed: ['#8f8567', '#89805f'],
+  // **M14 and M16's three, and for two blocks they had no colour at all.**
+  // `pal[name] || ['#f0f','#f0f']` draws an unknown terrain **magenta**, so the
+  // Reefs' quicksand bands, every silt floor and the bar of shingle came out
+  // pink. Reported twice: *"the land is pink and it says no way through"* — the
+  // sentence was fixed then and the colour was not — and *"make the tiles in
+  // the dungeon less pink, there is so much pink it hurts my eyes and is hard
+  // to tell what is going on."*
+  //
+  // Chosen against their neighbours rather than in isolation, which is what
+  // `look.rs` asks of anything drawn: **silt** is the ground you walk on down
+  // there, so it is the quietest; **quick** is the thing that stops you, so it
+  // is darker and muddier than the silt it sits in bands through; **tide** is
+  // water that goes out, so it reads as shallow sea beside `sea`'s deep.
+  silt:  ['#a89b86', '#a2947f'],
+  quick: ['#7f6f52', '#79694d'],
+  tide:  ['#6f96a4', '#68909e'],
 };
 const DARK = {
   road:  ['#4a4132', '#514837'],
@@ -97,6 +113,10 @@ const DARK = {
   sea:   ['#1a2c33', '#1e323a'],
   curd:  ['#6a5c26', '#71622b'],
   lakebed: ['#3b3524', '#423b29'],
+  // See LIGHT: the three that were magenta until somebody's eyes hurt.
+  silt:  ['#4a4338', '#443d33'],
+  quick: ['#332c20', '#2e281c'],
+  tide:  ['#2c4652', '#27414c'],
 };
 
 function dark() {
@@ -2865,6 +2885,19 @@ function closeKit() {
 /// carrying two and never learning which one answered.
 function paintKit() {
   const r = JSON.parse(kit_reading_json(kitMap));
+  // **Which door this is.** `#instrument-where` was static HTML reading "the
+  // Wextreen Reach" and nothing ever set it, so all four surveying doors said
+  // the Reach and three of them were lying — reported from play as *"it just
+  // took the old survey stats from the wextreen reach"*, which is what the
+  // screen was telling them. The name is the gate's, from the map file.
+  if (r.where) $('instrument-where').textContent = r.where;
+  const blurb = $('instrument-blurb');
+  if (blurb) {
+    blurb.textContent = (r.prose ?? []).join(' ') ||
+      'What you read it with is the only thing that decides what is in front ' +
+      'of you. Build an instrument on this frame — it is not your weapon grid ' +
+      'and it never was.';
+  }
   $('instrument-go').disabled = !r.kind;
   $('instrument-reading').textContent = r.kind
     ? `A ${r.kind}. That is what the ground will answer to.`
@@ -2872,7 +2905,17 @@ function paintKit() {
   const rows = [];
   if (r.kind) {
     const m = r.reads ?? {};
-    if (m.encounter_pct) rows.push(`<li><b>${m.encounter_pct}%</b> on how often the ground stops you</li>`);
+    // **Signed, because one of the two maps is worse.** A compass quiets the
+    // Reach by a fifth and is a quarter *louder* on the Sands — there is iron
+    // under the sand — and an unsigned "25%" reads like a discount. The sign is
+    // the whole of what tells a player they have brought the wrong tool, on
+    // the screen where they can still change it.
+    if (m.encounter_pct) {
+      const worse = m.encounter_pct > 0;
+      rows.push(`<li class="${worse ? 'bad' : ''}"><b>${worse ? '+' : ''}` +
+                `${m.encounter_pct}%</b> on how often the ground stops you` +
+                `${worse ? ' — this is the wrong instrument for it' : ''}</li>`);
+    }
     if (m.drops_per_mille) rows.push(`<li><b>+${m.drops_per_mille}‰</b> on what falls off it</li>`);
     if (m.xp_pct) rows.push(`<li><b>+${m.xp_pct}%</b> on what a win pays</li>`);
     if (m.golem) rows.push(`<li>a golem walks in with you and takes the first fight</li>`);
@@ -3810,6 +3853,10 @@ async function main() {
   window.__preview = (angle, power) => JSON.parse(preview_shot(angle, power));
   window.__shoot = (angle, power) => { cue = { angle, power }; shoot(); };
   window.__cue = () => cue;
+  // Both palettes, so a check can hold them against `data/terrain.json` — which
+  // is the engine's and cannot see the page's colours from `cargo test`.
+  window.__palette = (mode) => (mode === 'dark' ? DARK : LIGHT);
+  window.__terrains = () => JSON.parse(terrain_names());
   window.__ahead = () => lookAhead();
   // What the page is drawing of a flight: the path in sub-cells, where the
   // ball is on it, and the scale. A check reads the *drawing* here and the

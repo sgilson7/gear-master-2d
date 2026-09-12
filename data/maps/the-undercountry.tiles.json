@@ -177,6 +177,20 @@
       "id": "the-lost-corner",
       "name": "the lost corner",
       "shut": "A hole in the slag with nothing at the bottom you can see. Things go in here and the country does not give them back."
+    },
+    {
+      "at": [
+        15,
+        7
+      ],
+      "kind": "boss",
+      "id": "the-unwritten",
+      "name": "the post with nothing on it",
+      "creature": "The Unwritten",
+      "prose": [
+        "A post driven into the scrub with a face planed flat on it and nothing cut into the face.",
+        "Everything else down here is a thing somebody stopped writing. This is the thing they stopped at."
+      ]
     }
   ],
   "traversal": "shot"

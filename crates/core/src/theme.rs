@@ -1179,6 +1179,23 @@ pub static TURTLE_DICK: Theme = Theme {
         ("The Ninth Surveyor", "THE ONE WHO WENT DOWN"),
         ("What Marbulon Faced Away From", "WHAT SHE FACED AWAY FROM"),
         ("The Tenth Surveyor", "THE ONE WHO STAYED"),
+        // **The Wextreen deep.** Ten creatures wearing the Tenth Surveyor's own
+        // board in part, and the world's word for each is what the people still
+        // above ground call them — a job, a rumour, or a thing on a chart.
+        // Never the engine's noun: `Backsight` is a survey term and *The Look
+        // Back* is what somebody who has seen one says.
+        ("Chainman", "The One Who Held the Chain"),
+        ("Backsight", "The Look Back"),
+        ("The Eleventh Notch", "The Notch Nobody Cut"),
+        ("Iron Under It", "What Is Under the Sand"),
+        ("The Levelling Staff", "The Staff Still Standing"),
+        ("What the Flat Kept", "What the Sand Keeps"),
+        ("The Closing Error", "The Sum That Would Not Close"),
+        ("The Benchmark", "The Mark They Measured From"),
+        ("Datum", "What Everything Was Measured Against"),
+        ("The Traverse", "The Long Way Round"),
+        // The Undercountry's, and the only one whose name is the absence.
+        ("The Unwritten", "THE POST WITH NOTHING ON IT"),
         ("The Quiet Hour", "The Grand Calculation"),
         ("Verdigris", "Gappy Handman"),
         ("The Drowned Court", "The Sea of Cleveland"),

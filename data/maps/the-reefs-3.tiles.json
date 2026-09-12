@@ -2,7 +2,7 @@
   "format": "gm2d-tiles",
   "version": 1,
   "id": "the-reefs-3",
-  "_note": "**The Needle Room — four sinkholes, four levers, one plate.** A ring of silt round a square of quicksand, and in the middle of the square the plate the needle has been turning on for eleven years. The four corner alcoves touch the ring only on the **diagonal**, which is a corner and not a way in: the one way into one is to fall down the right sinkhole.\n\nTwo of the four sinkholes are true and two are false. A true one drops you in an alcove with a lever in it; a false one drops you back at the stair eight percent more tired. Each true alcove's lever is **ungated**, which is what stops a fall being a trap — the lever is the way out, and what it drains is a wall down the outside of the ring to the *other* alcove on its side. So two sinkholes reach two alcoves and two levers reach two more, and the second lever on each side is behind the first.\n\n**An alcove is two tiles and that is load-bearing.** A warp sets `world.at` and repairs, and nothing resolves the landing tile's place — which is right, because every other warp in the game lands you on ground. So a sinkhole drops you on the outer tile and you *step* onto the lever, the way you step onto every other card in the game. A one-tile alcove would have been a lever nobody could ever pull, and the browser would have been the only place it showed.\n\nThe four quadrants of the quicksand are what the four levers take away, and the plate is under them. `hidden_until_all` rather than `needs_all`: the plate is not a door you are refused at, it is a plate under three feet of sand, and the drains are what uncover it.",
+  "_note": "**The Needle Room \u2014 four sinkholes, four levers, one plate.** A ring of silt round a square of quicksand, and in the middle of the square the plate the needle has been turning on for eleven years. The four corner alcoves touch the ring only on the **diagonal**, which is a corner and not a way in: the one way into one is to fall down the right sinkhole.\n\nTwo of the four sinkholes are true and two are false. A true one drops you in an alcove with a lever in it; a false one drops you back at the stair eight percent more tired. Each true alcove's lever is **ungated**, which is what stops a fall being a trap \u2014 the lever is the way out, and what it drains is a wall down the outside of the ring to the *other* alcove on its side. So two sinkholes reach two alcoves and two levers reach two more, and the second lever on each side is behind the first.\n\n**An alcove is two tiles and that is load-bearing.** A warp sets `world.at` and repairs, and nothing resolves the landing tile's place \u2014 which is right, because every other warp in the game lands you on ground. So a sinkhole drops you on the outer tile and you *step* onto the lever, the way you step onto every other card in the game. A one-tile alcove would have been a lever nobody could ever pull, and the browser would have been the only place it showed.\n\nThe four quadrants of the quicksand are what the four levers take away, and the plate is under them. `hidden_until_all` rather than `needs_all`: the plate is not a door you are refused at, it is a plate under three feet of sand, and the drains are what uncover it.",
   "width": 17,
   "height": 12,
   "start": [
@@ -40,7 +40,11 @@
         "Iron Abbot",
         "Obsidian Colossus",
         "Rimefather",
-        "The Rust Parliament"
+        "The Rust Parliament",
+        "The Closing Error",
+        "The Benchmark",
+        "Datum",
+        "The Traverse"
       ]
     }
   ],

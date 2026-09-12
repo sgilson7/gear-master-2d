@@ -5237,6 +5237,38 @@ and returns before the clicks if any of them is unreachable, because a click
 that times out ends a check with a Playwright traceback instead of the sentence
 that says what is wrong.
 
+**M20's is the first deploy this project has had stopped by its own gate twice
+over, and both times it was the checks rather than the page.** Ninety-seven
+questions against the deployed page, and the table is short because the gate
+asked all of them.
+
+```
+live build 7bd05abb
+  index.html asks app.js?v=7bd05abb   app.js carries BUILD = '7bd05abb'
+  chromium walked the gate    ok      97 ok lines, no failures
+  the bench                   brews a pair, and the glass is a shape
+                              (7 cells of a 12-cell box)
+  an area                     says its name — The Slag Flats — and then stops
+  the errand log              2 rows, ['asked for', 'after 1'], 1 wire measured
+  a word errand               told you arrived on a map you arrive at by
+                              shooting
+  console errors: none                off-origin requests: none
+```
+
+**Three of the four new checks were wrong before the code was**, and the one
+real bug they found is worth the other three: `.mapwrap` is `line-height: 0` so
+the canvas gets no baseline gap, and the area card inherited it — in the
+document, unhidden, 638 pixels wide and **nought pixels high**. Nothing in
+`cargo test` can see that and nothing in the source reads wrong.
+
+**And the deploy gate caught the fourth.** `page.click("#download")` is the
+*first* click in the bench check, so a `clear_screens` placed after the plant is
+a guard placed after the timeout — green locally, red in CI, which is the shape
+of every ordering bug this harness has had. The map is reached by `.focus()`
+now: **a click hit-tests and focus does not**, and a click that times out ends a
+check with a Playwright traceback instead of the sentence that says what is
+wrong.
+
 **Deploying is three things, and finishing the first is not finishing.**
 `make publish` runs the engine suite and pushes; Actions then runs the suite
 again, builds, **walks the full gate in three browsers**, and only then uploads

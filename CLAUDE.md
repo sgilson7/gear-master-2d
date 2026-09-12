@@ -12,6 +12,33 @@ was arranged until it was long enough that the arrangement mattered.
 
 `HANDOFF.md` is the short door in. Read that first if you have never seen this.
 
+## Where it is right now
+
+**Live at `263641a8`**, and the whole of M17, M18 and M19 is in it. The last
+session's own record is in the sections below rather than in a block note —
+what follows is only what somebody arriving with no context needs before they
+touch anything.
+
+- **The overworld is a table.** The Treyway and the Undercountry carry
+  `traversal: "shot"`: the arrow keys aim a cue, space fires, and the ball runs
+  to rest under integer physics in `core::shot`. The cue draws the whole
+  predicted path before you fire. Every other map is walked a tile a press.
+- **The ladder is 72 creatures.** The newest eleven are the Wextreen deep, all
+  wearing the Tenth Surveyor's board in part; nine of the ten pool members beat
+  the best board the game hands out, and `The Unwritten` on the Undercountry is
+  the longest fight in the game.
+- **There is a glossary on `G`**, five shelves, every number read from the
+  constant that decides it.
+- **There is a long cart** between towns you have stood in, 40 Fnorp.
+- **The suite is 1,006 tests in 86 binaries** and the browser gate is **93
+  `ok:` lines**. Do not read a total off `cargo test`'s output — it interleaves
+  and cannot be summed; `packaging/count-tests.sh` is the way to get one back.
+
+**What this session was told and has not built yet**: errands through the new
+content — one for finishing each dungeon, one for arriving at the Undercountry's
+town, and some for the Wextreen Sands. `data/quests.json` is where they go and
+*Errands are not a town's* in Part four is the shape they take.
+
 ## What this is
 
 A 2D tile-based open-world RPG built on the gear-assembly auto-battler forked
@@ -36,7 +63,12 @@ that moves nothing but its own promise, and four new rules to move it with; and
 **M14 down twice, and the country under the country** — the Treyway grew a
 south, two four-floor dungeons with a puzzle on every floor went into it and
 under the lake, and behind both of them is a country with one town on it that is
-empty and says so.
+empty and says so; **M15** a bestiary, a cart, the Wextreen Sands and instant
+battle; **M16** the Eleven Reefs, two base classes GM2D wrote and the twenty-one
+pairs they make; **M17 the overworld is a table** — integer physics, a cue, five
+obstacle kinds and two countries you shoot across; **M18** both notebooks
+executed; and **M19** what a fortnight of play reported — a ball you can watch,
+a diamond you can hit, a glossary, a cart between towns, and the Wextreen deep.
 <https://sgilson7.github.io/gear-master-2d/>
 
 **M11 is live**, deployed at `43804e49` on the human's word. Its live check is

@@ -337,3 +337,74 @@ fn the_floors_cost_more_than_the_things_at_the_end_of_them() {
         "an Oak Handle and an Iron Blade cleared the top floor of the Drambus Stack"
     );
 }
+
+/// **Only the floor's boss ends the sitting, and for a milestone every fight did.**
+///
+/// Reported from play: *"every time you defeat an enemy in the drambus stack,
+/// you are kicked out of it."* `leave_the_sitting` sat one level out of the
+/// `boss_at` branch in `fight::settle`, so **any** victory on a map with an
+/// `outside` ended the sitting — which is every one of the five floors. The
+/// tower was a room you could not have two fights in.
+///
+/// **Nothing covered the trigger.** The three tests above call
+/// `leave_the_sitting` directly and prove what it does; none of them asked
+/// *when* it is called, which is where the fault was. A function tested apart
+/// from its caller is a function whose caller is untested.
+///
+/// `boss_at` is what makes a fight the floor's — the same lookup the drops go
+/// through, for the same reason: the creature standing on the plate also
+/// stands in a region's pool, and beating one in a field must not clear a
+/// floor.
+#[test]
+fn only_the_floors_boss_ends_the_sitting() {
+    let floor = "the-drambus-stack-4";
+    let w = data::map(floor, D);
+    let boss = w
+        .places
+        .iter()
+        .find(|p| p.kind == gm2d_core::world::PlaceKind::Boss)
+        .expect("the floor has a plate");
+    let who = boss.creature.clone().expect("somebody is standing on it");
+
+    // A creature out of this floor's own pool, fought somewhere that is not
+    // the plate.
+    // `Region::enemies` is resolved to specs at load, so this is a name off one.
+    let ordinary = w
+        .regions
+        .iter()
+        .flat_map(|r| r.enemies.iter())
+        .find(|m| m.name != who)
+        .map(|m| m.name.to_string())
+        .expect("the floor deals something besides its boss");
+
+    let fight_at = |creature: &str, at: [u8; 2]| -> gm2d_core::world::WorldState {
+        let mut g = gm2d_core::game::Game::new(4, "td");
+        g.character = common::geared_from(&["the-end-of-all-gears", "kettleworks"]);
+        g.world.go_to(floor);
+        g.world.at = at;
+        g.encounter = Some(gm2d_core::fight::Encounter {
+            enemy: creature.to_string(),
+            at,
+        });
+        let s = gm2d_core::fight::run(&mut g, D).expect("a fight");
+        assert_eq!(s.outcome, Outcome::Victory, "{creature} was not beaten");
+        gm2d_core::fight::settle(&mut g, &s, D);
+        g.world
+    };
+
+    // **An ordinary fight leaves you where you were.**
+    let after = fight_at(&ordinary, [4, 4]);
+    assert_eq!(
+        after.map_id(),
+        floor,
+        "beating {ordinary} on {floor} put you outside - every fight ended the sitting"
+    );
+
+    // **And the boss on its own plate ends it.**
+    let out = fight_at(&who, boss.at);
+    assert_ne!(
+        out.map_id(),
+        floor,
+        "beating the floor's boss left you standing on it"
+    );
+}

@@ -570,15 +570,26 @@ pub fn settle(game: &mut Game, log: &CombatLog, difficulty: Difficulty) -> Optio
                     // order they come down in is fixed and written.
                     receipt.extend(prose);
                 }
+                // **A floor is one sitting, and beating its *boss* ends it.**
+                //
+                // The kick is a position write and not a death: nothing is
+                // lost, the walk out is not part of the budget, and the next
+                // time you go in it is a different map. Here rather than in the
+                // shim because "clearing a floor puts you outside" is a rule,
+                // and a rule decided in the shim is a rule the fast suite
+                // cannot reach.
+                //
+                // **Inside the boss branch, which it was not.** Reported from
+                // play: *"every time you defeat an enemy in the drambus stack,
+                // you are kicked out of it."* It sat one level out, so every
+                // ordinary pool creature on any of the five floors ended the
+                // sitting — the tower was a room you could not fight twice in.
+                // `boss_at` is what makes a fight the floor's, and it is the
+                // same lookup the drops go through for the same reason: the
+                // creature standing here also stands in a region's pool, and
+                // beating one in a field must not clear a floor.
+                crate::world::leave_the_sitting(&mut game.world, difficulty);
             }
-            // **A floor is one sitting, and beating it ends the sitting.**
-            //
-            // The kick is a position write and not a death: nothing is lost,
-            // the walk out is not part of the budget, and the next time you go
-            // in it is a different map. Here rather than in the shim because
-            // "clearing a floor puts you outside" is a rule, and a rule decided
-            // in the shim is a rule the fast suite cannot reach.
-            crate::world::leave_the_sitting(&mut game.world, difficulty);
         }
         Outcome::Defeat | Outcome::Stalemate => {
             game.world.bump("losses");

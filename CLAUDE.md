@@ -1391,6 +1391,26 @@ is one fewer above it.
   `World::arrival` answers which one you get. The five files are separate
   because they are five different rooms, not one room with a number on it.
 
+### Only the boss ends the sitting, and for a milestone every fight did
+
+Reported from play: *"every time you defeat an enemy in the drambus stack, you
+are kicked out of it."* `leave_the_sitting` sat **one level outside** the
+`boss_at` branch in `fight::settle`, so any victory on a map carrying an
+`outside` ended the sitting — which is all five floors. The tower was a room
+you could not have two fights in.
+
+**`boss_at` is what makes a fight the floor's**, and it is the same lookup the
+drops go through for the same reason: the creature on the plate also stands in
+a region's pool, and beating one in a field must not clear a floor.
+
+**Why it survived is the more useful half.** Three tests call
+`leave_the_sitting` directly and prove exactly what it does; **not one asked
+when it is called**, and that is where the fault was. *A function tested apart
+from its caller is a function whose caller is untested.*
+`only_the_floors_boss_ends_the_sitting` fights an ordinary pool creature on
+floor four and asserts you are still standing there, then the Iron Abbot on its
+plate and asserts you are not.
+
 ## The lake empties, and it is still one map
 
 When the Stack is down, the lake in the middle of West Bambulon drains, and

@@ -46,3 +46,4 @@
 | **M19.10** | A shot prints a refusal | `shoot` threw `blocked`/`refused_by` away; `walk` has printed them since M15. The third *"the land is pink"* | ✓ |
 | **M19.11** | Instant battle on a table | `try_shoot` ran neither `rout` nor `instant`; one `settle_without_a_screen` called from both | ✓ |
 | **M19.12** | A sealed door that says what it wants | `needs_all` rather than `hidden_until` on the way under the flat — and `sealed_because` had been called by nothing since M14 | ✓ |
+| **M19.13** | Only the boss ends the sitting | `leave_the_sitting` fired on every win on a Stack floor; three tests covered the function and none the trigger | ✓ |

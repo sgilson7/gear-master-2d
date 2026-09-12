@@ -428,6 +428,9 @@ pub static TURTLE_DICK: Theme = Theme {
         // Marbulon's chain is about three Whisperlings and nobody has ever said
         // what one is. This is the answer: not a monster, a job.
         ("Whisperer", "Whisperling"),
+        // The first specialization. A licence rather than a calling, which is
+        // what a specialization is.
+        ("Apothecary", "Kettle Chemist"),
         ("Avenged", "Sprocket Avenged"),
         ("Wanderer", "Plane Tourist"),          // half-tourist, half-catastrophe
         ("Warpriest", "Acolyte of Dobira"),     // the Master and Baylon, pp. 46-50
@@ -1196,6 +1199,12 @@ pub static TURTLE_DICK: Theme = Theme {
         ("The Traverse", "The Long Way Round"),
         // The Undercountry's, and the only one whose name is the absence.
         ("The Unwritten", "THE POST WITH NOTHING ON IT"),
+        // The Cairnworks. Each name says which lane is open without naming a
+        // number, which is the register a creature's name is in.
+        ("The Unslaked Kiln", "THE KILN THAT NEVER LIT"),
+        ("Nine Courses of Brick", "NINE COURSES AND A STRING"),
+        ("The Cold Flue", "THE DRAUGHT IN THE FLUE"),
+        ("What Was Left Banked", "WHAT THE WORKS PUT BY"),
         ("The Quiet Hour", "The Grand Calculation"),
         ("Verdigris", "Gappy Handman"),
         ("The Drowned Court", "The Sea of Cleveland"),

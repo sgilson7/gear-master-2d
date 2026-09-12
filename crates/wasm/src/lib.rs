@@ -85,6 +85,28 @@ fn surveyable(id: &str) -> bool {
     })
 }
 
+/// What you arrived at, told to the errands.
+///
+/// **One answer for two doors, because for a milestone there were two.** A step
+/// resolves whatever place it landed on and hands that id over; a landing on a
+/// table handed over `s.event` and nothing else, so a word errand pointing at a
+/// town, a gate, a bench, a caravan or a boss could never be finished on the
+/// Treyway or the Undercountry — and the Undercountry is where the only town
+/// down there is. Both go through here now.
+///
+/// The guard is the caller's: a step that was refused is not an arrival, and a
+/// shot always is.
+fn spoke_on_arrival(g: &mut Game) -> Vec<String> {
+    let allowed = g.character.allowances();
+    let here = g.world.map_id();
+    let marks = seen_by(g);
+    let at = g.world.at;
+    let id = map_in(&here, &marks, |w| {
+        w.place_now(&g.world, at[0], at[1], &allowed).map(|p| p.id.clone())
+    });
+    id.map(|id| gm2d_core::quest::on_arrival(g, &id)).unwrap_or_default()
+}
+
 /// Everything a map needs to know about the game, owned.
 ///
 /// **Owned, and that is the point.** Nearly every call site is a closure that
@@ -526,13 +548,7 @@ pub fn try_step(dir: &str) -> String {
             // question needs the bag and the purse, which a `World` is
             // deliberately never given.
             let toll = s.event.as_deref().map(|id| g.read_event(id)).unwrap_or(0);
-            let mut spoke = Vec::new();
-            if s.moved {
-                if let Some(p) = w.place_now(&g.world, g.world.at[0], g.world.at[1], &allowed) {
-                    let id = p.id.clone();
-                    spoke = gm2d_core::quest::on_arrival(g, &id);
-                }
-            }
+            let spoke = if s.moved { spoke_on_arrival(g) } else { Vec::new() };
             let (went, shut, wants_instrument, turned, ending) =
                 answer_the_gate(g, &s, stepped_from, !standing);
             let mended = s.town.as_ref().map(|t| g.arrive_in_town(t)).unwrap_or(0);
@@ -2830,6 +2846,12 @@ fn quest_ask(g: &gm2d_core::game::Game, q: &gm2d_core::quest::Quest) -> String {
         gm2d_core::quest::Goal::Word { place } => {
             format!("go to {}, then report back", place_name(g, place))
         }
+        // "clear" rather than "beat what stands at", because a boss place is
+        // named for the room on four of the six and for the creature on the
+        // other two, and only one verb reads on both.
+        gm2d_core::quest::Goal::Clear { place } => {
+            format!("clear {}", place_name(g, place))
+        }
     }
 }
 
@@ -2845,7 +2867,18 @@ fn theme_thing(g: &gm2d_core::game::Game, id: &str) -> String {
 /// What a place is called, whether it is a town or something standing in a
 /// field. A town has a name on the map; an event's name is its title.
 fn place_name(g: &gm2d_core::game::Game, id: &str) -> String {
-    let from_map = map_for(g, |w| w.places.iter().find(|p| p.id == id).map(|p| p.name.clone()));
+    // **Every map, not the one you are standing on.** An errand's target has
+    // been on another map since M11.2 — kettleworks sends you to the Reach and
+    // now to the bottom of six dungeons — and a lookup that only searched here
+    // fell through to printing the raw id at somebody. The hidden ones are
+    // searched too: a place you have been told to go to is a place with a name,
+    // whether or not it is drawn yet.
+    let from_map = WORLDS.with(|ws| {
+        ws.iter()
+            .flat_map(|w| w.places.iter())
+            .find(|p| p.id == id)
+            .map(|p| p.name.clone())
+    });
     if let Some(n) = from_map.filter(|n| !n.is_empty()) {
         return n;
     }
@@ -2868,6 +2901,73 @@ fn theme_piece(g: &gm2d_core::game::Game, canonical: &str) -> String {
         .find(|d| d.name == canonical)
         .map(|d| theme.piece(d.name).to_string())
         .unwrap_or_else(|| canonical.to_string())
+}
+
+/// The larder, the glass, and what is standing in it.
+///
+/// **One payload for one screen**, and every number in it is core's: which
+/// cells the glass has, whether a third ingredient may go in, what the pair
+/// brews to and what that is worth. A page that worked any of it out would be
+/// a second rulebook — which is the one thing the shim is not allowed to be,
+/// and is exactly the mistake the board's green fit preview exists not to make.
+#[wasm_bindgen]
+pub fn larder_json() -> String {
+    with(|g| {
+        let brews = gm2d_core::data::brews();
+        let held: Vec<serde_json::Value> = brews
+            .ingredients
+            .iter()
+            .filter(|i| g.character.in_larder(&i.id) > 0)
+            .map(|i| {
+                serde_json::json!({
+                    "id": i.id,
+                    "name": i.name,
+                    "blurb": i.blurb,
+                    "n": g.character.in_larder(&i.id),
+                    "cells": i.cells,
+                    "potency": i.potency,
+                })
+            })
+            .collect();
+        let standing: Vec<serde_json::Value> = g
+            .character
+            .brewed
+            .iter()
+            .filter_map(|id| brews.get(id))
+            .map(|i| serde_json::json!({ "id": i.id, "name": i.name, "cells": i.cells }))
+            .collect();
+        let (potency, _) = g.character.apothecary();
+        serde_json::json!({
+            "larder": held,
+            "glass": g.retort(),
+            "holds": g.retort_holds(),
+            "standing": standing,
+            "brewed": g.brew_name(),
+            // Derived, never typed: the sentence is built from the numbers the
+            // fight will actually read, so retuning a pair retunes the line.
+            "gives": (!g.character.brewed.is_empty()).then(|| g.character.boon().line()),
+            "potency": potency,
+        })
+        .to_string()
+    })
+}
+
+/// Put a brew in the glass. Empty string, or why not.
+#[wasm_bindgen]
+pub fn brew(ids: String) -> String {
+    with_mut(|g| {
+        let want: Vec<String> = ids.split(',').filter(|s| !s.is_empty()).map(String::from).collect();
+        match g.brew(&want) {
+            Ok(_) => String::new(),
+            Err(e) => e,
+        }
+    })
+}
+
+/// Tip the glass out; the ingredients go back in the larder.
+#[wasm_bindgen]
+pub fn tip_out() {
+    with_mut(|g| g.tip_out())
 }
 
 /// Every errand on you, plus the ones already finished.
@@ -2925,6 +3025,12 @@ pub fn quest_log_json() -> String {
                     // and says nothing is a log that is wrong rather than a
                     // road that is shut.
                     "shut": guide.shut,
+                    // **Where it sits in its chain.** Core's, for the reason
+                    // the skill tree's rows are: a page that worked out its own
+                    // layering would be a second answer to *what has to come
+                    // first*.
+                    "depth": gm2d_core::quest::depth_of(&quests, &q.id),
+                    "requires": q.requires,
                 })
             })
             .collect();
@@ -2995,6 +3101,9 @@ fn where_to(
         }
         Stage::Carrying { have, want } => match &q.goal {
             Goal::Word { place } => format!("go to {}", place_name(g, place)),
+            Goal::Clear { place } => {
+                format!("it is still standing, at {}", place_name(g, place))
+            }
             Goal::Slay { creature, .. } => {
                 let names: Vec<String> = guide
                     .regions
@@ -3774,11 +3883,7 @@ pub fn try_shoot(angle: u16, power: u8) -> String {
             answer_the_gate(g, &s, fired_from, true);
         let mended = s.town.as_ref().map(|t| g.arrive_in_town(t)).unwrap_or(0);
         let toll = s.event.as_deref().map(|id| g.read_event(id)).unwrap_or(0);
-        let spoke = s
-            .event
-            .as_deref()
-            .map(|id| gm2d_core::quest::on_arrival(g, id))
-            .unwrap_or_default();
+        let spoke = spoke_on_arrival(g);
         let mut out = report_step(
             g, &s, mended, toll, spoke, &went, shut, wants_instrument, turned, ending, routed,
             instant,

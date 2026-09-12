@@ -132,6 +132,26 @@
       "creature": "The Gearwright",
       "piece": "Drover's Sole",
       "per_mille": 140
+    },
+    {
+      "creature": "The Unslaked Kiln",
+      "piece": "Bread Knife",
+      "per_mille": 400
+    },
+    {
+      "creature": "Nine Courses of Brick",
+      "piece": "Cosmic Alignment",
+      "per_mille": 400
+    },
+    {
+      "creature": "The Cold Flue",
+      "piece": "Nine-Plane Lens",
+      "per_mille": 400
+    },
+    {
+      "creature": "What Was Left Banked",
+      "piece": "Living Earth",
+      "per_mille": 400
     }
   ]
 }

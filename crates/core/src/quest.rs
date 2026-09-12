@@ -49,6 +49,24 @@ pub enum Goal {
     /// recorded, which is the same set a tile-event writes to, so a word and a
     /// door are remembered the same way.
     Word { place: String },
+    /// Beat what is standing on a tile, and the tile is the whole of the
+    /// question.
+    ///
+    /// **Not `Slay`, and the difference is not a nicety.** Eight of the nine
+    /// creatures standing on a boss tile also stand in some region's pool, so
+    /// "beat What Marbulon Faced Away From" is finishable in a field on behalf
+    /// of a room nobody has walked into. A boss *tile* is the one thing in the
+    /// game there is exactly one of.
+    ///
+    /// **And not `Word`, for the opposite reason.** A word is satisfied by
+    /// arriving, and arriving at a boss tile is the start of the fight rather
+    /// than the end of it — so a word here would be handed in by walking
+    /// through the door and turning round.
+    ///
+    /// Derived, never banked: a boss writes its own tile id into `answered`
+    /// when it is cleared, and this reads that set. There is no counter, no
+    /// token and nothing to drop.
+    Clear { place: String },
 }
 
 impl Goal {
@@ -65,7 +83,7 @@ impl Goal {
         match self {
             Goal::Slay { token, .. } => Some(token),
             Goal::Bring { item, .. } => Some(item),
-            Goal::Word { .. } => None,
+            Goal::Word { .. } | Goal::Clear { .. } => None,
         }
     }
 
@@ -81,14 +99,14 @@ impl Goal {
         match self {
             Goal::Slay { count, .. } => *count,
             Goal::Bring { count, .. } => *count,
-            Goal::Word { .. } => 1,
+            Goal::Word { .. } | Goal::Clear { .. } => 1,
         }
     }
 
     /// The place it sends you to, if it sends you anywhere.
     pub fn place(&self) -> Option<&str> {
         match self {
-            Goal::Word { place } => Some(place),
+            Goal::Word { place } | Goal::Clear { place } => Some(place),
             _ => None,
         }
     }
@@ -320,8 +338,14 @@ pub fn done(game: &Game, id: &str) -> bool {
 /// word and a door are remembered the same way and a save carries one field
 /// rather than two.
 pub fn spoken(id: &str) -> String {
-    format!("word:{id}")
+    format!("{SPOKEN}{id}")
 }
+
+/// The prefix [`spoken`] puts on an errand's id.
+///
+/// Written out once, because `unlock` reads a mark back the other way and two
+/// copies of a wire format is how the two stop agreeing.
+pub const SPOKEN: &str = "word:";
 
 /// The errands a place has something to say about **to this character**.
 ///
@@ -387,6 +411,18 @@ pub fn stage(game: &Game, q: &Quest) -> Stage {
                 Stage::Carrying { have: 0, want: 1 }
             }
         }
+        // The place's own id, not a mark of this errand's — because the thing
+        // that put it there is the boss falling, which happened whether or not
+        // anybody had been asked about it. So an errand taken after the
+        // dungeon is already done is `Ready` the moment it is taken, which is
+        // right: you did the thing.
+        Goal::Clear { place } => {
+            if game.world.answered.iter().any(|a| a == place) {
+                Stage::Ready
+            } else {
+                Stage::Carrying { have: 0, want: 1 }
+            }
+        }
         _ => {
             let want = q.goal.count();
             let have = q.goal.token().map(|t| holding(game, t)).unwrap_or(0);
@@ -408,7 +444,12 @@ pub fn on_arrival(game: &mut Game, place: &str) -> Vec<String> {
     let quests = crate::data::quests();
     let mut moved = Vec::new();
     for q in &quests.quests {
-        if q.goal.place() != Some(place) {
+        // `Goal::Word` and nothing else. `place()` answers for a `Clear` too,
+        // because both send you somewhere and the guide has to point — but a
+        // clearing is not done by standing there, and reading `place()` here
+        // would hand one in for walking onto the boss's tile and turning
+        // round.
+        if !matches!(&q.goal, Goal::Word { place: p } if p == place) {
             continue;
         }
         if !matches!(stage(game, q), Stage::Carrying { .. }) {
@@ -421,6 +462,37 @@ pub fn on_arrival(game: &mut Game, place: &str) -> Vec<String> {
         }
     }
     moved
+}
+
+/// How deep in its chain an errand is: 0 for one nothing comes before.
+///
+/// **The same question `Tree::depth_of` answers for a skill node**, and the
+/// same answer: one past the deepest thing it requires. Reported from play —
+/// *"the current errand tree is just hard to follow as a player"* — and the fix
+/// is the one the skill tree already made: rows are depth, and depth is core's,
+/// because a screen working its own layering out would be a second answer to
+/// *what has to come first* and the two would part the first time an errand
+/// gained a second prerequisite.
+///
+/// Cycle-safe by construction: `requires` names errands, `parse` refuses one
+/// that is not an errand, and the depth is capped so a file that named a loop
+/// is a flat row rather than a hang.
+pub fn depth_of(quests: &QuestsData, id: &str) -> u32 {
+    fn walk(quests: &QuestsData, id: &str, seen: &mut Vec<String>) -> u32 {
+        if seen.iter().any(|s| s == id) || seen.len() > 16 {
+            return 0;
+        }
+        seen.push(id.to_string());
+        let out = quests
+            .get(id)
+            .map(|q| {
+                q.requires.iter().map(|r| walk(quests, r, seen) + 1).max().unwrap_or(0)
+            })
+            .unwrap_or(0);
+        seen.pop();
+        out
+    }
+    walk(quests, id, &mut Vec::new())
 }
 
 /// Where an errand is asking you to go next, in ids a map can find.
@@ -472,7 +544,7 @@ pub fn guide(game: &Game, q: &Quest, worlds: &[crate::world::World]) -> Guide {
         // match below.
         Stage::Ready => out.places.push(QuestsData::turn_in_of(q).to_string()),
         Stage::Carrying { .. } => match &q.goal {
-            Goal::Word { place } => out.places.push(place.clone()),
+            Goal::Word { place } | Goal::Clear { place } => out.places.push(place.clone()),
             Goal::Slay { creature, .. } => {
                 for w in worlds {
                     for r in w.regions_holding(creature) {
@@ -642,6 +714,7 @@ pub fn hand_in(game: &mut Game, id: &str) -> Result<Vec<String>, String> {
         Stage::Carrying { have, want } => {
             return Err(match &q.goal {
                 Goal::Word { .. } => "You have not been yet.".to_string(),
+                Goal::Clear { .. } => "It is still standing.".to_string(),
                 _ => format!("{have} of {want}, and nobody writes down what they are not handed."),
             });
         }

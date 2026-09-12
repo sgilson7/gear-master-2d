@@ -30,14 +30,24 @@ touch anything.
 - **There is a glossary on `G`**, five shelves, every number read from the
   constant that decides it.
 - **There is a long cart** between towns you have stood in, 40 Fnorp.
-- **The suite is 1,006 tests in 86 binaries** and the browser gate is **93
-  `ok:` lines**. Do not read a total off `cargo test`'s output — it interleaves
+- **The suite runs in 95 binaries** and the browser gate is **97 `ok:` lines**. Do not read a total off `cargo test`'s output — it interleaves
   and cannot be summed; `packaging/count-tests.sh` is the way to get one back.
 
-**What this session was told and has not built yet**: errands through the new
-content — one for finishing each dungeon, one for arriving at the Undercountry's
-town, and some for the Wextreen Sands. `data/quests.json` is where they go and
-*Errands are not a town's* in Part four is the shape they take.
+- **There are 51 errands**, eleven of them new: one for finishing each of the
+  six dungeons, one for arriving at the Undercountry's town, three for the
+  Wextreen Sands and one for the Cairnworks. `Goal::Clear` is a fourth goal kind
+  and a landing on a table is an arrival now — see *An errand for finishing a
+  dungeon* in Part four, which is also where the two bugs that found are
+  written down.
+- **A shut door names every hop to its key**, not the last one — `unlock.rs`,
+  and the bar of shingle now reads out seven steps over three maps.
+- **There is a brewing bench in every town**, a larder that opens nowhere else,
+  eight ingredients and all twenty-eight of their pairs. The glass is seven
+  cells and not a rectangle.
+- **There is a specialization**, which is a class you take instead of pairing:
+  the Apothecary, one slot, outside the fork and outside the expert table.
+- **The Cairnworks is four floors under the Wextreen Reach**, and each floor
+  shuts every lane but one.
 
 ## What this is
 
@@ -3923,6 +3933,384 @@ slay something, bring something, or go somewhere and report.
   what you became, and a reward that vanished for three players in four would
   be worse than one they cannot use yet.
 
+## An errand for finishing a dungeon, and a fourth kind of goal
+
+Two errands were *gated* on a dungeon being finished and none was *about*
+finishing one, so the quest log — the one screen in this game that points at the
+map — had never once pointed at a dungeon. Asked for: *"there needs to be one
+quest for completing each of the dungeons, a quest for arriving to the under
+country town, and some quests for the wextreen sands"*. Ten errands, and the
+interesting part is that the three goal kinds the game had were each wrong for
+the first six in a different way.
+
+**`Goal::Clear { place }` is the fourth**, and it reads `world.answered` for the
+tile's own id — which a boss writes when it falls. There is no token, no drop,
+no counter and no mark of the errand's own.
+
+- **Not `Slay`, and the difference is not a nicety.** M15.1 measured it: **eight
+  of the nine creatures standing on a boss tile also stand in some region's
+  pool**, so *beat What Marbulon Faced Away From* is finishable in a field on
+  behalf of a room nobody has walked into. A boss **tile** is the one thing in
+  the game there is exactly one of.
+- **And not `Word`, for the opposite reason.** A word is satisfied by
+  **arriving**, and arriving at a boss tile is the start of the fight rather
+  than the end of it — so a word here is handed in by stepping onto the square
+  and turning round.
+- **Which meant `on_arrival` had to be narrowed to `Word` by name.** It filtered
+  on `Goal::place()`, and `place()` answers for a `Clear` too, because the guide
+  has to point at something. `a_clearing_is_not_handed_in_by_standing_on_the_tile`
+  is the check, and with the old filter put back it says
+  *what-the-cave-had advanced for arriving at the-bottom-of-the-cave*.
+- **An errand taken after the dungeon is already done is `Ready` the moment it
+  is taken**, which is right: you did the thing. That falls out of reading the
+  place's id rather than a mark of this errand's.
+
+### A landing is an arrival, and for a milestone it was not
+
+**The bug the Undercountry errand found, and it is the shim's.** A step resolves
+whatever place it came to rest on and hands that id to `quest::on_arrival`; a
+**landing on a table handed over `s.event` and nothing else.** So a word errand
+pointing at a town, a gate, a bench, a caravan or a boss could never be finished
+on either shot map — and the Undercountry is where the only town down there is,
+which is the one thing that was asked for by name.
+
+`spoke_on_arrival` is one function and both doors call it. Nothing in
+`cargo test` could see it: both halves are the shim's, and the two halves agreed
+about every map that is walked. `check_a_word_errand_lands_on_a_table` is the
+browser check.
+
+### `place_name` searched the map you are standing on
+
+An errand's target has been on another map since M11.2, and the lookup that
+names it for the ask line and the guide read the **current** map, then the
+events, then the theme, then printed the raw id. Every clearing errand is given
+in a town and points at the bottom of a dungeon, so all six would have read
+*clear the-bottom-of-the-cave* at somebody. It searches every map now, hidden
+places included: **a place you have been told to go to is a place with a name,
+whether or not it is drawn yet.**
+
+### The fixture must not hold the rewards of the road it is being asked to walk
+
+`common::geared_from` takes *both shelves and every errand*, and that is the
+yardstick M11.7 established for **can the board a player actually has get down
+there**. A board holding the Sump's own completion reward answers a different
+question, and a circular one: *can the character who beat it beat it.*
+
+So it skips an errand whose goal is a `Clear`, and anything that transitively
+requires one. It is the exclusive-chain rule one step along — *a fixture that
+can hold every branch of a mutually exclusive choice is measuring a game nobody
+plays*, with **and every reward for finishing the thing it is measuring**
+after it.
+
+### What the ten are
+
+| | goal | given at |
+|---|---|---|
+| the Great Gear Cave | clear `the-bottom-of-the-cave` | the pit |
+| the Drambus Stack | clear `the-drambus-stack-1-boss` | Kettleworks |
+| under the lake | clear `the-bottom-of-the-lake` | the pit |
+| the Wextreen Sump | clear `the-ninth-surveyor` | Kettleworks |
+| the Silt Stair | clear `the-bottom-of-the-bottom` | **Marbulon's door** |
+| the Eleven Reefs | clear `the-tenth-surveyor` | Kettleworks |
+| the Undercountry's town | word at `the-third-town` | Kettleworks |
+| the iron under the flat | word at `the-iron-under-the-sand` | Kettleworks |
+| the needle that will not settle | word at `the-spinning-needle` | Kettleworks |
+| four tickets off the flat | slay 4 × Iron Abbot | Kettleworks |
+
+- **Marbulon gives the Silt Stair's**, because the thing at the bottom of it is
+  *What Marbulon Faced Away From* and she has stood at that door with her back
+  to it since M8. She wants to be told, in plain words, once.
+- **The third town gives nothing and is only pointed at.** It is in
+  `common::UNWRITTEN` and `every_town_has_an_errand` asserts that an unwritten
+  town hands out nothing — so the errand about arriving there is Kettleworks's,
+  and what it asks for is a report that there is nothing there, *which is a
+  different report from nobody having been.*
+- **They pay gold and components, and no rows and no enchs.** A row must be the
+  end of a questline and every one of these has something after it; all eight
+  priceless enchs already have an owner, and
+  `every_ench_comes_from_somewhere` refuses a second source outside an expert
+  tree. **And no new components**, because adding to `CATALOG` moves the save
+  fingerprint and there is a player mid-run. Four of the seven gear rewards are
+  dead `EVENT_ONLY` casting pieces the campaign left behind — `Gold Chip`, and
+  the drover's, shunter's and signalman's orbs — which had been reachable from
+  nowhere since the fork.
+- **The three Sands errands pay money and nothing else, and that is the
+  fixture's doing rather than a taste.** They are the only three of the ten a
+  `Clear` does not stand in front of, so they are the only three `geared_from`
+  picks up — and picking them up broke **three** tests at once: the deep went
+  from nine of ten killing that board to eight, and two floors of the Drambus
+  Stack became a walk where every wanderer is a win. *A fixture that is the
+  yardstick for how dangerous a place is must not be wearing what that place
+  paid.* Gold is invisible to it, so gold is what they pay, at 260, 320 and 480
+  — which is more than any errand on either shelf.
+
+
+## A refusal names the lock; this names the key, all the way down
+
+Reported from play, standing at the bar of shingle: *"the event outside of the
+diamond to get to the southern area should say very specifically the mechanical
+necessities to unlock the area; so the specific events and errands that have to
+be complete. anything that is locked should have such an explanation."*
+
+**Third time this project has been told the same thing, each time one level
+further in.** The shore said what a cliff says, and was given its own sentence.
+Then the sentence named the notch and not where the notch is cut, and was given
+the one event that raises the flag — one hop. This is the rest of the hops, and
+`crates/core/src/unlock.rs` is where they are worked out.
+
+The bar of shingle now reads, on a new game:
+
+> The water is over the bar and the bar is nine feet down. Eleven years of
+> notches on the post say it goes out the year somebody cuts the tenth, and
+> nobody has cut the tenth. **To open it: carry The Deep Gate Key, then go in
+> through the door in the wall, then THE WEXTREEN REACH — Read the five, then
+> assemble a survey instrument on its own frame, then go in through the edge of
+> the Wextreen Reach, then THE TRIG STONE — Sign the plate, then THE NINE
+> SURVEYS — Build the tenth cairn.**
+
+- **Seven steps over three maps, and not one of them is written down
+  anywhere.** `unlock::walk` asks which *choice* raises a flag, recurses into
+  what that choice itself wants, finds which map the card stands on, finds the
+  gate onto that map, and recurses into what *that* gate wants. A chain
+  somebody re-authors cannot leave it pointing at the wrong place, which is the
+  same argument `Requirement::wants` made for one hop.
+- **The order is the order you have to do them in**, because a requirement is
+  recursed *before* its own line is pushed. That is the whole of what makes it
+  a plan rather than a list.
+- **THE WEXTREEN REACH stands on the Treyway and the trig stone is inside the
+  Reach**, so the card comes before the frame and the frame before the plate —
+  which is a fact about where two tiles are and not one anybody would have
+  guessed. The first draft of the test asserted the other order and was wrong.
+- **A hop already made is not printed again.** `steps_to` takes the character's
+  own marks, so a chain three quarters walked prints the quarter that is left.
+  A gate is skipped the same way: turning a key writes the gate's id into
+  `answered`, so somebody standing on the Treyway is not told to go and find a
+  key they spent to get there.
+- **Every lock, not only the sealed kind.** `sealed_because` answered for
+  `needs_all` and returned `None` for the other two, so the Cave's mouth and the
+  Reach's edge each refused with the map file's sentence and nothing to act on.
+  It reports a mark you have not made, a key you are not carrying **and** an
+  instrument you have not built.
+  `every_locked_place_says_what_would_open_it` walks every locked gate on every
+  map and fails one whose refusal has no plan under it.
+- **Unthemed, TONE 13a.** The `shut` prose is the world's and is appended to;
+  what is added is the engine's, because somebody reading it is working out
+  what to go and do.
+- **`gate_toward` is gone**, and its one caller with it: it answered *which door
+  leads to the map this event is on*, which is one line of the new walk.
+
+
+## The larder, the bench, and a glass that is not a box
+
+**M20.** Asked for: *"add a potion making stand in cities, which lets you brew
+together ingredients that enemies drop ... ingredients do not go in the
+inventory but instead into an ingredient inventory that can only be accessed in
+towns. the potion brewing window is a single slot with a bizzarre shape."*
+
+- **An ingredient is not a component, and that is the load-bearing decision.**
+  No `PieceKind`, no entry in `CATALOG`, no home in any of the five worn
+  grids — because adding to the catalogue moves the save fingerprint and there
+  is a player mid-run. `Character::larder` is a second bag, so an ingredient
+  does not pack, does not bench, cannot be handed over a counter and cannot be
+  spent as a key: **four consumers that all read `owned` and are all right
+  about this without being touched**, which is exactly the return
+  `Character::banked` got for the same shape.
+- **It does have a footprint**, because the ask says so and because the retort
+  is the whole of the puzzle. The shape is a `shape::Shape`, the same polyomino
+  a component uses, so a cell in the glass is the same kind of thing as a cell
+  on a board.
+- **A brew adds to `Held`, so it is zero new combat code.** `Held` is the one
+  door for *what you are already holding when the bell goes* — the tree's
+  armour, its mana, its granted rules and the furnace's carried stacks all
+  arrive through it — and a potion is exactly that shape. It expires when the
+  fight does **for free**, because `Held` is translated into a `Combatant` at
+  the bell and nothing persists.
+- **`Held` grew its first rate.** Everything else in it is a quantity; a potion
+  that gives strength is a rate, and it is in `Held::stats` rather than in
+  `player_stats` because that is what *for this fight only* means — added to the
+  player's stats inside `simulate_party_holding` and nowhere else, so combat
+  stays a pure function of what it was handed.
+- **Eight ingredients and all twenty-eight pairs.** `C(8,2)` is 28, which is a
+  table a person can author and a lint can prove complete — the argument
+  `every_pair_of_offered_classes_reaches_an_expert` already makes for the
+  experts. **Which ingredient a creature leaves is keyed by its art family**,
+  read out of `art/creatures.json`, so a creature added to `enemies.json`
+  cannot arrive without a drop: it already fails a test without a family, and
+  `every_creature_leaves_something_for_the_larder` is the second half of that.
+  A list of seventy-five creature names would have been the seventh
+  hand-written list this project has paid for.
+- **The drop is in `pay_a_win`**, beside everything else a win pays — so a rout
+  leaves one too, which is right: a creature that gave up still left what it was
+  carrying.
+- **Spent beside the line that tires you.** `fight::settle` charges four percent
+  won or lost, and the comment above it is the argument for putting the
+  spending there as well: the way not to have some fights drink a potion and
+  some not, invisibly, is to put it beside the one line that already means *a
+  fight happened*. **A rout does not reach there and must not** — nothing was
+  fought, so nothing was drunk.
+- **Nothing is spent until everything is checked**, and a refusal names what is
+  in the way: the reroll's rule, the bank's and the cart's. Tipping the glass
+  out puts the ingredients back, because a bench that ate what you put in it is
+  a bench nobody experiments at — and twenty-eight pairs are only worth having
+  if trying one is free.
+
+### Seven cells, and the number is measured rather than chosen
+
+The glass is `brew::RETORT`: seven cells, no symmetry, a bent neck into a bulb.
+Clearing the Cairnworks adds **one** more.
+
+**One and not two, and that is a measurement.** At nine cells every one of the
+fifty-six triples tiles the glass, so the shape carries nothing at all and the
+ink is a free slot with a ceremony in front of it — the *compares zero with
+zero* failure with a polyomino in it. At eight, three three-cell ingredients
+come to nine and can never go in together, so **a big ink wants a small pair**.
+`the_retort_is_a_shape_and_not_a_box` measures both ends — generous at two,
+tight at three — and it was red at nine.
+
+**Whether two things fit is core's.** `brew::fits` tries every rotation of every
+ingredient at every cell, exhaustively, for the reason the board's green fit
+preview is core's: a page that worked out its own answer would be a second
+rulebook, and the two would part the first time the glass was reblown. Seven
+cells and at most three ingredients is a search that finishes in microseconds,
+and the alternative is a heuristic that refuses an arrangement somebody can see
+with their eyes.
+
+**The ink multiplies and does not add**, which is the ask in as many words —
+*acts like an ink in books ie increases potency*. So it is a percentage on the
+pair rather than a third term in the sum, which is what makes it worth spending
+a rare one on a good pair rather than on any pair.
+
+**And the glass is reblown by a boss's own tile id.** `REBLOWN_MARK` is
+`what-was-left-banked`, which is what beating the thing at the bottom of the
+Cairnworks writes into `answered`. Derived, never banked: there is no
+`glass_reblown` field, the same way there is no counter for how many floors of
+the Drambus Stack are gone. The errand Kettleworks hands out is the pointer
+rather than the trigger.
+
+## A specialization is a class you take instead of pairing
+
+Asked for: *"a new type of class called a specialization, and you can only have
+one of them, and it does not interact / form expert classes."*
+
+- **`Character::specialization` is its own slot and not a fourth entry in
+  `classes`.** Everything that walks that list walks it to ask *which pair are
+  you* — the expert table, the second fork, the portrait — and a specialization
+  pairs with nothing, so putting it there would change the answer to a question
+  it has no opinion about. `class::SPECIALIZATIONS` is its own list, outside
+  `OFFERED` (so the level-five fork does not draw it) and outside
+  `expert::EXPERTS` (so `C(7,2)` is still twenty-one).
+- **It is the first class in this game whose power the fight never reads.**
+  `ClassPower::Apothecary` is honoured in `Character::boon` and `Game::retort`
+  and nowhere in `combat.rs` — which has an arm saying so, because adding a
+  specialization should be a decision about combat rather than a silence.
+- **`Character::specialization_def` tunes it**, the same way `class_defs` tunes
+  an expert and a base class. Reading `CLASSES` directly would print the power
+  as written rather than as bought, which is M13.6's thirty-eight dead nodes one
+  level along.
+- **The Apothecary's eight nodes tune the bench and nothing else**, which is the
+  constraint the twenty-one expert trees already obey. A flat stat there would
+  be a node you could take without noticing what you are.
+
+## The Cairnworks, and four lanes
+
+Four floors under the Wextreen Reach, behind a hatch that opens once the tenth
+cairn is cut. Each floor has one thing on a plate and every defence at the cap
+but one.
+
+| floor | the thing on the plate | the lane it leaves open |
+|---|---|---|
+| 1 | The Unslaked Kiln | curse — you have to sear it |
+| 2 | Nine Courses of Brick | physical |
+| 3 | The Cold Flue | magic |
+| 4 | What Was Left Banked | none: **piercing** cuts the resistance instead |
+
+- **"100%" is 95**, and the constant is not moving. `stats::LANE_CAP` has been
+  95 since M16 for a reason this block must not undo — *a lane you can commit to
+  is never one you can be shut out of* — so a boss written at a literal hundred
+  would be a wall with a sentence on it. Ninety-five means the wrong lane does a
+  twentieth of its damage, which against these healths is a loss at the buzzer.
+  That **is** *you have to use the other lane*, in a game with a clock.
+- **The open lane is written as a large negative, not as a zero**, and this is
+  the finding. A board grants resistances of its own, so a boss with
+  `curse_resist: 0` and forty pieces on it is a boss with about forty curse
+  resist — **the design would have been undone by the costume**. The negative is
+  what makes the sum land at nothing whatever the gear adds.
+- **All four wear The Unwritten's two slots**, which is the one shape in the set
+  a player survives — see its own note, and the fourth time this file has found
+  that *what a creature deals is mostly how many items its board makes*. Nothing
+  here invents a component, so the catalogue and the save fingerprint are
+  untouched.
+- **A boss you can refight is a boss that also walks its floor.** Each floor's
+  pool holds its own boss, so once the plate is clear you can meet it again —
+  which is the existing shape rather than a new one, because eight of the nine
+  boss creatures in this game already stand in a region pool by accident. What
+  it drops is `data/drops.json` at 400‰, and the drop is the next floor's
+  answer: a blade off the kiln, an alignment off the brick, a lens with magic
+  piercing on it off the flue.
+- **Every drop is a component `geared_from` already had**, chosen deliberately.
+  Three errand rewards and one set-adjacent piece, so the yardstick the deep
+  maps are measured against did not move — see *The fixture must not hold the
+  rewards of the road it is being asked to walk*, which is the same trap from
+  the other side and cost three red tests one milestone earlier.
+
+## A place says its own name
+
+Asked for: *"whenever you enter a new area, the name of the area pops up
+briefly in the middle of the screen before fading away."*
+
+- **Watched in `paintPanel`**, which is the one function every path that moves
+  anybody already goes through — a step, a landing, a gate, a defeat that
+  carries you home and a save being restored. Chasing each of those separately
+  is how the stale map got shipped for three blocks.
+- **The region and not only the map**, because an area is what a player means:
+  West Bambulon is one map and five regions, and crossing from the pit road into
+  the Kolok Downs is arriving somewhere. The name is `RegionDef::name`, which is
+  the same string the standing panel prints.
+- **Compared by name rather than cleared by a flag.** A flag would have to be
+  cleared by whoever moved you, which is seven call sites and the eighth is the
+  one that gets forgotten.
+- **Nothing on the first paint of a session.** A save being restored is not an
+  arrival, and a card over the map before the player has pressed anything reads
+  as a splash screen.
+- **Haloed, not tinted**, and `pointer-events: none` — the ground under the
+  middle of a map is anything from pale sand to dark slag, and a card you can
+  accidentally aim a cue through is a card that costs somebody a shot. Fourth
+  time the halo has been the answer, after the armour label, the wrapping bar
+  and the shot preview.
+- **And it needs its own `line-height`, which is the one real bug the browser
+  checks found in this block.** `.mapwrap` is `line-height: 0` so the canvas
+  gets no baseline gap under it — and every other child of that box inherits
+  it, so the card was in the document, unhidden, 638 pixels wide and **nought
+  pixels high**. Nothing in `cargo test` can see that and nothing in the source
+  reads wrong; what said so was a browser measuring the rectangle. **Same
+  family as the `.card` and `.tabs` collisions**: a property set on a container
+  for one child is a property every other child gets.
+
+## The errand log is a tree
+
+Reported from play: *"the current errand tree is just hard to follow as a
+player; a spatial layout of the errands in the errand screen will really
+help."* Twenty-one of the fifty-one errands are chain rungs and the log listed
+them flat, so which one follows which was a thing you worked out by reading
+briefs.
+
+- **Rows are depth, and depth is core's.** `quest::depth_of` is
+  `Tree::depth_of` over `requires` — one past the deepest thing it needs — for
+  the same reason the skill tree's is: a screen working its own layering out
+  would be a second answer to *what has to come first*, and the two would part
+  the first time an errand gained a second prerequisite.
+- **Within a row, ordered by the average position of its parents**, which is the
+  cheapest thing that keeps the wires from crossing and puts a rung under the
+  thing it follows. The skill tree's rule, reused rather than re-derived.
+- **Wires are measured, not computed**, and the screen is shown before they are
+  drawn. `openTree` painted its wires while the screen was still
+  `display: none`, every rectangle was zero, and a check that *counted*
+  seventeen paths was green through it — so `check_the_errand_log_is_a_tree`
+  measures the svg's width and refuses a path at the origin.
+- **The depth is labelled rather than merely indented.** Which rung of its chain
+  an errand is, is information; an indent is a decoration.
+
+
 ## A locked choice was a wall, and is a target now
 
 Reported from play, standing at the wall an errand had sent them to:
@@ -5455,6 +5843,13 @@ about a string. Every one caught something on its first run:
 | 15.2 | **`reach(20)` is 4,300 and §2.5 recommends 6,000.** The recommendation reasons that 150 fights at forty experience a win is plausible, and says in as many words that this is *"exactly the sort of plausible that a walk disproves"*. Replaying the shipped walk's own payouts, the mean over its first 150 wins is **28.7**, so 6,000 puts level twenty at 184 fights and 5,500 at 175 — both outside the band. The plan's own instruction covers it: *if the half still leaves 150 out of reach, go under it.* | `crates/core/src/progression.rs`, `CURVE_A` |
 | 15.3 | **The 130–170 band is not measurable to the precision it was written at, and `make play` is not the instrument.** §2.3 asks for it *"exactly the way level 5's 25–35 already is"*; that band is set by a **fixed patrol over nine seeds**, not by the walker, and the walker misses it by three fights on its own transcript. Two walks on the shipped curve put level twenty at **150 and 192 wins** — a 28% spread around a ±13% band. The number is kept and the spread is written down rather than tuned away, because `CLAUDE.md` already says the walker is not deterministic and two runs of it disagree. | `SECOND-ORDER-M15.md` rows 9, 13, 14 |
 | 15.4 | **`Step::crossing` is `Step::refused_by`**, which no plan asked for. The field's own doc has always described the class — *"this says which kind of refusal it was, so the page can put it where a player will read it"* — and its name described the one instance it had. Renamed while fixing the shore, because restoring the channel under the old name would have put the tide's sentence in the one-second flash the report says it does not belong in. | `crates/core/src/world.rs`, `Step` |
+| 20.1 | **An ingredient is not a component**, which `PROMPT` does not say either way. No `PieceKind`, no `CATALOG` entry, no grid among the five — adding to the catalogue moves the save fingerprint and there is a player mid-run. It keeps a footprint, because the retort is a shape. | `crates/core/src/brew.rs` |
+| 20.2 | **"100% resists" is 95**, because `stats::LANE_CAP` has been 95 since M16 so that *a lane you can commit to is never one you can be shut out of*. A boss immune in three lanes is a wall with a sentence on it. Ninety-five is a twentieth of the damage, which against these healths is a loss at the buzzer — and that is what the ask means in a game with a clock. | `crates/core/src/stats.rs`, `LANE_CAP` |
+| 20.3 | **The open lane is a large negative and not a zero.** A forty-piece board grants resistances of its own, so `curse_resist: 0` is about forty curse resist and the costume would have undone the design. `the_cairnworks_shuts_every_lane_but_one` reads the *summed* defences rather than the numbers typed. | `crates/core/src/combat.rs` |
+| 20.4 | **Four floors, three of them "floors of bosses".** The ask names four creatures; the Wextreen Sump is the precedent already on disk — *four floors, three puzzles and the Ninth Surveyor*. | `data/maps/the-cairnworks-*.tiles.json` |
+| 20.5 | **Each floor's pool holds one creature.** `draw_enemy` makes a pool's hardest member its rarest, so a floor holding its boss beside three ordinary creatures dealt it one time in a hundred and put its drop hundreds of wins away — `a_set_is_a_few_hours_and_not_a_lifetime` said so. One member has no weighting to get wrong. | `data/maps/the-cairnworks-*.tiles.json` |
+| 20.6 | **The three Wextreen Sands errands pay money and no gear**, because they are the only three of the eleven a `Clear` does not stand in front of, so they are the only three `geared_from` picks up — and picking them up broke three tests at once. *A fixture that is the yardstick for how dangerous a place is must not be wearing what that place paid.* | `data/quests.json` |
+| 20.7 | **A specialization is its own slot, not a fourth entry in `classes`.** Everything that walks that list walks it to ask *which pair are you*, and a specialization pairs with nothing. | `crates/core/src/character.rs`, `specialization` |
 | 14.9 | **The wading shortcut on the Gallery is drawn, and saves eight tiles.** §9 decision 4 leaves it to the recon — *"if it saves nothing it is cut"*. The chains are in opposite walls, so a flooded gallery is seventeen tiles round and nine across. **Flooding the room makes the walk worse**, which is the design rather than an accident: chain A costs you the crossing you had and the Toad's Own Frame is what gives it back. | `data/maps/the-silt-stair-3.tiles.json` |
 
 Also true, and not in the brief because it could not have been:
@@ -5625,7 +6020,7 @@ content*, and one check now measures what a range used to guess at.
 | Data files | **29** — 9 in `data/` and 20 in `data/maps/`; `data::FILES` is the list `data_is_current` walks, and adding a file to it is the second half of adding one to `data::MAPS` |
 | Starting kit | 2 components, **140 Fnorp**, 1 assembled weapon. The purse moved ×5 with the prices; at 28 a beginner could afford three of thirteen barrel lines and no helmet, and both M4 soft-lock guards said so |
 | Towns | **3 placed** (the pit, Kettleworks and the third town) and 1 staged, and **the third one is empty on purpose** — `common::UNWRITTEN` is where that is declared, the mirror of `avail.rs`'s `STAGED`: a shelf with no ground under it and ground with no shelf on it, and both are fine only because somebody wrote the name down. Of the two that sell anything: fixed shelves of 11 / 15 / 17 that **still never reroll**; none sells an ench, and neither placed one sells arcana — a town is its character. Under each counter: a **16-line barrel** and an **order book** (8 lines over 3 towns), and those two *do* turn over. **High Wick is the arcane shelf and it is the staged one**, which is why the barrel had to be what carries the casting family |
-| Errands | **40** — 19 authored, and **21 chain errands a choice hands over**. A chain errand is `granted`: never offered at a counter, because the branch you did not take must not be sitting on the tile a moment later |
+| Errands | **50** — 29 authored, and **21 chain errands a choice hands over**. A chain errand is `granted`: never offered at a counter, because the branch you did not take must not be sitting on the tile a moment later. **Six of them clear a dungeon**, one arrives at the Undercountry's town and three are the Wextreen Sands' — see *An errand for finishing a dungeon* |
 | Enchs | **8** — 3 on the van's table at **2,000 each**, 2 awarded by a class tree, 1 off an errand, and **2 written for the ends of chains**. The van also sells **a licence for 5,000** to anybody whose class did not come with one |
 | The pack | **5 things, and three kinds.** Three tins at **20 / 55 / 140**, and two charms: **The Quiet Word** at 40, which pays for one running-away, and **The Short Way Back** at 300, which puts you in your last town. `SupplyDoes` is the kind and it defaults to `restore`, so the tins did not move and there is no seam. **The Quiet Word's price is arithmetic**: running away costs 20%, the cheapest tin covering 20% is 55, so a charm dearer than that is a charm nobody buys — it shipped at 90 in its first draft and a test caught it |
 | Two fatigue caps | **`CAP` is 60 and `HARD_CAP` is 99**, and the difference is the whole of what a penalty is. Wear stops at 60 because a fight is a budget; the things you do *instead of* fighting do not — **running away is 20% and walking off a cairn is 10%**, both through `tire_hard`. Ninety-nine and not a hundred, because `worn` floors a maximum at one point of health and a hundred would be a character alive by a rounding rule. **It is never a dead end**: walking is free, every map has a way up, and a town takes all of it off from 99 as readily as from 60 |
@@ -5650,10 +6045,13 @@ content*, and one check now measures what a range used to guess at.
 | The papers | **3** on Spike's van, all drawn from the first visit: the Patent's licence at 5,000, **the Second Paper at 5,000 behind nothing at all**, and the expert paper at **nothing** behind two finished trees — the twenty-four points are the price, which is what keeps a free paper from being a fourth class on the fork. M15.4 took the tree gate off the second paper on the human's ask; the level that puts the van on the road is what is left |
 | Figures | 29 `.tex` → **122 SVGs**. Before: 27 → **83** (13 family drawings, 4 drawn for themselves, 5 classes, 3 towns, you) |
 | Art coverage | **72 of 72 creatures**, from **20 families** — `drowned` is one drawing in ten colourways and `unwritten` is the Undercountry boss's own. Before: **60 of 60**, 3 of 3 towns, 5 of 5 classes, and you. The set pieces, the instruments and the enchs have no art and want none — a component has never had a figure |
-| Browser gate | **93 `ok:` lines in one engine**, the newest being that no terrain draws magenta. Before: **92 `ok:` lines**, seven of them M19's — the ball slides and the trail grows behind it, a diamond catches, the long cart runs between towns, the furnace shows on the bar, and the glossary opens on G. One of them *passed while printing the wrong thing* (**9 burns off None**, reading `what` where an event's subject rides in `item`), which is the argument for a check that prints what it found — and **one of them was vacuous twice**: the shut-crossing check matched the tideline card's own prose, and then reached the tile through `cross`, which falls back to `here` and so goes through `walk`, the door that already worked. Before it: **85 `ok:` lines**, seven of them M17's and every one negative-tested — the cue snaps to what core takes and pulling further pulls harder, a shot flies the path core returned, four keys aim and space fires with no pointer, a spike takes its percent and says so, a ball in the pocket wakes up in town, a floor still steps and draws no cue, and reduced motion is at rest with the trail still drawn. **The hardest of the seven to break is the floor one**: every lie about *the arrows mean two things now* takes the whole gate down before the check runs. Before it: **78 `ok:` lines**, six of them M16's and every one negative-tested — the way under is silt until the sheet, a stake offers the pull and a compass that lies, a sinkhole drops you in an alcove nothing walks into, the Tenth Surveyor's panel draws the run's own items, the fork is seven cards in two rows, and a Stoker's replay says what the furnace took. Before it: **96 `ok:` lines over 3 engines** — which is 67 in any one of them, not 81; the count is a total and reading it as per-engine is wrong by fourteen. The newest is M15.2's, and it is the only one that can answer a *negative*: that a fight you have already had is settled and **never drawn**. The newest five are M14.5's: the tide is drawn before it goes out and walkable after, the lip of the Sump refuses in the Reach's words and opens the frame, a wheel that keeps what you feed it says what shape it wants, the chair is three moves in an order **and comes back**, and the third town is empty with the screen after it saying so. **All five were negative-tested, and two of the five found faults on a green build** — see *A stack gate that wants an instrument* |
+| Browser gate | **97 `ok:` lines in one engine**, the newest four being M20's: a word errand told you arrived on a map you arrive at by *shooting*, the bench brewing a pair in a glass that is a shape and not a box, an area saying its own name and then stopping, and the errand log drawn as a tree with its wires **measured**. **Three of the four were wrong before the code was** — one read `window.__log()` as an array when it is an object, one gave a single-tile landing six shots when *a tile one step away is a tile you cannot shoot to*, and one walked a fixed number of steps and never left its own region — which is this file's *break a new check and watch it fail* arriving from the other side. Before: **94 `ok:` lines**, the newest being that a word errand is told you arrived on a map you arrive at by *shooting* — the one question about the new errands that `cargo test` cannot reach, because both halves of it are the shim's. Before: **93**, the newest being that no terrain draws magenta. Before: **92 `ok:` lines**, seven of them M19's — the ball slides and the trail grows behind it, a diamond catches, the long cart runs between towns, the furnace shows on the bar, and the glossary opens on G. One of them *passed while printing the wrong thing* (**9 burns off None**, reading `what` where an event's subject rides in `item`), which is the argument for a check that prints what it found — and **one of them was vacuous twice**: the shut-crossing check matched the tideline card's own prose, and then reached the tile through `cross`, which falls back to `here` and so goes through `walk`, the door that already worked. Before it: **85 `ok:` lines**, seven of them M17's and every one negative-tested — the cue snaps to what core takes and pulling further pulls harder, a shot flies the path core returned, four keys aim and space fires with no pointer, a spike takes its percent and says so, a ball in the pocket wakes up in town, a floor still steps and draws no cue, and reduced motion is at rest with the trail still drawn. **The hardest of the seven to break is the floor one**: every lie about *the arrows mean two things now* takes the whole gate down before the check runs. Before it: **78 `ok:` lines**, six of them M16's and every one negative-tested — the way under is silt until the sheet, a stake offers the pull and a compass that lies, a sinkhole drops you in an alcove nothing walks into, the Tenth Surveyor's panel draws the run's own items, the fork is seven cards in two rows, and a Stoker's replay says what the furnace took. Before it: **96 `ok:` lines over 3 engines** — which is 67 in any one of them, not 81; the count is a total and reading it as per-engine is wrong by fourteen. The newest is M15.2's, and it is the only one that can answer a *negative*: that a fight you have already had is settled and **never drawn**. The newest five are M14.5's: the tide is drawn before it goes out and walkable after, the lip of the Sump refuses in the Reach's words and opens the frame, a wheel that keeps what you feed it says what shape it wants, the chair is three moves in an order **and comes back**, and the third town is empty with the screen after it saying so. **All five were negative-tested, and two of the five found faults on a green build** — see *A stack gate that wants an instrument* |
 | The suite | **976 passing** after M18, and a `data/` touch costs about **three minutes**, not ten: **127 seconds relinking 83 test binaries and 47 running**, measured on an idle machine. The ten is a cold `--workspace`, which adds the lab and the shim on top of both. **Measure on a quiet machine or not at all** — one attempt at this read `real 1279.89` against `user 63.37`, which is twenty-one minutes of wall clock for a minute of work, because it was queued behind three browser gates. `include_str!` is not the thing to change — loading from disk in the test profile would make the tested path differ from the shipped one, which is two rulebooks — and the fix, if one is ever wanted, is **fewer test binaries**, which is a trade against one file per concern that nobody should make to save two minutes. `SECOND-ORDER-M16.md` row 17 is where that is measured. Before it: **950 passing** after M16. Before it: **913 passing, and ~33 seconds warm** after M15, the bestiary, the cart and the sands; **832 and 27.5s** after M14 — measured after M14, and the ten slowest files are the ten that were slow at M13: `drops.rs` at 11.0s and `experts_reach.rs` at 6.3s, neither of them M14's, and nothing this block added is above 0.4s. **`SECOND-ORDER-M14.md` row 17 was written claiming it had slowed to minutes and is corrected there**: what is minutes is rebuilding sixty test binaries after a change to `combat.rs`, which is a fact about editing the engine. Before M14 it was **788 passing, and 34 seconds warm.** It was a minute through most of M13 and `rules_m13.rs` was 29.6s of it: `beacon_board` ran Auto-pack over the whole catalogue on twenty-row grids, four times, because it was the only fixture in the repository with two items that touch. `common::items_in_a_row` is what replaced it — **0.03s** — and `experts_reach.rs` went 9.6s → 6.5s by measuring once per *set* of nodes rather than once per question. `drops.rs` at 11.3s is now the slowest file and is untouched. `[profile.test] opt-level = 2` since M12.6, with debug assertions and overflow checks still on — this is the `test` profile, not `--release` |
 | Floors with a puzzle | **6**, and floors with a boss **2**. Every one is monotone — flags only grow, so no move can make the way on unreachable — and `puzzle::solvable_blind` counts the worst case rather than the plan asserting it |
 | Blind-solution ceilings | Sump **8 / 1 / 45**, Stair **1 / 3 / 3**. The plan guessed 10 / 11 / 45 and 2 / 27 / 3; **the Cairnfield's forty-five came back exactly**, which is the reason to believe the other five. `every_floor_in_the_game_can_be_solved_blind` holds every floor there is under 45 |
+| Ingredients | **8**, and **all 28 of their pairs** — `C(8,2)`, complete rather than representative, which is the argument the twenty-one experts make. Which one a creature leaves is keyed by its **art family**, so a creature added without a drop is a creature that already fails a test. An ingredient is **not a component**: no `PieceKind`, no `CATALOG` entry, no grid among the five, and therefore no save seam |
+| The glass | **7 cells, and 8 once the Cairnworks has reblown it** — the number is measured rather than chosen: at nine every one of the fifty-six triples tiles it and the shape carries nothing, at eight three three-cell ingredients can never go in together. `brew::fits` is core's, exhaustively, for the reason the board's green preview is |
+| Errand goal kinds | **4**: slay, bring, word, **clear** — the fourth is what an errand about finishing a dungeon asks, and it is neither of the two that were nearly used for it: a `slay` is finishable in a field because eight of the nine boss creatures also stand in a pool, and a `word` is finishable by walking onto the tile and turning round |
 | `Requirement` kinds | **8**: none, gold, flag, holding, **loose_item_of_size**, **assembled_of_rarity**, **surveying**, **all**. Three of them are ported from `event::Requirement`, which is the cut campaign's type — `PLAN-M14.md` §1.1 names them and they were unreachable from a data file |
 | `Outcome` kinds | **11**, the newest being **give_up** — the other half of `LooseItemOfSize`, and a separate arm because a requirement is a question and an outcome is what happened |
 | Terrains | **17**, the newest two being **`tide`** (sea that goes out, drawn only where something drains it) and **`silt`** (what a room is floored with after it has been under water). `silt` is not `lakebed`, and the difference is eleven inches |

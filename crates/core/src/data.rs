@@ -77,12 +77,28 @@ pub const UNDERCOUNTRY_JSON: &str =
 pub const REEFS_1_JSON: &str = include_str!("../../../data/maps/the-reefs-1.tiles.json");
 pub const REEFS_2_JSON: &str = include_str!("../../../data/maps/the-reefs-2.tiles.json");
 pub const REEFS_3_JSON: &str = include_str!("../../../data/maps/the-reefs-3.tiles.json");
+pub const CAIRNWORKS_1_JSON: &str = include_str!("../../../data/maps/the-cairnworks-1.tiles.json");
+pub const CAIRNWORKS_2_JSON: &str = include_str!("../../../data/maps/the-cairnworks-2.tiles.json");
+pub const CAIRNWORKS_3_JSON: &str = include_str!("../../../data/maps/the-cairnworks-3.tiles.json");
+pub const CAIRNWORKS_4_JSON: &str = include_str!("../../../data/maps/the-cairnworks-4.tiles.json");
 pub const EVENTS_JSON: &str = include_str!("../../../data/events.json");
 pub const THEME_TD_JSON: &str = include_str!("../../../data/theme.td.json");
 pub const SKILLS_JSON: &str = include_str!("../../../data/skills.json");
 pub const SHOPS_JSON: &str = include_str!("../../../data/shops.json");
 pub const QUESTS_JSON: &str = include_str!("../../../data/quests.json");
 pub const SUPPLIES_JSON: &str = include_str!("../../../data/supplies.json");
+pub const BREWS_JSON: &str = include_str!("../../../data/brews.json");
+/// The art manifest, which is also the one place a creature's **family** is
+/// written down.
+///
+/// **Read here rather than copied into a second list.** `make art` compiles a
+/// figure per creature out of this and rewrites the creature half of
+/// `data/art.json` from it, so it is already the single source for *which
+/// silhouette is this creature cut from* — and M20 needs the same answer for
+/// *which ingredient does it leave*. A list of seventy-five creature names in
+/// `brews.json` would be the seventh hand-written list this project has paid
+/// for.
+pub const CREATURE_ART_JSON: &str = include_str!("../../../art/creatures.json");
 pub const ENCHS_JSON: &str = include_str!("../../../data/enchs.json");
 pub const DROPS_JSON: &str = include_str!("../../../data/drops.json");
 
@@ -120,12 +136,17 @@ pub const FILES: &[(&str, &str)] = &[
     ("maps/the-reefs-1.tiles.json", REEFS_1_JSON),
     ("maps/the-reefs-2.tiles.json", REEFS_2_JSON),
     ("maps/the-reefs-3.tiles.json", REEFS_3_JSON),
+    ("maps/the-cairnworks-1.tiles.json", CAIRNWORKS_1_JSON),
+    ("maps/the-cairnworks-2.tiles.json", CAIRNWORKS_2_JSON),
+    ("maps/the-cairnworks-3.tiles.json", CAIRNWORKS_3_JSON),
+    ("maps/the-cairnworks-4.tiles.json", CAIRNWORKS_4_JSON),
     ("events.json", EVENTS_JSON),
     ("theme.td.json", THEME_TD_JSON),
     ("skills.json", SKILLS_JSON),
     ("shops.json", SHOPS_JSON),
     ("quests.json", QUESTS_JSON),
     ("supplies.json", SUPPLIES_JSON),
+    ("brews.json", BREWS_JSON),
     ("enchs.json", ENCHS_JSON),
     ("drops.json", DROPS_JSON),
 ];
@@ -166,6 +187,10 @@ pub const MAPS: &[(&str, &str)] = &[
     ("the-reefs-1", REEFS_1_JSON),
     ("the-reefs-2", REEFS_2_JSON),
     ("the-reefs-3", REEFS_3_JSON),
+    ("the-cairnworks-1", CAIRNWORKS_1_JSON),
+    ("the-cairnworks-2", CAIRNWORKS_2_JSON),
+    ("the-cairnworks-3", CAIRNWORKS_3_JSON),
+    ("the-cairnworks-4", CAIRNWORKS_4_JSON),
 ];
 
 /// One map by id, falling back to the overworld.
@@ -301,6 +326,27 @@ pub fn quests() -> crate::quest::QuestsData {
 /// What a town sells to take the tiredness off.
 pub fn supplies() -> crate::fatigue::SuppliesData {
     crate::fatigue::SuppliesData::parse(SUPPLIES_JSON).expect("the shipped supplies are broken")
+}
+
+/// Which family drawing each creature is cut from.
+///
+/// Keys beginning `_` are the manifest's own notes and are not creatures.
+pub fn art_families() -> std::collections::BTreeMap<String, String> {
+    #[derive(serde::Deserialize)]
+    struct Row {
+        family: String,
+    }
+    let raw: std::collections::BTreeMap<String, serde_json::Value> =
+        serde_json::from_str(CREATURE_ART_JSON).expect("the art manifest is broken");
+    raw.into_iter()
+        .filter(|(k, _)| !k.starts_with('_'))
+        .filter_map(|(k, v)| serde_json::from_value::<Row>(v).ok().map(|r| (k, r.family)))
+        .collect()
+}
+
+/// The larder and the bench.
+pub fn brews() -> crate::brew::BrewsData {
+    crate::brew::BrewsData::parse(BREWS_JSON).expect("the shipped brews are broken")
 }
 
 /// What a licensee can bolt to a component.

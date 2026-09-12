@@ -1,100 +1,454 @@
 {
   "_note": "Canonical creature name -> the family figure it is drawn from, and its own colourway. One .tex per family, compiled once per creature with these three colours defined on the command line, so two creatures in a family share a silhouette and never a palette. `make art` writes web/assets/<slug>.svg and regenerates the creature half of data/art.json from this file — so a creature added to enemies.json without an entry here fails `cargo test`, which is the whole point.",
   "_palette": "Fills are chosen off the Okabe-Ito-adjacent ladder the rest of the game uses. Within a family the hues separate; across the ladder the later rungs run darker and more saturated, so rating reads as weight even in greyscale.",
-
-  "What Marbulon Faced Away From": { "family": "mirror",   "main": "3A3F4E", "dark": "1C2029", "accent": "9FB4D8" },
-  "The Ninth Surveyor":  { "family": "wright",   "main": "6B7A62", "dark": "3A4536", "accent": "D9C88A" },
-  "The Tenth Surveyor":  { "family": "wright",   "main": "8A7A5C", "dark": "4A4030", "accent": "C9D8E6" },
-
-  "Cave Rat":            { "family": "a-rat" },
-  "Vermin Sovereign":    { "family": "vermin",   "main": "8E8A82", "dark": "5C594F", "accent": "C8B36A" },
-
-  "Bog Toad":            { "family": "bengulon-toad" },
-  "Mire Behemoth":       { "family": "behemoth",  "main": "5A7448", "dark": "33452A", "accent": "C9B23F" },
-
-  "Rust Golem":          { "family": "the-crimper" },
-  "Rust Colossus":       { "family": "sentinel",  "main": "8B4225", "dark": "5A2A17", "accent": "E0913A" },
-  "Obsidian Colossus":   { "family": "sentinel",  "main": "2E2B33", "dark": "17151B", "accent": "8E7FD0" },
-  "Anvilheart":          { "family": "sentinel",  "main": "4A4E55", "dark": "26292E", "accent": "D94F3D" },
-  "Verdigris":           { "family": "sentinel",  "main": "4E9184", "dark": "2C5A51", "accent": "C8E6D4" },
-
-  "Iron Sentinel":       { "family": "sentinel",  "main": "6E7278", "dark": "43464B", "accent": "D3A05A" },
-  "The Iron Warden":     { "family": "sentinel",  "main": "5F6B78", "dark": "38414A", "accent": "E5C07B" },
-  "Null Sentinel":       { "family": "sentinel",  "main": "3A3D45", "dark": "1E2026", "accent": "7FDBDA" },
-  "Slag Warden":         { "family": "sentinel",  "main": "7A5A3A", "dark": "4A3522", "accent": "F0A03A" },
-  "Gallowglass":         { "family": "sentinel",  "main": "434A5C", "dark": "252A38", "accent": "B7C7E8" },
-
-  "Bone Archer":         { "family": "bone",      "main": "DFDCCF", "dark": "9C9787", "accent": "8B4225" },
-  "Bone Cantor":         { "family": "bone",      "main": "D6D2C2", "dark": "928D7C", "accent": "6A8FC0" },
-  "Grave Chorus":        { "family": "bone",      "main": "C9C6BA", "dark": "84806F", "accent": "8E6FC0" },
-  "The Iron Choir":      { "family": "bone",      "main": "A9AFB6", "dark": "666D75", "accent": "E0B03A" },
-
-  "Frost Wisp":          { "family": "wisp",      "main": "9FD3E8", "dark": "4F7E96", "accent": "FFFFFF" },
-  "Ember Wisp":          { "family": "wisp",      "main": "E8A05A", "dark": "9A5220", "accent": "FFE9A8" },
-  "The Last Light":      { "family": "wisp",      "main": "F0E2A0", "dark": "9A8B3E", "accent": "FFFFFF" },
-  "Whisperling":         { "family": "wisp",      "main": "C6BEE0", "dark": "6E6690", "accent": "F2EEFF" },
-  "Silence":             { "family": "wisp",      "main": "8A8E96", "dark": "44484F", "accent": "D8DCE4" },
-  "The Quiet Hour":      { "family": "wisp",      "main": "6C6F86", "dark": "383A4C", "accent": "C4C7E0" },
-
-  "Plague Hound":        { "family": "hound",     "main": "7E8C63", "dark": "4E5940", "accent": "C4D84A" },
-  "Ruin Hound":          { "family": "hound",     "main": "6E5B4E", "dark": "42352C", "accent": "E07A3A" },
-
-  "Warded Idol":         { "family": "idol",      "main": "A79B84", "dark": "6E6555", "accent": "2E6E8E" },
-  "Salt Idol":           { "family": "idol",      "main": "DCD8CC", "dark": "9A9488", "accent": "5A9AA8" },
-  "Weeping Idol":        { "family": "idol",      "main": "8E8878", "dark": "56514A", "accent": "5A7FC0" },
-
-  "Mirror Fiend":        { "family": "mirror",    "main": "B9C4CC", "dark": "5A6570", "accent": "D8CFE4" },
-  "The Long Mirror":     { "family": "mirror",    "main": "9FB0BC", "dark": "48545E", "accent": "E4DCEE" },
-  "Pale Twin":           { "family": "mirror",    "main": "D4D8DC", "dark": "737C86", "accent": "F0E4E4" },
-
-  "Cog Priest":          { "family": "clergy",    "main": "7A6E86", "dark": "4C4457", "accent": "D3A05A" },
-  "Iron Abbot":          { "family": "clergy",    "main": "5C6470", "dark": "343A44", "accent": "C9A94A" },
-  "The Tallow Saint":    { "family": "clergy",    "main": "D8C89A", "dark": "8E8058", "accent": "F0C85A" },
-
-  "The Hollow King":     { "family": "crown",     "main": "3A3F4A", "dark": "22252C", "accent": "D3A05A" },
-  "Crowned Hollow":      { "family": "crown",     "main": "45404E", "dark": "26232D", "accent": "C0A0D8" },
-  "Gilt":                { "family": "crown",     "main": "5A4A28", "dark": "332A16", "accent": "F5CE4A" },
-
-  "The Drowned Court":   { "family": "court",     "main": "3E6A78", "dark": "224049", "accent": "8FD0DA" },
-  "The Rust Parliament": { "family": "court",     "main": "7A4526", "dark": "492917", "accent": "E0913A" },
-  "Hollowmarch":         { "family": "court",     "main": "43485A", "dark": "252838", "accent": "B0B8E0" },
-  "The Salt Wedding":    { "family": "court",     "main": "C2BCAE", "dark": "7A756A", "accent": "D8A0A8" },
-
-  "The Gearwright":      { "family": "wright",    "main": "9A7B4F", "dark": "5E4A2E", "accent": "6FB7C6" },
-  "The Last Gearwright": { "family": "wright",    "main": "7E6A54", "dark": "4A3E30", "accent": "D3A05A" },
-  "The Curator":         { "family": "wright",    "main": "5E6A78", "dark": "363E48", "accent": "C0D0DC" },
-
-  "Ashen Marshal":       { "family": "ash",       "main": "6B6560", "dark": "3B3733", "accent": "E0713A" },
-  "Sootmother":          { "family": "ash",       "main": "4A4642", "dark": "26241F", "accent": "D95A3A" },
-  "Nine of Ashes":       { "family": "ash",       "main": "55504A", "dark": "2A2724", "accent": "F0A83A" },
-
-  "Rimefather":          { "family": "rime",      "main": "A9C6D6", "dark": "5D8095", "accent": "FFFFFF" },
-
-  "Francis":             { "family": "francis",   "main": "2B2436", "dark": "171223", "accent": "E8D24A" },
-
-  "_m11_9": "M11.9's eight, and the new maps stop borrowing. Two for the Kettleworks field, two for the Stack's shadow, two for the Wextreen Reach and two standing on tower floors. Families are reused on purpose \u2014 thirteen silhouettes and a palette each is what stops fifty creatures being fifty drawings \u2014 and no two of the eight share a colourway.",
-
-  "Kettle Wight":        { "family": "wisp",      "main": "8FB8C4", "dark": "48707C", "accent": "E8F0EE" },
-  "Curd Wraith":         { "family": "wisp",      "main": "E8D98A", "dark": "9A8B3C", "accent": "FFF6D0" },
-  "Hoop Hound":          { "family": "hound",     "main": "9A7A4E", "dark": "5E4A2C", "accent": "D8C088" },
-  "The Good Wall":       { "family": "sentinel",  "main": "7C7168", "dark": "4A423C", "accent": "C4B49A" },
-  "Trig Sentinel":       { "family": "sentinel",  "main": "5D6E7C", "dark": "36424C", "accent": "C0AE72" },
-  "Curd Sentinel":       { "family": "sentinel",  "main": "C8B45E", "dark": "7E7032", "accent": "F4E9B0" },
-  "Cairn Chorus":        { "family": "bone",      "main": "CFCABA", "dark": "888372", "accent": "7EA6C8" },
-  "The Ground Floor":    { "family": "idol",      "main": "6A5F52", "dark": "3C352C", "accent": "D0B85A" },
-
+  "What Marbulon Faced Away From": {
+    "family": "mirror",
+    "main": "3A3F4E",
+    "dark": "1C2029",
+    "accent": "9FB4D8"
+  },
+  "The Ninth Surveyor": {
+    "family": "wright",
+    "main": "6B7A62",
+    "dark": "3A4536",
+    "accent": "D9C88A"
+  },
+  "The Tenth Surveyor": {
+    "family": "wright",
+    "main": "8A7A5C",
+    "dark": "4A4030",
+    "accent": "C9D8E6"
+  },
+  "Cave Rat": {
+    "family": "a-rat"
+  },
+  "Vermin Sovereign": {
+    "family": "vermin",
+    "main": "8E8A82",
+    "dark": "5C594F",
+    "accent": "C8B36A"
+  },
+  "Bog Toad": {
+    "family": "bengulon-toad"
+  },
+  "Mire Behemoth": {
+    "family": "behemoth",
+    "main": "5A7448",
+    "dark": "33452A",
+    "accent": "C9B23F"
+  },
+  "Rust Golem": {
+    "family": "the-crimper"
+  },
+  "Rust Colossus": {
+    "family": "sentinel",
+    "main": "8B4225",
+    "dark": "5A2A17",
+    "accent": "E0913A"
+  },
+  "Obsidian Colossus": {
+    "family": "sentinel",
+    "main": "2E2B33",
+    "dark": "17151B",
+    "accent": "8E7FD0"
+  },
+  "Anvilheart": {
+    "family": "sentinel",
+    "main": "4A4E55",
+    "dark": "26292E",
+    "accent": "D94F3D"
+  },
+  "Verdigris": {
+    "family": "sentinel",
+    "main": "4E9184",
+    "dark": "2C5A51",
+    "accent": "C8E6D4"
+  },
+  "Iron Sentinel": {
+    "family": "sentinel",
+    "main": "6E7278",
+    "dark": "43464B",
+    "accent": "D3A05A"
+  },
+  "The Iron Warden": {
+    "family": "sentinel",
+    "main": "5F6B78",
+    "dark": "38414A",
+    "accent": "E5C07B"
+  },
+  "Null Sentinel": {
+    "family": "sentinel",
+    "main": "3A3D45",
+    "dark": "1E2026",
+    "accent": "7FDBDA"
+  },
+  "Slag Warden": {
+    "family": "sentinel",
+    "main": "7A5A3A",
+    "dark": "4A3522",
+    "accent": "F0A03A"
+  },
+  "Gallowglass": {
+    "family": "sentinel",
+    "main": "434A5C",
+    "dark": "252A38",
+    "accent": "B7C7E8"
+  },
+  "Bone Archer": {
+    "family": "bone",
+    "main": "DFDCCF",
+    "dark": "9C9787",
+    "accent": "8B4225"
+  },
+  "Bone Cantor": {
+    "family": "bone",
+    "main": "D6D2C2",
+    "dark": "928D7C",
+    "accent": "6A8FC0"
+  },
+  "Grave Chorus": {
+    "family": "bone",
+    "main": "C9C6BA",
+    "dark": "84806F",
+    "accent": "8E6FC0"
+  },
+  "The Iron Choir": {
+    "family": "bone",
+    "main": "A9AFB6",
+    "dark": "666D75",
+    "accent": "E0B03A"
+  },
+  "Frost Wisp": {
+    "family": "wisp",
+    "main": "9FD3E8",
+    "dark": "4F7E96",
+    "accent": "FFFFFF"
+  },
+  "Ember Wisp": {
+    "family": "wisp",
+    "main": "E8A05A",
+    "dark": "9A5220",
+    "accent": "FFE9A8"
+  },
+  "The Last Light": {
+    "family": "wisp",
+    "main": "F0E2A0",
+    "dark": "9A8B3E",
+    "accent": "FFFFFF"
+  },
+  "Whisperling": {
+    "family": "wisp",
+    "main": "C6BEE0",
+    "dark": "6E6690",
+    "accent": "F2EEFF"
+  },
+  "Silence": {
+    "family": "wisp",
+    "main": "8A8E96",
+    "dark": "44484F",
+    "accent": "D8DCE4"
+  },
+  "The Quiet Hour": {
+    "family": "wisp",
+    "main": "6C6F86",
+    "dark": "383A4C",
+    "accent": "C4C7E0"
+  },
+  "Plague Hound": {
+    "family": "hound",
+    "main": "7E8C63",
+    "dark": "4E5940",
+    "accent": "C4D84A"
+  },
+  "Ruin Hound": {
+    "family": "hound",
+    "main": "6E5B4E",
+    "dark": "42352C",
+    "accent": "E07A3A"
+  },
+  "Warded Idol": {
+    "family": "idol",
+    "main": "A79B84",
+    "dark": "6E6555",
+    "accent": "2E6E8E"
+  },
+  "Salt Idol": {
+    "family": "idol",
+    "main": "DCD8CC",
+    "dark": "9A9488",
+    "accent": "5A9AA8"
+  },
+  "Weeping Idol": {
+    "family": "idol",
+    "main": "8E8878",
+    "dark": "56514A",
+    "accent": "5A7FC0"
+  },
+  "Mirror Fiend": {
+    "family": "mirror",
+    "main": "B9C4CC",
+    "dark": "5A6570",
+    "accent": "D8CFE4"
+  },
+  "The Long Mirror": {
+    "family": "mirror",
+    "main": "9FB0BC",
+    "dark": "48545E",
+    "accent": "E4DCEE"
+  },
+  "Pale Twin": {
+    "family": "mirror",
+    "main": "D4D8DC",
+    "dark": "737C86",
+    "accent": "F0E4E4"
+  },
+  "Cog Priest": {
+    "family": "clergy",
+    "main": "7A6E86",
+    "dark": "4C4457",
+    "accent": "D3A05A"
+  },
+  "Iron Abbot": {
+    "family": "clergy",
+    "main": "5C6470",
+    "dark": "343A44",
+    "accent": "C9A94A"
+  },
+  "The Tallow Saint": {
+    "family": "clergy",
+    "main": "D8C89A",
+    "dark": "8E8058",
+    "accent": "F0C85A"
+  },
+  "The Hollow King": {
+    "family": "crown",
+    "main": "3A3F4A",
+    "dark": "22252C",
+    "accent": "D3A05A"
+  },
+  "Crowned Hollow": {
+    "family": "crown",
+    "main": "45404E",
+    "dark": "26232D",
+    "accent": "C0A0D8"
+  },
+  "Gilt": {
+    "family": "crown",
+    "main": "5A4A28",
+    "dark": "332A16",
+    "accent": "F5CE4A"
+  },
+  "The Drowned Court": {
+    "family": "court",
+    "main": "3E6A78",
+    "dark": "224049",
+    "accent": "8FD0DA"
+  },
+  "The Rust Parliament": {
+    "family": "court",
+    "main": "7A4526",
+    "dark": "492917",
+    "accent": "E0913A"
+  },
+  "Hollowmarch": {
+    "family": "court",
+    "main": "43485A",
+    "dark": "252838",
+    "accent": "B0B8E0"
+  },
+  "The Salt Wedding": {
+    "family": "court",
+    "main": "C2BCAE",
+    "dark": "7A756A",
+    "accent": "D8A0A8"
+  },
+  "The Gearwright": {
+    "family": "wright",
+    "main": "9A7B4F",
+    "dark": "5E4A2E",
+    "accent": "6FB7C6"
+  },
+  "The Last Gearwright": {
+    "family": "wright",
+    "main": "7E6A54",
+    "dark": "4A3E30",
+    "accent": "D3A05A"
+  },
+  "The Curator": {
+    "family": "wright",
+    "main": "5E6A78",
+    "dark": "363E48",
+    "accent": "C0D0DC"
+  },
+  "Ashen Marshal": {
+    "family": "ash",
+    "main": "6B6560",
+    "dark": "3B3733",
+    "accent": "E0713A"
+  },
+  "Sootmother": {
+    "family": "ash",
+    "main": "4A4642",
+    "dark": "26241F",
+    "accent": "D95A3A"
+  },
+  "Nine of Ashes": {
+    "family": "ash",
+    "main": "55504A",
+    "dark": "2A2724",
+    "accent": "F0A83A"
+  },
+  "Rimefather": {
+    "family": "rime",
+    "main": "A9C6D6",
+    "dark": "5D8095",
+    "accent": "FFFFFF"
+  },
+  "Francis": {
+    "family": "francis",
+    "main": "2B2436",
+    "dark": "171223",
+    "accent": "E8D24A"
+  },
+  "_m11_9": "M11.9's eight, and the new maps stop borrowing. Two for the Kettleworks field, two for the Stack's shadow, two for the Wextreen Reach and two standing on tower floors. Families are reused on purpose — thirteen silhouettes and a palette each is what stops fifty creatures being fifty drawings — and no two of the eight share a colourway.",
+  "Kettle Wight": {
+    "family": "wisp",
+    "main": "8FB8C4",
+    "dark": "48707C",
+    "accent": "E8F0EE"
+  },
+  "Curd Wraith": {
+    "family": "wisp",
+    "main": "E8D98A",
+    "dark": "9A8B3C",
+    "accent": "FFF6D0"
+  },
+  "Hoop Hound": {
+    "family": "hound",
+    "main": "9A7A4E",
+    "dark": "5E4A2C",
+    "accent": "D8C088"
+  },
+  "The Good Wall": {
+    "family": "sentinel",
+    "main": "7C7168",
+    "dark": "4A423C",
+    "accent": "C4B49A"
+  },
+  "Trig Sentinel": {
+    "family": "sentinel",
+    "main": "5D6E7C",
+    "dark": "36424C",
+    "accent": "C0AE72"
+  },
+  "Curd Sentinel": {
+    "family": "sentinel",
+    "main": "C8B45E",
+    "dark": "7E7032",
+    "accent": "F4E9B0"
+  },
+  "Cairn Chorus": {
+    "family": "bone",
+    "main": "CFCABA",
+    "dark": "888372",
+    "accent": "7EA6C8"
+  },
+  "The Ground Floor": {
+    "family": "idol",
+    "main": "6A5F52",
+    "dark": "3C352C",
+    "accent": "D0B85A"
+  },
   "_deep": "The Wextreen deep: ten creatures wearing the Tenth Surveyor's own board in part, and one family drawing between them. They were surveyors and the flat kept them, so the figure is a levelling staff still held upright by something that has become part of what it was measuring.",
-  "Chainman":                { "family": "drowned",  "main": "8C8370", "dark": "463F32", "accent": "D8CBA6" },
-  "Backsight":               { "family": "drowned",  "main": "7C8A84", "dark": "3C453F", "accent": "CBE0D6" },
-  "The Eleventh Notch":      { "family": "drowned",  "main": "8A7A64", "dark": "42382A", "accent": "E2C98A" },
-  "Iron Under It":           { "family": "drowned",  "main": "6E6B78", "dark": "33313C", "accent": "A9B6D4" },
-  "The Levelling Staff":     { "family": "drowned",  "main": "7A6A55", "dark": "3A3123", "accent": "E6D9B4" },
-  "What the Flat Kept":      { "family": "drowned",  "main": "5F6B6E", "dark": "2B3335", "accent": "9FC4CC" },
-  "The Closing Error":       { "family": "drowned",  "main": "705E6A", "dark": "352B32", "accent": "D3A8C4" },
-  "The Benchmark":           { "family": "drowned",  "main": "5A6350", "dark": "292E23", "accent": "B9CE93" },
-  "Datum":                   { "family": "drowned",  "main": "4E5A6B", "dark": "232933", "accent": "8FB2E0" },
-  "The Traverse":            { "family": "drowned",  "main": "5A4A4A", "dark": "281F1F", "accent": "E09A86" },
-
+  "Chainman": {
+    "family": "drowned",
+    "main": "8C8370",
+    "dark": "463F32",
+    "accent": "D8CBA6"
+  },
+  "Backsight": {
+    "family": "drowned",
+    "main": "7C8A84",
+    "dark": "3C453F",
+    "accent": "CBE0D6"
+  },
+  "The Eleventh Notch": {
+    "family": "drowned",
+    "main": "8A7A64",
+    "dark": "42382A",
+    "accent": "E2C98A"
+  },
+  "Iron Under It": {
+    "family": "drowned",
+    "main": "6E6B78",
+    "dark": "33313C",
+    "accent": "A9B6D4"
+  },
+  "The Levelling Staff": {
+    "family": "drowned",
+    "main": "7A6A55",
+    "dark": "3A3123",
+    "accent": "E6D9B4"
+  },
+  "What the Flat Kept": {
+    "family": "drowned",
+    "main": "5F6B6E",
+    "dark": "2B3335",
+    "accent": "9FC4CC"
+  },
+  "The Closing Error": {
+    "family": "drowned",
+    "main": "705E6A",
+    "dark": "352B32",
+    "accent": "D3A8C4"
+  },
+  "The Benchmark": {
+    "family": "drowned",
+    "main": "5A6350",
+    "dark": "292E23",
+    "accent": "B9CE93"
+  },
+  "Datum": {
+    "family": "drowned",
+    "main": "4E5A6B",
+    "dark": "232933",
+    "accent": "8FB2E0"
+  },
+  "The Traverse": {
+    "family": "drowned",
+    "main": "5A4A4A",
+    "dark": "281F1F",
+    "accent": "E09A86"
+  },
   "_unwritten": "The Undercountry's boss, and the one figure in this game whose subject is an absence: the town's own sign is a post with no name on it, and this is that post standing up.",
-  "The Unwritten":        { "family": "unwritten", "main": "4A4640", "dark": "22201D", "accent": "D8D2C2" }
+  "The Unwritten": {
+    "family": "unwritten",
+    "main": "4A4640",
+    "dark": "22201D",
+    "accent": "D8D2C2"
+  },
+  "The Unslaked Kiln": {
+    "family": "wright",
+    "main": "6B3A1E",
+    "dark": "33190B",
+    "accent": "E8A05C"
+  },
+  "Nine Courses of Brick": {
+    "family": "sentinel",
+    "main": "7A4038",
+    "dark": "3A1C18",
+    "accent": "D6B9A6"
+  },
+  "The Cold Flue": {
+    "family": "wisp",
+    "main": "3E5C6B",
+    "dark": "1B2B33",
+    "accent": "AEE3F2"
+  },
+  "What Was Left Banked": {
+    "family": "court",
+    "main": "4A4436",
+    "dark": "221F18",
+    "accent": "C9B87A"
+  }
 }

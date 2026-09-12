@@ -1,0 +1,68 @@
+{
+  "format": "gm2d-tiles",
+  "version": 1,
+  "id": "the-cairnworks-4",
+  "_note": "A floor of the Cairnworks. **One plate, one lane.** The thing on it has every defence at the cap but one, so the floor is answered by the lane it has left open rather than by a bigger number — and the floor's own pool holds that same creature, which is what makes it farmable once the plate is clear. That is the existing shape rather than a new one: eight of the nine boss creatures in this game already stand in a region pool, and here it is on purpose. **Floored with `road`**, like every other dungeon: a floor whose walk costs more than its fight is a corridor with a toll on it.",
+  "width": 11,
+  "height": 9,
+  "start": [
+    5,
+    7
+  ],
+  "rows": [
+    "^^^^^^^^^^^",
+    "^,,,,,,,,,^",
+    "^,,#####,,^",
+    "^,,#===#,,^",
+    "^,,#===#,,^",
+    "^,,#===#,,^",
+    "^,,#####,,^",
+    "^,,,,,,,,,^",
+    "^^^^^^^^^^^"
+  ],
+  "places": [
+    {
+      "at": [
+        5,
+        7
+      ],
+      "kind": "gate",
+      "id": "the-cairnworks-4-up",
+      "name": "the steps back up",
+      "to": "the-cairnworks-3",
+      "at_to": [
+        5,
+        2
+      ]
+    },
+    {
+      "at": [
+        5,
+        4
+      ],
+      "kind": "boss",
+      "id": "what-was-left-banked",
+      "name": "what the works put by",
+      "creature": "What Was Left Banked",
+      "prose": []
+    }
+  ],
+  "regions": [
+    {
+      "id": "the-cairnworks-4",
+      "name": "the Cairnworks",
+      "bounds": [
+        [
+          0,
+          0,
+          10,
+          8
+        ]
+      ],
+      "enemies": [
+        "What Was Left Banked"
+      ],
+      "_note": "**A pool of one, which is the whole of how a floor is farmed.** `draw_enemy` weights a pool by `(max + 1 - rating)`, so the hardest member is the rarest — and a floor whose pool held its boss beside three ordinary creatures dealt that boss about one time in a hundred, which put its drop hundreds of wins away. `a_set_is_a_few_hours_and_not_a_lifetime` said so, in the band it has held since M9. One member has no weighting to get wrong: the room has one thing in it, meeting it again is the farm, and that is what was asked for."
+    }
+  ]
+}

@@ -137,6 +137,28 @@
       ],
       "kind": "event",
       "id": "the-far-hedge"
+    },
+    {
+      "at": [
+        17,
+        13
+      ],
+      "kind": "gate",
+      "id": "the-way-into-the-cairnworks",
+      "name": "the way down into the Cairnworks",
+      "to": "the-cairnworks-1",
+      "at_to": [
+        5,
+        7
+      ],
+      "needs_all": [
+        "built-the-tenth"
+      ],
+      "shut": "A hatch in the turf with nine courses of brick under it, and it has been shut since before the first survey.",
+      "prose": [
+        "Under the turf there is brickwork, and under the brickwork there is a works nobody surveyed because nobody knew it was there.",
+        "Four floors, and every floor has one thing standing on a plate in the middle of it."
+      ]
     }
   ]
 }

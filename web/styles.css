@@ -196,7 +196,7 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
    swallowing clicks, and this. All three were found by `elementFromPoint` and
    none of them by reading. `check_the_fork_is_on_top` is what stops a fourth. */
 #tree, #log, #ending, #history, #combat, #instrument, #instant, #bestiary,
-#cart-screen, #glossary { z-index: 30; }
+#cart-screen, #glossary, #brewbench { z-index: 30; }
 /* The cart is a counter you walked onto, like the town and the van, so it
    sits on the tier those do — *where you are* rather than *what you
    opened from there*. */
@@ -809,3 +809,100 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
   font-size: 11px;
   color: var(--ink-3);
 }
+
+
+/* ------------------------------------------------- where you have got to
+   The area's name, over the middle of the map for a beat.
+
+   Pointer-events off, because it must never eat a click on the board it is
+   sitting on: a card you can accidentally aim a cue through is a card that
+   costs somebody a shot. Haloed rather than tinted, for the reason the armour
+   label and the shot preview are — the ground under the middle of a map is
+   anything from pale sand to dark slag and no single ink reads on both. */
+.mapwrap { position: relative; }
+.area {
+  position: absolute;
+  /* **Its own line-height, because the box it sits in has none.** `.mapwrap`
+     is `line-height: 0` so the canvas gets no baseline gap under it — and this
+     inherits that, which gives the card a text line box exactly zero pixels
+     tall. It was in the document, unhidden, 638 wide and 0 high, and the only
+     thing that said so was a browser measuring it. Same family as `.card` and
+     `.tabs`: a property set on a container for one child is a property every
+     other child gets too. */
+  line-height: 1.2;
+  left: 0; right: 0; top: 38%;
+  pointer-events: none;
+  text-align: center;
+  font-size: clamp(20px, 3.4vw, 34px);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow:
+    0 0 2px #000, 0 0 6px #000, 0 0 14px #000,
+    0 2px 0 rgba(0, 0, 0, 0.6);
+}
+.area[hidden] { display: none !important; }
+.area.going { animation: area-card 2.2s ease-out both; }
+@keyframes area-card {
+  0%   { opacity: 0; transform: translateY(10px); }
+  14%  { opacity: 1; transform: none; }
+  70%  { opacity: 1; transform: none; }
+  100% { opacity: 0; transform: translateY(-6px); }
+}
+/* **Do not move things is not tell me less** — the same rule the shot's trail
+   obeys. The card still appears and still goes; it just does not travel. */
+@media (prefers-reduced-motion: reduce) {
+  .area.going { animation: area-card-still 2.2s steps(1, end) both; }
+  @keyframes area-card-still {
+    0%, 92% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+}
+
+/* ------------------------------------------------------ the errand tree
+   Rows are chain depth. Reported from play: a flat list of fifty errands says
+   nothing about which one follows which, and the skill tree had already solved
+   exactly this — so the log borrows its shape rather than inventing one. */
+.chainrows { position: relative; display: flex; flex-direction: column; gap: 26px; }
+.chainrow {
+  display: flex; flex-wrap: wrap; gap: 10px; align-items: stretch;
+  position: relative; z-index: 1;
+}
+.chainrow .rung {
+  flex: 0 0 auto; align-self: center; width: 76px;
+  font-size: 11px; letter-spacing: 0.09em; text-transform: uppercase;
+  opacity: 0.62;
+}
+/* Behind the buttons, never over them, and never hit-testable: a wire that
+   eats a click on the errand it points at is worse than no wire. */
+.chainrows > .wires {
+  position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  overflow: visible;
+}
+.chainrows > .wires path { fill: none; stroke: currentColor; stroke-width: 2; opacity: 0.22; }
+.chainrows > .wires path.live { opacity: 0.55; }
+.chainrows > .wires path.done { opacity: 0.3; stroke-dasharray: 4 4; }
+
+
+/* ----------------------------------------------------------- the bench
+   A glass with a bizarre shape, and the larder that feeds it.
+
+   The glass is drawn from the cells core hands over, so the page never has an
+   opinion about what fits — the same division the board's green fit preview
+   makes. */
+.benchrow { display: flex; flex-wrap: wrap; gap: 28px; align-items: flex-start; }
+.larderbox { flex: 1 1 320px; min-width: 280px; }
+.glass {
+  display: grid; gap: 3px; margin: 10px 0 14px;
+  grid-auto-rows: 34px; justify-content: start;
+}
+.glass .cell {
+  border: 1px solid currentColor; border-radius: 2px; opacity: 0.35;
+}
+/* A cell something is standing in. Brightness and weight, never a second hue:
+   the board's own rule, because the map and the boards have spent every
+   channel there is. */
+.glass .cell.full { opacity: 1; background: currentColor; }
+.glass .cell.gone { border-style: dashed; opacity: 0.14; }
+.glass .cell.ink { opacity: 1; background: currentColor; filter: brightness(1.35); }

@@ -396,6 +396,21 @@ pub enum ClassPower {
     ///
     /// **A creature is never a Stoker**, the same rule an expert follows.
     Stoker { every_ms: u32, per_stack: i32 },
+    /// Every brew is `potency_pct` stronger, and the glass holds `extra` more
+    /// cells.
+    ///
+    /// **The first specialization's power, and it touches no fight at all.**
+    /// Asked for: *a new type of class called a specialization, and you can
+    /// only have one of them, and it does not interact / form expert classes.
+    /// the first specialization is a new tree related to potion brewing.*
+    ///
+    /// So it is honoured in `Character::boon` and in `Game::retort`, and
+    /// nowhere in `combat.rs` — which is the first class in this game whose
+    /// power the fight never reads. `every_offered_class_reaches_something`
+    /// gains a fifth arm for exactly that: *did the brew differ*, asked the
+    /// same way the other four ask whether the purse, the fighter or the board
+    /// did.
+    Apothecary { potency_pct: i32, extra: u32 },
     /// A creature whose maximum health you have eaten down to `third` percent
     /// of what it was is unmade — dead, whatever is still in it.
     ///
@@ -573,6 +588,10 @@ impl ClassPower {
             // points of somebody's tuning is also not a thing a fountain
             // could mean.
             Expert(_) => return None,
+            // **Nor is a specialization**, for the same two reasons: it is
+            // taken off a tree rather than poured, and there is no fountain in
+            // this game to pour one at.
+            Apothecary { .. } => return None,
             // **Both doublable, and each doubles the thing it is about.** The
             // Stoker's is the shovel — twice as many points a tick — rather
             // than the clock, because a furnace stoked twice as often is a
@@ -642,6 +661,7 @@ impl ClassPower {
         match self {
             ClassPower::Stoker { .. } => &["every_ms", "per_stack"],
             ClassPower::Whisperer { .. } => &["third"],
+            ClassPower::Apothecary { .. } => &["potency_pct", "extra"],
             // **An expert's knobs are its own**, asked through the arm that
             // wraps it rather than duplicated here.
             ClassPower::Expert(e) => e.knobs(),
@@ -673,6 +693,19 @@ impl ClassPower {
     /// Move a knob, if this power has it.
     pub fn tune(self, knob: &str, by: i32) -> ClassPower {
         match self {
+            ClassPower::Apothecary { potency_pct, extra } => match knob {
+                "potency_pct" => {
+                    ClassPower::Apothecary { potency_pct: (potency_pct + by).max(0), extra }
+                }
+                // A glass that got smaller would tip out whatever was standing
+                // in it, which is `resize_boards`'s rule one system along, so
+                // this only ever grows.
+                "extra" => ClassPower::Apothecary {
+                    potency_pct,
+                    extra: (extra as i32 + by).max(0) as u32,
+                },
+                _ => self,
+            },
             ClassPower::Stoker { every_ms, per_stack } => match knob {
                 // **Clamped at a tick, because a furnace that stokes faster
                 // than the clock is a furnace that stokes every tick** — and
@@ -710,6 +743,9 @@ impl ClassPower {
     pub fn short(self) -> String {
         match self {
             ClassPower::Guilt => "you cannot heal".to_string(),
+            ClassPower::Apothecary { potency_pct, extra } => {
+                format!("+{potency_pct}% on every brew, and {extra} more cells of glass")
+            }
             ClassPower::Stoker { every_ms, per_stack } => format!(
                 "burn {per_stack} of your biggest pool every {:.1}s",
                 every_ms as f32 / 1000.0
@@ -778,6 +814,13 @@ impl ClassPower {
     /// rule that was never written. Name the numbers and the condition.
     pub fn describe(self) -> String {
         match self {
+            // **Two registers on one line, TONE 13a**, the same as the Stoker:
+            // somebody weighing a specialization against the points it costs is
+            // comparing numbers.
+            ClassPower::Apothecary { potency_pct, extra } => format!(
+                "Every brew you drink is {potency_pct}% stronger, and the glass holds {extra} \
+                 more cells than it was blown with."
+            ),
             // **No stacks.** Upstream handed the same class out over and over
             // and a promise had to say what a second one bought; GM2D asks
             // once, at level five, and the answer does not come off. A
@@ -1038,6 +1081,28 @@ pub static CLASSES: &[ClassDef] = &[
         // close as the existing fifteen come.
         requires: &[(Axis::Arcana, 40), (Axis::Ward, 30)],
         power: ClassPower::Whisperer { third: 33 },
+    },
+    // **The first specialization, and it is not on the fork.** Asked for: *a
+    // new type of class called a specialization, and you can only have one of
+    // them, and it does not interact / form expert classes.* So it is outside
+    // `OFFERED` — the fork screen draws that list — and outside
+    // `expert::EXPERTS`, which stays `C(7,2)` at twenty-one.
+    //
+    // `requires` is empty because there is no fountain in this game to rank at
+    // and nothing else reads it; how you become one is a paper on Spike's van,
+    // the same counter the other two papers stand on.
+    ClassDef {
+        name: "Apothecary",
+        blurb: "Two things off two corpses, in a glass, in the right order.",
+        // **Not empty**, and the reason is an inherited invariant worth
+        // keeping: exactly one class in the roster asks for nothing, and it is
+        // the floor class a fountain falls back to. A specialization with no
+        // requirements made *two*, and `there_is_always_a_class_to_give` said
+        // so on the next run. Nothing in GM2D ranks at a fountain, so the
+        // numbers here are a shape rather than a gate — how you become one is
+        // a paper on Spike's van.
+        requires: &[(Axis::Attunement, 30), (Axis::Ward, 20)],
+        power: ClassPower::Apothecary { potency_pct: 10, extra: 0 },
     },
     ClassDef {
         name: "Berserker",
@@ -1322,6 +1387,15 @@ pub struct Match {
 /// find the five they know where they left them.
 pub const OFFERED: &[&str] =
     &["Berserker", "Hexweaver", "Bloodletter", "Recycler", "Showstopper", "Stoker", "Whisperer"];
+
+/// The specializations, of which a character holds at most one.
+///
+/// **A third kind of class, and the list is deliberately its own.** It is not
+/// in `OFFERED`, so the level-five fork does not draw it; it is not in
+/// `expert::EXPERTS`, so no pair reaches it and it pairs with nothing; and it
+/// is not in `Character::classes`, because everything that reads that list
+/// reads it to ask *which pair are you* and the answer must not change.
+pub const SPECIALIZATIONS: &[&str] = &["Apothecary"];
 
 pub const TOWN_CLASSES: &[&str] = &["Piety", "Ticket to Ride", "Tired", "Recycler"];
 

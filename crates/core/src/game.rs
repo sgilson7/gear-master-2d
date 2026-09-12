@@ -1062,7 +1062,19 @@ impl Game {
         difficulty: crate::combat::Difficulty,
     ) -> Option<String> {
         let wanting = self.sealed_wanting(place);
-        if wanting.is_empty() {
+        // **Every lock, not only the sealed kind.** A gate has three of them —
+        // a mark you have not made, a key you are not carrying, and an
+        // instrument you have not built — and this answered for one, so the
+        // Cave's mouth and the Reach's edge each refused with the map file's
+        // sentence and nothing a player could act on. Asked for: *anything
+        // that is locked should have such an explanation.*
+        let wants_key = place
+            .needs
+            .clone()
+            .filter(|k| crate::quest::holding(self, k) == 0)
+            .filter(|_| !self.world.answered.iter().any(|a| *a == place.id));
+        let wants_kit = place.needs_survey && self.survey_kind().is_none();
+        if wanting.is_empty() && wants_key.is_none() && !wants_kit {
             return None;
         }
         let maps = crate::data::all_maps(difficulty);
@@ -1074,19 +1086,167 @@ impl Game {
                 .unwrap_or_else(|| mark.replace('-', " "))
         };
         let named: Vec<String> = wanting.iter().map(|m| name_of(m)).collect();
-        let list = match named.as_slice() {
-            [one] => one.clone(),
-            [a, b] => format!("{a} and {b}"),
-            rest => rest.join(", "),
-        };
         let head = if place.shut.is_empty() { "It will not open.".to_string() } else { place.shut.clone() };
-        Some(format!("{head} It is waiting on {list}."))
+        let mut out = head;
+        if !named.is_empty() {
+            let list = match named.as_slice() {
+                [one] => one.clone(),
+                [a, b] => format!("{a} and {b}"),
+                rest => rest.join(", "),
+            };
+            out.push_str(&format!(" It is waiting on {list}."));
+        }
+        // **And what to go and do about it.** Naming the mark is naming the
+        // lock; this names the key, all the way down — which is what was asked
+        // for, in as many words: *anything that is locked should have such an
+        // explanation*. Derived from the events and the maps, so a chain
+        // somebody re-authors cannot leave it pointing at the wrong place, and
+        // it is skipped when every step of it is a mark this character already
+        // has, because *waiting on* and *go and do* are different sentences.
+        let marks = self.world.marks();
+        let mut steps: Vec<String> = Vec::new();
+        let add = |one: String, steps: &mut Vec<String>| {
+            if !steps.iter().any(|s| *s == one) {
+                steps.push(one);
+            }
+        };
+        for m in &wanting {
+            for one in crate::unlock::steps_to(m, &marks, difficulty) {
+                add(one, &mut steps);
+            }
+        }
+        if wants_kit {
+            add("assemble a survey instrument on its own frame".to_string(), &mut steps);
+        }
+        if let Some(key) = &wants_key {
+            add(format!("carry {key}"), &mut steps);
+        }
+        if !steps.is_empty() {
+            out.push_str(&format!(" To open it: {}.", steps.join(", then ")));
+        }
+        Some(out)
     }
 
     /// Which instrument is assembled, if any.
     ///
     /// Derived from the rules an assembled item grants, the same as everything
     /// else about surveying — there is no field saying which one you carry.
+    /// What is standing in the retort, by name, if anything is.
+    pub fn brew_name(&self) -> Option<String> {
+        let brews = crate::data::brews();
+        let [a, b] = match self.character.brewed.as_slice() {
+            [a, b] | [a, b, _] => [a.as_str(), b.as_str()],
+            _ => return None,
+        };
+        brews.pair(a, b).map(|d| d.name.clone())
+    }
+
+    /// The cells of the glass this character has — nine, or eleven once the
+    /// Cairnworks has reblown it.
+    pub fn retort(&self) -> Vec<(i8, i8)> {
+        let mut cells = crate::brew::retort_cells(&self.world.marks());
+        // **And whatever an apothecary has blown onto it.** Added as a column
+        // on the right of what is already there, so the glass only ever grows —
+        // a glass that got narrower would tip out whatever was standing in it,
+        // which is `resize_boards`'s rule one system along.
+        let (_, extra) = self.character.apothecary();
+        if extra > 0 {
+            let x = cells.iter().map(|c| c.0).max().unwrap_or(0);
+            let ys: Vec<i8> = {
+                let mut ys: Vec<i8> = cells.iter().map(|c| c.1).collect();
+                ys.sort_unstable();
+                ys.dedup();
+                ys
+            };
+            let mut left = extra;
+            'grow: for dx in 1..=4i8 {
+                for &y in &ys {
+                    if left == 0 {
+                        break 'grow;
+                    }
+                    let cell = (x + dx, y);
+                    if !cells.contains(&cell) {
+                        cells.push(cell);
+                        left -= 1;
+                    }
+                }
+            }
+        }
+        cells
+    }
+
+    /// How many ingredients the glass takes: two, or three with the ink slot.
+    pub fn retort_holds(&self) -> usize {
+        if self.world.marks().iter().any(|m| m == crate::brew::REBLOWN_MARK) {
+            crate::brew::WITH_INK
+        } else {
+            2
+        }
+    }
+
+    /// Put a brew in the retort, or say why not.
+    ///
+    /// **Every refusal names the thing in the way and spends nothing**, which
+    /// is the rule the reroll, the bank and the cart all obey: the first thing
+    /// anybody does with a refused button is press it again.
+    ///
+    /// Whether the two *fit in the glass together* is the whole of the puzzle
+    /// and is asked here rather than on a screen — a page that worked out its
+    /// own answer would be a second rulebook, which is the one thing the shim
+    /// is not allowed to be.
+    pub fn brew(&mut self, ids: &[String]) -> Result<String, String> {
+        let brews = crate::data::brews();
+        if ids.len() < 2 {
+            return Err("a brew is two things".into());
+        }
+        if ids.len() > self.retort_holds() {
+            return Err(if self.retort_holds() == 2 {
+                "the glass holds two".into()
+            } else {
+                "the glass holds two and an ink".into()
+            });
+        }
+        for id in ids {
+            if brews.get(id).is_none() {
+                return Err(format!("there is no {id} in any larder"));
+            }
+        }
+        // Counted against the larder as a whole, so two of the same thing needs
+        // two of the same thing.
+        for id in ids {
+            let want = ids.iter().filter(|o| *o == id).count() as u32;
+            if self.character.in_larder(id) < want {
+                let name = brews.get(id).map(|i| i.name.clone()).unwrap_or_else(|| id.clone());
+                return Err(format!("you have not got {want} × {name}"));
+            }
+        }
+        let Some(def) = brews.pair(&ids[0], &ids[1]) else {
+            return Err("those two do nothing together".into());
+        };
+        if !crate::brew::fits(&self.retort(), &brews, ids) {
+            return Err("they will not go in the glass together".into());
+        }
+        // Nothing is spent until everything has been checked.
+        for id in ids {
+            self.character.take_from_larder(id)?;
+        }
+        self.character.brewed = ids.to_vec();
+        Ok(def.name.clone())
+    }
+
+    /// Tip the retort out, and the ingredients go back in the larder.
+    ///
+    /// Poured back rather than lost, because a brew you have not drunk is a
+    /// decision you have not taken — and a bench that ate what you put in it
+    /// would be a bench nobody experiments at, which is the whole of what a
+    /// twenty-eight-pair table is for.
+    pub fn tip_out(&mut self) {
+        let ids = std::mem::take(&mut self.character.brewed);
+        for id in ids {
+            self.character.gather(&id);
+        }
+    }
+
     pub fn survey_kind(&self) -> Option<String> {
         self.character.rules().into_iter().find_map(|r| match r {
             crate::rule::Rule::Survey { kind } => Some(kind.into_owned()),

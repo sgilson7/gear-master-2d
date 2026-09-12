@@ -221,6 +221,25 @@ pub struct CharacterSave {
     /// characters were.
     #[serde(default, skip_serializing_if = "is_zero_u32")]
     pub warm_stacks: u32,
+    /// The ingredient larder, counted by id.
+    ///
+    /// **A second bag, and skipped when it is empty**, so no save written
+    /// before the bench existed is refused and every one opens with nothing in
+    /// it — which is what those characters had. Nothing about this moves the
+    /// catalogue fingerprint: an ingredient is not a component.
+    #[serde(default, skip_serializing_if = "std::collections::BTreeMap::is_empty")]
+    pub larder: std::collections::BTreeMap<String, u32>,
+    /// What is standing in the retort, by ingredient id.
+    ///
+    /// **What was brewed, never what it brews to.** Derived, never banked: the
+    /// boon is read out of `data/brews.json` every time it is asked for, so
+    /// retuning a pair retunes every character carrying one.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub brewed: Vec<String>,
+    /// The one specialization, if it has been taken. Skipped when it has not,
+    /// so no save written before it existed is refused.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub specialization: Option<String>,
 }
 
 fn is_zero_i32(n: &i32) -> bool {
@@ -312,6 +331,9 @@ impl SaveFile {
             fast_wins,
             told_curses,
             warm_stacks,
+            larder,
+            brewed,
+            specialization,
             enchs_owned,
             enchanted,
             bought_licence,
@@ -405,6 +427,9 @@ impl SaveFile {
                     fast_wins: *fast_wins,
                     told_curses: told_curses.clone(),
                     warm_stacks: *warm_stacks,
+                    larder: larder.clone(),
+                    brewed: brewed.clone(),
+                    specialization: specialization.clone(),
                     enchs_owned: enchs_owned.clone(),
                     bought_licence: *bought_licence,
                     enchanted: enchanted
@@ -531,6 +556,9 @@ impl SaveFile {
             fast_wins,
             told_curses,
             warm_stacks,
+            larder,
+            brewed,
+            specialization,
             enchs_owned,
             enchanted,
         } = character;
@@ -636,6 +664,9 @@ impl SaveFile {
         character.fast_wins = fast_wins;
         character.told_curses = told_curses;
         character.warm_stacks = warm_stacks;
+        character.larder = larder;
+        character.brewed = brewed;
+        character.specialization = specialization;
         character.enchs_owned = enchs_owned;
         character.bought_licence = bought_licence;
         // Checked like every other index into the registry. An ench bolted to

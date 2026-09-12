@@ -391,6 +391,28 @@ fn pay_a_win(game: &mut Game, creature: &'static str, receipt: &mut Vec<String>)
         receipt.push(format!("It had a {} on it. They do not usually.", game.theme_piece(&name)));
         game.character.give(&name);
     }
+    // **And one ingredient, every time, from everything.** Asked for: *each
+    // enemy should drop one ingredient*. It goes in `pay_a_win` for the reason
+    // everything else here does — this is the one place a win is paid, so a
+    // rout drops one too, which is right: a creature that gave up still left
+    // what it was carrying.
+    //
+    // **Keyed by the art family rather than by the creature**, so a creature
+    // added to `enemies.json` cannot arrive without a drop. It already fails a
+    // test without a family; this is the second half of that.
+    if let Some(ing) = ingredient_off(creature) {
+        game.character.gather(&ing.id);
+        receipt.push(format!("{} for the larder.", ing.name));
+    }
+}
+
+/// Which ingredient a creature leaves, or `None` if nothing is drawn for it.
+///
+/// `None` is unreachable in the shipped game and is not an `expect`: a save is
+/// not worth losing over a creature this build draws no picture of.
+fn ingredient_off(creature: &str) -> Option<crate::brew::IngredientDef> {
+    let family = crate::data::art_families().get(creature)?.clone();
+    crate::data::brews().from_family(&family).cloned()
 }
 
 /// Bank the result and clear the encounter.
@@ -468,6 +490,23 @@ pub fn settle(game: &mut Game, log: &CombatLog, difficulty: Difficulty) -> Optio
     let before = game.character.fatigue;
     game.character.tire(crate::fatigue::PER_FIGHT);
     let tired = game.character.fatigue - before;
+
+    // **And the retort is empty again, won or lost, beside the line that
+    // already means a fight happened.** The argument is the one directly above
+    // and it is the reason this is here rather than anywhere else: the way not
+    // to have some fights drink a potion and some not, invisibly, is to put the
+    // spending beside the tiring. **A rout deliberately does not reach here**,
+    // and must not — nothing was fought, so nothing was drunk.
+    let drunk = if game.character.brewed.is_empty() {
+        None
+    } else {
+        let name = game.brew_name();
+        game.character.brewed.clear();
+        name
+    };
+    if let Some(name) = drunk {
+        receipt.push(format!("You had drunk {name}, and it is gone."));
+    }
 
     // **An order ticks exactly when the character gets tired.** M12.2, and the
     // placement is the whole argument: `PLAN-M12.md` §6 entry 3 warns about "a

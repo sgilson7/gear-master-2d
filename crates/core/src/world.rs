@@ -2032,15 +2032,18 @@ fn refused_at(
                 .iter()
                 .find(|d| d.from == here && !marks_have(state, &d.when))
             {
-                if let Some((event, title)) =
-                    crate::tile_event::where_a_flag_is_raised(&crate::data::events(), &d.when)
+                // **The whole chain, not the last link of it.** This named the
+                // one event that raises the flag and the door onto the map it
+                // stands on, which is one hop — and the tenth cairn wants the
+                // trig stone, which wants the reach read, which wants an
+                // instrument on a frame. Reported from play a third time:
+                // *"it should say very specifically the mechanical
+                // necessities to unlock the area."*
+                if let Some(line) =
+                    crate::unlock::sentence(&d.when, &state.marks(), difficulty)
                 {
-                    match gate_toward(world, &event, difficulty) {
-                        Some(gate) => {
-                            said.push_str(&format!(" It is {title} that opens it, through {gate}."))
-                        }
-                        None => said.push_str(&format!(" It is {title} that opens it.")),
-                    }
+                    said.push(' ');
+                    said.push_str(&line);
                 }
             }
             let mut out = Step::nowhere(&said);
@@ -2339,30 +2342,6 @@ fn tick_caravan(world: &World, state: &mut WorldState, rng: &mut Rng) {
     }
 }
 
-/// The gate **on this map** that leads to wherever an event stands.
-///
-/// **One hop, and that is deliberate.** A refusal is a keypress, and
-/// `data::all_maps` parses twenty-one files; what a player needs is not the
-/// name of a map two countries away, it is the door on the map under their
-/// feet. The Reach is entered from the Treyway, which is where somebody is
-/// standing when the shore turns them back.
-///
-/// `None` when the event is not one hop away — better silence than a direction
-/// that is wrong, and the sentence reads without it.
-fn gate_toward(world: &World, event: &str, difficulty: Difficulty) -> Option<String> {
-    for p in &world.places {
-        if p.kind != PlaceKind::Gate {
-            continue;
-        }
-        let Some(to) = p.to.as_deref() else { continue };
-        let far = crate::data::map(to, difficulty);
-        if far.places.iter().any(|q| q.id == event) {
-            let name = if p.name.is_empty() { p.id.clone() } else { p.name.clone() };
-            return Some(name);
-        }
-    }
-    None
-}
 
 /// Whether a mark has been made, in either of the two lists that hold them.
 ///

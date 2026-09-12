@@ -615,6 +615,11 @@ fn an_errand_pays_its_ench_to_a_character_who_cannot_use_one() {
             gm2d_core::quest::Goal::Word { place } => {
                 quest::on_arrival(&mut g, place);
             }
+            // A boss writes its own tile id into `answered` when it falls, so
+            // this is the fixture standing where the fight would have been.
+            gm2d_core::quest::Goal::Clear { place } => {
+                g.world.answered.push(place.clone());
+            }
             gm2d_core::quest::Goal::Slay { token, count, .. } => {
                 for _ in 0..*count {
                     g.character.give(token);

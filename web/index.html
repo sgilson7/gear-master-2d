@@ -22,6 +22,10 @@
       <div class="mapwrap">
         <canvas id="map" width="640" height="640" tabindex="0"
                 aria-label="The map of west Bambulon. Arrow keys or WASD to walk."></canvas>
+        <!-- Where you have got to. Over the map rather than beside it, because
+             the point is that you see it without looking away from where you
+             are walking; `aria-live` so a screen reader is told as well. -->
+        <div id="area" class="area" aria-live="polite" hidden></div>
       </div>
 
       <aside>
@@ -372,7 +376,13 @@
             <div><dt>finished</dt><dd id="log-finished">&mdash;</dd></div>
           </dl>
         </header>
-        <div id="log-list" class="shelf"></div>
+        <!-- **Rows are chain depth.** A root on the top row and every rung
+             under the one it follows, wires measured after layout — the same
+             shape the skill tree has, for the same reason: a flat list of
+             fifty says nothing about which one follows which. -->
+        <div id="log-list" class="shelf chainrows">
+          <svg class="wires" aria-hidden="true"></svg>
+        </div>
         <p id="log-says" class="says" hidden></p>
         <div class="row"><button id="log-close" type="button" class="primary">Back out</button></div>
       </div>
@@ -510,8 +520,49 @@
           <button id="pack" type="button" class="primary advance">Inventory / Character Sheet</button>
           <button id="bank" type="button">Level up</button>
           <button id="cart" type="button">Take the long cart</button>
+          <!-- **Only in a town**, which is the ask: *an ingredient inventory
+               that can only be accessed in towns*. It is on the town's action
+               bar rather than the standing panel for exactly that reason. -->
+          <button id="bench" type="button">The brewing bench</button>
           <button id="leave" type="button">Back out</button>
         </div>
+      </div>
+    </div>
+
+    <!-- The brewing bench. Tier 30, the same as the tree and the log: it is a
+         thing you opened from the town rather than the place you are. -->
+    <div id="brewbench" class="screen" hidden>
+      <div class="screenbox">
+        <header>
+          <div>
+            <p class="eyebrow">the bench</p>
+            <h2>Two things, in a glass</h2>
+          </div>
+          <dl class="figures">
+            <div><dt>the glass holds</dt><dd id="brew-holds">&mdash;</dd></div>
+            <div><dt>your potency</dt><dd id="brew-potency">&mdash;</dd></div>
+          </dl>
+        </header>
+        <!-- The glass, drawn from the cells core gave. A page that worked out
+             its own shape would be a second rulebook about what fits. -->
+        <div class="benchrow">
+          <div>
+            <h4 class="sub-h">The glass</h4>
+            <div id="brew-glass" class="glass"></div>
+            <p id="brew-gives" class="spec"></p>
+            <div class="row">
+              <button id="brew-tip" type="button">Tip it out</button>
+            </div>
+          </div>
+          <div class="larderbox">
+            <h4 class="sub-h">The larder</h4>
+            <p class="note">Everything that goes down leaves something. Two of them make one
+              thing worth drinking; a third is an ink, and multiplies what the two came to.</p>
+            <div id="brew-larder" class="shelf"></div>
+          </div>
+        </div>
+        <p id="brew-says" class="says" hidden></p>
+        <div class="row"><button id="brew-close" type="button" class="primary">Back out</button></div>
       </div>
     </div>
 

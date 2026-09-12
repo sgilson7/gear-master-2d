@@ -9,6 +9,7 @@ import init, {
   shop_json, bench_json, buy, buy_barrel, order, collect_order, buy_supply, buy_ench,
   reroll_barrel, reroll_ledger, buy_paper, use_supply, quests_json, take_quest, hand_in_quest, bank_xp,
   quest_log_json, guide_json, pin_quest,
+  larder_json, brew, tip_out,
   character_json, skills_json, take_skill, pressure_json, pools_json,
   class_offer_json, choose_class, choose_second_class, class_name, all_trees_json,
   cart_json, take_the_cart, glossary_json, terrain_names,
@@ -512,6 +513,20 @@ function paintPanel() {
     world = JSON.parse(world_json());
     draw();
   }
+  // **A place says its own name when you arrive in it.** Reported as an ask:
+  // *"whenever you enter a new area, the name of the area pops up briefly in
+  // the middle of the screen before fading away."*
+  //
+  // Watched here because this is the one function every path that moves
+  // anybody already goes through — a step, a landing, a gate, a defeat that
+  // carries you home and a save being restored. Chasing each of those
+  // separately is how the stale map got shipped for three blocks.
+  //
+  // **The region and not only the map**, because an area is what a player
+  // means: West Bambulon is one map and five regions, and crossing from the
+  // pit road into the Kolok Downs is arriving somewhere. The name is core's —
+  // `RegionDef::name`, which is the same string the standing panel prints.
+  sayTheArea(p);
   const c = JSON.parse(character_json());
   $('level').textContent = c.level;
   $('xp').textContent = `${c.into} / ${c.needed}`;
@@ -2219,8 +2234,13 @@ function closeEnding() {
 /// place want", which is a property of where you are standing; this is "what am
 /// I carrying", which follows you around. Two questions, two calls.
 function openLog() {
-  paintLog();
+  // **Show it, then paint it.** The wires are measured, and a hidden screen is
+  // `display: none`, where every rectangle is zero — which is exactly how the
+  // skill tree drew seventeen wires at the origin on every first open for two
+  // milestones. Painting first was harmless while the log was a flat list; it
+  // is the bug the moment the list has lines drawn between its rows.
   $('log').hidden = false;
+  paintLog();
 }
 
 function paintLog() {
@@ -2229,7 +2249,9 @@ function paintLog() {
   $('log-carrying').textContent = live.length;
   $('log-finished').textContent = all.errands.length - live.length;
   const box = $('log-list');
+  const wires = box.querySelector('.wires');
   box.replaceChildren();
+  if (wires) box.appendChild(wires);
   if (!all.errands.length) {
     const p = document.createElement('p');
     p.className = 'note';
@@ -2237,9 +2259,55 @@ function paintLog() {
     box.appendChild(p);
     return;
   }
-  // Live first, finished after: a log is a list of what is still owed, with a
-  // record of what is not underneath it.
-  for (const q of [...live, ...all.errands.filter((x) => x.stage === 'done')]) {
+  // **Rows are chain depth, and depth is core's.** Reported from play: *"the
+  // current errand tree is just hard to follow as a player; a spatial layout of
+  // the errands in the errand screen will really help."* Which is the argument
+  // the skill tree already won — `Tree::depth_of` groups nodes into rows, and
+  // `quest::depth_of` is the same function over `requires`. A page working its
+  // own layering out would be a second answer to *what has to come first*, and
+  // the two would part the first time an errand gained a second prerequisite.
+  //
+  // Within a row, the order is by the average position of the errands that
+  // require it — the cheapest thing that keeps the wires from crossing, and it
+  // puts a root over the things that follow it.
+  const shown = [...live, ...all.errands.filter((x) => x.stage === 'done')];
+  const rows = [];
+  for (const q of shown) {
+    const d = q.depth ?? 0;
+    (rows[d] ||= []).push(q);
+  }
+  // Within a row, ordered by where its parents sit on the row above, so a rung
+  // lands under the thing it follows and the wires do not cross.
+  for (let d = 1; d < rows.length; d++) {
+    if (!rows[d] || !rows[d - 1]) continue;
+    const above = new Map(rows[d - 1].map((q, i) => [q.id, i]));
+    rows[d].sort((a, b) => mean(a) - mean(b));
+    function mean(q) {
+      const ps = (q.requires ?? []).map((r) => above.get(r)).filter((i) => i !== undefined);
+      return ps.length ? ps.reduce((t, i) => t + i, 0) / ps.length : 1e6;
+    }
+  }
+  const el = new Map();
+  for (let d = 0; d < rows.length; d++) {
+    const line = rows[d];
+    if (!line || !line.length) continue;
+    const rowEl = document.createElement('div');
+    rowEl.className = 'chainrow';
+    // The depth is information: it is which rung of its chain this is, so it
+    // is labelled rather than merely indented.
+    const tag = document.createElement('span');
+    tag.className = 'rung';
+    tag.textContent = d === 0 ? 'asked for' : `after ${d}`;
+    rowEl.appendChild(tag);
+    for (const q of line) rowEl.appendChild(errandButton(q, el));
+    box.appendChild(rowEl);
+  }
+  if (wires) drawChainWires(box, wires, shown, el);
+}
+
+/// One errand, as a button. Split out of `paintLog` when the log became rows.
+function errandButton(q, el) {
+  {
     const done = q.stage === 'done';
     const b = document.createElement('button');
     b.type = 'button';
@@ -2278,7 +2346,41 @@ function paintLog() {
       draw();
       autosave();
     };
-    box.appendChild(b);
+    el.set(q.id, b);
+    return b;
+  }
+}
+
+/// Wires from an errand to the ones it opens.
+///
+/// **Measured, not computed**, for the reason the skill tree's are: the rows
+/// are flex and wrap, so where a button actually *is* is the only thing that
+/// can be trusted — and a hidden screen is `display: none`, where every
+/// rectangle is zero. `openLog` shows the screen before this runs, which is the
+/// order the tree's own wires had to learn.
+function drawChainWires(box, svg, rows, el) {
+  const b = box.getBoundingClientRect();
+  svg.setAttribute('width', b.width);
+  svg.setAttribute('height', b.height);
+  svg.setAttribute('viewBox', `0 0 ${b.width} ${b.height}`);
+  svg.replaceChildren();
+  for (const q of rows) {
+    const to = el.get(q.id);
+    if (!to) continue;
+    for (const r of q.requires ?? []) {
+      const from = el.get(r);
+      if (!from) continue;
+      const a = from.getBoundingClientRect(), c = to.getBoundingClientRect();
+      const x1 = a.left - b.left + a.width / 2, y1 = a.bottom - b.top;
+      const x2 = c.left - b.left + c.width / 2, y2 = c.top - b.top;
+      const mid = y1 + (y2 - y1) / 2;
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      // Elbows rather than diagonals: a straight line through three rows of
+      // buttons is unreadable, which the tree found out first.
+      path.setAttribute('d', `M ${x1} ${y1} V ${mid} H ${x2} V ${y2}`);
+      path.setAttribute('class', q.stage === 'done' ? 'done' : 'live');
+      svg.appendChild(path);
+    }
   }
 }
 
@@ -2292,6 +2394,40 @@ function closeLog() {
   hoverGuide = null;
   $('log').hidden = true;
   paintPanel(); draw(); $('map').focus();
+}
+
+// ------------------------------------------------------- where you have got to
+
+/// The last area announced, so arriving twice in one place says it once.
+///
+/// **A string and not a flag.** A flag would have to be cleared by whoever
+/// moved you, which is seven call sites and the eighth is the one that gets
+/// forgotten — see the stale map. Comparing the name is a question this
+/// function can answer on its own.
+let saidArea = null;
+let areaTimer = 0;
+
+function sayTheArea(p) {
+  const name = p.region || null;
+  const key = `${p.map}/${name ?? ''}`;
+  if (key === saidArea) return;
+  const first = saidArea === null;
+  saidArea = key;
+  // Nothing on the first paint of a session: a save being restored is not an
+  // arrival, and a card over the map before the player has pressed anything
+  // reads as a splash screen.
+  if (first || !name) return;
+  const el = $('area');
+  if (!el) return;
+  el.textContent = name;
+  el.hidden = false;
+  // Restart rather than stack: walking through three regions quickly should
+  // leave the third one up, not three cards fighting over one box.
+  el.classList.remove('going');
+  void el.offsetWidth;
+  el.classList.add('going');
+  clearTimeout(areaTimer);
+  areaTimer = setTimeout(() => { el.hidden = true; el.classList.remove('going'); }, 2200);
 }
 
 // ---------------------------------------------------------------- the town
@@ -3253,6 +3389,112 @@ function closeGlossary() { $('glossary').hidden = true; }
 /// Stride gets you out of the wilderness and this one runs counter to counter,
 /// so it can never be the thing that saves a run. The engine holds every
 /// clause — who may, what it costs, where it puts you — and this draws them.
+// ------------------------------------------------------------- the bench
+
+/// What is picked up out of the larder, waiting to go in the glass.
+///
+/// **The page holds the hand and core holds the rule.** Nothing is spent until
+/// `brew` is called, so a half-made brew costs nothing and backing out of the
+/// screen loses nothing — which is what makes twenty-eight pairs worth
+/// experimenting with rather than hoarding against.
+let inHand = [];
+
+function openBench() {
+  inHand = [];
+  paintBench();
+  $('brewbench').hidden = false;
+}
+
+function benchSays(text, bad = false) {
+  const el = $('brew-says');
+  el.textContent = text; el.hidden = !text;
+  el.classList.toggle('bad', bad);
+}
+
+function paintBench() {
+  const b = JSON.parse(larder_json());
+  $('brew-holds').textContent = b.holds === 2 ? 'two' : 'two and an ink';
+  $('brew-potency').textContent = b.potency > 0 ? `+${b.potency}%` : 'none yet';
+
+  // **The glass, from the cells core gave.** Laid out on its own bounding box
+  // so a shape that is not a rectangle draws as the shape it is.
+  const cells = b.glass;
+  const w = Math.max(...cells.map((c) => c[0])) + 1;
+  const h = Math.max(...cells.map((c) => c[1])) + 1;
+  const g = $('brew-glass');
+  g.style.gridTemplateColumns = `repeat(${w}, 34px)`;
+  g.replaceChildren();
+  const has = new Set(cells.map((c) => `${c[0]},${c[1]}`));
+  // What is standing in it, in the order it went in — the third is the ink.
+  const standing = b.standing.map((s, i) => ({ ...s, ink: i >= 2 }));
+  const filled = new Map();
+  let ox = 0;
+  for (const s of standing) {
+    // Drawn left to right along the glass's own cells rather than packed by
+    // the page: where core seated them is core's business, and the screen's
+    // job is to say *these two are in it*, which is what a player asked of it.
+    for (const c of s.cells) {
+      const key = `${c[0] + ox},${c[1]}`;
+      if (has.has(key)) filled.set(key, s.ink ? 'ink' : 'full');
+    }
+    ox += Math.max(...s.cells.map((c) => c[0])) + 1;
+  }
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const d = document.createElement('div');
+      const key = `${x},${y}`;
+      d.className = 'cell ' + (!has.has(key) ? 'gone' : (filled.get(key) ?? ''));
+      g.appendChild(d);
+    }
+  }
+  $('brew-gives').textContent = b.brewed
+    ? `${b.brewed} — ${b.gives}`
+    : inHand.length ? `${inHand.length} picked up. Two makes a brew.` : 'Nothing in it.';
+  $('brew-tip').disabled = !b.standing.length;
+
+  // The larder. Everything you are holding, with how many.
+  const box = $('brew-larder');
+  box.replaceChildren();
+  if (!b.larder.length) {
+    const p = document.createElement('p');
+    p.className = 'note';
+    p.textContent = 'Empty. Everything that goes down leaves something; go and meet something.';
+    box.appendChild(p);
+    return;
+  }
+  for (const i of b.larder) {
+    const picked = inHand.filter((x) => x === i.id).length;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'wares' + (picked ? ' pin' : '');
+    btn.dataset.ingredient = i.id;
+    btn.innerHTML = `<b>${i.name}</b>` +
+      `<span class="spec">${i.cells.length} cell${i.cells.length > 1 ? 's' : ''} · ` +
+      `ink +${i.potency}%</span>` +
+      `<span class="flavour">${i.blurb}</span>` +
+      `<span class="cost">${i.n} in the larder${picked ? ` · ${picked} picked up` : ''}</span>`;
+    btn.onclick = () => {
+      if (picked >= i.n) { benchSays('You have not got another.', true); return; }
+      if (inHand.length >= b.holds) { benchSays('Your hands are full. Tip it out or brew it.', true); return; }
+      inHand.push(i.id);
+      benchSays('');
+      if (inHand.length >= 2) {
+        const why = brew(inHand.join(','));
+        if (why) { inHand.pop(); benchSays(why, true); }
+        else { inHand = []; }
+      }
+      paintBench();
+    };
+    box.appendChild(btn);
+  }
+}
+
+function closeBench() {
+  inHand = [];
+  $('brewbench').hidden = true;
+  paintPanel();
+}
+
 function openCart() {
   const c = JSON.parse(cart_json());
   $('cart-blurb').textContent = c.stops.length
@@ -3645,6 +3887,10 @@ async function main() {
       if (e.key === 'Escape') closeCart();
       return;
     }
+    if (!$('brewbench').hidden) {
+      if (e.key === 'Escape') closeBench();
+      return;
+    }
     if (!$('log').hidden) {
       if (e.key === 'Escape') closeLog();
       return;
@@ -3946,6 +4192,9 @@ async function main() {
   $('gloss-open').onclick = openGlossary;
   $('gloss-close').onclick = closeGlossary;
   $('cart').onclick = openCart;
+  $('bench').onclick = openBench;
+  $('brew-close').onclick = closeBench;
+  $('brew-tip').onclick = () => { tip_out(); inHand = []; benchSays(''); paintBench(); autosave(); };
   $('cart-close').onclick = closeCart;
   $('tree-done').onclick = closeTree;
   $('vendor-close').onclick = closeVendor;

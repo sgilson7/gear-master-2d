@@ -494,3 +494,95 @@ fn a_chain_errand_nobody_gave_you_is_not_on_offer() {
         );
     }
 }
+
+/// **Every clearing names a boss tile, and no two name the same one.**
+///
+/// `Goal::Clear` reads `world.answered` for the place's own id, and the only
+/// thing that writes a place id there unprompted is a boss falling. Pointed at
+/// a town or an event, the errand would be handed in by answering a card — or,
+/// worse, never, with nothing on any screen saying why.
+#[test]
+fn every_clearing_errand_names_a_boss_tile() {
+    use gm2d_core::world::PlaceKind;
+    let quests = data::quests();
+    let bosses: Vec<String> = data::MAPS
+        .iter()
+        .flat_map(|(id, _)| {
+            data::map(id, D)
+                .places
+                .iter()
+                .filter(|p| p.kind == PlaceKind::Boss)
+                .map(|p| p.id.clone())
+                .collect::<Vec<_>>()
+        })
+        .collect();
+    let mut named: Vec<&str> = Vec::new();
+    for q in &quests.quests {
+        let Goal::Clear { place } = &q.goal else { continue };
+        assert!(
+            bosses.iter().any(|b| b == place),
+            "{} clears {place:?}, which nothing on any map is a boss at",
+            q.id
+        );
+        assert!(
+            !named.contains(&place.as_str()),
+            "{} and something before it both clear {place:?}",
+            q.id
+        );
+        named.push(place);
+    }
+    // One a dungeon, and there are six of those: the Cave, the Stack, the map
+    // under the lake, the Sump, the Stair and the Reefs. A count rather than a
+    // list of ids, because the list is the thing the check would go stale
+    // against.
+    assert!(named.len() >= 6, "only {} dungeons have an errand about finishing them", named.len());
+}
+
+/// **A clearing is not handed in by walking onto the tile.**
+///
+/// `Goal::place()` answers for a `Clear` as well as a `Word`, because the guide
+/// has to point at something — so the arrival hook had to be narrowed to `Word`
+/// by name. Read through `place()` instead and this errand is finished by
+/// stepping onto the boss's square and turning round, which is the one thing a
+/// dungeon is supposed to charge for.
+#[test]
+fn a_clearing_is_not_handed_in_by_standing_on_the_tile() {
+    let quests = data::quests();
+    let q = quests
+        .quests
+        .iter()
+        .find(|q| matches!(q.goal, Goal::Clear { .. }))
+        .expect("a clearing errand");
+    let Goal::Clear { place } = &q.goal else { unreachable!() };
+
+    let mut g = Game::new(4, "td");
+    for r in &q.requires {
+        g.world.quests_done.push(r.clone());
+    }
+    for k in &q.requires_answered {
+        g.world.answered.push(k.clone());
+    }
+    g.world.quests_taken.push(q.id.clone());
+    assert!(matches!(quest::stage(&g, q), Stage::Carrying { .. }), "taken, and not yet done");
+
+    // Standing on it. This is exactly what a player who walked in, was
+    // refused, and walked out again would have done.
+    let moved = quest::on_arrival(&mut g, place);
+    assert!(moved.is_empty(), "{} advanced for arriving at {place}", q.id);
+    assert!(
+        matches!(quest::stage(&g, q), Stage::Carrying { .. }),
+        "{} is ready and nothing has been beaten",
+        q.id
+    );
+    assert_eq!(
+        quest::hand_in(&mut g, &q.id).unwrap_err(),
+        "It is still standing.",
+        "and the refusal says which"
+    );
+
+    // And beating it. A boss writes its own tile id into `answered`; nothing
+    // else in this test does.
+    g.world.answered.push(place.clone());
+    assert!(matches!(quest::stage(&g, q), Stage::Ready), "{} is not ready after the boss fell", q.id);
+    quest::hand_in(&mut g, &q.id).expect("it hands in");
+}

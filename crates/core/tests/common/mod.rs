@@ -240,8 +240,35 @@ pub fn geared_from(towns: &[&str]) -> Character {
     // A `granted` errand is one a *choice* hands over, and its `giver` is the
     // event it comes out of, so one per giver is exactly one branch per root.
     let quests = data::quests();
+    // **And nothing that is paid for clearing a dungeon.** This fixture is the
+    // yardstick the deep maps are *measured against* — can the board a player
+    // actually has get down the Sump — so a board holding the Sump's own
+    // completion reward is answering a different question, and a circular one:
+    // can the character who beat it beat it. The rule is the exclusive-chain
+    // rule one step along, and it is transitive because a chain hanging off a
+    // clearing is behind that clearing too.
+    let mut behind: Vec<&str> = Vec::new();
+    loop {
+        let before = behind.len();
+        for q in &quests.quests {
+            if behind.contains(&q.id.as_str()) {
+                continue;
+            }
+            let clears = matches!(q.goal, gm2d_core::quest::Goal::Clear { .. });
+            let after = q.requires.iter().any(|r| behind.contains(&r.as_str()));
+            if clears || after {
+                behind.push(&q.id);
+            }
+        }
+        if behind.len() == before {
+            break;
+        }
+    }
     let mut roots_taken: Vec<&str> = Vec::new();
     for q in &quests.quests {
+        if behind.contains(&q.id.as_str()) {
+            continue;
+        }
         if q.granted {
             if roots_taken.contains(&q.giver.as_str()) {
                 continue;
@@ -252,7 +279,18 @@ pub fn geared_from(towns: &[&str]) -> Character {
             ch.give(r);
         }
     }
+    // **Given the way `pay_a_win` gives them**, which is: not if you already
+    // hold one. The game refuses a duplicate drop by name, so a fixture that
+    // took a second Bread Knife off a Cairnworks floor was not *the board a
+    // player actually has* — it was one of everything, twice, and the extra
+    // copies made two Drambus Stack floors a walk where every wanderer is a
+    // win. `the_floors_cost_more_than_the_things_at_the_end_of_them` said so,
+    // which is the second time this block that a yardstick moved because
+    // something was added to the road it measures.
     for d in &data::drops().drops {
+        if ch.holds(&d.piece) {
+            continue;
+        }
         ch.give(&d.piece);
     }
     ch.apply_preset();

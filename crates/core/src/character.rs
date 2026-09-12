@@ -261,6 +261,45 @@ pub struct Character {
     /// it is skipped when it is and why no older save was refused for it.
     #[serde(default)]
     pub told_curses: Vec<String>,
+    /// The ingredient larder, counted by id.
+    ///
+    /// **A second bag, and it is deliberately not the first.** Asked for:
+    /// *"ingredients do not go in the inventory but instead into an ingredient
+    /// inventory that can only be accessed in towns."* So it is not `owned`,
+    /// which means an ingredient does not pack, does not bench, is not
+    /// something an errand can ask for and is not something a key can be spent
+    /// from — four consumers that all read `owned` and are all right about this
+    /// without being touched, which is exactly the return `Character::banked`
+    /// got for the same shape.
+    ///
+    /// A map rather than a `Vec` with repeats, because a run picks up hundreds
+    /// and a save that carried them one per line would be a save that grows
+    /// without bound. `#[serde(default)]` and skipped when empty, so no older
+    /// file was refused for it and every one opens with an empty larder —
+    /// which is what those characters had.
+    #[serde(default, skip_serializing_if = "std::collections::BTreeMap::is_empty")]
+    pub larder: std::collections::BTreeMap<String, u32>,
+    /// The ingredients standing in the retort, waiting for the next bell.
+    ///
+    /// **What is brewed, not what it brews to.** Derived, never banked — the
+    /// rule this project has paid for six times: the boon is read fresh out of
+    /// `data/brews.json` every time it is asked for, so retuning a pair retunes
+    /// every character carrying it.
+    ///
+    /// Two ids, or three once the glass has been reblown. Empty is the ordinary
+    /// case and is skipped.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub brewed: Vec<String>,
+    /// The one specialization, if it has been taken.
+    ///
+    /// **Its own slot and not a fourth entry in `classes`.** Everything that
+    /// walks that list walks it to ask *which pair are you* — the expert table,
+    /// the second fork, the portrait — and a specialization pairs with nothing,
+    /// so putting it there would change the answer to a question it has no
+    /// opinion about. Asked for in as many words: *you can only have one of
+    /// them, and it does not interact / form expert classes.*
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub specialization: Option<String>,
     /// Empowerment stacks the furnace bought that survived the last bell.
     ///
     /// **The second field in the game that carries a fact about a fight**, and
@@ -319,6 +358,9 @@ impl Character {
             second_paper: false,
             fast_wins: 0,
             told_curses: Vec::new(),
+            larder: Default::default(),
+            brewed: Vec::new(),
+            specialization: None,
             undo_stack: Vec::new(),
         }
     }
@@ -1169,6 +1211,38 @@ impl Character {
     /// way for a caller to reach the untuned one by accident. The fork's own
     /// screen still reads `CLASSES` directly, and should: nobody choosing a
     /// class has spent a point in its tree yet.
+    /// The specialization you are, with its own tree's knobs turned.
+    ///
+    /// **Tuned here rather than read off `CLASSES`**, which is M13.6's whole
+    /// finding: the roster is the power as written, before a point is spent,
+    /// and a caller that read it would print a promise nobody's tree had moved.
+    pub fn specialization_def(&self) -> Option<crate::class::ClassDef> {
+        let name = self.specialization.as_deref()?;
+        let d = crate::class::CLASSES.iter().find(|c| c.name == name)?;
+        let mut power = d.power;
+        if !self.skills_taken.is_empty() {
+            for (knob, by) in crate::data::skills().tunings_for(d.name, &self.skills_taken) {
+                power = power.tune(&knob, by);
+            }
+        }
+        Some(crate::class::ClassDef { power, ..*d })
+    }
+
+    /// What the apothecary in you is worth, as a pair of numbers.
+    ///
+    /// `(potency in percentage points, extra cells of glass)`, and `(0, 0)` for
+    /// everybody who is not one — so every caller can add it unconditionally
+    /// rather than branching on a class, which is how a power ends up honoured
+    /// in one of the two places it should be.
+    pub fn apothecary(&self) -> (i32, u32) {
+        match self.specialization_def().map(|d| d.power) {
+            Some(crate::class::ClassPower::Apothecary { potency_pct, extra }) => {
+                (potency_pct, extra)
+            }
+            _ => (0, 0),
+        }
+    }
+
     pub fn class_defs(&self) -> Vec<crate::class::ClassDef> {
         let tuned = self.expert_power();
         let skills = (!self.skills_taken.is_empty()).then(crate::data::skills);
@@ -2043,7 +2117,78 @@ impl Character {
             .iter()
             .filter_map(|n| crate::curse::CurseKind::by_name(n))
             .collect();
+        // **And whatever is standing in the retort.** A potion is exactly the
+        // shape `Held` is for — a thing you are already holding when the bell
+        // goes — so it is no new combat code at all, and it expires when the
+        // fight does for free, because `Held` is translated into a `Combatant`
+        // at the bell and nothing persists.
+        let boon = self.boon();
+        held.armor += boon.armor;
+        held.mana += boon.mana;
+        held.rage += boon.rage;
+        held.faith += boon.faith;
+        held.nature += boon.nature;
+        held.insight += boon.insight;
+        held.dread += boon.dread;
+        held.mind += boon.mind;
+        held.stats += boon.rates();
         held
+    }
+
+    /// What the brew standing in the retort is worth, if one is.
+    ///
+    /// **Derived, never banked.** The save carries which ingredients went in;
+    /// what they are worth is read out of `data/brews.json` every time, so
+    /// retuning a pair retunes every character carrying one. The same rule the
+    /// skill tree, the tower's fallen floors and the assembly bonus all follow.
+    ///
+    /// **The third ingredient is an ink and multiplies.** Asked for in as many
+    /// words — *acts like an ink in books ie increases potency* — so it is not
+    /// a third term in the sum, it is a percentage on the pair, which is what
+    /// makes it worth spending a rare one on a good pair rather than on any
+    /// pair.
+    pub fn boon(&self) -> crate::brew::Gives {
+        let brews = crate::data::brews();
+        let [a, b] = match self.brewed.as_slice() {
+            [a, b] | [a, b, _] => [a.as_str(), b.as_str()],
+            _ => return crate::brew::Gives::default(),
+        };
+        let Some(def) = brews.pair(a, b) else { return crate::brew::Gives::default() };
+        let ink = self.brewed.get(2).and_then(|i| brews.get(i)).map(|i| i.potency).unwrap_or(0);
+        // **And the apothecary's own, on top of the ink.** One multiplier, so
+        // an apothecary with a good ink is better at both rather than better
+        // twice — which is what keeps a specialization from being the only way
+        // the bench is worth using.
+        let (mine, _) = self.apothecary();
+        def.gives.scaled(ink + mine)
+    }
+
+    /// Put one ingredient in the larder.
+    pub fn gather(&mut self, id: &str) {
+        *self.larder.entry(id.to_string()).or_insert(0) += 1;
+    }
+
+    /// How many of one you have.
+    pub fn in_larder(&self, id: &str) -> u32 {
+        self.larder.get(id).copied().unwrap_or(0)
+    }
+
+    /// Take one out, or say why not.
+    ///
+    /// **A refusal spends nothing**, which is the reroll's rule and the bank's,
+    /// pinned the same way: the first thing anybody does with a refused button
+    /// is press it again.
+    pub fn take_from_larder(&mut self, id: &str) -> Result<(), String> {
+        match self.larder.get_mut(id) {
+            Some(n) if *n > 0 => {
+                *n -= 1;
+                if *n == 0 {
+                    self.larder.remove(id);
+                }
+                Ok(())
+            }
+            _ => Err("you have none of that".into()),
+        }
     }
 
     /// Every rule this character has, from wherever it came.

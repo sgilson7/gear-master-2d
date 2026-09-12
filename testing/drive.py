@@ -800,6 +800,7 @@ def clear_screens(page):
         ("#bestiary", "#bestiary-close"),
         ("#instant", "#instant-close"),
         ("#log", "#log-close"),
+        ("#brewbench", "#brew-close"),
         ("#ending", "#ending-close"),
     ]:
         if page.is_visible(screen):
@@ -1023,6 +1024,280 @@ def check_sunk_lands_you_in_town(page, name, fails):
     finally:
         clear_screens(page)
         plant(page, base, lambda body: None, stem="pocket-restore")
+
+
+def check_the_bench_brews_a_pair(page, name, fails):
+    """**Two things off two corpses, in a glass.**
+
+    The larder is a second bag that opens nowhere but a town, and the glass is a
+    shape rather than a box — so what only a browser can say is whether the
+    counter is actually there, whether the shape is drawn as the shape core gave
+    (and not as a rectangle), and whether picking two up produces a brew with a
+    line under it. `cargo test` can say what a pair is worth; it cannot say
+    whether anybody can reach the bench.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+
+    def stocked(body):
+        strip_the_boards(body)
+        w = body.setdefault("world", {})
+        w["map"] = "west-bambulon"
+        # One tile above the pit's own counter at [1, 18]. Stepping onto a town
+        # is what opens it, so the check has to walk the last tile rather than
+        # be planted on it.
+        w["at"] = [1, 17]
+        # A larder with both halves of a pair the shipped table has.
+        body.setdefault("character", {})["larder"] = {"kettle-scale": 2, "rust-bloom": 2}
+
+    plant(page, base, stocked, stem="bench")
+    try:
+        # **Whatever the check before left up.** A shot can end on any screen,
+        # and the one before this one lands on a town — so a click on the map
+        # times out against a screen this check never opened.
+        clear_screens(page)
+        page.click("#map")
+        for _ in range(4):
+            if page.is_visible("#town"):
+                break
+            page.keyboard.press("ArrowDown")
+            page.wait_for_timeout(260)
+            dismiss_card(page)
+            close_fight(page)
+        if not page.is_visible("#town"):
+            at = page.evaluate("() => window.__position()")
+            fails.append(f"{name}: could not get into a town at all ({at})")
+            return
+        page.click("#bench")
+        page.wait_for_selector("#brewbench", state="visible", timeout=4000)
+        cells = page.eval_on_selector_all("#brew-glass .cell", "els => els.length")
+        gone = page.eval_on_selector_all("#brew-glass .cell.gone", "els => els.length")
+        if cells == 0 or gone == 0:
+            fails.append(f"{name}: the glass drew {cells} cells and {gone} of them cut away, "
+                         "which is a rectangle and not a shape")
+            return
+        held = page.eval_on_selector_all("#brew-larder button", "els => els.length")
+        if held != 2:
+            fails.append(f"{name}: the larder drew {held} things, not the two that were planted")
+            return
+        page.click("button[data-ingredient='kettle-scale']")
+        page.wait_for_timeout(120)
+        page.click("button[data-ingredient='rust-bloom']")
+        page.wait_for_timeout(200)
+        said = page.text_content("#brew-gives") or ""
+        full = page.eval_on_selector_all("#brew-glass .cell.full", "els => els.length")
+        if "Searing Draught" not in said or full == 0:
+            fails.append(f"{name}: brewed and the glass says {said!r} with {full} cells standing")
+        else:
+            print(f"ok: the bench brews a pair, and the glass is a shape ({cells - gone} cells of {cells})")
+    finally:
+        clear_screens(page)
+        plant(page, base, lambda body: None, stem="bench-restore")
+
+
+def check_the_area_says_its_name(page, name, fails):
+    """**A place says its own name when you arrive in it.**
+
+    Only a browser can answer this: it is a card over the canvas, it appears on
+    a change the page notices for itself, and it goes away on a clock. Nothing
+    in `cargo test` can see any of the three.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+
+    def in_the_pit(body):
+        strip_the_boards(body)
+        w = body.setdefault("world", {})
+        w["map"] = "west-bambulon"
+        w["at"] = [9, 12]
+
+    plant(page, base, in_the_pit, stem="area")
+    try:
+        # **Whatever the check before left up.** A shot can end on any screen,
+        # and the one before this one lands on a town — so a click on the map
+        # times out against a screen this check never opened.
+        clear_screens(page)
+        # A save being restored is not an arrival, so nothing is up yet.
+        page.wait_for_timeout(400)
+        if page.is_visible("#area"):
+            fails.append(f"{name}: the card was up before anybody had moved")
+            return
+        page.click("#map")
+        was = page.evaluate("() => JSON.parse(window.__position()).region")
+        seen, region, moved = None, was, False
+        # **Until the region actually changes.** A card that is not shown while
+        # you stand still is the feature working, so the assertion has to be
+        # anchored to the moment the answer moves rather than to a step count.
+        for _ in range(22):
+            page.keyboard.press("ArrowUp")
+            page.wait_for_timeout(200)
+            dismiss_card(page)
+            close_fight(page)
+            if page.is_visible("#area"):
+                seen = (page.text_content("#area") or "").strip()
+            region = page.evaluate("() => JSON.parse(window.__position()).region")
+            if region != was:
+                moved = True
+                break
+        if not moved:
+            fails.append(f"{name}: never left {was!r} in twenty-two steps, so nothing was asked")
+            return
+        if not seen:
+            fails.append(f"{name}: crossed from {was!r} into {region!r} and no card showed")
+            return
+        if seen != region:
+            fails.append(f"{name}: the card said {seen!r} and the panel says {region!r}")
+            return
+        # And it goes. A card that stays is a card over the map.
+        page.wait_for_timeout(2600)
+        if page.is_visible("#area"):
+            fails.append(f"{name}: the card is still up after two and a half seconds")
+        else:
+            print(f"ok: arriving somewhere says its name ({seen}) and then stops saying it")
+    finally:
+        clear_screens(page)
+        plant(page, base, lambda body: None, stem="area-restore")
+
+
+def check_the_errand_log_is_a_tree(page, name, fails):
+    """**Rows are chain depth, and the wires are measured.**
+
+    The tree's own lesson, one screen along: *a check that counts elements is
+    not asking whether they are drawn.* `openTree` painted its wires while the
+    screen was still `display: none`, every rectangle was zero, and a check that
+    counted seventeen paths was green through it. So this measures — the svg has
+    a width, the rows are more than one, and no wire sits at the origin.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+
+    def with_a_chain(body):
+        strip_the_boards(body)
+        w = body.setdefault("world", {})
+        w["map"] = "west-bambulon"
+        w["at"] = [9, 12]
+        # A chain three rungs deep, all taken, so there is something to draw.
+        w["quests_taken"] = ["marbulon-asks-first", "marbulon-asks-second",
+                             "a-door-where-there-was-not-one", "the-eyes-have-it"]
+        w["quests_done"] = ["marbulon-asks-first"]
+        w["answered"] = list(w.get("answered", [])) + ["the-bottom-of-the-cave"]
+
+    plant(page, base, with_a_chain, stem="log-tree")
+    try:
+        # **Whatever the check before left up.** A shot can end on any screen,
+        # and the one before this one lands on a town — so a click on the map
+        # times out against a screen this check never opened.
+        clear_screens(page)
+        page.click("#errands-open")
+        page.wait_for_selector("#log", state="visible", timeout=4000)
+        rows = page.eval_on_selector_all("#log-list .chainrow", "els => els.length")
+        if rows < 2:
+            fails.append(f"{name}: the log drew {rows} row(s), so nothing is laid out by depth")
+            return
+        # Measured, not counted.
+        box = page.eval_on_selector("#log-list .wires",
+                                    "el => ({ w: el.getBoundingClientRect().width, "
+                                    "n: el.querySelectorAll('path').length, "
+                                    "real: Array.from(el.querySelectorAll('path'))"
+                                    ".filter(p => !/M 0 0 V 0 H 0 V 0/.test(p.getAttribute('d')))"
+                                    ".length })")
+        if box["w"] <= 0:
+            fails.append(f"{name}: the wires svg is {box['w']}px wide, so it was drawn hidden")
+        elif box["n"] == 0 or box["real"] != box["n"]:
+            fails.append(f"{name}: {box['n']} wires drawn and {box['real']} of them have "
+                         "real coordinates")
+        else:
+            rungs = page.eval_on_selector_all("#log-list .rung", "els => els.map(e => e.textContent)")
+            print(f"ok: the errand log is a tree — {rows} rows {rungs}, {box['n']} wires measured")
+    finally:
+        clear_screens(page)
+        plant(page, base, lambda body: None, stem="log-restore")
+
+
+def check_a_word_errand_lands_on_a_table(page, name, fails):
+    """**Arriving is the doing, and on a table arriving is a landing.**
+
+    A step resolves whatever place it came to rest on and tells the errands; a
+    landing told them only about an *event*. So a word errand pointing at a
+    town, a gate, a bench, a caravan or a boss could never be finished on either
+    of the two shot maps — and the Undercountry is where the only town down
+    there is, which is the one this was asked for by name.
+
+    Nothing in `cargo test` can see it: both halves are the shim's, and the two
+    halves agreed about every map that is walked.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+
+    def below(body):
+        strip_the_boards(body)
+        w = body.setdefault("world", {})
+        w["map"] = "the-undercountry"
+        # Column ten is road the whole way down, and the town is the tile at
+        # [10, 10]. A tee four tiles up it, because a tile one step away is a
+        # tile you cannot shoot to.
+        w["at"] = [10, 3]
+        taken = list(w.get("quests_taken", []))
+        taken.append("nobody-has-named-it")
+        w["quests_taken"] = taken
+        done = list(w.get("quests_done", []))
+        done.append("the-ninth-is-accounted-for")
+        w["quests_done"] = done
+
+    plant(page, base, below, stem="under-the-country")
+    try:
+        before = page.evaluate(
+            "() => (window.__log().errands || []).find(q => q.id === 'nobody-has-named-it')")
+        if not before or before.get("stage") != "carrying":
+            fails.append(f"{name}: the errand planted as {before and before.get('stage')!r}, "
+                         "not something you are carrying")
+            return
+        # **Shot until it lands**, with a wider budget than `cross`'s six: the
+        # Undercountry is a table and a town deliberately does not catch a ball
+        # the way a gate does, so putting one on a single tile takes a few
+        # goes. The aim is core's — `shot::aim_at` — so what is aimed at is what
+        # a player could have aimed at.
+        landed = False
+        for _ in range(20):
+            at = json.loads(page.evaluate("() => window.__position()"))
+            if [at["x"], at["y"]] == [10, 10]:
+                landed = True
+                break
+            got = page.evaluate("() => window.__aimAt(10, 10, false)")
+            if got.get("angle") is None:
+                # **A tile one step away is a tile you cannot shoot to** — from
+                # directly adjacent every power overshoots or bounces off the
+                # wall behind, which is what a cue *is* and is written down in
+                # CLAUDE.md. So when there is no exact shot from here, take a
+                # tee: fire somewhere else and aim again from there.
+                page.evaluate("() => window.__shoot(0, 4)")
+                page.wait_for_timeout(700)
+                dismiss_card(page)
+                close_fight(page)
+                continue
+            page.evaluate(f"() => window.__shoot({got['angle']}, {got['power']})")
+            page.wait_for_timeout(700)
+            dismiss_card(page)
+            close_fight(page)
+        if not landed:
+            at = page.evaluate("() => window.__position()")
+            fails.append(f"{name}: could not put the ball on the town, and stopped at {at}")
+            return
+        after = page.evaluate(
+            "() => (window.__log().errands || []).find(q => q.id === 'nobody-has-named-it')")
+        if not after or after.get("stage") != "ready":
+            at = page.evaluate("() => window.__position()")
+            fails.append(f"{name}: landed on the town and the errand is still "
+                         f"{after and after.get('stage')!r} ({at})")
+        else:
+            print("ok: a word errand is told you arrived, on a map you arrive at by shooting")
+    finally:
+        clear_screens(page)
+        plant(page, base, lambda body: None, stem="under-restore")
 
 
 def check_a_floor_still_steps(page, name, fails):
@@ -7303,6 +7578,10 @@ def walk_the_gate(browser, name, fails=None):
     check_the_cue_shows_where_the_ball_will_stop(page, name, fails)
     check_a_shut_crossing_says_so_when_you_land_beside_it(page, name, fails)
     check_the_furnace_shows_on_the_bar(page, name, fails)
+    check_a_word_errand_lands_on_a_table(page, name, fails)
+    check_the_bench_brews_a_pair(page, name, fails)
+    check_the_area_says_its_name(page, name, fails)
+    check_the_errand_log_is_a_tree(page, name, fails)
     check_the_glossary_says_what_a_thing_does(page, name, fails)
 
     # --- the log ---------------------------------------------------------------

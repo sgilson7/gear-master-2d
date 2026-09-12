@@ -212,8 +212,10 @@ fn reachability_derives_over_every_map() {
     // **A count rather than a name**, and it moves when a map is added — which
     // is the point: the loop below is the check and this is what stops it
     // silently walking a shorter list. The twenty-second is the Wextreen
-    // Sands; twenty-three to twenty-five are the three floors of the Eleven Reefs under it.
-    assert_eq!(data::MAPS.len(), 25, "the game ships {} maps", data::MAPS.len());
+    // Sands; twenty-three to twenty-five are the three floors of the Eleven
+    // Reefs under it; twenty-six to twenty-nine are the four floors of the
+    // Cairnworks under the Wextreen Reach.
+    assert_eq!(data::MAPS.len(), 29, "the game ships {} maps", data::MAPS.len());
     for (id, _) in data::MAPS {
         let mut opened = WorldState::default();
         opened.map = (*id).to_string();

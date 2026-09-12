@@ -11,6 +11,7 @@
 //!   * Combat is fully deterministic and simulated to completion up front
 //!     (`combat::simulate`), producing a log the GUI replays.
 
+pub mod brew;
 pub mod character;
 pub mod class;
 pub mod glossary;
@@ -49,4 +50,5 @@ pub mod stats;
 pub mod theme;
 pub mod theme_data;
 pub mod tile_event;
+pub mod unlock;
 pub mod world;

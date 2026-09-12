@@ -4309,6 +4309,188 @@ pub const LADDER: &[MonsterSpec] = &[
         drops: &[],
         enchs: &[],
     },
+    // ---- the Cairnworks, four floors under the Wextreen Reach -------------
+    //
+    // **Each one shuts every lane but one, and "100%" is 95.** `stats::LANE_CAP`
+    // has been 95 since M16 for a reason this block must not undo — *a lane you
+    // can commit to is never one you can be shut out of* — so a boss written at
+    // a literal hundred would be a wall with a sentence on it. Ninety-five
+    // means the wrong lane does a twentieth of its damage, which against these
+    // healths is a loss at the buzzer. That *is* "you have to use the other
+    // lane", in a game with a clock.
+    //
+    // **The open lane is written as a large negative, not as a zero.** A board
+    // grants resistances of its own, so a boss with `curse_resist: 0` and forty
+    // pieces on it is a boss with about forty curse resist — the design would
+    // have been undone by the costume. The negative is what makes the sum land
+    // at nothing whatever the gear adds, and
+    // `the_cairnworks_shuts_every_lane_but_one` is what measures it rather than
+    // trusting the arithmetic.
+    //
+    // **All four wear The Unwritten's two slots**, which is the one shape in
+    // the set a player survives — see its own note. Nothing here invents a
+    // component, so the catalogue and the save fingerprint are untouched.
+    // **Floor one: sear it.** Swings and spells alike come off it and it has never
+    // been on fire, which is a thing it does not have a word for.
+    MonsterSpec {
+        name: "The Unslaked Kiln",
+        health: 26_000,
+        strength: 96,
+        regen: 20,
+        mind_resist: 130,
+        curse_resist: -400,
+        physical_resist: 130,
+        magic_resist: 130,
+        attacks: &[],
+        gear: &[
+            ("Hymnal", SlotKind::Weapon, 0, 0, 0),
+            ("Bulwark Vial", SlotKind::Weapon, 1, 0, 2),
+            ("Runewash Ink", SlotKind::Weapon, 0, 2, 2),
+            ("Emberburst", SlotKind::Weapon, 2, 2, 0),
+            ("Cosmic Alignment", SlotKind::Weapon, 2, 0, 0),
+            ("Cinderscript Ink", SlotKind::Weapon, 2, 1, 1),
+            ("The Bog Census", SlotKind::Weapon, 3, 0, 0),
+            ("Census Bolt", SlotKind::Weapon, 4, 2, 1),
+            ("Cinderscript Ink", SlotKind::Weapon, 5, 0, 1),
+            ("Flywheel Cog", SlotKind::Weapon, 0, 4, 1),
+            ("Cinderscript Ink", SlotKind::Weapon, 2, 4, 0),
+            ("Azure Alignment", SlotKind::Weapon, 4, 4, 0),
+            ("Bone Crown", SlotKind::Helmet, 0, 0, 3),
+            ("Bone Scale", SlotKind::Helmet, 1, 1, 2),
+            ("Bone Fletch", SlotKind::Helmet, 2, 2, 3),
+            ("Idol's Crest", SlotKind::Helmet, 3, 0, 0),
+            ("Tin Frame", SlotKind::Helmet, 4, 1, 0),
+            ("Tin Plating", SlotKind::Helmet, 4, 0, 0),
+        ],
+        items: &[4, 5, 3, 3, 3],
+        gear_offset: 0,
+        bounty: 900,
+        sprite: MonsterSprite::Fiend,
+        rank: Rank::Boss,
+        drops: &[],
+        enchs: &[],
+    },
+    // **Floor two: hit it.** A wall built by somebody who was counting. Nothing
+    // subtle gets through it and a hammer does.
+    MonsterSpec {
+        name: "Nine Courses of Brick",
+        health: 11_000,
+        strength: 74,
+        regen: 20,
+        mind_resist: 130,
+        curse_resist: 130,
+        physical_resist: -400,
+        magic_resist: 130,
+        attacks: &[],
+        gear: &[
+            ("Hymnal", SlotKind::Weapon, 0, 0, 0),
+            ("Bulwark Vial", SlotKind::Weapon, 1, 0, 2),
+            ("Runewash Ink", SlotKind::Weapon, 0, 2, 2),
+            ("Emberburst", SlotKind::Weapon, 2, 2, 0),
+            ("Cosmic Alignment", SlotKind::Weapon, 2, 0, 0),
+            ("Cinderscript Ink", SlotKind::Weapon, 2, 1, 1),
+            ("The Bog Census", SlotKind::Weapon, 3, 0, 0),
+            ("Census Bolt", SlotKind::Weapon, 4, 2, 1),
+            ("Cinderscript Ink", SlotKind::Weapon, 5, 0, 1),
+            ("Flywheel Cog", SlotKind::Weapon, 0, 4, 1),
+            ("Cinderscript Ink", SlotKind::Weapon, 2, 4, 0),
+            ("Azure Alignment", SlotKind::Weapon, 4, 4, 0),
+            ("Bone Crown", SlotKind::Helmet, 0, 0, 3),
+            ("Bone Scale", SlotKind::Helmet, 1, 1, 2),
+            ("Bone Fletch", SlotKind::Helmet, 2, 2, 3),
+            ("Idol's Crest", SlotKind::Helmet, 3, 0, 0),
+            ("Tin Frame", SlotKind::Helmet, 4, 1, 0),
+            ("Tin Plating", SlotKind::Helmet, 4, 0, 0),
+        ],
+        items: &[4, 5, 3, 3, 3],
+        gear_offset: 0,
+        bounty: 950,
+        sprite: MonsterSprite::Colossus,
+        rank: Rank::Boss,
+        drops: &[],
+        enchs: &[],
+    },
+    // **Floor three: burn it down with something that is not a blade.** Draught,
+    // and a draught you cannot put a blade in.
+    MonsterSpec {
+        name: "The Cold Flue",
+        health: 6_000,
+        strength: 46,
+        regen: 20,
+        mind_resist: 130,
+        curse_resist: 130,
+        physical_resist: 130,
+        magic_resist: -400,
+        attacks: &[],
+        gear: &[
+            ("Hymnal", SlotKind::Weapon, 0, 0, 0),
+            ("Bulwark Vial", SlotKind::Weapon, 1, 0, 2),
+            ("Runewash Ink", SlotKind::Weapon, 0, 2, 2),
+            ("Emberburst", SlotKind::Weapon, 2, 2, 0),
+            ("Cosmic Alignment", SlotKind::Weapon, 2, 0, 0),
+            ("Cinderscript Ink", SlotKind::Weapon, 2, 1, 1),
+            ("The Bog Census", SlotKind::Weapon, 3, 0, 0),
+            ("Census Bolt", SlotKind::Weapon, 4, 2, 1),
+            ("Cinderscript Ink", SlotKind::Weapon, 5, 0, 1),
+            ("Flywheel Cog", SlotKind::Weapon, 0, 4, 1),
+            ("Cinderscript Ink", SlotKind::Weapon, 2, 4, 0),
+            ("Azure Alignment", SlotKind::Weapon, 4, 4, 0),
+            ("Bone Crown", SlotKind::Helmet, 0, 0, 3),
+            ("Bone Scale", SlotKind::Helmet, 1, 1, 2),
+            ("Bone Fletch", SlotKind::Helmet, 2, 2, 3),
+            ("Idol's Crest", SlotKind::Helmet, 3, 0, 0),
+            ("Tin Frame", SlotKind::Helmet, 4, 1, 0),
+            ("Tin Plating", SlotKind::Helmet, 4, 0, 0),
+        ],
+        items: &[4, 5, 3, 3, 3],
+        gear_offset: 0,
+        bounty: 1000,
+        sprite: MonsterSprite::Wisp,
+        rank: Rank::Boss,
+        drops: &[],
+        enchs: &[],
+    },
+    // **Floor four: pierce it.** Every lane at the cap and health enough to sit
+    // out a twentieth of anything. Piercing cuts a resistance rather than
+    // beating it, which is the one thing that reaches this.
+    MonsterSpec {
+        name: "What Was Left Banked",
+        health: 7_500,
+        strength: 52,
+        regen: 20,
+        mind_resist: 130,
+        curse_resist: 130,
+        physical_resist: 130,
+        magic_resist: 130,
+        attacks: &[],
+        gear: &[
+            ("Hymnal", SlotKind::Weapon, 0, 0, 0),
+            ("Bulwark Vial", SlotKind::Weapon, 1, 0, 2),
+            ("Runewash Ink", SlotKind::Weapon, 0, 2, 2),
+            ("Emberburst", SlotKind::Weapon, 2, 2, 0),
+            ("Cosmic Alignment", SlotKind::Weapon, 2, 0, 0),
+            ("Cinderscript Ink", SlotKind::Weapon, 2, 1, 1),
+            ("The Bog Census", SlotKind::Weapon, 3, 0, 0),
+            ("Census Bolt", SlotKind::Weapon, 4, 2, 1),
+            ("Cinderscript Ink", SlotKind::Weapon, 5, 0, 1),
+            ("Flywheel Cog", SlotKind::Weapon, 0, 4, 1),
+            ("Cinderscript Ink", SlotKind::Weapon, 2, 4, 0),
+            ("Azure Alignment", SlotKind::Weapon, 4, 4, 0),
+            ("Bone Crown", SlotKind::Helmet, 0, 0, 3),
+            ("Bone Scale", SlotKind::Helmet, 1, 1, 2),
+            ("Bone Fletch", SlotKind::Helmet, 2, 2, 3),
+            ("Idol's Crest", SlotKind::Helmet, 3, 0, 0),
+            ("Tin Frame", SlotKind::Helmet, 4, 1, 0),
+            ("Tin Plating", SlotKind::Helmet, 4, 0, 0),
+        ],
+        items: &[4, 5, 3, 3, 3],
+        gear_offset: 0,
+        bounty: 1500,
+        sprite: MonsterSprite::Null,
+        rank: Rank::Boss,
+        drops: &[],
+        enchs: &[],
+    },
 ];
 
 // ----------------------------------------------------------- combatants
@@ -6320,6 +6502,20 @@ pub struct Held {
     /// contributes, once, beside the item* — the same door the tree's armour,
     /// its mana and its granted rules go through.
     pub mind: i32,
+    /// Rates the character has **for this fight only**.
+    ///
+    /// **The one field in `Held` that is a rate rather than a quantity**, and
+    /// it is here rather than in the character's own `Stats` because that is
+    /// what *for this fight only* means: a potion that added to `player_stats`
+    /// would be a permanent stat with a click in front of it, and there would
+    /// be no moment at which it wore off. Added to the player's stats at the
+    /// bell and nowhere else, so combat stays a pure function of what it was
+    /// handed.
+    ///
+    /// Nothing but a brew fills it today. It is not named `brew` for the same
+    /// reason `armor` is not named `tree`: the next thing that wants a rate for
+    /// one fight should use this rather than inventing a second one.
+    pub stats: crate::stats::Stats,
 }
 
 /// Put an expert's power onto the fighter at the bell.
@@ -6555,6 +6751,12 @@ pub fn simulate_party_holding(
     held: Held,
 ) -> CombatLog {
     assert!(!specs.is_empty(), "a fight needs something to fight");
+    // **Rates for this fight only, folded in before the fighter is built.**
+    // A brew is the only thing that fills this today, and it goes on here
+    // rather than on the character so that there is a moment at which it wears
+    // off — which is the whole of what *temporary* means.
+    let mut player_stats = player_stats;
+    player_stats += held.stats;
     let mut start_player = Combatant::player(player_stats, profiles);
     start_player.purse = purse;
     // Before the class powers, so `Tired`'s debt and `Unionized`'s plate still
@@ -6656,6 +6858,14 @@ pub fn simulate_party_holding(
     // same field.
     for c in classes {
         match c.power {
+            // **The one class in the game the fight never reads.** An
+            // apothecary's power is honoured where a brew is made and where a
+            // brew is worth something — `Game::retort` and `Character::boon` —
+            // and the potion it produces arrives here through `Held` like every
+            // other thing you walk in already holding. The arm exists so that
+            // adding a specialization is a decision about combat rather than a
+            // silence.
+            crate::class::ClassPower::Apothecary { .. } => {}
             crate::class::ClassPower::SlowTime(n) => start_player.slow_time = n,
             crate::class::ClassPower::Overflowing(n) => start_player.overflowing = n,
             crate::class::ClassPower::Leeching(pct) => start_player.leech = pct,

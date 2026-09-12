@@ -249,7 +249,7 @@ pub fn flags_raised(o: &Outcome, out: &mut Vec<String>) {
 /// `Outcome::All` holds outcomes, so a flag can sit one level down from the
 /// choice — which is where every chain in the game puts it, beside the errand
 /// it hands over.
-fn sets_flag(o: &Outcome, flag: &str) -> bool {
+pub fn sets_flag(o: &Outcome, flag: &str) -> bool {
     match o {
         Outcome::Flag(f) => f == flag,
         Outcome::All(list) => list.iter().any(|x| sets_flag(x, flag)),

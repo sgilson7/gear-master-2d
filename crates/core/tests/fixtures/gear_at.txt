@@ -11790,6 +11790,582 @@ LADDER[71] The Unwritten INSANE Helmet 4,1 r0
     Warded Frame
 LADDER[71] The Unwritten INSANE Helmet 4,0 r0
     Layered Plating
+LADDER[72] The Unslaked Kiln EASY Weapon 0,0 r0
+    War Ledger
+LADDER[72] The Unslaked Kiln EASY Weapon 1,0 r2
+    Ratchet Cog
+LADDER[72] The Unslaked Kiln EASY Weapon 0,2 r2
+    Runewash Ink
+LADDER[72] The Unslaked Kiln EASY Weapon 2,2 r0
+    Emberburst
+LADDER[72] The Unslaked Kiln EASY Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[72] The Unslaked Kiln EASY Weapon 2,1 r1
+    Prismatic Ink
+LADDER[72] The Unslaked Kiln EASY Weapon 3,0 r0
+    The Bog Census
+LADDER[72] The Unslaked Kiln EASY Weapon 4,2 r1
+    Census Bolt
+LADDER[72] The Unslaked Kiln EASY Weapon 5,0 r1
+    Prismatic Ink
+LADDER[72] The Unslaked Kiln EASY Weapon 0,4 r1
+    Flywheel Cog
+LADDER[72] The Unslaked Kiln EASY Weapon 2,4 r0
+    Prismatic Ink
+LADDER[72] The Unslaked Kiln EASY Weapon 4,4 r0
+    Azure Alignment
+LADDER[72] The Unslaked Kiln EASY Helmet 0,0 r3
+    Bone Crown
+LADDER[72] The Unslaked Kiln EASY Helmet 1,1 r2
+    Bone Scale
+LADDER[72] The Unslaked Kiln EASY Helmet 2,2 r3
+    Bone Fletch
+LADDER[72] The Unslaked Kiln EASY Helmet 3,0 r0
+    Idol's Crest
+LADDER[72] The Unslaked Kiln EASY Helmet 4,1 r0
+    Tin Frame
+LADDER[72] The Unslaked Kiln EASY Helmet 4,0 r0
+    Tin Plating
+LADDER[72] The Unslaked Kiln MEDIUM Weapon 0,0 r0
+    Hymnal
+LADDER[72] The Unslaked Kiln MEDIUM Weapon 1,0 r2
+    Bulwark Vial
+LADDER[72] The Unslaked Kiln MEDIUM Weapon 0,2 r2
+    Runewash Ink
+LADDER[72] The Unslaked Kiln MEDIUM Weapon 2,2 r0
+    Emberburst
+LADDER[72] The Unslaked Kiln MEDIUM Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[72] The Unslaked Kiln MEDIUM Weapon 2,1 r1
+    Cinderscript Ink
+LADDER[72] The Unslaked Kiln MEDIUM Weapon 3,0 r0
+    The Bog Census
+LADDER[72] The Unslaked Kiln MEDIUM Weapon 4,2 r1
+    Census Bolt
+LADDER[72] The Unslaked Kiln MEDIUM Weapon 5,0 r1
+    Cinderscript Ink
+LADDER[72] The Unslaked Kiln MEDIUM Weapon 0,4 r1
+    Flywheel Cog
+LADDER[72] The Unslaked Kiln MEDIUM Weapon 2,4 r0
+    Cinderscript Ink
+LADDER[72] The Unslaked Kiln MEDIUM Weapon 4,4 r0
+    Azure Alignment
+LADDER[72] The Unslaked Kiln MEDIUM Helmet 0,0 r3
+    Bone Crown
+LADDER[72] The Unslaked Kiln MEDIUM Helmet 1,1 r2
+    Bone Scale
+LADDER[72] The Unslaked Kiln MEDIUM Helmet 2,2 r3
+    Bone Fletch
+LADDER[72] The Unslaked Kiln MEDIUM Helmet 3,0 r0
+    Idol's Crest
+LADDER[72] The Unslaked Kiln MEDIUM Helmet 4,1 r0
+    Tin Frame
+LADDER[72] The Unslaked Kiln MEDIUM Helmet 4,0 r0
+    Tin Plating
+LADDER[72] The Unslaked Kiln HARD Weapon 0,0 r0
+    Herbal
+LADDER[72] The Unslaked Kiln HARD Weapon 1,0 r2
+    Chain Coil
+LADDER[72] The Unslaked Kiln HARD Weapon 0,2 r2
+    Bloodletter's Ink
+LADDER[72] The Unslaked Kiln HARD Weapon 2,2 r0
+    Emberburst
+LADDER[72] The Unslaked Kiln HARD Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[72] The Unslaked Kiln HARD Weapon 2,1 r1
+    Quicksilver Ink
+LADDER[72] The Unslaked Kiln HARD Weapon 3,0 r0
+    The Bog Census
+LADDER[72] The Unslaked Kiln HARD Weapon 4,2 r1
+    Census Bolt
+LADDER[72] The Unslaked Kiln HARD Weapon 5,0 r1
+    Quicksilver Ink
+LADDER[72] The Unslaked Kiln HARD Weapon 0,4 r1
+    Ratchet Cog
+LADDER[72] The Unslaked Kiln HARD Weapon 2,4 r0
+    Quicksilver Ink
+LADDER[72] The Unslaked Kiln HARD Weapon 4,4 r0
+    Crimson Alignment
+LADDER[72] The Unslaked Kiln HARD Helmet 0,0 r3
+    Bone Crown
+LADDER[72] The Unslaked Kiln HARD Helmet 1,1 r2
+    Bone Scale
+LADDER[72] The Unslaked Kiln HARD Helmet 2,2 r3
+    Bone Fletch
+LADDER[72] The Unslaked Kiln HARD Helmet 3,0 r0
+    Idol's Crest
+LADDER[72] The Unslaked Kiln HARD Helmet 4,1 r0
+    Bronze Frame
+LADDER[72] The Unslaked Kiln HARD Helmet 4,0 r0
+    Bronze Plating
+LADDER[72] The Unslaked Kiln INSANE Weapon 0,0 r0
+    Herbal
+LADDER[72] The Unslaked Kiln INSANE Weapon 1,0 r2
+    Grimoire Rack
+LADDER[72] The Unslaked Kiln INSANE Weapon 0,2 r2
+    Bloodletter's Ink
+LADDER[72] The Unslaked Kiln INSANE Weapon 2,2 r0
+    Emberburst
+LADDER[72] The Unslaked Kiln INSANE Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[72] The Unslaked Kiln INSANE Weapon 2,1 r1
+    Quicksilver Ink
+LADDER[72] The Unslaked Kiln INSANE Weapon 3,0 r0
+    The Bog Census
+LADDER[72] The Unslaked Kiln INSANE Weapon 4,2 r1
+    Census Bolt
+LADDER[72] The Unslaked Kiln INSANE Weapon 5,0 r1
+    Quicksilver Ink
+LADDER[72] The Unslaked Kiln INSANE Weapon 0,4 r1
+    Bulwark Vial
+LADDER[72] The Unslaked Kiln INSANE Weapon 2,4 r0
+    Quicksilver Ink
+LADDER[72] The Unslaked Kiln INSANE Weapon 4,4 r0
+    Crimson Alignment
+LADDER[72] The Unslaked Kiln INSANE Helmet 0,0 r3
+    Bone Crown
+LADDER[72] The Unslaked Kiln INSANE Helmet 1,1 r2
+    Bone Scale
+LADDER[72] The Unslaked Kiln INSANE Helmet 2,2 r3
+    Bone Fletch
+LADDER[72] The Unslaked Kiln INSANE Helmet 3,0 r0
+    Idol's Crest
+LADDER[72] The Unslaked Kiln INSANE Helmet 4,1 r0
+    Warded Frame
+LADDER[72] The Unslaked Kiln INSANE Helmet 4,0 r0
+    Layered Plating
+LADDER[73] Nine Courses of Brick EASY Weapon 0,0 r0
+    War Ledger
+LADDER[73] Nine Courses of Brick EASY Weapon 1,0 r2
+    Ratchet Cog
+LADDER[73] Nine Courses of Brick EASY Weapon 0,2 r2
+    Runewash Ink
+LADDER[73] Nine Courses of Brick EASY Weapon 2,2 r0
+    Emberburst
+LADDER[73] Nine Courses of Brick EASY Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[73] Nine Courses of Brick EASY Weapon 2,1 r1
+    Prismatic Ink
+LADDER[73] Nine Courses of Brick EASY Weapon 3,0 r0
+    The Bog Census
+LADDER[73] Nine Courses of Brick EASY Weapon 4,2 r1
+    Census Bolt
+LADDER[73] Nine Courses of Brick EASY Weapon 5,0 r1
+    Prismatic Ink
+LADDER[73] Nine Courses of Brick EASY Weapon 0,4 r1
+    Flywheel Cog
+LADDER[73] Nine Courses of Brick EASY Weapon 2,4 r0
+    Prismatic Ink
+LADDER[73] Nine Courses of Brick EASY Weapon 4,4 r0
+    Azure Alignment
+LADDER[73] Nine Courses of Brick EASY Helmet 0,0 r3
+    Bone Crown
+LADDER[73] Nine Courses of Brick EASY Helmet 1,1 r2
+    Bone Scale
+LADDER[73] Nine Courses of Brick EASY Helmet 2,2 r3
+    Bone Fletch
+LADDER[73] Nine Courses of Brick EASY Helmet 3,0 r0
+    Idol's Crest
+LADDER[73] Nine Courses of Brick EASY Helmet 4,1 r0
+    Tin Frame
+LADDER[73] Nine Courses of Brick EASY Helmet 4,0 r0
+    Tin Plating
+LADDER[73] Nine Courses of Brick MEDIUM Weapon 0,0 r0
+    Hymnal
+LADDER[73] Nine Courses of Brick MEDIUM Weapon 1,0 r2
+    Bulwark Vial
+LADDER[73] Nine Courses of Brick MEDIUM Weapon 0,2 r2
+    Runewash Ink
+LADDER[73] Nine Courses of Brick MEDIUM Weapon 2,2 r0
+    Emberburst
+LADDER[73] Nine Courses of Brick MEDIUM Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[73] Nine Courses of Brick MEDIUM Weapon 2,1 r1
+    Cinderscript Ink
+LADDER[73] Nine Courses of Brick MEDIUM Weapon 3,0 r0
+    The Bog Census
+LADDER[73] Nine Courses of Brick MEDIUM Weapon 4,2 r1
+    Census Bolt
+LADDER[73] Nine Courses of Brick MEDIUM Weapon 5,0 r1
+    Cinderscript Ink
+LADDER[73] Nine Courses of Brick MEDIUM Weapon 0,4 r1
+    Flywheel Cog
+LADDER[73] Nine Courses of Brick MEDIUM Weapon 2,4 r0
+    Cinderscript Ink
+LADDER[73] Nine Courses of Brick MEDIUM Weapon 4,4 r0
+    Azure Alignment
+LADDER[73] Nine Courses of Brick MEDIUM Helmet 0,0 r3
+    Bone Crown
+LADDER[73] Nine Courses of Brick MEDIUM Helmet 1,1 r2
+    Bone Scale
+LADDER[73] Nine Courses of Brick MEDIUM Helmet 2,2 r3
+    Bone Fletch
+LADDER[73] Nine Courses of Brick MEDIUM Helmet 3,0 r0
+    Idol's Crest
+LADDER[73] Nine Courses of Brick MEDIUM Helmet 4,1 r0
+    Tin Frame
+LADDER[73] Nine Courses of Brick MEDIUM Helmet 4,0 r0
+    Tin Plating
+LADDER[73] Nine Courses of Brick HARD Weapon 0,0 r0
+    Herbal
+LADDER[73] Nine Courses of Brick HARD Weapon 1,0 r2
+    Chain Coil
+LADDER[73] Nine Courses of Brick HARD Weapon 0,2 r2
+    Bloodletter's Ink
+LADDER[73] Nine Courses of Brick HARD Weapon 2,2 r0
+    Emberburst
+LADDER[73] Nine Courses of Brick HARD Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[73] Nine Courses of Brick HARD Weapon 2,1 r1
+    Quicksilver Ink
+LADDER[73] Nine Courses of Brick HARD Weapon 3,0 r0
+    The Bog Census
+LADDER[73] Nine Courses of Brick HARD Weapon 4,2 r1
+    Census Bolt
+LADDER[73] Nine Courses of Brick HARD Weapon 5,0 r1
+    Quicksilver Ink
+LADDER[73] Nine Courses of Brick HARD Weapon 0,4 r1
+    Ratchet Cog
+LADDER[73] Nine Courses of Brick HARD Weapon 2,4 r0
+    Quicksilver Ink
+LADDER[73] Nine Courses of Brick HARD Weapon 4,4 r0
+    Crimson Alignment
+LADDER[73] Nine Courses of Brick HARD Helmet 0,0 r3
+    Bone Crown
+LADDER[73] Nine Courses of Brick HARD Helmet 1,1 r2
+    Bone Scale
+LADDER[73] Nine Courses of Brick HARD Helmet 2,2 r3
+    Bone Fletch
+LADDER[73] Nine Courses of Brick HARD Helmet 3,0 r0
+    Idol's Crest
+LADDER[73] Nine Courses of Brick HARD Helmet 4,1 r0
+    Bronze Frame
+LADDER[73] Nine Courses of Brick HARD Helmet 4,0 r0
+    Bronze Plating
+LADDER[73] Nine Courses of Brick INSANE Weapon 0,0 r0
+    Herbal
+LADDER[73] Nine Courses of Brick INSANE Weapon 1,0 r2
+    Grimoire Rack
+LADDER[73] Nine Courses of Brick INSANE Weapon 0,2 r2
+    Bloodletter's Ink
+LADDER[73] Nine Courses of Brick INSANE Weapon 2,2 r0
+    Emberburst
+LADDER[73] Nine Courses of Brick INSANE Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[73] Nine Courses of Brick INSANE Weapon 2,1 r1
+    Quicksilver Ink
+LADDER[73] Nine Courses of Brick INSANE Weapon 3,0 r0
+    The Bog Census
+LADDER[73] Nine Courses of Brick INSANE Weapon 4,2 r1
+    Census Bolt
+LADDER[73] Nine Courses of Brick INSANE Weapon 5,0 r1
+    Quicksilver Ink
+LADDER[73] Nine Courses of Brick INSANE Weapon 0,4 r1
+    Bulwark Vial
+LADDER[73] Nine Courses of Brick INSANE Weapon 2,4 r0
+    Quicksilver Ink
+LADDER[73] Nine Courses of Brick INSANE Weapon 4,4 r0
+    Crimson Alignment
+LADDER[73] Nine Courses of Brick INSANE Helmet 0,0 r3
+    Bone Crown
+LADDER[73] Nine Courses of Brick INSANE Helmet 1,1 r2
+    Bone Scale
+LADDER[73] Nine Courses of Brick INSANE Helmet 2,2 r3
+    Bone Fletch
+LADDER[73] Nine Courses of Brick INSANE Helmet 3,0 r0
+    Idol's Crest
+LADDER[73] Nine Courses of Brick INSANE Helmet 4,1 r0
+    Warded Frame
+LADDER[73] Nine Courses of Brick INSANE Helmet 4,0 r0
+    Layered Plating
+LADDER[74] The Cold Flue EASY Weapon 0,0 r0
+    War Ledger
+LADDER[74] The Cold Flue EASY Weapon 1,0 r2
+    Ratchet Cog
+LADDER[74] The Cold Flue EASY Weapon 0,2 r2
+    Runewash Ink
+LADDER[74] The Cold Flue EASY Weapon 2,2 r0
+    Emberburst
+LADDER[74] The Cold Flue EASY Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[74] The Cold Flue EASY Weapon 2,1 r1
+    Prismatic Ink
+LADDER[74] The Cold Flue EASY Weapon 3,0 r0
+    The Bog Census
+LADDER[74] The Cold Flue EASY Weapon 4,2 r1
+    Census Bolt
+LADDER[74] The Cold Flue EASY Weapon 5,0 r1
+    Prismatic Ink
+LADDER[74] The Cold Flue EASY Weapon 0,4 r1
+    Flywheel Cog
+LADDER[74] The Cold Flue EASY Weapon 2,4 r0
+    Prismatic Ink
+LADDER[74] The Cold Flue EASY Weapon 4,4 r0
+    Azure Alignment
+LADDER[74] The Cold Flue EASY Helmet 0,0 r3
+    Bone Crown
+LADDER[74] The Cold Flue EASY Helmet 1,1 r2
+    Bone Scale
+LADDER[74] The Cold Flue EASY Helmet 2,2 r3
+    Bone Fletch
+LADDER[74] The Cold Flue EASY Helmet 3,0 r0
+    Idol's Crest
+LADDER[74] The Cold Flue EASY Helmet 4,1 r0
+    Tin Frame
+LADDER[74] The Cold Flue EASY Helmet 4,0 r0
+    Tin Plating
+LADDER[74] The Cold Flue MEDIUM Weapon 0,0 r0
+    Hymnal
+LADDER[74] The Cold Flue MEDIUM Weapon 1,0 r2
+    Bulwark Vial
+LADDER[74] The Cold Flue MEDIUM Weapon 0,2 r2
+    Runewash Ink
+LADDER[74] The Cold Flue MEDIUM Weapon 2,2 r0
+    Emberburst
+LADDER[74] The Cold Flue MEDIUM Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[74] The Cold Flue MEDIUM Weapon 2,1 r1
+    Cinderscript Ink
+LADDER[74] The Cold Flue MEDIUM Weapon 3,0 r0
+    The Bog Census
+LADDER[74] The Cold Flue MEDIUM Weapon 4,2 r1
+    Census Bolt
+LADDER[74] The Cold Flue MEDIUM Weapon 5,0 r1
+    Cinderscript Ink
+LADDER[74] The Cold Flue MEDIUM Weapon 0,4 r1
+    Flywheel Cog
+LADDER[74] The Cold Flue MEDIUM Weapon 2,4 r0
+    Cinderscript Ink
+LADDER[74] The Cold Flue MEDIUM Weapon 4,4 r0
+    Azure Alignment
+LADDER[74] The Cold Flue MEDIUM Helmet 0,0 r3
+    Bone Crown
+LADDER[74] The Cold Flue MEDIUM Helmet 1,1 r2
+    Bone Scale
+LADDER[74] The Cold Flue MEDIUM Helmet 2,2 r3
+    Bone Fletch
+LADDER[74] The Cold Flue MEDIUM Helmet 3,0 r0
+    Idol's Crest
+LADDER[74] The Cold Flue MEDIUM Helmet 4,1 r0
+    Tin Frame
+LADDER[74] The Cold Flue MEDIUM Helmet 4,0 r0
+    Tin Plating
+LADDER[74] The Cold Flue HARD Weapon 0,0 r0
+    Herbal
+LADDER[74] The Cold Flue HARD Weapon 1,0 r2
+    Chain Coil
+LADDER[74] The Cold Flue HARD Weapon 0,2 r2
+    Bloodletter's Ink
+LADDER[74] The Cold Flue HARD Weapon 2,2 r0
+    Emberburst
+LADDER[74] The Cold Flue HARD Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[74] The Cold Flue HARD Weapon 2,1 r1
+    Quicksilver Ink
+LADDER[74] The Cold Flue HARD Weapon 3,0 r0
+    The Bog Census
+LADDER[74] The Cold Flue HARD Weapon 4,2 r1
+    Census Bolt
+LADDER[74] The Cold Flue HARD Weapon 5,0 r1
+    Quicksilver Ink
+LADDER[74] The Cold Flue HARD Weapon 0,4 r1
+    Ratchet Cog
+LADDER[74] The Cold Flue HARD Weapon 2,4 r0
+    Quicksilver Ink
+LADDER[74] The Cold Flue HARD Weapon 4,4 r0
+    Crimson Alignment
+LADDER[74] The Cold Flue HARD Helmet 0,0 r3
+    Bone Crown
+LADDER[74] The Cold Flue HARD Helmet 1,1 r2
+    Bone Scale
+LADDER[74] The Cold Flue HARD Helmet 2,2 r3
+    Bone Fletch
+LADDER[74] The Cold Flue HARD Helmet 3,0 r0
+    Idol's Crest
+LADDER[74] The Cold Flue HARD Helmet 4,1 r0
+    Bronze Frame
+LADDER[74] The Cold Flue HARD Helmet 4,0 r0
+    Bronze Plating
+LADDER[74] The Cold Flue INSANE Weapon 0,0 r0
+    Herbal
+LADDER[74] The Cold Flue INSANE Weapon 1,0 r2
+    Grimoire Rack
+LADDER[74] The Cold Flue INSANE Weapon 0,2 r2
+    Bloodletter's Ink
+LADDER[74] The Cold Flue INSANE Weapon 2,2 r0
+    Emberburst
+LADDER[74] The Cold Flue INSANE Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[74] The Cold Flue INSANE Weapon 2,1 r1
+    Quicksilver Ink
+LADDER[74] The Cold Flue INSANE Weapon 3,0 r0
+    The Bog Census
+LADDER[74] The Cold Flue INSANE Weapon 4,2 r1
+    Census Bolt
+LADDER[74] The Cold Flue INSANE Weapon 5,0 r1
+    Quicksilver Ink
+LADDER[74] The Cold Flue INSANE Weapon 0,4 r1
+    Bulwark Vial
+LADDER[74] The Cold Flue INSANE Weapon 2,4 r0
+    Quicksilver Ink
+LADDER[74] The Cold Flue INSANE Weapon 4,4 r0
+    Crimson Alignment
+LADDER[74] The Cold Flue INSANE Helmet 0,0 r3
+    Bone Crown
+LADDER[74] The Cold Flue INSANE Helmet 1,1 r2
+    Bone Scale
+LADDER[74] The Cold Flue INSANE Helmet 2,2 r3
+    Bone Fletch
+LADDER[74] The Cold Flue INSANE Helmet 3,0 r0
+    Idol's Crest
+LADDER[74] The Cold Flue INSANE Helmet 4,1 r0
+    Warded Frame
+LADDER[74] The Cold Flue INSANE Helmet 4,0 r0
+    Layered Plating
+LADDER[75] What Was Left Banked EASY Weapon 0,0 r0
+    War Ledger
+LADDER[75] What Was Left Banked EASY Weapon 1,0 r2
+    Ratchet Cog
+LADDER[75] What Was Left Banked EASY Weapon 0,2 r2
+    Runewash Ink
+LADDER[75] What Was Left Banked EASY Weapon 2,2 r0
+    Emberburst
+LADDER[75] What Was Left Banked EASY Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[75] What Was Left Banked EASY Weapon 2,1 r1
+    Prismatic Ink
+LADDER[75] What Was Left Banked EASY Weapon 3,0 r0
+    The Bog Census
+LADDER[75] What Was Left Banked EASY Weapon 4,2 r1
+    Census Bolt
+LADDER[75] What Was Left Banked EASY Weapon 5,0 r1
+    Prismatic Ink
+LADDER[75] What Was Left Banked EASY Weapon 0,4 r1
+    Flywheel Cog
+LADDER[75] What Was Left Banked EASY Weapon 2,4 r0
+    Prismatic Ink
+LADDER[75] What Was Left Banked EASY Weapon 4,4 r0
+    Azure Alignment
+LADDER[75] What Was Left Banked EASY Helmet 0,0 r3
+    Bone Crown
+LADDER[75] What Was Left Banked EASY Helmet 1,1 r2
+    Bone Scale
+LADDER[75] What Was Left Banked EASY Helmet 2,2 r3
+    Bone Fletch
+LADDER[75] What Was Left Banked EASY Helmet 3,0 r0
+    Idol's Crest
+LADDER[75] What Was Left Banked EASY Helmet 4,1 r0
+    Tin Frame
+LADDER[75] What Was Left Banked EASY Helmet 4,0 r0
+    Tin Plating
+LADDER[75] What Was Left Banked MEDIUM Weapon 0,0 r0
+    Hymnal
+LADDER[75] What Was Left Banked MEDIUM Weapon 1,0 r2
+    Bulwark Vial
+LADDER[75] What Was Left Banked MEDIUM Weapon 0,2 r2
+    Runewash Ink
+LADDER[75] What Was Left Banked MEDIUM Weapon 2,2 r0
+    Emberburst
+LADDER[75] What Was Left Banked MEDIUM Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[75] What Was Left Banked MEDIUM Weapon 2,1 r1
+    Cinderscript Ink
+LADDER[75] What Was Left Banked MEDIUM Weapon 3,0 r0
+    The Bog Census
+LADDER[75] What Was Left Banked MEDIUM Weapon 4,2 r1
+    Census Bolt
+LADDER[75] What Was Left Banked MEDIUM Weapon 5,0 r1
+    Cinderscript Ink
+LADDER[75] What Was Left Banked MEDIUM Weapon 0,4 r1
+    Flywheel Cog
+LADDER[75] What Was Left Banked MEDIUM Weapon 2,4 r0
+    Cinderscript Ink
+LADDER[75] What Was Left Banked MEDIUM Weapon 4,4 r0
+    Azure Alignment
+LADDER[75] What Was Left Banked MEDIUM Helmet 0,0 r3
+    Bone Crown
+LADDER[75] What Was Left Banked MEDIUM Helmet 1,1 r2
+    Bone Scale
+LADDER[75] What Was Left Banked MEDIUM Helmet 2,2 r3
+    Bone Fletch
+LADDER[75] What Was Left Banked MEDIUM Helmet 3,0 r0
+    Idol's Crest
+LADDER[75] What Was Left Banked MEDIUM Helmet 4,1 r0
+    Tin Frame
+LADDER[75] What Was Left Banked MEDIUM Helmet 4,0 r0
+    Tin Plating
+LADDER[75] What Was Left Banked HARD Weapon 0,0 r0
+    Herbal
+LADDER[75] What Was Left Banked HARD Weapon 1,0 r2
+    Chain Coil
+LADDER[75] What Was Left Banked HARD Weapon 0,2 r2
+    Bloodletter's Ink
+LADDER[75] What Was Left Banked HARD Weapon 2,2 r0
+    Emberburst
+LADDER[75] What Was Left Banked HARD Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[75] What Was Left Banked HARD Weapon 2,1 r1
+    Quicksilver Ink
+LADDER[75] What Was Left Banked HARD Weapon 3,0 r0
+    The Bog Census
+LADDER[75] What Was Left Banked HARD Weapon 4,2 r1
+    Census Bolt
+LADDER[75] What Was Left Banked HARD Weapon 5,0 r1
+    Quicksilver Ink
+LADDER[75] What Was Left Banked HARD Weapon 0,4 r1
+    Ratchet Cog
+LADDER[75] What Was Left Banked HARD Weapon 2,4 r0
+    Quicksilver Ink
+LADDER[75] What Was Left Banked HARD Weapon 4,4 r0
+    Crimson Alignment
+LADDER[75] What Was Left Banked HARD Helmet 0,0 r3
+    Bone Crown
+LADDER[75] What Was Left Banked HARD Helmet 1,1 r2
+    Bone Scale
+LADDER[75] What Was Left Banked HARD Helmet 2,2 r3
+    Bone Fletch
+LADDER[75] What Was Left Banked HARD Helmet 3,0 r0
+    Idol's Crest
+LADDER[75] What Was Left Banked HARD Helmet 4,1 r0
+    Bronze Frame
+LADDER[75] What Was Left Banked HARD Helmet 4,0 r0
+    Bronze Plating
+LADDER[75] What Was Left Banked INSANE Weapon 0,0 r0
+    Herbal
+LADDER[75] What Was Left Banked INSANE Weapon 1,0 r2
+    Grimoire Rack
+LADDER[75] What Was Left Banked INSANE Weapon 0,2 r2
+    Bloodletter's Ink
+LADDER[75] What Was Left Banked INSANE Weapon 2,2 r0
+    Emberburst
+LADDER[75] What Was Left Banked INSANE Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[75] What Was Left Banked INSANE Weapon 2,1 r1
+    Quicksilver Ink
+LADDER[75] What Was Left Banked INSANE Weapon 3,0 r0
+    The Bog Census
+LADDER[75] What Was Left Banked INSANE Weapon 4,2 r1
+    Census Bolt
+LADDER[75] What Was Left Banked INSANE Weapon 5,0 r1
+    Quicksilver Ink
+LADDER[75] What Was Left Banked INSANE Weapon 0,4 r1
+    Bulwark Vial
+LADDER[75] What Was Left Banked INSANE Weapon 2,4 r0
+    Quicksilver Ink
+LADDER[75] What Was Left Banked INSANE Weapon 4,4 r0
+    Crimson Alignment
+LADDER[75] What Was Left Banked INSANE Helmet 0,0 r3
+    Bone Crown
+LADDER[75] What Was Left Banked INSANE Helmet 1,1 r2
+    Bone Scale
+LADDER[75] What Was Left Banked INSANE Helmet 2,2 r3
+    Bone Fletch
+LADDER[75] What Was Left Banked INSANE Helmet 3,0 r0
+    Idol's Crest
+LADDER[75] What Was Left Banked INSANE Helmet 4,1 r0
+    Warded Frame
+LADDER[75] What Was Left Banked INSANE Helmet 4,0 r0
+    Layered Plating
 ALTERNATES[0] The Dreaming Idiot EASY Helmet 0,0 r0
     Reliquary Frame of Nine
 ALTERNATES[0] The Dreaming Idiot EASY Helmet 3,0 r0

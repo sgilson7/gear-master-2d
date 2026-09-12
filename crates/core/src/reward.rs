@@ -130,7 +130,11 @@ pub fn bounty_with_class(
             // the Whisperer changes where a fight *ends* — and an unmaking is a
             // kill, so it pays what a kill pays through the ordinary path
             // rather than through a second one here.
-            ClassPower::Stoker { .. } | ClassPower::Whisperer { .. } => {}
+            // And neither does an apothecary: a brew is worth what it is worth
+            // at the bell, and nothing about it reaches a purse.
+            ClassPower::Stoker { .. }
+            | ClassPower::Whisperer { .. }
+            | ClassPower::Apothecary { .. } => {}
             ClassPower::Showstopper { pct: more, under_ms } => {
                 if duration_ms < under_ms {
                     pct += more;

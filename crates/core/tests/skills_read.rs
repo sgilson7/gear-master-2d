@@ -264,7 +264,7 @@ fn armour_the_tree_grants_is_armour_the_fight_starts_with() {
     };
     assert_eq!(soaked(Held::default()), 0, "nobody starts a fight wearing armour");
     assert_eq!(
-        soaked(Held { armor: 40, mana: 0, rules: Vec::new(), empty_frames: 0, told: Vec::new(), empowerment: 0, rage: 0, faith: 0, nature: 0, insight: 0, dread: 0, mind: 0 }),
+        soaked(Held { armor: 40, mana: 0, rules: Vec::new(), empty_frames: 0, told: Vec::new(), empowerment: 0, rage: 0, faith: 0, nature: 0, insight: 0, dread: 0, mind: 0, stats: Default::default() }),
         40,
         "all forty points should be spent soaking, and no more than forty"
     );
@@ -275,7 +275,7 @@ fn armour_the_tree_grants_is_armour_the_fight_starts_with() {
 fn the_shipped_tree_still_hands_out_what_it_promises() {
     let tree = data::skills();
     let held = tree.start_with(&["corked".into(), "funnel-drill".into()]);
-    assert_eq!(held, Held { armor: 12, mana: 20, rules: Vec::new(), empty_frames: 0, told: Vec::new(), empowerment: 0, rage: 0, faith: 0, nature: 0, insight: 0, dread: 0, mind: 0 }, "the two base nodes that grant them");
+    assert_eq!(held, Held { armor: 12, mana: 20, rules: Vec::new(), empty_frames: 0, told: Vec::new(), empowerment: 0, rage: 0, faith: 0, nature: 0, insight: 0, dread: 0, mind: 0, stats: Default::default() }, "the two base nodes that grant them");
 
     // And the mixed node keeps both halves: strength through `stats_from`,
     // armour through `start_with`.
@@ -420,7 +420,7 @@ fn the_log_opens_holding_what_the_tree_granted() {
     // asserted here rather than ignored.
     assert_eq!(
         held,
-        Held { armor: 12, mana: 20, rules: Vec::new(), empty_frames: 4, told: Vec::new(), empowerment: 0, rage: 0, faith: 0, nature: 0, insight: 0, dread: 0, mind: 0 },
+        Held { armor: 12, mana: 20, rules: Vec::new(), empty_frames: 4, told: Vec::new(), empowerment: 0, rage: 0, faith: 0, nature: 0, insight: 0, dread: 0, mind: 0, stats: Default::default() },
         "the two nodes as shipped"
     );
 
@@ -471,7 +471,7 @@ fn the_four_nodes_a_player_took_all_do_something() {
     // a fixture whose board silently filled would change what this measures.
     assert_eq!(
         c.start_with(),
-        Held { armor: 12, mana: 20, rules: Vec::new(), empty_frames: 5, told: Vec::new(), empowerment: 0, rage: 0, faith: 0, nature: 0, insight: 0, dread: 0, mind: 0 },
+        Held { armor: 12, mana: 20, rules: Vec::new(), empty_frames: 5, told: Vec::new(), empowerment: 0, rage: 0, faith: 0, nature: 0, insight: 0, dread: 0, mind: 0, stats: Default::default() },
         "Corked and Funnel Drill"
     );
 }

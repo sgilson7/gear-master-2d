@@ -725,6 +725,206 @@
         "Living Earth"
       ],
       "gold": 70
+    },
+    {
+      "id": "what-the-cave-had",
+      "giver": "the-end-of-all-gears",
+      "requires": [
+        "marbulon-asks-second"
+      ],
+      "name": "WHAT THE CAVE HAD",
+      "brief": "The register has a line for the Great Gear Cave and the line says OCCUPIED, in a hand that is not hers, dated before the pit was a pit. She would like it to say something else. She is not particular about what, and has ruled a box for it that is eleven characters wide.",
+      "thanks": "She writes CLEARED, which is seven, and then spends a while on the four she has left over. What she settles on is a chip the office has been carrying since before the fourth doorway and has never once managed to spend.",
+      "goal": {
+        "clear": {
+          "place": "the-bottom-of-the-cave"
+        }
+      },
+      "reward": [
+        "Gold Chip"
+      ],
+      "gold": 120
+    },
+    {
+      "id": "the-stack-came-down",
+      "giver": "kettleworks",
+      "requires": [
+        "what-the-door-smells-of"
+      ],
+      "name": "TWO HUNDRED AND TEN FEET",
+      "brief": "Kettleworks measures the Drambus Stack every spring, and the figure has been two hundred and ten feet for eleven years. The man with the theodolite says that is not a measurement, that is a rumour somebody wrote down. He would like a smaller number. He does not mind how it is arrived at.",
+      "thanks": "He measures it at nothing, which takes no time at all, and is more pleased about it than a man with a theodolite ought to be. He hands over a thing for moving stock along, and says that is what the rest of the spring is now.",
+      "goal": {
+        "clear": {
+          "place": "the-drambus-stack-1-boss"
+        }
+      },
+      "reward": [
+        "Shunter's Orb"
+      ],
+      "gold": 180
+    },
+    {
+      "id": "what-the-lake-was-on-top-of",
+      "giver": "the-end-of-all-gears",
+      "requires": [
+        "the-stack-came-down"
+      ],
+      "name": "WHAT THE LAKE WAS ON TOP OF",
+      "brief": "With the Stack down the lake has gone, and what the lake was on top of is a ring of cut stone with a grating in the middle of it. The register has no line for a ring of cut stone. The clerk has ruled one. It is blank, and she will not rule the next one until this one is filled in.",
+      "thanks": "She fills it in and rules the next one, which is the whole of what she wanted. Then she gives you an orb that a drover left against a debt, on the grounds that the office has nothing to drove and you plainly have somewhere to be.",
+      "goal": {
+        "clear": {
+          "place": "the-bottom-of-the-lake"
+        }
+      },
+      "reward": [
+        "Drover's Orb"
+      ],
+      "gold": 220
+    },
+    {
+      "id": "the-ninth-is-accounted-for",
+      "giver": "kettleworks",
+      "requires": [
+        "the-tenth-survey"
+      ],
+      "name": "THE NINTH IS ACCOUNTED FOR",
+      "brief": "Nine surveyors went out over the Wextreen and eight sheets came back. The ninth came back too, eleven years late, wet through, and in a hand nobody at Kettleworks recognises. Somebody is going to have to go down the hole on the shore and ask the ninth about it in person.",
+      "thanks": "He writes ACCOUNTED FOR beside the ninth name and does not ask a single question about the state of her. Then he hands over an orb the works kept for stopping things with, which he says nobody here has had a use for in eleven years.",
+      "goal": {
+        "clear": {
+          "place": "the-ninth-surveyor"
+        }
+      },
+      "reward": [
+        "Signalman's Orb"
+      ],
+      "gold": 280
+    },
+    {
+      "id": "what-she-faced-away-from",
+      "giver": "marbulons-door",
+      "requires": [
+        "what-the-lake-was-on-top-of"
+      ],
+      "name": "WHAT SHE FACED AWAY FROM",
+      "brief": "Marbulon has stood at this door with her back to it for as long as there has been a door, and she is clear that this is a decision and not an accident. She would like to be told what is at the bottom of the stair under the lake. In plain words. Once. And then never again.",
+      "thanks": "She listens to all of it without turning round, says thank you, and goes back to facing the shallows. The circlet she hands over is one somebody else was wearing the last time anybody came back up, and she has been keeping it for whoever managed it next.",
+      "goal": {
+        "clear": {
+          "place": "the-bottom-of-the-bottom"
+        }
+      },
+      "reward": [
+        "Overseer's Circlet"
+      ],
+      "gold": 300
+    },
+    {
+      "id": "the-iron-under-it",
+      "giver": "kettleworks",
+      "requires": [
+        "the-tenth-survey"
+      ],
+      "name": "THE IRON UNDER IT",
+      "brief": "Every compass carried onto the Wextreen Sands has come back pointing at the ground. Kettleworks has four of them in a drawer, all pointing down, all four in a different direction. Somebody should go out onto the flat and stand on the patch they are arguing about.",
+      "thanks": "He puts your report in the drawer with the four compasses and shuts it, which he says is the correct filing. Then he counts the works' money out onto the bench, twice, and writes down neither figure.",
+      "goal": {
+        "word": {
+          "place": "the-iron-under-the-sand"
+        }
+      },
+      "gold": 260
+    },
+    {
+      "id": "the-needle-will-not-settle",
+      "giver": "kettleworks",
+      "requires": [
+        "the-iron-under-it"
+      ],
+      "name": "THE NEEDLE WILL NOT SETTLE",
+      "brief": "There is one place on the flat where the needle does not point down. It goes round instead, at a rate the ninth sheet gives as a hundred and nine turns to the hour, which is a figure Kettleworks has been unable to get anybody to stand next to and check.",
+      "thanks": "A hundred and eleven, he writes, and then draws a line under the whole column. He pays it out of the survey fund, which he says has eleven years in it and has never once had anything to spend it on.",
+      "goal": {
+        "word": {
+          "place": "the-spinning-needle"
+        }
+      },
+      "gold": 320
+    },
+    {
+      "id": "the-abbots-of-the-flat",
+      "giver": "kettleworks",
+      "requires": [
+        "the-needle-will-not-settle"
+      ],
+      "name": "FOUR TICKETS OFF THE FLAT",
+      "brief": "The things standing on the sands are wearing the works' own plate — stamped, numbered, and signed out to men who have been dead eleven years. Each of them is carrying the scrap ticket that went with it. Kettleworks would like four of those tickets back and is not asking how.",
+      "thanks": "He reads all four, says the numbers are right and the signatures are not, and files them anyway. Then he pays out the four wages the plate was signed against, which he says is the only way the works has of closing a line.",
+      "goal": {
+        "slay": {
+          "creature": "Iron Abbot",
+          "count": 4,
+          "token": "Scrap Ticket"
+        }
+      },
+      "gold": 480
+    },
+    {
+      "id": "the-tenth-is-accounted-for",
+      "giver": "kettleworks",
+      "requires": [
+        "the-abbots-of-the-flat"
+      ],
+      "name": "ELEVEN REEFS, TEN SURVEYORS",
+      "brief": "The tenth surveyor's sheet lists eleven reefs under the Wextreen flat and stops at the eleventh line, which is blank and has been ruled twice. Kettleworks would like the eleventh line. The man asking is aware of what happened to the nine sheets before it, and is asking anyway.",
+      "thanks": "He rules the eleventh line a third time and writes it out, and then sits for a while with the whole sheet in front of him and does not say anything. The edge he hands over is one of the works' own, off the quota bench, and he does not write that down at all.",
+      "goal": {
+        "clear": {
+          "place": "the-tenth-surveyor"
+        }
+      },
+      "reward": [
+        "Quota Edge"
+      ],
+      "gold": 400
+    },
+    {
+      "id": "nobody-has-named-it",
+      "giver": "kettleworks",
+      "requires": [
+        "the-ninth-is-accounted-for"
+      ],
+      "name": "A POST WITH NOTHING ON IT",
+      "brief": "There is a country under the country and there is one town on it. The town has a post where a name would go, and nothing on the post. Kettleworks would like somebody to walk in, stand in it, and confirm that there is nothing there — which is a different report from nobody having been.",
+      "thanks": "He writes NOTHING THERE, CONFIRMED, and then, after a while, adds AS OF NOW. The thing he hands over is a crest somebody brought up from a place like that one and could not afterwards explain the purchase of.",
+      "goal": {
+        "word": {
+          "place": "the-third-town"
+        }
+      },
+      "reward": [
+        "The Wrong Sense"
+      ],
+      "gold": 260
+    },
+    {
+      "id": "what-the-works-put-by",
+      "giver": "kettleworks",
+      "requires": [
+        "the-tenth-survey"
+      ],
+      "name": "FOUR FLOORS AND A HATCH",
+      "brief": "There is brickwork under the turf at the east end of the Reach and the works has no record of laying it. Nine courses, a hatch, and four floors under that — which Kettleworks knows because somebody counted the courses from below and did not come back up. Each floor has one thing standing on a plate in the middle of it, and each of them is proof against everything but one thing.",
+      "thanks": "He does not write anything down at all, which from him is the whole of it. Then he takes your glass, turns it over twice, and sends it back into the kiln with a note for the blower — and it comes out with a lobe on it that it did not go in with.",
+      "goal": {
+        "clear": {
+          "place": "what-was-left-banked"
+        }
+      },
+      "reward": [],
+      "gold": 900
     }
   ],
   "_rows": "At most one row per questline and only on its last errand - a row from the world stays an event that way, and one per errand would be the level schedule M12.3 retired wearing a different hat. Rows are never in a drop table: a row is a decision or an achievement, never a lottery ticket."

@@ -2313,6 +2313,31 @@ identical.
   **Sixth time** *a derived number needs somewhere it is shown* has been the
   answer here.
 
+## A number nobody can reproduce is not a number
+
+**1,137 went into three commit messages as the engine suite's size. It is
+993.** Confirmed by an independent re-run — 87 test binaries, nought failing —
+and by arithmetic: M18 was 976 and the block adds about fourteen tests.
+
+**And the first correction was wrong too.** It said a shared `/tmp/gm-done`
+between two runner scripts had let a *workspace* run's total be read as the
+engine's. That is a real hazard and it is fixed; it is not what happened.
+`cargo test --workspace` is 92 binaries and **also 993**, because the shim and
+the authoring bench carry no tests of their own. So 1,137 is the output of
+neither command and the mechanism is unknown.
+
+Two things come out of it and the second is the one worth keeping:
+
+- **A number nobody can reproduce is not a number.** It was published three
+  times before anybody tried to get it back.
+- **An explanation that sounds right is not a measurement.** The shared
+  done-file story was written down *before* `--workspace` had been run, and
+  running it took four minutes and disproved it. This file is full of places
+  where measuring first was the whole of the finding — *when a test disagrees
+  with a cost, suspect the test's idea of income first*, the 40%-too-high
+  experience target, the Kettleworks gear that was not the body numbers — and
+  this is that rule failing in the one place it should be cheapest to obey.
+
 ## A glossary is a proofreading surface
 
 The unintended half of the last section, and it earned its place on the first

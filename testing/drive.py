@@ -1276,6 +1276,125 @@ def check_the_long_cart_runs_between_towns(page, name, fails):
         plant(page, base, lambda body: None, stem="cart-restore")
 
 
+def check_the_cue_shows_where_the_ball_will_stop(page, name, fails):
+    """You can see the shot before you take it.
+
+    **Reported from play as a question about events: *"how are events on the
+    overworld accessed? it seems i cannot access them right now"*.** They are
+    accessed by stopping on one — an event is a single tile, and unlike a gate
+    it does not catch the ball, because a signpost you can roll past is a
+    signpost and the Undercountry's town sits in the middle of its one fast
+    lane. So reaching one is a shot you have to be able to **aim**, and the cue
+    gave no feedback beyond an arrow's direction and length.
+
+    686 of the Treyway's 720-shot fan land on the Kettleworks road, from 159
+    different tiles. The mechanism was never broken; a player simply had no way
+    to find one of those shots.
+
+    What only a browser answers is that the road drawn is the road taken —
+    `preview_shot` is the same `shot::shoot` the fire button runs, so a page
+    that integrated its own would be the first thing here to disagree with the
+    engine about where a ball goes. This aims, reads the preview, fires, and
+    compares.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+    plant(page, base, lambda b: on_the_table(b, (13, 13)), stem="ahead")
+    try:
+        page.click("#map")
+        page.keyboard.press("ArrowLeft")
+        page.wait_for_timeout(120)
+        cue = page.evaluate("() => window.__cue()")
+        ahead = page.evaluate("() => window.__ahead()")
+        if not cue or not ahead:
+            fails.append(f"{name}: aiming drew no road ahead — cue {cue}, ahead {ahead}")
+            return
+        if not ahead.get("path"):
+            fails.append(f"{name}: the road ahead has no path in it")
+            return
+        # **The road drawn is the road taken.** Core answers once and the same
+        # answer is shown and then used.
+        page.keyboard.press(" ")
+        page.wait_for_timeout(1600)
+        dismiss_card(page)
+        close_fight(page)
+        at = json.loads(page.evaluate("() => window.__position()"))
+        if at["map"] != "the-treyway":
+            print(f"ok: the cue shows the road ahead, and the shot went through a gate")
+            return
+        if [at["x"], at["y"]] != list(ahead["rest"]):
+            fails.append(f"{name}: the cue said the ball stops at {ahead['rest']} and it "
+                         f"stopped at {[at['x'], at['y']]}")
+        else:
+            print(f"ok: the cue shows where the ball will stop — {len(ahead['path'])} points "
+                  f"to {ahead['rest']}, and that is where it stopped")
+    finally:
+        clear_screens(page)
+        plant(page, base, lambda body: None, stem="ahead-restore")
+
+
+def check_a_shut_crossing_says_so_when_you_land_beside_it(page, name, fails):
+    """The bar of shingle says what is over it, on a shot as well as a step.
+
+    **Reported from play: *"make sure you can get through the bottom of the
+    first overworld map, its still pink for me"*.** You come to rest beside the
+    tide crossing, the engine fills in what is over the bar and what opens it —
+    and `shoot` never printed it. `walk` has since M15; this door did not exist
+    then.
+
+    That is *the land is pink and it says no way through* for the third time,
+    and the first two are already in `CLAUDE.md`. A refusal a player cannot
+    read is a wall.
+    """
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+
+    def the_tide_is_in(body):
+        strip_the_boards(body)
+        w = body.setdefault("world", {})
+        w["map"] = "the-treyway"
+        w["at"] = [13, 13]
+        w["flags"] = [f for f in w.get("flags", []) if f != "built-the-tenth"]
+
+    plant(page, base, the_tide_is_in, stem="shut-bar")
+    try:
+        if page.evaluate("() => window.__world().rows[15][8]") != "tide":
+            fails.append(f"{name}: the bar is not tide with the cairn uncut")
+            return
+        # **Shot, and not `cross`.** `cross` falls back to `window.__here()`
+        # once it is standing on the target, and `here` goes through `walk`,
+        # which has printed this refusal since M15 — so a check that used it
+        # passed with `shoot`'s arm deleted. It was testing the wrong door,
+        # which is the only thing a negative test ever finds.
+        aim = page.evaluate("() => window.__aimAt(8, 14, false)")
+        if aim.get("angle") is None:
+            fails.append(f"{name}: no shot from the start reaches the tideline")
+            return
+        page.evaluate(f"() => window.__shoot({aim['angle']}, {aim['power']})")
+        page.wait_for_timeout(1600)
+        dismiss_card(page)
+        close_fight(page)
+        said = " ".join(tape(page)).lower()
+        # **On the half the engine appends, not on the map file's own words.**
+        # The first version looked for "tenth" — and the tideline card standing
+        # on that very tile says *the tenth is a hand lower than the ninth*, so
+        # the check passed with the fix reverted. It was reading the event's
+        # prose. What only the refusal produces is `Requirement::wants` naming
+        # the errand and the gate it is behind, which is the engine's half of a
+        # two-register sentence and appears nowhere in `events.json`.
+        if "nine surveys" not in said or "wextreen reach" not in said:
+            fails.append(f"{name}: landed beside the shut bar and it never said what opens "
+                         f"it: {said[-160:]!r}")
+        else:
+            print("ok: a shut crossing says what is over it, and what opens it, when you "
+                  "land beside it")
+    finally:
+        clear_screens(page)
+        plant(page, base, lambda body: None, stem="shut-bar-restore")
+
+
 def check_the_furnace_shows_on_the_bar(page, name, fails):
     """A Kettle-Stoker can see what the furnace bought.
 
@@ -7111,6 +7230,8 @@ def walk_the_gate(browser, name, fails=None):
     check_the_ball_slides_and_the_trail_grows_behind_it(page, name, fails)
     check_a_diamond_catches_the_ball(page, name, fails)
     check_the_long_cart_runs_between_towns(page, name, fails)
+    check_the_cue_shows_where_the_ball_will_stop(page, name, fails)
+    check_a_shut_crossing_says_so_when_you_land_beside_it(page, name, fails)
     check_the_furnace_shows_on_the_bar(page, name, fails)
     check_the_glossary_says_what_a_thing_does(page, name, fails)
 

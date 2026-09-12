@@ -820,6 +820,53 @@ The clock drives it now rather than the frame counter, and the ball is drawn
 so a median shot is about a second. The trail grows behind it and stays drawn
 after it lands.
 
+### The cue draws the road ahead, because a table you cannot aim is a dice roll
+
+Reported from play as a question: *"how are events on the overworld accessed?
+it seems i cannot access them right now"*. **The mechanism was never broken** —
+686 of the Treyway's 720-shot fan land on the Kettleworks road, from 159
+different tiles, and the card opens when you stop there. What was missing is
+that an event is **one tile**, it deliberately does not catch the ball the way
+a gate does, and the cue told a player nothing but a direction and a length.
+
+So the whole predicted path is drawn while you aim, with a ring on the tile it
+will stop at and a box round anything it will hit. **`preview_shot` is the same
+`shot::shoot` the fire button runs**, so what is drawn is what happens — a page
+that integrated its own would be the first thing here to disagree with the
+engine about where a ball goes.
+
+- **Haloed, not tinted.** The ground under a predicted path is anything from
+  pale sand to dark slag and no single ink reads on both, so it is a dark
+  stroke with a pale dashed one over it. Third time that trick has been the
+  answer, after the armour label and the wrapping bar.
+- **Memoised on the angle and power**, because `draw` runs on an animation
+  frame while an errand is pinned.
+
+### A shot never printed a refusal, and a step has since M15
+
+Reported from play: *"make sure you can get through the bottom of the first
+overworld map, its still pink for me"* — the bar of shingle. `arrive_at` fills
+in `blocked` and `refused_by` with the whole sentence, including the half
+`Requirement::wants` appends naming the errand and the gate it is behind, and
+**`shoot` threw it away**. `walk` has printed it since M15; this door did not
+exist then.
+
+That is **the third instance of *the land is pink and it says no way through***
+in this project, and a payload field nothing reads is the same failure as a
+number nothing prints.
+
+**And the way through works**: once the tenth cairn is cut the bar is `coast`,
+and it crosses in **one shot from the map's own start**. The blocker was never
+the crossing; it was the silence.
+
+**The negative test for it was wrong twice**, and both times the check was
+reading a different subject. First it looked for *"tenth"* — which the tideline
+card standing on that very tile also says, so it was matching the event's
+prose. Then it used the gate's own `cross` helper, which falls back to
+`window.__here()` and therefore goes through **`walk`**, the door that already
+worked. Both were green with the fix deleted. Neither would have been found by
+reading them.
+
 ### A tile one step away is a tile you cannot shoot to
 
 From directly adjacent every power overshoots or bounces off the wall behind,
@@ -5311,7 +5358,7 @@ Every figure below was re-measured for M12.6 rather than carried forward.
 | M16.6: six browser checks, a walk that loops, and the block written down | 950 passing |
 | M17.0: a table nobody can see yet, and a cue you could not have aimed | 960 passing |
 | M17.1–M17.5 + M18: the overworld is a table, and the notebooks executed | 976 passing |
-| **M19: a ball you can watch, a diamond you can hit, and a glossary** | **1,137 passing** |
+| **M19: a ball you can watch, a diamond you can hit, and a glossary** | **993 passing** |
 
 **M13.5 adds none and M13.7 and M13.8 add none, and all three are honest.**
 M13.5 lands ten trees into a data file and the three lints it needed were
@@ -5377,7 +5424,7 @@ content*, and one check now measures what a range used to guess at.
 | The papers | **3** on Spike's van, all drawn from the first visit: the Patent's licence at 5,000, **the Second Paper at 5,000 behind nothing at all**, and the expert paper at **nothing** behind two finished trees — the twenty-four points are the price, which is what keeps a free paper from being a fourth class on the fork. M15.4 took the tree gate off the second paper on the human's ask; the level that puts the van on the road is what is left |
 | Figures | 27 `.tex` → **83 SVGs** (13 family drawings, 4 drawn for themselves, 5 classes, 3 towns, you) |
 | Art coverage | **60 of 60 creatures**, 3 of 3 towns, 5 of 5 classes, and you. The set pieces, the instruments and the enchs have no art and want none — a component has never had a figure |
-| Browser gate | **90 `ok:` lines in one engine**, five of them M19's — the ball slides and the trail grows behind it, a diamond catches, the long cart runs between towns, the furnace shows on the bar, and the glossary opens on G. One of the five *passed while printing the wrong thing* (**9 burns off None**, reading `what` where an event's subject rides in `item`), which is the argument for a check that prints what it found. Before it: **85 `ok:` lines**, seven of them M17's and every one negative-tested — the cue snaps to what core takes and pulling further pulls harder, a shot flies the path core returned, four keys aim and space fires with no pointer, a spike takes its percent and says so, a ball in the pocket wakes up in town, a floor still steps and draws no cue, and reduced motion is at rest with the trail still drawn. **The hardest of the seven to break is the floor one**: every lie about *the arrows mean two things now* takes the whole gate down before the check runs. Before it: **78 `ok:` lines**, six of them M16's and every one negative-tested — the way under is silt until the sheet, a stake offers the pull and a compass that lies, a sinkhole drops you in an alcove nothing walks into, the Tenth Surveyor's panel draws the run's own items, the fork is seven cards in two rows, and a Stoker's replay says what the furnace took. Before it: **96 `ok:` lines over 3 engines** — which is 67 in any one of them, not 81; the count is a total and reading it as per-engine is wrong by fourteen. The newest is M15.2's, and it is the only one that can answer a *negative*: that a fight you have already had is settled and **never drawn**. The newest five are M14.5's: the tide is drawn before it goes out and walkable after, the lip of the Sump refuses in the Reach's words and opens the frame, a wheel that keeps what you feed it says what shape it wants, the chair is three moves in an order **and comes back**, and the third town is empty with the screen after it saying so. **All five were negative-tested, and two of the five found faults on a green build** — see *A stack gate that wants an instrument* |
+| Browser gate | **92 `ok:` lines in one engine**, seven of them M19's — the ball slides and the trail grows behind it, a diamond catches, the long cart runs between towns, the furnace shows on the bar, and the glossary opens on G. One of them *passed while printing the wrong thing* (**9 burns off None**, reading `what` where an event's subject rides in `item`), which is the argument for a check that prints what it found — and **one of them was vacuous twice**: the shut-crossing check matched the tideline card's own prose, and then reached the tile through `cross`, which falls back to `here` and so goes through `walk`, the door that already worked. Before it: **85 `ok:` lines**, seven of them M17's and every one negative-tested — the cue snaps to what core takes and pulling further pulls harder, a shot flies the path core returned, four keys aim and space fires with no pointer, a spike takes its percent and says so, a ball in the pocket wakes up in town, a floor still steps and draws no cue, and reduced motion is at rest with the trail still drawn. **The hardest of the seven to break is the floor one**: every lie about *the arrows mean two things now* takes the whole gate down before the check runs. Before it: **78 `ok:` lines**, six of them M16's and every one negative-tested — the way under is silt until the sheet, a stake offers the pull and a compass that lies, a sinkhole drops you in an alcove nothing walks into, the Tenth Surveyor's panel draws the run's own items, the fork is seven cards in two rows, and a Stoker's replay says what the furnace took. Before it: **96 `ok:` lines over 3 engines** — which is 67 in any one of them, not 81; the count is a total and reading it as per-engine is wrong by fourteen. The newest is M15.2's, and it is the only one that can answer a *negative*: that a fight you have already had is settled and **never drawn**. The newest five are M14.5's: the tide is drawn before it goes out and walkable after, the lip of the Sump refuses in the Reach's words and opens the frame, a wheel that keeps what you feed it says what shape it wants, the chair is three moves in an order **and comes back**, and the third town is empty with the screen after it saying so. **All five were negative-tested, and two of the five found faults on a green build** — see *A stack gate that wants an instrument* |
 | The suite | **976 passing** after M18, and a `data/` touch costs about **three minutes**, not ten: **127 seconds relinking 83 test binaries and 47 running**, measured on an idle machine. The ten is a cold `--workspace`, which adds the lab and the shim on top of both. **Measure on a quiet machine or not at all** — one attempt at this read `real 1279.89` against `user 63.37`, which is twenty-one minutes of wall clock for a minute of work, because it was queued behind three browser gates. `include_str!` is not the thing to change — loading from disk in the test profile would make the tested path differ from the shipped one, which is two rulebooks — and the fix, if one is ever wanted, is **fewer test binaries**, which is a trade against one file per concern that nobody should make to save two minutes. `SECOND-ORDER-M16.md` row 17 is where that is measured. Before it: **950 passing** after M16. Before it: **913 passing, and ~33 seconds warm** after M15, the bestiary, the cart and the sands; **832 and 27.5s** after M14 — measured after M14, and the ten slowest files are the ten that were slow at M13: `drops.rs` at 11.0s and `experts_reach.rs` at 6.3s, neither of them M14's, and nothing this block added is above 0.4s. **`SECOND-ORDER-M14.md` row 17 was written claiming it had slowed to minutes and is corrected there**: what is minutes is rebuilding sixty test binaries after a change to `combat.rs`, which is a fact about editing the engine. Before M14 it was **788 passing, and 34 seconds warm.** It was a minute through most of M13 and `rules_m13.rs` was 29.6s of it: `beacon_board` ran Auto-pack over the whole catalogue on twenty-row grids, four times, because it was the only fixture in the repository with two items that touch. `common::items_in_a_row` is what replaced it — **0.03s** — and `experts_reach.rs` went 9.6s → 6.5s by measuring once per *set* of nodes rather than once per question. `drops.rs` at 11.3s is now the slowest file and is untouched. `[profile.test] opt-level = 2` since M12.6, with debug assertions and overflow checks still on — this is the `test` profile, not `--release` |
 | Floors with a puzzle | **6**, and floors with a boss **2**. Every one is monotone — flags only grow, so no move can make the way on unreachable — and `puzzle::solvable_blind` counts the worst case rather than the plan asserting it |
 | Blind-solution ceilings | Sump **8 / 1 / 45**, Stair **1 / 3 / 3**. The plan guessed 10 / 11 / 45 and 2 / 27 / 3; **the Cairnfield's forty-five came back exactly**, which is the reason to believe the other five. `every_floor_in_the_game_can_be_solved_blind` holds every floor there is under 45 |

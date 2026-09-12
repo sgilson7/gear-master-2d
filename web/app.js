@@ -2948,8 +2948,92 @@ function drawFlight(ctx, cell) {
   ctx.restore();
 }
 
+/// Where this cue would put you, cached on the cue itself.
+///
+/// **Reported from play as a question about events: *"how are events on the
+/// overworld accessed? it seems i cannot access them right now"*.** They are
+/// accessed by stopping on one, and an event is one tile — so on a table that
+/// is a shot you have to be able to *aim*, and the cue gave no feedback beyond
+/// an arrow's direction and length. 686 of the Treyway's shots land on the
+/// Kettleworks road and a player had no way to find one of them.
+///
+/// So the ball's road is drawn before it is taken. **This is not the page
+/// working anything out** — `preview_shot` is the same `shot::shoot` the fire
+/// button runs, so what is drawn is what will happen, and a page that
+/// integrated its own would be the first thing here that disagreed with the
+/// engine about where a ball goes.
+///
+/// Memoised on the angle and power, because `draw` runs on an animation frame
+/// while an errand is pinned and a flight is four hundred ticks at worst.
+let seenAhead = null;
+
+function lookAhead() {
+  if (!cue) return null;
+  if (seenAhead && seenAhead.a === cue.angle && seenAhead.p === cue.power) {
+    return seenAhead.f;
+  }
+  let f = null;
+  try { f = JSON.parse(preview_shot(cue.angle, cue.power)); } catch { f = null; }
+  seenAhead = { a: cue.angle, p: cue.power, f };
+  return f;
+}
+
+/// The road the ball would take, faint, under the cue.
+function drawAhead(ctx, cell) {
+  const f = lookAhead();
+  if (!f || !(f.path || []).length) return;
+  const u = f.sub || 16;
+  ctx.save();
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
+  const road = () => {
+    ctx.beginPath();
+    f.path.forEach(([sx, sy], i) => {
+      const x = (sx / u) * cell, y = (sy / u) * cell;
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+  };
+  // **Haloed, not tinted.** The ground under this line is anything from pale
+  // sand to dark slag, and no single ink reads on both — the armour label
+  // learned the same thing about the ground under a wrapping bar. So it is a
+  // dark stroke with a pale dashed one over it, which reads on every terrain
+  // this game draws.
+  ctx.strokeStyle = 'rgba(28,24,16,.55)';
+  ctx.lineWidth = Math.max(2.5, cell / 9);
+  road();
+  ctx.strokeStyle = 'rgba(246,236,206,.95)';
+  ctx.lineWidth = Math.max(1.5, cell / 16);
+  ctx.setLineDash([cell / 6, cell / 8]);
+  road();
+  ctx.setLineDash([]);
+  // **And a ring where it would stop**, which is the whole of what a player is
+  // trying to find out. On the tile, because a tile is what a place is on.
+  const [rx, ry] = f.rest;
+  const cx = (rx + 0.5) * cell, cy = (ry + 0.5) * cell;
+  ctx.beginPath();
+  ctx.arc(cx, cy, cell * 0.34, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(28,24,16,.6)';
+  ctx.lineWidth = Math.max(3, cell / 8);
+  ctx.stroke();
+  ctx.strokeStyle = 'rgba(246,236,206,.98)';
+  ctx.lineWidth = Math.max(2, cell / 13);
+  ctx.stroke();
+  // What it would cost on the way: a spike, a hole, a gate that catches.
+  for (const c of f.contacts || []) {
+    if (c.kind === 'crossed' || c.kind === 'wall' || !c.at) continue;
+    const [cx, cy] = c.at;
+    ctx.strokeStyle = c.kind === 'spike' || c.kind === 'pocket'
+      ? 'rgba(224,116,42,.85)' : 'rgba(232,217,168,.55)';
+    ctx.lineWidth = Math.max(1.5, cell / 16);
+    ctx.strokeRect(cx * cell + 3, cy * cell + 3, cell - 6, cell - 6);
+  }
+  ctx.restore();
+}
+
 function drawCue(ctx, cell) {
   if (!cue) return;
+  drawAhead(ctx, cell);
   const [px, py] = position_at();
   const x = (px + 0.5) * cell;
   const y = (py + 0.5) * cell;
@@ -3199,6 +3283,14 @@ function shoot() {
     }
     if (r.wants_instrument) openKit(r.wants_instrument, r.shut);
     else if (r.shut) log(r.shut, true);
+    // **A place that refused you says why, and a landing can be refused.**
+    // Reported from play: *"make sure you can get through the bottom of the
+    // first overworld map, its still pink for me"* — you come to rest beside
+    // the bar of shingle, the engine fills in what is over it and what opens
+    // it, and the page threw the sentence away. `walk` has printed this since
+    // M15 and `shoot` never learned it, which is *the land is pink and it says
+    // no way through* arriving through a door that did not exist then.
+    else if (r.refused_by) log(r.blocked, true);
     if (r.ending) openEnding(r.ending);
     if (r.mended > 0) log(`Somebody puts a chair out. ${r.mended}% of you comes back.`);
     if (r.town) openTown(r.town);
@@ -3704,6 +3796,7 @@ async function main() {
   window.__preview = (angle, power) => JSON.parse(preview_shot(angle, power));
   window.__shoot = (angle, power) => { cue = { angle, power }; shoot(); };
   window.__cue = () => cue;
+  window.__ahead = () => lookAhead();
   // What the page is drawing of a flight: the path in sub-cells, where the
   // ball is on it, and the scale. A check reads the *drawing* here and the
   // flight off `preview_shot`, which is the only way to catch a page that

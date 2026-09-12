@@ -47,3 +47,6 @@
 | **M19.11** | Instant battle on a table | `try_shoot` ran neither `rout` nor `instant`; one `settle_without_a_screen` called from both | ✓ |
 | **M19.12** | A sealed door that says what it wants | `needs_all` rather than `hidden_until` on the way under the flat — and `sealed_because` had been called by nothing since M14 | ✓ |
 | **M19.13** | Only the boss ends the sitting | `leave_the_sitting` fired on every win on a Stack floor; three tests covered the function and none the trigger | ✓ |
+| **M19.14** | The Wextreen deep | ten enemies on her board, two TikZ families, `The Unwritten` on the Undercountry | `cc5c0bc` |
+| **M19.15** | Nothing draws magenta | `quick`, `silt` and `tide` had no palette entry; a check now holds the palette against the engine's list | `cc5c0bc` |
+| **M19.16** | A surveying door that asks | the frame opens every time, names its own door, and signs the figure | `cc5c0bc` |

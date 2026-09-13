@@ -257,6 +257,28 @@ pub struct BrewDef {
     pub name: String,
     pub blurb: String,
     pub gives: Gives,
+    /// What an ink added to it, in percentage points.
+    ///
+    /// **Not in the file** — it is a fact about the potion somebody brewed
+    /// rather than about the pair, so it is filled in by
+    /// `Character::what_is_brewing` and carried on the potion. `#[serde(skip)]`
+    /// because a file that named it would be a second answer to how strong a
+    /// brew is.
+    #[serde(skip)]
+    pub ink_pct: i32,
+}
+
+impl BrewDef {
+    /// The brew's own id: the two ingredients, sorted and joined.
+    ///
+    /// **Derived rather than written**, so a pair cannot be given an id that
+    /// disagrees with what is in it — and a potion in the pack is the pair it
+    /// was made of, which is the only thing anything needs to look one up by.
+    pub fn id(&self) -> String {
+        let mut of: Vec<&str> = self.of.iter().map(|s| s.as_str()).collect();
+        of.sort_unstable();
+        of.join("+")
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -411,4 +433,76 @@ fn seat(glass: &[(i8, i8)], shapes: &[Vec<Shape>], n: usize, taken: &mut Vec<(i8
         }
     }
     false
+}
+
+/// One ingredient seated in the glass.
+///
+/// **The seating is the puzzle, so the seating is what is saved.** A list of
+/// ids would say what went in and not how, and the whole of what the ask wants
+/// — *built using gear shaped items like the surveying table* — is that an
+/// ingredient is a shape you put somewhere rather than a line you tick.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Seat {
+    pub id: String,
+    /// Quarter turns clockwise, the same unit a component's rotation is in.
+    #[serde(default)]
+    pub turn: u8,
+    pub at: [u8; 2],
+}
+
+/// Where an ingredient's cells land, seated at `at` and turned `turn`.
+pub fn cells_of(def: &IngredientDef, turn: u8, at: [u8; 2]) -> Vec<(i8, i8)> {
+    def.shape()
+        .rotated(turn)
+        .cells()
+        .iter()
+        .map(|&(x, y)| (x + at[0] as i8, y + at[1] as i8))
+        .collect()
+}
+
+/// Every cell the seated ingredients are standing on.
+pub fn taken(brews: &BrewsData, seats: &[Seat]) -> Vec<(i8, i8)> {
+    seats
+        .iter()
+        .filter_map(|s| brews.get(&s.id).map(|d| cells_of(d, s.turn, s.at)))
+        .flatten()
+        .collect()
+}
+
+/// Which seat, if any, is standing on a cell.
+pub fn seat_at(brews: &BrewsData, seats: &[Seat], x: u8, y: u8) -> Option<usize> {
+    seats.iter().position(|s| {
+        brews
+            .get(&s.id)
+            .map(|d| cells_of(d, s.turn, s.at).contains(&(x as i8, y as i8)))
+            .unwrap_or(false)
+    })
+}
+
+/// Every anchor this ingredient could be seated at, turned this way.
+///
+/// **Core's, for the reason the board's green fit preview is core's.** A page
+/// that worked out its own answer would be a second rulebook about what goes
+/// in the glass, and the two would part the first time the glass was reblown.
+pub fn legal_anchors(
+    glass: &[(i8, i8)],
+    brews: &BrewsData,
+    seats: &[Seat],
+    id: &str,
+    turn: u8,
+) -> Vec<[u8; 2]> {
+    let Some(def) = brews.get(id) else { return Vec::new() };
+    let full = taken(brews, seats);
+    let mut out = Vec::new();
+    for &(ox, oy) in glass {
+        if ox < 0 || oy < 0 {
+            continue;
+        }
+        let at = [ox as u8, oy as u8];
+        let cells = cells_of(def, turn, at);
+        if cells.iter().all(|c| glass.contains(c) && !full.contains(c)) {
+            out.push(at);
+        }
+    }
+    out
 }

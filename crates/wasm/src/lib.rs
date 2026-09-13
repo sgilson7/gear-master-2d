@@ -2903,71 +2903,225 @@ fn theme_piece(g: &gm2d_core::game::Game, canonical: &str) -> String {
         .unwrap_or_else(|| canonical.to_string())
 }
 
-/// The larder, the glass, and what is standing in it.
+/// Which way the ingredient in your hand is turned.
 ///
-/// **One payload for one screen**, and every number in it is core's: which
-/// cells the glass has, whether a third ingredient may go in, what the pair
-/// brews to and what that is worth. A page that worked any of it out would be
-/// a second rulebook — which is the one thing the shim is not allowed to be,
-/// and is exactly the mistake the board's green fit preview exists not to make.
+/// **Session state, and deliberately not the character's.** A component's
+/// rotation lives in the registry because it has to survive a save; which way
+/// you are holding a pinch of cairn dust does not — what is *seated* carries
+/// its own turn, and that is the half that matters. Every rule about whether it
+/// will go in is still core's: `brew::legal_anchors` takes the turn as an
+/// argument and answers.
+thread_local! {
+    static TURNS: std::cell::RefCell<std::collections::BTreeMap<String, u8>> =
+        std::cell::RefCell::new(std::collections::BTreeMap::new());
+}
+
+fn turn_of(id: &str) -> u8 {
+    TURNS.with(|t| t.borrow().get(id).copied().unwrap_or(0))
+}
+
+/// The glass, as a board — the same payload the packing screen and the
+/// instrument frame are drawn from, so the same `Board` draws all three.
+///
+/// **`holes` is the one thing a gear grid has never needed.** The five worn
+/// frames are rectangles and the retort is not, which is the whole of what
+/// makes brewing an arrangement rather than a checklist.
 #[wasm_bindgen]
-pub fn larder_json() -> String {
+pub fn retort_json() -> String {
     with(|g| {
         let brews = gm2d_core::data::brews();
-        let held: Vec<serde_json::Value> = brews
+        let glass = g.retort();
+        let cols = glass.iter().map(|c| c.0).max().unwrap_or(0) as u32 + 1;
+        let rows = glass.iter().map(|c| c.1).max().unwrap_or(0) as u32 + 1;
+        let holes: Vec<[i8; 2]> = (0..rows as i8)
+            .flat_map(|y| (0..cols as i8).map(move |x| (x, y)))
+            .filter(|c| !glass.contains(c))
+            .map(|(x, y)| [x, y])
+            .collect();
+        let placed: Vec<_> = g
+            .character
+            .retort
+            .iter()
+            .filter_map(|seat| {
+                let def = brews.get(&seat.id)?;
+                let cells = gm2d_core::brew::cells_of(def, seat.turn, seat.at);
+                Some(serde_json::json!({
+                    "id": format!("seat:{},{}", seat.at[0], seat.at[1]),
+                    "name": def.name,
+                    "kind": "Ingredient",
+                    "x": seat.at[0], "y": seat.at[1],
+                    "cells": cells,
+                    "fill": ingredient_fill(&seat.id),
+                    "motif": "flask",
+                    "ink": "#ffffff", "ink_alpha": 0.55,
+                    "locked": false, "effect": false, "trigger": false,
+                }))
+            })
+            .collect();
+        let bag: Vec<_> = brews
             .ingredients
             .iter()
             .filter(|i| g.character.in_larder(&i.id) > 0)
             .map(|i| {
+                let turn = turn_of(&i.id);
                 serde_json::json!({
                     "id": i.id,
                     "name": i.name,
-                    "blurb": i.blurb,
+                    "kind": "Ingredient",
+                    "slot": "retort",
+                    "cells": i.shape().rotated(turn).cells(),
+                    "fill": ingredient_fill(&i.id),
+                    "motif": "flask",
+                    "ink": "#ffffff", "ink_alpha": 0.55,
                     "n": g.character.in_larder(&i.id),
-                    "cells": i.cells,
+                    "blurb": i.blurb,
                     "potency": i.potency,
                 })
             })
             .collect();
-        let standing: Vec<serde_json::Value> = g
-            .character
-            .brewed
-            .iter()
-            .filter_map(|id| brews.get(id))
-            .map(|i| serde_json::json!({ "id": i.id, "name": i.name, "cells": i.cells }))
-            .collect();
-        let (potency, _) = g.character.apothecary();
+        let stats = g.character.player_stats();
         serde_json::json!({
-            "larder": held,
-            "glass": g.retort(),
+            "slots": [{
+                "slot": "retort",
+                "rows": rows, "cols": cols,
+                "holes": holes,
+                "placed": placed,
+                "items": [],
+                "recipes": [],
+            }],
+            "bag": bag,
+            "undoable": false,
             "holds": g.retort_holds(),
-            "standing": standing,
-            "brewed": g.brew_name(),
-            // Derived, never typed: the sentence is built from the numbers the
-            // fight will actually read, so retuning a pair retunes the line.
-            "gives": (!g.character.brewed.is_empty()).then(|| g.character.boon().line()),
-            "potency": potency,
+            "seated": g.character.retort.len(),
+            // What it *would* brew to, and what that is worth — core's answer,
+            // so the button and the sentence under it cannot disagree with the
+            // fight.
+            "brewing": g.character.what_is_brewing().ok().map(|d| serde_json::json!({
+                "name": d.name, "blurb": d.blurb,
+                "gives": d.gives.scaled(d.ink_pct + g.character.apothecary().0).line(),
+                "ink": d.ink_pct,
+            })),
+            "why": g.character.what_is_brewing().err(),
+            "potions": potions_json(g),
+            "drunk": g.character.drunk.as_ref().and_then(|id| {
+                brews.brews.iter().find(|d| d.id() == *id).map(|d| d.name.clone())
+            }),
+            "potency": g.character.apothecary().0,
+            "stats": {
+                "health": stats.health, "strength": stats.strength,
+                "armor": stats.armor, "mana": stats.mana, "regen": stats.regen,
+            },
         })
         .to_string()
     })
 }
 
-/// Put a brew in the glass. Empty string, or why not.
+/// What the potions in the pack are, with what each is worth.
+fn potions_json(g: &gm2d_core::game::Game) -> Vec<serde_json::Value> {
+    let brews = gm2d_core::data::brews();
+    let (mine, _) = g.character.apothecary();
+    g.character
+        .potions
+        .iter()
+        .filter_map(|id| {
+            let d = brews.brews.iter().find(|d| d.id() == *id)?;
+            Some(serde_json::json!({
+                "id": id, "name": d.name, "blurb": d.blurb,
+                "gives": d.gives.scaled(mine).line(),
+            }))
+        })
+        .collect()
+}
+
+/// An ingredient's fill, off the board's own palette so the glass reads the way
+/// every other grid does.
+fn ingredient_fill(id: &str) -> String {
+    let n = gm2d_core::data::brews().ingredients.iter().position(|i| i.id == id).unwrap_or(0);
+    gm2d_core::look::hex(gm2d_core::look::ingredient_fill(n))
+}
+
 #[wasm_bindgen]
-pub fn brew(ids: String) -> String {
+pub fn retort_legal_anchors(id: String, _slot: String) -> String {
+    with(|g| {
+        let brews = gm2d_core::data::brews();
+        if id.starts_with("seat:") {
+            return "[]".to_string();
+        }
+        let out = gm2d_core::brew::legal_anchors(
+            &g.retort(), &brews, &g.character.retort, &id, turn_of(&id));
+        serde_json::to_string(&out).unwrap_or_else(|_| "[]".into())
+    })
+}
+
+#[wasm_bindgen]
+pub fn retort_place(id: String, _slot: String, x: u32, y: u32) -> String {
+    with_mut(|g| match g.seat_ingredient(&id, turn_of(&id), [x as u8, y as u8]) {
+        Ok(()) => String::new(),
+        Err(e) => e,
+    })
+}
+
+/// Take one out of the glass. The id is `seat:x,y`, which is where it is.
+#[wasm_bindgen]
+pub fn retort_pick_up(id: String) -> String {
     with_mut(|g| {
-        let want: Vec<String> = ids.split(',').filter(|s| !s.is_empty()).map(String::from).collect();
-        match g.brew(&want) {
+        let Some(rest) = id.strip_prefix("seat:") else { return String::new() };
+        let mut n = rest.split(',');
+        let (Some(x), Some(y)) = (n.next(), n.next()) else { return "nowhere".into() };
+        let (Ok(x), Ok(y)) = (x.parse::<u8>(), y.parse::<u8>()) else { return "nowhere".into() };
+        match g.lift_from_glass(x, y) {
             Ok(_) => String::new(),
             Err(e) => e,
         }
     })
 }
 
+#[wasm_bindgen]
+pub fn retort_rotate(id: String) {
+    if id.starts_with("seat:") {
+        return;
+    }
+    TURNS.with(|t| {
+        let mut t = t.borrow_mut();
+        let e = t.entry(id).or_insert(0);
+        *e = (*e + 1) % 4;
+    })
+}
+
+#[wasm_bindgen]
+pub fn retort_look_over(id: String, _slot: String) -> String {
+    serde_json::json!({
+        "fill": ingredient_fill(&id),
+        "motif": "flask",
+        "ink": "#ffffff",
+        "ink_alpha": 0.55,
+        "fits": true,
+    })
+    .to_string()
+}
+
 /// Tip the glass out; the ingredients go back in the larder.
 #[wasm_bindgen]
 pub fn tip_out() {
     with_mut(|g| g.tip_out())
+}
+
+/// **The brew button.** What is in the glass becomes a potion in the pack.
+#[wasm_bindgen]
+pub fn brew_it() -> String {
+    with_mut(|g| match g.brew() {
+        Ok(_) => String::new(),
+        Err(e) => e,
+    })
+}
+
+/// Drink one. It lands at the next bell.
+#[wasm_bindgen]
+pub fn drink_potion(id: String) -> String {
+    with_mut(|g| match g.drink(&id) {
+        Ok(_) => String::new(),
+        Err(e) => e,
+    })
 }
 
 /// Every errand on you, plus the ones already finished.

@@ -541,24 +541,28 @@
           <dl class="figures">
             <div><dt>the glass holds</dt><dd id="brew-holds">&mdash;</dd></div>
             <div><dt>your potency</dt><dd id="brew-potency">&mdash;</dd></div>
+            <div><dt>drunk</dt><dd id="brew-drunk">&mdash;</dd></div>
           </dl>
         </header>
-        <!-- The glass, drawn from the cells core gave. A page that worked out
-             its own shape would be a second rulebook about what fits. -->
+        <!-- **The glass is a board, the way the surveying table is.** Asked
+             for: *the brewing bench should be built using gear shaped items
+             like the surveying table.* So it is the same `Board` class handed
+             one grid — the only thing it has that a worn frame does not is
+             holes, because the retort is not a rectangle. -->
         <div class="benchrow">
-          <div>
-            <h4 class="sub-h">The glass</h4>
-            <div id="brew-glass" class="glass"></div>
-            <p id="brew-gives" class="spec"></p>
-            <div class="row">
-              <button id="brew-tip" type="button">Tip it out</button>
-            </div>
+          <div class="glassbox">
+            <canvas id="retort-board" width="560" height="420"></canvas>
+            <p id="brew-holding" class="note"></p>
           </div>
           <div class="larderbox">
-            <h4 class="sub-h">The larder</h4>
-            <p class="note">Everything that goes down leaves something. Two of them make one
-              thing worth drinking; a third is an ink, and multiplies what the two came to.</p>
-            <div id="brew-larder" class="shelf"></div>
+            <h4 class="sub-h">What it would make</h4>
+            <p id="brew-gives" class="spec"></p>
+            <div class="row">
+              <button id="brew-do" type="button" class="primary">Brew it</button>
+              <button id="brew-tip" type="button">Tip it out</button>
+            </div>
+            <h4 class="sub-h">The pack</h4>
+            <div id="brew-potions" class="shelf"></div>
           </div>
         </div>
         <p id="brew-says" class="says" hidden></p>

@@ -289,7 +289,23 @@ pub struct Character {
     /// Two ids, or three once the glass has been reblown. Empty is the ordinary
     /// case and is skipped.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    pub brewed: Vec<String>,
+    pub retort: Vec<crate::brew::Seat>,
+    /// Potions brewed and not yet drunk, by the brew's own id.
+    ///
+    /// **A potion is a thing you carry.** Asked for: *press a brew button to
+    /// actually turn your ingredients into a potion, that can be activated
+    /// before any fight.* So brewing is a moment with a receipt rather than a
+    /// state the glass is in, and what comes out of it goes in the pack beside
+    /// the tins.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub potions: Vec<String>,
+    /// The one you have drunk, which lands at the next bell and is gone after.
+    ///
+    /// **Held rather than applied**, because *before any fight* is a decision
+    /// and a decision needs a moment: the boon is read out of here at the bell
+    /// and `fight::settle` clears it beside the line that charges the fatigue.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub drunk: Option<String>,
     /// The one specialization, if it has been taken.
     ///
     /// **Its own slot and not a fourth entry in `classes`.** Everything that
@@ -359,7 +375,9 @@ impl Character {
             fast_wins: 0,
             told_curses: Vec::new(),
             larder: Default::default(),
-            brewed: Vec::new(),
+            retort: Vec::new(),
+            potions: Vec::new(),
+            drunk: None,
             specialization: None,
             undo_stack: Vec::new(),
         }
@@ -2148,19 +2166,41 @@ impl Character {
     /// makes it worth spending a rare one on a good pair rather than on any
     /// pair.
     pub fn boon(&self) -> crate::brew::Gives {
+        let Some(id) = self.drunk.as_deref() else { return crate::brew::Gives::default() };
         let brews = crate::data::brews();
-        let [a, b] = match self.brewed.as_slice() {
-            [a, b] | [a, b, _] => [a.as_str(), b.as_str()],
-            _ => return crate::brew::Gives::default(),
+        let Some(def) = brews.brews.iter().find(|d| d.id() == id) else {
+            return crate::brew::Gives::default();
         };
-        let Some(def) = brews.pair(a, b) else { return crate::brew::Gives::default() };
-        let ink = self.brewed.get(2).and_then(|i| brews.get(i)).map(|i| i.potency).unwrap_or(0);
-        // **And the apothecary's own, on top of the ink.** One multiplier, so
-        // an apothecary with a good ink is better at both rather than better
-        // twice — which is what keeps a specialization from being the only way
-        // the bench is worth using.
+        // **And the apothecary's own.** Read fresh off the specialization, so
+        // taking a point in the Apothecary's tree improves the potion you are
+        // already carrying — which is the *derived, never banked* rule, and is
+        // also the only version anybody would expect.
         let (mine, _) = self.apothecary();
-        def.gives.scaled(ink + mine)
+        def.gives.scaled(def.ink_pct + mine)
+    }
+
+    /// What is in the glass, brewed, or why it will not.
+    ///
+    /// **The pair is the recipe and the third is an ink**, so the glass has to
+    /// hold two before anything happens and three is the most it ever takes.
+    /// Which two they are is a question about the *table*, not about where they
+    /// are sitting: the arrangement is what it costs to get them both in.
+    pub fn what_is_brewing(&self) -> Result<crate::brew::BrewDef, String> {
+        let brews = crate::data::brews();
+        let ids: Vec<&str> = self.retort.iter().map(|s| s.id.as_str()).collect();
+        let [a, b] = match ids.as_slice() {
+            [a, b] | [a, b, _] => [*a, *b],
+            [] => return Err("There is nothing in the glass.".into()),
+            [_] => return Err("A brew is two things, and there is one in the glass.".into()),
+            _ => return Err("The glass holds two and an ink.".into()),
+        };
+        let Some(def) = brews.pair(a, b) else {
+            return Err("Those two do nothing together.".into());
+        };
+        let ink = ids.get(2).and_then(|i| brews.get(i));
+        let mut out = def.clone();
+        out.ink_pct = ink.map(|i| i.potency).unwrap_or(0);
+        Ok(out)
     }
 
     /// Put one ingredient in the larder.

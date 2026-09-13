@@ -165,6 +165,11 @@ pub enum Motif {
     /// Not any one grid's mark: the component fits more than one and is in
     /// none of them yet.
     Shared,
+    /// An ingredient's. Not a grid's mark at all — an ingredient is not gear
+    /// and never goes in one of the six — but the glass is a board, so the
+    /// shape channel of the colourblind triple has to carry *something*, and a
+    /// mark nothing else draws is the rule `look.rs` has kept since M6.
+    Flask,
 }
 
 impl Motif {
@@ -178,6 +183,7 @@ impl Motif {
             Motif::Straps => "straps",
             Motif::Rose => "rose",
             Motif::Shared => "shared",
+            Motif::Flask => "flask",
         }
     }
 }
@@ -367,4 +373,20 @@ pub mod board {
     /// Markers for a cell carrying a positional effect or a trigger.
     pub const EFFECT: &str = "#69cdeb";
     pub const TRIGGER: &str = "#e182e1";
+}
+
+/// The fill for the `n`th ingredient.
+///
+/// **Off the wheel the slots are not using.** The five gear hues and the
+/// instrument's take six points on it; an ingredient is not any of them, and
+/// two ingredients in one glass have to be told apart at a glance — so they
+/// walk the circle at the golden angle from the instrument's own hue, which
+/// spreads eight of them about as far apart as eight can be.
+///
+/// Brightness is the role channel everywhere else and there are no roles here,
+/// so it is held at one value: what a cell is carrying is the *hue*, and the
+/// motif says it is an ingredient at all.
+pub fn ingredient_fill(n: usize) -> Rgb {
+    let hue = (0.732 + 0.381_966 * n as f32).fract();
+    hsl(hue, 0.52, 0.46)
 }

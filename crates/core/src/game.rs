@@ -1131,18 +1131,12 @@ impl Game {
     ///
     /// Derived from the rules an assembled item grants, the same as everything
     /// else about surveying — there is no field saying which one you carry.
-    /// What is standing in the retort, by name, if anything is.
+    /// What the glass would brew to, by name, if it would brew at all.
     pub fn brew_name(&self) -> Option<String> {
-        let brews = crate::data::brews();
-        let [a, b] = match self.character.brewed.as_slice() {
-            [a, b] | [a, b, _] => [a.as_str(), b.as_str()],
-            _ => return None,
-        };
-        brews.pair(a, b).map(|d| d.name.clone())
+        self.character.what_is_brewing().ok().map(|d| d.name)
     }
 
-    /// The cells of the glass this character has — nine, or eleven once the
-    /// Cairnworks has reblown it.
+    /// The cells of the glass this character has.
     pub fn retort(&self) -> Vec<(i8, i8)> {
         let mut cells = crate::brew::retort_cells(&self.world.marks());
         // **And whatever an apothecary has blown onto it.** Added as a column
@@ -1184,67 +1178,93 @@ impl Game {
         }
     }
 
-    /// Put a brew in the retort, or say why not.
+    /// Seat one ingredient out of the larder, or say why not.
     ///
     /// **Every refusal names the thing in the way and spends nothing**, which
     /// is the rule the reroll, the bank and the cart all obey: the first thing
     /// anybody does with a refused button is press it again.
-    ///
-    /// Whether the two *fit in the glass together* is the whole of the puzzle
-    /// and is asked here rather than on a screen — a page that worked out its
-    /// own answer would be a second rulebook, which is the one thing the shim
-    /// is not allowed to be.
-    pub fn brew(&mut self, ids: &[String]) -> Result<String, String> {
+    pub fn seat_ingredient(&mut self, id: &str, turn: u8, at: [u8; 2]) -> Result<(), String> {
         let brews = crate::data::brews();
-        if ids.len() < 2 {
-            return Err("a brew is two things".into());
+        if brews.get(id).is_none() {
+            return Err(format!("there is no {id} in any larder"));
         }
-        if ids.len() > self.retort_holds() {
+        if self.character.in_larder(id) == 0 {
+            return Err("you have none of that".into());
+        }
+        if self.character.retort.len() >= self.retort_holds() {
             return Err(if self.retort_holds() == 2 {
                 "the glass holds two".into()
             } else {
                 "the glass holds two and an ink".into()
             });
         }
-        for id in ids {
-            if brews.get(id).is_none() {
-                return Err(format!("there is no {id} in any larder"));
-            }
-        }
-        // Counted against the larder as a whole, so two of the same thing needs
-        // two of the same thing.
-        for id in ids {
-            let want = ids.iter().filter(|o| *o == id).count() as u32;
-            if self.character.in_larder(id) < want {
-                let name = brews.get(id).map(|i| i.name.clone()).unwrap_or_else(|| id.clone());
-                return Err(format!("you have not got {want} × {name}"));
-            }
-        }
-        let Some(def) = brews.pair(&ids[0], &ids[1]) else {
-            return Err("those two do nothing together".into());
-        };
-        if !crate::brew::fits(&self.retort(), &brews, ids) {
-            return Err("they will not go in the glass together".into());
+        let glass = self.retort();
+        if !crate::brew::legal_anchors(&glass, &brews, &self.character.retort, id, turn)
+            .contains(&at)
+        {
+            return Err("it will not go there".into());
         }
         // Nothing is spent until everything has been checked.
-        for id in ids {
-            self.character.take_from_larder(id)?;
-        }
-        self.character.brewed = ids.to_vec();
-        Ok(def.name.clone())
+        self.character.take_from_larder(id)?;
+        self.character.retort.push(crate::brew::Seat { id: id.to_string(), turn, at });
+        Ok(())
     }
 
-    /// Tip the retort out, and the ingredients go back in the larder.
+    /// Take whatever is standing on a cell back out of the glass.
     ///
-    /// Poured back rather than lost, because a brew you have not drunk is a
+    /// Poured back rather than lost, because a brew you have not made is a
     /// decision you have not taken — and a bench that ate what you put in it
     /// would be a bench nobody experiments at, which is the whole of what a
     /// twenty-eight-pair table is for.
+    pub fn lift_from_glass(&mut self, x: u8, y: u8) -> Result<String, String> {
+        let brews = crate::data::brews();
+        let Some(i) = crate::brew::seat_at(&brews, &self.character.retort, x, y) else {
+            return Err("there is nothing there".into());
+        };
+        let seat = self.character.retort.remove(i);
+        self.character.gather(&seat.id);
+        Ok(seat.id)
+    }
+
+    /// Tip the glass out; everything in it goes back to the larder.
     pub fn tip_out(&mut self) {
-        let ids = std::mem::take(&mut self.character.brewed);
-        for id in ids {
-            self.character.gather(&id);
+        let seats = std::mem::take(&mut self.character.retort);
+        for s in seats {
+            self.character.gather(&s.id);
         }
+    }
+
+    /// **Brew it.** What is in the glass becomes a potion in the pack.
+    ///
+    /// Asked for in as many words: *you should press a brew button to actually
+    /// turn your ingredients into a potion.* So this is the moment, and it has
+    /// a receipt — where before the glass simply *was* the potion and nothing
+    /// ever happened.
+    pub fn brew(&mut self) -> Result<String, String> {
+        let def = self.character.what_is_brewing()?;
+        self.character.retort.clear();
+        self.character.potions.push(def.id());
+        Ok(def.name)
+    }
+
+    /// Drink one, which lands at the next bell.
+    pub fn drink(&mut self, id: &str) -> Result<String, String> {
+        let Some(i) = self.character.potions.iter().position(|p| p == id) else {
+            return Err("you are not carrying that".into());
+        };
+        if self.character.drunk.is_some() {
+            return Err("you have already drunk something, and it lands at the next bell".into());
+        }
+        let brews = crate::data::brews();
+        let name = brews
+            .brews
+            .iter()
+            .find(|d| d.id() == id)
+            .map(|d| d.name.clone())
+            .unwrap_or_else(|| id.to_string());
+        self.character.potions.remove(i);
+        self.character.drunk = Some(id.to_string());
+        Ok(name)
     }
 
     pub fn survey_kind(&self) -> Option<String> {

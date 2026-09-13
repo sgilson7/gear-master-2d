@@ -892,17 +892,6 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
    opinion about what fits — the same division the board's green fit preview
    makes. */
 .benchrow { display: flex; flex-wrap: wrap; gap: 28px; align-items: flex-start; }
-.larderbox { flex: 1 1 320px; min-width: 280px; }
-.glass {
-  display: grid; gap: 3px; margin: 10px 0 14px;
-  grid-auto-rows: 34px; justify-content: start;
-}
-.glass .cell {
-  border: 1px solid currentColor; border-radius: 2px; opacity: 0.35;
-}
-/* A cell something is standing in. Brightness and weight, never a second hue:
-   the board's own rule, because the map and the boards have spent every
-   channel there is. */
-.glass .cell.full { opacity: 1; background: currentColor; }
-.glass .cell.gone { border-style: dashed; opacity: 0.14; }
-.glass .cell.ink { opacity: 1; background: currentColor; filter: brightness(1.35); }
+.glassbox { flex: 0 1 auto; }
+.glassbox canvas { max-width: 100%; height: auto; }
+.larderbox { flex: 1 1 300px; min-width: 260px; }

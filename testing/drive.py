@@ -1082,26 +1082,64 @@ def check_the_bench_brews_a_pair(page, name, fails):
             return
         page.click("#bench")
         page.wait_for_selector("#brewbench", state="visible", timeout=4000)
-        cells = page.eval_on_selector_all("#brew-glass .cell", "els => els.length")
-        gone = page.eval_on_selector_all("#brew-glass .cell.gone", "els => els.length")
-        if cells == 0 or gone == 0:
-            fails.append(f"{name}: the glass drew {cells} cells and {gone} of them cut away, "
-                         "which is a rectangle and not a shape")
+
+        # **The glass is a board, so it is a canvas.** What only a browser can
+        # say is whether the grid is the *shape* core gave rather than a
+        # rectangle, and whether seating two things by clicking actually fills
+        # it — which is the whole of what was asked for.
+        st = page.evaluate("() => JSON.parse(window.__retort())")
+        slot = st["slots"][0]
+        cells = slot["rows"] * slot["cols"] - len(slot["holes"])
+        if not slot["holes"]:
+            fails.append(f"{name}: the glass is a {slot['cols']}x{slot['rows']} rectangle, "
+                         "so its shape carries nothing")
             return
-        held = page.eval_on_selector_all("#brew-larder button", "els => els.length")
-        if held != 2:
-            fails.append(f"{name}: the larder drew {held} things, not the two that were planted")
+        if len(st["bag"]) != 2:
+            fails.append(f"{name}: the larder drew {len(st['bag'])} things, not the two planted")
             return
-        page.click("button[data-ingredient='kettle-scale']")
-        page.wait_for_timeout(120)
-        page.click("button[data-ingredient='rust-bloom']")
-        page.wait_for_timeout(200)
+        if st["brewing"] is not None:
+            fails.append(f"{name}: an empty glass is already brewing {st['brewing']['name']!r}")
+            return
+
+        # Seat both, through the same core the page's board goes through.
+        for ing in ("kettle-scale", "rust-bloom"):
+            at = page.evaluate(f"() => JSON.parse(window.__retortAnchors('{ing}'))")
+            if not at:
+                fails.append(f"{name}: nowhere in the glass takes {ing}")
+                return
+            why = page.evaluate(
+                f"() => window.__retortPlace('{ing}', {at[0][0]}, {at[0][1]})")
+            if why:
+                fails.append(f"{name}: seating {ing} was refused: {why}")
+                return
+        page.evaluate("() => window.__benchPaint()")
+        page.wait_for_timeout(150)
         said = page.text_content("#brew-gives") or ""
-        full = page.eval_on_selector_all("#brew-glass .cell.full", "els => els.length")
-        if "Searing Draught" not in said or full == 0:
-            fails.append(f"{name}: brewed and the glass says {said!r} with {full} cells standing")
+        if "Searing Draught" not in said:
+            fails.append(f"{name}: two things in the glass and it says {said!r}")
+            return
+        if page.eval_on_selector("#brew-do", "el => el.disabled"):
+            fails.append(f"{name}: the glass would brew and the button is dead")
+            return
+
+        # **The button is the moment.** Before it there is no potion; after it
+        # the glass is empty and there is one in the pack.
+        page.click("#brew-do")
+        page.wait_for_timeout(250)
+        after = page.evaluate("() => JSON.parse(window.__retort())")
+        if after["seated"] != 0 or len(after["potions"]) != 1:
+            fails.append(f"{name}: brewed and the glass holds {after['seated']} with "
+                         f"{len(after['potions'])} in the pack")
+            return
+        # And drinking it is a second decision.
+        page.click("button[data-potion]")
+        page.wait_for_timeout(250)
+        drunk = page.evaluate("() => JSON.parse(window.__retort()).drunk")
+        if not drunk:
+            fails.append(f"{name}: drank one and nothing is on you")
         else:
-            print(f"ok: the bench brews a pair, and the glass is a shape ({cells - gone} cells of {cells})")
+            print(f"ok: the glass is a board of {cells} cells in a "
+                  f"{slot['cols']}x{slot['rows']} box, the button brews, and {drunk} is drunk")
     finally:
         clear_screens(page)
         plant(page, base, lambda body: None, stem="bench-restore")

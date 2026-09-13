@@ -497,13 +497,9 @@ pub fn settle(game: &mut Game, log: &CombatLog, difficulty: Difficulty) -> Optio
     // to have some fights drink a potion and some not, invisibly, is to put the
     // spending beside the tiring. **A rout deliberately does not reach here**,
     // and must not — nothing was fought, so nothing was drunk.
-    let drunk = if game.character.brewed.is_empty() {
-        None
-    } else {
-        let name = game.brew_name();
-        game.character.brewed.clear();
-        name
-    };
+    let drunk = game.character.drunk.take().and_then(|id| {
+        crate::data::brews().brews.iter().find(|d| d.id() == id).map(|d| d.name.clone())
+    });
     if let Some(name) = drunk {
         receipt.push(format!("You had drunk {name}, and it is gone."));
     }

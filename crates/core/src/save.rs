@@ -229,13 +229,19 @@ pub struct CharacterSave {
     /// catalogue fingerprint: an ingredient is not a component.
     #[serde(default, skip_serializing_if = "std::collections::BTreeMap::is_empty")]
     pub larder: std::collections::BTreeMap<String, u32>,
-    /// What is standing in the retort, by ingredient id.
+    /// What is standing in the glass, and **where**.
     ///
-    /// **What was brewed, never what it brews to.** Derived, never banked: the
-    /// boon is read out of `data/brews.json` every time it is asked for, so
-    /// retuning a pair retunes every character carrying one.
+    /// **The seating is the puzzle, so the seating is what is saved.** What a
+    /// pair is *worth* is derived out of `data/brews.json` every time it is
+    /// asked for, so retuning one retunes every character carrying it.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    pub brewed: Vec<String>,
+    pub retort: Vec<crate::brew::Seat>,
+    /// Potions brewed and not yet drunk, by the brew's own derived id.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub potions: Vec<String>,
+    /// The one drunk and waiting on a bell.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub drunk: Option<String>,
     /// The one specialization, if it has been taken. Skipped when it has not,
     /// so no save written before it existed is refused.
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -332,7 +338,9 @@ impl SaveFile {
             told_curses,
             warm_stacks,
             larder,
-            brewed,
+            retort,
+            potions,
+            drunk,
             specialization,
             enchs_owned,
             enchanted,
@@ -428,7 +436,9 @@ impl SaveFile {
                     told_curses: told_curses.clone(),
                     warm_stacks: *warm_stacks,
                     larder: larder.clone(),
-                    brewed: brewed.clone(),
+                    retort: retort.clone(),
+                    potions: potions.clone(),
+                    drunk: drunk.clone(),
                     specialization: specialization.clone(),
                     enchs_owned: enchs_owned.clone(),
                     bought_licence: *bought_licence,
@@ -557,7 +567,9 @@ impl SaveFile {
             told_curses,
             warm_stacks,
             larder,
-            brewed,
+            retort,
+            potions,
+            drunk,
             specialization,
             enchs_owned,
             enchanted,
@@ -665,7 +677,9 @@ impl SaveFile {
         character.told_curses = told_curses;
         character.warm_stacks = warm_stacks;
         character.larder = larder;
-        character.brewed = brewed;
+        character.retort = retort;
+        character.potions = potions;
+        character.drunk = drunk;
         character.specialization = specialization;
         character.enchs_owned = enchs_owned;
         character.bought_licence = bought_licence;

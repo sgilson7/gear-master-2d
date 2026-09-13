@@ -48,7 +48,26 @@ export function paintMotif(g, x, y, cell, kind, ink, alpha) {
   } else if (kind === 'bands') { line(0.22, 0.34, 0.78, 0.34); line(0.22, 0.64, 0.78, 0.64); }
   else if (kind === 'weave') { line(0.5, 0.22, 0.5, 0.78); line(0.22, 0.5, 0.78, 0.5); }
   else if (kind === 'straps') { line(0.34, 0.22, 0.34, 0.78); line(0.64, 0.22, 0.64, 0.78); }
-  else if (kind === 'shared') {
+  else if (kind === 'rose') {
+    // **A compass rose, and it was drawing nothing at all.** `Motif::Rose` has
+    // been the instrument frame's mark since M11.6 and this switch has never
+    // had an arm for it — so the one grid whose whole point is that it is not
+    // gear carried no shape channel, which is a third of the colourblind
+    // triple missing on a screen nobody compared against another.
+    line(0.5, 0.2, 0.5, 0.8); line(0.2, 0.5, 0.8, 0.5);
+    line(0.3, 0.3, 0.7, 0.7); line(0.7, 0.3, 0.3, 0.7);
+  } else if (kind === 'flask') {
+    // An ingredient's: a neck into a bulb, which is the glass it goes in.
+    g.beginPath();
+    g.moveTo(x + f(0.38), y + f(0.2));
+    g.lineTo(x + f(0.38), y + f(0.44));
+    g.lineTo(x + f(0.2), y + f(0.8));
+    g.lineTo(x + f(0.8), y + f(0.8));
+    g.lineTo(x + f(0.62), y + f(0.44));
+    g.lineTo(x + f(0.62), y + f(0.2));
+    g.closePath();
+    g.stroke();
+  } else if (kind === 'shared') {
     const r = 0.26, p = [[0.5, 0.5 - r], [0.5 + r, 0.5], [0.5, 0.5 + r], [0.5 - r, 0.5]];
     for (let i = 0; i < 4; i++) {
       const a = p[i], b = p[(i + 1) % 4];
@@ -60,7 +79,7 @@ export function paintMotif(g, x, y, cell, kind, ink, alpha) {
 
 /// The order grids are drawn in when a payload carries them. A preference, not
 /// a list of what exists — see `Board#slotOrder`.
-const SLOT_ORDER = ['weapon', 'helmet', 'chest', 'gloves', 'greaves', 'instrument'];
+const SLOT_ORDER = ['weapon', 'helmet', 'chest', 'gloves', 'greaves', 'instrument', 'retort'];
 
 export class Board {
   constructor(canvas, api) {
@@ -181,14 +200,18 @@ export class Board {
 
   layout() {
     if (!this.state) return;
-    const gw = 6 * (CELL + GAP) + PAD * 2;
     this.boxes = {};
     let x = PAD, y = 30, rowH = 0;
     for (const name of this.slotOrder) {
       const s = this.state.slots.find((s) => s.slot === name);
+      // **Columns come off the payload.** Every worn frame is six wide and the
+      // retort is not, which is what makes brewing an arrangement: a grid that
+      // is a rectangle carries nothing about where a thing goes.
+      const cols = s.cols ?? 6;
+      const gw = cols * (CELL + GAP) + PAD * 2;
       const gh = s.rows * (CELL + GAP) + PAD * 2;
       if (x + gw > this.c.width - PAD && x > PAD) { x = PAD; y += rowH + 40; rowH = 0; }
-      this.boxes[name] = { x, y, w: gw, h: gh, rows: s.rows };
+      this.boxes[name] = { x, y, w: gw, h: gh, rows: s.rows, cols };
       rowH = Math.max(rowH, gh);
       x += gw + PAD;
     }
@@ -200,7 +223,7 @@ export class Board {
       const b = this.boxes[name];
       const gx = Math.floor((px - b.x - PAD) / (CELL + GAP));
       const gy = Math.floor((py - b.y - PAD) / (CELL + GAP));
-      if (gx >= 0 && gx < 6 && gy >= 0 && gy < b.rows &&
+      if (gx >= 0 && gx < (b.cols ?? 6) && gy >= 0 && gy < b.rows &&
           px >= b.x && px <= b.x + b.w && py >= b.y && py <= b.y + b.h) {
         return { slot: name, x: gx, y: gy };
       }
@@ -449,8 +472,15 @@ export class Board {
       g.fillText(name.toUpperCase(), b.x, b.y - 8);
 
       // The empty grid: low contrast on purpose. It is a ruler, not a subject.
+      //
+      // **A hole is not drawn at all.** The five worn frames have none — they
+      // are rectangles — and the retort is a bent neck into a bulb, so the
+      // cells it has *not* got have to read as absent rather than as empty. A
+      // shaded hole would read as a cell you had failed to fill.
+      const holes = new Set((s.holes ?? []).map(([hx, hy]) => `${hx},${hy}`));
       for (let y = 0; y < s.rows; y++) {
-        for (let x = 0; x < 6; x++) {
+        for (let x = 0; x < (s.cols ?? 6); x++) {
+          if (holes.has(`${x},${y}`)) continue;
           const [px, py] = origin(x, y);
           g.fillStyle = (x + y) % 2 === 0 ? L.cell_a : L.cell_b;
           g.fillRect(px, py, CELL, CELL);
@@ -579,7 +609,7 @@ export class Board {
         const ok = this.legal.has(`${this.hover.x},${this.hover.y}`);
         const inside = this.heldCells()
           .map(([dx, dy]) => [this.hover.x + dx, this.hover.y + dy])
-          .filter(([cx, cy]) => cx >= 0 && cy >= 0 && cx < 6 && cy < s.rows);
+          .filter(([cx, cy]) => cx >= 0 && cy >= 0 && cx < (s.cols ?? 6) && cy < s.rows);
         g.save();
         g.globalAlpha = L.footprint_alpha;
         g.fillStyle = ok ? L.legal : L.illegal;

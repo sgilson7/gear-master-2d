@@ -9,7 +9,8 @@ import init, {
   shop_json, bench_json, buy, buy_barrel, order, collect_order, buy_supply, buy_ench,
   reroll_barrel, reroll_ledger, buy_paper, use_supply, quests_json, take_quest, hand_in_quest, bank_xp,
   quest_log_json, guide_json, pin_quest,
-  larder_json, brew, tip_out,
+  retort_json, retort_legal_anchors, retort_place, retort_pick_up,
+  retort_rotate, retort_look_over, brew_it, drink_potion, tip_out,
   character_json, skills_json, take_skill, pressure_json, pools_json,
   class_offer_json, choose_class, choose_second_class, class_name, all_trees_json,
   cart_json, take_the_cart, glossary_json, terrain_names,
@@ -3391,18 +3392,38 @@ function closeGlossary() { $('glossary').hidden = true; }
 /// clause — who may, what it costs, where it puts you — and this draws them.
 // ------------------------------------------------------------- the bench
 
-/// What is picked up out of the larder, waiting to go in the glass.
+/// The glass, drawn by the same `Board` the packing screen and the instrument
+/// frame are.
 ///
-/// **The page holds the hand and core holds the rule.** Nothing is spent until
-/// `brew` is called, so a half-made brew costs nothing and backing out of the
-/// screen loses nothing — which is what makes twenty-eight pairs worth
-/// experimenting with rather than hoarding against.
-let inHand = [];
+/// **Asked for in as many words**: *the brewing bench should be built using
+/// gear shaped items like the surveying table.* The `Board` class takes its
+/// whole world through one api object, so this is that api pointed at the
+/// retort — every rule about what goes where is still core's, and the page
+/// draws what it is told.
+let retort = null;
 
 function openBench() {
-  inHand = [];
-  paintBench();
   $('brewbench').hidden = false;
+  if (!retort) {
+    retort = new Board($('retort-board'), {
+      boardJson: retort_json,
+      legalAnchors: retort_legal_anchors,
+      place: retort_place,
+      pickUp: retort_pick_up,
+      rotate: retort_rotate,
+      toggleLock: () => {},
+      look: look_json,
+      lookOver: retort_look_over,
+    });
+    retort.onchange = () => paintBench();
+    retort.onhold = (name) => {
+      $('brew-holding').textContent = name
+        ? `Holding ${name}. Click a cell to put it in, right-click to turn it.`
+        : 'Pick something out of the larder and put it in the glass.';
+    };
+  }
+  retort.refresh();
+  paintBench();
 }
 
 function benchSays(text, bad = false) {
@@ -3412,85 +3433,52 @@ function benchSays(text, bad = false) {
 }
 
 function paintBench() {
-  const b = JSON.parse(larder_json());
+  const b = JSON.parse(retort_json());
   $('brew-holds').textContent = b.holds === 2 ? 'two' : 'two and an ink';
   $('brew-potency').textContent = b.potency > 0 ? `+${b.potency}%` : 'none yet';
+  $('brew-drunk').textContent = b.drunk ?? 'nothing';
 
-  // **The glass, from the cells core gave.** Laid out on its own bounding box
-  // so a shape that is not a rectangle draws as the shape it is.
-  const cells = b.glass;
-  const w = Math.max(...cells.map((c) => c[0])) + 1;
-  const h = Math.max(...cells.map((c) => c[1])) + 1;
-  const g = $('brew-glass');
-  g.style.gridTemplateColumns = `repeat(${w}, 34px)`;
-  g.replaceChildren();
-  const has = new Set(cells.map((c) => `${c[0]},${c[1]}`));
-  // What is standing in it, in the order it went in — the third is the ink.
-  const standing = b.standing.map((s, i) => ({ ...s, ink: i >= 2 }));
-  const filled = new Map();
-  let ox = 0;
-  for (const s of standing) {
-    // Drawn left to right along the glass's own cells rather than packed by
-    // the page: where core seated them is core's business, and the screen's
-    // job is to say *these two are in it*, which is what a player asked of it.
-    for (const c of s.cells) {
-      const key = `${c[0] + ox},${c[1]}`;
-      if (has.has(key)) filled.set(key, s.ink ? 'ink' : 'full');
-    }
-    ox += Math.max(...s.cells.map((c) => c[0])) + 1;
-  }
-  for (let y = 0; y < h; y++) {
-    for (let x = 0; x < w; x++) {
-      const d = document.createElement('div');
-      const key = `${x},${y}`;
-      d.className = 'cell ' + (!has.has(key) ? 'gone' : (filled.get(key) ?? ''));
-      g.appendChild(d);
-    }
-  }
-  $('brew-gives').textContent = b.brewed
-    ? `${b.brewed} — ${b.gives}`
-    : inHand.length ? `${inHand.length} picked up. Two makes a brew.` : 'Nothing in it.';
-  $('brew-tip').disabled = !b.standing.length;
+  // **What the button would make, in core's numbers.** A screen that worked out
+  // its own would be a second answer to what a pair is worth.
+  $('brew-gives').textContent = b.brewing
+    ? `${b.brewing.name} — ${b.brewing.gives}` +
+      (b.brewing.ink ? ` (an ink is adding ${b.brewing.ink}%)` : '')
+    : (b.why ?? '');
+  $('brew-do').disabled = !b.brewing;
+  $('brew-tip').disabled = b.seated === 0;
 
-  // The larder. Everything you are holding, with how many.
-  const box = $('brew-larder');
+  const box = $('brew-potions');
   box.replaceChildren();
-  if (!b.larder.length) {
+  if (!b.potions.length) {
     const p = document.createElement('p');
     p.className = 'note';
-    p.textContent = 'Empty. Everything that goes down leaves something; go and meet something.';
+    p.textContent = b.drunk
+      ? `You have drunk ${b.drunk}. It lands at the next bell.`
+      : 'Nothing brewed yet.';
     box.appendChild(p);
-    return;
   }
-  for (const i of b.larder) {
-    const picked = inHand.filter((x) => x === i.id).length;
+  for (const p of b.potions) {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = 'wares' + (picked ? ' pin' : '');
-    btn.dataset.ingredient = i.id;
-    btn.innerHTML = `<b>${i.name}</b>` +
-      `<span class="spec">${i.cells.length} cell${i.cells.length > 1 ? 's' : ''} · ` +
-      `ink +${i.potency}%</span>` +
-      `<span class="flavour">${i.blurb}</span>` +
-      `<span class="cost">${i.n} in the larder${picked ? ` · ${picked} picked up` : ''}</span>`;
+    btn.className = 'wares';
+    btn.dataset.potion = p.id;
+    btn.disabled = !!b.drunk;
+    btn.innerHTML = `<b>${p.name}</b>` +
+      `<span class="spec">${p.gives}</span>` +
+      `<span class="flavour">${p.blurb}</span>` +
+      `<span class="cost">${b.drunk ? 'you have already drunk one' : 'drink it'}</span>`;
     btn.onclick = () => {
-      if (picked >= i.n) { benchSays('You have not got another.', true); return; }
-      if (inHand.length >= b.holds) { benchSays('Your hands are full. Tip it out or brew it.', true); return; }
-      inHand.push(i.id);
-      benchSays('');
-      if (inHand.length >= 2) {
-        const why = brew(inHand.join(','));
-        if (why) { inHand.pop(); benchSays(why, true); }
-        else { inHand = []; }
-      }
+      const why = drink_potion(p.id);
+      benchSays(why || `You drank ${p.name}. It is on you at the next bell.`, !!why);
       paintBench();
+      paintTape();
+      autosave();
     };
     box.appendChild(btn);
   }
 }
 
 function closeBench() {
-  inHand = [];
   $('brewbench').hidden = true;
   paintPanel();
 }
@@ -4135,6 +4123,13 @@ async function main() {
   window.__save = () => save_json();
   window.__errandMarks = () => JSON.parse(errand_marks_json()).places;
   window.__log = () => JSON.parse(quest_log_json());
+  // The bench, for the gate: the payload, where a thing may go, and putting one
+  // there. Every one of them goes through core, which is the point — a check
+  // that clicked pixels would be asking the canvas rather than the rulebook.
+  window.__retort = () => retort_json();
+  window.__retortAnchors = (id) => retort_legal_anchors(id, 'retort');
+  window.__retortPlace = (id, x, y) => retort_place(id, 'retort', x, y);
+  window.__benchPaint = () => { retort?.refresh(); paintBench(); };
   window.__guide = (id) => JSON.parse(guide_json(id));
   window.__hoverGuide = () => hoverGuide;
   window.__position = () => position();
@@ -4194,7 +4189,17 @@ async function main() {
   $('cart').onclick = openCart;
   $('bench').onclick = openBench;
   $('brew-close').onclick = closeBench;
-  $('brew-tip').onclick = () => { tip_out(); inHand = []; benchSays(''); paintBench(); autosave(); };
+  $('brew-tip').onclick = () => {
+    tip_out(); benchSays(''); retort?.refresh(); paintBench(); autosave();
+  };
+  $('brew-do').onclick = () => {
+    const why = brew_it();
+    benchSays(why || 'Brewed. It is in the pack.', !!why);
+    retort?.refresh();
+    paintBench();
+    paintTape();
+    autosave();
+  };
   $('cart-close').onclick = closeCart;
   $('tree-done').onclick = closeTree;
   $('vendor-close').onclick = closeVendor;

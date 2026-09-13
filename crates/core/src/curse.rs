@@ -70,6 +70,36 @@ pub fn misfire_interval(stacks: u32) -> u32 {
     }
 }
 
+/// Milliseconds as the seconds a player reads: whole where it is whole, and to
+/// a tenth where it is not, because 1,200 is 1.2 seconds and 10,000 is ten.
+pub fn secs_for(ms: u32) -> String {
+    if ms % 1000 == 0 { format!("{}s", ms / 1000) } else { format!("{:.1}s", ms as f32 / 1000.0) }
+}
+
+/// The fewest stacks at which `holds` is true, searched rather than written
+/// down. Every curse in the game settles inside a handful, so the sweep stops
+/// at eight and falls back to it — a curse that never settles is one whose
+/// sentence should not be claiming a number.
+fn stacks_until(holds: impl Fn(u32) -> bool) -> u32 {
+    (1..=8).find(|&n| holds(n)).unwrap_or(8)
+}
+
+/// Small counts are spelled out, which is TONE rule 12's house style and the
+/// reason `no_sentence_has_a_gap_in_the_middle_of_it`'s neighbour reads
+/// numbers as prose.
+fn spelled(n: u32) -> &'static str {
+    match n {
+        1 => "one",
+        2 => "two",
+        3 => "three",
+        4 => "four",
+        5 => "five",
+        6 => "six",
+        7 => "seven",
+        _ => "eight",
+    }
+}
+
 impl CurseKind {
     /// All four, so anything that has to cover the set - the glossary, the
     /// theme, a legend - can be checked rather than kept in step by hand.
@@ -105,20 +135,50 @@ impl CurseKind {
         }
     }
 
-    pub fn describe(self) -> &'static str {
+    /// What this curse does, in the words a player reads, **with every figure
+    /// in it read from the constant that decides it**.
+    ///
+    /// It was four string literals with the numbers typed in, and it was
+    /// called by nothing at all — a describer that had gone stale in private,
+    /// which is this project's *a derived number needs somewhere it is shown*
+    /// with the sentence in place of the number. The glossary is its one
+    /// caller now, so retuning `FROST_SLOW_CAP_PCT` retunes what the shelf
+    /// says about frost.
+    ///
+    /// Where a stack count appears it is **searched for** rather than written:
+    /// two stacks reach the frost cap today, and the day a third is needed
+    /// this sentence says three without anybody editing it.
+    pub fn describe(self) -> String {
         match self {
-            CurseKind::Searing => "10 damage a second for 10 seconds, per stack",
-            CurseKind::Frost => {
-                "all of the target's gear runs 50% slower for 1 second, per stack, up to 75%"
-            }
-            CurseKind::Stun => {
-                "one of their items stops dead for 1.2 seconds, then carries on from \
-                 where it stood; stacks add up to 3.6 seconds on that item"
-            }
-            CurseKind::Misfire => {
-                "one activation in three does nothing, for 6 seconds; two stacks or more \
-                 makes it one in two"
-            }
+            CurseKind::Searing => format!(
+                "{} damage a second, for {}. Stacks add up with no ceiling.",
+                SEARING_DPS,
+                secs_for(SEARING_MS),
+            ),
+            CurseKind::Frost => format!(
+                "All of the target's gear runs {}% slower, for {}. Stacks add up \
+                 to {}%, which {} of them reach — at the cap an item still \
+                 fires, at a quarter speed.",
+                FROST_SLOW_PCT,
+                secs_for(FROST_MS),
+                FROST_SLOW_CAP_PCT,
+                spelled(stacks_until(|n| frost_slow_pct(n) == FROST_SLOW_CAP_PCT)),
+            ),
+            CurseKind::Stun => format!(
+                "One of their items stops dead for {}, then carries on from \
+                 where it stood rather than starting over. Stacks pile onto that \
+                 item's clock rather than refreshing it, up to {}.",
+                secs_for(STUN_MS),
+                secs_for(STUN_CAP_MS),
+            ),
+            CurseKind::Misfire => format!(
+                "One activation in {} does nothing at all, for {}. From {} \
+                 stacks on it is one in {}, and that is the worst it gets.",
+                MISFIRE_EVERY,
+                secs_for(MISFIRE_MS),
+                spelled(stacks_until(|n| misfire_interval(n) == MISFIRE_FLOOR)),
+                MISFIRE_FLOOR,
+            ),
         }
     }
 

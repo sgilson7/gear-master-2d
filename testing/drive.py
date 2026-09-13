@@ -806,6 +806,7 @@ def clear_screens(page):
         ("#history", "#history-close"),
         ("#glossary", "#gloss-close"),
         ("#cart-screen", "#cart-close"),
+        ("#sheet-pop", "#sheet-close"),
     ]:
         if page.is_visible(screen):
             try:
@@ -3128,7 +3129,46 @@ def check_the_sheet_says_what_you_are(page, name, fails):
     any of them had landed. The tree grants +6 strength and +60 max health, and
     there was nowhere in the game showing either — which is indistinguishable
     from a skill that does nothing.
+
+    **And it is a popup now, so this presses the chip first.** The sheet moved
+    off the always-up panel on the human's ask — *"make a chip for the character
+    sheet you can click to bring up in a popup, so we can reclaim that space"* —
+    and `textContent` reads a hidden element perfectly happily, so every
+    assertion below would have gone on passing against a sheet nobody could
+    open. That is this file's *a check that counts elements is not asking
+    whether they are drawn*, one screen along: the fix is to reach the rows the
+    way a player does.
     """
+    # **Nothing over the top of it**, because this one clicks. Playwright's
+    # `is_visible` answers about the element and not about what is covering it,
+    # so a screen left up by the check before would time out here rather than
+    # report — which is this file's oldest harness rule from the other side.
+    clear_screens(page)
+    chip = page.query_selector("#sheet-chip")
+    if chip is None or not chip.is_visible():
+        fails.append(f"{name}: there is no chip on the panel to open the sheet with")
+        return
+    # The headline is on the chip itself, because a chip saying only its own
+    # name is a button nobody presses.
+    said = (page.text_content("#sheet-chip") or "").lower()
+    if "health" not in said or "strength" not in said:
+        fails.append(f"{name}: the sheet chip carries no headline: {said!r}")
+    chip.click()
+    # **A timeout here is a traceback, and a traceback is not a finding.** A
+    # check that dies on a `wait_for` ends the run with a Playwright stack
+    # instead of the one sentence that says what is wrong — and takes every
+    # failure found before it with it.
+    try:
+        page.wait_for_selector("#sheet-pop:not([hidden])", timeout=4000)
+    except Exception:
+        fails.append(f"{name}: pressing the sheet chip opened nothing")
+        return
+    box = page.evaluate("""() => {
+      const r = document.querySelector('#sheet-pop .screenbox')?.getBoundingClientRect();
+      return r ? { w: Math.round(r.width), h: Math.round(r.height) } : null;
+    }""")
+    if not box or box["w"] < 100 or box["h"] < 100:
+        fails.append(f"{name}: the sheet popup opened at {box}, which nobody can read")
     got = page.evaluate("""() => {
       const c = window.__character();
       return { rows: [...document.querySelectorAll('#sheet li')].map(li => li.textContent.trim()),
@@ -3145,6 +3185,17 @@ def check_the_sheet_says_what_you_are(page, name, fails):
     for st in got["stats"]:
         if st["n"] and st["label"].lower() not in text:
             fails.append(f"{name}: core reports {st['label']!r} and the sheet drops it")
+    # And it comes off again, because every check after this one starts by
+    # clicking something. `a check that opens a screen has to close it on every
+    # path out` — and the two early returns above are exactly those paths, which
+    # is why neither of them has opened it yet.
+    page.keyboard.press("Escape")
+    try:
+        page.wait_for_selector("#sheet-pop", state="hidden", timeout=4000)
+    except Exception:
+        fails.append(f"{name}: Escape does not close the sheet popup")
+        clear_screens(page)
+    print("ok: the sheet is a chip, and pressing it opens what you are")
 
 
 def check_a_starting_balance_is_on_the_bar(page, name, fails):
@@ -6588,6 +6639,15 @@ def check_a_town_takes_the_tiredness_off(page, name, fails):
     Planted, because the walk cannot be relied on to arrive at a town tired —
     and a check that only fires when it happens to is a check that stops
     firing.
+
+    **And it reads the strip, which for three blocks it did not.** This asked
+    whether the fatigue came off and whether the panel agreed, and both were
+    true the whole time — so the `ok:` line's *"and the panel says so"* was
+    literally correct about a different thing. `arrive_in_town` returns what it
+    took, M17 left **two** callers taking it, the first one won, and the number
+    the page prints its chair sentence from was always a zero. Nothing about
+    the mending was broken, which is what made it survive: a town still mended
+    you, it just stopped saying so.
     """
     town = page.evaluate("""() => (window.__world().places ?? [])
         .find(p => p.kind === 'town')""")
@@ -6607,8 +6667,25 @@ def check_a_town_takes_the_tiredness_off(page, name, fails):
     if page.evaluate("() => window.__character().fatigue") != 32:
         fails.append(f"{name}: the planted save did not arrive worn out")
         return
+    # **What the strip held before, by content and not by index.** `#tape`
+    # keeps the last few lines and drops the rest into the history, so
+    # `tape(page)[before:]` goes on returning the last one or two however much
+    # has been said — the *compares zero with zero* failure with a scrollback
+    # in it. What is new is what is there now and was not there before.
+    was = set(tape(page))
     page.keyboard.press("ArrowLeft")
     page.wait_for_timeout(350)
+    # **The receipt, before anything else.** `report_step` carries `mended`
+    # into the payload and the page prints the chair sentence only when it is
+    # above zero, so this is the one assertion that can tell a town that mends
+    # from a town that mends silently.
+    fresh = [l for l in tape(page) if l not in was]
+    said = " ".join(fresh).lower()
+    if "chair" not in said:
+        fails.append(f"{name}: walked into a town 32% worn and nothing said it came off - "
+                     f"the strip's new lines are {fresh!r}")
+    elif "32%" not in said:
+        fails.append(f"{name}: the town took 32% off and the receipt says {said!r}")
     after = page.evaluate("() => window.__character()")
     if after["fatigue"] != 0:
         fails.append(f"{name}: walked into a town 32% worn and came out {after['fatigue']}%")

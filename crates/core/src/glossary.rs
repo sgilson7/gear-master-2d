@@ -339,12 +339,44 @@ fn the_fight() -> Vec<Entry> {
             ),
         ]),
         Entry::new("Curses", &[
-            "Four kinds, landed by gear rather than by you. Each shows as a \
-             chip beside the pools with its stacks, what it is doing, and how \
-             long it has left.",
+            &format!(
+                "{} kinds, landed by gear rather than by you. Each shows as a \
+                 chip beside the pools with its stacks, what it is doing, and \
+                 how long it has left.",
+                crate::curse::CurseKind::ALL.len()
+            ),
             "How likely one is to land is what is left after the target's curse \
              resistance.",
         ]),
+    ]);
+    // **One entry a curse, and every figure in it read from the constant that
+    // decides it.** Reported from play: *"the mechanical explanation of what
+    // each curse does is missing from the glossary."* It was — the shelf said
+    // *four kinds* and never named one, on the screen whose whole job is to
+    // say what a thing does.
+    //
+    // `CurseKind::describe` is what it reads, and finding it is most of what
+    // this fixed: it existed, it had **no caller anywhere in the game**, and
+    // its four sentences had their numbers typed in — a describer that had
+    // gone stale in private. So the fix went there rather than here. *Before
+    // adding a system, grep for it*, and then check whether what you found is
+    // alive.
+    //
+    // The second line is the landing, which `describe` does not cover and the
+    // chip beside the pools does: a curse is a clock, and how long it runs is
+    // what the target's resistance is actually buying.
+    for k in crate::curse::CurseKind::ALL {
+        out.push(
+            Entry::new(k.name(), &[&k.describe()]).with_aside(&[format!(
+                "A target with no curse resistance holds it for {}; at {} — the \
+                 cap — it is {}, which is why no creature is ever proof against one.",
+                crate::curse::secs_for(k.landing_ms(0)),
+                crate::stats::LANE_CAP,
+                crate::curse::secs_for(k.landing_ms(crate::stats::LANE_CAP)),
+            )]),
+        );
+    }
+    out.extend([
         Entry::new("The mind lane", &[
             "Mind damage eats a creature's MAXIMUM health rather than what is \
              left of it. Something whose maximum reaches nothing is down.",

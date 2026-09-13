@@ -30,8 +30,14 @@ touch anything.
 - **There is a glossary on `G`**, five shelves, every number read from the
   constant that decides it.
 - **There is a long cart** between towns you have stood in, 40 Fnorp.
-- **The suite runs in 95 binaries** and the browser gate is **97 `ok:` lines**. Do not read a total off `cargo test`'s output — it interleaves
-  and cannot be summed; `packaging/count-tests.sh` is the way to get one back.
+- **The suite runs in 95 binaries** and the browser gate is **99 `ok:` lines**.
+  Do not read a total off `cargo test`'s output — it interleaves and cannot be
+  summed; `packaging/count-tests.sh` is the way to get one back.
+- **A curse says what it does**, four entries derived off the constants —
+  and the describer that does it had no caller in the game until the glossary
+  became one.
+- **The character sheet is a chip on the panel** and a popup behind it; the
+  second paper keeps its own chip, because a popup is nobody mentioning it.
 
 - **There are 51 errands**, eleven of them new: one for finishing each of the
   six dungeons, one for arriving at the Undercountry's town, three for the
@@ -2608,6 +2614,106 @@ from one that was broken. It was broken.
   in the entry that says it.**
 - **Unthemed, TONE 13a**, except a class's *name*, which is the world's word
   and goes through the theme — the same split the standing panel makes.
+
+### The shelf said "four kinds" and never named one
+
+Reported from play: *"the mechanical explanation of what each curse does is
+missing from the glossary."* It was — four kinds counted and not one of them
+described, on the screen whose whole job is to say what a thing does.
+
+**The fix went into `curse.rs` rather than into the glossary, and finding out
+why is most of what this was worth.** `CurseKind::describe` already existed,
+had **no caller anywhere in the game**, and had its four sentences' numbers
+typed into the string literals. A describer nobody reads is a describer that
+goes stale in private — this file's *a derived number needs somewhere it is
+shown*, with a sentence in place of the number — so it is derived off
+`SEARING_DPS`, `FROST_SLOW_CAP_PCT`, `STUN_CAP_MS` and `MISFIRE_FLOOR` now,
+and the glossary is its one caller. *Before adding a system, grep for it*, and
+then check whether what you found is alive.
+
+- **The stack count in the sentence is searched for, not written.**
+  `stacks_until` walks up to eight and reports the first that reaches the cap,
+  so *"up to 75%, which two of them reach"* says three the day a third is
+  needed. A hand-written *two* there is the eighth hand-written list this
+  project would have paid for.
+- **Three drafts read badly and only reading them found it.** `effect_at`
+  returns a bare phrase — `"10/s"`, `"stopped"`, `"1 in 3"` — so a first draft
+  saying *"One stack does stopped"* was not a sentence, and *"Two stacks:
+  -75%. Three: -75%."* printed the same number twice for the three curses that
+  cap, which reads as a third stack doing something. **A glossary is a
+  proofreading surface** and it earned that a second time.
+- **Stun's stacking is in its duration and not in its effect**, which is why a
+  derived *"two stacks: {effect}"* line was wrong for it in particular: stacks
+  pile onto one item's clock up to `STUN_CAP_MS`, and `effect_at` is
+  `"stopped"` at every count. Deriving the wrong axis is a number that is read
+  rather than typed and still says nothing.
+- **`every_curse_says_what_it_does` asks over `CurseKind::ALL`**, and asserts
+  the entry carries `describe()` itself rather than merely existing — an entry
+  reading *"a curse"* passes a presence check and tells a player exactly what
+  the old four-kinds line told them. Broken three ways before it was kept: a
+  typed cap, a missing kind, and a present entry that says nothing.
+
+## The sheet is a chip, and the paper is not
+
+Reported from play: *"rename the tree button to Skill Tree, and make a chip for
+the character sheet you can click to bring up in a popup, so we can reclaim
+that space on the map screen."* Two lists of a dozen figures each sat open
+under the panel on the one screen that is always up.
+
+**What made that safe is the reason they were there at all.** *A derived number
+needs somewhere it is shown* is why the sheet exists — four skills worked
+perfectly and were reported as broken because nothing printed them — so folding
+it into a popup is only allowed if the chip still carries enough to notice a
+change. It reads *"1,240 health · 46 strength"* off `character_json`'s own
+array by label.
+
+- **The paper does not go in the popup.** `Spike's second paper is in your
+  pack` exists because *a thing in your pack that no screen mentions is a thing
+  you have forgotten you own*, and a popup you have to open is nobody
+  mentioning it. It is its own chip on the always-up panel, hidden until there
+  is one, the way the rack and the van's button are.
+- **`textContent` reads a hidden element perfectly happily**, so all four gate
+  checks that ask the sheet something went on passing against a sheet nobody
+  could open — *a check that counts elements is not asking whether they are
+  drawn*, one screen along. `check_the_sheet_says_what_you_are` presses the
+  chip, waits for the popup, and measures the box before it reads a row.
+
+## A town mends you, and for three blocks it never said so
+
+**Found by the compiler, in a warning that had been on the build the whole
+time.** `warning: unused variable: mended` at the end of `answer_the_gate` —
+and an unused binding sitting at the end of a function is usually a call
+somebody meant to keep the *effect* of.
+
+`Game::arrive_in_town` zeroes the fatigue and returns what it took. M17 pulled
+`answer_the_gate` out of `try_step` when the overworld became a table, and
+brought that line along with it — **and both callers kept their own copy.** The
+one inside the gate runs first, takes the tiredness, and hands the caller a
+zero; `report_step` carries the zero into the payload; the page prints the
+chair sentence only `if (r.mended > 0)`. So *"Somebody puts a chair out. N% of
+you comes back"* has not printed on a walk or a landing since M17.
+
+- **Nothing about the mending was ever broken**, which is exactly what made it
+  invisible. A town still took your tiredness off. It stopped saying so, and *a
+  thing that works and cannot be seen is a thing that does not work* — the
+  fifth time that sentence has been the answer here, and the first time the
+  thing that could not be seen was a *receipt* rather than a number.
+- **Two answers to *what happens when you arrive somewhere***, which is the
+  shape this file keeps recording — and the giveaway is that they did not
+  disagree about the rule, only about which of them ran first.
+- **`cargo test` cannot reach it.** Both halves are the shim's, and they were
+  the same shim. The check already existed —
+  `check_a_town_takes_the_tiredness_off` plants a character carrying 32% beside
+  a town and steps in — and it asked whether the fatigue came off and whether
+  the **panel** agreed. Both were true the whole time, so its own `ok:` line,
+  *"a town takes the tiredness off, and the panel says so"*, was literally
+  correct about a different thing. It reads the **strip** now, which is the one
+  assertion that can tell a town that mends from a town that mends silently.
+- **And it compares the strip by content rather than by index.** `#tape` keeps
+  the last few lines and drops the rest into the history, so `tape(page)[n:]`
+  goes on returning the last one or two however much has been said — this
+  file's *a slice of a capped list is a comparison that quietly stops being
+  about anything*, which it takes a deliberate effort not to write again.
 
 ## The speed of a fight, and a log you can read
 
@@ -6182,7 +6288,7 @@ content*, and one check now measures what a range used to guess at.
 | The papers | **3** on Spike's van, all drawn from the first visit: the Patent's licence at 5,000, **the Second Paper at 5,000 behind nothing at all**, and the expert paper at **nothing** behind two finished trees — the twenty-four points are the price, which is what keeps a free paper from being a fourth class on the fork. M15.4 took the tree gate off the second paper on the human's ask; the level that puts the van on the road is what is left |
 | Figures | 29 `.tex` → **122 SVGs**. Before: 27 → **83** (13 family drawings, 4 drawn for themselves, 5 classes, 3 towns, you) |
 | Art coverage | **72 of 72 creatures**, from **20 families** — `drowned` is one drawing in ten colourways and `unwritten` is the Undercountry boss's own. Before: **60 of 60**, 3 of 3 towns, 5 of 5 classes, and you. The set pieces, the instruments and the enchs have no art and want none — a component has never had a figure |
-| Browser gate | **98 `ok:` lines in one engine**, the newest being that a potion is drunk on the pre-battle screen and in its own view rather than in the rack. Before it: the glass is a board of seven cells in a four-by-three box, the button brews, and what it made can be drunk. Before it, the newest four were M20's: a word errand told you arrived on a map you arrive at by *shooting*, the bench brewing a pair in a glass that is a shape and not a box, an area saying its own name and then stopping, and the errand log drawn as a tree with its wires **measured**. **Three of the four were wrong before the code was** — one read `window.__log()` as an array when it is an object, one gave a single-tile landing six shots when *a tile one step away is a tile you cannot shoot to*, and one walked a fixed number of steps and never left its own region — which is this file's *break a new check and watch it fail* arriving from the other side. Before: **94 `ok:` lines**, the newest being that a word errand is told you arrived on a map you arrive at by *shooting* — the one question about the new errands that `cargo test` cannot reach, because both halves of it are the shim's. Before: **93**, the newest being that no terrain draws magenta. Before: **92 `ok:` lines**, seven of them M19's — the ball slides and the trail grows behind it, a diamond catches, the long cart runs between towns, the furnace shows on the bar, and the glossary opens on G. One of them *passed while printing the wrong thing* (**9 burns off None**, reading `what` where an event's subject rides in `item`), which is the argument for a check that prints what it found — and **one of them was vacuous twice**: the shut-crossing check matched the tideline card's own prose, and then reached the tile through `cross`, which falls back to `here` and so goes through `walk`, the door that already worked. Before it: **85 `ok:` lines**, seven of them M17's and every one negative-tested — the cue snaps to what core takes and pulling further pulls harder, a shot flies the path core returned, four keys aim and space fires with no pointer, a spike takes its percent and says so, a ball in the pocket wakes up in town, a floor still steps and draws no cue, and reduced motion is at rest with the trail still drawn. **The hardest of the seven to break is the floor one**: every lie about *the arrows mean two things now* takes the whole gate down before the check runs. Before it: **78 `ok:` lines**, six of them M16's and every one negative-tested — the way under is silt until the sheet, a stake offers the pull and a compass that lies, a sinkhole drops you in an alcove nothing walks into, the Tenth Surveyor's panel draws the run's own items, the fork is seven cards in two rows, and a Stoker's replay says what the furnace took. Before it: **96 `ok:` lines over 3 engines** — which is 67 in any one of them, not 81; the count is a total and reading it as per-engine is wrong by fourteen. The newest is M15.2's, and it is the only one that can answer a *negative*: that a fight you have already had is settled and **never drawn**. The newest five are M14.5's: the tide is drawn before it goes out and walkable after, the lip of the Sump refuses in the Reach's words and opens the frame, a wheel that keeps what you feed it says what shape it wants, the chair is three moves in an order **and comes back**, and the third town is empty with the screen after it saying so. **All five were negative-tested, and two of the five found faults on a green build** — see *A stack gate that wants an instrument* |
+| Browser gate | **99 `ok:` lines in one engine**, the newest being that the character sheet is reachable by pressing the chip that replaced it — which the four checks already asking it something could not tell from a sheet nobody can open. **And one existing check grew the assertion that was missing from it**: a town's receipt, which had not printed since M17 and which that check's own `ok:` line had been claiming. Before: **98 `ok:` lines**, the newest being that a potion is drunk on the pre-battle screen and in its own view rather than in the rack. Before it: the glass is a board of seven cells in a four-by-three box, the button brews, and what it made can be drunk. Before it, the newest four were M20's: a word errand told you arrived on a map you arrive at by *shooting*, the bench brewing a pair in a glass that is a shape and not a box, an area saying its own name and then stopping, and the errand log drawn as a tree with its wires **measured**. **Three of the four were wrong before the code was** — one read `window.__log()` as an array when it is an object, one gave a single-tile landing six shots when *a tile one step away is a tile you cannot shoot to*, and one walked a fixed number of steps and never left its own region — which is this file's *break a new check and watch it fail* arriving from the other side. Before: **94 `ok:` lines**, the newest being that a word errand is told you arrived on a map you arrive at by *shooting* — the one question about the new errands that `cargo test` cannot reach, because both halves of it are the shim's. Before: **93**, the newest being that no terrain draws magenta. Before: **92 `ok:` lines**, seven of them M19's — the ball slides and the trail grows behind it, a diamond catches, the long cart runs between towns, the furnace shows on the bar, and the glossary opens on G. One of them *passed while printing the wrong thing* (**9 burns off None**, reading `what` where an event's subject rides in `item`), which is the argument for a check that prints what it found — and **one of them was vacuous twice**: the shut-crossing check matched the tideline card's own prose, and then reached the tile through `cross`, which falls back to `here` and so goes through `walk`, the door that already worked. Before it: **85 `ok:` lines**, seven of them M17's and every one negative-tested — the cue snaps to what core takes and pulling further pulls harder, a shot flies the path core returned, four keys aim and space fires with no pointer, a spike takes its percent and says so, a ball in the pocket wakes up in town, a floor still steps and draws no cue, and reduced motion is at rest with the trail still drawn. **The hardest of the seven to break is the floor one**: every lie about *the arrows mean two things now* takes the whole gate down before the check runs. Before it: **78 `ok:` lines**, six of them M16's and every one negative-tested — the way under is silt until the sheet, a stake offers the pull and a compass that lies, a sinkhole drops you in an alcove nothing walks into, the Tenth Surveyor's panel draws the run's own items, the fork is seven cards in two rows, and a Stoker's replay says what the furnace took. Before it: **96 `ok:` lines over 3 engines** — which is 67 in any one of them, not 81; the count is a total and reading it as per-engine is wrong by fourteen. The newest is M15.2's, and it is the only one that can answer a *negative*: that a fight you have already had is settled and **never drawn**. The newest five are M14.5's: the tide is drawn before it goes out and walkable after, the lip of the Sump refuses in the Reach's words and opens the frame, a wheel that keeps what you feed it says what shape it wants, the chair is three moves in an order **and comes back**, and the third town is empty with the screen after it saying so. **All five were negative-tested, and two of the five found faults on a green build** — see *A stack gate that wants an instrument* |
 | The suite | **976 passing** after M18, and a `data/` touch costs about **three minutes**, not ten: **127 seconds relinking 83 test binaries and 47 running**, measured on an idle machine. The ten is a cold `--workspace`, which adds the lab and the shim on top of both. **Measure on a quiet machine or not at all** — one attempt at this read `real 1279.89` against `user 63.37`, which is twenty-one minutes of wall clock for a minute of work, because it was queued behind three browser gates. `include_str!` is not the thing to change — loading from disk in the test profile would make the tested path differ from the shipped one, which is two rulebooks — and the fix, if one is ever wanted, is **fewer test binaries**, which is a trade against one file per concern that nobody should make to save two minutes. `SECOND-ORDER-M16.md` row 17 is where that is measured. Before it: **950 passing** after M16. Before it: **913 passing, and ~33 seconds warm** after M15, the bestiary, the cart and the sands; **832 and 27.5s** after M14 — measured after M14, and the ten slowest files are the ten that were slow at M13: `drops.rs` at 11.0s and `experts_reach.rs` at 6.3s, neither of them M14's, and nothing this block added is above 0.4s. **`SECOND-ORDER-M14.md` row 17 was written claiming it had slowed to minutes and is corrected there**: what is minutes is rebuilding sixty test binaries after a change to `combat.rs`, which is a fact about editing the engine. Before M14 it was **788 passing, and 34 seconds warm.** It was a minute through most of M13 and `rules_m13.rs` was 29.6s of it: `beacon_board` ran Auto-pack over the whole catalogue on twenty-row grids, four times, because it was the only fixture in the repository with two items that touch. `common::items_in_a_row` is what replaced it — **0.03s** — and `experts_reach.rs` went 9.6s → 6.5s by measuring once per *set* of nodes rather than once per question. `drops.rs` at 11.3s is now the slowest file and is untouched. `[profile.test] opt-level = 2` since M12.6, with debug assertions and overflow checks still on — this is the `test` profile, not `--release` |
 | Floors with a puzzle | **6**, and floors with a boss **2**. Every one is monotone — flags only grow, so no move can make the way on unreachable — and `puzzle::solvable_blind` counts the worst case rather than the plan asserting it |
 | Blind-solution ceilings | Sump **8 / 1 / 45**, Stair **1 / 3 / 3**. The plan guessed 10 / 11 / 45 and 2 / 27 / 3; **the Cairnfield's forty-five came back exactly**, which is the reason to believe the other five. `every_floor_in_the_game_can_be_solved_blind` holds every floor there is under 45 |

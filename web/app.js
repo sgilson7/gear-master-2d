@@ -722,6 +722,22 @@ function paintSheet(c) {
   // moment a number is worth watching. Same rows, written twice rather than
   // derived twice — a second painter is a second answer.
   const html = rows.join('') || `<li class="none">nothing yet</li>`;
+  // **And the chip says the headline, because a chip that says only its own
+  // name is a button nobody presses.** The point of the sheet being on the map
+  // panel was that a derived number with nowhere it is shown cannot be told
+  // from a bug; folding it into a popup keeps that only if the chip carries
+  // enough to notice a change.
+  const chip = $('sheet-chip-meta');
+  if (chip) {
+    const of = (label) => c.stats?.find((s) => s.label === label)?.n;
+    const hp = of('max health'), str = of('strength');
+    chip.textContent = `${hp ?? '—'} health · ${str ?? '—'} strength`;
+  }
+  // The paper rides beside the chip rather than inside the popup, because the
+  // whole reason that line exists is that a thing nobody mentions is a thing
+  // you forget you own — and a popup you have to open is nobody mentioning it.
+  const paper = $('paper-chip');
+  if (paper) paper.hidden = !c.second_paper;
   for (const id of ['sheet', 'pack-sheet']) {
     const el = $(id);
     if (el) el.innerHTML = html;
@@ -3986,6 +4002,10 @@ async function main() {
       if (e.key === 'Escape') closeBench();
       return;
     }
+    if (!$('sheet-pop').hidden) {
+      if (e.key === 'Escape') $('sheet-pop').hidden = true;
+      return;
+    }
     if (!$('log').hidden) {
       if (e.key === 'Escape') closeLog();
       return;
@@ -4299,6 +4319,9 @@ async function main() {
   $('gloss-close').onclick = closeGlossary;
   $('cart').onclick = openCart;
   $('bench').onclick = openBench;
+  $('sheet-chip').onclick = () => { $('sheet-pop').hidden = false; };
+  $('paper-chip').onclick = () => offerClass({ paper: true });
+  $('sheet-close').onclick = () => { $('sheet-pop').hidden = true; };
   $('brew-close').onclick = closeBench;
   $('brew-tip').onclick = () => {
     tip_out(); benchSays(''); retort?.refresh(); paintBench(); autosave();

@@ -2903,14 +2903,16 @@ fn theme_piece(g: &gm2d_core::game::Game, canonical: &str) -> String {
         .unwrap_or_else(|| canonical.to_string())
 }
 
-/// Which way the ingredient in your hand is turned.
-///
-/// **Session state, and deliberately not the character's.** A component's
-/// rotation lives in the registry because it has to survive a save; which way
-/// you are holding a pinch of cairn dust does not — what is *seated* carries
-/// its own turn, and that is the half that matters. Every rule about whether it
-/// will go in is still core's: `brew::legal_anchors` takes the turn as an
-/// argument and answers.
+// **Which way the ingredient in your hand is turned.** Session state, and
+// deliberately not the character's: a component's rotation lives in the
+// registry because it has to survive a save; which way you are holding a pinch
+// of cairn dust does not — what is *seated* carries its own turn, and that is
+// the half that matters. Every rule about whether it will go in is still
+// core's: `brew::legal_anchors` takes the turn as an argument and answers.
+//
+// A `///` here documents nothing at all, because rustdoc does not see inside a
+// macro invocation — which is the compiler saying *a comment nobody reads is a
+// comment that can say anything*, one file along.
 thread_local! {
     static TURNS: std::cell::RefCell<std::collections::BTreeMap<String, u8>> =
         std::cell::RefCell::new(std::collections::BTreeMap::new());
@@ -4610,8 +4612,20 @@ fn answer_the_gate(
             }
         }
 
-        // **A town takes the tiredness off**, and says so. The rule is
-        // core's; this is where the arriving happens.
-        let mended = s.town.as_ref().map(|t| g.arrive_in_town(t)).unwrap_or(0);
+    // **The arriving is the caller's, and for three blocks it was done
+    // twice.** M17 pulled this function out of `try_step` and brought the
+    // town-mending line along, and both callers kept their own — so the copy
+    // in here ran first, took the tiredness, and handed the caller a zero.
+    // `report_step` carries that zero into the payload, the page prints the
+    // chair sentence only `if (r.mended > 0)`, and **"Somebody puts a chair
+    // out" has not printed on a walk or a landing since the overworld became
+    // a table.** Nothing was broken about the mending itself, which is what
+    // made it invisible: a town still took your tiredness off, it just never
+    // said so.
+    //
+    // Two answers to *what happens when you arrive somewhere* is the shape
+    // this file keeps recording, and the giveaway was the compiler: an unused
+    // binding sitting at the end of a function is usually a call somebody
+    // meant to keep the effect of.
     (went, shut, wants_instrument, turned, ending)
 }

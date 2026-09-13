@@ -104,6 +104,16 @@ fn the_numbers_are_read_and_not_typed() {
         ("Grids", "the tallest a grid gets", gm2d_core::progression::MAX_ROWS.to_string()),
         ("Enchs", "the licence", gm2d_core::ench::LICENCE_PRICE.to_string()),
         ("The spin", "a turn", gm2d_core::combat::SPIN_PCT_PER_TURN.to_string()),
+        // **And one curse's own figures in one curse's own entry.** These
+        // reach the shelf through `CurseKind::describe`, which had its four
+        // sentences typed out and no caller anywhere in the game until the
+        // glossary became one — so they were four numbers that could go stale
+        // in private, which is the failure this whole test exists to refuse.
+        ("searing", "the damage a second", gm2d_core::curse::SEARING_DPS.to_string()),
+        ("frost", "the slow", gm2d_core::curse::FROST_SLOW_PCT.to_string()),
+        ("frost", "the cap", gm2d_core::curse::FROST_SLOW_CAP_PCT.to_string()),
+        ("misfire", "one activation in how many", gm2d_core::curse::MISFIRE_EVERY.to_string()),
+        ("misfire", "the floor", gm2d_core::curse::MISFIRE_FLOOR.to_string()),
     ] {
         let body = body_of(term);
         let said: Vec<&str> = body
@@ -141,5 +151,36 @@ fn the_pools_shelf_is_the_panels_answer() {
                 what
             );
         }
+    }
+}
+
+/// **Every curse the fight can land has an entry that says what it does.**
+///
+/// Reported from play: *"the mechanical explanation of what each curse does is
+/// missing from the glossary."* It was — the shelf said *four kinds* and never
+/// named one, on the screen whose whole job is to say what a thing does.
+///
+/// Asked over `CurseKind::ALL` rather than over a list of four written here,
+/// for the reason every completeness lint in this repository is: a list of four
+/// written by hand is a list that can be three.
+#[test]
+fn every_curse_says_what_it_does() {
+    let entries: Vec<gm2d_core::glossary::Entry> =
+        glossary::shelves().into_iter().flat_map(|s| s.entries).collect();
+    for k in gm2d_core::curse::CurseKind::ALL {
+        let e = entries
+            .iter()
+            .find(|e| e.term == k.name())
+            .unwrap_or_else(|| panic!("{:?} is a curse the fight lands and the glossary has never heard of", k.name()));
+        // Not merely present: it has to carry the sentence the engine writes.
+        // An entry reading "a curse" would pass a presence check and tell a
+        // player exactly what the old four-kinds line told them.
+        assert!(
+            e.body.iter().any(|l| *l == k.describe()),
+            "{:?}'s entry does not carry CurseKind::describe - two answers to what a curse \
+             does is the thing this screen exists to stop",
+            k.name(),
+        );
+        assert!(!e.aside.is_empty(), "{:?} says nothing about how long it lasts", k.name());
     }
 }

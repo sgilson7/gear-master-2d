@@ -196,7 +196,7 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
    swallowing clicks, and this. All three were found by `elementFromPoint` and
    none of them by reading. `check_the_fork_is_on_top` is what stops a fourth. */
 #tree, #log, #ending, #history, #combat, #instrument, #instant, #bestiary,
-#cart-screen, #glossary, #brewbench { z-index: 30; }
+#cart-screen, #glossary, #brewbench, #sheet-pop { z-index: 30; }
 /* The cart is a counter you walked onto, like the town and the van, so it
    sits on the tier those do — *where you are* rather than *what you
    opened from there*. */
@@ -887,3 +887,24 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
 .glassbox { flex: 0 1 auto; }
 .glassbox canvas { max-width: 100%; height: auto; }
 .larderbox { flex: 1 1 300px; min-width: 260px; }
+
+
+/* --------------------------------------------------------- the sheet chip
+   Two lists of a dozen stats each used to sit open under the map panel, on the
+   one screen that is always up. The reason they were there still holds — a
+   derived number with nowhere it is shown cannot be told from a bug — and a
+   chip is somewhere it is shown. */
+.chip {
+  display: inline-flex; align-items: baseline; gap: 8px;
+  padding: 6px 12px; border: 1px solid var(--line); background: transparent;
+  color: var(--ink-2); font-family: var(--mono); font-size: 11px;
+  letter-spacing: .08em; text-transform: uppercase; cursor: pointer;
+}
+.chip:hover { color: var(--ink); border-color: var(--brass); }
+.chip .meta { font-size: 10.5px; opacity: .8; text-transform: none; letter-spacing: .04em; }
+/* The one chip that is an offer rather than a door. */
+.chip.paper { border-color: var(--brass); color: var(--ink); }
+.chip[hidden] { display: none !important; }
+/* The popup is a screen like any other, only narrower: it is a column of
+   figures and a column of figures does not want nine hundred pixels. */
+.screenbox.narrow { max-width: 520px; }

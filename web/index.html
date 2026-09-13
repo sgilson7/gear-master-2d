@@ -54,19 +54,24 @@
             <div><dt>points</dt><dd id="points">&mdash;</dd></div>
             <div><dt>class</dt><dd id="class">&mdash;</dd></div>
           </dl>
-          <!-- What the character actually is. The tree grants +6 strength and
-               +60 max health and there was nowhere at all to see either. -->
-          <h4 class="sub-h">What you are</h4>
-          <ul id="sheet" class="stats"></ul>
-          <!-- **What a banked pool pays, per point.** Ported from the
-               original's reference shelf, and drawn from the same function:
-               `Combatant::pool_pays` runs the rulebook on a probe holding one
-               point, so this cannot disagree with the fight. Without it a board
-               banks fury all the way through a fight, the replay prints
-               `fury 8`, and nothing anywhere says the 8 is eight more damage on
-               every swing. -->
-          <h4 class="sub-h">What a banked pool pays, per point</h4>
-          <ul id="pools-pay" class="stats"></ul>
+          <!-- **The sheet is a chip now, and the sheet itself is a popup.**
+               Reported from play: *"make a chip for the character sheet you can
+               click to bring up in a popup, so we can reclaim that space on the
+               map screen."* Two lists of a dozen stats each sat open under the
+               panel on the one screen that is always up — and the reason they
+               were there at all still holds: a derived number with nowhere it
+               is shown cannot be told from a bug. A chip is somewhere it is
+               shown. -->
+          <button id="sheet-chip" type="button" class="chip">
+            What you are<span class="meta" id="sheet-chip-meta">&mdash;</span>
+          </button>
+          <!-- **And the paper stays on the always-up panel.** *A thing in your
+               pack that no screen mentions is a thing you have forgotten you
+               own* is why that line exists at all, so folding the sheet into a
+               popup must not fold this in with it. Hidden until there is one,
+               the way the rack and the van's button are. -->
+          <button id="paper-chip" type="button" class="chip paper" hidden
+                  data-open-paper>Spike's second paper &mdash; say what else you are</button>
           <!-- What you are carrying to take the tiredness off, usable here:
                the decision this mechanic exists for is the one on the road.
                **Not `id="pack"`** — the town already has a Pack Your Frames
@@ -75,7 +80,7 @@
                button, waited for a hidden element and hung. -->
           <div id="kit" class="pack"></div>
           <div class="row">
-            <button id="skills" type="button">The tree</button>
+            <button id="skills" type="button">Skill Tree</button>
             <button id="errands-open" type="button">Errands</button>
             <button id="gloss-open" type="button" title="How to play (G)">How to play</button>
             <!-- **Only once something has been beaten five times.** A button
@@ -738,6 +743,26 @@
   <!-- The skill hover card. Outside every screen, because it is pinned to the
        viewport and a screen that hides itself must not take it along. -->
   <div id="node-detail" hidden></div>
+  <!-- What you are. Outside every screen for the same reason, and opened from
+       the chip on the map panel rather than sitting open under it. -->
+  <div id="sheet-pop" class="screen" hidden>
+    <div class="screenbox narrow">
+      <header>
+        <div>
+          <p class="eyebrow">the character</p>
+          <h2>What you are</h2>
+        </div>
+      </header>
+      <ul id="sheet" class="stats"></ul>
+      <!-- **What a banked pool pays, per point.** Drawn from
+           `Combatant::pool_pays`, so it cannot disagree with the fight: without
+           it a board banks fury all the way through and nothing anywhere says
+           the 8 is eight more damage on every swing. -->
+      <h4 class="sub-h">What a banked pool pays, per point</h4>
+      <ul id="pools-pay" class="stats"></ul>
+      <div class="row"><button id="sheet-close" type="button" class="primary">Back out</button></div>
+    </div>
+  </div>
   <!-- What one component is. Outside every screen, because it is pinned to the
        viewport and the shelf, the bag and the board all summon it. -->
   <!-- **The combat log.** Ported from the original, and the good idea in it is

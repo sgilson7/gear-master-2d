@@ -30,9 +30,10 @@ touch anything.
 - **There is a glossary on `G`**, five shelves, every number read from the
   constant that decides it.
 - **There is a long cart** between towns you have stood in, 40 Fnorp.
-- **The suite runs in 95 binaries** and the browser gate is **99 `ok:` lines**.
-  Do not read a total off `cargo test`'s output — it interleaves and cannot be
-  summed; `packaging/count-tests.sh` is the way to get one back.
+- **The suite is 1,025 tests in 89 core binaries** — 95 across the workspace,
+  which adds the shim's and the lab's — and the browser gate is **99 `ok:`
+  lines**. Do not read a total off `cargo test`'s output: it interleaves and
+  cannot be summed, and `packaging/count-tests.sh` is the way to get one back.
 - **A curse says what it does**, four entries derived off the constants —
   and the describer that does it had no caller in the game until the glossary
   became one.
@@ -5448,6 +5449,37 @@ and returns before the clicks if any of them is unreachable, because a click
 that times out ends a check with a Playwright traceback instead of the sentence
 that says what is wrong.
 
+**The deploy after M20 is three asks and a fault the compiler had been
+reporting the whole time**, and its table is one line an ask because the gate
+asked ninety-nine of the questions.
+
+```
+live build cff43baf
+  index.html asks app.js?v=cff43baf   app.js carries BUILD = 'cff43baf'
+  chromium walked the gate    ok      99 ok lines, no failures
+  the curse shelf             four entries, derived: "All of the target's gear
+                              runs 50% slower, for 1s. Stacks add up to 75%,
+                              which two of them reach"
+  the sheet                   a chip reading "health · strength", a popup
+                              behind it, and Escape closes it
+  the paper                   its own chip on the always-up panel
+  a town                      "Somebody puts a chair out. 32% of you comes
+                              back." — which had not printed since M17
+  console errors: none
+```
+
+**The town line is the one worth reading twice.** Nothing about the mending
+was ever broken, so the only way to find it was to read a warning that had
+been on every build for three blocks — and the check that should have caught
+it was already planting the exact state and asserting the wrong half of it.
+
+**And both new assertions were watched failing with their fault put back**,
+which is the only thing that makes an `ok:` line mean anything: *"nothing said
+it came off - the strip's new lines are []"* and *"pressing the sheet chip
+opened nothing"*. The second of those first failed as a **Playwright
+traceback** rather than a sentence, which is the harness rule this file
+already carries, arriving again.
+
 **M20's is the first deploy this project has had stopped by its own gate twice
 over, and both times it was the checks rather than the page.** Ninety-seven
 questions against the deployed page, and the table is short because the gate
@@ -6223,6 +6255,8 @@ Every figure below was re-measured for M12.6 rather than carried forward.
 | M17.0: a table nobody can see yet, and a cue you could not have aimed | 960 passing |
 | M17.1–M17.5 + M18: the overworld is a table, and the notebooks executed | 976 passing |
 | **M19: a ball you can watch, a diamond you can hit, and a glossary** | **1,004 tests** (`packaging/count-tests.sh`) |
+| M20: the larder, the bench, the Cairnworks, a specialization, and an errand log that is a tree | — |
+| **A curse says what it does, the sheet is a chip, and a town speaks again** | **1,025 tests in 89 binaries** (`packaging/count-tests.sh`; the workspace run is 95 binaries, which adds the shim's and the lab's) |
 
 **M13.5 adds none and M13.7 and M13.8 add none, and all three are honest.**
 M13.5 lands ten trees into a data file and the three lints it needed were

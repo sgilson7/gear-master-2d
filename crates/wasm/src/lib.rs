@@ -3185,6 +3185,19 @@ pub fn quest_log_json() -> String {
                     // first*.
                     "depth": gm2d_core::quest::depth_of(&quests, &q.id),
                     "requires": q.requires,
+                    // **Which chain it is in, and what that chain is called.**
+                    // One tab a chain, the way the skill tree is one tab a
+                    // tree — and the head's name comes off the whole errand
+                    // file rather than off the rows below, because the head of
+                    // a chain you are halfway through may be one you finished
+                    // and may be one you have not been offered.
+                    "chain": gm2d_core::quest::chain_of(&quests, &q.id),
+                    "chain_name": quests
+                        .get(&gm2d_core::quest::chain_of(&quests, &q.id))
+                        .map(|h| h.name.clone())
+                        .unwrap_or_default(),
+                    "alone": gm2d_core::quest::chain_size(
+                        &quests, &gm2d_core::quest::chain_of(&quests, &q.id)) == 1,
                 })
             })
             .collect();

@@ -495,6 +495,57 @@ pub fn depth_of(quests: &QuestsData, id: &str) -> u32 {
     walk(quests, id, &mut Vec::new())
 }
 
+/// Which chain an errand belongs to, named by the errand at the head of it.
+///
+/// **A chain is a connected component of `requires`**, and the head is the
+/// member with nothing before it — the one at depth zero. Where two of those
+/// exist in one component the smallest id wins, because a tab that changed its
+/// name when an errand was re-parented would be a tab nobody could find twice.
+///
+/// Core's, for the reason `depth_of` is: the screen draws one chain a tab now,
+/// and a page working out its own grouping would be a second answer to *what
+/// follows what* — which would part from this one the first time an errand
+/// gained a second prerequisite.
+pub fn chain_of(quests: &QuestsData, id: &str) -> String {
+    // Everything reachable from `id` in either direction. `requires` is a
+    // forest in the shipped data and this does not assume it: a component is
+    // walked rather than climbed, so two roots joining lower down is one chain.
+    let mut seen: Vec<&str> = vec![id];
+    let mut queue: Vec<&str> = vec![id];
+    while let Some(cur) = queue.pop() {
+        let touching = quests.quests.iter().filter(|q| {
+            q.id == cur
+                || q.requires.iter().any(|r| r == cur)
+                || quests.get(cur).map(|c| c.requires.iter().any(|r| *r == q.id)).unwrap_or(false)
+        });
+        for q in touching {
+            if !seen.contains(&q.id.as_str()) {
+                seen.push(&q.id);
+                queue.push(&q.id);
+            }
+        }
+    }
+    // The head: nothing in the chain comes before it. Smallest id where there
+    // is more than one, so the answer never depends on the file's order.
+    let mut heads: Vec<&str> = seen
+        .iter()
+        .copied()
+        .filter(|i| {
+            quests
+                .get(i)
+                .map(|q| !q.requires.iter().any(|r| seen.contains(&r.as_str())))
+                .unwrap_or(true)
+        })
+        .collect();
+    heads.sort_unstable();
+    heads.first().copied().unwrap_or(id).to_string()
+}
+
+/// How many errands are in the chain this one is in.
+pub fn chain_size(quests: &QuestsData, head: &str) -> usize {
+    quests.quests.iter().filter(|q| chain_of(quests, &q.id) == head).count()
+}
+
 /// Where an errand is asking you to go next, in ids a map can find.
 ///
 /// **A rule, not a drawing decision.** Where to go depends on the errand's

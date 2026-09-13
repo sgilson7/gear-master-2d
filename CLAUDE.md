@@ -4339,6 +4339,26 @@ underneath, same `#node-detail` hover card — a card that already lives outside
 every screen, pinned to the viewport, because the tree scrolls and a card must
 not scroll with the row it describes.
 
+**And one tab a chain, which is the half that was missing.** Reported a third
+time, and correctly: *"it should also LOOK like the skill tree ... each quest
+chain should form a skill tree and a tab in the errands tab."* Sharing the
+class was the plumbing; fifty-one errands in one tree is thirty-one unrelated
+things standing side by side, and no amount of row-ordering makes that a skill
+tree. `quest::chain_of` walks the `requires` component and names it after its
+head — core's, for the reason `depth_of` is.
+
+- **Depth is re-based to the chain's own head.** `depth_of` counts from the
+  whole file's roots, so a chain whose first rung you have not been offered
+  would open three rows down.
+- **The twenty-seven one-offs share a tab, and it is first**, the way the base
+  tree is. An errand with nothing before or after it is a different kind of
+  thing from a rung, and twenty-seven tabs of one node each is a worse screen
+  than the flat list this replaced. The rest are ordered by what is still owed
+  on them, which is what somebody opening the log is after.
+- **The tab strip moved from `#tree-tabs` to a `.treetabs` class.** A strip
+  styled by id is a strip the second screen that wants one does not get — which
+  is the `.made .tabs` scoping bug from M13.7, one screen along.
+
 - **Three lines on a node, the same three a skill node has**: the name is the
   world's, the line under it is the engine's ask, and the foot is what you could
   do about it. It was six blocks including a whole `brief` paragraph — so fifty

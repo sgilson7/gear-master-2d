@@ -802,6 +802,10 @@ def clear_screens(page):
         ("#log", "#log-close"),
         ("#brewbench", "#brew-close"),
         ("#ending", "#ending-close"),
+        ("#tree", "#tree-done"),
+        ("#history", "#history-close"),
+        ("#glossary", "#gloss-close"),
+        ("#cart-screen", "#cart-close"),
     ]:
         if page.is_visible(screen):
             try:
@@ -810,6 +814,21 @@ def clear_screens(page):
             except Exception:
                 page.keyboard.press("Escape")
                 page.wait_for_timeout(120)
+
+    # **And then whatever is left, by asking the page rather than a list.** A
+    # list of screens is a second copy of what screens exist, and it went stale
+    # the moment one was added — which is how a `#download` click came to time
+    # out against something nothing here had heard of, green locally and red in
+    # CI. Escape closes every screen but the fork, which does not come off on
+    # purpose; that one is reported rather than fought with.
+    for _ in range(6):
+        up = page.evaluate(
+            "() => Array.from(document.querySelectorAll('.screen'))"
+            ".filter(e => !e.hidden).map(e => e.id)")
+        if not up:
+            return
+        page.keyboard.press("Escape")
+        page.wait_for_timeout(120)
 
 
 def check_the_cue_draws_what_core_is_asked(page, name, fails):
@@ -1314,9 +1333,24 @@ def check_the_errand_log_is_a_tree(page, name, fails):
     try:
         page.click("#errands-open")
         page.wait_for_selector("#log", state="visible", timeout=4000)
+        # **One tab a chain.** The save plants a three-rung chain and a
+        # standalone errand, so there are two tabs and the chain's is the one
+        # with rows under it.
+        tabs = page.eval_on_selector_all(
+            "#log-tabs button", "els => els.map(e => e.textContent)")
+        if len(tabs) < 2:
+            fails.append(f"{name}: the log drew {len(tabs)} tab(s): {tabs}")
+            return
+        chain = page.query_selector("#log-tabs button:not([data-chain='*alone'])")
+        if not chain:
+            fails.append(f"{name}: every tab is the one-offs tab: {tabs}")
+            return
+        chain.click()
+        page.wait_for_timeout(150)
         rows = page.eval_on_selector_all("#log-list .tier", "els => els.length")
         if rows < 2:
-            fails.append(f"{name}: the log drew {rows} row(s), so nothing is laid out by depth")
+            fails.append(f"{name}: the chain's tab drew {rows} row(s), "
+                         "so nothing is laid out by depth")
             return
         # Measured, not counted.
         box = page.eval_on_selector("#log-list .wires",
@@ -1341,8 +1375,8 @@ def check_the_errand_log_is_a_tree(page, name, fails):
             if not shaped:
                 fails.append(f"{name}: the log is not drawn as the tree is")
             else:
-                print(f"ok: the errand log is the skill tree — {rows} rows, "
-                      f"{box['n']} wires measured, nodes {wide}px")
+                print(f"ok: the errand log is the skill tree — {len(tabs)} chain tabs, "
+                      f"{rows} rows, {box['n']} wires measured, nodes {wide}px")
     finally:
         clear_screens(page)
         plant(page, base, lambda body: None, stem="log-restore")
@@ -6379,9 +6413,26 @@ def check_the_log_points_somewhere(page, name, fails):
     """
     page.click("#errands-open")
     page.wait_for_selector("#log", state="visible", timeout=8000)
-    rows = page.locator("#log-list .wares")
+    # **One that points at *this* map**, which is what `.open` marks and is not
+    # fussiness: `guide_json` answers `null` for an errand whose target is
+    # somewhere else, and that is right — the map cannot ring a tile it is not
+    # drawing. A finished one is no good either: its node is disabled, so it
+    # takes no pointer events, and a thing you have done points nowhere.
+    #
+    # The log is one tab a chain now, so which nodes are on screen depends on
+    # the tab. The handles are re-read each time round because painting a tab
+    # replaces every child of the box.
+    n_tabs = len(page.query_selector_all("#log-tabs button"))
+    for i in range(max(1, n_tabs)):
+        if page.query_selector("#log-list .node.open"):
+            break
+        tabs = page.query_selector_all("#log-tabs button")
+        if i < len(tabs):
+            tabs[i].click()
+            page.wait_for_timeout(140)
+    rows = page.locator("#log-list .node.open")
     if rows.count() == 0:
-        fails.append(f"{name}: the walk has taken errands and the log is empty")
+        fails.append(f"{name}: no tab has an errand pointing at the map you are standing on")
         page.click("#log-close")
         return
     # **Hovering answers before anything is committed to, and it answers

@@ -2289,6 +2289,9 @@ function openLog() {
   paintLog();
 }
 
+/// Which chain's tree is up. Kept across repaints, the way `openTreeId` is.
+let openChain = null;
+
 function paintLog() {
   const all = JSON.parse(quest_log_json());
   const live = all.errands.filter((q) => q.stage !== 'done');
@@ -2304,16 +2307,60 @@ function paintLog() {
     return;
   }
 
-  // **This is the skill tree, and it is the skill tree's code.** Reported from
-  // play: *"the errands screen is really messed up, it should look more like
-  // the skill tree."* It was the tree's *layout* wearing the shelf's cards —
-  // rows of paragraphs with wires between them — and the answer is not a second
-  // thing that resembles a tree. Rows are `quest::depth_of`, ordered within a
-  // row by the average position of their parents, wires measured after layout,
-  // and the brief goes in the same hover card every node uses.
-  const shown = [...live, ...all.errands.filter((x) => x.stage === 'done')];
+  // **One tab a chain, and each chain is a tree.** Reported from play: *"each
+  // quest chain should form a skill tree and a tab in the errands tab."* Fifty
+  // errands in one tree is thirty-one unrelated things standing side by side —
+  // which is not what a skill tree looks like however the rows are laid out.
+  //
+  // Which chain an errand is in is `quest::chain_of`, for the reason its depth
+  // is core's: a page grouping them itself would be a second answer to *what
+  // follows what*.
+  //
+  // **The one-offs share a tab**, and that is a category rather than a tidy-up:
+  // an errand with nothing before or after it is a different kind of thing from
+  // a rung, and twenty-seven tabs of one node each is a worse screen than the
+  // flat list this replaced. It sits first, the way the base tree does.
+  const everything = [...live, ...all.errands.filter((x) => x.stage === 'done')];
+  // A key no errand id can be, so it cannot collide and *can* be written
+  // into a selector — a NUL in a dataset value is neither.
+  const ALONE = '*alone';
+  const chains = new Map();
+  for (const q of everything) {
+    const key = q.alone ? ALONE : q.chain;
+    const c = chains.get(key) ?? { key, name: q.alone ? 'On their own' : q.chain_name, rows: [] };
+    c.rows.push(q);
+    chains.set(key, c);
+  }
+  // One-offs first, the way the base tree is first; the rest by how much is
+  // still owed on them, because that is what somebody opening this is after.
+  const owed = (c) => c.rows.filter((q) => q.stage !== 'done').length;
+  const order = [...chains.values()].sort((a, b) =>
+    (a.key === ALONE ? -1 : b.key === ALONE ? 1 : owed(b) - owed(a) || b.rows.length - a.rows.length));
+  if (!order.some((c) => c.key === openChain)) openChain = order[0]?.key ?? null;
+
+  const tabs = $('log-tabs');
+  tabs.replaceChildren();
+  tabs.hidden = order.length < 2;
+  for (const c of order) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.role = 'tab';
+    b.className = c.key === openChain ? 'on' : '';
+    b.dataset.chain = c.key;
+    const left = c.rows.filter((q) => q.stage !== 'done').length;
+    b.innerHTML = `${c.name}<span class="meta">${left ? `${left} left` : 'finished'}</span>`;
+    b.onclick = () => { openChain = c.key; hideNode(); paintLog(); };
+    tabs.appendChild(b);
+  }
+
+  const shown = (chains.get(openChain)?.rows) ?? [];
+  // **Depth within the chain it is drawn in.** `quest::depth_of` counts from
+  // the whole file's roots; a tab showing one chain starts at that chain's own
+  // head, so the shallowest thing on screen is the top row. Otherwise a chain
+  // whose head you have not been offered would open three rows down.
+  const floor = Math.min(...shown.map((q) => q.depth ?? 0));
   const byDepth = [];
-  for (const q of shown) (byDepth[q.depth ?? 0] ??= []).push(q);
+  for (const q of shown) (byDepth[(q.depth ?? 0) - floor] ??= []).push(q);
   const at = new Map();
   byDepth.forEach((row, d) => {
     if (!row) return;
@@ -2475,6 +2522,14 @@ function closeLog() {
 /// function can answer on its own.
 let saidArea = null;
 let areaTimer = 0;
+
+/// Forget where the card thinks you were, so the next paint says nothing.
+function forgetTheArea() {
+  saidArea = null;
+  clearTimeout(areaTimer);
+  const el = $('area');
+  if (el) { el.hidden = true; el.classList.remove('going'); }
+}
 
 function sayTheArea(p) {
   const name = p.region || null;
@@ -4202,6 +4257,9 @@ async function main() {
     save.state.world.at = at;
     if (map !== null) save.state.world.map = map;
     load_json(JSON.stringify(save));
+    // Being put somewhere by a test harness is not an arrival either, for the
+    // same reason loading a file is not one.
+    forgetTheArea();
     world = JSON.parse(world_json());
     paintPanel(); draw();
   };
@@ -4357,6 +4415,14 @@ async function main() {
     if (!f) return;
     try {
       load_json(new TextDecoder().decode(await f.arrayBuffer()));
+      // **A save being restored is not an arrival**, whether it is the first
+      // one of the session or the fifth. Forgetting where the card thinks you
+      // were makes the next paint the *first* one, which is the branch that
+      // says nothing — otherwise loading a file into another region announces
+      // it, and a card over the map before anybody has pressed anything reads
+      // as a splash screen. Reported by the deploy gate, in webkit only,
+      // because chromium happened to reload into the region it was already in.
+      forgetTheArea();
       closeCard(); $('fight').hidden = true;
       // **Re-read the map, not just repaint it.** A save carries which map it
       // was on and what the character may read of it, and both ride in

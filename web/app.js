@@ -1488,6 +1488,51 @@ const ORDINALS = ['first', 'second', 'third', 'fourth', 'fifth'];
 /// arrives with the class rather than with a point spent inside it — and
 /// whether this character has it is core's answer, not a class name the page
 /// compared for itself.
+/// What you are carrying to drink, on the screen where the decision is made.
+///
+/// **Here rather than at the bench**, which is the whole of the report: brewing
+/// is a thing you do in a town and drinking is a thing you do in front of
+/// something. And its own block rather than a row in the rack — a rack is where
+/// enchs live, and two unrelated lists under one heading is the `.card`
+/// collision in a new coat.
+function paintPotions() {
+  const b = JSON.parse(retort_json());
+  const box = $('potion-shelf');
+  const wrap = $('potions');
+  // Nothing brewed and nothing drunk is a screen with nothing on it, which is
+  // the rack's own rule: a list you cannot use is worse than no list.
+  wrap.hidden = !b.potions.length && !b.drunk;
+  $('potion-note').textContent = b.drunk
+    ? `You have drunk ${b.drunk}. It is on you at the bell.`
+    : 'One before the bell. It lasts the fight.';
+  box.replaceChildren();
+  for (const p of b.potions) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'wares';
+    btn.dataset.potion = p.id;
+    btn.disabled = !!b.drunk;
+    btn.innerHTML = `<b>${p.name}</b>` +
+      `<span class="spec">${p.gives}</span>` +
+      `<span class="flavour">${p.blurb}</span>` +
+      `<span class="cost">${b.drunk ? 'you have already drunk one' : 'drink it'}</span>`;
+    btn.onclick = () => {
+      const why = drink_potion(p.id);
+      potionSays(why || `You drank ${p.name}. It is on you at the bell.`, !!why);
+      paintPotions();
+      paintTape();
+      autosave();
+    };
+    box.appendChild(btn);
+  }
+}
+
+function potionSays(text, bad = false) {
+  const el = $('potion-says');
+  el.textContent = text; el.hidden = !text;
+  el.classList.toggle('bad', bad);
+}
+
 function paintRack() {
   const r = JSON.parse(ench_rack_json());
   // **An ench you own is shown whether or not you can use one.**
@@ -2250,9 +2295,7 @@ function paintLog() {
   $('log-carrying').textContent = live.length;
   $('log-finished').textContent = all.errands.length - live.length;
   const box = $('log-list');
-  const wires = box.querySelector('.wires');
   box.replaceChildren();
-  if (wires) box.appendChild(wires);
   if (!all.errands.length) {
     const p = document.createElement('p');
     p.className = 'note';
@@ -2260,96 +2303,119 @@ function paintLog() {
     box.appendChild(p);
     return;
   }
-  // **Rows are chain depth, and depth is core's.** Reported from play: *"the
-  // current errand tree is just hard to follow as a player; a spatial layout of
-  // the errands in the errand screen will really help."* Which is the argument
-  // the skill tree already won — `Tree::depth_of` groups nodes into rows, and
-  // `quest::depth_of` is the same function over `requires`. A page working its
-  // own layering out would be a second answer to *what has to come first*, and
-  // the two would part the first time an errand gained a second prerequisite.
-  //
-  // Within a row, the order is by the average position of the errands that
-  // require it — the cheapest thing that keeps the wires from crossing, and it
-  // puts a root over the things that follow it.
+
+  // **This is the skill tree, and it is the skill tree's code.** Reported from
+  // play: *"the errands screen is really messed up, it should look more like
+  // the skill tree."* It was the tree's *layout* wearing the shelf's cards —
+  // rows of paragraphs with wires between them — and the answer is not a second
+  // thing that resembles a tree. Rows are `quest::depth_of`, ordered within a
+  // row by the average position of their parents, wires measured after layout,
+  // and the brief goes in the same hover card every node uses.
   const shown = [...live, ...all.errands.filter((x) => x.stage === 'done')];
-  const rows = [];
-  for (const q of shown) {
-    const d = q.depth ?? 0;
-    (rows[d] ||= []).push(q);
+  const byDepth = [];
+  for (const q of shown) (byDepth[q.depth ?? 0] ??= []).push(q);
+  const at = new Map();
+  byDepth.forEach((row, d) => {
+    if (!row) return;
+    if (d > 0) row.sort((a, b) => mean(a) - mean(b));
+    row.forEach((q, i) => at.set(q.id, i));
+  });
+  function mean(q) {
+    const ps = (q.requires ?? []).map((r) => at.get(r)).filter((v) => v !== undefined);
+    return ps.length ? ps.reduce((a, b) => a + b, 0) / ps.length : 99;
   }
-  // Within a row, ordered by where its parents sit on the row above, so a rung
-  // lands under the thing it follows and the wires do not cross.
-  for (let d = 1; d < rows.length; d++) {
-    if (!rows[d] || !rows[d - 1]) continue;
-    const above = new Map(rows[d - 1].map((q, i) => [q.id, i]));
-    rows[d].sort((a, b) => mean(a) - mean(b));
-    function mean(q) {
-      const ps = (q.requires ?? []).map((r) => above.get(r)).filter((i) => i !== undefined);
-      return ps.length ? ps.reduce((t, i) => t + i, 0) / ps.length : 1e6;
-    }
-  }
+
+  const wires = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  wires.setAttribute('class', 'wires');
+  box.appendChild(wires);
+
   const el = new Map();
-  for (let d = 0; d < rows.length; d++) {
-    const line = rows[d];
-    if (!line || !line.length) continue;
-    const rowEl = document.createElement('div');
-    rowEl.className = 'chainrow';
-    // The depth is information: it is which rung of its chain this is, so it
-    // is labelled rather than merely indented.
-    const tag = document.createElement('span');
-    tag.className = 'rung';
-    tag.textContent = d === 0 ? 'asked for' : `after ${d}`;
-    rowEl.appendChild(tag);
-    for (const q of line) rowEl.appendChild(errandButton(q, el));
-    box.appendChild(rowEl);
-  }
-  if (wires) drawChainWires(box, wires, shown, el);
+  byDepth.forEach((row) => {
+    if (!row || !row.length) return;
+    const line = document.createElement('div');
+    line.className = 'tier';
+    for (const q of row) line.appendChild(errandButton(q, el));
+    box.appendChild(line);
+  });
+
+  drawChainWires(box, wires, shown, el);
+  // The rows reflow with the window, so the lines have to be redrawn with it.
+  paintLog.onresize ??= () => { if (!$('log').hidden) paintLog(); };
+  window.removeEventListener('resize', paintLog.onresize);
+  window.addEventListener('resize', paintLog.onresize);
 }
 
-/// One errand, as a button. Split out of `paintLog` when the log became rows.
+/// One errand, as a node. **Three lines, the same three a skill node has**: the
+/// name is the world's, the line under it is the engine's, and the foot is what
+/// you could do about it. Everything else — the brief, where it points, what it
+/// pays — is in the hover card, because a row of paragraphs is not a tree.
 function errandButton(q, el) {
-  {
-    const done = q.stage === 'done';
-    const b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'wares errand' + (done ? ' sold' : '') + (q.pinned ? ' pin' : '');
-    b.dataset.errand = q.id;
-    b.disabled = done;
-    const foot = done ? 'finished'
-      : q.pinned ? 'pinned — click to unpin'
-      : q.on_this_map ? 'pin it to the map'
-      : 'not on this map';
-    // **Where it points, and whether you can get there.** Core's sentence. A
-    // log that pointed a level-one player north past a crossing and said
-    // nothing about it reads as a log that is wrong rather than a road that is
-    // shut — which is what the M9.4 playthrough did for nine thousand steps.
-    const shut = !done && q.shut ? `<span class="why">${q.shut}</span>` : '';
-    b.innerHTML = `<b>${q.name}</b>` +
-      `<span class="spec">${q.asks}</span>` +
-      `<span class="flavour">${q.brief}</span>` +
-      `<span class="meta">${q.where} · pays ${q.pays.join(', ')}</span>` +
-      shut +
-      `<span class="cost">${foot}</span>`;
-    // Hover, and the map answers — before anything is committed to. The pin is
-    // what makes the answer outlive the screen.
-    const show = () => { hoverGuide = JSON.parse(guide_json(q.id)); startPulse(); draw(); };
-    const drop = () => { hoverGuide = null; draw(); };
-    b.onpointerenter = show;
-    b.onfocus = show;
-    b.onpointerleave = drop;
-    b.onblur = drop;
-    b.onclick = () => {
-      const why = pin_quest(q.id);
-      logSays(why, !!why);
-      hoverGuide = null;
-      refreshPin();
-      paintLog();
-      draw();
-      autosave();
-    };
-    el.set(q.id, b);
-    return b;
-  }
+  const done = q.stage === 'done';
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.dataset.errand = q.id;
+  b.className = 'wares node'
+    + (done ? ' pinned' : '')
+    + (q.pinned ? ' pin' : '')
+    + (!done && q.stage === 'carrying' ? ' carrying' : '')
+    + (!done && q.on_this_map ? ' open' : '');
+  b.disabled = done;
+  const foot = done ? 'finished'
+    : q.pinned ? 'pinned — click to unpin'
+    : q.on_this_map ? 'pin it to the map'
+    : 'not on this map';
+  b.innerHTML = `<b>${q.name}</b>` +
+    `<span class="spec">${q.asks}</span>` +
+    `<span class="cost">${foot}</span>`;
+
+  // Hover does two things at once, and both are the point: the card says what
+  // this errand is, and the map rings where it points — before anything is
+  // committed to. The pin is what makes the map's answer outlive the screen.
+  const show = () => {
+    hoverErrand(b, q);
+    hoverGuide = JSON.parse(guide_json(q.id));
+    startPulse();
+    draw();
+  };
+  const drop = () => { hideNode(); hoverGuide = null; draw(); };
+  b.onpointerenter = show;
+  b.onfocus = show;
+  b.onpointerleave = drop;
+  b.onblur = drop;
+  b.onclick = () => {
+    const why = pin_quest(q.id);
+    logSays(why, !!why);
+    hoverGuide = null;
+    refreshPin();
+    paintLog();
+    draw();
+    autosave();
+  };
+  el.set(q.id, b);
+  return b;
+}
+
+/// What an errand is, in the card every tree-shaped screen already uses.
+///
+/// **`#node-detail` rather than one of its own**, because it is outside every
+/// screen and pinned to the viewport — a second card would be a second thing to
+/// keep inside the window, and this screen scrolls.
+function hoverErrand(button, q) {
+  const box = $('node-detail');
+  const shut = q.shut ? `<p class="spec">${q.shut}</p>` : '';
+  box.innerHTML =
+    `<b>${q.name}</b>` +
+    `<p class="spec">${q.asks}</p>` +
+    shut +
+    `<p class="flavour">${q.brief}</p>` +
+    `<p class="cost">${q.where} · pays ${q.pays.join(', ')}</p>`;
+  box.hidden = false;
+  const r = button.getBoundingClientRect();
+  const w = box.offsetWidth, h = box.offsetHeight;
+  const left = Math.min(Math.max(8, r.left), window.innerWidth - w - 8);
+  const top = r.bottom + 8 + h > window.innerHeight ? Math.max(8, r.top - h - 8) : r.bottom + 8;
+  box.style.left = `${left}px`;
+  box.style.top = `${top}px`;
 }
 
 /// Wires from an errand to the ones it opens.
@@ -2357,8 +2423,7 @@ function errandButton(q, el) {
 /// **Measured, not computed**, for the reason the skill tree's are: the rows
 /// are flex and wrap, so where a button actually *is* is the only thing that
 /// can be trusted — and a hidden screen is `display: none`, where every
-/// rectangle is zero. `openLog` shows the screen before this runs, which is the
-/// order the tree's own wires had to learn.
+/// rectangle is zero. `openLog` shows the screen before this runs.
 function drawChainWires(box, svg, rows, el) {
   const b = box.getBoundingClientRect();
   svg.setAttribute('width', b.width);
@@ -2379,7 +2444,10 @@ function drawChainWires(box, svg, rows, el) {
       // Elbows rather than diagonals: a straight line through three rows of
       // buttons is unreadable, which the tree found out first.
       path.setAttribute('d', `M ${x1} ${y1} V ${mid} H ${x2} V ${y2}`);
-      path.setAttribute('class', q.stage === 'done' ? 'done' : 'live');
+      // A wire into something finished is spent; one into something you are
+      // carrying is lit. The rest is scaffolding — the tree's own rule.
+      path.setAttribute('class',
+        q.stage === 'done' ? 'done' : q.stage === 'carrying' ? 'live' : '');
       svg.appendChild(path);
     }
   }
@@ -3447,35 +3515,19 @@ function paintBench() {
   $('brew-do').disabled = !b.brewing;
   $('brew-tip').disabled = b.seated === 0;
 
+  // **What is in the pack, and nothing you can do about it here.** Drinking is
+  // a decision made in front of the thing you are about to fight, so the button
+  // is on the pre-battle screen and this is a receipt.
   const box = $('brew-potions');
   box.replaceChildren();
-  if (!b.potions.length) {
-    const p = document.createElement('p');
-    p.className = 'note';
-    p.textContent = b.drunk
+  const note = document.createElement('p');
+  note.className = 'note';
+  note.textContent = b.potions.length
+    ? `${b.potions.map((p) => p.name).join(', ')} — drink one before a fight.`
+    : b.drunk
       ? `You have drunk ${b.drunk}. It lands at the next bell.`
       : 'Nothing brewed yet.';
-    box.appendChild(p);
-  }
-  for (const p of b.potions) {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'wares';
-    btn.dataset.potion = p.id;
-    btn.disabled = !!b.drunk;
-    btn.innerHTML = `<b>${p.name}</b>` +
-      `<span class="spec">${p.gives}</span>` +
-      `<span class="flavour">${p.blurb}</span>` +
-      `<span class="cost">${b.drunk ? 'you have already drunk one' : 'drink it'}</span>`;
-    btn.onclick = () => {
-      const why = drink_potion(p.id);
-      benchSays(why || `You drank ${p.name}. It is on you at the next bell.`, !!why);
-      paintBench();
-      paintTape();
-      autosave();
-    };
-    box.appendChild(btn);
-  }
+  box.appendChild(note);
 }
 
 function closeBench() {
@@ -4029,6 +4081,7 @@ async function main() {
     $('undo').disabled = !st.undoable;
     paintMade(st);
     paintRack();
+    paintPotions();
     // **And what you are, because packing is what changes it.** The map
     // panel's copy is painted on a step; this one has to be painted on a
     // seat, or the screen where you move your strength around is the one

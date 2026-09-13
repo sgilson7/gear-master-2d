@@ -1131,18 +1131,83 @@ def check_the_bench_brews_a_pair(page, name, fails):
             fails.append(f"{name}: brewed and the glass holds {after['seated']} with "
                          f"{len(after['potions'])} in the pack")
             return
-        # And drinking it is a second decision.
-        page.click("button[data-potion]")
-        page.wait_for_timeout(250)
+        # **And drinking is not done here.** Reported from play: the decision a
+        # potion exists to create is the one in front of the thing you are
+        # about to fight, so the bench shows what is in the pack and offers no
+        # button at all.
+        if page.query_selector("#brew-potions button[data-potion]"):
+            fails.append(f"{name}: the bench is still offering a drink")
+            return
+        print(f"ok: the glass is a board of {cells} cells in a "
+              f"{slot['cols']}x{slot['rows']} box, and the button brews")
+    finally:
+        clear_screens(page)
+        plant(page, base, lambda body: None, stem="bench-restore")
+
+
+def check_a_potion_is_drunk_before_the_bell(page, name, fails):
+    """**The pack is on the screen where the decision is made, and it is not the
+    rack.**
+
+    Reported from play: *"you should be able to drink the brew before battle in
+    the pre-battle screen, not in the brewing screen. they should be in a
+    separate view than the enchs."* Both halves are only answerable in a
+    browser: which screen a control is on, and whether it is inside somebody
+    else's box.
+    """
+    # **Whatever the check before left up, cleared before anything is
+    # clicked.** A shot can end on any screen and the first click here is
+    # `#download`.
+    clear_screens(page)
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    base = dl.value.path()
+
+    def carrying(body):
+        strip_the_boards(body)
+        w = body.setdefault("world", {})
+        w["map"] = "west-bambulon"
+        w["at"] = [9, 12]
+        # A potion in the pack, by the brew's own derived id.
+        body.setdefault("character", {})["potions"] = ["kettle-scale+rust-bloom"]
+
+    plant(page, base, carrying, stem="potion")
+    try:
+        clear_screens(page)
+        page.evaluate("() => document.getElementById('map').focus()")
+        # Walk until something opens a fight.
+        for _ in range(40):
+            if page.is_visible("#fight"):
+                break
+            page.keyboard.press("ArrowUp")
+            page.wait_for_timeout(140)
+            dismiss_card(page)
+        if not page.is_visible("#fight"):
+            fails.append(f"{name}: never met anything in forty steps")
+            return
+        if not page.is_visible("#potions"):
+            fails.append(f"{name}: a potion in the pack and no pack on the pre-battle screen")
+            return
+        # **Its own block, not a row in the rack.**
+        inside = page.evaluate(
+            "() => !!document.getElementById('rack')?.contains(document.getElementById('potions'))")
+        if inside:
+            fails.append(f"{name}: the pack is inside the rack")
+            return
+        btn = page.query_selector("#potion-shelf button[data-potion]")
+        if not btn:
+            fails.append(f"{name}: the pack is on screen and offers nothing to drink")
+            return
+        btn.click()
+        page.wait_for_timeout(200)
         drunk = page.evaluate("() => JSON.parse(window.__retort()).drunk")
         if not drunk:
             fails.append(f"{name}: drank one and nothing is on you")
         else:
-            print(f"ok: the glass is a board of {cells} cells in a "
-                  f"{slot['cols']}x{slot['rows']} box, the button brews, and {drunk} is drunk")
+            print(f"ok: a potion is drunk before the bell ({drunk}), in its own view")
     finally:
         clear_screens(page)
-        plant(page, base, lambda body: None, stem="bench-restore")
+        plant(page, base, lambda body: None, stem="potion-restore")
 
 
 def check_the_area_says_its_name(page, name, fails):
@@ -1249,7 +1314,7 @@ def check_the_errand_log_is_a_tree(page, name, fails):
     try:
         page.click("#errands-open")
         page.wait_for_selector("#log", state="visible", timeout=4000)
-        rows = page.eval_on_selector_all("#log-list .chainrow", "els => els.length")
+        rows = page.eval_on_selector_all("#log-list .tier", "els => els.length")
         if rows < 2:
             fails.append(f"{name}: the log drew {rows} row(s), so nothing is laid out by depth")
             return
@@ -1266,8 +1331,18 @@ def check_the_errand_log_is_a_tree(page, name, fails):
             fails.append(f"{name}: {box['n']} wires drawn and {box['real']} of them have "
                          "real coordinates")
         else:
-            rungs = page.eval_on_selector_all("#log-list .rung", "els => els.map(e => e.textContent)")
-            print(f"ok: the errand log is a tree — {rows} rows {rungs}, {box['n']} wires measured")
+            # **And it is the skill tree's own shape**, which is what was asked
+            # for: the same class, so a node is 208 wide and a row is centred
+            # rather than a paragraph in a list.
+            wide = page.eval_on_selector(
+                "#log-list .node", "el => Math.round(el.getBoundingClientRect().width)")
+            shaped = page.eval_on_selector(
+                "#log-list", "el => el.classList.contains('skilltree')")
+            if not shaped:
+                fails.append(f"{name}: the log is not drawn as the tree is")
+            else:
+                print(f"ok: the errand log is the skill tree — {rows} rows, "
+                      f"{box['n']} wires measured, nodes {wide}px")
     finally:
         clear_screens(page)
         plant(page, base, lambda body: None, stem="log-restore")
@@ -6309,14 +6384,18 @@ def check_the_log_points_somewhere(page, name, fails):
         fails.append(f"{name}: the walk has taken errands and the log is empty")
         page.click("#log-close")
         return
-    said = page.locator("#log-list .wares .meta").first.text_content() or ""
-    if "·" not in said:
-        fails.append(f"{name}: the log's first row says {said!r}, which names no destination")
-
-    # Hovering answers before anything is committed to.
+    # **Hovering answers before anything is committed to, and it answers
+    # twice**: the card says where the errand points and the map rings it. The
+    # sentence used to be a line on the node itself; the log is the skill tree's
+    # shape now, so a node is three lines and everything else is in the card
+    # every tree-shaped screen shares.
     first = rows.first
     first.hover()
-    page.wait_for_timeout(120)
+    page.wait_for_timeout(150)
+    said = page.locator("#node-detail .cost").first.text_content() or ""
+    if "·" not in said:
+        fails.append(f"{name}: hovering the first errand says {said!r}, "
+                     "which names no destination")
     hovered = page.evaluate("() => window.__hoverGuide()")
     if not hovered:
         fails.append(f"{name}: hovering an errand lit nothing on the map")
@@ -7643,6 +7722,7 @@ def walk_the_gate(browser, name, fails=None):
     check_the_furnace_shows_on_the_bar(page, name, fails)
     check_a_word_errand_lands_on_a_table(page, name, fails)
     check_the_bench_brews_a_pair(page, name, fails)
+    check_a_potion_is_drunk_before_the_bell(page, name, fails)
     check_the_area_says_its_name(page, name, fails)
     check_the_errand_log_is_a_tree(page, name, fails)
     check_the_glossary_says_what_a_thing_does(page, name, fails)

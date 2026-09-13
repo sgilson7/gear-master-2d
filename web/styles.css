@@ -861,28 +861,13 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
 }
 
 /* ------------------------------------------------------ the errand tree
-   Rows are chain depth. Reported from play: a flat list of fifty errands says
-   nothing about which one follows which, and the skill tree had already solved
-   exactly this — so the log borrows its shape rather than inventing one. */
-.chainrows { position: relative; display: flex; flex-direction: column; gap: 26px; }
-.chainrow {
-  display: flex; flex-wrap: wrap; gap: 10px; align-items: stretch;
-  position: relative; z-index: 1;
-}
-.chainrow .rung {
-  flex: 0 0 auto; align-self: center; width: 76px;
-  font-size: 11px; letter-spacing: 0.09em; text-transform: uppercase;
-  opacity: 0.62;
-}
-/* Behind the buttons, never over them, and never hit-testable: a wire that
-   eats a click on the errand it points at is worse than no wire. */
-.chainrows > .wires {
-  position: absolute; inset: 0; pointer-events: none; z-index: 0;
-  overflow: visible;
-}
-.chainrows > .wires path { fill: none; stroke: currentColor; stroke-width: 2; opacity: 0.22; }
-.chainrows > .wires path.live { opacity: 0.55; }
-.chainrows > .wires path.done { opacity: 0.3; stroke-dasharray: 4 4; }
+   It *is* the skill tree, so it wears the skill tree's class and adds nothing
+   but the two states a node has not got: an errand you are carrying, and one
+   pinned to the map. Reported from play — "it should look more like the skill
+   tree" — and the honest answer to that is not to make a second thing that
+   resembles it. */
+.skilltree .node.carrying { border-left: 2px solid var(--brass); }
+.skilltree .node.pin { box-shadow: inset 0 0 0 1px var(--brass); }
 
 
 /* ----------------------------------------------------------- the bench

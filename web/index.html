@@ -376,13 +376,16 @@
             <div><dt>finished</dt><dd id="log-finished">&mdash;</dd></div>
           </dl>
         </header>
-        <!-- **Rows are chain depth.** A root on the top row and every rung
-             under the one it follows, wires measured after layout — the same
-             shape the skill tree has, for the same reason: a flat list of
-             fifty says nothing about which one follows which. -->
-        <div id="log-list" class="shelf chainrows">
-          <svg class="wires" aria-hidden="true"></svg>
-        </div>
+        <!-- **Rows are chain depth, and this is the skill tree's own shape.**
+             Reported from play twice: flat, it said nothing about which errand
+             follows which; and drawn with the shelf's big cards it was a mess
+             of paragraphs with lines between them. So it is `.skilltree` — the
+             same grid, the same centred rows, the same 208-pixel nodes, the
+             same wires under them and the same hover card beside. An errand
+             node says its name, what it asks and where it stands; the brief
+             and the pay are in `#node-detail`, which every other tree-shaped
+             screen already uses. -->
+        <div id="log-list" class="skilltree"></div>
         <p id="log-says" class="says" hidden></p>
         <div class="row"><button id="log-close" type="button" class="primary">Back out</button></div>
       </div>
@@ -561,7 +564,7 @@
               <button id="brew-do" type="button" class="primary">Brew it</button>
               <button id="brew-tip" type="button">Tip it out</button>
             </div>
-            <h4 class="sub-h">The pack</h4>
+            <h4 class="sub-h">What is in the pack</h4>
             <div id="brew-potions" class="shelf"></div>
           </div>
         </div>
@@ -607,6 +610,20 @@
               <p id="board-says" class="says" hidden></p>
               <!-- The rack. Only there for a licensee: enching is what the
                    Kaklon Patent is, so it arrives with the class. -->
+              <!-- **The pack, on the screen where a fight is about to start.**
+                   Reported from play: *"you should be able to drink the brew
+                   before battle in the pre-battle screen, not in the brewing
+                   screen. they should be in a separate view than the enchs."*
+                   Which is right twice over — the decision a potion exists to
+                   create is *this one*, in front of the thing you are about to
+                   meet, and a rack is where enchs live and nothing else.
+                   Its own block, its own heading, above the rack. -->
+              <div id="potions" hidden>
+                <h4 class="sub-h">The pack</h4>
+                <p class="note" id="potion-note">One before the bell. It lasts the fight.</p>
+                <div id="potion-shelf" class="shelf"></div>
+                <p id="potion-says" class="says" hidden></p>
+              </div>
               <div id="rack" hidden>
                 <h4 class="sub-h">The rack</h4>
                 <p class="note" id="rack-note">Click an ench, then click the component you

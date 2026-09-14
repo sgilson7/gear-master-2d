@@ -344,6 +344,21 @@ pub struct Character {
     /// wrong, and the loader is where that is caught.*
     #[serde(default, deserialize_with = "one_or_many", skip_serializing_if = "Vec::is_empty")]
     pub drunk: Vec<String>,
+    /// Seeds you are carrying, by seed id, and how many of each.
+    ///
+    /// **A second bag beside the larder, and a bag for the larder's reason.** A
+    /// seed is not a component: it does not pack, does not bench, cannot be
+    /// handed over a counter and cannot be spent as a key — four consumers that
+    /// all read `owned` and are all right about this without being touched.
+    ///
+    /// **On the character and not in the world**, which is a divergence from
+    /// `PLAN-M21.md` §M21.0 and is the larder's own argument: what you are
+    /// carrying is a fact about you, and `WorldState` holds what has *happened*
+    /// — what is answered, what has drained, what a shop has sold. A drawer in
+    /// the world would be the only bag in the game that was not on the person
+    /// holding it.
+    #[serde(default, skip_serializing_if = "std::collections::BTreeMap::is_empty")]
+    pub seed_drawer: std::collections::BTreeMap<String, u32>,
     /// The one specialization, if it has been taken.
     ///
     /// **Its own slot and not a fourth entry in `classes`.** Everything that
@@ -416,6 +431,7 @@ impl Character {
             retort: Vec::new(),
             potions: Vec::new(),
             drunk: Vec::new(),
+            seed_drawer: std::collections::BTreeMap::new(),
             specialization: None,
             undo_stack: Vec::new(),
         }
@@ -2300,6 +2316,31 @@ impl Character {
         let mut out = def.clone();
         out.ink_pct = ink.map(|i| i.potency).unwrap_or(0);
         Ok(out)
+    }
+
+    /// How many of one seed the drawer holds.
+    pub fn seeds_held(&self, id: &str) -> u32 {
+        self.seed_drawer.get(id).copied().unwrap_or(0)
+    }
+
+    /// Put one seed in the drawer.
+    pub fn pocket_seed(&mut self, id: &str) {
+        *self.seed_drawer.entry(id.to_string()).or_insert(0) += 1;
+    }
+
+    /// Take one out, or say why not. **A refusal spends nothing** — the
+    /// reroll's rule, the bank's, the cart's and the larder's.
+    pub fn spend_seed(&mut self, id: &str) -> Result<(), String> {
+        match self.seed_drawer.get_mut(id) {
+            Some(n) if *n > 0 => {
+                *n -= 1;
+                if *n == 0 {
+                    self.seed_drawer.remove(id);
+                }
+                Ok(())
+            }
+            _ => Err("there is none of that in the drawer".into()),
+        }
     }
 
     /// Put one ingredient in the larder.

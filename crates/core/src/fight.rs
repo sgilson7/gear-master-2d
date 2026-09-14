@@ -404,6 +404,30 @@ fn pay_a_win(game: &mut Game, creature: &'static str, receipt: &mut Vec<String>)
         game.character.gather(&ing.id);
         receipt.push(format!("{} for the larder.", ing.name));
     }
+
+    // **And a seed, sometimes, off the same creature.** Keyed by the same art
+    // family the ingredient is, so a creature cannot arrive without one — and
+    // rolled, where the ingredient is certain, because the Plot is a second
+    // source for the larder rather than a doubling of the first.
+    //
+    // **Rolled whether or not the drawer is full**, and refused after. Skipping
+    // the draw would make the stream a function of what the player is carrying
+    // rather than of the fights they had, which is the rule `drops::roll_with`
+    // has followed since M9.1 and the reason a seeded walk replays at all.
+    if let Some(seed) = seed_off(creature) {
+        let rolled = game.rng.below(1_000) < crate::plot::SEED_PER_MILLE as usize;
+        let room = game.character.seeds_held(&seed.id) < crate::plot::DRAWER_CAP;
+        if rolled && room {
+            game.character.pocket_seed(&seed.id);
+            receipt.push(format!("{} for the drawer.", seed.name));
+        }
+    }
+}
+
+/// Which seed a creature leaves, keyed the way its ingredient is.
+fn seed_off(creature: &str) -> Option<crate::plot::SeedDef> {
+    let family = crate::data::art_families().get(creature)?.clone();
+    crate::data::plot().from_family(&family).cloned()
 }
 
 /// Which ingredient a creature leaves, or `None` if nothing is drawn for it.

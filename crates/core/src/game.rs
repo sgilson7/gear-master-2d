@@ -1765,6 +1765,20 @@ impl PartialEq for Game {
             // nowhere above. A save that dropped it would round-trip green
             // and empty somebody's vault.
             && a.banked == b.banked
+            // **And every other bag, which this had never learned about.** The
+            // comment above is about the vault and it is the general rule: a
+            // field that is not in `owned` is compared nowhere else, so a save
+            // that dropped it round-trips **green**. M20 added four of these —
+            // the larder, the glass, the pack and what you are — and none of
+            // them was added here, so `tests/save.rs` could not have caught a
+            // loader that lost your ingredients. The Plot's drawer is the
+            // fifth, and it is added in the commit that makes it.
+            && a.larder == b.larder
+            && a.seed_drawer == b.seed_drawer
+            && a.retort == b.retort
+            && a.potions == b.potions
+            && a.drunk == b.drunk
+            && a.specialization == b.specialization
             && a.enchanted == b.enchanted
             && self.world == other.world
             && self.encounter == other.encounter

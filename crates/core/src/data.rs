@@ -88,6 +88,7 @@ pub const SHOPS_JSON: &str = include_str!("../../../data/shops.json");
 pub const QUESTS_JSON: &str = include_str!("../../../data/quests.json");
 pub const SUPPLIES_JSON: &str = include_str!("../../../data/supplies.json");
 pub const BREWS_JSON: &str = include_str!("../../../data/brews.json");
+pub const PLOT_JSON: &str = include_str!("../../../data/plot.json");
 /// The art manifest, which is also the one place a creature's **family** is
 /// written down.
 ///
@@ -147,6 +148,7 @@ pub const FILES: &[(&str, &str)] = &[
     ("quests.json", QUESTS_JSON),
     ("supplies.json", SUPPLIES_JSON),
     ("brews.json", BREWS_JSON),
+    ("plot.json", PLOT_JSON),
     ("enchs.json", ENCHS_JSON),
     ("drops.json", DROPS_JSON),
 ];
@@ -348,6 +350,14 @@ pub fn art_families() -> std::collections::BTreeMap<String, String> {
 pub fn brews() -> crate::brew::BrewsData {
     crate::brew::BrewsData::parse(BREWS_JSON).expect("the shipped brews are broken")
 }
+/// The Plot's seeds, parsed once.
+pub fn plot() -> &'static crate::plot::PlotData {
+    static ONCE: std::sync::OnceLock<crate::plot::PlotData> = std::sync::OnceLock::new();
+    ONCE.get_or_init(|| {
+        crate::plot::PlotData::parse(PLOT_JSON).expect("the shipped seeds are broken")
+    })
+}
+
 
 /// What a licensee can bolt to a component.
 pub fn enchs() -> crate::ench::EnchsData {

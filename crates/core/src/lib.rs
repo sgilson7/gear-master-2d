@@ -29,6 +29,7 @@ pub mod loadout;
 pub mod look;
 pub mod naming;
 pub mod piece;
+pub mod plot;
 pub mod pressure;
 pub mod puzzle;
 pub mod progression;

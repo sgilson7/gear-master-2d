@@ -1,0 +1,388 @@
+{
+  "format": "gm2d-plot",
+  "version": 1,
+  "_note": "The Plot's seeds. Keyed by the same art families `brews.json` keys its ingredients by, so the eight seeds and the eight pairing ingredients are one set of eight buckets — which is what makes a harvest land somewhere the retort can use rather than opening a second economy beside it. A seed is not a component: no `PieceKind`, no `CATALOG` entry, no grid, and therefore no save seam.",
+  "_stages": "Three per seed, and each contains the one before it. A crop that moved cells as it grew could be planted legally and then not fit, which is the stunting this game does not have — `Game::plant` refuses on the *harvest* shape for exactly that reason.",
+  "seeds": [
+    {
+      "id": "kettle-scale-seed",
+      "name": "Kettle Scale Seed",
+      "blurb": "A flake off something the works made, and it comes up as a thing with edges. Nobody planted the first one.",
+      "from": [
+        "wright",
+        "the-crimper",
+        "behemoth"
+      ],
+      "crop": "kettle-scale",
+      "stages": [
+        [
+          [
+            0,
+            0
+          ]
+        ],
+        [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ]
+        ],
+        [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "toad-ichor-seed",
+      "name": "Toad Ichor Seed",
+      "blurb": "It is not a seed and it is not a spawn. Put it in wet ground and in three fights there is something in the ground.",
+      "from": [
+        "vermin",
+        "a-rat",
+        "bengulon-toad",
+        "hound"
+      ],
+      "crop": "toad-ichor",
+      "stages": [
+        [
+          [
+            0,
+            0
+          ]
+        ],
+        [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ]
+        ],
+        [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            1,
+            2
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "cairn-dust-seed",
+      "name": "Cairn Dust Seed",
+      "blurb": "Grey, dry, and it grows a grey dry thing that somebody at the works swears is a fern. It is not a fern.",
+      "from": [
+        "sentinel",
+        "unwritten"
+      ],
+      "crop": "cairn-dust",
+      "stages": [
+        [
+          [
+            0,
+            0
+          ]
+        ],
+        [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ]
+        ],
+        [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            2,
+            0
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "rust-bloom-seed",
+      "name": "Rust Bloom Seed",
+      "blurb": "It wants iron in the ground and there is iron in every bed in this country. Cut it back twice and it comes up three times.",
+      "from": [
+        "ash",
+        "rime"
+      ],
+      "crop": "rust-bloom",
+      "stages": [
+        [
+          [
+            0,
+            0
+          ]
+        ],
+        [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ]
+        ],
+        [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            1
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "tallow-drip-seed",
+      "name": "Tallow Drip Seed",
+      "blurb": "Set in wax and planted in wax. It leans toward whatever is warmest, which in a Kettleworks bed is everything.",
+      "from": [
+        "clergy",
+        "idol",
+        "crown"
+      ],
+      "crop": "tallow-drip",
+      "stages": [
+        [
+          [
+            0,
+            0
+          ]
+        ],
+        [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ]
+        ],
+        [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            2
+          ],
+          [
+            1,
+            2
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "silt-pearl-seed",
+      "name": "Silt Pearl Seed",
+      "blurb": "Off the bottom of something that used to be a lake. It opens once, at the end, and closes for good an hour later.",
+      "from": [
+        "drowned",
+        "francis"
+      ],
+      "crop": "silt-pearl",
+      "stages": [
+        [
+          [
+            0,
+            0
+          ]
+        ],
+        [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ]
+        ],
+        [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            1
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "reef-salt-seed",
+      "name": "Reef Salt Seed",
+      "blurb": "Salt that came off a reef nobody has stood on. It will grow in a bed and it will take the bed with it.",
+      "from": [
+        "wisp",
+        "mirror"
+      ],
+      "crop": "reef-salt",
+      "stages": [
+        [
+          [
+            0,
+            0
+          ]
+        ],
+        [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ]
+        ],
+        [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            0
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "bone-meal-seed",
+      "name": "Bone Meal Seed",
+      "blurb": "Ground fine and sown thin. What comes up is white and comes up in rows whether or not it was sown in them.",
+      "from": [
+        "bone",
+        "court"
+      ],
+      "crop": "bone-meal",
+      "stages": [
+        [
+          [
+            0,
+            0
+          ]
+        ],
+        [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ]
+        ],
+        [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            2,
+            1
+          ]
+        ]
+      ]
+    }
+  ]
+}

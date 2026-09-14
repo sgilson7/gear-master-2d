@@ -139,6 +139,37 @@
           "pct": 450
         }
       }
+    },
+    {
+      "id": "the-bramble-coat",
+      "name": "The Bramble Coat",
+      "blurb": "Grown over a frame rather than cut to one. Whoever wore it last is still in the pattern, and the works has stopped asking.",
+      "effect": {
+        "returns": {
+          "pct": 35
+        }
+      }
+    },
+    {
+      "id": "the-slow-match",
+      "name": "The Slow Match",
+      "blurb": "It was lit once, a long way from here, and it has not gone out. The fitter who sells it will not say when.",
+      "effect": {
+        "coats": {
+          "curse": "searing"
+        }
+      }
+    },
+    {
+      "id": "the-long-count",
+      "name": "The Long Count",
+      "blurb": "Eleven marks on the shaft and no two the same depth. Somebody was counting something that was getting harder.",
+      "effect": {
+        "ramps": {
+          "pct": 4,
+          "cap": 40
+        }
+      }
     }
   ]
 }

@@ -1389,14 +1389,57 @@ impl Game {
                 if left == 1 { "One win".into() } else { format!("{left} wins") }
             ));
         }
+        // **Who it is touching, asked before it is pulled.** A pair is two
+        // crops that are *both* ready and whose harvest shapes touch edge-on,
+        // which is `PerAdjacent`'s own question asked on a bed rather than on a
+        // board. Read here rather than at planting time because the answer can
+        // change while they grow — and because being ready is half of it.
+        let mine = crate::plot::cells_of(plot, &crops[i]);
+        let touching: Vec<String> = crops
+            .iter()
+            .enumerate()
+            .filter(|(j, o)| *j != i && o.ready())
+            .filter(|(_, o)| {
+                let theirs = crate::plot::cells_of(plot, o);
+                mine.iter().any(|&(x, y)| {
+                    [(1, 0), (-1, 0), (0, 1), (0, -1)]
+                        .iter()
+                        .any(|(dx, dy)| theirs.contains(&(x + dx, y + dy)))
+                })
+            })
+            .map(|(_, o)| o.seed.clone())
+            .collect();
+
         let c = crops.remove(i);
         if crops.is_empty() {
             self.character.beds.remove(town);
         }
         let Some(def) = plot.get(&c.seed) else { return Err("it grew into nothing".into()) };
-        let n = crate::plot::HARVEST_YIELD;
+        let mut n = crate::plot::HARVEST_YIELD;
+        let mut extra: Vec<String> = Vec::new();
+        let mut enchs: Vec<String> = Vec::new();
+        // **Every neighbour pays**, because a crop with two ready neighbours is
+        // a row somebody arranged and the arrangement is the whole input.
+        for other in &touching {
+            let Some(pair) = plot.pair(&c.seed, other) else { continue };
+            match &pair.gives {
+                crate::plot::Yield::Double(_) => n += crate::plot::HARVEST_YIELD,
+                crate::plot::Yield::Potency(_) => {}
+                crate::plot::Yield::Second(id) => extra.push(id.clone()),
+                crate::plot::Yield::EnchSeed(id) => enchs.push(id.clone()),
+            }
+        }
         for _ in 0..n {
             self.character.gather(&def.crop);
+        }
+        for id in &extra {
+            self.character.gather(id);
+        }
+        // **Straight into the rack**, which is where an ench that was paid
+        // rather than bought goes — the errands' own door since M8, and the
+        // reason `enchs_owned` is banked rather than loose.
+        for id in &enchs {
+            self.character.enchs_owned.push(id.clone());
         }
         let name = crate::data::brews()
             .get(&def.crop)

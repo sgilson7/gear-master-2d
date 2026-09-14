@@ -139,6 +139,52 @@ pub enum Effect {
     /// opposite directions, so nothing new was invented in combat — the rule
     /// this project has held since M5.
     Heavy { pct: i32, slower_pct: i32 },
+    /// What this item's armour absorbs is turned back on whoever swung, at
+    /// `pct`.
+    ///
+    /// **From Diablo II's Thorns aura, and Terraria's Thorns potion** — the
+    /// wall that bites back. *The ench is new; the mechanic is not.*
+    /// `Stats::reflect` has been on the fighter since the fork, documented as
+    /// exactly this and read in `combat.rs` — what has never existed is a way
+    /// for a *player* to get any, because no component grants it and nothing
+    /// else writes it. This is that way, and it reaches the fighter through the
+    /// item's own `stats`, which is where an item's standing contribution has
+    /// always gone.
+    Returns { pct: i32 },
+    /// This item's first activation of the fight runs twice.
+    ///
+    /// **From Hades' opening-hit boons** — the fight is decided in the first
+    /// second or it is not. *The mechanic is `RunningItem::overtakes`*, which
+    /// has been in the engine since the fork with `has_fired` beside it and is
+    /// granted today by exactly one thing. An ench is the second.
+    Ambush,
+    /// Every activation lands `curse` at its base duration.
+    ///
+    /// **From Path of Exile's Ignite** — the hit that keeps hitting. Built out
+    /// of `Trigger::OnActivate(Action::Curse)`, which is the vocabulary
+    /// fifty-nine components in the catalogue already speak: an ench that
+    /// curses is a trigger pushed onto the profile, not a new rule in the
+    /// fight.
+    /// **Named as a string and checked at parse**, which is how
+    /// `Rule::CurseOnActivate` has named one since M8.3: a curse nobody can
+    /// spell is an ench that costs two thousand and does nothing, and
+    /// `EnchsData::parse` refuses one the engine has not got.
+    Coats { curse: String },
+    /// A share of what this item deals comes back as **mana**.
+    ///
+    /// **From Diablo II's mana leech** — the item that pays for the next cast.
+    /// One of the two in this set that is genuinely new: `RunningItem::leech`
+    /// returns *health* and has since the fork, and the whole point of this one
+    /// is the other pool, because mana is what a caster runs out of.
+    LeechesMana { pct: i32 },
+    /// Each activation adds `pct` to this item's power, to `cap`, for the
+    /// fight.
+    ///
+    /// **From Risk of Rain 2's stacking items** — a fight that gets worse for
+    /// them the longer it goes. The other genuinely new one: nothing in the
+    /// engine ramps an item by its own activation count, and the cap is what
+    /// keeps a slow fight from being a different game.
+    Ramps { pct: i32, cap: i32 },
 }
 
 impl Effect {
@@ -169,6 +215,29 @@ impl Effect {
                 "+{pct}% power to the item this is on, and it comes round \
                  {slower_pct}% less often"
             ),
+            Effect::Returns { pct } => format!(
+                "{pct}% of what this item's armour soaks goes back to whoever swung"
+            ),
+            Effect::Ambush => {
+                "the first time this item goes off in a fight, it goes off 2 times".into()
+            }
+            // **With the curse's own duration in it**, which is the number a
+            // player actually wants and is read off `CurseKind` rather than
+            // typed — the same rule the glossary's curse shelf follows, and the
+            // reason `the_shipped_enchs_parse_and_say_what_they_do` insists a
+            // spec names one at all.
+            Effect::Coats { curse } => format!(
+                "every activation of this item lands a curse of {curse}, which runs {}",
+                crate::curse::CurseKind::by_name(curse)
+                    .map(|k| crate::curse::secs_for(k.base_duration_ms()))
+                    .unwrap_or_else(|| "nothing".into()),
+            ),
+            Effect::LeechesMana { pct } => {
+                format!("{pct}% of what this item deals comes back as mana")
+            }
+            Effect::Ramps { pct, cap } => format!(
+                "every activation adds +{pct}% power to this item, up to +{cap}%, for the fight"
+            ),
         }
     }
 
@@ -190,6 +259,27 @@ impl Effect {
                  of the fight — the activation that breaks it pays in full, and nothing \
                  after it does. Whole again at the next bell. Everything else on the board \
                  plays on, so what this is worth is what one enormous activation is worth."
+                .into(),
+            Effect::Returns { .. } => "It reads off what your armour actually absorbed, so \
+                 it does nothing on a board that dies fast and everything on one built to \
+                 be hit. The return is dealt directly rather than swung, so two of them \
+                 cannot bounce a hit between them for ever."
+                .into(),
+            Effect::Ambush { .. } => "Once a fight, and it is the item's own first \
+                 activation rather than the fight's — so a board with two of them opens \
+                 with two double swings, which is what building two is for."
+                .into(),
+            Effect::Coats { .. } => "Every activation, at the curse's base duration, and \
+                 the target's curse resistance still cuts it. A fast item lands more of \
+                 them than a slow one, which is the whole of where this goes."
+                .into(),
+            Effect::LeechesMana { .. } => "Mana is what a caster runs out of, and this is \
+                 the only thing in the game that turns damage back into it. On a board \
+                 that casts nothing it is worth nothing."
+                .into(),
+            Effect::Ramps { .. } => "It starts at nothing and is worth most in a fight \
+                 that goes long — which is the opposite trade from the first word, and \
+                 they are deliberately the same price."
                 .into(),
             Effect::Heavy { .. } => "Power and cadence pull against each other, and this \
                  buys one with the other. It is worth most on an item that already hits \
@@ -227,7 +317,30 @@ impl Effect {
             // neighbour handed forty percent of this would take the slowing
             // without enough of the power to pay for it, which is a beacon
             // that punishes packing.
-            Effect::Spin | Effect::Fragile { .. } | Effect::Heavy { .. } => None,
+            // These two are percentages of a number and lend in part.
+            Effect::Returns { pct: p } => {
+                let n = share(*p);
+                (n != 0).then_some(Effect::Returns { pct: n })
+            }
+            Effect::LeechesMana { pct: p } => {
+                let n = share(*p);
+                (n != 0).then_some(Effect::LeechesMana { pct: n })
+            }
+            // **The ramp lends its step and keeps its ceiling**, because a
+            // neighbour given four tenths of a *cap* would be given a different
+            // promise rather than a share of one.
+            Effect::Ramps { pct: p, cap } => {
+                let n = share(*p);
+                (n != 0).then_some(Effect::Ramps { pct: n, cap: *cap })
+            }
+            // A switch has no fraction — `Spin`'s own rule, and `Ambush` and
+            // `Coats` are switches: half a doubled opening is not a thing, and
+            // forty percent of a curse is not one either.
+            Effect::Spin
+            | Effect::Fragile { .. }
+            | Effect::Heavy { .. }
+            | Effect::Ambush
+            | Effect::Coats { .. } => None,
         }
     }
 
@@ -250,6 +363,26 @@ impl Effect {
             // `(100 - slower).max(10)` is the floor that keeps a cadence from
             // being divided to nothing, exactly as `Haste`'s `.max(10)` keeps
             // one from being multiplied to nothing.
+            // **Through the item's own stats**, which is where an item's
+            // standing contribution has always gone and how this reaches the
+            // fighter at all: `Combatant::player` sums them.
+            Effect::Returns { pct } => p.stats.reflect += pct,
+            Effect::Ambush => p.overtakes = true,
+            // **A trigger, not a rule.** Fifty-nine components in the catalogue
+            // curse on activation through exactly this, so an ench that curses
+            // is one more of them rather than a new thing in the fight.
+            Effect::Coats { curse } => {
+                if let Some(kind) = crate::curse::CurseKind::by_name(curse) {
+                    p.triggers.push(crate::piece::Trigger::OnActivate(
+                        crate::piece::Action::Curse { kind, target: crate::piece::Target::Enemy },
+                    ));
+                }
+            }
+            Effect::LeechesMana { pct } => p.leeches_mana += pct,
+            Effect::Ramps { pct, cap } => {
+                p.ramp_pct += pct;
+                p.ramp_cap = p.ramp_cap.max(*cap);
+            }
             Effect::Heavy { pct, slower_pct } => {
                 p.power += pct;
                 let slower = (100 - slower_pct).max(10);
@@ -308,6 +441,15 @@ impl EnchsData {
             }
             if e.price.is_some_and(|p| p <= 0) {
                 return Err(format!("{}: an ench on a shelf for nothing", e.id));
+            }
+            // **A curse nobody can spell is an ench that does nothing**, which
+            // is the *eight skill nodes* failure with a string in it.
+            // `Rule::check` has refused one since M8.3 and this is the same
+            // guard where the same mistake can be made.
+            if let Effect::Coats { curse } = &e.effect {
+                if crate::curse::CurseKind::by_name(curse).is_none() {
+                    return Err(format!("{}: there is no curse called {curse:?}", e.id));
+                }
             }
         }
         Ok(d)

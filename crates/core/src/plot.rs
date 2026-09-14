@@ -88,11 +88,42 @@ impl SeedDef {
     }
 }
 
+/// What a pair of crops touching edge-on at harvest pays.
+///
+/// **One of four, and never two at once.** A pair that both doubled and paid an
+/// ench seed would be a pair nobody could price against the other twenty-seven,
+/// and the table is only worth authoring if its entries are comparable.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case", deny_unknown_fields)]
+pub enum Yield {
+    /// Twice the ingredients, from both crops.
+    Double(bool),
+    /// The ink-style potency the pair's harvest carries, in percentage points.
+    Potency(i32),
+    /// One more of this ingredient, beside what the two paid.
+    Second(String),
+    /// **The Plot's second door.** An ench, straight into the rack, and one
+    /// nothing else in the game sells.
+    EnchSeed(String),
+}
+
+/// Two families that pay something when they come up touching.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Companion {
+    pub a: String,
+    pub b: String,
+    pub blurb: String,
+    pub gives: Yield,
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct PlotData {
     pub format: String,
     pub version: u32,
     pub seeds: Vec<SeedDef>,
+    #[serde(default)]
+    pub companions: Vec<Companion>,
 }
 
 impl PlotData {
@@ -141,6 +172,39 @@ impl PlotData {
                 return Err(format!("{}: harvests {:?}, which is no ingredient", s.id, s.crop));
             }
         }
+        // **Every pair, and no pair twice.** A table of twenty-eight written by
+        // hand is a table that can be twenty-seven, which is what
+        // `every_pair_is_authored` is for — this is the load-time half, so a
+        // data edit that duplicates one is refused rather than silently
+        // shadowing the other.
+        let mut seen: Vec<(&str, &str)> = Vec::new();
+        for c in &d.companions {
+            if c.a == c.b {
+                return Err(format!("{} is paired with itself", c.a));
+            }
+            for id in [&c.a, &c.b] {
+                if !d.seeds.iter().any(|s| s.id == *id) {
+                    return Err(format!("{id:?} is no seed"));
+                }
+            }
+            let key = if c.a < c.b { (c.a.as_str(), c.b.as_str()) } else { (c.b.as_str(), c.a.as_str()) };
+            if seen.contains(&key) {
+                return Err(format!("{} and {} are paired twice", key.0, key.1));
+            }
+            seen.push(key);
+            if c.blurb.is_empty() {
+                return Err(format!("{} and {} say nothing", c.a, c.b));
+            }
+            match &c.gives {
+                Yield::Potency(n) if *n <= 0 => {
+                    return Err(format!("{} and {} pay nothing", c.a, c.b))
+                }
+                Yield::Second(id) if !brews.ingredients.iter().any(|i| i.id == *id) => {
+                    return Err(format!("{} and {} pay {id:?}, which is no ingredient", c.a, c.b))
+                }
+                _ => {}
+            }
+        }
         Ok(d)
     }
 
@@ -150,6 +214,17 @@ impl PlotData {
 
     /// The seed a creature of this family drops, the way `from_family` answers
     /// for an ingredient — and it is the same question over the same buckets.
+    /// What this pair pays, either way round.
+    ///
+    /// **Order-insensitive**, because which of the two you planted first is a
+    /// fact about your afternoon and not about the pair — the same argument
+    /// `expert::for_pair` makes, and for the same reason the lint can count.
+    pub fn pair(&self, a: &str, b: &str) -> Option<&Companion> {
+        self.companions
+            .iter()
+            .find(|c| (c.a == a && c.b == b) || (c.a == b && c.b == a))
+    }
+
     pub fn from_family(&self, family: &str) -> Option<&SeedDef> {
         self.seeds.iter().find(|s| s.from.iter().any(|f| f == family))
     }

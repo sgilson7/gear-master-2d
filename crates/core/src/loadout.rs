@@ -82,6 +82,17 @@ pub struct ItemProfile {
     /// again immediately. Read off the pieces here so combat does not have to
     /// walk a registry it does not have.
     pub overtakes: bool,
+    /// A share of what this item deals comes back as mana, in percent.
+    ///
+    /// **One of the two things M21.6 actually added.** `RunningItem::leech`
+    /// returns *health* and has since the fork; this is the other pool, which
+    /// is what a caster runs out of. Written only by an ench, so it is zero on
+    /// every board that has not bolted one on.
+    pub leeches_mana: i32,
+    /// Each activation adds this much power to the item, to `ramp_cap`.
+    pub ramp_pct: i32,
+    /// The ceiling the ramp stops at, in percentage points.
+    pub ramp_cap: i32,
     /// **The wrong sense.** This item's board deals no physical and no magic,
     /// and its mind damage is multiplied by what it gave up. One crest carries
     /// it, and it is the board's rather than the item's - which is why combat
@@ -1218,6 +1229,9 @@ impl Loadout {
                     .pieces
                     .iter()
                     .any(|&p| reg.def(p).name == crate::piece::STRAY_ORB),
+                leeches_mana: 0,
+                ramp_pct: 0,
+                ramp_cap: 0,
                 overtakes: item.pieces.iter().any(|&p| {
                     matches!(reg.def(p).effect.map(|e| e.kind), Some(EffectKind::Overtake))
                 }),

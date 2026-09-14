@@ -334,3 +334,183 @@ fn a_harvest_fills_the_larder() {
     assert_eq!(g.character.in_larder("bone-meal"), before + n, "{name} did not reach the larder");
     assert!(g.character.beds.get("the-third-town").is_none(), "the bed kept a pulled crop");
 }
+
+// ------------------------------------------------------- companion planting
+
+/// **Every pair is authored**, which is `C(8,2)` and complete.
+///
+/// A table of twenty-eight written by hand is a table that can be
+/// twenty-seven — the argument `every_pair_of_offered_classes_reaches_an_expert`
+/// makes for the experts and `every_pair_of_ingredients_brews_to_something`
+/// makes for the retort. This is the third of them and they want one lint;
+/// M21.5 and M21.8 add the other two tables and this generalises then.
+#[test]
+fn every_pair_is_authored() {
+    let plot = data::plot();
+    let ids: Vec<&str> = plot.seeds.iter().map(|s| s.id.as_str()).collect();
+    let want = ids.len() * (ids.len() - 1) / 2;
+    assert_eq!(plot.companions.len(), want, "{} seeds want {want} pairs", ids.len());
+    for i in 0..ids.len() {
+        for j in (i + 1)..ids.len() {
+            let (a, b) = (ids[i], ids[j]);
+            let got = plot.pair(a, b).unwrap_or_else(|| panic!("{a} and {b} pay nothing"));
+            // Either order, because which you planted first is a fact about
+            // your afternoon and not about the pair.
+            assert_eq!(
+                plot.pair(b, a).map(|c| &c.blurb),
+                Some(&got.blurb),
+                "{a}/{b} is order-sensitive"
+            );
+        }
+    }
+}
+
+/// **Six of the twenty-eight pay an ench seed**, which is the Plot's second
+/// door, and none of them pays an ench a counter already sells.
+#[test]
+fn six_pairs_pay_an_ench_seed() {
+    let plot = data::plot();
+    let enchs = data::enchs();
+    let seeds: Vec<&str> = plot
+        .companions
+        .iter()
+        .filter_map(|c| match &c.gives {
+            gm2d_core::plot::Yield::EnchSeed(id) => Some(id.as_str()),
+            _ => None,
+        })
+        .collect();
+    assert_eq!(seeds.len(), 6, "the Plot pays {} ench seeds", seeds.len());
+    for id in &seeds {
+        let def = enchs.get(id).unwrap_or_else(|| panic!("{id} is no ench"));
+        // **Priceless, which is what keeps it off every counter.** A reward you
+        // could have bought makes the growing a slow way to shop — the errands'
+        // own rule since M8, and `a_price_means_somebody_charges_it` is what
+        // holds the other end of it.
+        assert!(def.price.is_none(), "{id} is grown and also for sale");
+    }
+}
+
+/// **Two ready crops that touch pay their pair, and one on its own does not.**
+///
+/// The control is *one crop alone*, not *two crops apart* — which was the first
+/// version and could not be written: measured over all three beds, only 10 of
+/// 28 pairs can be planted apart at Kettleworks and 15 at the third town, so
+/// for most pairs two crops that both fit **must** touch. A test that needed a
+/// non-touching arrangement would be a test about the bed's size. Notebook
+/// row 9.
+#[test]
+fn touching_at_harvest_pays_the_pair() {
+    let plot = data::plot();
+    // A pair that doubles, so the difference is a count rather than a flavour.
+    let (a, b) = plot
+        .companions
+        .iter()
+        .find_map(|c| match c.gives {
+            gm2d_core::plot::Yield::Double(_) => Some((c.a.clone(), c.b.clone())),
+            _ => None,
+        })
+        .expect("some pair doubles");
+    let mask = Game::new(0, "td").bed_mask("the-third-town", D);
+    let spot = touching_spot(plot, &mask, &a, &b).expect("they can touch in the third town");
+
+    let grow = |g: &mut Game| {
+        for _ in 0..(STAGES - 1) {
+            g.character.fatigue = 0;
+            g.encounter = Some(fight::Encounter { enemy: "Cave Rat".into(), at: [1, 18] });
+            let log = fight::run(g, D).expect("a fight");
+            fight::settle(g, &log, D).expect("it settles");
+        }
+    };
+    let crop = plot.get(&a).unwrap().crop.clone();
+
+    // Alone.
+    let mut g = a_fighter(0x5EED_0000_C0FF_0001);
+    g.character.pocket_seed(&a);
+    g.plant("the-third-town", &a, spot.0, 0, D).expect("one");
+    grow(&mut g);
+    let before = g.character.in_larder(&crop);
+    g.harvest("the-third-town", spot.0).expect("it comes up");
+    let alone = g.character.in_larder(&crop) - before;
+
+    // And beside its companion.
+    let mut g = a_fighter(0x5EED_0000_C0FF_0001);
+    g.character.pocket_seed(&a);
+    g.character.pocket_seed(&b);
+    g.plant("the-third-town", &a, spot.0, 0, D).expect("one");
+    g.plant("the-third-town", &b, spot.1, 0, D).expect("two");
+    grow(&mut g);
+    let before = g.character.in_larder(&crop);
+    g.harvest("the-third-town", spot.0).expect("it comes up");
+    let paired = g.character.in_larder(&crop) - before;
+
+    assert_eq!(alone, gm2d_core::plot::HARVEST_YIELD, "a crop on its own paid a pair");
+    assert!(paired > alone, "touching paid {paired} and alone paid {alone}");
+}
+
+/// Somewhere the two can stand touching edge-on and not overlapping.
+fn touching_spot(
+    plot: &gm2d_core::plot::PlotData,
+    mask: &[(i8, i8)],
+    a: &str,
+    b: &str,
+) -> Option<((i8, i8), (i8, i8))> {
+    for &(ax, ay) in mask {
+        for &(bx, by) in mask {
+            let ca = gm2d_core::plot::harvest_cells(plot, a, (ax, ay), 0);
+            let cb = gm2d_core::plot::harvest_cells(plot, b, (bx, by), 0);
+            if ca.is_empty() || cb.is_empty() {
+                continue;
+            }
+            if !ca.iter().all(|c| mask.contains(c)) || !cb.iter().all(|c| mask.contains(c)) {
+                continue;
+            }
+            if ca.iter().any(|c| cb.contains(c)) {
+                continue;
+            }
+            let touch = ca.iter().any(|&(x, y)| {
+                [(1, 0), (-1, 0), (0, 1), (0, -1)]
+                    .iter()
+                    .any(|(dx, dy)| cb.contains(&(x + dx, y + dy)))
+            });
+            if touch {
+                return Some(((ax, ay), (bx, by)));
+            }
+        }
+    }
+    None
+}
+
+/// **An ench seed harvests an ench**, straight into the rack.
+#[test]
+fn an_ench_seed_harvests_an_ench() {
+    let plot = data::plot();
+    let (a, b, want) = plot
+        .companions
+        .iter()
+        .find_map(|c| match &c.gives {
+            gm2d_core::plot::Yield::EnchSeed(id) => {
+                Some((c.a.clone(), c.b.clone(), id.clone()))
+            }
+            _ => None,
+        })
+        .expect("some pair pays an ench seed");
+    let mask = Game::new(0, "td").bed_mask("the-third-town", D);
+    let spot = touching_spot(plot, &mask, &a, &b)
+        .expect("the pair can be made in the third town");
+
+    let mut g = a_fighter(0x5EED_0000_C0FF_0002);
+    g.character.pocket_seed(&a);
+    g.character.pocket_seed(&b);
+    g.plant("the-third-town", &a, spot.0, 0, D).expect("one");
+    g.plant("the-third-town", &b, spot.1, 0, D).expect("two");
+    let before = g.character.enchs_owned.iter().filter(|e| **e == want).count();
+    for _ in 0..(STAGES - 1) {
+        g.character.fatigue = 0;
+        g.encounter = Some(fight::Encounter { enemy: "Cave Rat".into(), at: [1, 18] });
+        let log = fight::run(&g, D).expect("a fight");
+        fight::settle(&mut g, &log, D).expect("it settles");
+    }
+    g.harvest("the-third-town", spot.0).expect("it comes up");
+    let after = g.character.enchs_owned.iter().filter(|e| **e == want).count();
+    assert_eq!(after, before + 1, "{want} did not reach the rack");
+}

@@ -4602,6 +4602,14 @@ pub struct RunningItem {
     pub steady: bool,
     /// **Overtake**: the first firing of the fight runs twice.
     pub overtakes: bool,
+    /// A share of what this item deals comes back as mana. Off the profile,
+    /// which took it from an ench.
+    pub leeches_mana: i32,
+    /// Each activation adds this much to the item's power, to `ramp_cap`.
+    pub ramp_pct: i32,
+    pub ramp_cap: i32,
+    /// What the ramp has added so far, this fight.
+    pub ramped: i32,
     /// Whether this item has fired yet, which is the whole of Overtake's
     /// condition. Per item rather than per fighter, because a board with two
     /// overtaking gloves gets two opening double-swings and that is what
@@ -4720,6 +4728,10 @@ impl RunningItem {
             attracts_curses: p.attracts_curses,
             steady: p.steady,
             overtakes: p.overtakes,
+            leeches_mana: p.leeches_mana,
+            ramp_pct: p.ramp_pct,
+            ramp_cap: p.ramp_cap,
+            ramped: 0,
             has_fired: false,
             fragile: p.fragile,
             broken: false,
@@ -4777,6 +4789,10 @@ impl RunningItem {
             steady: false,
             // Overtake is a glove's, and a creature wears no gloves.
             overtakes: false,
+            leeches_mana: 0,
+            ramp_pct: 0,
+            ramp_cap: 0,
+            ramped: 0,
             has_fired: false,
             // A creature's own teeth do not break. An ench is bolted to a
             // component and a bite stands on none.
@@ -8162,6 +8178,19 @@ fn activate(
         });
     }
 
+    // **The long count, beside the spin, because they are the same shape of
+    // thing**: a number that is added to this item's own power and is a fact
+    // about this fight rather than about the board. What separates them is
+    // what pays — a spin is paid for in cells and this is paid for once, at
+    // the bell, by having gone off before.
+    //
+    // Capped, and the cap is why it is not a different game in a long fight.
+    if item.ramp_pct > 0 && item.ramped < item.ramp_cap {
+        let step = item.ramp_pct.min(item.ramp_cap - item.ramped);
+        item.ramped += step;
+        item.power += step;
+    }
+
     // A spell swaps in the payload whose turn it is. A book has bound one and
     // casts it every time; a crystal ball cycles through the two or three it
     // holds, so the same item does something different each time it comes
@@ -8458,6 +8487,18 @@ fn activate(
             let me = pick(p, foes, me);
             let back = (swing * reps as i32) * leech / 100;
             me.health = (me.health + back).min(me.max_health);
+        }
+        // **And the tithe ring's, which is the other pool.** Beside the health
+        // one rather than anywhere else, because *a share of what you dealt
+        // comes back* is one sentence and two places that said it would be two
+        // answers to how much. Per **item**, where `leech` is per fighter:
+        // this is an ench on one thing and it pays for what that thing did.
+        if item.leeches_mana > 0 && swing > 0 {
+            let me = pick(p, foes, me);
+            let back = (swing * reps as i32) * item.leeches_mana / 100;
+            if back > 0 {
+                me.mana += back;
+            }
         }
     }
 

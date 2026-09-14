@@ -100,6 +100,17 @@ fn every_ench_comes_from_somewhere() {
     let by_expert: Vec<String> =
         tree.trees.iter().filter(|t| is_expert(t)).flat_map(|t| &t.nodes).flat_map(ench_of).collect();
     let paid: Vec<String> = quests.quests.iter().flat_map(|q| q.enchs.clone()).collect();
+    // **And what the Plot grows**, which is the fourth source and the first one
+    // that is not a counter, a tree or an errand: six of the twenty-eight
+    // companion pairs pay an ench seed, and an ench seed is an ench.
+    let grown: Vec<String> = data::plot()
+        .companions
+        .iter()
+        .filter_map(|c| match &c.gives {
+            gm2d_core::plot::Yield::EnchSeed(id) => Some(id.clone()),
+            _ => None,
+        })
+        .collect();
 
     for e in &enchs.enchs {
         let from: Vec<&str> = [
@@ -107,6 +118,7 @@ fn every_ench_comes_from_somewhere() {
             granted.contains(&e.id).then_some("a node"),
             paid.contains(&e.id).then_some("an errand"),
             by_expert.contains(&e.id).then_some("an expert tree"),
+            grown.contains(&e.id).then_some("the Plot"),
         ]
         .into_iter()
         .flatten()
@@ -121,6 +133,12 @@ fn every_ench_comes_from_somewhere() {
     }
     for id in &paid {
         assert!(!sold.contains(id), "{id} is both paid and for sale");
+    }
+    // **And nothing is grown and also sold**, for the same reason: a reward you
+    // could have bought makes the growing a slow way to shop.
+    for id in &grown {
+        assert!(!sold.contains(id), "{id} is grown and also for sale");
+        assert!(!paid.contains(id), "{id} is grown and also paid for an errand");
     }
     // **And an expert tree may only ever hand over a second copy.** The other
     // direction of the exemption above, and the half that keeps it honest: an

@@ -384,5 +384,232 @@
         ]
       ]
     }
+  ],
+  "_companions": "Twenty-eight pairs, which is C(8,2) and complete — `every_pair_is_authored` counts it, because a table of twenty-eight written by hand is a table that can be twenty-seven. Two crops pay their pair when both are **ready** and their harvest shapes touch edge-on in the bed, which is `PerAdjacent`'s own question asked on a bed rather than on a board. Six of the twenty-eight pay an **ench seed** instead of a yield: that is the Plot's second door, and it opens onto enchs nothing else in the game sells.",
+  "companions": [
+    {
+      "a": "kettle-scale-seed",
+      "b": "toad-ichor-seed",
+      "blurb": "Something comes up between the Kettle Scale and the Toad Ichor that is not either of them.",
+      "gives": {
+        "ench_seed": "the-long-count"
+      }
+    },
+    {
+      "a": "kettle-scale-seed",
+      "b": "cairn-dust-seed",
+      "blurb": "Cairn Dust takes something out of the ground that Kettle Scale puts back, and what comes up is stronger for it.",
+      "gives": {
+        "potency": 20
+      }
+    },
+    {
+      "a": "kettle-scale-seed",
+      "b": "rust-bloom-seed",
+      "blurb": "Something comes up between the Kettle Scale and the Rust Bloom that is not either of them.",
+      "gives": {
+        "ench_seed": "the-bramble-coat"
+      }
+    },
+    {
+      "a": "kettle-scale-seed",
+      "b": "tallow-drip-seed",
+      "blurb": "Kettle Scale and Tallow Drip in one row is twice what either does alone, and nobody at the works can say why.",
+      "gives": {
+        "double": true
+      }
+    },
+    {
+      "a": "kettle-scale-seed",
+      "b": "silt-pearl-seed",
+      "blurb": "Silt Pearl takes something out of the ground that Kettle Scale puts back, and what comes up is stronger for it.",
+      "gives": {
+        "potency": 15
+      }
+    },
+    {
+      "a": "kettle-scale-seed",
+      "b": "reef-salt-seed",
+      "blurb": "Kettle Scale crowds Reef Salt and Reef Salt does not mind. There is more in the row than went into it.",
+      "gives": {
+        "second": "reef-salt"
+      }
+    },
+    {
+      "a": "kettle-scale-seed",
+      "b": "bone-meal-seed",
+      "blurb": "Kettle Scale and Bone Meal in one row is twice what either does alone, and nobody at the works can say why.",
+      "gives": {
+        "double": true
+      }
+    },
+    {
+      "a": "toad-ichor-seed",
+      "b": "cairn-dust-seed",
+      "blurb": "Cairn Dust takes something out of the ground that Toad Ichor puts back, and what comes up is stronger for it.",
+      "gives": {
+        "potency": 30
+      }
+    },
+    {
+      "a": "toad-ichor-seed",
+      "b": "rust-bloom-seed",
+      "blurb": "Toad Ichor crowds Rust Bloom and Rust Bloom does not mind. There is more in the row than went into it.",
+      "gives": {
+        "second": "rust-bloom"
+      }
+    },
+    {
+      "a": "toad-ichor-seed",
+      "b": "tallow-drip-seed",
+      "blurb": "Toad Ichor and Tallow Drip in one row is twice what either does alone, and nobody at the works can say why.",
+      "gives": {
+        "double": true
+      }
+    },
+    {
+      "a": "toad-ichor-seed",
+      "b": "silt-pearl-seed",
+      "blurb": "Something comes up between the Toad Ichor and the Silt Pearl that is not either of them.",
+      "gives": {
+        "ench_seed": "the-slow-match"
+      }
+    },
+    {
+      "a": "toad-ichor-seed",
+      "b": "reef-salt-seed",
+      "blurb": "Toad Ichor crowds Reef Salt and Reef Salt does not mind. There is more in the row than went into it.",
+      "gives": {
+        "second": "reef-salt"
+      }
+    },
+    {
+      "a": "toad-ichor-seed",
+      "b": "bone-meal-seed",
+      "blurb": "Toad Ichor and Bone Meal in one row is twice what either does alone, and nobody at the works can say why.",
+      "gives": {
+        "double": true
+      }
+    },
+    {
+      "a": "cairn-dust-seed",
+      "b": "rust-bloom-seed",
+      "blurb": "Rust Bloom takes something out of the ground that Cairn Dust puts back, and what comes up is stronger for it.",
+      "gives": {
+        "potency": 20
+      }
+    },
+    {
+      "a": "cairn-dust-seed",
+      "b": "tallow-drip-seed",
+      "blurb": "Cairn Dust crowds Tallow Drip and Tallow Drip does not mind. There is more in the row than went into it.",
+      "gives": {
+        "second": "tallow-drip"
+      }
+    },
+    {
+      "a": "cairn-dust-seed",
+      "b": "silt-pearl-seed",
+      "blurb": "Cairn Dust and Silt Pearl in one row is twice what either does alone, and nobody at the works can say why.",
+      "gives": {
+        "double": true
+      }
+    },
+    {
+      "a": "cairn-dust-seed",
+      "b": "reef-salt-seed",
+      "blurb": "Reef Salt takes something out of the ground that Cairn Dust puts back, and what comes up is stronger for it.",
+      "gives": {
+        "potency": 15
+      }
+    },
+    {
+      "a": "cairn-dust-seed",
+      "b": "bone-meal-seed",
+      "blurb": "Something comes up between the Cairn Dust and the Bone Meal that is not either of them.",
+      "gives": {
+        "ench_seed": "the-bramble-coat"
+      }
+    },
+    {
+      "a": "rust-bloom-seed",
+      "b": "tallow-drip-seed",
+      "blurb": "Rust Bloom and Tallow Drip in one row is twice what either does alone, and nobody at the works can say why.",
+      "gives": {
+        "double": true
+      }
+    },
+    {
+      "a": "rust-bloom-seed",
+      "b": "silt-pearl-seed",
+      "blurb": "Silt Pearl takes something out of the ground that Rust Bloom puts back, and what comes up is stronger for it.",
+      "gives": {
+        "potency": 30
+      }
+    },
+    {
+      "a": "rust-bloom-seed",
+      "b": "reef-salt-seed",
+      "blurb": "Something comes up between the Rust Bloom and the Reef Salt that is not either of them.",
+      "gives": {
+        "ench_seed": "the-long-count"
+      }
+    },
+    {
+      "a": "rust-bloom-seed",
+      "b": "bone-meal-seed",
+      "blurb": "Rust Bloom and Bone Meal in one row is twice what either does alone, and nobody at the works can say why.",
+      "gives": {
+        "double": true
+      }
+    },
+    {
+      "a": "tallow-drip-seed",
+      "b": "silt-pearl-seed",
+      "blurb": "Silt Pearl takes something out of the ground that Tallow Drip puts back, and what comes up is stronger for it.",
+      "gives": {
+        "potency": 25
+      }
+    },
+    {
+      "a": "tallow-drip-seed",
+      "b": "reef-salt-seed",
+      "blurb": "Something comes up between the Tallow Drip and the Reef Salt that is not either of them.",
+      "gives": {
+        "ench_seed": "the-slow-match"
+      }
+    },
+    {
+      "a": "tallow-drip-seed",
+      "b": "bone-meal-seed",
+      "blurb": "Tallow Drip and Bone Meal in one row is twice what either does alone, and nobody at the works can say why.",
+      "gives": {
+        "double": true
+      }
+    },
+    {
+      "a": "silt-pearl-seed",
+      "b": "reef-salt-seed",
+      "blurb": "Reef Salt takes something out of the ground that Silt Pearl puts back, and what comes up is stronger for it.",
+      "gives": {
+        "potency": 20
+      }
+    },
+    {
+      "a": "silt-pearl-seed",
+      "b": "bone-meal-seed",
+      "blurb": "Silt Pearl crowds Bone Meal and Bone Meal does not mind. There is more in the row than went into it.",
+      "gives": {
+        "second": "bone-meal"
+      }
+    },
+    {
+      "a": "reef-salt-seed",
+      "b": "bone-meal-seed",
+      "blurb": "Reef Salt and Bone Meal in one row is twice what either does alone, and nobody at the works can say why.",
+      "gives": {
+        "double": true
+      }
+    }
   ]
 }

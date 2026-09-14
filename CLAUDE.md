@@ -30,7 +30,7 @@ touch anything.
 - **There is a glossary on `G`**, five shelves, every number read from the
   constant that decides it.
 - **There is a long cart** between towns you have stood in, 40 Fnorp.
-- **The suite is 1,025 tests in 89 core binaries** — 95 across the workspace,
+- **The suite is 1,037 tests in 90 core binaries** — 96 across the workspace,
   which adds the shim's and the lab's — and the browser gate is **102 `ok:`
   lines**. Do not read a total off `cargo test`'s output: it interleaves and
   cannot be summed, and `packaging/count-tests.sh` is the way to get one back.
@@ -6520,7 +6520,9 @@ Every figure below was re-measured for M12.6 rather than carried forward.
 | M17.1–M17.5 + M18: the overworld is a table, and the notebooks executed | 976 passing |
 | **M19: a ball you can watch, a diamond you can hit, and a glossary** | **1,004 tests** (`packaging/count-tests.sh`) |
 | M20: the larder, the bench, the Cairnworks, a specialization, and an errand log that is a tree | — |
-| **A curse says what it does, the sheet is a chip, and a town speaks again** | **1,025 tests in 89 binaries** (`packaging/count-tests.sh`; the workspace run is 95 binaries, which adds the shim's and the lab's) |
+| A curse says what it does, the sheet is a chip, and a town speaks again | **1,025 tests in 89 binaries** (`packaging/count-tests.sh`; the workspace run is 95 binaries, which adds the shim's and the lab's) |
+| The sand cart, five more enchs, and somebody standing in front of them | — |
+| **A trainer, a Chef, and the specialization nobody could take** | **1,037 tests in 90 binaries** (`packaging/count-tests.sh`; 96 across the workspace) |
 
 **M13.5 adds none and M13.7 and M13.8 add none, and all three are honest.**
 M13.5 lands ten trees into a data file and the three lints it needed were

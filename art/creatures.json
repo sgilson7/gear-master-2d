@@ -450,5 +450,11 @@
     "main": "4A4436",
     "dark": "221F18",
     "accent": "C9B87A"
+  },
+  "The Tailgate": {
+    "family": "sentinel",
+    "main": "8A6A3A",
+    "dark": "40301A",
+    "accent": "E0C48A"
   }
 }

@@ -2153,14 +2153,36 @@ pub fn caravan_json() -> String {
         let mut stop = None;
         map_in(&here, &marks, |w| {
             if let Some(p) = w.place_now(&g.world, g.world.at[0], g.world.at[1], &allowed) {
-                if p.kind == gm2d_core::world::PlaceKind::Caravan {
-                    stop = Some((p.id.clone(), p.name.clone(), p.prose.clone()));
+                // **And not while somebody is standing in front of it.**
+                // `world::arrive_at` already decides this and hands back a
+                // `guard` instead of a `caravan`; without the same question
+                // here there would be two answers to *is the tailgate open*,
+                // and the one that matters is this one — `closeFight` asks it
+                // to find out whether the tile you are standing on became a
+                // counter while you were fighting on it.
+                let shut = p
+                    .creature
+                    .as_deref()
+                    .is_some_and(|c| g.world.count(&gm2d_core::fight::beat_key(c)) == 0);
+                if p.kind == gm2d_core::world::PlaceKind::Caravan && !shut {
+                    stop = Some((p.id.clone(), p.name.clone(), p.prose.clone(), p.sells.clone()));
                 }
             }
         });
-        let Some((id, name, prose)) = stop else { return "null".to_string() };
+        let Some((id, name, prose, sells)) = stop else { return "null".to_string() };
         let shops = gm2d_core::data::shops();
-        let rows: Vec<_> = gm2d_core::shop::caravan_shelf(&shops, &g.world.bought)
+        // **A cart sells one kind of thing, and the stop says which.** The
+        // survey shelf in `shops.json` is *the* cart's — one list, keyed under
+        // `shop::CARAVAN` so what you have bought follows it between stops —
+        // and a second merchant with a second list of components would be a
+        // second curve to keep tuned against the three that already exist.
+        // What the sand cart carries instead is enchs, which are priced one
+        // way for everybody and are read off the stop's own `sells`, exactly
+        // as the van's table is.
+        let rows: Vec<_> = if !sells.is_empty() {
+            Vec::new()
+        } else {
+            gm2d_core::shop::caravan_shelf(&shops, &g.world.bought)
             .into_iter()
             .map(|o| {
                 serde_json::json!({
@@ -2174,12 +2196,36 @@ pub fn caravan_json() -> String {
                     "lines": gm2d_core::explain::piece_lines(o.def),
                 })
             })
+            .collect()
+        };
+        // The tailgate's five, built the way the van's table is so the two
+        // screens cannot disagree about what an ench costs or what it does.
+        let data = gm2d_core::data::enchs();
+        let enchs: Vec<_> = sells
+            .iter()
+            .filter_map(|id| {
+                let e = data.get(id)?;
+                let price = e.price?;
+                Some(serde_json::json!({
+                    "id": e.id, "name": e.name, "blurb": e.blurb,
+                    "spec": e.effect.line(), "detail": e.effect.detail(),
+                    "price": price,
+                    "sold": g.world.bought_enchs.iter().any(|b| b == id),
+                    "afford": g.character.gold >= price,
+                    "have": g.character.enchs_loose(&e.id),
+                }))
+            })
             .collect();
         serde_json::json!({
             "id": id,
             "name": name,
             "prose": prose,
             "gold": g.character.gold,
+            "enchs": enchs,
+            // Whether anything can be *done* with them yet. The cart takes the
+            // money either way, which is the van's rule: an ench you cannot
+            // bolt on yet is still an ench you own.
+            "licensed": g.character.licensed(),
             // **How much longer it is here**, which is the whole character of
             // the thing: a cart you can come back to tomorrow is a shop.
             "moves_left": g.world.caravan.as_ref().map(|c| c.moves_left).unwrap_or(0),
@@ -2318,6 +2364,22 @@ fn town_here(g: &gm2d_core::game::Game) -> Option<String> {
 /// shop you cannot see is a shop you cannot buy from — asking the raw map would
 /// let a level-nine character stand on a van that is not there and spend money
 /// at it.
+/// Whoever is selling on this tile, bench or tailgate.
+///
+/// **Asked by what it does rather than what it is**, the same widening the
+/// ench-source lint needed: the van is a `Bench` and the sand cart is a
+/// `Caravan`, and to somebody buying an ench off either the difference is
+/// where they will be tomorrow. `World::load` refuses a `sells` on anything
+/// that is not one of the two, so this set cannot quietly grow.
+fn counter_here(g: &gm2d_core::game::Game) -> Option<gm2d_core::world::PlaceDef> {
+    let allowed = g.character.allowances();
+    map_for(g, |w| {
+        w.place_now(&g.world, g.world.at[0], g.world.at[1], &allowed)
+            .filter(|p| !p.sells.is_empty())
+            .cloned()
+    })
+}
+
 fn bench_here(g: &gm2d_core::game::Game) -> Option<gm2d_core::world::PlaceDef> {
     let allowed = g.character.allowances();
     map_for(g, |w| {
@@ -2525,7 +2587,7 @@ pub fn buy_ench(id: &str) -> String {
         // handed an ench and being able to bolt one on are two questions, which
         // is the rule `quest::hand_in` has followed since M8 and the one the
         // rack was breaking until it was reported.
-        let Some(here) = bench_here(g) else { return "there is nobody selling here".into() };
+        let Some(here) = counter_here(g) else { return "there is nobody selling here".into() };
         if !here.sells.iter().any(|s| s == id) {
             return "He does not have one of those.".into();
         }
@@ -4287,6 +4349,10 @@ fn report_step(
                 "turned": turned,
                 "ending": ending,
                 "boss": s.boss,
+                // The cart's stop, when what is on it is a bodyguard. Its own
+                // key because the page opens the same fight screen either way
+                // and says something different after it.
+                "guard": s.guard,
                 "bench": s.bench,
                 // The cart, if today is a day it is here.
                 "caravan": s.caravan,
@@ -4602,8 +4668,13 @@ fn answer_the_gate(
             }
         }
 
-        // A creature standing here rather than one the ground rolled.
-        if let Some(id) = &s.boss {
+        // A creature standing here rather than one the ground rolled — **or
+        // somebody standing in front of a tailgate**, which is the same
+        // sentence and the same field. `PlaceDef::creature` answers both; what
+        // separates them is that a boss's tile is answered for good and a
+        // guard's is a fight you can walk away from, and core has already
+        // decided which of the two this is.
+        if let Some(id) = s.boss.as_ref().or(s.guard.as_ref()) {
             if let Some(p) = w.places.iter().find(|p| p.id == *id) {
                 if let Some(c) = p.creature.clone() {
                     let at = g.world.at;

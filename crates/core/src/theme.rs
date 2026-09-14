@@ -1205,6 +1205,9 @@ pub static TURTLE_DICK: Theme = Theme {
         ("Nine Courses of Brick", "NINE COURSES AND A STRING"),
         ("The Cold Flue", "THE DRAUGHT IN THE FLUE"),
         ("What Was Left Banked", "WHAT THE WORKS PUT BY"),
+        // The sand cart's. Named for the thing they stand in front of, which
+        // is what the plain name does too.
+        ("The Tailgate", "WHOEVER IS ON THE BOARDS"),
         ("The Quiet Hour", "The Grand Calculation"),
         ("Verdigris", "Gappy Handman"),
         ("The Drowned Court", "The Sea of Cleveland"),

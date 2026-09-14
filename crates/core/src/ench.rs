@@ -61,12 +61,19 @@ pub const LICENSED_CLASS: &str = "Recycler";
 /// permission for everybody else — one price, once, and it does not come off,
 /// which is the same shape as the fork it works around.
 ///
-/// Five thousand against an ench's two. **The one price in the game that
-/// went up and did not stay ahead**: everything else was multiplied by five in
-/// the same pass and the enchs were held where they were, so a licence is now
-/// dearer than the thing it lets you bolt on. That is deliberate — the paper is
-/// the permission and the permission is the scarce thing.
-pub const LICENCE_PRICE: i32 = 5_000;
+/// **Two thousand, which is an ench's own price**, on the human's ask. It was
+/// five, and the argument for five was that the paper is the permission and
+/// the permission is the scarce thing — true, and it priced the permission
+/// above two and a half of the things it exists to let you bolt on, on a
+/// counter that does not appear until level ten. A licence that costs more
+/// than the whole table it unlocks is a licence most runs never buy, which
+/// makes the class the only real way in and the paper a line on a shelf.
+///
+/// **`Paper::Second` reads this too**, so the second class moved with it. That
+/// is one price and not two on purpose: Spike does not price by what a thing
+/// is worth to you, and two papers off one counter at one price is the whole
+/// of what that means.
+pub const LICENCE_PRICE: i32 = 2_000;
 
 /// May a character of this class bolt an ench onto a component?
 ///
@@ -117,6 +124,21 @@ pub enum Effect {
     /// destroyed permanently would be the fight writing to the character, and a
     /// mid-fight save carries a creature name and a tile because it does not.
     Fragile { pct: i32 },
+    /// The item hits this much harder and comes round this much **less** often.
+    ///
+    /// One variant and not `Power` beside a negative `Haste`, for exactly the
+    /// argument [`Fragile`](Self::Fragile) makes one line up: the two halves
+    /// are one bargain, and two effects that could be attached separately
+    /// would let somebody take the good half. It is the counterpart to
+    /// `Haste` rather than a bigger `Power` — what it asks is *which of your
+    /// items is worth hitting with less often*, which is a different question
+    /// from *which is worth more*.
+    ///
+    /// **Both numbers are ones the engine already had.** `power` and
+    /// `cooldown_ms` are what `Power` and `Haste` move; this moves both, in
+    /// opposite directions, so nothing new was invented in combat — the rule
+    /// this project has held since M5.
+    Heavy { pct: i32, slower_pct: i32 },
 }
 
 impl Effect {
@@ -140,6 +162,13 @@ impl Effect {
             Effect::Fragile { pct } => format!(
                 "+{pct}% power to the item this is on, and it breaks after 1 activation"
             ),
+            // Both halves and both numbers, the same as `Fragile`'s: a spec
+            // naming the power and not the cadence would be the half of this
+            // that sells it.
+            Effect::Heavy { pct, slower_pct } => format!(
+                "+{pct}% power to the item this is on, and it comes round \
+                 {slower_pct}% less often"
+            ),
         }
     }
 
@@ -161,6 +190,12 @@ impl Effect {
                  of the fight — the activation that breaks it pays in full, and nothing \
                  after it does. Whole again at the next bell. Everything else on the board \
                  plays on, so what this is worth is what one enormous activation is worth."
+                .into(),
+            Effect::Heavy { .. } => "Power and cadence pull against each other, and this \
+                 buys one with the other. It is worth most on an item that already hits \
+                 hard and rarely, and worst on one whose whole job is to come round — \
+                 which is the decision, and it is made on the board rather than at the \
+                 counter."
                 .into(),
         }
     }
@@ -188,7 +223,11 @@ impl Effect {
                 let n = share(*p);
                 (n != 0).then_some(Effect::Haste { pct: n })
             }
-            Effect::Spin | Effect::Fragile { .. } => None,
+            // A bargain cannot be lent in part, for `Fragile`'s reason: a
+            // neighbour handed forty percent of this would take the slowing
+            // without enough of the power to pay for it, which is a beacon
+            // that punishes packing.
+            Effect::Spin | Effect::Fragile { .. } | Effect::Heavy { .. } => None,
         }
     }
 
@@ -206,6 +245,16 @@ impl Effect {
             Effect::Fragile { pct } => {
                 p.power += pct;
                 p.fragile = true;
+            }
+            // **The same arithmetic `Haste` does, with the sign turned over.**
+            // `(100 - slower).max(10)` is the floor that keeps a cadence from
+            // being divided to nothing, exactly as `Haste`'s `.max(10)` keeps
+            // one from being multiplied to nothing.
+            Effect::Heavy { pct, slower_pct } => {
+                p.power += pct;
+                let slower = (100 - slower_pct).max(10);
+                p.cooldown_ms = ((p.cooldown_ms as i64 * 100 / slower as i64) as u32)
+                    .max(crate::curse::TICK_MS);
             }
         }
     }

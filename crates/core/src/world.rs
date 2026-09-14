@@ -1001,9 +1001,16 @@ impl World {
         // guard `Rule::check` is, and it runs where the map is read.
         let enchs = crate::ench::EnchsData::parse(crate::data::ENCHS_JSON)
             .map_err(|e| format!("the shipped enchs are broken: {e}"))?;
+        // **Two kinds have a counter, and they are the two kinds that stand
+        // still long enough to have one.** A bench is somebody with a table;
+        // a caravan stop is somebody with a tailgate, and the only difference
+        // the engine cares about is that one of them is somewhere else
+        // tomorrow. Everything below — the ench exists, and somebody charges
+        // for it — is asked of both, because it was never about the furniture.
+        let counter = |k: PlaceKind| matches!(k, PlaceKind::Bench | PlaceKind::Caravan);
         for p in &world.places {
-            if p.kind != PlaceKind::Bench && !p.sells.is_empty() {
-                return Err(format!("{}: only a bench sells anything", p.id));
+            if !counter(p.kind) && !p.sells.is_empty() {
+                return Err(format!("{}: only a counter sells anything", p.id));
             }
             if p.kind == PlaceKind::Bench && p.sells.is_empty() {
                 return Err(format!("{}: a bench with nothing on it", p.id));
@@ -1887,8 +1894,20 @@ pub struct Step {
     pub boss: Option<String>,
     /// A bench you are now standing at.
     pub bench: Option<String>,
-    /// The travelling cart, if it is here today.
+    /// The travelling cart, if it is here today **and nobody is standing in
+    /// front of it**.
     pub caravan: Option<String>,
+    /// The cart's stop, when what is standing on it is a bodyguard rather than
+    /// a tailgate.
+    ///
+    /// **Its own field and not `boss`**, because the two are different things
+    /// wearing one shape. A boss is a tile with something on it for good: you
+    /// beat it once and the tile is answered for the rest of the run. This is
+    /// a fight you can lose, walk away from and come back to — the cart will
+    /// be somewhere else and the same person will be in front of it — so
+    /// nothing about it is written into `answered`, and what it costs the save
+    /// is nothing at all.
+    pub guard: Option<String>,
     /// The **place** that refused this step, if a place did rather than the
     /// ground.
     ///
@@ -1946,6 +1965,7 @@ impl Step {
             boss: None,
             bench: None,
         caravan: None,
+            guard: None,
             refused_by: None,
             encounter: None,
         }
@@ -2125,6 +2145,7 @@ pub fn here(
         boss: None,
         bench: None,
         caravan: None,
+            guard: None,
         refused_by: None,
         encounter: None,
     };
@@ -2433,6 +2454,7 @@ pub fn arrive_at(
         boss: None,
         bench: None,
         caravan: None,
+            guard: None,
         refused_by: None,
         encounter: None,
     };
@@ -2520,8 +2542,26 @@ pub fn arrive_at(
             }
             // The cart. What it sells and whether you can afford any of it is
             // not the world's business, the same as a bench's.
+            //
+            // **Unless somebody is standing in front of it.** A stop may name
+            // a `creature`, which is the field a boss uses for the same thing
+            // — *the creature standing here* — and until that creature has
+            // been beaten the arrival is the fight rather than the tailgate.
+            //
+            // **Beaten is `beat:<canonical>` and not a mark of the stop's**,
+            // because the cart moves: a mark keyed by the tile would let you
+            // clear the guard at one stop and meet it again at the next, for
+            // ever. The counter is already there and already round-trips, so
+            // this is derived and costs the save nothing — the same answer
+            // *how many floors of the Stack are gone* gets.
             PlaceKind::Caravan => {
-                out.caravan = Some(p.id.clone());
+                match p.creature.as_deref().filter(|c| state.count(&crate::fight::beat_key(c)) == 0) {
+                    // Not the cart, and deliberately not `out.boss` either:
+                    // a boss is a tile with something on it for good, and this
+                    // is a fight you can walk away from and come back to.
+                    Some(_) => out.guard = Some(p.id.clone()),
+                    None => out.caravan = Some(p.id.clone()),
+                }
                 return out;
             }
             // **You walk over it.** A crossing that stopped you on its own tile

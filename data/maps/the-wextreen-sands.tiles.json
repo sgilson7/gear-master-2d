@@ -2,7 +2,7 @@
   "format": "gm2d-tiles",
   "version": 1,
   "id": "the-wextreen-sands",
-  "_note": "**The second surveyable map, and the first that reads a compass badly.** `survey::mods_for` has taken a `map` argument since M11.6 and never read it \u2014 its own doc says why: *a second surveyable map is meant to be a data drop plus an arm here, and a signature that could not tell two maps apart would have to change to become one that could.* This is that data drop. There is iron under the sand, so the needle is no use and the paper survey is: on the Reach a compass quiets the ground and an atlas is loud, and here it is the other way round. That is the whole point of a second one \u2014 it makes *which instrument you built* a question about where you are going rather than a question with one answer. The door states the trade before you walk through it, in core's own numbers, because `kit_reading_json` runs `mods_for` against the map on the far side.",
+  "_note": "**The second surveyable map, and the first that reads a compass badly.** `survey::mods_for` has taken a `map` argument since M11.6 and never read it — its own doc says why: *a second surveyable map is meant to be a data drop plus an arm here, and a signature that could not tell two maps apart would have to change to become one that could.* This is that data drop. There is iron under the sand, so the needle is no use and the paper survey is: on the Reach a compass quiets the ground and an atlas is loud, and here it is the other way round. That is the whole point of a second one — it makes *which instrument you built* a question about where you are going rather than a question with one answer. The door states the trade before you walk through it, in core's own numbers, because `kit_reading_json` runs `mods_for` against the map on the far side.",
   "width": 18,
   "height": 12,
   "start": [
@@ -125,6 +125,132 @@
       ],
       "needs_all": [
         "the-tenth-survey"
+      ]
+    },
+    {
+      "at": [
+        2,
+        2
+      ],
+      "kind": "caravan",
+      "id": "the-sand-cart-stop-1",
+      "name": "the cart, in the lee of the north bank",
+      "prose": [
+        "A cart with a canvas over it and no wheel marks behind it, which on a flat this size is the first thing you notice.",
+        "Somebody very large is sitting on the tailgate with their back to the goods, and they do not get up when you arrive."
+      ],
+      "creature": "The Tailgate",
+      "sells": [
+        "the-sand-glass",
+        "the-ninth-bearing",
+        "the-long-measure",
+        "the-stopped-clock",
+        "the-one-swing-in-the-flat"
+      ]
+    },
+    {
+      "at": [
+        15,
+        2
+      ],
+      "kind": "caravan",
+      "id": "the-sand-cart-stop-2",
+      "name": "the cart, at the eastern edge of the silt",
+      "prose": [
+        "The canvas is off and there are five things laid out on sacking, each one in its own square of it.",
+        "The person on the tailgate has not looked at them once. They are looking at you."
+      ],
+      "creature": "The Tailgate",
+      "sells": [
+        "the-sand-glass",
+        "the-ninth-bearing",
+        "the-long-measure",
+        "the-stopped-clock",
+        "the-one-swing-in-the-flat"
+      ]
+    },
+    {
+      "at": [
+        2,
+        6
+      ],
+      "kind": "caravan",
+      "id": "the-sand-cart-stop-3",
+      "name": "the cart, by the western rock",
+      "prose": [
+        "Parked where the rock throws a shadow, which is the only shade on the flat and is about four feet of it.",
+        "A ledger is open on the boards with nothing written in it. The large person's hand is flat on the page."
+      ],
+      "creature": "The Tailgate",
+      "sells": [
+        "the-sand-glass",
+        "the-ninth-bearing",
+        "the-long-measure",
+        "the-stopped-clock",
+        "the-one-swing-in-the-flat"
+      ]
+    },
+    {
+      "at": [
+        15,
+        6
+      ],
+      "kind": "caravan",
+      "id": "the-sand-cart-stop-4",
+      "name": "the cart, where the iron reads strongest",
+      "prose": [
+        "Every needle you own is pointing at the ground here, so the cart is either very well placed or not placed at all.",
+        "Whoever is on the tailgate has the look of somebody who has been asked to move on and has not."
+      ],
+      "creature": "The Tailgate",
+      "sells": [
+        "the-sand-glass",
+        "the-ninth-bearing",
+        "the-long-measure",
+        "the-stopped-clock",
+        "the-one-swing-in-the-flat"
+      ]
+    },
+    {
+      "at": [
+        5,
+        9
+      ],
+      "kind": "caravan",
+      "id": "the-sand-cart-stop-5",
+      "name": "the cart, on the southern silt",
+      "prose": [
+        "Tracks come to the cart from the north and none leave it, and there are a great many of them.",
+        "The five things on the sacking are the same five things. They are always the same five things."
+      ],
+      "creature": "The Tailgate",
+      "sells": [
+        "the-sand-glass",
+        "the-ninth-bearing",
+        "the-long-measure",
+        "the-stopped-clock",
+        "the-one-swing-in-the-flat"
+      ]
+    },
+    {
+      "at": [
+        12,
+        9
+      ],
+      "kind": "caravan",
+      "id": "the-sand-cart-stop-6",
+      "name": "the cart, near the tenth survey",
+      "prose": [
+        "Close enough to the folding table that you could shout between them, and nobody ever has.",
+        "The person on the tailgate stands up as you come in, which is the first time they have done that."
+      ],
+      "creature": "The Tailgate",
+      "sells": [
+        "the-sand-glass",
+        "the-ninth-bearing",
+        "the-long-measure",
+        "the-stopped-clock",
+        "the-one-swing-in-the-flat"
       ]
     }
   ]

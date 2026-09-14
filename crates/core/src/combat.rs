@@ -4491,6 +4491,77 @@ pub const LADDER: &[MonsterSpec] = &[
         drops: &[],
         enchs: &[],
     },
+    // **The Tailgate** — whoever is standing in front of the sand cart.
+    //
+    // A merchant who wanders the Wextreen Sands with five enchs under a canvas
+    // does not do it alone, and this is the reason the cart is still there.
+    // Beat them once and the cart is open for the rest of the run, wherever it
+    // has got to — the mark is `beat:The Tailgate`, which is a counter that
+    // already existed, so the guard costs the save nothing.
+    //
+    // **A gate rather than an endgame.** What is behind it is a shop, so this
+    // is tuned to a fight a character who can *reach* the flat wins and does
+    // not stroll through — measured against `common::geared_from`, which is
+    // this repository's answer to *the board a player actually has*, rather
+    // than against a rating. A rating predicts nothing about whether a fight
+    // is winnable: that board beats a 2958 and loses to a 1141.
+    //
+    // **Two slots, wearing The Unwritten's**, which is the one board shape in
+    // this game that a player survives — *what a creature deals is mostly how
+    // many items its board makes*, found four times now. Nothing here invents
+    // a component, so the catalogue and the save fingerprint are untouched.
+    MonsterSpec {
+        name: "The Tailgate",
+        // **Measured, and the first draft won at the buzzer.** At 6,000 health
+        // the yardstick board killed it at exactly `SUDDEN_DEATH_MS` — which
+        // is not a win a board earned, and is the same tell the Kettleworks
+        // report turned on: *the only one I can reliably kill is the thing in
+        // the fortieth kettle due to timing it out*. Five thousand is a
+        // victory at **24.3s**, which is a fight decided by the boards with
+        // five seconds of the clock still unspent.
+        health: 5_000,
+        // **Strength is the dial and health is the length.** Across 3,200 to
+        // 5,000 health not one outcome moved; across strength the fight goes
+        // from a comfortable win at 200 to a loss in eleven seconds at 240.
+        // So this sits well back from that cliff rather than one notch under
+        // it: everything above the yardstick board is somebody who cannot
+        // shop here, and what is behind this is a counter rather than an
+        // ending.
+        strength: 160,
+        regen: 10,
+        mind_resist: 40,
+        curse_resist: 40,
+        physical_resist: 30,
+        magic_resist: 30,
+        attacks: &[],
+        gear: &[
+            ("Hymnal", SlotKind::Weapon, 0, 0, 0),
+            ("Bulwark Vial", SlotKind::Weapon, 1, 0, 2),
+            ("Runewash Ink", SlotKind::Weapon, 0, 2, 2),
+            ("Emberburst", SlotKind::Weapon, 2, 2, 0),
+            ("Cosmic Alignment", SlotKind::Weapon, 2, 0, 0),
+            ("Cinderscript Ink", SlotKind::Weapon, 2, 1, 1),
+            ("The Bog Census", SlotKind::Weapon, 3, 0, 0),
+            ("Census Bolt", SlotKind::Weapon, 4, 2, 1),
+            ("Cinderscript Ink", SlotKind::Weapon, 5, 0, 1),
+            ("Flywheel Cog", SlotKind::Weapon, 0, 4, 1),
+            ("Cinderscript Ink", SlotKind::Weapon, 2, 4, 0),
+            ("Azure Alignment", SlotKind::Weapon, 4, 4, 0),
+            ("Bone Crown", SlotKind::Helmet, 0, 0, 3),
+            ("Bone Scale", SlotKind::Helmet, 1, 1, 2),
+            ("Bone Fletch", SlotKind::Helmet, 2, 2, 3),
+            ("Idol's Crest", SlotKind::Helmet, 3, 0, 0),
+            ("Tin Frame", SlotKind::Helmet, 4, 1, 0),
+            ("Tin Plating", SlotKind::Helmet, 4, 0, 0),
+        ],
+        items: &[4, 5, 3, 3, 3],
+        gear_offset: 0,
+        bounty: 900,
+        sprite: MonsterSprite::Null,
+        rank: Rank::Boss,
+        drops: &[],
+        enchs: &[],
+    },
 ];
 
 // ----------------------------------------------------------- combatants

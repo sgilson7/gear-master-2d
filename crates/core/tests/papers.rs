@@ -128,14 +128,20 @@ fn the_second_paper_wants_five_thousand_and_nothing_else() {
     );
 
     // The money is the only thing left, and a refusal spends nothing.
-    g.character.gold = 4_999;
+    //
+    // **The boundary is read off the price rather than typed at it**, so a
+    // paper that is retuned moves both halves of this together. It was written
+    // at 4,999/5,000 and the price has since moved to two thousand; a literal
+    // here would have been a test asserting the old economy.
+    let price = gm2d_core::ench::LICENCE_PRICE;
+    g.character.gold = price - 1;
     let why = g.buy_paper(Paper::Second).unwrap_err();
-    assert!(why.contains("4999"), "{why}");
+    assert!(why.contains(&(price - 1).to_string()), "{why}");
     assert!(!g.character.second_paper, "a refusal spends nothing");
-    assert_eq!(g.character.gold, 4_999);
+    assert_eq!(g.character.gold, price - 1);
 
-    g.character.gold = 5_000;
-    assert_eq!(g.buy_paper(Paper::Second).unwrap(), 5_000);
+    g.character.gold = price;
+    assert_eq!(g.buy_paper(Paper::Second).unwrap(), price);
     assert_eq!(g.character.gold, 0);
     assert!(g.character.owed_a_second_class());
 
@@ -144,9 +150,9 @@ fn the_second_paper_wants_five_thousand_and_nothing_else() {
     let mut h = at_level(12);
     h.character.choose_class("Berserker").unwrap();
     finish(&mut h.character, "Berserker");
-    h.character.gold = 5_000;
+    h.character.gold = price;
     assert!(line(&h, Paper::Second).unwrap().why.is_none());
-    assert_eq!(h.buy_paper(Paper::Second).unwrap(), 5_000);
+    assert_eq!(h.buy_paper(Paper::Second).unwrap(), price);
 }
 
 /// **The expert paper kept its gate, and that is not an oversight.**
@@ -198,10 +204,15 @@ fn the_expert_paper_is_free_and_wants_two_finished_trees() {
     let mut g = at_level(14);
     g.character.choose_class("Berserker").unwrap();
     finish(&mut g.character, "Berserker");
-    g.character.gold = 5_000;
+    g.character.gold = gm2d_core::ench::LICENCE_PRICE;
     g.buy_paper(Paper::Second).unwrap();
     g.character.choose_second_class("Recycler").unwrap();
-    assert_eq!(g.character.gold, 0, "and it is free, so this stays at nothing");
+    // **Free is a purse that does not move, not a purse that is empty.** This
+    // asserted `gold == 0`, which only ever held because the second paper
+    // happened to drain it to the penny — so the day that price moved, a test
+    // about the *expert* paper failed about a different paper. What free means
+    // is measured across the purchase below.
+    let before = g.character.gold;
 
     // One of two is not two.
     let why = g.buy_paper(Paper::Expert).unwrap_err();
@@ -210,7 +221,7 @@ fn the_expert_paper_is_free_and_wants_two_finished_trees() {
     finish(&mut g.character, "Recycler");
     assert_eq!(g.character.finished_trees(), 2);
     assert_eq!(g.buy_paper(Paper::Expert).unwrap(), 0, "free");
-    assert_eq!(g.character.gold, 0);
+    assert_eq!(g.character.gold, before, "and free means the purse did not move");
     let want = gm2d_core::expert::for_pair("Berserker", "Recycler").unwrap();
     assert_eq!(g.character.expert.as_deref(), Some(want.name));
     // Three classes, all live.

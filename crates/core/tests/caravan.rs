@@ -76,16 +76,45 @@ fn every_stop_is_on_empty_walkable_ground() {
     assert_eq!(before, seen.len(), "two stops are on one tile");
 }
 
-/// **Only one map has a cart**, so nothing else on the map list quietly grew one.
+/// **A cart is one country's, and the countries are named here.**
+///
+/// This asserted there was exactly one, which was a description of the content
+/// rather than a rule — and the rule underneath it is the one that matters:
+/// `WorldState::caravan` is a **single** slot and `tick_caravan` fills it from
+/// the stops on the map you are standing on, so two carts on *one* map would
+/// be two merchants sharing one position and one of them would never be
+/// anywhere. Two carts on two maps is fine, and costs the save nothing:
+/// crossing between them is hundreds of steps, and the cart moves every
+/// `CARAVAN_STAY` of them, so a cart re-placed on arrival is indistinguishable
+/// from one that moved while you were away.
+///
+/// Named rather than counted, the way `common::UNWRITTEN` is: a list that
+/// quietly grew is a list that has gone stale.
 #[test]
-fn the_cart_travels_one_country() {
+fn a_cart_is_one_countrys() {
+    const CARTS: &[&str] = &[FIELD, "the-wextreen-sands"];
     let mut carrying = Vec::new();
     for (id, _) in data::MAPS {
         if !stops(&data::map(id, D)).is_empty() {
-            carrying.push(id);
+            carrying.push(*id);
         }
     }
-    assert_eq!(carrying, vec![&FIELD], "the cart is on {carrying:?}");
+    assert_eq!(carrying.as_slice(), CARTS, "the carts are on {carrying:?}");
+
+    // **And one merchant a map.** Every stop on a map is the same person's:
+    // the same counter and the same person standing in front of it. Two
+    // different `sells` lists among one map's stops would be two merchants
+    // taking turns in one slot, which is the failure the slot's shape makes
+    // possible and nothing else would report.
+    for id in CARTS {
+        let w = data::map(id, D);
+        let all = stops(&w);
+        let first = all[0];
+        for p in &all {
+            assert_eq!(p.sells, first.sells, "{id}: {} sells something else", p.id);
+            assert_eq!(p.creature, first.creature, "{id}: {} is guarded by somebody else", p.id);
+        }
+    }
 }
 
 // -------------------------------------------------------------- the movement
@@ -338,4 +367,94 @@ fn what_you_bought_off_it_follows_it() {
         !shop::caravan_shelf(&shops, &by_stop)[0].sold,
         "purchases are keyed by the stop, so moving the cart restocks it"
     );
+}
+
+// ------------------------------------------------------------- the bodyguard
+
+/// **A cart's guard stands nowhere else in the game.**
+///
+/// The mark is `beat:<canonical>` — a counter that already existed, so the
+/// guard costs the save nothing — and that is only safe while the creature is
+/// somewhere you can meet exactly once. A guard who also stood in a region
+/// pool would be a shop opened by a lucky encounter two maps away, which is
+/// `Goal::Slay`'s own trap: *eight of the nine creatures standing on a boss
+/// tile also stand in some region's pool*, and that is precisely why finishing
+/// a dungeon is a `Clear` and not a `Slay`.
+#[test]
+fn a_guard_is_met_in_one_place() {
+    let mut guards = Vec::new();
+    for (id, _) in data::MAPS {
+        for p in stops(&data::map(id, D)) {
+            if let Some(c) = &p.creature {
+                guards.push(c.clone());
+            }
+        }
+    }
+    assert!(!guards.is_empty(), "no cart has a guard, so this checks nothing");
+    for g in &guards {
+        for (id, _) in data::MAPS {
+            let w = data::map(id, D);
+            for r in &w.regions {
+                assert!(
+                    !r.enemies.iter().any(|e| e.name == *g),
+                    "{g} guards a cart and is also dealt by {}/{}: beating one in a field \
+                     would open a shop somewhere else",
+                    id, r.id,
+                );
+            }
+            // And it is on no boss plate either, for the same reason one way up.
+            for pl in &w.places {
+                if pl.kind == PlaceKind::Boss {
+                    assert!(pl.creature.as_ref() != Some(g), "{g} is also standing on {}", pl.id);
+                }
+            }
+        }
+    }
+}
+
+/// **A guarded cart does not open until the guard is down, and then it stays
+/// open wherever the cart has got to.**
+///
+/// Both halves matter and the second is the one a mark keyed to the *tile*
+/// would get wrong: the cart is somewhere else every `CARAVAN_STAY` steps, so
+/// clearing the guard at one stop and meeting them again at the next would be
+/// a toll rather than a fight.
+#[test]
+fn a_guard_shuts_the_tailgate_once() {
+    let sands = "the-wextreen-sands";
+    let w = data::map(sands, D);
+    let all = stops(&w);
+    let guard = all[0].creature.clone().expect("the sand cart has a guard");
+
+    let mut st = WorldState::at_start(&w);
+    st.map = sands.into();
+    for s in &all {
+        st.at = s.at;
+        st.caravan = Some(world::CaravanAt { place: s.id.clone(), moves_left: CARAVAN_STAY });
+        let step =
+            world::arrive_at(&w, &mut st, &mut Rng::new(1), D, (s.at[0], s.at[1]), &Allowances::of(&[]));
+        assert_eq!(step.guard.as_deref(), Some(s.id.as_str()), "{}: no guard on arrival", s.id);
+        assert!(step.caravan.is_none(), "{}: the tailgate opened past the guard", s.id);
+    }
+
+    // Beaten once, anywhere, and every stop is a counter.
+    st.bump(&gm2d_core::fight::beat_key(&guard));
+    for s in &all {
+        st.at = s.at;
+        st.caravan = Some(world::CaravanAt { place: s.id.clone(), moves_left: CARAVAN_STAY });
+        let step =
+            world::arrive_at(&w, &mut st, &mut Rng::new(1), D, (s.at[0], s.at[1]), &Allowances::of(&[]));
+        assert_eq!(step.caravan.as_deref(), Some(s.id.as_str()), "{}: still shut", s.id);
+        assert!(step.guard.is_none(), "{}: the guard came back", s.id);
+    }
+}
+
+/// **And the cart the field has is not guarded**, which is what keeps the
+/// survey shelf where it has always been. A guard on it would be a fight in
+/// front of a Magnet.
+#[test]
+fn the_survey_cart_is_not_guarded() {
+    for p in stops(&field()) {
+        assert!(p.creature.is_none(), "{} grew a guard", p.id);
+    }
 }

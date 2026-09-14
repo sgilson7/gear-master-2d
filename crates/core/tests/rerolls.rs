@@ -31,7 +31,7 @@ fn the_van_sells_a_licence_to_anybody_who_has_not_got_one() {
     let before = g.character.gold;
     let paid = g.buy_licence().expect("he sells one");
     assert_eq!(paid, gm2d_core::ench::LICENCE_PRICE);
-    assert_eq!(paid, 5_000, "the licence moved with everything else");
+    assert_eq!(paid, 2_000, "the licence is an ench's own price, on the human's ask");
     assert_eq!(g.character.gold, before - paid, "it was not paid for");
     assert!(g.character.licensed(), "paid for a licence and is not licensed");
 

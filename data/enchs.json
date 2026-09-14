@@ -2,7 +2,7 @@
   "format": "gm2d-enchs",
   "version": 1,
   "_note": "Enchs. Not enchantments — `PieceKind::Enchantment` is thirteen catalogue pieces laid under the grid, and this is the other thing, which is the book's own word for it (the ench economy, p. 119). An ench has no shape and goes on no grid: it bolts to a component you already own, and it comes off. Everything one does is a number the engine already had, so nothing here retunes combat.",
-  "_price": "What the van charges, and it is two thousand for any of them. An ench is the last thing a character buys rather than the next: the licence is a thousand and the bolting-on is where the money goes, which is what a licence is everywhere else.",
+  "_price": "What a counter charges, and it is two thousand for any of them — the van's three and the sand cart's five alike. An ench is the last thing a character buys rather than the next: the licence is two thousand as well now, and what separates the cart's five from the van's three is not money, it is the flat they are on and the thing standing in front of them.",
   "enchs": [
     {
       "id": "plug-energy-tap",
@@ -80,6 +80,63 @@
       "effect": {
         "power": {
           "pct": 40
+        }
+      }
+    },
+    {
+      "id": "the-sand-glass",
+      "name": "The Sand Glass",
+      "blurb": "Iron dust from under the flat, run through a lens and set. It is heavier than the thing it is set into and the fitter who sells it says that is the point, twice, before you have asked.",
+      "price": 2000,
+      "effect": {
+        "heavy": {
+          "pct": 120,
+          "slower_pct": 30
+        }
+      }
+    },
+    {
+      "id": "the-ninth-bearing",
+      "name": "The Ninth Bearing",
+      "blurb": "Cut to a survey nobody has been able to repeat. It sits wrong in the hand and true in the housing, and the ninth surveyor is on record as having thrown one into the water.",
+      "price": 2000,
+      "effect": {
+        "haste": {
+          "pct": 60
+        }
+      }
+    },
+    {
+      "id": "the-long-measure",
+      "name": "The Long Measure",
+      "blurb": "A chain of ninety-nine links where the tenth, the fortieth and the ninetieth are a different metal. Whoever made it was counting something, and the cart will not say what.",
+      "price": 2000,
+      "effect": {
+        "power": {
+          "pct": 85
+        }
+      }
+    },
+    {
+      "id": "the-stopped-clock",
+      "name": "The Stopped Clock",
+      "blurb": "It stopped at eleven and has been sold four times since, each time by somebody explaining that this is not a fault. It is not a fault. It is what you are buying.",
+      "price": 2000,
+      "effect": {
+        "heavy": {
+          "pct": 260,
+          "slower_pct": 55
+        }
+      }
+    },
+    {
+      "id": "the-one-swing-in-the-flat",
+      "name": "The One Swing In The Flat",
+      "blurb": "Somebody went out onto the sand with this and came back without it, and then went out again and came back with it. There is one mark on it. There was one thing out there.",
+      "price": 2000,
+      "effect": {
+        "fragile": {
+          "pct": 450
         }
       }
     }

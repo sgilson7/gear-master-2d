@@ -1061,6 +1061,34 @@ function paintCaravan() {
     };
     return b;
   }));
+  // **The tailgate's five, in the van's own markup.** An ench row is an ench
+  // row wherever it is sold — the same class, the same three lines, the same
+  // `buy_ench` behind it — and a second renderer would be a second answer to
+  // *what an ench costs and what it does*, on a screen nobody would compare
+  // them side by side on. Empty on the survey cart, which sells components.
+  const ebox = $('caravan-enchs');
+  ebox.replaceChildren(...(r.enchs ?? []).map((e) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'wares ench' + (e.sold ? ' sold' : '');
+    b.dataset.buyEnch = e.id;
+    b.disabled = e.sold || !e.afford;
+    b.innerHTML = `<b>${e.name}</b>` +
+      `<span class="spec">${e.spec}</span>` +
+      `<span class="flavour">${e.blurb}</span>` +
+      `<span class="cost">${e.sold ? 'gone' : `${e.price} Fnorp`}` +
+      `${e.have ? ` · ${e.have} in the rack` : ''}</span>`;
+    b.onclick = () => {
+      const why = buy_ench(e.id);
+      log(why || `Bought ${e.name}. It goes on when you pack.`, !!why);
+      paintCaravan(); paintPanel(); autosave();
+    };
+    return b;
+  }));
+  // The van's own sentence, for the van's own reason: the cart takes the money
+  // either way, and being handed an ench is not being able to bolt one on.
+  const unl = $('caravan-unlicensed');
+  if (unl) unl.hidden = !(r.enchs ?? []).length || !!r.licensed;
 }
 
 function openCaravan() {
@@ -1457,7 +1485,22 @@ function closeFight() {
   $('fight').hidden = true;
   paintPanel(); draw(); autosave();
   // A fight is where a level lands, so it is where the fork is offered.
-  if (!offerClass()) $('map').focus();
+  if (offerClass()) return;
+  // **And a bodyguard is the one fight whose tile answers differently
+  // afterwards.** You are standing on the cart's own stop: before the fight
+  // the arrival was the guard, and now the same tile is a tailgate. `world`
+  // already had the rule for this — *a gate is the one place whose answer can
+  // change while you stand on it, because the answer is a question about you*
+  // — and the cart is the second instance of it.
+  //
+  // Asked by opening the payload rather than by remembering what the fight
+  // was: `caravan_json` is null unless the player is standing on a cart that
+  // is *open*, so this cannot mistake a won guard fight for a lost one, and it
+  // costs nothing on the thousand fights that are not a guard's.
+  try {
+    if (JSON.parse(caravan_json())) { openCaravan(); return; }
+  } catch { /* not on a cart */ }
+  $('map').focus();
 }
 
 function runFight() {
@@ -4244,6 +4287,10 @@ async function main() {
   // uses rather than a privileged export of its own.
   window.__attachEnch = (id, piece) => attach_ench(id, piece);
   window.__benchJson = () => JSON.parse(bench_json());
+  // The cart's own payload, which is the one answer to *is the tailgate open*:
+  // null while somebody is standing in front of it, and what `closeFight` asks
+  // to find out whether the tile it is on became a counter mid-fight.
+  window.__caravanJson = () => JSON.parse(caravan_json());
   window.__trees = () => JSON.parse(all_trees_json());
   window.__places = () => world.places;
   window.__world = () => world;

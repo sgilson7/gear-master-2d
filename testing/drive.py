@@ -3835,6 +3835,117 @@ def check_the_bestiary_holds_what_you_have_met(page, name, fails, base):
     print("ok: the bestiary holds what you have met, with its board and what it resists")
 
 
+def check_the_sand_cart_is_guarded(page, name, fails, base):
+    """**Somebody is standing in front of the tailgate, and the shop is behind
+    them.**
+
+    Asked for as *"a wandering merchant in the wextreen sands that sells
+    them"*, and then *"the wextreen sands merchant should have a body guard you
+    have to fight in order to access the shop"*.
+
+    Two halves, and they are split the way this repository splits everything:
+    **whether the board can beat the guard is `cargo test`'s** — measured
+    against `common::geared_from`, which wins in 24.3 seconds with five of the
+    clock still unspent — and **whether the screens do the right thing is the
+    browser's**, because both halves of that are the shim's and the page's. So
+    this plants the guard up and then down rather than fighting it: what it is
+    asking is *which screen opened*, and a check that had to win a fight first
+    would be a check that fails when a board is retuned.
+    """
+    SANDS = "the-wextreen-sands"
+    ENCHS = 5
+
+    def on_the_flat(body, beaten):
+        strip_the_boards(body)
+        w = body.setdefault("world", {})
+        w["map"] = SANDS
+        w["at"] = BESIDE
+        # Where it is standing today, and long enough to still be there for the
+        # one step this takes.
+        w["caravan"] = {"place": STOP, "moves_left": 5}
+        # Nothing bought, so every line on the tailgate is still there.
+        w["bought_enchs"] = []
+        # **The mark is a counter, and that is the whole design.** `beat:` is
+        # keyed by the creature rather than the tile, because the cart is
+        # somewhere else every five steps — a mark on the stop would put the
+        # same person in front of you again at the next one.
+        cs = [c for c in w.get("counters", []) if c[0] != "beat:The Tailgate"]
+        if beaten:
+            cs.append(["beat:The Tailgate", 1])
+        w["counters"] = cs
+        body["character"]["class"] = "Recycler"
+        body["character"]["xp"] = 4000
+        body["character"]["gold"] = 50_000
+
+    # **The cart is planted rather than hunted for.** Where it is today is a
+    # roll off `game.rng`, and the page's copy of the world is re-read when the
+    # *map* moves rather than on every step — so a check that walked about
+    # looking for it would be asking a cached map where a moving place is. The
+    # save carries `caravan`, so this says where it is and stands next to it,
+    # which is what planting is for: *what wants proving is what happens at
+    # that state rather than the road to it.*
+    STOP = "the-sand-cart-stop-3"   # [2, 6], with silt at [3, 6] to step in from
+    BESIDE, INTO = [3, 6], "ArrowLeft"
+
+    def walk_into_the_cart():
+        page.evaluate("() => document.getElementById('map').focus()")
+        page.keyboard.press(INTO)
+        page.wait_for_timeout(400)
+
+    # --- the guard is up: the arrival is a fight, and the cart is not open ---
+    plant(page, base, lambda b: on_the_flat(b, beaten=False), stem="sand-guard")
+    clear_screens(page)
+    walk_into_the_cart()
+    fighting = page.is_visible("#fight")
+    shopping = page.is_visible("#caravan")
+    who = (page.text_content("#fight-name") or "").strip()
+    if shopping:
+        fails.append(f"{name}: the tailgate opened with a bodyguard standing in front of it")
+    # **And the payload agrees with the arrival.** `caravan_json` is what
+    # `closeFight` asks to find out whether the tile you are standing on became
+    # a counter while you were fighting on it, so a payload that answered *yes*
+    # here would open the shop the moment any fight on this tile ended — two
+    # answers to *is the tailgate open*, and the wrong one winning.
+    if page.evaluate("() => window.__caravanJson() !== null"):
+        fails.append(f"{name}: the cart's payload says it is open with a guard in front of it")
+    if not fighting:
+        fails.append(f"{name}: walked onto a guarded cart and no fight opened (foe {who!r})")
+    elif not who:
+        fails.append(f"{name}: a fight opened on the cart's tile and named nobody")
+    clear_screens(page)
+
+    # --- beaten: the same tile is a counter, with five things on it ----------
+    plant(page, base, lambda b: on_the_flat(b, beaten=True), stem="sand-open")
+    clear_screens(page)
+    walk_into_the_cart()
+    if not page.is_visible("#caravan"):
+        fails.append(f"{name}: the guard is down and the tailgate did not open")
+        clear_screens(page)
+        return
+    rows = page.eval_on_selector_all(
+        "#caravan-enchs .wares", "e => e.map(x => x.textContent.trim())")
+    if len(rows) != ENCHS:
+        fails.append(f"{name}: the sand cart has {len(rows)} enchs on it and sells {ENCHS}")
+    # **The survey shelf is the other cart's**, and a cart sells one kind of
+    # thing: components here would mean the Kettleworks list had followed it.
+    comps = page.eval_on_selector_all("#caravan-stock .wares", "e => e.length")
+    if comps:
+        fails.append(f"{name}: the sand cart is also carrying {comps} components")
+    # And it buys. The row goes to 'gone' and the rack has one more in it.
+    if rows:
+        before = page.evaluate("() => window.__character().gold")
+        page.click("#caravan-enchs .wares:not([disabled])")
+        page.wait_for_timeout(300)
+        after = page.evaluate("() => window.__character().gold")
+        if after >= before:
+            fails.append(f"{name}: bought an ench off the cart and the purse did not move")
+        gone = page.eval_on_selector_all("#caravan-enchs .wares.sold", "e => e.length")
+        if not gone:
+            fails.append(f"{name}: bought one and no line on the cart says it is gone")
+    clear_screens(page)
+    print(f"ok: the sand cart is guarded, and past the guard it sells {ENCHS} enchs")
+
+
 def check_the_cart_is_somewhere_and_then_somewhere_else(page, name, fails, base):
     """**A shop that is not in the same place twice.**
 
@@ -7532,6 +7643,7 @@ def walk_the_gate(browser, name, fails=None):
     check_a_fight_you_have_had_is_not_drawn(page, name, fails, path)
     check_the_bestiary_holds_what_you_have_met(page, name, fails, path)
     check_the_cart_is_somewhere_and_then_somewhere_else(page, name, fails, path)
+    check_the_sand_cart_is_guarded(page, name, fails, path)
     check_the_sands_read_the_other_way_round(page, name, fails, path)
     check_running_away_costs_you(page, name, fails, path)
     check_the_stones_push_and_come_back(page, name, fails, path)

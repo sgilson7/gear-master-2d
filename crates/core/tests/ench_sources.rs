@@ -18,11 +18,21 @@ use gm2d_core::world::{Allowances, PlaceKind};
 
 const D: Difficulty = Difficulty::Easy;
 
+/// **Every counter in the game, asked by what it does rather than what it is.**
+///
+/// This filtered on `PlaceKind::Bench`, which was the same set while the van
+/// was the only thing selling an ench. The sand cart is a `Caravan` with a
+/// `sells` list and five enchs on it, and a lint keyed to the kind would have
+/// called all five orphans while they sat on a tailgate — *a lint that reads a
+/// list rather than the behaviour is the failure it exists to catch, one level
+/// up*, which this file has now paid for often enough to write the other kind
+/// first. `World::load` is what keeps the set honest from the other side: it
+/// refuses a `sells` on anything that is not a counter.
 fn benches() -> Vec<gm2d_core::world::PlaceDef> {
     data::all_maps(D)
         .iter()
         .flat_map(|w| w.places.clone())
-        .filter(|p| p.kind == PlaceKind::Bench)
+        .filter(|p| !p.sells.is_empty())
         .collect()
 }
 
@@ -182,7 +192,7 @@ fn a_bench_that_sells_nothing_real_is_refused() {
     // And only a bench sells anything.
     let mut town = base;
     town["kind"] = serde_json::json!("town");
-    assert!(load(serde_json::json!([town])).unwrap_err().contains("only a bench"));
+    assert!(load(serde_json::json!([town])).unwrap_err().contains("only a counter"));
 }
 
 // ---------------------------------------------------------------- the vendor

@@ -136,6 +136,52 @@ pub struct ItemProfile {
 }
 
 impl ItemProfile {
+    /// An item that is nothing but a name, a cadence and whatever triggers the
+    /// caller hangs on it.
+    ///
+    /// **Written for a creature's teeth.** A bite stands on no component, so
+    /// everything a profile normally derives from cells is zero — and the
+    /// fight already turns an innate attack into a `RunningItem` this way
+    /// (`RunningItem::from_attack`); this is the same thing one layer up, for
+    /// the one caller that needs a *profile* rather than a running item.
+    pub fn bare(name: &str, cooldown_ms: u32) -> ItemProfile {
+        ItemProfile {
+            sigil_seed: 0,
+            pieces: Vec::new(),
+            adjacent_items: Vec::new(),
+            aligned_items: Vec::new(),
+            diagonal_items: Vec::new(),
+            name: name.to_string(),
+            full_name: name.to_string(),
+            core: String::new(),
+            // **A weapon, because a bite deals damage** and `hit_for` returns
+            // nothing for anything else. It is the only field here that is a
+            // claim rather than a zero, and it is the same claim
+            // `RunningItem::from_attack` makes by having no slot at all.
+            slot: SlotKind::Weapon,
+            cooldown_ms,
+            stats: crate::stats::Stats::ZERO,
+            triggers: Vec::new(),
+            adjacent_assembled_same_slot: 0,
+            open_cells: 0,
+            turn_cycle: Vec::new(),
+            spins: false,
+            fragile: false,
+            enched: false,
+            overtakes: false,
+            leeches_mana: 0,
+            ramp_pct: 0,
+            ramp_cap: 0,
+            wrong_sense: false,
+            steady: false,
+            attracts_curses: false,
+            power_bonus: 0,
+            power: 100,
+            casts: Vec::new(),
+            rating: 0,
+        }
+    }
+
     /// The badge this item has earned.
     pub fn rarity(&self) -> crate::rating::Rarity {
         crate::rating::Rarity::of(self.rating)

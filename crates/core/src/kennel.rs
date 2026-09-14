@@ -194,3 +194,26 @@ pub fn cells_of(data: &KennelData, k: &Kennelled) -> Vec<(i8, i8)> {
         .map(|&(x, y)| (x + k.at.0, y + k.at.1))
         .collect()
 }
+
+/// What a creature out contributes, as a share of what it is worth.
+///
+/// **Capped at the *region's* bracket and never at its own**, which is
+/// `PLAN-M21.md` §M21.5's own decision and the answer to the balance risk in
+/// the whole idea: a creature kennelled in the deep and walked back to the pit
+/// would otherwise be a boss on your side. What it is worth where you are
+/// standing is what it gives.
+///
+/// Returned as a percentage so the caller scales profiles rather than this
+/// module knowing what a profile is.
+pub fn share(rating: i32, danger: i32, tally_pct: i32) -> i32 {
+    if rating <= 0 {
+        return 0;
+    }
+    // At or under the bracket it gives everything; over it, the bracket's
+    // worth. **Never more than a hundred before the tally**, so the tally is
+    // the only thing that takes it past its own strength.
+    let capped = if danger <= 0 { rating } else { rating.min(danger) };
+    let base = (capped * 100) / rating;
+    base + tally_pct
+}
+

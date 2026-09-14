@@ -230,3 +230,105 @@ fn ten_wins_together_pay_five() {
     k.wins_together = TALLY_STEP * 3;
     assert_eq!(k.tally_pct(), TALLY_PCT * 3);
 }
+
+// ------------------------------------------------------- and into the fight
+
+/// **A creature out fights, and is capped at the region rather than its own
+/// strength.**
+///
+/// That cap is the answer to the balance risk in the whole idea: something
+/// kennelled in the deep and walked back to the pit would otherwise be a boss
+/// on your side. `Region::danger` is the mean of `creature_rating` over the
+/// pool, measured at load — *danger is measured, never typed*.
+#[test]
+fn a_creature_out_fights_and_is_capped_at_the_region() {
+    let mut g = a_fighter(0x5EED_0000_6E00_0010);
+    let rat = "Cave Rat";
+    for _ in 0..OFFER_AT {
+        win(&mut g, rat);
+    }
+    g.take_along(rat).expect("it comes");
+    let mask = g.run_mask("the-end-of-all-gears", D);
+    let at = *mask.first().expect("a run");
+
+    let alone = g.character.combat_items().len();
+    g.put_out("the-end-of-all-gears", rat, at, 0, D).expect("it goes out");
+    let danger = g.here_danger(D);
+    let with = g.character.combat_items().len()
+        + g.character.companion_items(danger, D).len();
+    assert!(with > alone, "a creature out contributed nothing");
+
+    // **Capped.** Something far over the bracket gives the bracket's worth,
+    // not its own — asked of `share` directly, which is where the sum is done.
+    let modest = gm2d_core::kennel::share(100, 1_000, 0);
+    let huge = gm2d_core::kennel::share(5_000, 1_000, 0);
+    assert_eq!(modest, 100, "something under the bracket gave {modest}%");
+    assert!(huge < 100, "something five times the bracket gave {huge}%");
+    assert!(huge > 0, "and it gave nothing at all");
+}
+
+/// **Ten wins together pay five percent**, and it is the only thing that takes
+/// a companion past its own strength.
+#[test]
+fn the_tally_is_the_only_thing_past_its_own_strength() {
+    let plain = gm2d_core::kennel::share(500, 500, 0);
+    let tallied = gm2d_core::kennel::share(500, 500, TALLY_PCT);
+    assert_eq!(plain, 100);
+    assert_eq!(tallied, 100 + TALLY_PCT);
+}
+
+/// **A lost fight puts it back and it forgets.**
+#[test]
+fn a_lost_fight_resets_it() {
+    let mut g = a_fighter(0x5EED_0000_6E00_0011);
+    let rat = "Cave Rat";
+    for _ in 0..OFFER_AT {
+        win(&mut g, rat);
+    }
+    g.take_along(rat).expect("it comes");
+    let mask = g.run_mask("the-end-of-all-gears", D);
+    g.put_out("the-end-of-all-gears", rat, mask[0], 0, D).expect("out");
+    g.character.kennel[0].wins_together = 25;
+
+    // A board that loses: strip it and meet something that does not lose.
+    g.character = common::bench();
+    g.character.kennel = vec![gm2d_core::kennel::Kennelled {
+        spec: rat.into(),
+        family: "a-rat".into(),
+        eats: "toad-ichor".into(),
+        wins_together: 25,
+        out: true,
+        at: (0, 0),
+        turn: 0,
+    }];
+    g.encounter = Some(fight::Encounter { enemy: "Nine of Ashes".into(), at: [1, 18] });
+    let log = fight::run(&g, D).expect("a fight");
+    assert_ne!(log.outcome, combat::Outcome::Victory, "the stripped board won");
+    let s = fight::settle(&mut g, &log, D).expect("it settles");
+    assert!(!g.character.kennel[0].out, "a lost fight left it out");
+    assert_eq!(g.character.kennel[0].wins_together, 0, "it remembered");
+    assert!(
+        s.receipt.iter().any(|l| l.contains("went back in the kennel")),
+        "nothing said so: {:?}",
+        s.receipt
+    );
+}
+
+/// **A win together counts**, and only for what is out.
+#[test]
+fn a_win_together_counts_for_what_is_out() {
+    let mut g = a_fighter(0x5EED_0000_6E00_0012);
+    let rat = "Cave Rat";
+    for _ in 0..OFFER_AT {
+        win(&mut g, rat);
+    }
+    g.take_along(rat).expect("it comes");
+    // In: the tally does not move.
+    win(&mut g, rat);
+    assert_eq!(g.character.kennel[0].wins_together, 0, "something in got credit");
+    // Out: it does.
+    let mask = g.run_mask("the-end-of-all-gears", D);
+    g.put_out("the-end-of-all-gears", rat, mask[0], 0, D).expect("out");
+    win(&mut g, rat);
+    assert_eq!(g.character.kennel[0].wins_together, 1);
+}

@@ -1561,6 +1561,20 @@ impl Game {
         Ok(name)
     }
 
+    /// The danger of the region the player is standing in, or zero.
+    ///
+    /// **Measured, never typed** — `Region::danger` is the mean of
+    /// `creature_rating` over the pool, taken at load, and the rule that no
+    /// data file may type a danger number has held since M3. This is what caps
+    /// a creature out: what it is worth *where you are standing*.
+    pub fn here_danger(&self, difficulty: crate::combat::Difficulty) -> i32 {
+        let marks = self.world.marks();
+        let here = self.world.map_id();
+        let w = crate::data::map_now(&here, difficulty, &self.world);
+        let _ = marks;
+        w.region_at(self.world.at[0], self.world.at[1]).map(|r| r.danger).unwrap_or(0)
+    }
+
     /// The run this town has, with whatever the Handler has added.
     pub fn run_mask(&self, town: &str, difficulty: crate::combat::Difficulty) -> Vec<(i8, i8)> {
         for (id, _) in crate::data::MAPS {

@@ -82,14 +82,24 @@ pub fn run(game: &Game, difficulty: Difficulty) -> Option<CombatLog> {
     // `simulate_at` does — so an unclassed fight is the same fight it was
     // before M5, and the golden fixture says so.
     let worn: Vec<crate::class::ClassDef> = game.character.class_defs();
+    // **And whatever is out, as gear.** Capped at the bracket of the region you
+    // are standing in rather than at its own — see `Character::companion_items`
+    // for why this is the board's door and not a second combatant.
+    let danger = game.here_danger(difficulty);
+    let mut items = game.character.combat_items();
+    items.extend(game.character.companion_items(danger, difficulty));
+    // Two out together whose diets are kin pay their pair, which is the
+    // Kennel's `C(8,2)` read at the bell.
+    let mut held = game.character.start_with();
+    held.rules.extend(game.character.kennel_rules());
     Some(combat::simulate_holding(
         game.character.player_stats(),
-        &game.character.combat_items(),
+        &items,
         spec,
         difficulty,
         &worn,
         0,
-        game.character.start_with(),
+        held,
     ))
 }
 
@@ -411,6 +421,13 @@ fn pay_a_win(game: &mut Game, creature: &'static str, receipt: &mut Vec<String>)
     let (stages, ..) = game.character.grower();
     crate::plot::tick(&mut game.character.beds, stages);
 
+    // **And what was out together with you got better at it.** Counted on a
+    // win, here, because here is the one place a win is paid — the same
+    // argument `beat:` makes one line up.
+    for k in game.character.kennel.iter_mut().filter(|k| k.out) {
+        k.wins_together += 1;
+    }
+
     // **And whatever is out eats, at the bell.** Only out, only here — beside
     // the line that charges the fatigue, which is the one place that means *a
     // fight happened, won or lost*. **A rout deliberately does not reach here**
@@ -698,6 +715,16 @@ pub fn settle(game: &mut Game, log: &CombatLog, difficulty: Difficulty) -> Optio
             // is that upstream's reasoning held because a ladder is a corridor
             // and this is not one.
             receipt.push("No bounty. Nothing was beaten.".into());
+            // **A fight lost with something out puts it back, at nothing.**
+            // What it was learning it was learning *with* you, and a defeat
+            // takes what you were carrying — this is that same sentence about a
+            // different thing, and it is the only cost the Kennel has that a
+            // player can feel.
+            for k in game.character.kennel.iter_mut().filter(|k| k.out) {
+                k.out = false;
+                k.wins_together = 0;
+                receipt.push(format!("{} went back in the kennel, and forgot.", k.spec));
+            }
             // Everything unbanked, gone. Not a share and not a penalty on the
             // total: what you had spent is what you are, and what you were
             // carrying is what you were going to be.

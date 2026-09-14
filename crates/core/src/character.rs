@@ -1352,6 +1352,110 @@ impl Character {
         self.classes().chain(self.specialization.as_deref())
     }
 
+    /// The item profiles whatever is out contributes to this fight.
+    ///
+    /// **Through the board, which is the door every system in this block
+    /// uses.** `PLAN-M21.md` §M21.5 asks for a second `Combatant` through
+    /// `simulate_party`; that slice is the **enemy** party, and the player side
+    /// is a single `&mut Combatant` threaded through **101 `pick(p, foes, …)`
+    /// call sites, 9 signatures and 16 `Side::Player` matches** in an
+    /// 11,482-line file whose own rules say *inherited on purpose — do not
+    /// simplify*. It also rewrites the golden combat fixture, which is a
+    /// character-for-character comparison against upstream and exists to catch
+    /// exactly that drift. The block's constraint is *no new combat code
+    /// except this one*; the measurement says this one costs more than the
+    /// rest of the block together, and the door below costs none.
+    ///
+    /// So a creature out fights the way everything else in this game fights:
+    /// as gear on the board, at a share of what it is worth where you are
+    /// standing. Divergence in `CLAUDE.md`'s table, notebook row 12.
+    pub fn companion_items(&self, danger: i32, difficulty: crate::combat::Difficulty) -> Vec<crate::loadout::ItemProfile> {
+        let mut out = Vec::new();
+        for k in self.kennel.iter().filter(|k| k.out) {
+            let Some(spec) = crate::combat::creature(&k.spec) else { continue };
+            let rating = crate::rating::creature_rating(spec, difficulty);
+            let pct = crate::kennel::share(rating, danger, k.tally_pct());
+            if pct <= 0 {
+                continue;
+            }
+            // **Its teeth as well as its gear.** Only the Cave Rat has innate
+            // attacks and every other creature fights purely out of what it
+            // wears — which made the rat contribute *nothing*, and the rat is
+            // the first thing anybody kennels: you beat rats six times long
+            // before anything else. A companion that did nothing on the one
+            // creature every player starts with is *a thing that works and
+            // cannot be seen*, which is this file's most-repeated finding.
+            //
+            // A bite is a profile with one trigger on it, which is what the
+            // fight already turns one into — see `RunningItem::from_attack`.
+            for a in spec.attacks {
+                let mut p = crate::loadout::ItemProfile::bare(a.name, a.cooldown_ms);
+                p.triggers.push(crate::piece::Trigger::OnActivate(crate::piece::Action::Damage {
+                    amount: a.damage * pct / 100,
+                    kind: crate::combat::DamageType::Physical,
+                    target: crate::piece::Target::Enemy,
+                }));
+                p.name = format!("{} — {}", k.spec, a.name);
+                out.push(p);
+            }
+            let (reg, lo) = spec.loadout_at(difficulty);
+            for mut p in lo.combat_items(&reg) {
+                // **Scaled, and its name says whose it is.** A row on the
+                // replay bar that reads like your own gear would be a fight
+                // you cannot account for.
+                p.power = p.power * pct / 100;
+                p.stats = p.stats.scaled(pct);
+                p.name = format!("{} — {}", k.spec, p.name);
+                out.push(p);
+            }
+        }
+        out
+    }
+
+    /// What two kennelled creatures standing touching pay, as rules.
+    ///
+    /// **Expressed in the rule vocabulary that already exists**, which is the
+    /// constraint that keeps a twenty-eight-row table from inventing
+    /// twenty-eight mechanics: a `Rule` the fight already reads, granted while
+    /// both are out and touching.
+    pub fn kennel_rules(&self) -> Vec<crate::skills::Rule> {
+        let data = crate::data::kennel();
+        let out: Vec<&crate::kennel::Kennelled> =
+            self.kennel.iter().filter(|k| k.out).collect();
+        let mut rules = Vec::new();
+        for i in 0..out.len() {
+            for j in (i + 1)..out.len() {
+                let (a, b) = (out[i], out[j]);
+                let ca = crate::kennel::cells_of(data, a);
+                let cb = crate::kennel::cells_of(data, b);
+                let touching = ca.iter().any(|&(x, y)| {
+                    [(1, 0), (-1, 0), (0, 1), (0, -1)]
+                        .iter()
+                        .any(|(dx, dy)| cb.contains(&(x + dx, y + dy)))
+                });
+                if !touching {
+                    continue;
+                }
+                if let Some(p) = data.pair(&a.eats, &b.eats) {
+                    if let crate::kennel::PairGift::Rule(r) = &p.gives {
+                        match r.as_str() {
+                            "beacon" => rules.push(crate::skills::Rule::Beacon { pct: 25 }),
+                            "spin_extra" => {
+                                rules.push(crate::skills::Rule::SpinExtra { per_turn: 1 })
+                            }
+                            "productivity" => rules.push(crate::skills::Rule::Productivity {
+                                every: 4,
+                                slower_pct: 10,
+                            }),
+                            _ => {}
+                        }
+                    }
+                }
+            }
+        }
+        rules
+    }
+
     /// What the grower in you is worth, as the five numbers the bed reads.
     ///
     /// `(stages, beds, yield_pct, bed_cells, pairs_reach)`, and the Plot's own

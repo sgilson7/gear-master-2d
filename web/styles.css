@@ -946,3 +946,9 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
 .ask-fair { border-left: 3px solid var(--ink-dim, #888); }
 .ask-high { border-left: 3px solid var(--bad, #c55); }
 #stall-prices input { width: 6em; }
+
+/* **The street.** One tab a building, and the strip is `.treetabs` — the skill
+   tree's and the errand log's — because a strip styled by id is a strip the
+   next screen that wants one does not get. */
+#town-street { margin: 0 0 12px; flex-wrap: wrap; }
+#town .building[hidden] { display: none !important; }

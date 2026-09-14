@@ -500,6 +500,7 @@ def check_the_barrel_is_under_the_counter(page, name, fails):
     elif same:
         fails.append(f"{name}: the barrel paints the same as the shelf")
 
+    enter(page, "#barrel")
     # **It never sells out.** The shelf greys an entry after you buy it and
     # leaves it in place; the barrel must not, because you took a copy.
     live = page.locator("#barrel .wares:not(:disabled)")
@@ -807,6 +808,28 @@ def download_save(page):
     with page.expect_download(timeout=20000) as dl:
         page.click("#download")
     return dl.value.path()
+
+
+def enter(page, sel):
+    """**Open whichever building in the town holds `sel`.**
+
+    M21.14 turned the town into a street: seven buildings, one visible at a
+    time, so a check that reaches straight into `#quests` now reaches into
+    something `hidden`. This is the one door — and it is **derived from the
+    DOM** rather than from a list of which id lives in which building, which
+    would be a second copy of the markup and would go stale the first time a
+    panel moved. It does nothing outside a town and nothing for a selector
+    that is not in a building, so it is safe to call before anything.
+    """
+    page.evaluate("""(sel) => {
+      const el = document.querySelector(sel);
+      const b = el && el.closest && el.closest('#town .building');
+      if (!b) return;
+      const tab = [...document.querySelectorAll('#town-street .tab')]
+        .find((t) => t.textContent === b.dataset.name);
+      if (tab) tab.click();
+    }""", sel)
+    page.wait_for_timeout(60)
 
 
 def clear_screens(page):
@@ -2495,6 +2518,94 @@ def check_a_won_fight_offers_the_creature(page, name, fails, _base):
     print(f"ok: a won fight offers the creature, and the receipt reads at {px[0]:.0f}px")
 
 
+def check_the_town_is_a_street(page, name, fails, base):
+    """**Seven buildings, one open at a time.**
+
+    Asked for as *the town screen should be reworked to be more like a bunch of
+    tabs you can select from, and when you press the tab button, the
+    functionality for that system appears; so each tab can be presented as
+    another building in the town.*
+
+    Three things, and only a browser can say any of them: that the strip is
+    drawn, that pressing a tab actually swaps which panel is **laid out** — not
+    merely which has `hidden` on it, because `.stages > div { display: flex }`
+    beating `[hidden]` on specificity is a bug this project has shipped twice
+    — and that a building a town has not got is not on the street at all.
+    """
+    # **Planted beside the pit, and restored afterwards.** The two checks
+    # before this one plant a whole different run and put the walk back, so
+    # where the walk is standing by the time this runs is whatever those left —
+    # which is not a thing to step from. Its neighbours have said so in a
+    # `finally` since M12, and leaving it out cost a live walk once already.
+    def beside_the_pit(body):
+        strip_the_boards(body)
+        w = body.setdefault("world", {})
+        w["map"] = "west-bambulon"
+        w["at"] = [2, 18]
+        body.setdefault("character", {})["class"] = "Berserker"
+
+    plant(page, ROOT / "testing" / "saves" / "at-the-lip.json",
+          beside_the_pit, stem="street")
+    try:
+        _the_street(page, name, fails)
+    finally:
+        plant(page, base, lambda body: None, stem="street-restore")
+        clear_screens(page)
+
+
+def _the_street(page, name, fails):
+    clear_screens(page)
+    page.focus("#map")
+    page.keyboard.press("ArrowLeft")
+    page.wait_for_timeout(400)
+    if not page.is_visible("#town"):
+        fails.append(f"{name}: stepped onto the pit and no town opened")
+        clear_screens(page)
+        return
+    tabs = page.eval_on_selector_all(
+        "#town-street .tab", "e => e.map(t => t.textContent)")
+    if len(tabs) < 4:
+        fails.append(f"{name}: the street has {len(tabs)} buildings on it: {tabs}")
+        clear_screens(page)
+        return
+    # **Laid out, not merely un-hidden.** A panel with `display` set on it by a
+    # container rule stays laid out through `hidden`, which is what the
+    # `.screen.framed` collision was and what the area card's nought-pixel
+    # height was. So this measures.
+    def shown():
+        return page.eval_on_selector_all(
+            "#town .building",
+            "e => e.filter(b => b.getBoundingClientRect().height > 0)"
+            "      .map(b => b.dataset.name)")
+    first = shown()
+    if len(first) != 1:
+        fails.append(f"{name}: {len(first)} buildings are laid out at once: {first}")
+        clear_screens(page)
+        return
+    # **A tab that is not the one already open.** Which building a town opens
+    # on is kept across visits on purpose — a player working a bed wants the
+    # bed next time — so the last tab may well be the one showing, and pressing
+    # it is a no-op that reads as a broken strip. Found by writing the check.
+    want = next((t for t in tabs if t != first[0]), None)
+    if want is None:
+        fails.append(f"{name}: only one building on the street: {tabs}")
+        clear_screens(page)
+        return
+    page.locator("#town-street .tab", has_text=want).first.click()
+    page.wait_for_timeout(120)
+    then = shown()
+    if len(then) != 1:
+        fails.append(f"{name}: pressing a tab left {len(then)} laid out: {then}")
+    elif then == first:
+        fails.append(f"{name}: pressed {want!r} and the town still shows {then[0]!r}")
+    elif then[0] != want:
+        fails.append(f"{name}: pressed {want!r} and got {then[0]!r}")
+    else:
+        print(f"ok: the town is a street of {len(tabs)} buildings, one open at a "
+              f"time — {first[0]!r} then {then[0]!r}")
+    clear_screens(page)
+
+
 def check_the_counter_sells(page, name, fails, base):
     """**A shelf of your own, and a price that is a decision.**
 
@@ -2533,6 +2644,7 @@ def _the_counter(page, name, fails):
         fails.append(f"{name}: stepped onto the pit and no town opened")
         clear_screens(page)
         return
+    enter(page, "#stall-box")
     if not page.is_visible("#stall-box"):
         fails.append(f"{name}: the town has no counter on it")
         return
@@ -2662,6 +2774,7 @@ def _bank_sorts(page, name, fails):
                      f"(at [{pos['x']}, {pos['y']}], screens {up})")
         clear_screens(page)
         return
+    enter(page, "#bank-sort")
     opts = page.eval_on_selector_all("#bank-sort option", "e => e.map(o => o.value)")
     for want in ("slot", "kind", "set"):
         if want not in opts:
@@ -2756,6 +2869,7 @@ def check_the_bank_is_one_vault_in_every_town(page, name, fails):
             fails.append(f"{name}: the step onto the pit opened no town")
             return
 
+        enter(page, "#bank-bag")
         def top(el):
             return el.inner_text().split("\n")[0].strip()
 
@@ -3245,6 +3359,7 @@ def check_the_shelf_is_the_shelf(page, name, fails):
     """
     if page.query_selector("#reroll"):
         fails.append(f"{name}: the reroll button is still there")
+    enter(page, "#shelf")
     before = page.evaluate("""() => [...document.querySelectorAll('#shelf .wares')].map(b => ({
       name: b.querySelector('b').textContent,
       sold: b.classList.contains('sold'),
@@ -3299,6 +3414,7 @@ def check_the_errand_board(page, name, fails):
     for the same reason a skill node's is: somebody deciding whether to walk
     four streets for it is reading a number.
     """
+    enter(page, "#quests")
     got = page.evaluate("""() => [...document.querySelectorAll('#quests .wares')].map(b => ({
       name: b.querySelector('b')?.textContent ?? '',
       asks: b.querySelector('.spec')?.textContent ?? '',
@@ -3412,6 +3528,7 @@ def check_a_component_is_a_shape(page, name, fails):
             fails.append(f"{name}: {w['name']!r} says {w['meta']!r}, not slot and type")
 
     # And hovering one reads the component, not the item it might become.
+    enter(page, "#shelf")
     page.locator("#shelf .wares").first.hover()
     page.wait_for_selector("#piece-card", state="visible", timeout=4000)
     card = page.evaluate("""() => {
@@ -7980,6 +8097,7 @@ def walk_the_gate(browser, name, fails=None):
     check_a_trainer_takes_you_on(page, name, fails, path)
     check_the_bank_sorts(page, name, fails, path)
     check_the_counter_sells(page, name, fails, path)
+    check_the_town_is_a_street(page, name, fails, path)
     check_a_won_fight_offers_the_creature(page, name, fails, path)
     check_the_sands_read_the_other_way_round(page, name, fails, path)
     check_running_away_costs_you(page, name, fails, path)

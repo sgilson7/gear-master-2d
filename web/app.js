@@ -2696,6 +2696,53 @@ function openTown(id) {
   paintRun();
   paintStall();
   $('town').hidden = false;
+  // **After the panels, not before them.** A building whose whole content is
+  // hidden has no tab, and whether it is hidden is only settled once the thing
+  // that owns it has painted — the bed hides itself when the town has no bed,
+  // the errands box when the town wants nothing. The strip reads those flags
+  // rather than carrying a second list of which towns have what, which is the
+  // *second copy of what grids exist* failure one screen along.
+  paintStreet();
+}
+
+// ------------------------------------------------------------- the street
+//
+// **The town is a street of buildings.** Asked for: *the town screen should be
+// reworked to be more like a bunch of tabs you can select from, and when you
+// press the tab button, the functionality for that system appears; so each tab
+// can be presented as another building in the town, somewhat like the way gear
+// master 1 presents its towns.*
+//
+// Seven buildings, one visible at a time. Before this the town was every
+// system in the game stacked down one scrolling column — the market, the
+// barrel, the order book, the errands, the supplies, the bank, the bed, the
+// run and the counter, which by M21.8 was about nine screens of it.
+
+/// Which building is open. Kept across visits, because a player who is working
+/// a bed wants the bed next time and not the market — the same reason the
+/// bank's sort order is kept.
+let street = 'town-market';
+
+function paintStreet() {
+  const strip = $('town-street');
+  const all = [...document.querySelectorAll('#town .building')];
+  // **A building with nothing in it is not on the street.** Asked of the
+  // rendered panel rather than of a list of towns: every system already hides
+  // its own box when it is not here, so this reads `offsetParent`-free —
+  // `hidden` on the box, or no visible child at all.
+  const live = all.filter((b) => [...b.children].some((c) => !c.hidden));
+  if (!live.some((b) => b.id === street)) street = live[0]?.id ?? 'town-market';
+  strip.replaceChildren(...live.map((b) => {
+    const t = document.createElement('button');
+    t.type = 'button';
+    t.className = 'tab' + (b.id === street ? ' on' : '');
+    t.setAttribute('role', 'tab');
+    t.setAttribute('aria-selected', String(b.id === street));
+    t.textContent = b.dataset.name;
+    t.onclick = () => { street = b.id; paintStreet(); };
+    return t;
+  }));
+  for (const b of all) b.hidden = b.id !== street;
 }
 
 /// The bank: your bag on one shelf, the vault on the other.

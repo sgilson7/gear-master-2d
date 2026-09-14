@@ -484,7 +484,24 @@
             <div><dt>Fnorp</dt><dd id="town-gold">&mdash;</dd></div>
           </dl>
         </header>
+        <!-- **The town is a street.** Asked for: *the town screen should be
+             reworked to be more like a bunch of tabs you can select from, and
+             when you press the tab button, the functionality for that system
+             appears; so each tab can be presented as another building in the
+             town, somewhat like the way gear master 1 presents its towns.*
+
+             The strip is `.treetabs`, which is the skill tree's and the errand
+             log's — **a class rather than an id**, because a strip styled by id
+             is a strip the next screen that wants one does not get, which is
+             the `.made .tabs` scoping bug this project has already paid for.
+
+             Which buildings a town has is the *page's* question only in the
+             sense of which panels are on the screen: every one of them is
+             hidden by its own system when that system is not here, and the
+             strip reads those flags rather than carrying a second list. -->
+        <div id="town-street" class="treetabs" role="tablist"></div>
         <div class="stages">
+        <div class="building" id="town-market" data-name="The market">
         <h3 class="sub-h">What they have</h3>
         <div id="shelf" class="shelf"></div>
         <!-- The barrel. Its own heading and its own ground, because the shelf
@@ -509,18 +526,24 @@
           <div id="order-roll" class="rollbar" hidden></div>
           <div id="order-book" class="shelf"></div>
         </div>
+        </div>
+        <div class="building" id="town-guild" data-name="The guild">
         <!-- The errands. Hidden entirely where a town has none, rather than
              printing a heading over an empty box. -->
         <div id="errands" hidden>
           <h3 class="sub-h">What they want</h3>
           <div id="quests" class="shelf"></div>
         </div>
+        </div>
+        <div class="building" id="town-supplies" data-name="The chandler">
         <!-- Experience is only worth something where somebody can write it
              down. This is that place. -->
         <h3 class="sub-h">Supplies</h3>
         <div id="tins" class="shelf"></div>
         <h3 class="sub-h">What you are carrying</h3>
         <p id="carrying" class="note"></p>
+        </div>
+        <div class="building" id="town-bank" data-name="The bank">
         <!-- **The bank. One vault, and every town opens the same one** — so
              the heading names no town, and what is in it travels with you
              rather than with the place. Two shelves, because putting a thing
@@ -532,11 +555,22 @@
           like. Click something in your bag to put it in; click something in the
           bank to take it back out. Anything seated on one of your boards has to
           come off there first.</p>
+        <!-- **The ordering.** The options are built from the rows themselves
+             rather than written here: a stat the catalogue starts granting
+             turns up in this menu without anybody remembering to add it, which
+             is the same reason the recipe box and the pools panel are
+             derived. -->
+        <p class="note sortbar"><label for="bank-sort">Sort by</label>
+          <select id="bank-sort"></select></p>
+        <div id="bank-bag" class="shelf"></div>
+        <h4 class="sub-h">In the bank</h4>
+        <div id="bank-held" class="shelf"></div>
+
+        </div>
+        <div class="building" id="town-bed" data-name="The bed">
         <!-- **The bed.** Drawn by the same `Board` the retort is, because it
              is the same kind of thing: a mask that is not a rectangle, a bag of
-             things with footprints, and core deciding every placement. Hidden
-             where a town has no bed, which is no town today and is the honest
-             condition rather than a list of three. -->
+             things with footprints, and core deciding every placement. -->
         <div id="bed-box" hidden>
           <h3 class="sub-h">The bed</h3>
           <p class="note" id="bed-note"></p>
@@ -548,6 +582,8 @@
           </div>
           <p id="bed-says" class="says" hidden></p>
         </div>
+        </div>
+        <div class="building" id="town-run" data-name="The run">
         <!-- **The run.** The bed's sibling, drawn by the same `Board`. -->
         <div id="run-box" hidden>
           <h3 class="sub-h">The run</h3>
@@ -561,6 +597,8 @@
           </div>
           <p id="run-says" class="says" hidden></p>
         </div>
+        </div>
+        <div class="building" id="town-stall" data-name="The counter">
         <!-- **The Stall.** The bed's and the run's third sibling, and the one
              grid in the game where a `CATALOG` component is placed by shape
              outside the five worn frames. It comes from the tray and it goes
@@ -585,16 +623,7 @@
           </div>
           <p id="stall-says" class="says" hidden></p>
         </div>
-        <!-- **The ordering, for both shelves at once.** The options are built
-             from the rows themselves rather than written here: a stat the
-             catalogue starts granting turns up in this menu without anybody
-             remembering to add it, which is the same reason the recipe box and
-             the pools panel are derived. -->
-        <p class="note sortbar"><label for="bank-sort">Sort by</label>
-          <select id="bank-sort"></select></p>
-        <div id="bank-bag" class="shelf"></div>
-        <h4 class="sub-h">In the bank</h4>
-        <div id="bank-held" class="shelf"></div>
+        </div>
         </div><!-- /.stages -->
         <p id="town-says" class="says" hidden></p>
         <div class="actionbar">

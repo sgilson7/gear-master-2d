@@ -63,8 +63,9 @@ off it.*
 | # | milestone | deliverables | tests | commit | state |
 |---|---|---|---|---|---|
 | M21.0 | The seed drawer | `plot.rs` · `plot.json` · `seed_drawer` · the drop · 2 lints · 5 acceptance | 1,044 (+7) | `b53964e` | done |
-| M21.1 | The bed | bed masks ×3 · `Game::plant` · `plot::tick` · harvest · the screen | | | pending |
-| M21.2 | Companion planting | 28 pairs · adjacency · six ench seeds · 3 lints | | | pending |
+| M21.1 | The bed | bed masks ×3 · `Game::plant` · `plot::tick` · harvest · the screen · 6 acceptance | 1,044 | `2ab7c62` | done |
+| M21.6 | Six enchs from six games | 5 `Effect` kinds · **4 were mechanics the engine already had** · 3 entries (3 held for the Stall) | 1,053 (+9) | `6226982` | done · **moved before M21.2** |
+| M21.2 | Companion planting | 28 pairs · adjacency at harvest · 3 ench seeds · load lint · `every_pair_is_authored` | 1,053 | `6226982` | done |
 | M21.3 | The Grower | `SpecPower::Grower` · six nodes · the paper · the fork at two | | | pending |
 | M21.4 | The kennel, and the offer | `kennel.rs` · the offer at six wins · the feed · the yard · the screen | | | pending |
 | M21.5 | The second combatant | `simulate_party` · targeting · the tally · 28 pairs · the replay | | | pending · **deploy** |
@@ -74,4 +75,4 @@ off it.*
 | M21.9 | The Factor, and the four papers | `SpecPower::Factor` · six nodes · four cards · a second counter | | | pending |
 | M21.10 | The figures | 25 TikZ figures · `make art` · the palette lint | | | pending |
 | M21.11 | The gate, the walk, the deploy | 9 browser checks · `make play` · the glossary · `HANDOFF-M21.md` | | | pending · **deploy** |
-| notebook | rows open / closed | 0 / 2 | | | |
+| notebook | rows open / closed | 2 / 7 | | | |

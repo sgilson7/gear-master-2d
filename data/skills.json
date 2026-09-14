@@ -3837,6 +3837,100 @@
           }
         }
       ]
+    },
+    {
+      "id": "grower",
+      "name": "Grower",
+      "class": "Grower",
+      "nodes": [
+        {
+          "id": "gr-first-furrow",
+          "name": "The First Furrow",
+          "blurb": "Cut once, straight, before anything went in it. Everything since has been cut against it and nothing since has been straight.",
+          "cost": 1,
+          "requires": [],
+          "effect": {
+            "tunes": {
+              "knob": "yield_pct",
+              "by": 20
+            }
+          }
+        },
+        {
+          "id": "gr-second-bed",
+          "name": "A Second Bed",
+          "blurb": "There was always a second one. What there was not was anybody minding both, which is a different thing from land.",
+          "cost": 1,
+          "requires": [],
+          "effect": {
+            "tunes": {
+              "knob": "beds",
+              "by": 1
+            }
+          }
+        },
+        {
+          "id": "gr-forced-under-glass",
+          "name": "Forced Under Glass",
+          "blurb": "Warm, close, and a week early. Whatever it costs the thing to come up like that, it is not the grower who pays it.",
+          "cost": 2,
+          "requires": [
+            "gr-first-furrow"
+          ],
+          "effect": {
+            "tunes": {
+              "knob": "stages",
+              "by": -1
+            }
+          }
+        },
+        {
+          "id": "gr-the-long-row",
+          "name": "The Long Row",
+          "blurb": "Three more cells at the end of every bed, and the works has never once asked where the ground came from.",
+          "cost": 2,
+          "requires": [
+            "gr-second-bed"
+          ],
+          "effect": {
+            "tunes": {
+              "knob": "bed_cells",
+              "by": 3
+            }
+          }
+        },
+        {
+          "id": "gr-companion-thrice",
+          "name": "Companion, Thrice",
+          "blurb": "Corner to corner counts. Everybody who has said otherwise has been growing one thing at a time.",
+          "cost": 3,
+          "requires": [
+            "gr-forced-under-glass",
+            "gr-the-long-row"
+          ],
+          "effect": {
+            "tunes": {
+              "knob": "pairs_reach",
+              "by": 1
+            }
+          }
+        },
+        {
+          "id": "gr-whole-allotment",
+          "name": "The Whole Allotment",
+          "blurb": "All of it, all at once, and the season stopped being a thing that happened to you.",
+          "cost": 4,
+          "requires": [
+            "gr-companion-thrice"
+          ],
+          "effect": {
+            "tunes": {
+              "knob": "yield_pct",
+              "by": 30
+            }
+          }
+        }
+      ]
     }
   ]
 }

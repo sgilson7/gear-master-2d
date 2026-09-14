@@ -81,6 +81,21 @@
         10
       ],
       "hidden_until": "chair-done"
+    },
+    {
+      "at": [
+        2,
+        7
+      ],
+      "kind": "bench",
+      "id": "the-one-who-kept-planting",
+      "name": "a row of something, in the dark",
+      "prose": [
+        "Nine feet of silt with a row cut into it, and something is coming up out of the row. There is no light down here and there has not been for a long time.",
+        "The person kneeling at the end of it says the trick is that the season is not a thing that happens to you. They say it without looking up.",
+        "They sell nothing. What a grower has that nobody else does is what comes up between two rows, and it is not for sale."
+      ],
+      "teaches": "Grower"
     }
   ]
 }

@@ -282,7 +282,19 @@ fn at_of(shape: &Shape, at: (i8, i8)) -> Vec<(i8, i8)> {
 }
 
 /// What a harvest pays into the larder, per crop.
-pub const HARVEST_YIELD: u32 = 2;
+///
+/// **Four, and the first draft was two — which made the Grower's whole promise
+/// round to nothing.** `yield_pct` is 120 untuned, and `2 * 120 / 100` is two:
+/// the specialization paid exactly what everybody else got, and the test that
+/// found it read *a grower pulled 2 and everybody else pulls 2*. That is the
+/// `SPELL_MANA_COST` failure, which this project already has written down —
+/// *a percentage off three rounds to nothing* — with a crop in it instead of a
+/// cast.
+///
+/// Four gives the ladder room: 120% is five, and a finished tree's 170% is
+/// seven. The sum is rounded **the payer's way** in `Game::harvest`, which is
+/// what `ExpertPower::cast_price` does and for the same reason.
+pub const HARVEST_YIELD: u32 = 4;
 
 /// `3 cells` / `one cell`, for a refusal that says how big a thing is.
 pub fn size_of(cells: &[(i8, i8)]) -> String {
@@ -320,3 +332,48 @@ pub fn tick(beds: &mut std::collections::BTreeMap<String, Vec<Crop>>, stages: u8
         }
     }
 }
+
+/// Which cells count as touching, at a given reach.
+///
+/// **One is edge-on and two is edge-on and the corners.** The Grower's
+/// *Companion, Thrice* reads the adjacency table wider rather than adding a
+/// second one — the same move `Rule::Spread` made when a corner turned out to
+/// be the tightest spread this board allows.
+pub fn neighbours(reach: u32) -> Vec<(i8, i8)> {
+    let mut v = vec![(1, 0), (-1, 0), (0, 1), (0, -1)];
+    if reach >= 2 {
+        v.extend([(1, 1), (1, -1), (-1, 1), (-1, -1)]);
+    }
+    v
+}
+
+/// A bed with `extra` more cells in it.
+///
+/// **Placed by the mask rather than by the player**, in reading order inside
+/// the bounding box the mask already implies — so *The Long Row* gives the
+/// same three cells to everybody in the same town, and a node cannot become a
+/// second bed editor. Growing only, which is `resize_boards`'s rule one system
+/// along: a bed that got smaller would tip out whatever was standing in it.
+pub fn widened(mask: &[(i8, i8)], extra: u32) -> Vec<(i8, i8)> {
+    let mut out = mask.to_vec();
+    if extra == 0 || mask.is_empty() {
+        return out;
+    }
+    let w = mask.iter().map(|c| c.0).max().unwrap_or(0);
+    let h = mask.iter().map(|c| c.1).max().unwrap_or(0);
+    let mut added = 0;
+    // One row past the box as well, so a full rectangle can still be widened.
+    for y in 0..=(h + 1) {
+        for x in 0..=(w + 1) {
+            if added >= extra {
+                return out;
+            }
+            if !out.contains(&(x, y)) {
+                out.push((x, y));
+                added += 1;
+            }
+        }
+    }
+    out
+}
+

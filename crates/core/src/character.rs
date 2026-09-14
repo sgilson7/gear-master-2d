@@ -1344,6 +1344,25 @@ impl Character {
         self.classes().chain(self.specialization.as_deref())
     }
 
+    /// What the grower in you is worth, as the five numbers the bed reads.
+    ///
+    /// `(stages, beds, yield_pct, bed_cells, pairs_reach)`, and the Plot's own
+    /// defaults for everybody who is not one — so every caller adds it
+    /// unconditionally rather than branching on a class, which is how a power
+    /// ends up honoured in one of the five places it should be.
+    pub fn grower(&self) -> (u8, u32, i32, u32, u32) {
+        match self.specialization_def().map(|d| d.power) {
+            Some(crate::class::ClassPower::Grower {
+                stages,
+                beds,
+                yield_pct,
+                bed_cells,
+                pairs_reach,
+            }) => (stages.max(2), beds.max(1), yield_pct, bed_cells, pairs_reach.clamp(1, 2)),
+            _ => (crate::plot::STAGES, 1, 100, 0, 1),
+        }
+    }
+
     /// How many potions this character may have in them at once.
     ///
     /// **One for everybody, and a Chef's own number for a Chef** — so every

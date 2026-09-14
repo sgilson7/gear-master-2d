@@ -1301,11 +1301,28 @@ impl Game {
         for (id, _) in crate::data::MAPS {
             for p in crate::data::map(id, difficulty).places {
                 if p.id == town {
-                    return p.bed;
+                    let (_, _, _, extra, _) = self.character.grower();
+                    // **The Long Row is placed by the map, not by the player.**
+                    // A node that handed out cells the player chose would be a
+                    // second bed editor; the cells it adds are the ones the
+                    // mask's own bounding box has room for, taken in reading
+                    // order, so the same node gives the same three cells to
+                    // everybody in the same town.
+                    return crate::plot::widened(&p.bed, extra);
                 }
             }
         }
         Vec::new()
+    }
+
+    /// How many towns this character may have something growing in at once.
+    ///
+    /// **A bed is a place and this is a licence to use one.** The masks are in
+    /// the map files and every town has one; what the Grower buys is being
+    /// allowed to keep more than one going, which is the difference between a
+    /// bed and a plot.
+    pub fn beds_allowed(&self) -> u32 {
+        self.character.grower().1
     }
 
     /// Plant one seed out of the drawer, or say why not.
@@ -1334,6 +1351,27 @@ impl Game {
         let mask = self.bed_mask(town, difficulty);
         if mask.is_empty() {
             return Err("There is no bed here.".into());
+        }
+        // **One bed at a time, unless you are a Grower.** Counted over towns
+        // that have something in them rather than over crops, because the
+        // licence is to work a *bed*.
+        let working: Vec<&String> = self
+            .character
+            .beds
+            .iter()
+            .filter(|(t, cs)| !cs.is_empty() && t.as_str() != town)
+            .map(|(t, _)| t)
+            .collect();
+        if working.len() as u32 >= self.beds_allowed() {
+            return Err(format!(
+                "You have a row going at {}, and you can only keep {}.",
+                working.iter().map(|s| s.replace('-', " ")).collect::<Vec<_>>().join(" and "),
+                if self.beds_allowed() == 1 {
+                    "one".to_string()
+                } else {
+                    format!("{}", self.beds_allowed())
+                },
+            ));
         }
         let want = crate::plot::harvest_cells(plot, seed, at, turn);
         let taken: Vec<(i8, i8)> = self
@@ -1374,6 +1412,10 @@ impl Game {
         at: (i8, i8),
     ) -> Result<(String, u32), String> {
         let plot = crate::data::plot();
+        // **Read before the bed is borrowed**, which is the borrow checker
+        // saying the same thing `map_for` says about the game: resolve what you
+        // need from the character first, then take the one mutable handle.
+        let (stages, _, yield_pct, _, reach) = self.character.grower();
         let Some(crops) = self.character.beds.get_mut(town) else {
             return Err("There is nothing in this bed.".into());
         };
@@ -1381,9 +1423,9 @@ impl Game {
         else {
             return Err("There is nothing there.".into());
         };
-        if !crops[i].ready() {
+        if crops[i].stage + 1 < stages {
             let c = &crops[i];
-            let left = crate::plot::STAGES - 1 - c.stage;
+            let left = stages - 1 - c.stage;
             return Err(format!(
                 "It is not up yet. {} more.",
                 if left == 1 { "One win".into() } else { format!("{left} wins") }
@@ -1398,14 +1440,15 @@ impl Game {
         let touching: Vec<String> = crops
             .iter()
             .enumerate()
-            .filter(|(j, o)| *j != i && o.ready())
+            .filter(|(j, o)| *j != i && o.stage + 1 >= stages)
             .filter(|(_, o)| {
                 let theirs = crate::plot::cells_of(plot, o);
-                mine.iter().any(|&(x, y)| {
-                    [(1, 0), (-1, 0), (0, 1), (0, -1)]
-                        .iter()
-                        .any(|(dx, dy)| theirs.contains(&(x + dx, y + dy)))
-                })
+                // **`pairs_reach` is edge-on, or edge-on and the corners.** The
+                // Grower's *Companion, Thrice* is the adjacency table read
+                // wider rather than a second table, which is the same move
+                // `Rule::Spread` made when it turned out a corner is the
+                // tightest spread this board allows.
+                mine.iter().any(|&(x, y)| crate::plot::neighbours(reach).iter().any(|(dx, dy)| theirs.contains(&(x + dx, y + dy))))
             })
             .map(|(_, o)| o.seed.clone())
             .collect();
@@ -1429,6 +1472,11 @@ impl Game {
                 crate::plot::Yield::EnchSeed(id) => enchs.push(id.clone()),
             }
         }
+        // **The Grower's share, applied last and to the whole.** A hundred for
+        // everybody else, so this line is the same line it was.
+        // **Rounded the payer's way**, which is `ExpertPower::cast_price`'s rule:
+        // a percentage that floors is a percentage a player cannot see moving.
+        let n = (((n as i32 * yield_pct) + 99) / 100).max(1) as u32;
         for _ in 0..n {
             self.character.gather(&def.crop);
         }

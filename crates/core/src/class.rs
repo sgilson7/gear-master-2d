@@ -429,6 +429,24 @@ pub enum ClassPower {
     /// `Held`, which is the one door *what you are already holding* goes
     /// through, and two potions are two lots of the same addition.
     Chef { draughts: u32 },
+    /// Crops come up in `stages` wins; you keep `beds` of them; a harvest is
+    /// `yield_pct` of what it would be; every bed has `bed_cells` more; and a
+    /// pair counts `pairs_reach` cells out.
+    ///
+    /// **The Plot's specialization, and the reason the Plot's clock is a
+    /// constant.** `plot::STAGES` is three because seven is a session at a new
+    /// player's pace — and *Forced Under Glass* takes it to two, which is the
+    /// whole of what this class is bought for. A specialization whose first
+    /// real node does not move the thing the system is about is a specialization
+    /// nobody takes.
+    ///
+    /// **It touches no fight at all**, like the other two, and `combat.rs` has
+    /// an arm saying so.
+    ///
+    /// `ClassPower` and not the plan's `SpecPower`: there is no such type, and
+    /// a second power enum would be a second exhaustive match in every place
+    /// that already has one.
+    Grower { stages: u8, beds: u32, yield_pct: i32, bed_cells: u32, pairs_reach: u32 },
     /// A creature whose maximum health you have eaten down to `third` percent
     /// of what it was is unmade — dead, whatever is still in it.
     ///
@@ -609,7 +627,7 @@ impl ClassPower {
             // **Nor is a specialization**, for the same two reasons: it is
             // taken off a tree rather than poured, and there is no fountain in
             // this game to pour one at.
-            Apothecary { .. } | Chef { .. } => return None,
+            Apothecary { .. } | Chef { .. } | Grower { .. } => return None,
             // **Both doublable, and each doubles the thing it is about.** The
             // Stoker's is the shovel — twice as many points a tick — rather
             // than the clock, because a furnace stoked twice as often is a
@@ -681,6 +699,9 @@ impl ClassPower {
             ClassPower::Whisperer { .. } => &["third"],
             ClassPower::Apothecary { .. } => &["potency_pct", "extra"],
             ClassPower::Chef { .. } => &["draughts"],
+            ClassPower::Grower { .. } => {
+                &["stages", "beds", "yield_pct", "bed_cells", "pairs_reach"]
+            }
             // **An expert's knobs are its own**, asked through the arm that
             // wraps it rather than duplicated here.
             ClassPower::Expert(e) => e.knobs(),
@@ -733,6 +754,36 @@ impl ClassPower {
                 "draughts" => ClassPower::Chef { draughts: (draughts as i32 + by).max(1) as u32 },
                 _ => self,
             },
+            ClassPower::Grower { stages, beds, yield_pct, bed_cells, pairs_reach } => {
+                match knob {
+                    // **Never below two.** A crop that came up the moment it
+                    // was planted would make the bed a button rather than a
+                    // clock, and the clock is what the whole system is.
+                    "stages" => ClassPower::Grower {
+                        stages: (stages as i32 + by).max(2) as u8,
+                        beds, yield_pct, bed_cells, pairs_reach,
+                    },
+                    "beds" => ClassPower::Grower {
+                        stages, beds: (beds as i32 + by).max(1) as u32,
+                        yield_pct, bed_cells, pairs_reach,
+                    },
+                    "yield_pct" => ClassPower::Grower {
+                        stages, beds, yield_pct: (yield_pct + by).max(0), bed_cells, pairs_reach,
+                    },
+                    // A bed that got smaller would tip out whatever was
+                    // growing in it, which is `resize_boards`'s rule one
+                    // system along: this only ever grows.
+                    "bed_cells" => ClassPower::Grower {
+                        stages, beds, yield_pct,
+                        bed_cells: (bed_cells as i32 + by).max(0) as u32, pairs_reach,
+                    },
+                    "pairs_reach" => ClassPower::Grower {
+                        stages, beds, yield_pct, bed_cells,
+                        pairs_reach: (pairs_reach as i32 + by).clamp(1, 2) as u32,
+                    },
+                    _ => self,
+                }
+            }
             ClassPower::Stoker { every_ms, per_stack } => match knob {
                 // **Clamped at a tick, because a furnace that stokes faster
                 // than the clock is a furnace that stokes every tick** — and
@@ -774,6 +825,9 @@ impl ClassPower {
                 format!("+{potency_pct}% on every brew, and {extra} more cells of glass")
             }
             ClassPower::Chef { draughts } => format!("{draughts} potions in one fight"),
+            ClassPower::Grower { stages, yield_pct, .. } => {
+                format!("a crop up in {} wins, paying {yield_pct}%", stages.saturating_sub(1))
+            }
             ClassPower::Stoker { every_ms, per_stack } => format!(
                 "burn {per_stack} of your biggest pool every {:.1}s",
                 every_ms as f32 / 1000.0
@@ -862,6 +916,27 @@ impl ClassPower {
             // player is counting. TONE 13a: unthemed, with the figure in it.
             ClassPower::Chef { draughts } => format!(
                 "You may have {draughts} potions in you at once, where everybody else has one."
+            ),
+            // **Every number, and none of them compared to a default.** A first
+            // draft read *"after 2 wins instead of 2"* for the untuned power,
+            // which is a sentence that says nothing twice — the promise is what
+            // you get, and what everybody else gets belongs on the glossary's
+            // Plot shelf rather than inside a class's own line.
+            //
+            // **And it does not say `harvest`**, which is a theme's word for
+            // the nature pool. `no_knob_or_line_speaks_a_word_a_theme_would
+            // _produce` caught it on the first run, which is the lint doing
+            // exactly what it was written for: this sentence is read before an
+            // irreversible choice and a number wearing a joke has to be
+            // translated first.
+            ClassPower::Grower { stages, beds, yield_pct, bed_cells, pairs_reach } => format!(
+                "A crop is up {} wins after you plant it, you work {}, a row pays \
+                 {yield_pct}% of what it would, every bed has {bed_cells} more \
+                 {}, and two crops count as neighbours {} cells out.",
+                stages.saturating_sub(1),
+                if beds == 1 { "one bed".to_string() } else { format!("{beds} beds") },
+                if bed_cells == 1 { "cell" } else { "cells" },
+                pairs_reach,
             ),
             // **No stacks.** Upstream handed the same class out over and over
             // and a promise had to say what a second one bought; GM2D asks
@@ -1168,6 +1243,22 @@ pub static CLASSES: &[ClassDef] = &[
         power: ClassPower::Chef { draughts: 2 },
     },
     ClassDef {
+        name: "Grower",
+        blurb: "Everything in the row came up because somebody put it there.",
+        // Non-empty for the Apothecary's reason, two entries up.
+        requires: &[(Axis::Attunement, 25), (Axis::Ward, 25)],
+        // **Untuned is what everybody already has**, except the yield, which is
+        // the promise somebody takes it for. A specialization whose base is the
+        // same as no specialization is a paper with nothing on it.
+        power: ClassPower::Grower {
+            stages: crate::plot::STAGES,
+            beds: 1,
+            yield_pct: 120,
+            bed_cells: 0,
+            pairs_reach: 1,
+        },
+    },
+    ClassDef {
         name: "Berserker",
         blurb: "Rage, and something heavy to spend it on.",
         requires: &[(Axis::Wrath, 40), (Axis::Brutality, 40)],
@@ -1458,7 +1549,7 @@ pub const OFFERED: &[&str] =
 /// `expert::EXPERTS`, so no pair reaches it and it pairs with nothing; and it
 /// is not in `Character::classes`, because everything that reads that list
 /// reads it to ask *which pair are you* and the answer must not change.
-pub const SPECIALIZATIONS: &[&str] = &["Apothecary", "Chef"];
+pub const SPECIALIZATIONS: &[&str] = &["Apothecary", "Chef", "Grower"];
 
 /// `a Chef`, `an Apothecary` — the article a name actually takes.
 ///

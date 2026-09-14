@@ -204,3 +204,73 @@ fn nobody_is_a_apothecary() {
     let why = g.train("Chef").unwrap_err();
     assert!(why.contains("an Apothecary"), "{why}");
 }
+
+/// **Every node of a specialization's tree tunes that specialization's own
+/// bench, and nothing else.**
+///
+/// `expert_nodes_touch_only_the_expert`'s rule read across. A `+12 strength`
+/// node would be a node you could take without noticing what you are — and a
+/// specialization is *one slot, for ever*, so its tree is the argument for its
+/// own promise six nodes long, more than an expert's is.
+///
+/// Asked over `SPECIALIZATIONS` rather than a list of three, for the reason
+/// every completeness lint here is.
+#[test]
+fn spec_nodes_touch_only_their_bench() {
+    let tree = data::skills();
+    let mut bad = Vec::new();
+    for class in SPECIALIZATIONS {
+        let power = gm2d_core::class::CLASSES
+            .iter()
+            .find(|c| c.name == *class)
+            .unwrap_or_else(|| panic!("{class} is in SPECIALIZATIONS and not in CLASSES"))
+            .power;
+        let t = tree
+            .trees
+            .iter()
+            .find(|t| t.class.as_deref() == Some(*class))
+            .unwrap_or_else(|| panic!("{class} has no tree"));
+        assert!(!t.nodes.is_empty(), "{class}'s tree is empty");
+        for n in &t.nodes {
+            for e in &n.effects {
+                match e {
+                    gm2d_core::skills::Effect::Tunes { knob, .. } => {
+                        if !power.knobs().contains(&knob.as_str()) {
+                            bad.push(format!("{}: {knob:?} is not {class}'s", n.id));
+                        }
+                    }
+                    other => bad.push(format!("{}: {other:?} is not a tuning", n.id)),
+                }
+            }
+        }
+    }
+    assert!(bad.is_empty(), "{bad:#?}");
+}
+
+/// **Every point in a specialization's tree buys something**, which is
+/// `every_point_in_an_expert_tree_buys_something` one system along.
+///
+/// A knob whose default the tree never moves off is a point sold for nothing —
+/// thirty-eight expert nodes shipped that way for two milestones.
+#[test]
+fn every_point_in_a_spec_tree_buys_something() {
+    let tree = data::skills();
+    for class in SPECIALIZATIONS {
+        let base = gm2d_core::class::CLASSES.iter().find(|c| c.name == *class).unwrap().power;
+        let t = tree.trees.iter().find(|t| t.class.as_deref() == Some(*class)).unwrap();
+        for n in &t.nodes {
+            let mut after = base;
+            for e in &n.effects {
+                if let gm2d_core::skills::Effect::Tunes { knob, by } = e {
+                    after = after.tune(knob, *by);
+                }
+            }
+            assert_ne!(
+                format!("{:?}", after),
+                format!("{:?}", base),
+                "{}: a point in {class}'s tree that changes nothing",
+                n.id
+            );
+        }
+    }
+}

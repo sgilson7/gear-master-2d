@@ -286,6 +286,11 @@ fn a_crop_grows_one_stage_per_win_anywhere() {
     let mut g = a_fighter(0x5EED_0000_B3D0_0004);
     g.character.pocket_seed("cairn-dust-seed");
     g.character.pocket_seed("cairn-dust-seed");
+    // **A Grower, because everybody else keeps one bed.** What this is asking
+    // is whether the bell reaches *every* bed, which needs two of them — and
+    // two beds is what `A Second Bed` is for.
+    g.train("Grower").expect("somebody teaches it");
+    g.character.skills_taken.push("gr-second-bed".into());
     g.plant("kettleworks", "cairn-dust-seed", (0, 0), 0, D).expect("one at the works");
     g.plant("the-third-town", "cairn-dust-seed", (0, 1), 0, D).expect("one down there");
     let stage = |g: &Game, t: &str| g.character.beds[t][0].stage;
@@ -308,8 +313,8 @@ fn a_crop_grows_one_stage_per_win_anywhere() {
         let log = fight::run(&g, D).expect("a fight");
         fight::settle(&mut g, &log, D).expect("it settles");
     }
-    assert_eq!(stage(&g, "kettleworks"), STAGES - 1, "a crop grew past ready");
-    assert!(g.character.beds["kettleworks"][0].ready());
+    let stages = g.character.grower().0;
+    assert_eq!(stage(&g, "kettleworks"), stages - 1, "a crop grew past ready");
 }
 
 /// A harvest fills the larder, and an unripe one is refused with the count.
@@ -513,4 +518,100 @@ fn an_ench_seed_harvests_an_ench() {
     g.harvest("the-third-town", spot.0).expect("it comes up");
     let after = g.character.enchs_owned.iter().filter(|e| **e == want).count();
     assert_eq!(after, before + 1, "{want} did not reach the rack");
+}
+
+// ------------------------------------------------------------------ the Grower
+
+/// **Forced Under Glass harvests at two**, which is what the specialization is
+/// bought for.
+///
+/// `plot::STAGES` is three because seven is a session at a new player's pace;
+/// this node is the reason that number is a constant with a knob on it rather
+/// than a number somebody argued about.
+#[test]
+fn forced_under_glass_harvests_at_two() {
+    let mut g = a_fighter(0x5EED_0000_6207_0001);
+    g.character.pocket_seed("cairn-dust-seed");
+    g.plant("the-third-town", "cairn-dust-seed", (0, 1), 0, D).expect("it goes in");
+
+    g.train("Grower").expect("somebody teaches it");
+    for n in ["gr-first-furrow", "gr-forced-under-glass"] {
+        g.character.skills_taken.push(n.to_string());
+    }
+    assert_eq!(g.character.grower().0, STAGES - 1, "the glass did not come off a stage");
+
+    // One win short of the ordinary three, and it is up.
+    for _ in 0..(STAGES - 2) {
+        g.character.fatigue = 0;
+        g.encounter = Some(fight::Encounter { enemy: "Cave Rat".into(), at: [1, 18] });
+        let log = fight::run(&g, D).expect("a fight");
+        fight::settle(&mut g, &log, D).expect("it settles");
+    }
+    g.harvest("the-third-town", (0, 1)).expect("a grower's row is up a win early");
+}
+
+/// **A second bed is two towns**, and one bed is one.
+#[test]
+fn a_second_bed_is_two_towns() {
+    let mut g = a_fighter(0x5EED_0000_6207_0002);
+    for _ in 0..2 {
+        g.character.pocket_seed("cairn-dust-seed");
+    }
+    g.plant("the-third-town", "cairn-dust-seed", (0, 1), 0, D).expect("the first row");
+    // Everybody else keeps one.
+    let why = g.plant("kettleworks", "cairn-dust-seed", (0, 0), 0, D).unwrap_err();
+    assert!(why.contains("only keep"), "{why}");
+    assert_eq!(g.character.seeds_held("cairn-dust-seed"), 1, "a refusal took the seed");
+
+    g.train("Grower").expect("somebody teaches it");
+    g.character.skills_taken.push("gr-second-bed".into());
+    assert_eq!(g.beds_allowed(), 2);
+    g.plant("kettleworks", "cairn-dust-seed", (0, 0), 0, D).expect("a grower keeps two");
+    assert_eq!(g.character.beds.len(), 2);
+}
+
+/// **The Long Row is placed by the map**, so the same node gives the same cells
+/// to everybody in the same town — and a bed only ever grows.
+#[test]
+fn the_long_row_is_placed_by_the_map() {
+    let mut g = a_fighter(0x5EED_0000_6207_0003);
+    let before = g.bed_mask("kettleworks", D);
+    g.train("Grower").expect("somebody teaches it");
+    g.character.skills_taken.push("gr-second-bed".into());
+    g.character.skills_taken.push("gr-the-long-row".into());
+    let after = g.bed_mask("kettleworks", D);
+    assert_eq!(after.len(), before.len() + 3, "the long row added {} cells", after.len() - before.len());
+    // **Only ever grows**: every cell that was there is still there.
+    for c in &before {
+        assert!(after.contains(c), "the bed lost {c:?}");
+    }
+    // And it is the same three cells every time, which is what *placed by the
+    // map* means.
+    assert_eq!(after, g.bed_mask("kettleworks", D));
+}
+
+/// **A grower's row pays more**, which is the one knob that is not a default.
+#[test]
+fn a_growers_row_pays_more() {
+    let pull = |grower: bool| -> u32 {
+        let mut g = a_fighter(0x5EED_0000_6207_0004);
+        if grower {
+            g.train("Grower").expect("somebody teaches it");
+        }
+        g.character.pocket_seed("cairn-dust-seed");
+        g.plant("the-third-town", "cairn-dust-seed", (0, 1), 0, D).expect("it goes in");
+        for _ in 0..(STAGES - 1) {
+            g.character.fatigue = 0;
+            g.encounter = Some(fight::Encounter { enemy: "Cave Rat".into(), at: [1, 18] });
+            let log = fight::run(&g, D).expect("a fight");
+            fight::settle(&mut g, &log, D).expect("it settles");
+        }
+        let before = g.character.in_larder("cairn-dust");
+        g.harvest("the-third-town", (0, 1)).expect("it comes up");
+        g.character.in_larder("cairn-dust") - before
+    };
+    let plain = pull(false);
+    let grown = pull(true);
+    assert_eq!(plain, gm2d_core::plot::HARVEST_YIELD);
+    assert!(grown > plain, "a grower pulled {grown} and everybody else pulls {plain}");
 }

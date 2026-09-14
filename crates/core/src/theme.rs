@@ -432,6 +432,7 @@ pub static TURTLE_DICK: Theme = Theme {
         // what a specialization is.
         ("Apothecary", "Kettle Chemist"),
         ("Chef", "Kettle Cook"),
+        ("Grower", "Kettle Gardener"),
         ("Avenged", "Sprocket Avenged"),
         ("Wanderer", "Plane Tourist"),          // half-tourist, half-catastrophe
         ("Warpriest", "Acolyte of Dobira"),     // the Master and Baylon, pp. 46-50

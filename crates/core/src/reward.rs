@@ -138,7 +138,8 @@ pub fn bounty_with_class(
             // the larder, one function along in `pay_a_win`, because an
             // ingredient is not money and was never in `bounty`.
             | ClassPower::Apothecary { .. }
-            | ClassPower::Chef { .. } => {}
+            | ClassPower::Chef { .. }
+            | ClassPower::Grower { .. } => {}
             ClassPower::Showstopper { pct: more, under_ms } => {
                 if duration_ms < under_ms {
                     pct += more;

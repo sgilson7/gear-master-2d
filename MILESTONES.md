@@ -76,3 +76,27 @@ off it.*
 | M21.10 | The figures | 25 TikZ figures · `make art` · the palette lint | | | pending |
 | M21.11 | The gate, the walk, the deploy | 9 browser checks · `make play` · the glossary · `HANDOFF-M21.md` | | | pending · **deploy** |
 | notebook | rows open / closed | 2 / 7 | | | |
+
+### after M21.8 — the counter
+
+| milestone | what it is | tests | Δ | commit |
+|---|---|---|---|---|
+| M21.0 | the seed drawer, and eight seeds | 1,013 | +9 | `9bcbfb1` |
+| M21.1 | the bed, and a crop that turns | 1,022 | +9 | `2ab7c62` |
+| M21.6 | six enchs, four of which the engine already had | 1,029 | +7 | `6226982` |
+| M21.2 | twenty-eight companion pairs | 1,029 | — | `6226982` |
+| M21.3 | the Grower, and a percentage that rounded to nothing | 1,034 | +5 | `f535c38` |
+| M21.4 | the kennel, the offer, the feed and the yard | 1,046 | +12 | `1e502ec` |
+| M21.5 | a creature out fights, as gear, capped at the region | 1,053 | +7 | `572796d` |
+| M21.7 | the Handler | 1,053 | — | `1d13985` |
+| M21.12 | the offer is reachable, and the result screen is legible | 1,053 | — | `1d13985` |
+| M21.13 | an ingredient is a roll at 250‰, not a certainty | 1,055 | +2 | `1d13985` |
+| **M21.8** | **the counter, eight buyers and twenty-eight bargains** | **1,069** | **+14** | **`1d13985`** |
+| M21.9 | the Factor | pending | | |
+| M21.10 | twenty-five figures | pending | | |
+| M21.11 | gate, walk, glossary, deploy | pending | | |
+| M21.14 | the town is a street | pending | | |
+| M21.16 | an errand for every bench | pending | | |
+
+Browser gate: **104 `ok:` lines**, chromium. Suite green in **99 binaries**.
+Notebook: **29 rows, 22 closed, 7 open.**

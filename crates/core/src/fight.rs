@@ -497,10 +497,19 @@ pub fn settle(game: &mut Game, log: &CombatLog, difficulty: Difficulty) -> Optio
     // to have some fights drink a potion and some not, invisibly, is to put the
     // spending beside the tiring. **A rout deliberately does not reach here**,
     // and must not — nothing was fought, so nothing was drunk.
-    let drunk = game.character.drunk.take().and_then(|id| {
-        crate::data::brews().brews.iter().find(|d| d.id() == id).map(|d| d.name.clone())
-    });
-    if let Some(name) = drunk {
+    // **All of them, because a Chef may have had more than one.** Taken in one
+    // go for the reason the line is here at all: the way not to have some
+    // fights spend a potion and some not, invisibly, is to put the spending
+    // beside the tiring.
+    let had = std::mem::take(&mut game.character.drunk);
+    let brews = crate::data::brews();
+    for id in &had {
+        let name = brews
+            .brews
+            .iter()
+            .find(|d| d.id() == *id)
+            .map(|d| d.name.clone())
+            .unwrap_or_else(|| id.clone());
         receipt.push(format!("You had drunk {name}, and it is gone."));
     }
 

@@ -319,6 +319,8 @@ fn sealed(id: &str, wants: &[&str]) -> PlaceDef {
         prose: Vec::new(),
         hidden_until_level: None,
         sells: Vec::new(),
+        teaches: None,
+        stocks: Vec::new(),
         guards: None,
         needs_level: None,
         floors: Vec::new(),

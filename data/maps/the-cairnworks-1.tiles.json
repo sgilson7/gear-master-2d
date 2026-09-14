@@ -63,6 +63,23 @@
         "the-unslaked-kiln"
       ],
       "shut": "The hatch is under whatever is standing on the plate, and it is standing on it."
+    },
+    {
+      "at": [
+        2,
+        1
+      ],
+      "kind": "bench",
+      "id": "the-ninth-surveyors-sister",
+      "name": "a bench against the kiln wall",
+      "prose": [
+        "Somebody has set a bench where the wall is warmest and worked there long enough to wear a dish into it.",
+        "There are nine glasses in a row and eight of them are empty. She pours the ninth back into the first and starts again, and asks whether you have come down here to watch or to learn."
+      ],
+      "teaches": "Apothecary",
+      "stocks": [
+        "the-ninth-distillate"
+      ]
     }
   ],
   "regions": [

@@ -6936,7 +6936,13 @@ pub fn simulate_party_holding(
             // other thing you walk in already holding. The arm exists so that
             // adding a specialization is a decision about combat rather than a
             // silence.
-            crate::class::ClassPower::Apothecary { .. } => {}
+            // **Neither specialization is combat's**, and this arm is why
+            // adding one is a decision rather than a silence. The Apothecary is
+            // read in `Character::boon` and `Game::retort`; the Chef in
+            // `fight::pay_a_win` and `Game::brew`. Both reach a fight only
+            // through what you drank before the bell, which is `Held`.
+            crate::class::ClassPower::Apothecary { .. }
+            | crate::class::ClassPower::Chef { .. } => {}
             crate::class::ClassPower::SlowTime(n) => start_player.slow_time = n,
             crate::class::ClassPower::Overflowing(n) => start_player.overflowing = n,
             crate::class::ClassPower::Leeching(pct) => start_player.leech = pct,

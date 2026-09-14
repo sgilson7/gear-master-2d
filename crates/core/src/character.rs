@@ -35,6 +35,32 @@ use crate::piece::{PieceId, PieceRegistry, SlotKind, CATALOG};
 use crate::slot::{PlaceError, SLOT_W};
 use crate::stats::Stats;
 
+/// Read a list that used to be a single value, or nothing.
+///
+/// **Written for `Character::drunk`**, which was `Option<String>` until the
+/// Chef made *how many potions you may have in you* a number. A save taken
+/// between brewing and the next fight carries the old shape, and serde would
+/// refuse the whole file over it rather than defaulting — the one failure mode
+/// worse than losing the field. Both shapes read; only the list is ever
+/// written.
+pub(crate) fn one_or_many<'de, D>(d: D) -> Result<Vec<String>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    #[derive(serde::Deserialize)]
+    #[serde(untagged)]
+    enum Shape {
+        One(String),
+        Many(Vec<String>),
+        None,
+    }
+    Ok(match <Shape as serde::Deserialize>::deserialize(d)? {
+        Shape::One(s) => vec![s],
+        Shape::Many(v) => v,
+        Shape::None => Vec::new(),
+    })
+}
+
 // **`STARTER` and `seat` are deleted, not kept.** They were an *arrangement*:
 // eleven components with a cell and a rotation each, seated onto the board by
 // `apply_preset`. The kit has been two components given into the bag since M7
@@ -299,13 +325,25 @@ pub struct Character {
     /// the tins.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub potions: Vec<String>,
-    /// The one you have drunk, which lands at the next bell and is gone after.
+    /// What you have drunk, which lands at the next bell and is gone after.
     ///
     /// **Held rather than applied**, because *before any fight* is a decision
     /// and a decision needs a moment: the boon is read out of here at the bell
     /// and `fight::settle` clears it beside the line that charges the fatigue.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub drunk: Option<String>,
+    ///
+    /// **A list since the Chef**, whose whole promise is *multiple potions per
+    /// fight*. `Character::draughts` is how many may be in here — one for
+    /// everybody else, so the cap is asked unconditionally and the old
+    /// behaviour is the `1` case rather than a branch.
+    ///
+    /// **It reads a lone string too**, which is what this field was and what a
+    /// save taken between brewing and the next fight still carries. Without
+    /// `one_or_many` such a file would be *refused*, which is much the worst
+    /// outcome available for a field that is absent from almost every save —
+    /// *a field carried across a build change is a field that will arrive
+    /// wrong, and the loader is where that is caught.*
+    #[serde(default, deserialize_with = "one_or_many", skip_serializing_if = "Vec::is_empty")]
+    pub drunk: Vec<String>,
     /// The one specialization, if it has been taken.
     ///
     /// **Its own slot and not a fourth entry in `classes`.** Everything that
@@ -377,7 +415,7 @@ impl Character {
             larder: Default::default(),
             retort: Vec::new(),
             potions: Vec::new(),
-            drunk: None,
+            drunk: Vec::new(),
             specialization: None,
             undo_stack: Vec::new(),
         }
@@ -1258,6 +1296,39 @@ impl Character {
                 (potency_pct, extra)
             }
             _ => (0, 0),
+        }
+    }
+
+    /// Every tree this character may spend a point in, by class name.
+    ///
+    /// **`classes()` plus the specialization, and deliberately a second
+    /// function rather than a wider `classes()`.** Everything that walks
+    /// `classes()` walks it to ask *which pair are you* — the expert table, the
+    /// second fork, the portrait, the purse, the bell — and a specialization
+    /// pairs with nothing, so putting it there would change the answer to a
+    /// question it has no opinion about. What a *tree tab* asks is a different
+    /// question, and this is it.
+    ///
+    /// **Without this the Apothecary's eight nodes were undrawable.** The tree
+    /// screen filters on `classes()`, so even a character who somehow had the
+    /// specialization set could not spend a point in it — the other half of the
+    /// same bug as there being no way to become one, and the half that would
+    /// have survived fixing only the first.
+    pub fn spendable_trees(&self) -> impl Iterator<Item = &str> {
+        self.classes().chain(self.specialization.as_deref())
+    }
+
+    /// How many potions this character may have in them at once.
+    ///
+    /// **One for everybody, and a Chef's own number for a Chef** — so every
+    /// caller asks this unconditionally rather than branching on a class,
+    /// which is how a power ends up honoured in one of the two places it
+    /// should be. The floor is `1` and the tree can only raise it, so being a
+    /// Chef is never worse than not being one.
+    pub fn draughts(&self) -> u32 {
+        match self.specialization_def().map(|d| d.power) {
+            Some(crate::class::ClassPower::Chef { draughts }) => draughts.max(1),
+            _ => 1,
         }
     }
 
@@ -2166,17 +2237,25 @@ impl Character {
     /// makes it worth spending a rare one on a good pair rather than on any
     /// pair.
     pub fn boon(&self) -> crate::brew::Gives {
-        let Some(id) = self.drunk.as_deref() else { return crate::brew::Gives::default() };
-        let brews = crate::data::brews();
-        let Some(def) = brews.brews.iter().find(|d| d.id() == id) else {
+        if self.drunk.is_empty() {
             return crate::brew::Gives::default();
-        };
+        }
+        let brews = crate::data::brews();
         // **And the apothecary's own.** Read fresh off the specialization, so
         // taking a point in the Apothecary's tree improves the potion you are
         // already carrying — which is the *derived, never banked* rule, and is
         // also the only version anybody would expect.
         let (mine, _) = self.apothecary();
-        def.gives.scaled(def.ink_pct + mine)
+        // **Every draught, summed.** One for everybody; a Chef's own number for
+        // a Chef, whose whole promise is that there is more than one. Two
+        // potions are two lots of the same addition, which is why this needed
+        // no new combat code at all: `Held` is the one door *what you are
+        // already holding when the bell goes* comes through, and it adds.
+        self.drunk
+            .iter()
+            .filter_map(|id| brews.brews.iter().find(|d| d.id() == *id))
+            .map(|def| def.gives.scaled(def.ink_pct + mine))
+            .fold(crate::brew::Gives::default(), |a, b| a.and(&b))
     }
 
     /// What is in the glass, brewed, or why it will not.
@@ -2188,16 +2267,36 @@ impl Character {
     pub fn what_is_brewing(&self) -> Result<crate::brew::BrewDef, String> {
         let brews = crate::data::brews();
         let ids: Vec<&str> = self.retort.iter().map(|s| s.id.as_str()).collect();
-        let [a, b] = match ids.as_slice() {
-            [a, b] | [a, b, _] => [*a, *b],
-            [] => return Err("There is nothing in the glass.".into()),
+        // **Which of them is the ink is a fact about the ingredient, not about
+        // where it is sitting.** A trainer's ingredient is ink-only — it never
+        // halves a pair — so seating one first must not make it one. Anything
+        // else in the third seat is still an ink, which is what the third seat
+        // has meant since it was blown.
+        let ink_only = |id: &str| {
+            brews.ingredients.iter().any(|i| i.id == id && i.ink_only)
+        };
+        if ids.iter().filter(|id| ink_only(id)).count() > 1 {
+            return Err("Two inks and nothing to put them in.".into());
+        }
+        let pair: Vec<&str> = ids.iter().copied().filter(|id| !ink_only(id)).collect();
+        let [a, b] = match pair.as_slice() {
+            [a, b] => [*a, *b],
+            [] if ids.is_empty() => return Err("There is nothing in the glass.".into()),
+            [] => return Err("An ink is not a brew. It needs two things under it.".into()),
             [_] => return Err("A brew is two things, and there is one in the glass.".into()),
             _ => return Err("The glass holds two and an ink.".into()),
         };
         let Some(def) = brews.pair(a, b) else {
             return Err("Those two do nothing together.".into());
         };
-        let ink = ids.get(2).and_then(|i| brews.get(i));
+        // The ink is the ink-only one if there is one, and otherwise whatever
+        // was seated that is not half the pair — so a trainer's ingredient
+        // works wherever it is put, and an ordinary third still inks.
+        let ink = ids
+            .iter()
+            .find(|id| ink_only(id))
+            .or_else(|| ids.iter().find(|id| **id != a && **id != b))
+            .and_then(|i| brews.get(i));
         let mut out = def.clone();
         out.ink_pct = ink.map(|i| i.potency).unwrap_or(0);
         Ok(out)

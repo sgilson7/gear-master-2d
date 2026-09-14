@@ -102,6 +102,20 @@ pub struct IngredientDef {
     /// family, and a family without an ingredient fails
     /// `every_family_drops_something`.
     pub from: Vec<String>,
+    /// Only ever the **third** thing in the glass, and never half of a pair.
+    ///
+    /// **What a trainer sells.** Asked for as *unlocks unique effects* and
+    /// *unlocks special ingredients they can buy from the trainer*, and this is
+    /// the shape that costs the table nothing: a pair ingredient added to the
+    /// eight would want `C(9,2) - C(8,2)` new brews written for it, and two of
+    /// them thirty-four — so a special ingredient that *combines* is a special
+    /// ingredient nobody can afford to add a third of.
+    ///
+    /// An ink multiplies instead, which is exactly what the third slot has done
+    /// since M20 and what the ask says an ink is. `every_pair_of_ingredients
+    /// _brews_to_something` skips these, and says why where it skips them.
+    #[serde(default)]
+    pub ink_only: bool,
 }
 
 impl IngredientDef {
@@ -180,6 +194,43 @@ impl Gives {
             magic_pierce: s(self.magic_pierce),
             curse_resist: s(self.curse_resist),
             mind_resist: s(self.mind_resist),
+        }
+    }
+
+    /// Two draughts in one fighter, added field by field.
+    ///
+    /// **Written for the Chef**, whose promise is *multiple potions per
+    /// fight*. It needed no new combat code and this is why: everything a brew
+    /// gives goes through `Held`, which is the one door *what you are already
+    /// holding when the bell goes* comes through, and two lots of the same
+    /// addition is what two potions are.
+    ///
+    /// **Adding and not maxing.** Two brews that both give strength give the
+    /// sum, because that is what drinking two of them means — and a `max`
+    /// would quietly make the second one free, which is the sort of number
+    /// nobody could check against anything the game tells them afterwards.
+    pub fn and(&self, o: &Gives) -> Gives {
+        Gives {
+            armor: self.armor + o.armor,
+            mana: self.mana + o.mana,
+            rage: self.rage + o.rage,
+            faith: self.faith + o.faith,
+            nature: self.nature + o.nature,
+            insight: self.insight + o.insight,
+            dread: self.dread + o.dread,
+            mind: self.mind + o.mind,
+            health: self.health + o.health,
+            strength: self.strength + o.strength,
+            regen: self.regen + o.regen,
+            power: self.power + o.power,
+            physical_damage: self.physical_damage + o.physical_damage,
+            magic_damage: self.magic_damage + o.magic_damage,
+            physical_resist: self.physical_resist + o.physical_resist,
+            magic_resist: self.magic_resist + o.magic_resist,
+            physical_pierce: self.physical_pierce + o.physical_pierce,
+            magic_pierce: self.magic_pierce + o.magic_pierce,
+            curse_resist: self.curse_resist + o.curse_resist,
+            mind_resist: self.mind_resist + o.mind_resist,
         }
     }
 
@@ -321,7 +372,13 @@ impl BrewsData {
             if i.potency <= 0 {
                 return Err(format!("{}: an ink that multiplies by nothing", i.id));
             }
-            if i.from.is_empty() {
+            // **An ingredient comes off a creature, or a trainer sells it.**
+            // `from` empty used to mean an orphan and now means the second
+            // kind — so the rule is *somebody has it*, and an ink-only
+            // ingredient nothing drops is refused only if no counter stocks it
+            // either. `every_special_ingredient_is_on_a_counter` is the other
+            // half, over the maps, because a map is not in scope here.
+            if i.from.is_empty() && !i.ink_only {
                 return Err(format!("{}: nothing drops it", i.id));
             }
         }

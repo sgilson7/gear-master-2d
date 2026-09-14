@@ -3757,6 +3757,86 @@
           ]
         }
       ]
+    },
+    {
+      "id": "chef",
+      "name": "Chef",
+      "class": "Chef",
+      "nodes": [
+        {
+          "id": "ch-a-second-cup",
+          "name": "A Second Cup",
+          "blurb": "Nobody has ever stopped at one of anything down here, and the works has never asked why the cups go missing in pairs.",
+          "cost": 1,
+          "requires": [],
+          "effect": {
+            "tunes": {
+              "knob": "draughts",
+              "by": 1
+            }
+          }
+        },
+        {
+          "id": "ch-the-standing-pot",
+          "name": "The Standing Pot",
+          "blurb": "Never empty, never washed, eleven years old. Everybody who has an opinion about it has eaten out of it.",
+          "cost": 2,
+          "requires": [
+            "ch-a-second-cup"
+          ],
+          "effect": {
+            "tunes": {
+              "knob": "draughts",
+              "by": 1
+            }
+          }
+        },
+        {
+          "id": "ch-nose-to-tail",
+          "name": "Nose To Tail",
+          "blurb": "There is more on a thing than the part somebody thought to name. You stopped leaving any of it a long time ago.",
+          "cost": 3,
+          "requires": [
+            "ch-the-standing-pot"
+          ],
+          "effect": {
+            "tunes": {
+              "knob": "draughts",
+              "by": 1
+            }
+          }
+        },
+        {
+          "id": "ch-the-long-braise",
+          "name": "The Long Braise",
+          "blurb": "Nine hours at a temperature nobody can check, judged entirely by what the room smells like at hour seven.",
+          "cost": 4,
+          "requires": [
+            "ch-nose-to-tail"
+          ],
+          "effect": {
+            "tunes": {
+              "knob": "draughts",
+              "by": 1
+            }
+          }
+        },
+        {
+          "id": "ch-nothing-on-the-bone",
+          "name": "Nothing On The Bone",
+          "blurb": "A Kettleworks butcher watched you finish and asked where the rest had gone. There was no rest, and that is the whole of the trade.",
+          "cost": 5,
+          "requires": [
+            "ch-the-long-braise"
+          ],
+          "effect": {
+            "tunes": {
+              "knob": "draughts",
+              "by": 1
+            }
+          }
+        }
+      ]
     }
   ]
 }

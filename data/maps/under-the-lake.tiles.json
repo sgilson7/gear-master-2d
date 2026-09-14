@@ -99,6 +99,23 @@
         5,
         10
       ]
+    },
+    {
+      "at": [
+        3,
+        7
+      ],
+      "kind": "bench",
+      "id": "the-pot-that-was-never-empty",
+      "name": "a pot on three stones",
+      "prose": [
+        "A pot on three stones with nothing under it but embers, on a floor that had a lake on top of it until recently.",
+        "The person turning it says they came down for a season and the season has not finished. They ask what you have been throwing away, and they do not ask it as a pleasantry."
+      ],
+      "teaches": "Chef",
+      "stocks": [
+        "the-standing-stock"
+      ]
     }
   ],
   "no_homeward": true

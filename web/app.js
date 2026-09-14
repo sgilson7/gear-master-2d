@@ -7,6 +7,7 @@ import init, {
   world_json, position, try_step, event_json, answer,
   save_json, load_json, new_game, apply_preset,
   shop_json, bench_json, buy, buy_barrel, order, collect_order, buy_supply, buy_ench,
+  train_here, buy_ingredient,
   reroll_barrel, reroll_ledger, buy_paper, use_supply, quests_json, take_quest, hand_in_quest, bank_xp,
   quest_log_json, guide_json, pin_quest,
   retort_json, retort_legal_anchors, retort_place, retort_pick_up,
@@ -678,6 +679,14 @@ function paintSheet(c) {
   // theme's, like every other name.
   for (const k of c.classes ?? []) {
     rows.push(`<li class="rule" title="${k.promise}">you are a <b>${k.name}</b> — ${k.promise}</li>`);
+  }
+  // **What else you are.** A specialization is not one of the three classes, so
+  // nothing that walks `classes()` prints it — and until this line no screen in
+  // the game said you had become one at all.
+  if (c.specialization) {
+    const sart = /^[aeiou]/i.test(c.specialization) ? 'an' : 'a';
+    rows.push(`<li class="rule" title="${c.specialization_says ?? ''}">you are ${sart} ` +
+              `<b>${c.specialization}</b>${c.specialization_says ? ` — ${c.specialization_says}` : ''}</li>`);
   }
   // **A paper bought and not yet answered**, because it is spent on the choice
   // rather than on the purchase and a thing in your pack that no screen
@@ -1560,21 +1569,29 @@ function paintPotions() {
   const wrap = $('potions');
   // Nothing brewed and nothing drunk is a screen with nothing on it, which is
   // the rack's own rule: a list you cannot use is worse than no list.
-  wrap.hidden = !b.potions.length && !b.drunk;
-  $('potion-note').textContent = b.drunk
-    ? `You have drunk ${b.drunk}. It is on you at the bell.`
-    : 'One before the bell. It lasts the fight.';
+  // **`drunk` is a list**, because a Chef may have more than one in them.
+  // Everybody else's list is one long, so the sentence below is the same
+  // sentence it was — what changed is that the number comes from core.
+  const drunk = b.drunk ?? [];
+  const room = b.draughts ?? 1;
+  const full = drunk.length >= room;
+  wrap.hidden = !b.potions.length && !drunk.length;
+  $('potion-note').textContent = drunk.length
+    ? `You have drunk ${drunk.join(' and ')}. ${full ? 'That is all you hold.' : `Room for ${room - drunk.length} more.`}`
+    : room === 1
+      ? 'One before the bell. It lasts the fight.'
+      : `Up to ${room} before the bell. They last the fight.`;
   box.replaceChildren();
   for (const p of b.potions) {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'wares';
     btn.dataset.potion = p.id;
-    btn.disabled = !!b.drunk;
+    btn.disabled = full;
     btn.innerHTML = `<b>${p.name}</b>` +
       `<span class="spec">${p.gives}</span>` +
       `<span class="flavour">${p.blurb}</span>` +
-      `<span class="cost">${b.drunk ? 'you have already drunk one' : 'drink it'}</span>`;
+      `<span class="cost">${full ? 'no room for another' : 'drink it'}</span>`;
     btn.onclick = () => {
       const why = drink_potion(p.id);
       potionSays(why || `You drank ${p.name}. It is on you at the bell.`, !!why);
@@ -2642,8 +2659,79 @@ function openTown(id) {
 /// builder, because a component nothing is holding reads the same whichever
 /// side of the counter it is on, and two builders would be two answers to
 /// *is a shared piece grey*.
+// **How the two shelves are ordered, and it is the page's to decide.**
+//
+// Sorting is not arithmetic about the game — every figure it reads was sent by
+// core and none of it is recomputed — so it lives here, where the screen is.
+// What it must not do is invent the *list* of things you can sort by: that is
+// built from the rows themselves, so a stat the catalogue starts granting
+// turns up in the menu without anybody remembering to put it there.
+let bankSort = 'slot';
+
+/// Every ordering these rows can offer, in the order the menu draws them.
+///
+/// `slot`, `kind` and `set` are always there because every row carries them;
+/// the stats are whatever the rows actually have, which is why the menu is
+/// short on a starting character and long on a finished one.
+function bankOrders(rows) {
+  const stats = new Map();
+  for (const w of rows) {
+    for (const st of w.stats ?? []) stats.set(st.label, true);
+  }
+  return [
+    ['slot', 'grid'],
+    ['kind', 'type'],
+    ['set', 'set'],
+    ...[...stats.keys()].sort().map((l) => [`stat:${l}`, l]),
+  ];
+}
+
+/// One row's key under the current ordering.
+///
+/// **Nothing is dropped for lacking the key.** A component with no physical
+/// resist still appears when you sort by physical resist — it sorts to the
+/// bottom — because a shelf that hid things when you reordered it would be a
+/// filter wearing a sort's clothes, and the thing you were looking for is the
+/// one that vanished.
+function bankKey(w, how) {
+  if (how.startsWith('stat:')) {
+    const want = how.slice(5);
+    const hit = (w.stats ?? []).find((s) => s.label === want);
+    return [hit ? -hit.n : 1, w.name];       // biggest first, absent last
+  }
+  if (how === 'set') return [w.set ?? '\uffff', w.name];
+  return [w[how] ?? '', w.name];
+}
+
+function sortedForBank(rows) {
+  const how = bankSort;
+  return [...rows].sort((a, b) => {
+    const [ka, na] = bankKey(a, how);
+    const [kb, nb] = bankKey(b, how);
+    if (ka < kb) return -1;
+    if (ka > kb) return 1;
+    return na.localeCompare(nb);
+  });
+}
+
 function paintBank() {
   const b = JSON.parse(bank_json());
+  // **The menu is built from both shelves at once**, so it does not change
+  // shape as things cross the counter — a control that reordered itself while
+  // you were using it is a control you cannot use twice.
+  const orders = bankOrders([...b.bag, ...b.banked]);
+  if (!orders.some(([k]) => k === bankSort)) bankSort = 'slot';
+  const pick = $('bank-sort');
+  if (pick) {
+    const keep = pick.value;
+    pick.replaceChildren(...orders.map(([k, label]) => {
+      const o = document.createElement('option');
+      o.value = k; o.textContent = label;
+      return o;
+    }));
+    pick.value = orders.some(([k]) => k === keep) ? keep : bankSort;
+    pick.onchange = () => { bankSort = pick.value; paintBank(); };
+  }
   const shelf = (box, list, empty, move, said) => {
     box.replaceChildren();
     if (!list.length) {
@@ -2653,12 +2741,25 @@ function paintBank() {
       box.appendChild(p);
       return;
     }
-    for (const w of list) {
+    for (const w of sortedForBank(list)) {
       const el = document.createElement('button');
       el.type = 'button';
       el.className = 'wares';
+      // **The line says what you sorted by**, because a shelf reordered by a
+      // number nobody can see is a shelf that looks shuffled. Grid and type are
+      // always there; the set and the stat join them when they are the reason
+      // for the order.
+      const extra = bankSort === 'set'
+        ? (w.set ? ` · ${w.set}` : ' · no set')
+        : bankSort.startsWith('stat:')
+          ? (() => {
+              const want = bankSort.slice(5);
+              const hit = (w.stats ?? []).find((st) => st.label === want);
+              return hit ? ` · ${hit.n}${hit.unit} ${want}` : ` · no ${want}`;
+            })()
+          : '';
       el.innerHTML = `<span class="ware-top"></span><b>${w.name}</b>` +
-        `<span class="meta">${w.slot} · ${w.kind}</span>`;
+        `<span class="meta">${w.slot} · ${w.kind}${extra}</span>`;
       el.querySelector('.ware-top').appendChild(shapeCanvas(w));
       // The same hover card the shelf and the bag show. A component is a
       // shape and a sentence wherever it appears.
@@ -2963,6 +3064,57 @@ function paintVendor() {
     };
     box.appendChild(l);
   }
+  // **What this person teaches, before what they sell.** A trainer is the one
+  // counter in the game whose first line is not a purchase: *one only, and it
+  // does not come off* is the fork's rule, so the line says so and the refusal
+  // names the thing in the way — the other trainer is a country away and *you
+  // are already something* has to be said here.
+  if (v.teaches) {
+    const t = document.createElement('button');
+    t.type = 'button';
+    t.className = 'wares ench licence' + (v.teaches.why ? ' sold' : '');
+    t.id = 'take-training';
+    t.dataset.teaches = v.teaches.class;
+    t.disabled = !!v.teaches.why;
+    t.innerHTML = `<b>${v.teaches.name}</b>` +
+      `<span class="spec">${v.teaches.says}</span>` +
+      (v.teaches.why ? `<span class="flavour">${v.teaches.why}</span>` : '') +
+      `<span class="cost">${v.teaches.taken ? 'you are one'
+        : v.teaches.why ? 'not for you' : 'nothing — one only, and it does not come off'}</span>`;
+    t.onclick = () => {
+      const why = train_here();
+      // `an Apothecary`, `a Chef` — the themed name can start with either.
+      const art = /^[aeiou]/i.test(v.teaches.name) ? 'an' : 'a';
+      vendorSays(why || `You are ${art} ${v.teaches.name}. It does not come off.`, !!why);
+      paintVendor(); paintPanel(); autosave();
+      // The tree they just unlocked is where somebody wants to be standing,
+      // which is what taking the expert paper already does.
+      if (!why) openTree();
+    };
+    box.appendChild(t);
+  }
+  // Their own shelf, to their own kind. Drawn for everybody, because *a locked
+  // line on a shelf you can read is a goal; an absent line is a secret* — and
+  // what it is a goal toward is the line above it.
+  for (const g of v.stocks ?? []) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'wares ench' + (g.mine ? '' : ' sold');
+    b.dataset.buyIngredient = g.id;
+    b.disabled = !g.mine || !g.afford;
+    b.innerHTML = `<b>${g.name}</b>` +
+      `<span class="spec">${g.spec}</span>` +
+      `<span class="flavour">${g.blurb}</span>` +
+      `<span class="cost">${g.price} Fnorp` +
+      `${g.mine ? '' : ' · they sell to their own'}` +
+      `${g.have ? ` · ${g.have} in the larder` : ''}</span>`;
+    b.onclick = () => {
+      const why = buy_ingredient(g.id);
+      vendorSays(why || `${g.name}. It is in the larder.`, !!why);
+      paintVendor(); paintPanel(); autosave();
+    };
+    box.appendChild(b);
+  }
   for (const e of v.stock ?? []) {
     const b = document.createElement('button');
     b.type = 'button';
@@ -2985,7 +3137,9 @@ function paintVendor() {
   // to bolt one on are two questions — the rule `quest::hand_in` has followed
   // since M8, and the one the rack was breaking until it was reported. So this
   // says so rather than refusing the sale.
-  if (!v.licensed) {
+  // **Only where the enchs are.** A trainer sells none, so the sentence about
+  // bolting them on has nothing to be about at their bench.
+  if (!v.licensed && (v.stock ?? []).length) {
     const p = document.createElement('p');
     p.className = 'note';
     p.textContent = 'He does not ask what you are. Bolting one onto a component is the '
@@ -4291,6 +4445,7 @@ async function main() {
   // null while somebody is standing in front of it, and what `closeFight` asks
   // to find out whether the tile it is on became a counter mid-fight.
   window.__caravanJson = () => JSON.parse(caravan_json());
+  window.__trainHere = () => train_here();
   window.__trees = () => JSON.parse(all_trees_json());
   window.__places = () => world.places;
   window.__world = () => world;

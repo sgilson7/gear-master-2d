@@ -31,7 +31,7 @@ touch anything.
   constant that decides it.
 - **There is a long cart** between towns you have stood in, 40 Fnorp.
 - **The suite is 1,025 tests in 89 core binaries** — 95 across the workspace,
-  which adds the shim's and the lab's — and the browser gate is **100 `ok:`
+  which adds the shim's and the lab's — and the browser gate is **102 `ok:`
   lines**. Do not read a total off `cargo test`'s output: it interleaves and
   cannot be summed, and `packaging/count-tests.sh` is the way to get one back.
 - **A curse says what it does**, four entries derived off the constants —
@@ -54,8 +54,13 @@ touch anything.
 - **There is a brewing bench in every town**, a larder that opens nowhere else,
   eight ingredients and all twenty-eight of their pairs. The glass is seven
   cells and not a rectangle.
-- **There is a specialization**, which is a class you take instead of pairing:
-  the Apothecary, one slot, outside the fork and outside the expert table.
+- **There are two specializations** and you take one from a **trainer** — the
+  Apothecary at a kiln wall in the Cairnworks, the Chef at a pot on three
+  stones under the lake. One slot, outside the fork and outside the expert
+  table. The Apothecary shipped with **no way to be taken at all**; see *The
+  Apothecary shipped unreachable*.
+- **The bank sorts** — by grid, by type, by set, and by any stat its rows
+  carry, with the menu built from the rows rather than written out.
 - **The Cairnworks is four floors under the Wextreen Reach**, and each floor
   shuts every lane but one.
 
@@ -4444,6 +4449,114 @@ Cairnworks writes into `answered`. Derived, never banked: there is no
 the Drambus Stack are gone. The errand Kettleworks hands out is the pointer
 rather than the trigger.
 
+## The Apothecary shipped unreachable, and a trainer is how you become one
+
+**The largest finding since M20, and it is a shipped bug rather than a
+measurement.** `Character::specialization` was written by exactly one line in
+the whole repository — `save.rs`, the loader — so the Apothecary was a tree, a
+power, a theme name and five honoured arms behind **no door at all**. Asked
+directly *how do I get the first specialization?*, the answer was: you cannot.
+
+**Two independent holes, and the second would have survived fixing the first.**
+Nothing set the field; and `all_trees_json` filters on `Character::classes()`,
+which is class, second class and expert — so even a character who somehow had
+one could not spend a point in its tree.
+
+- **`every_offered_class_reaches_something` could not see it**, because a
+  specialization is deliberately outside `class::OFFERED`. *A lint that reads a
+  list rather than the behaviour is the failure it exists to catch*, and the
+  list it reads had a hole exactly the shape of the new feature.
+  `every_specialization_has_a_trainer` asks the **maps** instead.
+- **A comment beside a constant that moved.** The roster entry said *how you
+  become one is a paper on Spike's van* — an intention, written while M20 was
+  being built, that no line of code ever made true.
+- **`Character::spendable_trees` is `classes()` plus the specialization**, and
+  deliberately a second function rather than a wider `classes()`: everything
+  that walks that list walks it to ask *which pair are you*, and a
+  specialization pairs with nothing.
+
+**How you become one is a trainer**, asked for in as many words: *each
+specialization has one trainer you can find somewhere on the map, in hidden /
+dangerous areas.* So it is a `Bench` with `teaches` and `stocks` — the whole of
+*where* is content, and the next specialization moves no code.
+
+- **A bench is two kinds of person now**, and the papers had to stop following
+  the second one around: a trainer at the bottom of the Cairnworks was offering
+  the Kaklon Patent. `licence` and `papers` are gated on the place **selling
+  enchs**, which is the right question rather than an id — the licence is the
+  licence to bolt on the things standing beside it.
+- **`counter_here` was `sells` alone** and a trainer sells no enchs, so
+  `train_here` found nobody standing in front of the player who was standing in
+  front of them. It asks all three now.
+- **A trainer is never on a table.** The Chef's was authored onto the
+  Undercountry, which is a *shot* map: the arrow keys aim a cue, and `catches`
+  is gates and bosses, so a counter there is a hole in one.
+  `every_place_on_a_shot_map_is_reachable_by_shots` passes it and is right to —
+  the tile *is* landable, which is the question that lint asks.
+  `a_trainer_is_on_ground_you_walk` is the sharper one, narrow on purpose: a
+  specialization is taken once, permanently, from one person in the world.
+- **The bank's sort check was vacuous twice, and only breaking it found out.**
+  It asserted *something moved*, which is an assertion about the bag rather
+  than the sort; then *the shelf is grouped*, which two rows satisfy for
+  nothing. Both passed with `sortedForBank` ripped out entirely. What it needed
+  was a shelf worth sorting: `testing/saves/at-the-lip.json` stripped of its
+  boards is **88 loose components and fourteen orderings**, and with the sort
+  gone it fails printing the unsorted shelf. *A check that compares zero with
+  zero is not a check* — third time on one control.
+- **And that plant opened the fork**, which is the one screen that does not
+  come off, so every key after it was eaten and the step never happened. A
+  plant sets a class rather than leaving one owed — written down here as the
+  *unlicensed character* trap and met again from the other side.
+- **`clear_screens` closed each screen once, and screens stack.** Taking a
+  trainer's offer opens the tree *over* the vendor; the vendor is earlier in
+  that list, so its button was covered, its click failed, and the Escape that
+  follows closed the tree instead — leaving the vendor up, where the generic
+  Escape sweep cannot help because **the vendor is one of the few screens with
+  no Escape handler at all**. The next check then failed against a screen it
+  had never heard of, which is this harness's oldest failure mode with a second
+  screen in it. The click pass runs twice now.
+- **`an Apothecary`, `a Chef`.** One of the two starts with a vowel and the
+  sentence sits on the screen where a permanent choice is confirmed.
+  `class::an` is the one answer and `nobody_is_a_apothecary` asks it over
+  `SPECIALIZATIONS`. *A glossary is a proofreading surface* — so is a receipt.
+
+### Two halves of one bench, and they are opposites
+
+Asked for: *the apothecary makes few ingredients more potent and unlocks unique
+effects, and the chef can consume multiple potions per fight and unlocks
+special ingredients they can buy from the trainer in both cases.*
+
+| | Apothecary | Chef |
+|---|---|---|
+| buys | **depth** — one brew, worth more | **breadth** — two or three at once |
+| power | `potency_pct`, `extra` cells of glass | `draughts`, how many you hold |
+| honoured in | `Character::boon`, `Game::retort` | `Game::drink`, `Character::boon` |
+
+A Chef who also made brews stronger would be an Apothecary with a hat on, and
+the whole point of *you may only have one* is that the choice costs you the
+other.
+
+- **`drunk` is a list**, and it needed no new combat code: everything a brew
+  gives goes through `Held`, which is the one door *what you are already
+  holding when the bell goes* comes through, and two potions are two lots of
+  the same addition. `Gives::and` adds rather than maxes, because a `max` would
+  quietly make the second one free.
+- **And it reads a lone string**, which is what the field was. Without
+  `one_or_many` a save taken between brewing and the next fight would be
+  **refused** — much the worst outcome available for a field absent from almost
+  every save.
+- **A trainer's ingredient is an ink and never half a pair**, which is what
+  makes it cost the brew table nothing. `every_pair_of_ingredients_brews_to
+  _something` is over all pairs, so two pairing ingredients on top of eight
+  want **seventeen** new brews written and the next two want nineteen more. An
+  ink multiplies instead, which is what the third slot has done since M20.
+- **`BrewsData::parse` lets an ink have no `from`**, because a trainer's stock
+  is not a drop — and that is a hole rather than a rule unless something asks
+  the maps whether anybody stocks it.
+  `every_special_ingredient_is_on_a_counter` is that half, and it refuses the
+  other direction too: a thing you can farm *and* buy is a thing the farming is
+  pointless for.
+
 ## A specialization is a class you take instead of pairing
 
 Asked for: *"a new type of class called a specialization, and you can only have
@@ -6429,15 +6542,17 @@ content*, and one check now measures what a range used to guess at.
 | Skill trees | **29 trees, 208 nodes.** The base's 22, seven classes' 8 / 8 / 10 / 8 / 8 / 9 / 9, and **twenty-one expert trees of six each**. (Was: **16 trees, 124 nodes.**) The base's **22 over nine tiers**, the five classes' 8 / 8 / 10 / 8 / 8, and **ten expert trees of six each** — two roots, three, and a capstone, every node of which must reach that expert's own power. **11 of the base's grow a row** — M12.3's seven, plus a five-tier spine at 3/4/5/6/7 points that walks every frame to the original **six by eight**. Twenty-eight points for that ladder alone, against a `MAX_LEVEL` of **60** since M15.3 — it was 32, and a table that stops at 32 stops nine levels before the curve changes shape. An expert node costs **2** |
 | Class figures | **28 — seven hand-drawn and twenty-one colourways of one drawing.** An expert is a pair, so its figure is the paper Spike hands over with one wax seal per parent class. `every_class_the_game_offers_has_a_figure` is the lint, over the offered seven and the twenty-one and nothing else |
 | Classes offered | **7 on the fork, 28 in the game.** The Kettle-Stoker and the Whisperling are M16's and are **the first two classes GM2D wrote rather than inherited**; the twenty-one experts are `C(7,2)`, one a pair, and none is on any list a player picks from. **Every one of the twenty-eight reaches something and so does every one of the 126 expert nodes**, and both are lints that *call* rather than declare. (Was: **5 on the fork, 15 in the game.**) The ten experts are `C(5,2)`, one a pair, and none is on any list a player picks from — you finish two trees and the pair decides. **Every one of the fifteen reaches something and so does every one of the sixty expert nodes**, and both are lints that *call* rather than declare |
+| Specializations | **2** — the Apothecary and the Chef, and **you take one from a trainer**: `PlaceDef::teaches` on a bench, one each, in the Cairnworks and under the lake. They are the two halves of the bench and they are opposites — depth against breadth, `potency_pct` against `draughts` — because *you may only have one* is only a choice if it costs you the other. Neither is in `class::OFFERED`, neither pairs, and `Character::spendable_trees` is what lets their trees be spent in |
 | Experts | **21**, carrying **64 knobs**. Eleven are M16's and they grant three new rules between them — `burn_keeps_bonus`, `burn_carries`, `mind_pierce` — each granted by more than one tree, which is the shape `Spread` and `Beacon` already have. Six of them are about a furnace, and every one of the six carries its own: *an expert's power is self-contained*. (Was: **10**, carrying **31 knobs**.) Six are read at the tick, two settle in the purse, one is the board's, one crosses a fight boundary. A character holds **up to three classes** and all three are live |
 | The papers | **3** on Spike's van, all drawn from the first visit: the Patent's licence at 2,000, **the Second Paper at 2,000 behind nothing at all**, and the expert paper at **nothing** behind two finished trees — the twenty-four points are the price, which is what keeps a free paper from being a fourth class on the fork. M15.4 took the tree gate off the second paper on the human's ask; the level that puts the van on the road is what is left |
 | Figures | **32 `.tex` → 126 SVGs**. Before: 29 → **122** |
 | Art coverage | **77 of 77 creatures**, from 20 families — the newest is The Tailgate, a `sentinel` in its own sand colourway, which is all a new creature needs: *one .tex per family, compiled once per creature*, so a creature added to the ladder without an entry in `art/creatures.json` fails `cargo test`. Before: **72 of 72**. The set pieces, the instruments and the enchs have no art and want none — a component has never had a figure |
-| Browser gate | **100 `ok:` lines in one engine**, the newest being that the sand cart is shut while its bodyguard is standing in front of it and sells five enchs once they are down — and that the cart's *payload* agrees, which is the one answer `closeFight` reads to notice a tile became a counter mid-fight. Before: **99 `ok:` lines**, the newest being that the character sheet is reachable by pressing the chip that replaced it — which the four checks already asking it something could not tell from a sheet nobody can open. **And one existing check grew the assertion that was missing from it**: a town's receipt, which had not printed since M17 and which that check's own `ok:` line had been claiming. Before: **98 `ok:` lines**, the newest being that a potion is drunk on the pre-battle screen and in its own view rather than in the rack. Before it: the glass is a board of seven cells in a four-by-three box, the button brews, and what it made can be drunk. Before it, the newest four were M20's: a word errand told you arrived on a map you arrive at by *shooting*, the bench brewing a pair in a glass that is a shape and not a box, an area saying its own name and then stopping, and the errand log drawn as a tree with its wires **measured**. **Three of the four were wrong before the code was** — one read `window.__log()` as an array when it is an object, one gave a single-tile landing six shots when *a tile one step away is a tile you cannot shoot to*, and one walked a fixed number of steps and never left its own region — which is this file's *break a new check and watch it fail* arriving from the other side. Before: **94 `ok:` lines**, the newest being that a word errand is told you arrived on a map you arrive at by *shooting* — the one question about the new errands that `cargo test` cannot reach, because both halves of it are the shim's. Before: **93**, the newest being that no terrain draws magenta. Before: **92 `ok:` lines**, seven of them M19's — the ball slides and the trail grows behind it, a diamond catches, the long cart runs between towns, the furnace shows on the bar, and the glossary opens on G. One of them *passed while printing the wrong thing* (**9 burns off None**, reading `what` where an event's subject rides in `item`), which is the argument for a check that prints what it found — and **one of them was vacuous twice**: the shut-crossing check matched the tideline card's own prose, and then reached the tile through `cross`, which falls back to `here` and so goes through `walk`, the door that already worked. Before it: **85 `ok:` lines**, seven of them M17's and every one negative-tested — the cue snaps to what core takes and pulling further pulls harder, a shot flies the path core returned, four keys aim and space fires with no pointer, a spike takes its percent and says so, a ball in the pocket wakes up in town, a floor still steps and draws no cue, and reduced motion is at rest with the trail still drawn. **The hardest of the seven to break is the floor one**: every lie about *the arrows mean two things now* takes the whole gate down before the check runs. Before it: **78 `ok:` lines**, six of them M16's and every one negative-tested — the way under is silt until the sheet, a stake offers the pull and a compass that lies, a sinkhole drops you in an alcove nothing walks into, the Tenth Surveyor's panel draws the run's own items, the fork is seven cards in two rows, and a Stoker's replay says what the furnace took. Before it: **96 `ok:` lines over 3 engines** — which is 67 in any one of them, not 81; the count is a total and reading it as per-engine is wrong by fourteen. The newest is M15.2's, and it is the only one that can answer a *negative*: that a fight you have already had is settled and **never drawn**. The newest five are M14.5's: the tide is drawn before it goes out and walkable after, the lip of the Sump refuses in the Reach's words and opens the frame, a wheel that keeps what you feed it says what shape it wants, the chair is three moves in an order **and comes back**, and the third town is empty with the screen after it saying so. **All five were negative-tested, and two of the five found faults on a green build** — see *A stack gate that wants an instrument* |
+| Browser gate | **102 `ok:` lines in one engine**, the newest two being that a trainer takes you on — the only way there has ever been to become a specialization — and that the bank sorts 88 loose components fourteen ways. **The second was vacuous twice**: *something moved* is a claim about the bag, and *the shelf is grouped* is satisfied by two rows for nothing, and both passed with the sorting ripped out. Before: **100 `ok:` lines**, the newest being that the sand cart is shut while its bodyguard is standing in front of it and sells five enchs once they are down — and that the cart's *payload* agrees, which is the one answer `closeFight` reads to notice a tile became a counter mid-fight. Before: **99 `ok:` lines**, the newest being that the character sheet is reachable by pressing the chip that replaced it — which the four checks already asking it something could not tell from a sheet nobody can open. **And one existing check grew the assertion that was missing from it**: a town's receipt, which had not printed since M17 and which that check's own `ok:` line had been claiming. Before: **98 `ok:` lines**, the newest being that a potion is drunk on the pre-battle screen and in its own view rather than in the rack. Before it: the glass is a board of seven cells in a four-by-three box, the button brews, and what it made can be drunk. Before it, the newest four were M20's: a word errand told you arrived on a map you arrive at by *shooting*, the bench brewing a pair in a glass that is a shape and not a box, an area saying its own name and then stopping, and the errand log drawn as a tree with its wires **measured**. **Three of the four were wrong before the code was** — one read `window.__log()` as an array when it is an object, one gave a single-tile landing six shots when *a tile one step away is a tile you cannot shoot to*, and one walked a fixed number of steps and never left its own region — which is this file's *break a new check and watch it fail* arriving from the other side. Before: **94 `ok:` lines**, the newest being that a word errand is told you arrived on a map you arrive at by *shooting* — the one question about the new errands that `cargo test` cannot reach, because both halves of it are the shim's. Before: **93**, the newest being that no terrain draws magenta. Before: **92 `ok:` lines**, seven of them M19's — the ball slides and the trail grows behind it, a diamond catches, the long cart runs between towns, the furnace shows on the bar, and the glossary opens on G. One of them *passed while printing the wrong thing* (**9 burns off None**, reading `what` where an event's subject rides in `item`), which is the argument for a check that prints what it found — and **one of them was vacuous twice**: the shut-crossing check matched the tideline card's own prose, and then reached the tile through `cross`, which falls back to `here` and so goes through `walk`, the door that already worked. Before it: **85 `ok:` lines**, seven of them M17's and every one negative-tested — the cue snaps to what core takes and pulling further pulls harder, a shot flies the path core returned, four keys aim and space fires with no pointer, a spike takes its percent and says so, a ball in the pocket wakes up in town, a floor still steps and draws no cue, and reduced motion is at rest with the trail still drawn. **The hardest of the seven to break is the floor one**: every lie about *the arrows mean two things now* takes the whole gate down before the check runs. Before it: **78 `ok:` lines**, six of them M16's and every one negative-tested — the way under is silt until the sheet, a stake offers the pull and a compass that lies, a sinkhole drops you in an alcove nothing walks into, the Tenth Surveyor's panel draws the run's own items, the fork is seven cards in two rows, and a Stoker's replay says what the furnace took. Before it: **96 `ok:` lines over 3 engines** — which is 67 in any one of them, not 81; the count is a total and reading it as per-engine is wrong by fourteen. The newest is M15.2's, and it is the only one that can answer a *negative*: that a fight you have already had is settled and **never drawn**. The newest five are M14.5's: the tide is drawn before it goes out and walkable after, the lip of the Sump refuses in the Reach's words and opens the frame, a wheel that keeps what you feed it says what shape it wants, the chair is three moves in an order **and comes back**, and the third town is empty with the screen after it saying so. **All five were negative-tested, and two of the five found faults on a green build** — see *A stack gate that wants an instrument* |
 | The suite | **976 passing** after M18, and a `data/` touch costs about **three minutes**, not ten: **127 seconds relinking 83 test binaries and 47 running**, measured on an idle machine. The ten is a cold `--workspace`, which adds the lab and the shim on top of both. **Measure on a quiet machine or not at all** — one attempt at this read `real 1279.89` against `user 63.37`, which is twenty-one minutes of wall clock for a minute of work, because it was queued behind three browser gates. `include_str!` is not the thing to change — loading from disk in the test profile would make the tested path differ from the shipped one, which is two rulebooks — and the fix, if one is ever wanted, is **fewer test binaries**, which is a trade against one file per concern that nobody should make to save two minutes. `SECOND-ORDER-M16.md` row 17 is where that is measured. Before it: **950 passing** after M16. Before it: **913 passing, and ~33 seconds warm** after M15, the bestiary, the cart and the sands; **832 and 27.5s** after M14 — measured after M14, and the ten slowest files are the ten that were slow at M13: `drops.rs` at 11.0s and `experts_reach.rs` at 6.3s, neither of them M14's, and nothing this block added is above 0.4s. **`SECOND-ORDER-M14.md` row 17 was written claiming it had slowed to minutes and is corrected there**: what is minutes is rebuilding sixty test binaries after a change to `combat.rs`, which is a fact about editing the engine. Before M14 it was **788 passing, and 34 seconds warm.** It was a minute through most of M13 and `rules_m13.rs` was 29.6s of it: `beacon_board` ran Auto-pack over the whole catalogue on twenty-row grids, four times, because it was the only fixture in the repository with two items that touch. `common::items_in_a_row` is what replaced it — **0.03s** — and `experts_reach.rs` went 9.6s → 6.5s by measuring once per *set* of nodes rather than once per question. `drops.rs` at 11.3s is now the slowest file and is untouched. `[profile.test] opt-level = 2` since M12.6, with debug assertions and overflow checks still on — this is the `test` profile, not `--release` |
 | Floors with a puzzle | **6**, and floors with a boss **2**. Every one is monotone — flags only grow, so no move can make the way on unreachable — and `puzzle::solvable_blind` counts the worst case rather than the plan asserting it |
 | Blind-solution ceilings | Sump **8 / 1 / 45**, Stair **1 / 3 / 3**. The plan guessed 10 / 11 / 45 and 2 / 27 / 3; **the Cairnfield's forty-five came back exactly**, which is the reason to believe the other five. `every_floor_in_the_game_can_be_solved_blind` holds every floor there is under 45 |
 | Ingredients | **8**, and **all 28 of their pairs** — `C(8,2)`, complete rather than representative, which is the argument the twenty-one experts make. Which one a creature leaves is keyed by its **art family**, so a creature added without a drop is a creature that already fails a test. An ingredient is **not a component**: no `PieceKind`, no `CATALOG` entry, no grid among the five, and therefore no save seam |
+| Special ingredients | **2**, one a trainer, and they are **inks**: never half a pair, which is what makes them cost the brew table nothing — `every_pair_of_ingredients_brews_to_something` is over *all* pairs, so two pairing ingredients on top of eight want seventeen new brews and the next two want nineteen more. Sold at 400 to their own kind only |
 | The glass | **7 cells, and 8 once the Cairnworks has reblown it** — the number is measured rather than chosen: at nine every one of the fifty-six triples tiles it and the shape carries nothing, at eight three three-cell ingredients can never go in together. `brew::fits` is core's, exhaustively, for the reason the board's green preview is |
 | Errand goal kinds | **4**: slay, bring, word, **clear** — the fourth is what an errand about finishing a dungeon asks, and it is neither of the two that were nearly used for it: a `slay` is finishable in a field because eight of the nine boss creatures also stand in a pool, and a `word` is finishable by walking onto the tile and turning round |
 | `Requirement` kinds | **8**: none, gold, flag, holding, **loose_item_of_size**, **assembled_of_rarity**, **surveying**, **all**. Three of them are ported from `event::Requirement`, which is the cut campaign's type — `PLAN-M14.md` §1.1 names them and they were unreachable from a data file |

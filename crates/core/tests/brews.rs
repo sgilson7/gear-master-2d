@@ -13,7 +13,18 @@ use gm2d_core::game::Game;
 #[test]
 fn every_pair_of_ingredients_brews_to_something() {
     let b = data::brews();
-    let ids: Vec<&str> = b.ingredients.iter().map(|i| i.id.as_str()).collect();
+    // **The pair table is over the ingredients that pair**, which is every one
+    // a creature drops and none of the ones a trainer sells. An ink-only
+    // ingredient multiplies a pair rather than halving one — see
+    // `IngredientDef::ink_only`, which carries the arithmetic that made that
+    // the cheap shape: two pairing ingredients on top of eight want seventeen
+    // new brews written, and the next two want nineteen more.
+    let ids: Vec<&str> =
+        b.ingredients.iter().filter(|i| !i.ink_only).map(|i| i.id.as_str()).collect();
+    assert!(
+        b.ingredients.iter().any(|i| i.ink_only),
+        "no ingredient is ink-only, so the exemption above is untested"
+    );
     let want = ids.len() * (ids.len() - 1) / 2;
     assert_eq!(b.brews.len(), want, "{} ingredients want {want} pairs", ids.len());
     for i in 0..ids.len() {
@@ -57,11 +68,48 @@ fn every_creature_leaves_something_for_the_larder() {
     assert!(bare.is_empty(), "creatures that leave nothing: {bare:?}");
     // And the other direction: an ingredient nothing drops is an ingredient
     // nobody can brew with, which is a pair that cannot be made.
-    for i in &b.ingredients {
+    //
+    // **Unless a trainer sells it.** An ink-only ingredient is bought, not
+    // dropped — `every_special_ingredient_is_on_a_counter` is that half, and it
+    // asks the maps, which this test cannot: a lint that let an ink off this
+    // hook without somebody else holding it would be the orphan rule with a
+    // door in it.
+    for i in b.ingredients.iter().filter(|i| !i.ink_only) {
         let dropped = gm2d_core::combat::LADDER
             .iter()
             .any(|m| families.get(m.name).map(|f| i.from.contains(f)).unwrap_or(false));
         assert!(dropped, "{} is dropped by nothing in the ladder", i.id);
+    }
+}
+
+/// **An ingredient nothing drops is one somebody sells, and this is where that
+/// is checked.**
+///
+/// The other half of the orphan rule. `BrewsData::parse` lets an `ink_only`
+/// ingredient have no `from`, because a trainer's stock is not a drop — and
+/// that would be a hole rather than a rule if nothing asked the maps whether
+/// anybody actually stocks it. A special ingredient on no counter is content
+/// reachable from nowhere, which is exactly the shape the Apothecary itself
+/// shipped in.
+#[test]
+fn every_special_ingredient_is_on_a_counter() {
+    let b = data::brews();
+    let stocked: Vec<String> = data::all_maps(gm2d_core::combat::Difficulty::Easy)
+        .iter()
+        .flat_map(|w| w.places.clone())
+        .flat_map(|p| p.stocks)
+        .collect();
+    let special: Vec<&str> =
+        b.ingredients.iter().filter(|i| i.ink_only).map(|i| i.id.as_str()).collect();
+    assert!(!special.is_empty(), "no ingredient is ink-only, so this checks nothing");
+    for id in special {
+        assert!(stocked.iter().any(|s| s == id), "{id} is on nobody's counter");
+    }
+    // And nothing that *does* drop is also for sale: a thing you can farm and
+    // buy is a thing the farming is pointless for.
+    for id in &stocked {
+        let def = b.ingredients.iter().find(|i| i.id == *id).expect("a real ingredient");
+        assert!(def.ink_only, "{id} is sold and also drops off a creature");
     }
 }
 

@@ -239,9 +239,20 @@ pub struct CharacterSave {
     /// Potions brewed and not yet drunk, by the brew's own derived id.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub potions: Vec<String>,
-    /// The one drunk and waiting on a bell.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub drunk: Option<String>,
+    /// What has been drunk and is waiting on a bell.
+    ///
+    /// **A list since the Chef**, whose promise is more than one at a time, and
+    /// it reads a lone string as well — the shape this field had, and the shape
+    /// a save taken between brewing and the next fight still carries.
+    /// `Character::drunk` carries the same `one_or_many`, and so does this,
+    /// because the file and the struct are two readers of one shape and only
+    /// one of them being lenient is the half-fix that refuses the save.
+    #[serde(
+        default,
+        deserialize_with = "crate::character::one_or_many",
+        skip_serializing_if = "Vec::is_empty"
+    )]
+    pub drunk: Vec<String>,
     /// The one specialization, if it has been taken. Skipped when it has not,
     /// so no save written before it existed is refused.
     #[serde(default, skip_serializing_if = "Option::is_none")]

@@ -792,29 +792,36 @@ def clear_screens(page):
     """
     dismiss_card(page)
     close_fight(page)
-    for screen, button in [
-        ("#town", "#leave"),
-        ("#vendor", "#vendor-close"),
-        ("#caravan", "#caravan-close"),
-        ("#instrument", "#instrument-done"),
-        ("#bestiary", "#bestiary-close"),
-        ("#instant", "#instant-close"),
-        ("#log", "#log-close"),
-        ("#brewbench", "#brew-close"),
-        ("#ending", "#ending-close"),
-        ("#tree", "#tree-done"),
-        ("#history", "#history-close"),
-        ("#glossary", "#gloss-close"),
-        ("#cart-screen", "#cart-close"),
-        ("#sheet-pop", "#sheet-close"),
-    ]:
-        if page.is_visible(screen):
-            try:
-                page.click(button, timeout=3000)
-                page.wait_for_selector(screen, state="hidden", timeout=3000)
-            except Exception:
-                page.keyboard.press("Escape")
-                page.wait_for_timeout(120)
+    # **Twice, because screens stack and not all of them take Escape.** Taking
+    # a trainer's offer opens the tree *over* the vendor; the vendor is earlier
+    # in this list, so its button is covered, its click fails, and the Escape
+    # that follows closes the tree instead. One more pass and the vendor is on
+    # top and closes — where the generic sweep below cannot help, because the
+    # vendor is one of the few screens with no Escape handler at all.
+    for _round in range(2):
+      for screen, button in [
+          ("#town", "#leave"),
+          ("#vendor", "#vendor-close"),
+          ("#caravan", "#caravan-close"),
+          ("#instrument", "#instrument-done"),
+          ("#bestiary", "#bestiary-close"),
+          ("#instant", "#instant-close"),
+          ("#log", "#log-close"),
+          ("#brewbench", "#brew-close"),
+          ("#ending", "#ending-close"),
+          ("#tree", "#tree-done"),
+          ("#history", "#history-close"),
+          ("#glossary", "#gloss-close"),
+          ("#cart-screen", "#cart-close"),
+          ("#sheet-pop", "#sheet-close"),
+      ]:
+          if page.is_visible(screen):
+              try:
+                  page.click(button, timeout=3000)
+                  page.wait_for_selector(screen, state="hidden", timeout=3000)
+              except Exception:
+                  page.keyboard.press("Escape")
+                  page.wait_for_timeout(120)
 
     # **And then whatever is left, by asking the page rather than a list.** A
     # list of screens is a second copy of what screens exist, and it went stale
@@ -2331,6 +2338,197 @@ def check_the_replay_can_be_slowed_and_read(page, name, fails):
             page.click("#done")
         page.wait_for_selector("#fight", state="hidden", timeout=8000)
 
+
+
+def an(word):
+    """a/an, because "a Apothecary" is a sentence nobody proof-read."""
+    return f"{'an' if word[:1].lower() in 'aeiou' else 'a'} {word}"
+
+
+def check_a_trainer_takes_you_on(page, name, fails, base):
+    """**How you become a specialization, which for a whole block was nothing.**
+
+    `Character::specialization` was written by exactly one line in the
+    repository — the save loader — so the Apothecary shipped as a tree, a
+    power, a theme name and five honoured arms that no player could reach.
+    Asked for as *each specialization has one trainer you can find somewhere on
+    the map, in hidden / dangerous areas.*
+
+    `cargo test` proves the rule — one only, it does not come off, and a
+    trainer sells to their own kind. What only a browser can say is that
+    walking onto the tile opens a counter, that pressing the line makes you one,
+    and that **the trainer is not Spike**: a bench is two kinds of person now,
+    and the papers had to stop following the second one around.
+    """
+    def at_the_kiln(body):
+        strip_the_boards(body)
+        w = body.setdefault("world", {})
+        w["map"] = "the-cairnworks-1"
+        w["at"] = [3, 1]                       # one step east of the bench
+        body["character"]["gold"] = 50_000
+        body["character"]["class"] = "Berserker"
+        body["character"]["xp"] = 9_000
+        body["character"].pop("specialization", None)
+
+    plant(page, base, at_the_kiln, stem="trainer")
+    clear_screens(page)
+    page.evaluate("() => document.getElementById('map').focus()")
+    page.keyboard.press("ArrowLeft")
+    page.wait_for_timeout(400)
+    if not page.is_visible("#vendor"):
+        fails.append(f"{name}: walked onto a trainer and no counter opened")
+        clear_screens(page)
+        return
+    v = page.evaluate("() => window.__benchJson()") or {}
+    t = v.get("teaches") or {}
+    if not t.get("class"):
+        fails.append(f"{name}: the trainer's counter teaches nothing")
+        clear_screens(page)
+        return
+    # **Not Spike's counter.** A bench is two kinds of person, and the licence
+    # and the three papers belong to the one with the enchs on it.
+    if v.get("papers") or v.get("licence"):
+        fails.append(f"{name}: a trainer at the bottom of a dungeon is selling Spike's papers")
+    # Their shelf is drawn and refused, which is the goal the line above is for.
+    stocks = v.get("stocks") or []
+    if not stocks:
+        fails.append(f"{name}: the trainer has nothing on their own shelf")
+    elif any(g["mine"] for g in stocks):
+        fails.append(f"{name}: the trainer sells to somebody who is not one of theirs")
+
+    page.click("#take-training")
+    page.wait_for_timeout(400)
+    became = page.evaluate("() => window.__character().specialization")
+    if became != t["class"]:
+        fails.append(f"{name}: took the training and became {became!r}, not {t['class']!r}")
+        clear_screens(page)
+        return
+    # **And the sheet says so**, which is the half the Apothecary never had: a
+    # thing you became that no screen mentions is a thing nobody can tell from
+    # a button that did nothing.
+    sheet = " ".join(page.eval_on_selector_all(
+        "#sheet li", "e => e.map(x => x.textContent.trim())"))
+    if t["class"].lower() not in sheet.lower():
+        fails.append(f"{name}: became a {t['class']} and the sheet does not say so: {sheet!r}")
+    clear_screens(page)
+    print(f"ok: a trainer takes you on, and you are {an(became)} afterwards")
+
+
+def check_the_bank_sorts(page, name, fails, _base):
+    """**The vault, ordered by what you are looking for.**
+
+    Asked for as *sort your items in the bank by type, stats like physical
+    resist, piercing, etc, and also sort by sets.*
+
+    The ordering is the page's — nothing here is recomputed, every figure was
+    sent by core — so what this asks is that the menu is built from the rows
+    rather than written out, and that choosing an order actually reorders the
+    shelf. A control whose options are a hand-written list is the seventh of
+    those this project has paid for.
+    """
+    # **Planted, with the boards stripped.** Two things in a bag cannot falsify
+    # a sort: the first two versions of this check passed with `sortedForBank`
+    # ripped out entirely, because two rows are trivially grouped *and*
+    # trivially in order under every key. `strip_the_boards` puts a whole
+    # late-game board into the bag, which is a shelf where the orderings
+    # actually disagree — *a check that compares zero with zero is not a
+    # check*, and this one was one twice.
+    def loose_beside_the_pit(body):
+        strip_the_boards(body)
+        w = body.setdefault("world", {})
+        w["map"] = "west-bambulon"
+        w["at"] = [2, 18]
+        # **And it is something already.** A character owed a class opens the
+        # fork on load, and the fork is the one screen that does not come off —
+        # so every key after it is eaten and the step never happens. Written
+        # down in `CLAUDE.md` as *a plant that wants an unlicensed character
+        # sets a class rather than removing the field*, and this is the same
+        # trap from the other side.
+        body.setdefault("character", {})["class"] = "Berserker"
+
+    # **A real save, because the walk's own is two components.** `base` here is
+    # whatever the gate had downloaded when it got this far, and a fresh
+    # character stripped of its boards is the starting kit — two things, which
+    # is a shelf no ordering can disagree about. `at-the-lip.json` is a run
+    # eighty-eight components deep, which is the shelf this control exists for.
+    plant(page, ROOT / "testing" / "saves" / "at-the-lip.json",
+          loose_beside_the_pit, stem="bank-sort")
+    clear_screens(page)
+    # **`focus`, not a click.** A click hit-tests against whatever is over the
+    # canvas and a focus does not — the lesson the M20 deploy gate taught.
+    page.focus("#map")
+    page.keyboard.press("ArrowLeft")
+    page.wait_for_timeout(400)
+    if not page.is_visible("#town"):
+        up = page.evaluate("() => [...document.querySelectorAll('.screen')]"
+                           ".filter(e => !e.hidden).map(e => e.id)")
+        pos = page.evaluate("() => JSON.parse(window.__position())")
+        fails.append(f"{name}: stepped onto the pit and no town opened "
+                     f"(at [{pos['x']}, {pos['y']}], screens {up})")
+        clear_screens(page)
+        return
+    opts = page.eval_on_selector_all("#bank-sort option", "e => e.map(o => o.value)")
+    for want in ("slot", "kind", "set"):
+        if want not in opts:
+            fails.append(f"{name}: the bank cannot be sorted by {want}: {opts}")
+    # **The stat orderings are derived from the rows**, so a bag with anything
+    # in it offers at least one.
+    rows = page.eval_on_selector_all("#bank-bag .wares", "e => e.length")
+    if rows and not any(o.startswith("stat:") for o in opts):
+        fails.append(f"{name}: {rows} things in the bag and no stat to sort them by: {opts}")
+    if rows < 4:
+        fails.append(f"{name}: only {rows} loose after stripping the boards, "
+                     f"which is a shelf no ordering can disagree about")
+        clear_screens(page)
+        return
+
+    def shelf():
+        return page.eval_on_selector_all("#bank-bag .wares", """e => e.map(x => ({
+            name: x.querySelector('b').textContent.trim(),
+            meta: x.querySelector('.meta').textContent.trim(),
+        }))""")
+
+    first = [w["name"] for w in shelf()]
+    for o in opts:
+        page.select_option("#bank-sort", o)
+        page.wait_for_timeout(150)
+        now = shelf()
+        # **Nothing is lost by reordering.** A sort that dropped a row would be
+        # a filter wearing a sort's clothes, and the thing you were looking for
+        # is the one that vanished.
+        if sorted(w["name"] for w in now) != sorted(first):
+            fails.append(f"{name}: sorting by {o} changed *which* things are on the shelf")
+            return
+        # **And the shelf is actually in that order**, which is the property
+        # rather than *something moved*: two things sorted five ways come out
+        # the same order more often than not, so an assertion that the order
+        # changed is an assertion about the bag. **Grouping was the first
+        # version and it was vacuous** — two rows are trivially grouped, and
+        # the check passed with the sort ripped out entirely.
+        #
+        # The row prints what it was sorted by, so the key is read off the
+        # shelf a player is looking at rather than out of a second payload.
+        parts = [w["meta"].split("\u00b7") for w in now]
+        field = {"slot": 0, "kind": 1}.get(o, 2)
+        keys = [p[field].strip() if len(p) > field else "" for p in parts]
+        if o.startswith("stat:"):
+            # "12% physical resist", or "no physical resist" for a row without
+            # it — which sorts last, because a shelf that hid what it lacked
+            # would be a filter.
+            def n(k):
+                head = k.split(" ")[0].rstrip("%")
+                try:
+                    return -int(head)
+                except ValueError:
+                    return 1            # absent, and after everything present
+            ranked = [n(k) for k in keys]
+        else:
+            ranked = keys
+        if ranked != sorted(ranked):
+            fails.append(f"{name}: sorted by {o} and the shelf reads {keys}")
+            return
+    clear_screens(page)
+    print(f"ok: the bank sorts {len(first)} things {len(opts)} ways")
 
 
 def check_the_bank_is_one_vault_in_every_town(page, name, fails):
@@ -7644,6 +7842,8 @@ def walk_the_gate(browser, name, fails=None):
     check_the_bestiary_holds_what_you_have_met(page, name, fails, path)
     check_the_cart_is_somewhere_and_then_somewhere_else(page, name, fails, path)
     check_the_sand_cart_is_guarded(page, name, fails, path)
+    check_a_trainer_takes_you_on(page, name, fails, path)
+    check_the_bank_sorts(page, name, fails, path)
     check_the_sands_read_the_other_way_round(page, name, fails, path)
     check_running_away_costs_you(page, name, fails, path)
     check_the_stones_push_and_come_back(page, name, fails, path)

@@ -393,6 +393,28 @@ pub struct PlaceDef {
     /// errands' half of the rule and has been since M8.
     #[serde(default)]
     pub sells: Vec<String>,
+    /// `Bench`: the specialization this person will take you on as.
+    ///
+    /// **Asked for as a trainer**, in as many words: *each specialization has
+    /// one trainer you can find somewhere on the map, in hidden / dangerous
+    /// areas.* So how you become one is content — this field and a map file —
+    /// and the next specialization moves no code at all.
+    ///
+    /// Before it there was **no way to become anything**:
+    /// `Character::specialization` was written by one line in the repository,
+    /// the save loader, so the Apothecary was a tree, a power, a theme name and
+    /// five honoured arms that no player could reach.
+    #[serde(default)]
+    pub teaches: Option<String>,
+    /// `Bench`: ingredient ids this person sells, to their own kind only.
+    ///
+    /// **Not `sells`, which is enchs.** Two lists rather than one tagged list,
+    /// because what they are is decided at load and an ingredient and an ench
+    /// have nothing in common but being bought: an ench bolts to a component
+    /// and goes in a rack, and an ingredient has a footprint and goes in a
+    /// glass. `World::load` refuses a name that is neither.
+    #[serde(default)]
+    pub stocks: Vec<String>,
     /// `Crossing`: the id of the region on the far side of it.
     #[serde(default)]
     pub guards: Option<String>,
@@ -1001,6 +1023,8 @@ impl World {
         // guard `Rule::check` is, and it runs where the map is read.
         let enchs = crate::ench::EnchsData::parse(crate::data::ENCHS_JSON)
             .map_err(|e| format!("the shipped enchs are broken: {e}"))?;
+        let brews = crate::brew::BrewsData::parse(crate::data::BREWS_JSON)
+            .map_err(|e| format!("the shipped brews are broken: {e}"))?;
         // **Two kinds have a counter, and they are the two kinds that stand
         // still long enough to have one.** A bench is somebody with a table;
         // a caravan stop is somebody with a tailgate, and the only difference
@@ -1012,8 +1036,25 @@ impl World {
             if !counter(p.kind) && !p.sells.is_empty() {
                 return Err(format!("{}: only a counter sells anything", p.id));
             }
-            if p.kind == PlaceKind::Bench && p.sells.is_empty() {
+            // **A bench has to be worth walking to**, which is enchs, or
+            // ingredients, or a trade to teach you. It used to be enchs alone,
+            // because the van was the only bench there was.
+            if p.kind == PlaceKind::Bench
+                && p.sells.is_empty()
+                && p.stocks.is_empty()
+                && p.teaches.is_none()
+            {
                 return Err(format!("{}: a bench with nothing on it", p.id));
+            }
+            if let Some(c) = &p.teaches {
+                if !crate::class::SPECIALIZATIONS.contains(&c.as_str()) {
+                    return Err(format!("{}: {c:?} is not a specialization", p.id));
+                }
+            }
+            for id in &p.stocks {
+                if !brews.ingredients.iter().any(|i| i.id == *id) {
+                    return Err(format!("{}: there is no ingredient called {id:?}", p.id));
+                }
             }
             for id in &p.sells {
                 match enchs.get(id) {

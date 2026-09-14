@@ -134,7 +134,11 @@ pub fn bounty_with_class(
             // at the bell, and nothing about it reaches a purse.
             ClassPower::Stoker { .. }
             | ClassPower::Whisperer { .. }
-            | ClassPower::Apothecary { .. } => {}
+            // A specialization never moves the purse. What the Chef moves is
+            // the larder, one function along in `pay_a_win`, because an
+            // ingredient is not money and was never in `bounty`.
+            | ClassPower::Apothecary { .. }
+            | ClassPower::Chef { .. } => {}
             ClassPower::Showstopper { pct: more, under_ms } => {
                 if duration_ms < under_ms {
                     pct += more;

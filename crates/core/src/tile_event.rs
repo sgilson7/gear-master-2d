@@ -155,6 +155,25 @@ pub enum Outcome {
     /// choice that takes a footprint it did not ask for — otherwise a door
     /// could want a 3x2 and quietly eat a 1x4.
     GiveUp { w: u8, h: u8 },
+    /// You are one of these now, and there is no path that clears it.
+    ///
+    /// **A specialization is taken from a person, not bought off a counter.**
+    /// Asked for in as many words: *each specialization has one trainer you can
+    /// find somewhere on the map, in hidden / dangerous areas.* So it is an
+    /// outcome of a choice on a card rather than a line on Spike's van — which
+    /// also means the whole of *where* is content, in `events.json` and a map
+    /// file, and adding the next trainer moves no code at all.
+    ///
+    /// **It shipped with no way to be taken and this is that bug's fix.**
+    /// `Character::specialization` was written by exactly one line in the
+    /// repository — the save loader — so the Apothecary was a tree, a power, a
+    /// theme name and five honoured arms that no player could ever reach.
+    /// `every_offered_class_reaches_something` could not see it, because a
+    /// specialization is deliberately outside `class::OFFERED`: *a lint that
+    /// reads a list rather than the behaviour is the failure it exists to
+    /// catch*, and the list it read had a hole exactly the shape of the new
+    /// feature.
+    Specialize(String),
 }
 
 impl Outcome {
@@ -183,6 +202,13 @@ impl Outcome {
             Outcome::Gold(n) => vec![format!("{n} Fnorp")],
             Outcome::Xp(n) => vec![format!("+{n} experience, carried")],
             Outcome::Give(name) => vec![format!("Gained: {name}")],
+            // Unthemed and with the canonical name in it, TONE 13a: somebody
+            // reading this before an irreversible choice is deciding what to
+            // become, and *one only, and it does not come off* is the half of
+            // it that matters most.
+            Outcome::Specialize(c) => vec![
+                format!("You are {}. One only, and it does not come off.", crate::class::an(c)),
+            ],
             Outcome::Supply { id, n } => {
                 vec![format!("{n} × {}", id.replace('-', " "))]
             }
@@ -508,6 +534,12 @@ fn pays(o: &Outcome) -> bool {
     match o {
         Outcome::All(list) => list.iter().any(pays),
         Outcome::Flag(_) | Outcome::Nothing | Outcome::Tire(_) | Outcome::GiveUp { .. } => false,
+        // **A specialization is a payment**, and the strictest kind: it is the
+        // one thing on this list a repeating event may never hand out, because
+        // it cannot be handed out twice and a repeating event that pays is a
+        // faucet. `a_repeating_event_may_never_pay` is what refuses it, and
+        // saying `true` here is what puts it under that rule.
+        Outcome::Specialize(_) => true,
         // A negative `Gold` is a charge and would be safe; it is refused with
         // the rest because *which sign* is a thing a data edit changes and a
         // lint that reads a sign is a lint that goes quiet on a typo.

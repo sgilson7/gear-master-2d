@@ -411,6 +411,24 @@ pub enum ClassPower {
     /// same way the other four ask whether the purse, the fighter or the board
     /// did.
     Apothecary { potency_pct: i32, extra: u32 },
+    /// You may have `draughts` potions in you at once, instead of one.
+    ///
+    /// **Both specializations are the bench, and they are opposite halves of
+    /// it.** Asked for in as many words: *the apothecary makes few ingredients
+    /// more potent and unlocks unique effects, and the chef can consume
+    /// multiple potions per fight.* So the Apothecary buys **depth** — one
+    /// brew, worth more — and the Chef buys **breadth**: two or three of them
+    /// at once, each worth exactly what it says. A Chef who also made brews
+    /// stronger would be an Apothecary with a hat on, and the whole point of
+    /// *you may only have one* is that the choice costs you the other.
+    ///
+    /// **It touches no fight either.** Honoured in `Game::drink` and
+    /// `Character::boon`, and `combat.rs` has an arm saying so — the same arm
+    /// the Apothecary has, because adding a specialization should be a
+    /// decision about combat rather than a silence. What reaches the bell is
+    /// `Held`, which is the one door *what you are already holding* goes
+    /// through, and two potions are two lots of the same addition.
+    Chef { draughts: u32 },
     /// A creature whose maximum health you have eaten down to `third` percent
     /// of what it was is unmade — dead, whatever is still in it.
     ///
@@ -591,7 +609,7 @@ impl ClassPower {
             // **Nor is a specialization**, for the same two reasons: it is
             // taken off a tree rather than poured, and there is no fountain in
             // this game to pour one at.
-            Apothecary { .. } => return None,
+            Apothecary { .. } | Chef { .. } => return None,
             // **Both doublable, and each doubles the thing it is about.** The
             // Stoker's is the shovel — twice as many points a tick — rather
             // than the clock, because a furnace stoked twice as often is a
@@ -662,6 +680,7 @@ impl ClassPower {
             ClassPower::Stoker { .. } => &["every_ms", "per_stack"],
             ClassPower::Whisperer { .. } => &["third"],
             ClassPower::Apothecary { .. } => &["potency_pct", "extra"],
+            ClassPower::Chef { .. } => &["draughts"],
             // **An expert's knobs are its own**, asked through the arm that
             // wraps it rather than duplicated here.
             ClassPower::Expert(e) => e.knobs(),
@@ -706,6 +725,14 @@ impl ClassPower {
                 },
                 _ => self,
             },
+            ClassPower::Chef { draughts } => match knob {
+                // **Never below one**, because a Chef who could drink nothing
+                // would be a specialization that took something away — and the
+                // floor is what everybody already has, so the promise is always
+                // *at least as good as not being one*.
+                "draughts" => ClassPower::Chef { draughts: (draughts as i32 + by).max(1) as u32 },
+                _ => self,
+            },
             ClassPower::Stoker { every_ms, per_stack } => match knob {
                 // **Clamped at a tick, because a furnace that stokes faster
                 // than the clock is a furnace that stokes every tick** — and
@@ -746,6 +773,7 @@ impl ClassPower {
             ClassPower::Apothecary { potency_pct, extra } => {
                 format!("+{potency_pct}% on every brew, and {extra} more cells of glass")
             }
+            ClassPower::Chef { draughts } => format!("{draughts} potions in one fight"),
             ClassPower::Stoker { every_ms, per_stack } => format!(
                 "burn {per_stack} of your biggest pool every {:.1}s",
                 every_ms as f32 / 1000.0
@@ -817,9 +845,23 @@ impl ClassPower {
             // **Two registers on one line, TONE 13a**, the same as the Stoker:
             // somebody weighing a specialization against the points it costs is
             // comparing numbers.
+            // **The glass clause goes when there is nothing in it.** `extra`
+            // is zero until a point is spent, and *the glass holds 0 more
+            // cells than it was blown with* is a sentence somebody reads on
+            // the one screen where the choice does not come off. A knob at
+            // zero is worth naming in a tree, where it shows you what the
+            // points are for; it is not worth naming here.
+            ClassPower::Apothecary { potency_pct, extra: 0 } => {
+                format!("Every brew you drink is {potency_pct}% stronger.")
+            }
             ClassPower::Apothecary { potency_pct, extra } => format!(
                 "Every brew you drink is {potency_pct}% stronger, and the glass holds {extra} \
                  more cells than it was blown with."
+            ),
+            // One number, and the unit is *potions*, which is the thing the
+            // player is counting. TONE 13a: unthemed, with the figure in it.
+            ClassPower::Chef { draughts } => format!(
+                "You may have {draughts} potions in you at once, where everybody else has one."
             ),
             // **No stacks.** Upstream handed the same class out over and over
             // and a promise had to say what a second one bought; GM2D asks
@@ -1088,9 +1130,17 @@ pub static CLASSES: &[ClassDef] = &[
     // `OFFERED` — the fork screen draws that list — and outside
     // `expert::EXPERTS`, which stays `C(7,2)` at twenty-one.
     //
-    // `requires` is empty because there is no fountain in this game to rank at
-    // and nothing else reads it; how you become one is a paper on Spike's van,
-    // the same counter the other two papers stand on.
+    // **How you become one is a trainer, and for a whole block it was
+    // nothing at all.** These two sat in this table with a tree, a power, a
+    // theme name and five honoured arms, and `Character::specialization` was
+    // written by exactly one line in the repository — the save loader. So the
+    // Apothecary shipped unreachable, and the comment that used to stand here
+    // said *how you become one is a paper on Spike's van*, which was an
+    // intention rather than a fact. **A comment beside a constant that moved**,
+    // one field along, and the reason the fix is `Outcome::Specialize` rather
+    // than a fourth line on the van: asked for as *each specialization has one
+    // trainer you can find somewhere on the map, in hidden / dangerous areas*,
+    // which puts the whole of *where* in `events.json` and a map file.
     ClassDef {
         name: "Apothecary",
         blurb: "Two things off two corpses, in a glass, in the right order.",
@@ -1099,10 +1149,23 @@ pub static CLASSES: &[ClassDef] = &[
         // the floor class a fountain falls back to. A specialization with no
         // requirements made *two*, and `there_is_always_a_class_to_give` said
         // so on the next run. Nothing in GM2D ranks at a fountain, so the
-        // numbers here are a shape rather than a gate — how you become one is
-        // a paper on Spike's van.
+        // numbers here are a shape rather than a gate.
         requires: &[(Axis::Attunement, 30), (Axis::Ward, 20)],
         power: ClassPower::Apothecary { potency_pct: 10, extra: 0 },
+    },
+    ClassDef {
+        name: "Chef",
+        blurb: "Everything that came off it, and nothing left on the bone.",
+        // Non-empty for the Apothecary's reason, one entry up.
+        requires: &[(Axis::Attunement, 20), (Axis::Wrath, 30)],
+        // **Both knobs start where the tree can move them and the untuned
+        // power is still worth having.** One extra off every win is the
+        // promise somebody takes it for; the glass giving something back is
+        // what the tree spends its points on.
+        // **Two, untuned**, because one is what everybody has and a
+        // specialization whose promise starts at nothing is a promise nobody
+        // can read. The tree takes it further.
+        power: ClassPower::Chef { draughts: 2 },
     },
     ClassDef {
         name: "Berserker",
@@ -1395,7 +1458,23 @@ pub const OFFERED: &[&str] =
 /// `expert::EXPERTS`, so no pair reaches it and it pairs with nothing; and it
 /// is not in `Character::classes`, because everything that reads that list
 /// reads it to ask *which pair are you* and the answer must not change.
-pub const SPECIALIZATIONS: &[&str] = &["Apothecary"];
+pub const SPECIALIZATIONS: &[&str] = &["Apothecary", "Chef"];
+
+/// `a Chef`, `an Apothecary` — the article a name actually takes.
+///
+/// **Because one of the two shipped specializations starts with a vowel**, and
+/// *"You are a Apothecary"* is a sentence on the screen where an irreversible
+/// choice is confirmed. This project already has
+/// `no_promise_is_ungrammatical_about_a_count` for the same failure with a
+/// number in it, and *a glossary is a proofreading surface* — so is a receipt.
+///
+/// Crude on purpose: it reads the first letter, which is right for every class
+/// name in the game and for every one a theme renames them to. A name where it
+/// is wrong is a name somebody should look at anyway.
+pub fn an(name: &str) -> String {
+    let vowel = name.chars().next().is_some_and(|c| "aeiouAEIOU".contains(c));
+    format!("{} {name}", if vowel { "an" } else { "a" })
+}
 
 pub const TOWN_CLASSES: &[&str] = &["Piety", "Ticket to Ride", "Tired", "Recycler"];
 

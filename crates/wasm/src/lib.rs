@@ -915,30 +915,7 @@ fn item_card(
         //
         // Standing still: what it contributes whether or not a
         // fight is happening.
-        let passive: Vec<serde_json::Value> = [
-            (st.health, "max health", ""),
-            (st.strength, "strength", ""),
-            (st.regen, "regen a second", ""),
-            (st.power, "weapon power", "%"),
-            (st.mind_resist, "thick skull", "%"),
-            (st.curse_resist, "curse resist", "%"),
-            (st.physical_resist, "physical resist", "%"),
-            (st.magic_resist, "magic resist", "%"),
-            (st.physical_pierce, "physical piercing", "%"),
-            (st.magic_pierce, "magic piercing", "%"),
-            (st.physical_harden, "physical hardening", "%"),
-            (st.magic_harden, "magic hardening", "%"),
-            // Not in upstream's list. It is a standing share of
-            // what armour soaks rather than something the item
-            // does on its tick, so it sits here.
-            (st.reflect, "reflected", "%"),
-        ]
-        .iter()
-        .filter(|(v, ..)| *v != 0)
-        .map(|(v, label, unit)| {
-            serde_json::json!({ "n": v, "label": label, "unit": unit })
-        })
-        .collect();
+        let passive: Vec<serde_json::Value> = standing_rows(&st);
 
         // An unconditional pool gain is a stat wearing a
         // trigger's clothes. Folded into the figures below, so
@@ -1093,6 +1070,40 @@ fn item_card(
 /// holding — and three copies of this would be three answers to *is a shared
 /// piece grey*. Same reasoning as `oneCard` on the page and `side_slots` for
 /// the two boards.
+/// What a `Stats` contributes standing still, as labelled rows.
+///
+/// **One vocabulary, and it used to be one caller's.** The character sheet
+/// built this array inline; the bank now sorts by the same figures, and two
+/// lists of stat names in two payloads is two answers to *what is this called*
+/// — on two screens a player reads in the same sitting. Extracted rather than
+/// copied, which is the whole of why this exists.
+///
+/// Zeroes are dropped: on a defence, nought is the ordinary case rather than a
+/// claim, and a row of them is a card that says nothing thirteen times.
+fn standing_rows(st: &gm2d_core::stats::Stats) -> Vec<serde_json::Value> {
+    [
+        (st.health, "max health", ""),
+        (st.strength, "strength", ""),
+        (st.regen, "regen a second", ""),
+        (st.power, "weapon power", "%"),
+        (st.mind_resist, "thick skull", "%"),
+        (st.curse_resist, "curse resist", "%"),
+        (st.physical_resist, "physical resist", "%"),
+        (st.magic_resist, "magic resist", "%"),
+        (st.physical_pierce, "physical piercing", "%"),
+        (st.magic_pierce, "magic piercing", "%"),
+        (st.physical_harden, "physical hardening", "%"),
+        (st.magic_harden, "magic hardening", "%"),
+        // Not in upstream's list. It is a standing share of what armour soaks
+        // rather than something the item does on its tick, so it sits here.
+        (st.reflect, "reflected", "%"),
+    ]
+    .iter()
+    .filter(|(v, ..)| *v != 0)
+    .map(|(v, label, unit)| serde_json::json!({ "n": v, "label": label, "unit": unit }))
+    .collect()
+}
+
 fn loose_entry(
     ch: &gm2d_core::character::Character,
     theme: &'static gm2d_core::theme::Theme,
@@ -1116,6 +1127,19 @@ fn loose_entry(
     o.insert("rotation".into(), ch.registry.rotation(p).into());
     o.insert("price".into(), d.price.into());
     o.insert("shared".into(), d.shared().into());
+    // **What it is worth standing still, and what set it belongs to**, so the
+    // bank can be sorted by either. Both are the component's own facts —
+    // `d.base` is its contribution and `assembly_bonus.names` is the set it
+    // *names* — and neither is a thing the page could work out for itself
+    // without becoming a second catalogue.
+    o.insert("stats".into(), serde_json::json!(standing_rows(&d.base)));
+    o.insert(
+        "set".into(),
+        match d.assembly_bonus.and_then(|b| b.names) {
+            Some(n) => serde_json::json!(n),
+            None => serde_json::Value::Null,
+        },
+    );
     v
 }
 
@@ -2375,7 +2399,12 @@ fn counter_here(g: &gm2d_core::game::Game) -> Option<gm2d_core::world::PlaceDef>
     let allowed = g.character.allowances();
     map_for(g, |w| {
         w.place_now(&g.world, g.world.at[0], g.world.at[1], &allowed)
-            .filter(|p| !p.sells.is_empty())
+            // **Anything with a counter**, which is enchs, or a trainer's own
+            // ingredients, or a trade to teach. It was `sells` alone — written
+            // when an ench was the only thing anybody sold — and a trainer
+            // sells no enchs at all, so `train_here` found nobody standing in
+            // front of the player who was standing in front of them.
+            .filter(|p| !p.sells.is_empty() || !p.stocks.is_empty() || p.teaches.is_some())
             .cloned()
     })
 }
@@ -2435,19 +2464,69 @@ pub fn bench_json() -> String {
             // line the screen had before there were three. Both are drawn off
             // `Game::papers`, so there is no second answer to what the Patent
             // costs or whether you have it.
-            "licence": {
+            // **What this person teaches, and whether they will take you on.**
+            // The refusal counts, because a line that greys with no reason is a
+            // line a player reports as a bug — and the other trainer is a
+            // country away, so *you are already something* has to be said here
+            // rather than found out there.
+            "teaches": p.teaches.as_ref().map(|c| {
+                let have = g.character.specialization.as_deref();
+                serde_json::json!({
+                    "class": c,
+                    "name": g.theme_class(c),
+                    "says": gm2d_core::class::CLASSES
+                        .iter()
+                        .find(|d| d.name == c.as_str())
+                        .map(|d| d.power.describe())
+                        .unwrap_or_default(),
+                    "taken": have == Some(c.as_str()),
+                    "why": match have {
+                        None => None,
+                        Some(h) if h == c => Some(format!("You are one.")),
+                        Some(h) => Some(format!("You are {}, and nobody is two things.", gm2d_core::class::an(&g.theme_class(h)))),
+                    },
+                })
+            }),
+            // Their own shelf of ingredients, which they sell to their own kind
+            // and nobody else. Priced here because an ingredient has no price
+            // in `brews.json` — what a thing costs is the shelf's, which is the
+            // division the components have always made.
+            "stocks": p.stocks.iter().filter_map(|id| {
+                let def = gm2d_core::data::brews().ingredients.iter().find(|i| i.id == *id)?.clone();
+                let price = gm2d_core::game::Game::TRAINER_PRICE;
+                Some(serde_json::json!({
+                    "id": def.id,
+                    "name": def.name,
+                    "blurb": def.blurb,
+                    "spec": format!("+{}% when it goes in third", def.potency),
+                    "price": price,
+                    "afford": g.character.gold >= price,
+                    "have": g.character.in_larder(&def.id),
+                    "mine": p.teaches.as_deref() == g.character.specialization.as_deref(),
+                }))
+            }).collect::<Vec<_>>(),
+            // **The papers are the van's, and the van is the counter with the
+            // enchs on it.** A bench is two kinds of person now, and a trainer
+            // at the bottom of the Cairnworks offering the Kaklon Patent would
+            // be Spike's counter wearing somebody else's prose. Asked by what
+            // the place *sells* rather than by its id, because a hand-written
+            // list of one is the seventh of those this project has paid for —
+            // and it is the right question anyway: the licence is the licence
+            // to bolt on the things standing beside it.
+            "licence": (!p.sells.is_empty()).then(|| serde_json::json!({
                 "price": gm2d_core::ench::LICENCE_PRICE,
                 "afford": g.character.gold >= gm2d_core::ench::LICENCE_PRICE,
                 "needed": !g.character.licensed(),
                 "bought": g.character.bought_licence,
-            },
+            })),
             // **Three papers, all drawn, and the refused ones say why.**
             // `Game::papers` drops the ones already answered and fills `why`
             // for the ones the counter will not sell yet — *a locked line on a
             // shelf you can read is a goal; an absent line is a secret*. The
             // refusal has the count in it, which is TONE 12 and is why the
             // sentence is core's rather than assembled here.
-            "papers": g.papers().into_iter().map(|l| serde_json::json!({
+            "papers": if p.sells.is_empty() { Vec::new() } else { g.papers() }
+                .into_iter().map(|l| serde_json::json!({
                 "id": l.paper.id(),
                 "name": l.name,
                 "says": l.says,
@@ -2576,6 +2655,44 @@ pub fn shop_json() -> String {
             "fatigue": g.character.fatigue,
         })
         .to_string()
+    })
+}
+
+/// Take the trade the person on this tile teaches. Empty string, or why not.
+///
+/// **Which specialization is the *place's*, not the caller's**, so the page
+/// cannot ask to be made something the person in front of it does not teach —
+/// the same division a gate's key makes and the reason `buy_ench` reads
+/// `sells` off the tile rather than trusting the id it was handed.
+#[wasm_bindgen]
+pub fn train_here() -> String {
+    with_mut(|g| {
+        let Some(here) = counter_here(g) else { return "there is nobody here".into() };
+        let Some(class) = here.teaches.clone() else {
+            return "They do not teach anything.".into();
+        };
+        match g.train(&class) {
+            Ok(_) => String::new(),
+            Err(why) => why,
+        }
+    })
+}
+
+/// Buy one ingredient off a trainer's own shelf. Empty string, or why not.
+#[wasm_bindgen]
+pub fn buy_ingredient(id: &str) -> String {
+    with_mut(|g| {
+        let Some(here) = counter_here(g) else { return "there is nobody here".into() };
+        if !here.stocks.iter().any(|s| s == id) {
+            return "They do not have one of those.".into();
+        }
+        let Some(wants) = here.teaches.clone() else {
+            return "They sell to their own and they teach nobody.".into();
+        };
+        match g.buy_ingredient(id, gm2d_core::game::Game::TRAINER_PRICE, &wants) {
+            Ok(_) => String::new(),
+            Err(why) => why,
+        }
     })
 }
 
@@ -3067,9 +3184,25 @@ pub fn retort_json() -> String {
             })),
             "why": g.character.what_is_brewing().err(),
             "potions": potions_json(g),
-            "drunk": g.character.drunk.as_ref().and_then(|id| {
-                brews.brews.iter().find(|d| d.id() == *id).map(|d| d.name.clone())
-            }),
+            // **Every draught, named**, because a Chef may have more than one
+            // in them and a screen that said only the first would be wrong
+            // about what is about to land.
+            "drunk": g
+                .character
+                .drunk
+                .iter()
+                .map(|id| {
+                    brews
+                        .brews
+                        .iter()
+                        .find(|d| d.id() == *id)
+                        .map(|d| d.name.clone())
+                        .unwrap_or_else(|| id.clone())
+                })
+                .collect::<Vec<_>>(),
+            // How many may be in you at once. One for everybody, and the Chef's
+            // own number for a Chef — the screen greys the rest off this.
+            "draughts": g.character.draughts(),
             "potency": g.character.apothecary().0,
             "stats": {
                 "health": stats.health, "strength": stats.strength,
@@ -3695,6 +3828,17 @@ pub fn character_json() -> String {
                 "detail": r.detail(),
             })).collect::<Vec<_>>(),
             "class": c.class.clone(),
+            // **And what else you are**, which no screen said at all: a
+            // specialization is not one of the three classes — `classes()`
+            // answers *which pair are you* and this pairs with nothing — so
+            // every payload that walks that list was right to leave it out and
+            // nothing was left to put it in. A thing you became that no screen
+            // mentions is the Apothecary's own bug, one layer up.
+            "specialization": c.specialization.clone(),
+            "specialization_says": c
+                .specialization_def()
+                .map(|d| d.power.describe())
+                .unwrap_or_default(),
         })
         .to_string()
     })
@@ -3934,7 +4078,10 @@ pub fn class_name() -> String {
 pub fn all_trees_json() -> String {
     with(|g| {
         let tree = gm2d_core::data::skills();
-        let mine: Vec<&str> = g.character.classes().collect();
+        // **Every tree they may spend in**, which is `classes()` *plus the
+        // specialization* — a specialization is not one of the three classes
+        // and has a tree all the same.
+        let mine: Vec<&str> = g.character.spendable_trees().collect();
         // The definitions **with the expert's knobs turned**, which is what a
         // tab's promise has to be printed from: `CLASSES` is the roster before
         // any point was spent.

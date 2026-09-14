@@ -129,6 +129,30 @@ impl Game {
         }
     }
 
+    /// A class's name in the theme that is talking.
+    ///
+    /// Takes a `&str` for `theme_piece`'s reason: the callers have one out of a
+    /// map file rather than out of `CLASSES`, so the roster is what turns it
+    /// back into a literal and a name it does not know comes back unchanged.
+    ///
+    /// **TONE 13a's exception, which is the class table's own.** A class's
+    /// *name* is the world's word and goes through the theme; what it *does* is
+    /// the engine's and does not.
+    pub fn theme_class(&self, canonical: &str) -> String {
+        match crate::class::CLASSES.iter().find(|d| d.name == canonical) {
+            Some(d) => crate::theme::by_id(&self.theme).class(d.name).to_string(),
+            None => canonical.to_string(),
+        }
+    }
+
+    /// What a trainer charges for one of their own ingredients.
+    ///
+    /// **One price, like the enchs**, and for the same reason: a trainer does
+    /// not price by what a thing is worth to you. It is the thing you spend
+    /// late money on once there is nothing left to buy, which is where an ench
+    /// already sits.
+    pub const TRAINER_PRICE: i32 = 400;
+
     /// Walking into a town takes the tiredness off. Returns how much came off.
     ///
     /// **This is not a rest, and there still is not one.** Health has reset at
@@ -482,6 +506,27 @@ impl Game {
                 self.warp_to(map, *at, difficulty);
                 receipt.push("You are somewhere else. It is a long walk back.".into());
             }
+            // **One only, and it does not come off**, which is the whole of
+            // what a specialization is. The refusal is a sentence rather than a
+            // silence, because a card that appears to do nothing is a card a
+            // player reports as broken — and it is the *trainer* who says it,
+            // since the other one is somewhere else entirely.
+            Outcome::Specialize(c) => match &self.character.specialization {
+                Some(have) if have == c => {
+                    receipt.push(format!("You are already {}.", crate::class::an(c)));
+                }
+                Some(have) => {
+                    receipt.push(format!(
+                        "You are {}, and nobody is two things. They wish you well.",
+                        crate::class::an(have)
+                    ));
+                }
+                None if crate::class::SPECIALIZATIONS.contains(&c.as_str()) => {
+                    self.character.specialization = Some(c.clone());
+                    receipt.push(format!("You are {}. It does not come off.", crate::class::an(c)));
+                }
+                None => receipt.push(format!("{c} is not something anybody trains")),
+            },
             // **What the door kept, by name.** A component that leaves the bag
             // without a word reads as a bug — this project's oldest rule, and
             // the same reason a spent key is announced.
@@ -1247,13 +1292,74 @@ impl Game {
         Ok(def.name)
     }
 
+    /// Take the trade this person teaches.
+    ///
+    /// **One only, and it does not come off** — the fork's own rule, and the
+    /// reason the refusal is a sentence: a specialization you cannot take
+    /// because you are already something is a thing the player has to be told,
+    /// in the trainer's own words, since the other one is somewhere else
+    /// entirely.
+    pub fn train(&mut self, class: &str) -> Result<String, String> {
+        if !crate::class::SPECIALIZATIONS.contains(&class) {
+            return Err(format!("{class} is not something anybody trains"));
+        }
+        match &self.character.specialization {
+            Some(have) if have == class => Err(format!("You are already {}.", crate::class::an(class))),
+            Some(have) => Err(format!("You are {}, and nobody is two things.", crate::class::an(have))),
+            None => {
+                self.character.specialization = Some(class.to_string());
+                Ok(class.to_string())
+            }
+        }
+    }
+
+    /// Buy one ingredient off a trainer's own shelf.
+    ///
+    /// **Their own kind only**, which is what makes a specialization a choice
+    /// rather than a shopping list: the Apothecary's trainer will not sell to a
+    /// Chef and the refusal says so. Money first, then the larder, and **a
+    /// refusal spends nothing** — the reroll's rule, the bank's and the cart's.
+    pub fn buy_ingredient(&mut self, id: &str, price: i32, wants: &str) -> Result<String, String> {
+        if self.character.specialization.as_deref() != Some(wants) {
+            return Err(format!("They sell to {} and you are not one.", crate::class::an(wants)));
+        }
+        let brews = crate::data::brews();
+        let Some(def) = brews.ingredients.iter().find(|i| i.id == id) else {
+            return Err("there is no such ingredient".into());
+        };
+        if self.character.gold < price {
+            return Err(format!("{price} Fnorp, and you have {}.", self.character.gold));
+        }
+        self.character.gold -= price;
+        self.character.gather(id);
+        Ok(def.name.clone())
+    }
+
     /// Drink one, which lands at the next bell.
     pub fn drink(&mut self, id: &str) -> Result<String, String> {
         let Some(i) = self.character.potions.iter().position(|p| p == id) else {
             return Err("you are not carrying that".into());
         };
-        if self.character.drunk.is_some() {
-            return Err("you have already drunk something, and it lands at the next bell".into());
+        // **How many you may have in you at once**, which is one for everybody
+        // and a Chef's own number for a Chef. Asked unconditionally rather than
+        // branched on a class, so the old behaviour is the `1` case.
+        //
+        // **The refusal counts**, because a button that greys with no reason is
+        // a button a player reports as a bug — a sentence this file has now
+        // written down five times.
+        let room = self.character.draughts();
+        if self.character.drunk.len() as u32 >= room {
+            return Err(if room == 1 {
+                "you have already drunk something, and it lands at the next bell".into()
+            } else {
+                format!("you have {room} in you already, and they land at the next bell")
+            });
+        }
+        // And never the same brew twice over: two of one potion is one potion
+        // you can no longer tell apart from the other, and the receipt would
+        // name it twice.
+        if self.character.drunk.iter().any(|d| d == id) {
+            return Err("you have drunk one of those already".into());
         }
         let brews = crate::data::brews();
         let name = brews
@@ -1263,7 +1369,7 @@ impl Game {
             .map(|d| d.name.clone())
             .unwrap_or_else(|| id.to_string());
         self.character.potions.remove(i);
-        self.character.drunk = Some(id.to_string());
+        self.character.drunk.push(id.to_string());
         Ok(name)
     }
 

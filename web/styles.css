@@ -908,3 +908,16 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
 /* The popup is a screen like any other, only narrower: it is a column of
    figures and a column of figures does not want nine hundred pixels. */
 .screenbox.narrow { max-width: 520px; }
+
+
+/* ------------------------------------------------------------- the sort bar
+   One control over two shelves. It sits with the note above the bag because
+   that is what it reorders, and it reorders the vault below with it — a
+   control per shelf would be two answers to *how is this sorted*. */
+.sortbar { display: flex; align-items: baseline; gap: 8px; }
+.sortbar select {
+  font: inherit; font-family: var(--mono); font-size: 11px;
+  background: transparent; color: var(--ink); border: 1px solid var(--line);
+  padding: 2px 6px;
+}
+.sortbar select:hover { border-color: var(--brass); }

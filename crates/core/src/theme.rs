@@ -431,6 +431,7 @@ pub static TURTLE_DICK: Theme = Theme {
         // The first specialization. A licence rather than a calling, which is
         // what a specialization is.
         ("Apothecary", "Kettle Chemist"),
+        ("Chef", "Kettle Cook"),
         ("Avenged", "Sprocket Avenged"),
         ("Wanderer", "Plane Tourist"),          // half-tourist, half-catastrophe
         ("Warpriest", "Acolyte of Dobira"),     // the Master and Baylon, pp. 46-50

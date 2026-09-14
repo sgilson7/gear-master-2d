@@ -776,6 +776,24 @@ def pull_to(page, tx, ty):
     page.wait_for_timeout(60)
 
 
+def download_save(page):
+    """The walk's own save, with nothing over the button.
+
+    **`#download` is the first click in a dozen checks**, so a screen left up by
+    the check before is a thirty-second timeout *here* rather than a finding
+    *there* — green locally and red in CI, which is the shape of every ordering
+    bug this harness has had. It failed the M21.3 deploy exactly that way: the
+    town screen grew two panels, chromium lost the race webkit won, and the run
+    died on a click against a button behind a town.
+
+    So the clearing is not a guard somebody remembers to write, it is the door.
+    """
+    clear_screens(page)
+    with page.expect_download(timeout=20000) as dl:
+        page.click("#download")
+    return dl.value.path()
+
+
 def clear_screens(page):
     """Close whatever a shot opened, whichever screen it was.
 
@@ -852,9 +870,7 @@ def check_the_cue_draws_what_core_is_asked(page, name, fails):
     thirty-seven degree pull and then fired the nearest of seventy-two would be
     a page whose arrow is a decoration.
     """
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
     plant(page, base, lambda b: on_the_table(b, (8, 12)), stem="cue-draw")
     try:
         if not page.evaluate("() => JSON.parse(window.__position()).is_table"):
@@ -911,9 +927,7 @@ def check_a_shot_animates_to_where_core_said(page, name, fails):
     own physics would look perfectly plausible and would disagree with the
     tile the game thinks you are on.
     """
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
     plant(page, base, lambda b: on_the_table(b, (8, 12)), stem="fly")
     try:
         said = page.evaluate("() => window.__preview(18, 4)")
@@ -941,9 +955,7 @@ def check_the_keyboard_shoots(page, name, fails):
     are the map's own arrows doing a different job, which is why `aimKey` has
     to answer *false* on a floor — see the check below.
     """
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
     plant(page, base, lambda b: on_the_table(b, (8, 12)), stem="cue-keys")
     try:
         page.click("#map")
@@ -984,9 +996,7 @@ def check_a_spike_flashes_and_the_fatigue_moves(page, name, fails):
     is the *derived number with nowhere it is shown* failure, in the one place
     it would read as the game cheating.
     """
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
     # Three spikes on this table; the low one is reachable from up the road.
     plant(page, base, lambda b: on_the_table(b, (11, 14)), stem="spike")
     try:
@@ -1021,9 +1031,7 @@ def check_sunk_lands_you_in_town(page, name, fails):
     A ball that sinks is the one contact that ends the shot somewhere the
     player did not aim, so it is the one that most needs saying out loud.
     """
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
     plant(page, base, lambda b: on_the_table(b, (1, 2)), stem="pocket")
     # **Searched in the page, not over the wire.** Seventy-two angles by ten
     # powers is seven hundred round trips, and a check that takes a minute to
@@ -1070,9 +1078,7 @@ def check_the_bench_brews_a_pair(page, name, fails):
     # locally and red in CI, which is the shape of every ordering bug this
     # harness has had.
     clear_screens(page)
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
 
     def stocked(body):
         strip_the_boards(body)
@@ -1186,9 +1192,7 @@ def check_a_potion_is_drunk_before_the_bell(page, name, fails):
     # clicked.** A shot can end on any screen and the first click here is
     # `#download`.
     clear_screens(page)
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
 
     def carrying(body):
         strip_the_boards(body)
@@ -1251,9 +1255,7 @@ def check_the_area_says_its_name(page, name, fails):
     # locally and red in CI, which is the shape of every ordering bug this
     # harness has had.
     clear_screens(page)
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
 
     def in_the_pit(body):
         strip_the_boards(body)
@@ -1322,9 +1324,7 @@ def check_the_errand_log_is_a_tree(page, name, fails):
     # locally and red in CI, which is the shape of every ordering bug this
     # harness has had.
     clear_screens(page)
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
 
     def with_a_chain(body):
         strip_the_boards(body)
@@ -1409,9 +1409,7 @@ def check_a_word_errand_lands_on_a_table(page, name, fails):
     # locally and red in CI, which is the shape of every ordering bug this
     # harness has had.
     clear_screens(page)
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
 
     def below(body):
         strip_the_boards(body)
@@ -1488,9 +1486,7 @@ def check_a_floor_still_steps(page, name, fails):
     a dungeon nobody could walk out of, and it would be invisible to every test
     in `cargo test` — the keys are the page's.
     """
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
 
     def in_the_pit(body):
         strip_the_boards(body)
@@ -1533,9 +1529,7 @@ def check_reduced_motion_skips_the_flight(page, name, fails):
     no account of a shot at all, which is the accessibility failure wearing the
     accessibility feature's coat.
     """
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
     plant(page, base, lambda b: on_the_table(b, (8, 12)), stem="still")
     try:
         page.emulate_media(reduced_motion="reduce")
@@ -1575,9 +1569,7 @@ def check_the_ball_slides_and_the_trail_grows_behind_it(page, name, fails):
     drawn on many frames and that `flown` — how much of the trail is painted —
     *grows* rather than arriving whole.
     """
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
     plant(page, base, lambda b: on_the_table(b, (13, 13)), stem="slide")
     try:
         page.evaluate("() => window.__shoot(30, 6)")
@@ -1624,9 +1616,7 @@ def check_a_diamond_catches_the_ball(page, name, fails):
     take you off the map, and a shot that ends somewhere the page did not
     expect is the stale-map bug in a new coat.
     """
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
     plant(page, base, lambda b: on_the_table(b, (13, 13)), stem="catch")
     try:
         found = page.evaluate("""() => {
@@ -1676,9 +1666,7 @@ def check_the_long_cart_runs_between_towns(page, name, fails):
     ride. That last one is this file's oldest rule and a ride is the largest
     change to a position there is short of a save being restored.
     """
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
 
     def been_to_both(body):
         strip_the_boards(body)
@@ -1752,9 +1740,7 @@ def check_the_cue_shows_where_the_ball_will_stop(page, name, fails):
     engine about where a ball goes. This aims, reads the preview, fires, and
     compares.
     """
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
     plant(page, base, lambda b: on_the_table(b, (13, 13)), stem="ahead")
     try:
         page.click("#map")
@@ -1802,9 +1788,7 @@ def check_a_shut_crossing_says_so_when_you_land_beside_it(page, name, fails):
     and the first two are already in `CLAUDE.md`. A refusal a player cannot
     read is a wall.
     """
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
 
     def the_tide_is_in(body):
         strip_the_boards(body)
@@ -1908,9 +1892,7 @@ def check_the_furnace_shows_on_the_bar(page, name, fails):
     walk-up character has not got: a pool to shovel and a fight long enough to
     shovel it in. An empty hopper buys nothing, which is the class's own rule.
     """
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
 
     def a_stoker_in_a_long_fight(body):
         body["character"]["class"] = "Stoker"
@@ -2076,9 +2058,7 @@ def check_a_swing_climbs_with_fury(page, name, fails):
     is what the row says at a given moment; a real-time scrub would be a test
     of the animation.
     """
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
 
     def a_fury_board_in_a_long_fight(body):
         strip_the_boards(body)
@@ -2562,9 +2542,7 @@ def check_the_bank_is_one_vault_in_every_town(page, name, fails):
     Planted at both counters, because the two towns are on different maps and
     the walk between them is the rest of the game.
     """
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
 
     def beside_the_pit(body):
         body["world"]["map"] = ""
@@ -2604,9 +2582,7 @@ def check_the_bank_is_one_vault_in_every_town(page, name, fails):
                 page.wait_for_selector("#town", state="hidden", timeout=5000)
 
         # --- the other town, on another map -----------------------------------
-        with page.expect_download(timeout=20000) as dl:
-            page.click("#download")
-        banked_save = dl.value.path()
+        banked_save = download_save(page)
 
         def beside_kettleworks(body):
             body["world"]["map"] = "kettleworks-field"
@@ -2666,9 +2642,7 @@ def check_an_instrument_has_its_own_frame(page, name, fails):
     3. **the weapon grid is untouched**, so what you walk in with is what you
        packed. That is the whole of the complaint and it is the last assertion.
     """
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
 
     def at_the_edge(body):
         body["world"]["map"] = "the-treyway"
@@ -2777,9 +2751,7 @@ def check_a_chain_errand_can_be_handed_in(page, name, fails):
     Planted at the point of handing in, because the road to it is a chain of
     choices and what has to be proved is the counter.
     """
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
     QUEST = "what-is-behind-the-door"
 
     def carrying_it(body):
@@ -2848,9 +2820,7 @@ def check_a_card_can_always_be_left(page, name, fails):
     wall two tiles west of it shows a paragraph and offers none. The patrol
     finds neither — it is six steps east and six west of the pit.
     """
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
 
     def by_her_door(body):
         w = body.setdefault("world", {})
@@ -2932,9 +2902,7 @@ def check_a_defeat_costs_you_your_place(page, name, fails):
     wrong, because the walk home lives in the shim and the shim was writing the
     bookmark down.
     """
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
 
     def on_the_treyway_about_to_lose(body):
         strip_the_boards(body)
@@ -4867,9 +4835,7 @@ def check_an_errand_can_be_handed_in_where_it_was_taken(page, name, fails):
     if not door:
         fails.append(f"{name}: the overworld has no marbulons-door on it")
         return
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
 
     # Standing one west of her door, having already read her card, carrying
     # the errand and the three jars it asked for. Exactly the reported state.
@@ -4940,9 +4906,7 @@ def check_the_fork_is_on_top(page, name, fails):
     way to see it: `.card` made every item card a full-viewport overlay, and
     `.screen.framed` kept a hidden fight screen swallowing clicks.
     """
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
     town = page.evaluate("""() => (window.__world().places ?? []).find(p => p.kind === 'town')""")
 
     def owed(body):
@@ -5010,9 +4974,7 @@ def check_the_door_opens_on_the_treyway(page, name, fails):
     Planted at each stage rather than walked, because the walk to it is the
     whole game.
     """
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
 
     on_map = page.evaluate("""() => (window.__world().places ?? [])
             .some(p => p.id === 'the-door-in-the-wall')""")
@@ -5186,9 +5148,7 @@ def check_the_road_west_reaches_a_town(page, name, fails):
     and end up on a shelf. Planted onto the Treyway rather than walked from the
     pit, because the walk from the pit is the whole game.
     """
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
 
     road = [3, 13]
 
@@ -5295,9 +5255,7 @@ def check_the_tower_drops(page, name, fails):
     leaves a stump that says so, and a save taken inside a floor reopens
     outside it.
     """
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
 
     floors = [f"the-drambus-stack-{n}" for n in (5, 4, 3, 2, 1)]
     door = [8, 12]
@@ -5380,9 +5338,7 @@ def check_the_lake_drains_and_the_demo_ends_under_it(page, name, fails):
     since M2, and the map is a cached object — a drain the page never re-read
     would be a lake that is bed in core and water on the screen.
     """
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
 
     def count_water():
         return page.evaluate("""() => {
@@ -5488,9 +5444,7 @@ def check_an_instrument_takes_the_grid(page, name, fails):
     The weapon grid keeping its blade is asserted next door, in
     `check_an_instrument_has_its_own_frame`, which is where the report is.
     """
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
 
     def with_a_compass(body):
         seat_a_set(body, COMPASS, "instrument")
@@ -5524,9 +5478,7 @@ def check_the_reach_reads_through_what_you_carry(page, name, fails):
     reading the map through or the whole feature is indistinguishable from
     nothing happening.
     """
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
 
     edge = [6, 1]
 
@@ -5626,9 +5578,7 @@ def check_the_long_way_back(page, name, fails):
     is going to be refused is a worse screen than not offering it, which is the
     ench rack's lesson and the same answer.
     """
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
 
     # --- wearing nothing: no button ------------------------------------------
     def bare(body):
@@ -5688,9 +5638,7 @@ def check_the_rack(page, name, fails):
     is that the licence gates it, that the board marks what is bolted on, and
     that the card says so — the arithmetic is `tests/enchs.rs`.
     """
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
 
     # --- unlicensed: no bench, no rack ---------------------------------------
     #
@@ -5858,9 +5806,7 @@ def check_the_spin_animates(page, name, fails):
     Planted, like the rack's check, and for the same reason: a licensee at
     level five with ninety Fnorp is a long walk.
     """
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
 
     def spinning(body):
         body["character"]["class"] = "Recycler"
@@ -6036,9 +5982,7 @@ def check_a_set_reads(page, name, fails):
     The engine's half — that the rule reaches the fight, that two thirds of a
     set grants nothing — is `tests/sets.rs`.
     """
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
 
     def show_the_board(pieces, stem):
         plant(page, base, lambda b: seat_a_set(b, pieces, "gloves"), stem=stem)
@@ -6110,9 +6054,7 @@ def check_the_toad_walks_on_water(page, name, fails):
     for is how you reach it before the Drambus Stack drains the whole thing.
     What this proves is that the allowance reaches `world::step` in a browser.
     """
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
 
     def dry(body):
         # **Wearing nothing**, or the character the walk built may already have
@@ -6199,9 +6141,7 @@ def check_the_van_appears_at_a_level(page, name, fails):
     if page.query_selector("#bench-wrap") is not None:
         fails.append(f"{name}: the town still has a bench on it")
 
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
 
     def at_level(xp):
         def edit(body):
@@ -6271,9 +6211,7 @@ def check_a_broken_item_reads(page, name, fails):
     rather than as the thing the player bought — the same reason `Event::Stunned`
     was given a variant of its own. The engine's half is `tests/breaking.rs`.
     """
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
 
     def swinging(body):
         strip_the_boards(body)
@@ -6329,9 +6267,7 @@ def check_a_broken_item_reads(page, name, fails):
     # into whatever the ground rolled and passed or failed on how much health
     # the creature happened to have. Downloaded *after* the bolt, so the save
     # carries it, and re-planted with something big standing in front of it.
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    armed = dl.value.path()
+    armed = download_save(page)
 
     def in_a_long_fight(body):
         body["encounter"] = {"enemy": "Rust Colossus", "at": body["world"]["at"]}
@@ -6375,9 +6311,7 @@ def check_an_ench_you_cannot_use_is_still_shown(page, name, fails):
     vanished for three players in four would be worse than one they cannot use
     yet.* This is the half of that sentence the screen owed.
     """
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
 
     def holding(licensed):
         def edit(body):
@@ -6475,6 +6409,7 @@ def check_the_game_talks_in_one_place(page, name, fails):
     # keeps only the last few, so what is measured is the *newest line*, not
     # how many there are — it is capped and a length check would read as a
     # pass or a fail depending on how much had already happened.
+    clear_screens(page)
     with page.expect_download(timeout=20000) as dl:
         page.click("#download")
     dl.value.path()
@@ -6534,9 +6469,7 @@ def check_the_north_is_shut(page, name, fails):
         fails.append(f"{name}: {cross['id']} asks for no level")
         return
 
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
 
     def at_the_crossing(level_xp):
         def edit(body):
@@ -6607,9 +6540,7 @@ def check_scouting_is_earned(page, name, fails):
         if shut["chances"]:
             fails.append(f"{name}: unscouted and the map shipped {shut['chances']} rows of odds")
 
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
 
     def keeper(body):
         body["character"]["class"] = "Bloodletter"
@@ -6657,9 +6588,7 @@ def check_the_replay_reports_a_curse(page, name, fails):
     check that only ever saw one would let the other rot. Both are creatures
     this map actually holds.
     """
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
 
     for who, want in (("Whisperling", "cursed"), ("Bone Archer", "stunned")):
         def against(body, who=who):
@@ -6884,9 +6813,7 @@ def check_the_cave_is_shut_until_it_is_not(page, name, fails):
         page.set_input_files("#file", str(out))
         page.wait_for_timeout(400)
 
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
 
     # Shut.
     stand_beside(base)
@@ -6978,9 +6905,7 @@ def check_a_town_takes_the_tiredness_off(page, name, fails):
     if not town:
         fails.append(f"{name}: the overworld has no town on it")
         return
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
 
     def tired(body):
         body["world"]["at"] = [town["at"][0] + 1, town["at"][1]]
@@ -7296,9 +7221,7 @@ def check_the_papers_are_drawn_and_refused(page, name, fails):
     bug — a sentence this project has written down four times and shipped
     against three.
     """
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
 
     def at_the_van(body, finished):
         c = body["character"]
@@ -7434,9 +7357,7 @@ def check_the_expert_tab_says_what_a_point_bought(page, name, fails):
     watches the sentence move — which is the only way to tell a promise that is
     read from one that is typed.
     """
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
 
     def both_trees(body):
         c = body["character"]
@@ -7510,9 +7431,7 @@ def check_a_full_bill_holds_two_enchs(page, name, fails):
     `attach_ench`, not a privileged export — a check that reached past the shim
     would be asking core a question the page never asks.
     """
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
     two = [e["id"] for e in
            json.loads((ROOT / "data" / "enchs.json").read_text())["enchs"][:2]]
 
@@ -7794,6 +7713,7 @@ def walk_the_gate(browser, name, fails=None):
     points_before = page.text_content("#points")
 
     # --- download ------------------------------------------------------------
+    clear_screens(page)
     with page.expect_download(timeout=20000) as dl:
         page.click("#download")
     saved = dl.value
@@ -8217,9 +8137,7 @@ def check_the_way_under_is_drawn_and_shut_before_the_sheet(page, name, fails):
     Only a browser can say what is drawn, which is the `paintPanel` question
     this project has now got wrong four times.
     """
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
 
     def onto(body, answered):
         strip_the_boards(body)
@@ -8286,9 +8204,7 @@ def check_a_stake_says_pull_read_or_lie(page, name, fails):
     thing only a browser can say is that all three are *drawn*, because a choice
     core refuses is a choice the page may or may not put on the screen.
     """
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
 
     # **Stand beside it and step in.** [2,12] is quicksand and [2,13] is the
     # corridor the stake is driven into, which is the whole shape of the floor.
@@ -8321,9 +8237,7 @@ def check_a_sinkhole_moves_you(page, name, fails):
     the map screen *follows*: a warp sets `world.at` and the page has gone on
     drawing the old tile three times in this project's history.
     """
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
 
     # On the ring, one east of the north sinkhole. The square inside the ring
     # is quicksand until four levers are over, so the only approach is along it.
@@ -8357,9 +8271,7 @@ def check_she_is_wearing_it(page, name, fails):
     exactly like one whose board came out right until somebody counted the
     cards.
     """
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
 
     def onto(body):
         body["encounter"] = {"enemy": "The Tenth Surveyor", "at": body["world"]["at"]}
@@ -8393,9 +8305,7 @@ def check_the_fork_is_seven_wide(page, name, fails):
     its own browser check all assumed five. Seven is two rows, and a row of one
     would be a screen whose whole job is to be compared across.
     """
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
     # **Home first.** The checks before this one leave the player under the
     # Sands, and `__world()` answers about the map the page is holding — so the
     # town this looks for is a town on whatever floor it happens to be standing
@@ -8468,9 +8378,7 @@ def check_the_furnace_line_moves(page, name, fails):
     which is *the page draws numbers core sent it*, stated for a number that
     moves twice. The only place to see that it reached a screen is a screen.
     """
-    with page.expect_download(timeout=20000) as dl:
-        page.click("#download")
-    base = dl.value.path()
+    base = download_save(page)
 
     def stoker(body):
         body["character"]["class"] = "Stoker"

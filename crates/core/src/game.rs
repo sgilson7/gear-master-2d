@@ -1496,6 +1496,167 @@ impl Game {
         Ok((name, n))
     }
 
+    /// Whether this creature may be taken along, and why not.
+    ///
+    /// **A boss is never offered**, which is the balance risk in the whole idea
+    /// stated as a rule — `no_boss_is_kennelled` reads `rank` and is in the
+    /// suite. And one per family, because the run is a shape and eight of one
+    /// silhouette is a run with one puzzle in it.
+    ///
+    /// **The tally is `beat:<canonical>`**, which this game has counted since
+    /// M15 for Instant Battle — a second counter meaning nearly the same thing
+    /// is how two answers to *how well do you know this creature* get made.
+    pub fn kennel_offer(&self, creature: &str) -> Result<(), String> {
+        let Some(m) = crate::combat::creature(creature) else {
+            return Err("there is no such creature".into());
+        };
+        if m.rank == crate::combat::Rank::Boss {
+            return Err("Whatever that is, it is not coming with you.".into());
+        }
+        let Some(family) = crate::data::art_families().get(creature).cloned() else {
+            return Err("nothing is drawn for it".into());
+        };
+        if self.character.kennel.iter().any(|k| k.spec == creature) {
+            return Err("You have one of those already.".into());
+        }
+        if self.character.kennel.iter().any(|k| k.family == family) {
+            return Err("You have something enough like it already.".into());
+        }
+        let beaten = self.beaten(creature);
+        if beaten < crate::kennel::OFFER_AT {
+            return Err(format!(
+                "It does not know you yet. {} more.",
+                crate::kennel::OFFER_AT - beaten
+            ));
+        }
+        Ok(())
+    }
+
+    /// Take it along. The offer is checked here, not by the screen.
+    pub fn take_along(&mut self, creature: &str) -> Result<String, String> {
+        self.kennel_offer(creature)?;
+        let family = crate::data::art_families()
+            .get(creature)
+            .cloned()
+            .ok_or_else(|| "nothing is drawn for it".to_string())?;
+        // **What it eats is what it drops**, which is the same bucket its
+        // ingredient and its seed come from — so a creature cannot arrive with
+        // a diet nothing in the game produces.
+        let eats = crate::data::brews()
+            .from_family(&family)
+            .map(|i| i.id.clone())
+            .ok_or_else(|| "it eats nothing".to_string())?;
+        let name = self.theme_name(
+            crate::combat::creature(creature).map(|m| m.name).unwrap_or("it"),
+        );
+        self.character.kennel.push(crate::kennel::Kennelled {
+            spec: creature.to_string(),
+            family,
+            eats,
+            wins_together: 0,
+            out: false,
+            at: (0, 0),
+            turn: 0,
+        });
+        Ok(name)
+    }
+
+    /// The run this town has, with whatever the Handler has added.
+    pub fn run_mask(&self, town: &str, difficulty: crate::combat::Difficulty) -> Vec<(i8, i8)> {
+        for (id, _) in crate::data::MAPS {
+            for p in crate::data::map(id, difficulty).places {
+                if p.id == town {
+                    return p.run;
+                }
+            }
+        }
+        Vec::new()
+    }
+
+    /// How many may be out at once. One, unless a Handler says otherwise.
+    pub fn mouths(&self) -> u32 {
+        1
+    }
+
+    /// Put one out, standing at `at`, or say why not.
+    ///
+    /// **Refused by cell**, which is the bed's rule and the board's: *it will
+    /// not fit* is a wall and *the run stops short at (4, 2)* is something to
+    /// do about it. **A refusal spends nothing.**
+    pub fn put_out(
+        &mut self,
+        town: &str,
+        creature: &str,
+        at: (i8, i8),
+        turn: u8,
+        difficulty: crate::combat::Difficulty,
+    ) -> Result<String, String> {
+        let data = crate::data::kennel();
+        let mask = self.run_mask(town, difficulty);
+        if mask.is_empty() {
+            return Err("There is no run here.".into());
+        }
+        let Some(i) = self.character.kennel.iter().position(|k| k.spec == creature) else {
+            return Err("That is not in your kennel.".into());
+        };
+        if self.character.kennel[i].out {
+            return Err("It is already out.".into());
+        }
+        let already = self.character.kennel.iter().filter(|k| k.out).count() as u32;
+        if already >= self.mouths() {
+            return Err(format!(
+                "You can lead {}.",
+                if self.mouths() == 1 { "one".into() } else { format!("{}", self.mouths()) }
+            ));
+        }
+        let mut probe = self.character.kennel[i].clone();
+        probe.at = at;
+        probe.turn = turn;
+        let want = crate::kennel::cells_of(data, &probe);
+        if want.is_empty() {
+            return Err("Nothing is drawn for it.".into());
+        }
+        let taken: Vec<(i8, i8)> = self
+            .character
+            .kennel
+            .iter()
+            .filter(|k| k.out && k.spec != creature)
+            .flat_map(|k| crate::kennel::cells_of(data, k))
+            .collect();
+        let off: Vec<(i8, i8)> = want.iter().copied().filter(|c| !mask.contains(c)).collect();
+        if !off.is_empty() {
+            return Err(format!(
+                "It stands {} and the run stops short: {}.",
+                crate::plot::size_of(&want),
+                crate::plot::name_cells(&off)
+            ));
+        }
+        let over: Vec<(i8, i8)> = want.iter().copied().filter(|c| taken.contains(c)).collect();
+        if !over.is_empty() {
+            return Err(format!(
+                "Something is standing there: {}.",
+                crate::plot::name_cells(&over)
+            ));
+        }
+        self.character.kennel[i].at = at;
+        self.character.kennel[i].turn = turn;
+        self.character.kennel[i].out = true;
+        Ok(creature.to_string())
+    }
+
+    /// Bring it back in. Always allowed — a refusal here would be a creature
+    /// you could not stop leading.
+    pub fn bring_in(&mut self, creature: &str) -> Result<String, String> {
+        match self.character.kennel.iter_mut().find(|k| k.spec == creature) {
+            Some(k) if k.out => {
+                k.out = false;
+                Ok(creature.to_string())
+            }
+            Some(_) => Err("It is already in.".into()),
+            None => Err("That is not in your kennel.".into()),
+        }
+    }
+
     /// Take the trade this person teaches.
     ///
     /// **One only, and it does not come off** — the fork's own rule, and the
@@ -1980,6 +2141,7 @@ impl PartialEq for Game {
             && a.larder == b.larder
             && a.seed_drawer == b.seed_drawer
             && a.beds == b.beds
+            && a.kennel == b.kennel
             && a.retort == b.retort
             && a.potions == b.potions
             && a.drunk == b.drunk

@@ -12,6 +12,7 @@ import init, {
   quest_log_json, guide_json, pin_quest,
   retort_json, retort_legal_anchors, retort_place, retort_pick_up,
   bed_json, bed_legal_anchors, bed_place, bed_pull, bed_rotate, bed_look_over,
+  run_json, run_legal_anchors, run_place, run_pick_up, run_rotate, run_look_over,
   retort_rotate, retort_look_over, brew_it, drink_potion, tip_out,
   character_json, skills_json, take_skill, pressure_json, pools_json,
   class_offer_json, choose_class, choose_second_class, class_name, all_trees_json,
@@ -2651,6 +2652,7 @@ function openTown(id) {
   paintCarrying();
   paintBank();
   paintBed();
+  paintRun();
   $('town').hidden = false;
 }
 
@@ -2791,6 +2793,76 @@ function paintBedText() {
 
 function bedSays(text, bad = false) {
   const el = $('bed-says');
+  el.textContent = text; el.hidden = !text;
+  el.classList.toggle('bad', bad);
+}
+
+// ------------------------------------------------------------------- the run
+
+let runBoard = null;
+
+/// The run, in the town screen — the bed's sibling and the same `Board`.
+///
+/// **`paintRunText` is split off from the start**, because `Board.refresh()`
+/// ends by calling `onchange`: a paint that refreshes and a refresh that paints
+/// is a stack overflow, and what that looks like from outside is the town
+/// screen never opening. The bed found that one the hard way.
+function paintRun() {
+  const box = $('run-box');
+  const r = JSON.parse(run_json());
+  if (!r) { box.hidden = true; return; }
+  box.hidden = false;
+  paintRunText();
+  if (!runBoard) {
+    runBoard = new Board($('run-board'), {
+      boardJson: run_json,
+      legalAnchors: run_legal_anchors,
+      place: run_place,
+      pickUp: run_pick_up,
+      rotate: run_rotate,
+      toggleLock: () => {},
+      look: look_json,
+      lookOver: run_look_over,
+    });
+    runBoard.onchange = () => { paintRunText(); autosave(); };
+    runBoard.onhold = (name) => {
+      $('run-holding').textContent = name
+        ? `Holding ${name}. Click a cell to put it out, right-click to turn it.`
+        : 'Pick something out of the kennel and put it in the run.';
+    };
+  }
+  runBoard.refresh();
+}
+
+/// The sentence over the run, and the kennel list beside it.
+///
+/// **The list is not the board's bag.** What is *in* the kennel is drawn by the
+/// board below the grid, the way the drawer is; this is the whole kennel — out
+/// and in — with what each one eats and whether you have any, because *no
+/// ingredient and it stays in* is a thing a player has to be able to see
+/// coming.
+function paintRunText() {
+  const r = JSON.parse(run_json());
+  if (!r) return;
+  const s = r.slots[0];
+  $('run-note').textContent =
+    `${s.cols}×${s.rows} and not a rectangle. ` +
+    (r.kennel.length
+      ? `${r.kennel.length} in the kennel, ${r.out} out of ${r.mouths}.`
+      : 'Nothing in it. Beat something six times and it may come with you.');
+  $('run-kennel').replaceChildren(...(r.kennel ?? []).map((k) => {
+    const el = document.createElement('div');
+    el.className = 'wares' + (k.out ? '' : ' sold');
+    el.innerHTML = `<b>${k.name}</b>` +
+      `<span class="spec">${k.out ? 'out' : 'in'} · eats ${k.eats}</span>` +
+      `<span class="cost">${k.have} in the larder` +
+      `${k.wins ? ` · ${k.wins} out together, +${k.tally}%` : ''}</span>`;
+    return el;
+  }));
+}
+
+function runSays(text, bad = false) {
+  const el = $('run-says');
   el.textContent = text; el.hidden = !text;
   el.classList.toggle('bad', bad);
 }
@@ -4527,6 +4599,7 @@ async function main() {
   // to find out whether the tile it is on became a counter mid-fight.
   window.__caravanJson = () => JSON.parse(caravan_json());
   window.__bedJson = () => bed_json();
+  window.__runJson = () => run_json();
   window.__trainHere = () => train_here();
   window.__trees = () => JSON.parse(all_trees_json());
   window.__places = () => world.places;

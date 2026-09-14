@@ -3107,6 +3107,209 @@ fn turn_of(id: &str) -> u8 {
 /// **`holes` is the one thing a gear grid has never needed.** The five worn
 /// frames are rectangles and the retort is not, which is the whole of what
 /// makes brewing an arrangement rather than a checklist.
+/// The run, and the kennel beside it.
+///
+/// **The bed's own shape**, because it is the same kind of thing: a mask that
+/// is not a rectangle, a bag of things with footprints, and core deciding every
+/// placement.
+#[wasm_bindgen]
+pub fn run_json() -> String {
+    with(|g| {
+        let Some(town) = bed_town(g) else { return "null".to_string() };
+        let data = gm2d_core::data::kennel();
+        let mask = g.run_mask(&town, DIFFICULTY);
+        if mask.is_empty() {
+            return "null".to_string();
+        }
+        let cols = mask.iter().map(|c| c.0).max().unwrap_or(0) as u32 + 1;
+        let rows = mask.iter().map(|c| c.1).max().unwrap_or(0) as u32 + 1;
+        let holes: Vec<[i8; 2]> = (0..rows as i8)
+            .flat_map(|y| (0..cols as i8).map(move |x| (x, y)))
+            .filter(|c| !mask.contains(c))
+            .map(|(x, y)| [x, y])
+            .collect();
+        let placed: Vec<_> = g
+            .character
+            .kennel
+            .iter()
+            .filter(|k| k.out)
+            .map(|k| {
+                serde_json::json!({
+                    "id": format!("out:{}", k.spec),
+                    "name": g.theme_name(
+                        gm2d_core::combat::creature(&k.spec).map(|m| m.name).unwrap_or("it")),
+                    "kind": "Creature",
+                    "x": k.at.0, "y": k.at.1,
+                    "cells": gm2d_core::kennel::cells_of(data, k),
+                    "fill": ingredient_fill(&k.eats),
+                    "motif": "rose",
+                    "ink": "#ffffff", "ink_alpha": 0.55,
+                    "locked": false, "effect": false, "trigger": false,
+                })
+            })
+            .collect();
+        let bag: Vec<_> = g
+            .character
+            .kennel
+            .iter()
+            .filter(|k| !k.out)
+            .filter_map(|k| {
+                let s = data.get(&k.family)?;
+                let turn = turn_of(&k.spec);
+                Some(serde_json::json!({
+                    "id": k.spec,
+                    "name": g.theme_name(
+                        gm2d_core::combat::creature(&k.spec).map(|m| m.name).unwrap_or("it")),
+                    "kind": "Creature",
+                    "slot": "run",
+                    "cells": gm2d_core::shape::Shape::new(&s.cells).rotated(turn).cells(),
+                    "fill": ingredient_fill(&k.eats),
+                    "motif": "rose",
+                    "ink": "#ffffff", "ink_alpha": 0.55,
+                    "locked": false, "effect": false, "trigger": false,
+                }))
+            })
+            .collect();
+        let kennel: Vec<_> = g
+            .character
+            .kennel
+            .iter()
+            .map(|k| {
+                let eats = gm2d_core::data::brews()
+                    .get(&k.eats)
+                    .map(|i| i.name.clone())
+                    .unwrap_or_else(|| k.eats.clone());
+                serde_json::json!({
+                    "spec": k.spec,
+                    "name": g.theme_name(
+                        gm2d_core::combat::creature(&k.spec).map(|m| m.name).unwrap_or("it")),
+                    "out": k.out,
+                    "eats": eats,
+                    "have": g.character.in_larder(&k.eats),
+                    "wins": k.wins_together,
+                    "tally": k.tally_pct(),
+                })
+            })
+            .collect();
+        serde_json::json!({
+            "town": town,
+            "slots": [{
+                "slot": "run",
+                "rows": rows, "cols": cols,
+                "holes": holes,
+                "placed": placed,
+                "items": [],
+                "recipes": [],
+            }],
+            "bag": bag,
+            "undoable": false,
+            "kennel": kennel,
+            "mouths": g.mouths(),
+            "out": g.character.kennel.iter().filter(|k| k.out).count(),
+        })
+        .to_string()
+    })
+}
+
+#[wasm_bindgen]
+pub fn run_legal_anchors(id: String, _slot: String) -> String {
+    with(|g| {
+        if id.starts_with("out:") {
+            return "[]".to_string();
+        }
+        let Some(town) = bed_town(g) else { return "[]".to_string() };
+        let data = gm2d_core::data::kennel();
+        let mask = g.run_mask(&town, DIFFICULTY);
+        let Some(k) = g.character.kennel.iter().find(|k| k.spec == id) else {
+            return "[]".to_string();
+        };
+        let taken: Vec<(i8, i8)> = g
+            .character
+            .kennel
+            .iter()
+            .filter(|o| o.out && o.spec != id)
+            .flat_map(|o| gm2d_core::kennel::cells_of(data, o))
+            .collect();
+        let turn = turn_of(&id);
+        let mut out: Vec<[i8; 2]> = Vec::new();
+        for &(x, y) in &mask {
+            let mut probe = k.clone();
+            probe.at = (x, y);
+            probe.turn = turn;
+            let want = gm2d_core::kennel::cells_of(data, &probe);
+            if !want.is_empty() && want.iter().all(|c| mask.contains(c) && !taken.contains(c)) {
+                out.push([x, y]);
+            }
+        }
+        serde_json::to_string(&out).unwrap_or_else(|_| "[]".into())
+    })
+}
+
+#[wasm_bindgen]
+pub fn run_place(id: String, _slot: String, x: u32, y: u32) -> String {
+    with_mut(|g| {
+        let Some(town) = bed_town(g) else { return "there is no run here".into() };
+        let turn = turn_of(&id);
+        match g.put_out(&town, &id, (x as i8, y as i8), turn, DIFFICULTY) {
+            Ok(_) => String::new(),
+            Err(e) => e,
+        }
+    })
+}
+
+/// Bring one in. The id is `out:<spec>`.
+#[wasm_bindgen]
+pub fn run_pick_up(id: String) -> String {
+    with_mut(|g| {
+        let Some(spec) = id.strip_prefix("out:").map(str::to_string) else {
+            return String::new();
+        };
+        match g.bring_in(&spec) {
+            Ok(_) => String::new(),
+            Err(e) => e,
+        }
+    })
+}
+
+#[wasm_bindgen]
+pub fn run_rotate(id: String) {
+    if id.starts_with("out:") {
+        return;
+    }
+    TURNS.with(|t| {
+        let mut t = t.borrow_mut();
+        let e = t.entry(id).or_insert(0);
+        *e = (*e + 1) % 4;
+    })
+}
+
+#[wasm_bindgen]
+pub fn run_look_over(id: String, _slot: String) -> String {
+    with(|g| {
+        let data = gm2d_core::data::kennel();
+        let spec = id.strip_prefix("out:").unwrap_or(&id).to_string();
+        let Some(k) = g.character.kennel.iter().find(|k| k.spec == spec) else {
+            return "null".to_string();
+        };
+        let Some(s) = data.get(&k.family) else { return "null".to_string() };
+        let eats = gm2d_core::data::brews()
+            .get(&k.eats)
+            .map(|i| i.name.clone())
+            .unwrap_or_else(|| k.eats.clone());
+        serde_json::json!({
+            "name": g.theme_name(
+                gm2d_core::combat::creature(&k.spec).map(|m| m.name).unwrap_or("it")),
+            "lines": [
+                s.blurb.clone(),
+                format!("It eats a {eats} every fight it is out for, and you have {}.",
+                    g.character.in_larder(&k.eats)),
+                format!("{} out together, which is +{}%.", k.wins_together, k.tally_pct()),
+            ],
+        })
+        .to_string()
+    })
+}
+
 /// Which town's bed the player is standing at, if any.
 fn bed_town(g: &gm2d_core::game::Game) -> Option<String> {
     let allowed = g.character.allowances();

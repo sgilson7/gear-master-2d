@@ -1,0 +1,669 @@
+{
+  "format": "gm2d-kennel",
+  "version": 1,
+  "_note": "What a kennelled creature stands on, and who it stands well beside. A silhouette is per **art family** — there are twenty and a creature is drawn from one — and a pair is per **diet**, which is one of the eight buckets the seeds and the retort already use. That is where the C(8,2) is: twenty-eight pairs a lint can count, where families would be a hundred and ninety nobody could author.",
+  "silhouettes": [
+    {
+      "family": "wright",
+      "name": "Wright",
+      "blurb": "It stands square and it stands where you put it, which is more than most of them do.",
+      "cells": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "family": "the-crimper",
+      "name": "The Crimper",
+      "blurb": "Long, low, and it goes through a gap you would have said was shut.",
+      "cells": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ]
+      ]
+    },
+    {
+      "family": "behemoth",
+      "name": "Behemoth",
+      "blurb": "It takes the middle of the run and everything else arranges itself round that.",
+      "cells": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          2
+        ]
+      ]
+    },
+    {
+      "family": "vermin",
+      "name": "Vermin",
+      "blurb": "Two cells and it is never in both of them when you look.",
+      "cells": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ]
+      ]
+    },
+    {
+      "family": "a-rat",
+      "name": "A Rat",
+      "blurb": "Small, and it has decided the arrangement is its business now.",
+      "cells": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ]
+      ]
+    },
+    {
+      "family": "bengulon-toad",
+      "name": "Bengulon Toad",
+      "blurb": "It sits in the corner it chose and the corner is damp by morning.",
+      "cells": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ]
+    },
+    {
+      "family": "hound",
+      "name": "Hound",
+      "blurb": "Head down, tail out, and it will not lie any other way.",
+      "cells": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ],
+        [
+          2,
+          1
+        ]
+      ]
+    },
+    {
+      "family": "sentinel",
+      "name": "Sentinel",
+      "blurb": "Upright, and it has not moved since you put it there. It has not moved.",
+      "cells": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          2
+        ]
+      ]
+    },
+    {
+      "family": "unwritten",
+      "name": "Unwritten",
+      "blurb": "A post with nothing cut into it, standing where a post would stand.",
+      "cells": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          0,
+          3
+        ]
+      ]
+    },
+    {
+      "family": "ash",
+      "name": "Ash",
+      "blurb": "What is left, arranged the way what is left arranges itself.",
+      "cells": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "family": "rime",
+      "name": "Rime",
+      "blurb": "It comes with its own weather and the run is colder at that end.",
+      "cells": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          1
+        ]
+      ]
+    },
+    {
+      "family": "clergy",
+      "name": "Clergy",
+      "blurb": "It kneels, and the shape it makes kneeling is the shape it makes.",
+      "cells": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          0,
+          2
+        ]
+      ]
+    },
+    {
+      "family": "idol",
+      "name": "Idol",
+      "blurb": "Somebody carried this a long way to put it down exactly here.",
+      "cells": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          0,
+          2
+        ]
+      ]
+    },
+    {
+      "family": "crown",
+      "name": "Crown",
+      "blurb": "Wide at the top and it insists on the wide part being seen.",
+      "cells": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          2,
+          1
+        ]
+      ]
+    },
+    {
+      "family": "drowned",
+      "name": "Drowned",
+      "blurb": "It leans, and what it leans toward is wherever the water was.",
+      "cells": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "family": "francis",
+      "name": "Francis",
+      "blurb": "Six cells of it and no two people describe the same six.",
+      "cells": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          1
+        ]
+      ]
+    },
+    {
+      "family": "wisp",
+      "name": "Wisp",
+      "blurb": "One cell. It is not always the same cell and you have stopped checking.",
+      "cells": [
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "family": "mirror",
+      "name": "Mirror",
+      "blurb": "It takes a square and gives you back a square, and the square is wrong.",
+      "cells": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "family": "bone",
+      "name": "Bone",
+      "blurb": "Upright with a crosspiece, which is the shape of the thing it used to be.",
+      "cells": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "family": "court",
+      "name": "Court",
+      "blurb": "It arrives as one and stands as several, and the run is full afterwards.",
+      "cells": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          2
+        ]
+      ]
+    }
+  ],
+  "pairs": [
+    {
+      "a": "kettle-scale",
+      "b": "toad-ichor",
+      "blurb": "They eat off each other's leavings and both of them do better for it.",
+      "gives": {
+        "together": 8
+      }
+    },
+    {
+      "a": "kettle-scale",
+      "b": "cairn-dust",
+      "blurb": "They eat off each other's leavings and both of them do better for it.",
+      "gives": {
+        "together": 12
+      }
+    },
+    {
+      "a": "kettle-scale",
+      "b": "rust-bloom",
+      "blurb": "They eat off each other's leavings and both of them do better for it.",
+      "gives": {
+        "together": 16
+      }
+    },
+    {
+      "a": "kettle-scale",
+      "b": "tallow-drip",
+      "blurb": "Two of them at that end of the run and something passes between them that is not food.",
+      "gives": {
+        "rule": "beacon"
+      }
+    },
+    {
+      "a": "kettle-scale",
+      "b": "silt-pearl",
+      "blurb": "They eat off each other's leavings and both of them do better for it.",
+      "gives": {
+        "together": 24
+      }
+    },
+    {
+      "a": "kettle-scale",
+      "b": "reef-salt",
+      "blurb": "They eat off each other's leavings and both of them do better for it.",
+      "gives": {
+        "together": 8
+      }
+    },
+    {
+      "a": "kettle-scale",
+      "b": "bone-meal",
+      "blurb": "They eat off each other's leavings and both of them do better for it.",
+      "gives": {
+        "together": 12
+      }
+    },
+    {
+      "a": "toad-ichor",
+      "b": "cairn-dust",
+      "blurb": "Two of them at that end of the run and something passes between them that is not food.",
+      "gives": {
+        "rule": "spin_extra"
+      }
+    },
+    {
+      "a": "toad-ichor",
+      "b": "rust-bloom",
+      "blurb": "They eat off each other's leavings and both of them do better for it.",
+      "gives": {
+        "together": 20
+      }
+    },
+    {
+      "a": "toad-ichor",
+      "b": "tallow-drip",
+      "blurb": "They eat off each other's leavings and both of them do better for it.",
+      "gives": {
+        "together": 24
+      }
+    },
+    {
+      "a": "toad-ichor",
+      "b": "silt-pearl",
+      "blurb": "They eat off each other's leavings and both of them do better for it.",
+      "gives": {
+        "together": 8
+      }
+    },
+    {
+      "a": "toad-ichor",
+      "b": "reef-salt",
+      "blurb": "Two of them at that end of the run and something passes between them that is not food.",
+      "gives": {
+        "rule": "productivity"
+      }
+    },
+    {
+      "a": "toad-ichor",
+      "b": "bone-meal",
+      "blurb": "They eat off each other's leavings and both of them do better for it.",
+      "gives": {
+        "together": 16
+      }
+    },
+    {
+      "a": "cairn-dust",
+      "b": "rust-bloom",
+      "blurb": "They eat off each other's leavings and both of them do better for it.",
+      "gives": {
+        "together": 20
+      }
+    },
+    {
+      "a": "cairn-dust",
+      "b": "tallow-drip",
+      "blurb": "They eat off each other's leavings and both of them do better for it.",
+      "gives": {
+        "together": 24
+      }
+    },
+    {
+      "a": "cairn-dust",
+      "b": "silt-pearl",
+      "blurb": "Two of them at that end of the run and something passes between them that is not food.",
+      "gives": {
+        "rule": "beacon"
+      }
+    },
+    {
+      "a": "cairn-dust",
+      "b": "reef-salt",
+      "blurb": "They eat off each other's leavings and both of them do better for it.",
+      "gives": {
+        "together": 12
+      }
+    },
+    {
+      "a": "cairn-dust",
+      "b": "bone-meal",
+      "blurb": "They eat off each other's leavings and both of them do better for it.",
+      "gives": {
+        "together": 16
+      }
+    },
+    {
+      "a": "rust-bloom",
+      "b": "tallow-drip",
+      "blurb": "They eat off each other's leavings and both of them do better for it.",
+      "gives": {
+        "together": 20
+      }
+    },
+    {
+      "a": "rust-bloom",
+      "b": "silt-pearl",
+      "blurb": "Two of them at that end of the run and something passes between them that is not food.",
+      "gives": {
+        "rule": "spin_extra"
+      }
+    },
+    {
+      "a": "rust-bloom",
+      "b": "reef-salt",
+      "blurb": "They eat off each other's leavings and both of them do better for it.",
+      "gives": {
+        "together": 8
+      }
+    },
+    {
+      "a": "rust-bloom",
+      "b": "bone-meal",
+      "blurb": "They eat off each other's leavings and both of them do better for it.",
+      "gives": {
+        "together": 12
+      }
+    },
+    {
+      "a": "tallow-drip",
+      "b": "silt-pearl",
+      "blurb": "They eat off each other's leavings and both of them do better for it.",
+      "gives": {
+        "together": 16
+      }
+    },
+    {
+      "a": "tallow-drip",
+      "b": "reef-salt",
+      "blurb": "Two of them at that end of the run and something passes between them that is not food.",
+      "gives": {
+        "rule": "productivity"
+      }
+    },
+    {
+      "a": "tallow-drip",
+      "b": "bone-meal",
+      "blurb": "They eat off each other's leavings and both of them do better for it.",
+      "gives": {
+        "together": 24
+      }
+    },
+    {
+      "a": "silt-pearl",
+      "b": "reef-salt",
+      "blurb": "They eat off each other's leavings and both of them do better for it.",
+      "gives": {
+        "together": 8
+      }
+    },
+    {
+      "a": "silt-pearl",
+      "b": "bone-meal",
+      "blurb": "They eat off each other's leavings and both of them do better for it.",
+      "gives": {
+        "together": 12
+      }
+    },
+    {
+      "a": "reef-salt",
+      "b": "bone-meal",
+      "blurb": "Two of them at that end of the run and something passes between them that is not food.",
+      "gives": {
+        "rule": "beacon"
+      }
+    }
+  ]
+}

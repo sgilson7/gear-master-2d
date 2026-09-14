@@ -28,6 +28,7 @@ pub mod game;
 pub mod loadout;
 pub mod look;
 pub mod naming;
+pub mod kennel;
 pub mod piece;
 pub mod plot;
 pub mod pressure;

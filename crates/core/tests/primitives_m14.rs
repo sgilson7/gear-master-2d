@@ -320,6 +320,7 @@ fn sealed(id: &str, wants: &[&str]) -> PlaceDef {
         hidden_until_level: None,
         sells: Vec::new(),
         bed: Vec::new(),
+        run: Vec::new(),
         teaches: None,
         stocks: Vec::new(),
         guards: None,

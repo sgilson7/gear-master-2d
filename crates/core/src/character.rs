@@ -368,6 +368,13 @@ pub struct Character {
     /// town's id for the same reason `bought` is.
     #[serde(default, skip_serializing_if = "std::collections::BTreeMap::is_empty")]
     pub beds: std::collections::BTreeMap<String, Vec<crate::plot::Crop>>,
+    /// What is in the kennel.
+    ///
+    /// **On the character with the other bags**, and a list rather than a map
+    /// because the order it was filled in is the order the screen reads and
+    /// there is at most one of each family.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub kennel: Vec<crate::kennel::Kennelled>,
     /// The one specialization, if it has been taken.
     ///
     /// **Its own slot and not a fourth entry in `classes`.** Everything that
@@ -442,6 +449,7 @@ impl Character {
             drunk: Vec::new(),
             seed_drawer: std::collections::BTreeMap::new(),
             beds: std::collections::BTreeMap::new(),
+            kennel: Vec::new(),
             specialization: None,
             undo_stack: Vec::new(),
         }

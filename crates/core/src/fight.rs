@@ -411,6 +411,33 @@ fn pay_a_win(game: &mut Game, creature: &'static str, receipt: &mut Vec<String>)
     let (stages, ..) = game.character.grower();
     crate::plot::tick(&mut game.character.beds, stages);
 
+    // **And whatever is out eats, at the bell.** Only out, only here — beside
+    // the line that charges the fatigue, which is the one place that means *a
+    // fight happened, won or lost*. **A rout deliberately does not reach here**
+    // and must not: nothing was fought, so nothing was hungry.
+    //
+    // **No ingredient and it stays in**, and the receipt says so rather than
+    // the creature quietly doing nothing — a thing that works and cannot be
+    // seen is a thing that does not work, and a thing that *stopped* working
+    // silently is worse.
+    for i in 0..game.character.kennel.len() {
+        if !game.character.kennel[i].out {
+            continue;
+        }
+        let (eats, spec) =
+            (game.character.kennel[i].eats.clone(), game.character.kennel[i].spec.clone());
+        let name = crate::data::brews()
+            .get(&eats)
+            .map(|d| d.name.clone())
+            .unwrap_or_else(|| eats.clone());
+        if game.character.take_from_larder(&eats).is_ok() {
+            receipt.push(format!("{spec} ate a {name}."));
+        } else {
+            game.character.kennel[i].out = false;
+            receipt.push(format!("No {name} for {spec}, so it stayed in."));
+        }
+    }
+
     // **And a seed, sometimes, off the same creature.** Keyed by the same art
     // family the ingredient is, so a creature cannot arrive without one — and
     // rolled, where the ingredient is certain, because the Plot is a second

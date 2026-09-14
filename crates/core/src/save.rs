@@ -260,6 +260,9 @@ pub struct CharacterSave {
     /// What is growing, by town. Skipped when nothing is.
     #[serde(default, skip_serializing_if = "std::collections::BTreeMap::is_empty")]
     pub beds: std::collections::BTreeMap<String, Vec<crate::plot::Crop>>,
+    /// What is in the kennel. Skipped when nothing is.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub kennel: Vec<crate::kennel::Kennelled>,
     /// The one specialization, if it has been taken. Skipped when it has not,
     /// so no save written before it existed is refused.
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -361,6 +364,7 @@ impl SaveFile {
             drunk,
             seed_drawer,
             beds,
+            kennel,
             specialization,
             enchs_owned,
             enchanted,
@@ -461,6 +465,7 @@ impl SaveFile {
                     drunk: drunk.clone(),
                     seed_drawer: seed_drawer.clone(),
                     beds: beds.clone(),
+                    kennel: kennel.clone(),
                     specialization: specialization.clone(),
                     enchs_owned: enchs_owned.clone(),
                     bought_licence: *bought_licence,
@@ -594,6 +599,7 @@ impl SaveFile {
             drunk,
             seed_drawer,
             beds,
+            kennel,
             specialization,
             enchs_owned,
             enchanted,
@@ -706,6 +712,7 @@ impl SaveFile {
         character.drunk = drunk;
         character.seed_drawer = seed_drawer;
         character.beds = beds;
+        character.kennel = kennel;
         character.specialization = specialization;
         character.enchs_owned = enchs_owned;
         character.bought_licence = bought_licence;

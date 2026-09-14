@@ -406,6 +406,12 @@ pub struct PlaceDef {
     /// and a gate's prose.
     #[serde(default)]
     pub bed: Vec<(i8, i8)>,
+    /// `Town`: the run, as a mask in its own coordinates.
+    ///
+    /// The bed's sibling and its argument: a bizarre shape per town, because a
+    /// run is a place and a place in this game is a thing you go to.
+    #[serde(default)]
+    pub run: Vec<(i8, i8)>,
     /// `Bench`: the specialization this person will take you on as.
     ///
     /// **Asked for as a trainer**, in as many words: *each specialization has
@@ -1063,6 +1069,9 @@ impl World {
             // written before the Plot — so the check is one-directional.
             if !p.bed.is_empty() && p.kind != PlaceKind::Town {
                 return Err(format!("{}: only a town has a bed", p.id));
+            }
+            if !p.run.is_empty() && p.kind != PlaceKind::Town {
+                return Err(format!("{}: only a town has a run", p.id));
             }
             if let Some(c) = &p.teaches {
                 if !crate::class::SPECIALIZATIONS.contains(&c.as_str()) {

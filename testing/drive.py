@@ -2414,7 +2414,7 @@ def check_a_trainer_takes_you_on(page, name, fails, base):
     print(f"ok: a trainer takes you on, and you are {an(became)} afterwards")
 
 
-def check_the_bank_sorts(page, name, fails, _base):
+def check_the_bank_sorts(page, name, fails, base):
     """**The vault, ordered by what you are looking for.**
 
     Asked for as *sort your items in the bank by type, stats like physical
@@ -2453,6 +2453,21 @@ def check_the_bank_sorts(page, name, fails, _base):
     # eighty-eight components deep, which is the shelf this control exists for.
     plant(page, ROOT / "testing" / "saves" / "at-the-lip.json",
           loose_beside_the_pit, stem="bank-sort")
+    try:
+        _bank_sorts(page, name, fails)
+    finally:
+        # **Put the walk back where it was found.** This check plants a whole
+        # different run — eighty-eight components and another map — and the gate
+        # is one long walk: a check that ends somewhere else hands the next one
+        # a game it was not written for. The bank's own check has said so in a
+        # `finally` since M12, and leaving this one out cost a live walk that
+        # died thirty-six checks in on a click intercepted by a shelf belonging
+        # to somebody else's character.
+        plant(page, base, lambda body: None, stem="bank-sort-restore")
+        clear_screens(page)
+
+
+def _bank_sorts(page, name, fails):
     clear_screens(page)
     # **`focus`, not a click.** A click hit-tests against whatever is over the
     # canvas and a focus does not — the lesson the M20 deploy gate taught.

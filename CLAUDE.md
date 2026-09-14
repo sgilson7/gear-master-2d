@@ -4503,6 +4503,16 @@ dangerous areas.* So it is a `Bench` with `teaches` and `stocks` — the whole o
   boards is **88 loose components and fourteen orderings**, and with the sort
   gone it fails printing the unsorted shelf. *A check that compares zero with
   zero is not a check* — third time on one control.
+- **And it did not put the walk back**, which is the older half of the same
+  rule and the one that cost a live walk. A check that plants a *whole
+  different run* — another map, another character, eighty-eight components —
+  and ends there hands the next check a game it was not written for. The
+  bank's own check has had a restoring `finally` since M12 and this one copied
+  the plant without it: the walk died thirty-six checks later on a click in a
+  town intercepted by a shelf belonging to somebody else's character.
+  **It passed locally and failed against the deployed page**, which is this
+  file's *a green suite is not evidence a check is not racing* with a different
+  cause — here the local run was simply luckier about which shelf was where.
 - **And that plant opened the fork**, which is the one screen that does not
   come off, so every key after it was eaten and the step never happened. A
   plant sets a class rather than leaving one owed — written down here as the
@@ -5672,6 +5682,36 @@ the bar. It measures the rects now — un-hidden, laid out, inside the window �
 and returns before the clicks if any of them is unreachable, because a click
 that times out ends a check with a Playwright traceback instead of the sentence
 that says what is wrong.
+
+**The deploy after that is the one that answered a question with a bug.** Asked
+*how do I get the first specialization?* — and the answer was that you could
+not. A hundred and two checks against the deployed page.
+
+```
+live build f5622b60
+  index.html asks app.js?v=f5622b60   app.js carries BUILD = 'f5622b60'
+  chromium walked the gate    ok      102 ok lines, no failures
+  a trainer                   a bench against the kiln wall in the Cairnworks
+                              takes you on; you are an Apothecary afterwards
+                              and the sheet says so
+  the other one               a pot on three stones under the lake, teaching
+                              the Chef — "You may have 2 potions in you at
+                              once, where everybody else has one."
+  their shelves               one ink each, 400, refused to anybody who is not
+                              one of theirs
+  the bank                    88 loose components, fourteen orderings
+  console errors: none
+```
+
+**The thing worth reading twice is that none of it was reachable.**
+`Character::specialization` was written by one line in the repository and the
+tree screen filtered on `classes()`, so both doors were shut and neither had a
+lint on it — `every_offered_class_reaches_something` reads `class::OFFERED`,
+and a specialization is deliberately outside it.
+
+**The deploy before it is the sand cart**, live at `7a9e0abd`: five more enchs
+on a tailgate in the Wextreen Sands with somebody standing in front of them,
+and the licence and the second paper down from five thousand to two.
 
 **The deploy after M20 is three asks and a fault the compiler had been
 reporting the whole time**, and its table is one line an ask because the gate

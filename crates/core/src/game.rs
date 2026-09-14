@@ -1522,12 +1522,10 @@ impl Game {
         if self.character.kennel.iter().any(|k| k.family == family) {
             return Err("You have something enough like it already.".into());
         }
+        let (offer_at, ..) = self.character.handler();
         let beaten = self.beaten(creature);
-        if beaten < crate::kennel::OFFER_AT {
-            return Err(format!(
-                "It does not know you yet. {} more.",
-                crate::kennel::OFFER_AT - beaten
-            ));
+        if beaten < offer_at {
+            return Err(format!("It does not know you yet. {} more.", offer_at - beaten));
         }
         Ok(())
     }
@@ -1555,6 +1553,7 @@ impl Game {
             eats,
             wins_together: 0,
             out: false,
+            since_fed: 0,
             at: (0, 0),
             turn: 0,
         });
@@ -1580,7 +1579,10 @@ impl Game {
         for (id, _) in crate::data::MAPS {
             for p in crate::data::map(id, difficulty).places {
                 if p.id == town {
-                    return p.run;
+                    // **Widened by the map, exactly as the bed is** — the same
+                    // function, so a node cannot become a second run editor.
+                    let (_, _, _, extra, _) = self.character.handler();
+                    return crate::plot::widened(&p.run, extra);
                 }
             }
         }
@@ -1589,7 +1591,7 @@ impl Game {
 
     /// How many may be out at once. One, unless a Handler says otherwise.
     pub fn mouths(&self) -> u32 {
-        1
+        self.character.handler().1
     }
 
     /// Put one out, standing at `at`, or say why not.
@@ -2156,6 +2158,8 @@ impl PartialEq for Game {
             && a.seed_drawer == b.seed_drawer
             && a.beds == b.beds
             && a.kennel == b.kennel
+            && a.stall == b.stall
+            && a.ledger == b.ledger
             && a.retort == b.retort
             && a.potions == b.potions
             && a.drunk == b.drunk
@@ -2167,3 +2171,219 @@ impl PartialEq for Game {
 }
 
 impl Eq for Game {}
+
+impl Game {
+    // ---- the Stall -------------------------------------------------------
+    //
+    // **A shelf of your own.** The bench's shape is `stall::SHELF`, the pricing
+    // is yours, and a buyer is drawn at every bell. What makes it a decision
+    // rather than a vendor is that a high ask is refused by two buyers in
+    // three: the ledger is the only way to find out what a thing is worth to
+    // somebody who is not the barrel.
+
+    /// The shelf's mask, widened by nothing — it is the same nine cells for
+    /// everybody, because a counter is a counter.
+    pub fn shelf_mask(&self) -> Vec<(i8, i8)> {
+        crate::stall::SHELF.to_vec()
+    }
+
+    /// What the barrel would charge for a component, which is what a fair ask
+    /// is measured against.
+    ///
+    /// **One answer**, read by the card, by `ask_of` and by the sale, so the
+    /// number a player is shown is the number a buyer judges them by — §C.3's
+    /// rule from the other side of the counter.
+    pub fn worth_of(&self, piece: crate::piece::PieceId) -> i32 {
+        crate::shop::shelf_price(self.character.registry.def(piece))
+    }
+
+    /// Put something out on the counter at a price.
+    ///
+    /// **A refusal spends nothing and nothing is seated off a board** — the
+    /// bank's two rules, for the bank's two reasons: this happens in a town
+    /// where the board is not on the screen, so lifting a piece off a grid
+    /// would break an item somewhere the player cannot watch it happen.
+    pub fn shelve(
+        &mut self,
+        piece: crate::piece::PieceId,
+        at: (i8, i8),
+        turn: u8,
+        price: i32,
+    ) -> Result<String, String> {
+        if price < 0 {
+            return Err("A price is not a negative number.".into());
+        }
+        if !self.character.owned.contains(&piece) {
+            return Err("That is not in your bag.".into());
+        }
+        let def = self.character.registry.def(piece);
+        let name = def.name.to_string();
+        // **A tally is carried, never sold.** `can_equip` has refused
+        // `PieceKind::Quest` since M8 — *that is a quest item, it is carried,
+        // not worn* — and a counter is the fourth consumer that has to know:
+        // an errand's tokens crossing a counter is an errand that cannot be
+        // handed in, and nothing anywhere would say so. Found by `make play`,
+        // which put a Bengulon Toad Eye out at twenty-five Fnorp.
+        if def.kind == crate::piece::PieceKind::Quest {
+            return Err(format!("{name} is a quest item. It is carried, not sold."));
+        }
+        if self.character.is_equipped(piece) {
+            return Err(format!("{name} is on one of your boards. Take it off first."));
+        }
+        let mask = self.shelf_mask();
+        let want = self.shelf_cells(piece, at, turn);
+        let off: Vec<(i8, i8)> = want.iter().copied().filter(|c| !mask.contains(c)).collect();
+        if !off.is_empty() {
+            return Err(format!(
+                "The counter stops short: {}.",
+                crate::plot::name_cells(&off)
+            ));
+        }
+        let taken: Vec<(i8, i8)> = self
+            .character
+            .stall
+            .iter()
+            .flat_map(|o| self.shelf_cells(o.piece, o.at, o.turn))
+            .collect();
+        let over: Vec<(i8, i8)> = want.iter().copied().filter(|c| taken.contains(c)).collect();
+        if !over.is_empty() {
+            return Err(format!(
+                "Something is already there: {}.",
+                crate::plot::name_cells(&over)
+            ));
+        }
+        self.character.owned.retain(|p| *p != piece);
+        self.character.stall.push(crate::stall::OnShelf { piece, at, turn, price });
+        Ok(name)
+    }
+
+    /// Which cells a component takes on the counter, at a turn.
+    pub fn shelf_cells(&self, piece: crate::piece::PieceId, at: (i8, i8), turn: u8) -> Vec<(i8, i8)> {
+        let shape = crate::shape::Shape::new(self.character.registry.def(piece).cells).rotated(turn % 4);
+        shape.cells().iter().map(|&(x, y)| (at.0 + x as i8, at.1 + y as i8)).collect()
+    }
+
+    /// Take something back off the counter and into the bag.
+    pub fn unshelve(&mut self, piece: crate::piece::PieceId) -> Result<String, String> {
+        let Some(i) = self.character.stall.iter().position(|o| o.piece == piece) else {
+            return Err("That is not on the counter.".into());
+        };
+        self.character.stall.remove(i);
+        self.character.owned.push(piece);
+        Ok(self.character.registry.def(piece).name.to_string())
+    }
+
+    /// Change what you are asking for something already out.
+    pub fn reprice(&mut self, piece: crate::piece::PieceId, price: i32) -> Result<i32, String> {
+        if price < 0 {
+            return Err("A price is not a negative number.".into());
+        }
+        let Some(o) = self.character.stall.iter_mut().find(|o| o.piece == piece) else {
+            return Err("That is not on the counter.".into());
+        };
+        o.price = price;
+        Ok(price)
+    }
+
+    /// One buyer comes by. Returns what they said, and what they did.
+    ///
+    /// **Called from `pay_a_win`, once a bell**, beside the ingredient roll and
+    /// the seed roll — because *a fight happened* is the one line in this game
+    /// that means time passed, and a shop on any other clock would be a shop on
+    /// a timer.
+    ///
+    /// **A buyer who wants nothing on the shelf is not printed.** One a bell is
+    /// already the plan's recommendation; printing eight refusals a fight would
+    /// make the strip a til roll.
+    pub fn a_buyer_comes_by(&mut self) -> Option<String> {
+        let data = crate::data::stall();
+        if data.buyers.is_empty() {
+            return None;
+        }
+        let i = self.rng.below(data.buyers.len());
+        let buyer = &data.buyers[i];
+        let wants: Vec<String> = buyer.wants.clone();
+        let floor = buyer.floor;
+        let (bid, bname) = (buyer.id.clone(), buyer.name.clone());
+        // **What they will look at**: the two grids they buy out of, and
+        // nothing under their floor. Asked of the *component*, because a
+        // shelf holds components and a buyer is not buying your weapon.
+        let mut best: Option<(crate::piece::PieceId, i32, i32)> = None;
+        for o in &self.character.stall {
+            let def = self.character.registry.def(o.piece);
+            let fits = wants.iter().any(|w| {
+                crate::skills::slot_of(w).map(|s| def.fits(s)).unwrap_or(false)
+            });
+            if !fits {
+                continue;
+            }
+            let worth = crate::shop::shelf_price(def);
+            if worth < floor {
+                continue;
+            }
+            // The dearest thing they can see, because somebody buying takes the
+            // best of what is in front of them.
+            if best.map(|(_, _, w)| worth > w).unwrap_or(true) {
+                best = Some((o.piece, o.price, worth));
+            }
+        }
+        let (piece, price, worth) = best?;
+        let high_ok = self.rng.below(crate::stall::HIGH_ODDS as usize) == 0;
+        let ask = crate::stall::ask_of(price, worth);
+        let name = self.character.registry.def(piece).name.to_string();
+        if ask == crate::stall::Ask::High && !high_ok {
+            return Some(format!("{bname} looked at the {name}, and then at the price."));
+        }
+        // Sold.
+        self.character.stall.retain(|o| o.piece != piece);
+        self.character.gold += price;
+        self.character.ledger.push(crate::stall::Sale {
+            buyer: bid.clone(),
+            item: name.clone(),
+            paid: price,
+            worth,
+        });
+        let mut said = format!("{bname} took the {name} for {price} Fnorp.");
+        if let Some(extra) = self.a_bargain_off_the_last_two() {
+            said.push(' ');
+            said.push_str(&extra);
+        }
+        Some(said)
+    }
+
+    /// Two kin in a row leave something. Read off the ledger's last two rows.
+    ///
+    /// **Not a certainty**, because two kin in a row is already the uncommon
+    /// thing — eight buyers drawn at random put a given pair together about one
+    /// time in sixty-four, and a certainty on top of that is a faucet somebody
+    /// could sit at.
+    fn a_bargain_off_the_last_two(&mut self) -> Option<String> {
+        let data = crate::data::stall();
+        let n = self.character.ledger.len();
+        if n < 2 {
+            return None;
+        }
+        let a = self.character.ledger[n - 2].buyer.clone();
+        let b = self.character.ledger[n - 1].buyer.clone();
+        if a == b {
+            return None;
+        }
+        let kin = data.kin_of(&a, &b)?;
+        if self.rng.below(1000) as u32 >= crate::stall::BARGAIN_PER_MILLE {
+            return None;
+        }
+        match kin.gives.clone() {
+            crate::stall::Bargain::Ench(id) => {
+                let all = crate::data::enchs();
+                let name = all.get(&id)?.name.clone();
+                self.character.enchs_owned.push(id);
+                Some(format!("{} They left {name} on the counter.", kin.blurb))
+            }
+            crate::stall::Bargain::Piece(want) => {
+                let id = self.character.give(&want)?;
+                let _ = id;
+                Some(format!("{} They left a {want}.", kin.blurb))
+            }
+        }
+    }
+}

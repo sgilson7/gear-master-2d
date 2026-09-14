@@ -3931,6 +3931,100 @@
           }
         }
       ]
+    },
+    {
+      "id": "handler",
+      "name": "Handler",
+      "class": "Handler",
+      "nodes": [
+        {
+          "id": "ha-known-by-name",
+          "name": "Known By Name",
+          "blurb": "It answers to something now. Nobody taught it the word and nobody is sure which of you chose it.",
+          "cost": 1,
+          "requires": [],
+          "effect": {
+            "tunes": {
+              "knob": "offer_at",
+              "by": -1
+            }
+          }
+        },
+        {
+          "id": "ha-fed-from-the-hand",
+          "name": "Fed From The Hand",
+          "blurb": "It will take what it is given rather than what it finds, which halves what it costs you and doubles what it watches.",
+          "cost": 1,
+          "requires": [],
+          "effect": {
+            "tunes": {
+              "knob": "feed_every",
+              "by": 1
+            }
+          }
+        },
+        {
+          "id": "ha-the-long-yard",
+          "name": "The Long Yard",
+          "blurb": "Three more cells of run, and the works has stopped asking where the ground came from twice now.",
+          "cost": 2,
+          "requires": [
+            "ha-known-by-name"
+          ],
+          "effect": {
+            "tunes": {
+              "knob": "run_cells",
+              "by": 3
+            }
+          }
+        },
+        {
+          "id": "ha-worked-together",
+          "name": "Worked Together",
+          "blurb": "Ten fights is when it stops watching you for what to do. What it does after that is its own.",
+          "cost": 2,
+          "requires": [
+            "ha-fed-from-the-hand"
+          ],
+          "effect": {
+            "tunes": {
+              "knob": "tally_pct",
+              "by": 5
+            }
+          }
+        },
+        {
+          "id": "ha-a-second-lead",
+          "name": "A Second Lead",
+          "blurb": "One in each hand. Everybody who has tried it says the difficult part is not the leading.",
+          "cost": 3,
+          "requires": [
+            "ha-the-long-yard",
+            "ha-worked-together"
+          ],
+          "effect": {
+            "tunes": {
+              "knob": "mouths",
+              "by": 1
+            }
+          }
+        },
+        {
+          "id": "ha-the-whole-pack",
+          "name": "The Whole Pack",
+          "blurb": "They arrange themselves now, and the arrangement is better than the one you were making.",
+          "cost": 4,
+          "requires": [
+            "ha-a-second-lead"
+          ],
+          "effect": {
+            "tunes": {
+              "knob": "tally_pct",
+              "by": 5
+            }
+          }
+        }
+      ]
     }
   ]
 }

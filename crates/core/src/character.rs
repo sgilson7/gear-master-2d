@@ -375,6 +375,32 @@ pub struct Character {
     /// there is at most one of each family.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub kennel: Vec<crate::kennel::Kennelled>,
+    /// What is out on the counter, at the price you put on it.
+    ///
+    /// **Shelved is not carried**, which is the bank's rule and the whole of
+    /// what a shelf is: a component out on the counter leaves `owned`, so it
+    /// does not pack, does not bench, is not a key you are holding and cannot
+    /// be handed over a counter — *four consumers that all read `owned` and are
+    /// all right about this without being touched*, the third time that return
+    /// has been taken, after `banked` and `larder`.
+    ///
+    /// The registry keeps a shelved piece, so its `PieceId` stays valid and it
+    /// comes back the same component with its ench still on it.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub stall: Vec<crate::stall::OnShelf>,
+    /// What has been sold, oldest first.
+    ///
+    /// **Kept because a price is a decision and a decision needs a receipt.**
+    /// A sale carries what the barrel would have charged beside what you got,
+    /// so the ledger says whether you did well rather than only what you got —
+    /// which is what makes the next price a choice instead of a guess.
+    ///
+    /// **And it is how a bargain is found.** Two kin buyers in a row is read
+    /// off the last two rows rather than out of a queue of callers: a bargain
+    /// is paid for *selling*, so the thing that records a sale is the thing
+    /// that knows. One list, no second answer.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub ledger: Vec<crate::stall::Sale>,
     /// The one specialization, if it has been taken.
     ///
     /// **Its own slot and not a fourth entry in `classes`.** Everything that
@@ -450,6 +476,8 @@ impl Character {
             seed_drawer: std::collections::BTreeMap::new(),
             beds: std::collections::BTreeMap::new(),
             kennel: Vec::new(),
+            stall: Vec::new(),
+            ledger: Vec::new(),
             specialization: None,
             undo_stack: Vec::new(),
         }
@@ -1374,7 +1402,12 @@ impl Character {
         for k in self.kennel.iter().filter(|k| k.out) {
             let Some(spec) = crate::combat::creature(&k.spec) else { continue };
             let rating = crate::rating::creature_rating(spec, difficulty);
-            let pct = crate::kennel::share(rating, danger, k.tally_pct());
+            // **The tally's step is the Kennel's and its size is the
+            // Handler's**, which is why `tally_pct()` takes one: a specialization
+            // that paid more per step is a different promise from one that
+            // stepped more often, and only the first is what the tree sells.
+            let step = self.handler().4;
+            let pct = crate::kennel::share(rating, danger, k.tally_pct_at(step));
             if pct <= 0 {
                 continue;
             }
@@ -1410,6 +1443,29 @@ impl Character {
             }
         }
         out
+    }
+
+    /// What the handler in you is worth, as the five numbers the kennel reads.
+    ///
+    /// The Kennel's own defaults for everybody who is not one, so every caller
+    /// asks unconditionally rather than branching on a class.
+    pub fn handler(&self) -> (u32, u32, u32, u32, i32) {
+        match self.specialization_def().map(|d| d.power) {
+            Some(crate::class::ClassPower::Handler {
+                offer_at,
+                mouths,
+                feed_every,
+                run_cells,
+                tally_pct,
+            }) => (offer_at.max(1), mouths.max(1), feed_every.max(1), run_cells, tally_pct),
+            _ => (
+                crate::kennel::OFFER_AT,
+                1,
+                crate::kennel::FEED_EVERY,
+                0,
+                crate::kennel::TALLY_PCT,
+            ),
+        }
     }
 
     /// What two kennelled creatures standing touching pay, as rules.

@@ -285,7 +285,73 @@ header comment `Written by filling in tikz_figure_prompt.md`).
 | `HANDOFF-M21.md`, `CLAUDE.md` | the three benches in `CLAUDE.md`'s systems section; twenty-nine maps unchanged; `data::MAPS.len()` untouched |
 | **deploy** | `make publish`, report the hash |
 
-### M21.12 → — Whatever the notebook says
+### M21.12 — The offer reaches the player, and the receipt can be read
+
+*Asked for mid-block, in the human's words: "make all the text in the after
+battle screen larger and easier to read, and hook the kennel into the game
+because there is currently no way for an enemy to offered for recruitment into
+the kennel".*
+
+**The second half is a bug and it is mine.** `Game::kennel_offer` and
+`Game::take_along` shipped in M21.4 with seven tests and **no caller outside
+them** — so the run, the yard and the feed are all live at `77bb4b19` with no
+way to put anything in the kennel. That is the Apothecary's own failure, in a
+block that opened by fixing it: *a lint that reads a list rather than the
+behaviour is the failure it exists to catch*, and nothing was asking whether
+the offer was reachable.
+
+| deliverable | what |
+|---|---|
+| the offer | the result screen of a won fight offers *Take it along* when `kennel_offer` says yes, and says why not when it is close — the refusal already counts down |
+| `offer_json`, `take_along_here` | two exports; the decision stays in core, the shim moves strings |
+| the reachability lint | `every_way_into_the_kennel_is_reachable` — a core rule with no caller is content reachable from nowhere, and this is the second time in two blocks |
+| the receipt | the after-battle screen at a size somebody can read: the result title, the receipt lines and the tape, up from 11–13px |
+
+Acceptance: `check_a_won_fight_offers_the_creature`, negative-tested;
+`check_the_receipt_is_legible` measures the computed font size rather than
+reading the stylesheet.
+
+### M21.13 — The larder is earned, not found
+
+*Asked for: "ingredients should be much rarer so that you have to use the
+growing system".*
+
+Today a win pays an ingredient **certainly**, so the Plot is a second source
+for something you already have enough of — and the Kennel eats out of the same
+larder, so nothing is ever short. A roll makes fighting the trickle and growing
+the supply, which is what the Plot was built to be.
+
+| deliverable | what |
+|---|---|
+| `INGREDIENT_PER_MILLE` | the drop becomes a roll, off `game.rng` like every other, with a glossary shelf |
+| the measurement | what a win pays against what a bed pays, written into the commit — the Plot's yield is `HARVEST_YIELD` per crop per `STAGES - 1` wins and that is the number the rate is set against |
+| the Kennel | a creature out eats out of the same larder, so this is also what makes the feed cost something — notebook row 13, answered |
+
+Acceptance: `a_win_pays_an_ingredient_at_its_rate`; `growing_out_pays_more_than
+_fighting_does`, which is the ask stated as a number.
+
+### M21.14 — The town is a street
+
+*Asked for: "the town screen should be reworked to be more like a bunch of tabs
+you can select from, and when you press the tab button, the functionality for
+that system appears. so each tab can be presented as another building in the
+town, somewhat like the way gear master 1 presents its towns".*
+
+The town screen is now the shelf, the barrel, the order book, the tins, the
+bank, the errands, the brewing bench, the bed and the run, stacked down one
+column. That is nine systems in one scroll.
+
+| deliverable | what |
+|---|---|
+| the street | one tab a building, drawn as a row of buildings rather than a tab strip — `.treetabs`' own shape, which the errand log already reuses |
+| what is behind each | the panels that exist, moved rather than rewritten; nothing changes about what any of them does |
+| which buildings | a town has the ones it *has*: no bed, no bed tab. The third town has no shelf and says so |
+| the figure | one TikZ figure a building, counted into M21.10 |
+
+Acceptance: `check_the_town_is_a_street` — every system reachable in one press,
+and a town missing one does not draw its building.
+
+### M21.15 → — Whatever the notebook says
 
 **These milestones do not exist yet.** When M21.11 is done, the builder reads
 `SECOND-ORDER-M21.md`, takes every row marked `open`, groups them into
@@ -351,3 +417,96 @@ is always last.
 | which three enchs are seeds and which three bargains | seeds: the bramble coat, the slow match, the long count (things that grow); bargains: the tithe ring, the one page, the first word (things that are traded). |
 | whether a kennelled creature eats when it is *in* | no. Only out, only at the bell. |
 | whether to ship the Grower before the Kennel exists | yes — the Plot is complete on its own and its ench seeds are its reason; the Kennel is the next thing it feeds. |
+
+---
+
+## M21.16 — An errand for every bench
+
+**Asked for**, in the human's own words:
+
+> I also want to add a quest chain for each new system, that the quests are
+> predicated upon using the system. an example would be brew a potion that
+> gives at least 300 max health and give it to the quest giver, have two
+> specific enemies as companions in your kennel, etc. add this as a new
+> milestone at the end
+
+Four benches shipped in M20 and M21 — the retort, the bed, the run, the counter
+— and **not one errand in the game is about any of them.** That is the M21.4
+failure one level up: a system a player can reach and no screen that *points*
+at it. The quest log is the one screen in this game that says *something has
+opened and it is somewhere else*, and it has never once said it about a bench.
+
+### The goal kinds
+
+`Goal` has four arms — `Slay`, `Bring`, `Word`, `Clear` — and **none of them
+can ask about a bench**, for the reason `Clear` had to be written in the first
+place: a `Bring` is answered by a component in the bag and a potion is not a
+component, a `Slay` is answered by a creature dying and a companion is a
+creature that did not, and a `Word` is answered by standing somewhere.
+
+So the block adds **one** new arm and not four, because four arms asking four
+nearly-identical questions is how they drift:
+
+```rust
+Goal::Show { what: Shown }
+```
+
+where `Shown` is what a bench can be asked to produce:
+
+| `Shown` | asked of | answered by |
+|---|---|---|
+| `Brew { stat, at_least }` | the pack | a potion in `Character::potions` whose `Gives` reaches the figure |
+| `Grown { seed, n }` | the larder | `n` of what that seed crops into, held at once |
+| `Kennelled { creatures }` | the kennel | every named creature in `Character::kennel` |
+| `Together { creatures }` | the run | every named creature **out** at once |
+| `Sold { at_least }` | the ledger | one sale at or over the figure |
+
+**Read, never banked.** Every one of the five is a question asked of what the
+character is holding *now*, the way `Clear` reads `answered` and `holding`
+reads the bag — so an errand taken after the fact is `Ready` the moment it is
+taken, which is right: you did the thing.
+
+**And the figure is derived.** `Brew { stat: "max_health", at_least: 300 }` is
+answered by running `brew::gives` over the potion, which is the same function
+the pack's card prints from — a threshold checked against a second sum would be
+a second rulebook.
+
+### The chains
+
+Four chains, one a bench, **three rungs each**, given at the counter the bench
+is at and turned in there:
+
+| chain | root | then | then |
+|---|---|---|---|
+| **the retort** | brew anything at all | brew one that gives 300 max health | brew one out of two three-cell ingredients |
+| **the bed** | grow anything | hold four of one crop at once | harvest a companion pair |
+| **the run** | kennel anything | kennel two named creatures | have both out together |
+| **the counter** | sell anything | sell something for 400 | sell at a high ask |
+
+Every rung is a thing the bench already does; **nothing new is built in any
+bench for this.** That is the constraint — an errand that needed a new
+mechanic would be a milestone about the mechanic.
+
+### What they pay
+
+Gold and components, and **no rows, no enchs and no new components** — M21.8's
+own rule and the catalogue's. The last rung of each chain pays the one thing
+that bench wants: **a seed** for the bed, **an ingredient** for the retort, a
+**bargain component** for the counter, and for the run the only thing a kennel
+can use, which is a larder full.
+
+### Deliverables
+
+| | |
+|---|---|
+| `Goal::Show { what: Shown }`, five arms, in `quest.rs` | read at `stage()` and nowhere else |
+| `quest::guide` answers for each — a bench is a *place* | so the log points at the town, which is what the log is for |
+| twelve errands in `data/quests.json`, four chains of three | `granted`, so a rung you have not reached is not on a counter |
+| `every_bench_has_a_chain` | a lint over the four benches, not a list of four |
+| `every_rung_is_a_thing_the_bench_already_does` | no rung needs a mechanic that does not exist |
+| the ask line for each, unthemed, TONE 13a | *brew one that gives 300 max health* is the engine's sentence |
+| a browser check: a rung goes `Offered` → `Ready` when you use the bench | the one thing `cargo test` cannot ask |
+
+**Acceptance.** Twelve errands, four chains, one new `Goal` arm with five
+variants. `make play` shows at least the root rung of one chain handed in. Every
+lint green, and breaking each new one names the bench it is about.

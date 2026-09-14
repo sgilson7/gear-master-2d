@@ -12,7 +12,9 @@ import init, {
   quest_log_json, guide_json, pin_quest,
   retort_json, retort_legal_anchors, retort_place, retort_pick_up,
   bed_json, bed_legal_anchors, bed_place, bed_pull, bed_rotate, bed_look_over,
+  stall_json, stall_legal_anchors, stall_place, stall_pick_up, stall_rotate, stall_reprice,
   run_json, run_legal_anchors, run_place, run_pick_up, run_rotate, run_look_over,
+  kennel_offer_json, take_along_here,
   retort_rotate, retort_look_over, brew_it, drink_potion, tip_out,
   character_json, skills_json, take_skill, pressure_json, pools_json,
   class_offer_json, choose_class, choose_second_class, class_name, all_trees_json,
@@ -682,6 +684,13 @@ function paintSheet(c) {
   for (const k of c.classes ?? []) {
     rows.push(`<li class="rule" title="${k.promise}">you are a <b>${k.name}</b> — ${k.promise}</li>`);
   }
+  // **And what is in the kennel**, which is a thing you own that nothing else
+  // on this screen would mention.
+  for (const k of c.kennel ?? []) {
+    rows.push(`<li class="rule">${k.spec} is in the kennel` +
+      `${k.out ? ', and out' : ''}${k.wins ? ` — ${k.wins} out together` : ''}</li>`);
+  }
+  if (c.seeds) rows.push(`<li class="dim">${c.seeds} in the seed drawer</li>`);
   // **What else you are.** A specialization is not one of the three classes, so
   // nothing that walks `classes()` prints it — and until this line no screen in
   // the game said you had become one at all.
@@ -1490,9 +1499,40 @@ function showTab(which) {
   }
 }
 
+/// **The offer, on the screen a player reads after a fight.**
+///
+/// Core decides — `Game::kennel_offer` — and this moves the string. The button
+/// is only ever on a *won* fight, because taking something along is a thing you
+/// do to a creature you beat, and it shows the count-down when it is close
+/// because a refusal that counts is a goal.
+function paintTakeAlong(beaten) {
+  const btn = $('take-along');
+  const why = $('take-along-why');
+  const o = beaten ? JSON.parse(kennel_offer_json(beaten)) : null;
+  if (!o) { btn.hidden = true; why.hidden = true; return; }
+  btn.hidden = !o.can;
+  why.hidden = !o.why;
+  if (o.can) {
+    btn.textContent = `Take the ${o.name} along`;
+    btn.onclick = () => {
+      const bad = take_along_here(beaten);
+      if (bad) { log(bad, true); return; }
+      log(`The ${o.name} is coming with you. It is in the kennel.`);
+      btn.hidden = true;
+      paintPanel();
+      autosave();
+    };
+  }
+  if (o.why) why.textContent = o.why;
+}
+
 function closeFight() {
   hideFrame();
   hidePiece();
+  // The offer belongs to the fight that just ended; a button that outlived it
+  // would be an offer about somebody else.
+  $('take-along').hidden = true;
+  $('take-along-why').hidden = true;
   $('fight').hidden = true;
   paintPanel(); draw(); autosave();
   // A fight is where a level lands, so it is where the fork is offered.
@@ -1531,6 +1571,7 @@ function runFight() {
     // is also the only place a drop is ever named, so it goes in the log —
     // where a player can go back and find out what that thing was called.
     for (const line of s.receipt) log(line, s.outcome !== 'victory');
+    paintTakeAlong(s.outcome === 'victory' ? s.beaten : null);
     // **Repaint behind the result.** A fight settles here — the purse, what is
     // carried and how worn out you are all move — and the standing panel used
     // to keep the pre-fight numbers until the result was dismissed.
@@ -2653,6 +2694,7 @@ function openTown(id) {
   paintBank();
   paintBed();
   paintRun();
+  paintStall();
   $('town').hidden = false;
 }
 
@@ -2863,6 +2905,116 @@ function paintRunText() {
 
 function runSays(text, bad = false) {
   const el = $('run-says');
+  el.textContent = text; el.hidden = !text;
+  el.classList.toggle('bad', bad);
+}
+
+// ----------------------------------------------------------------- the Stall
+
+let stallBoard = null;
+
+/// The counter, in the town screen — the bed's and the run's third sibling and
+/// the same `Board`.
+///
+/// **`paintStallText` is split off from the start**, for the reason the bed
+/// found the hard way: `Board.refresh()` ends by calling `onchange`, so a paint
+/// that refreshes and a refresh that paints is a stack overflow, and what that
+/// looks like from outside is the town screen never opening.
+function paintStall() {
+  const box = $('stall-box');
+  const b = JSON.parse(stall_json());
+  if (!b) { box.hidden = true; return; }
+  box.hidden = false;
+  paintStallText();
+  if (!stallBoard) {
+    stallBoard = new Board($('stall-board'), {
+      boardJson: stall_json,
+      legalAnchors: stall_legal_anchors,
+      place: stall_place,
+      pickUp: stall_pick_up,
+      rotate: stall_rotate,
+      toggleLock: () => {},
+      look: look_json,
+      lookOver: () => 'null',
+    });
+    stallBoard.onchange = () => { paintStallText(); autosave(); };
+    stallBoard.onhold = (name) => {
+      $('stall-holding').textContent = name
+        ? `Holding ${name}. Click a cell to put it out, right-click to turn it.`
+        : 'Pick something out of your bag and put it on the counter.';
+    };
+  }
+  stallBoard.refresh();
+}
+
+/// The sentence over the counter, the ledger and the eight buyers.
+function paintStallText() {
+  const b = JSON.parse(stall_json());
+  if (!b) return;
+  const s = b.slots[0];
+  const out = s.placed.length;
+  $('stall-note').textContent =
+    `${s.cols}×${s.rows} and not a rectangle. Put something out, set a price, ` +
+    `and somebody comes by every fight you win. Within ${b.fair_pct}% of what ` +
+    `it is worth is a fair ask and always sells; over that, two buyers in ` +
+    `three walk away. ` +
+    (out ? `${out} on the counter.` : 'Nothing on it.');
+  // **One price control a row, beside the grid.** A number typed into a canvas
+  // is a control a keyboard cannot reach, and a box that follows the pointer is
+  // a box that moves while you are using it — so the counter's prices are a
+  // list, which is also what a stall has.
+  $('stall-price').hidden = !out;
+  $('stall-prices').replaceChildren(...s.placed.map((w) => {
+    const el = document.createElement('div');
+    el.className = 'wares ask-' + w.ask;
+    const lab = document.createElement('label');
+    lab.className = 'spec';
+    lab.textContent = `${w.name} · worth ${w.worth}`;
+    const box = document.createElement('input');
+    box.type = 'number'; box.min = '0'; box.step = '1';
+    box.inputMode = 'numeric';
+    box.value = w.price;
+    box.id = `ask-${w.id}`;
+    lab.htmlFor = box.id;
+    box.onchange = () => {
+      const why = stall_reprice(w.id, Number(box.value) | 0);
+      if (why) { stallSays(why, true); return; }
+      stallSays('');
+      autosave();
+      paintStallText();
+    };
+    const tag = document.createElement('span');
+    tag.className = 'cost';
+    tag.textContent = { low: 'under the odds', fair: 'a fair ask', high: 'a high ask' }[w.ask];
+    el.append(lab, box, tag);
+    return el;
+  }));
+  $('stall-ledger').replaceChildren(...(b.ledger.length
+    ? b.ledger.map((r) => {
+        const el = document.createElement('div');
+        el.className = 'wares';
+        const over = r.worth ? Math.round((r.paid - r.worth) * 100 / r.worth) : 0;
+        el.innerHTML = `<b>${r.item}</b>` +
+          `<span class="spec">${r.buyer}</span>` +
+          `<span class="cost">${r.paid} Fnorp` +
+          `${over ? ` · ${over > 0 ? '+' : ''}${over}% on what it is worth` : ''}</span>`;
+        return el;
+      })
+    : [Object.assign(document.createElement('p'), {
+        className: 'note', textContent: 'Nothing has sold yet.',
+      })]));
+  $('stall-buyers').replaceChildren(...b.buyers.map((w) => {
+    const el = document.createElement('div');
+    el.className = 'wares';
+    el.innerHTML = `<b>${w.name}</b>` +
+      `<span class="spec">${w.blurb}</span>` +
+      `<span class="cost">buys ${w.wants.join(' and ')} over ${w.floor} Fnorp</span>`;
+    return el;
+  }));
+}
+
+function stallSays(text, bad = false) {
+  const el = $('stall-says');
   el.textContent = text; el.hidden = !text;
   el.classList.toggle('bad', bad);
 }
@@ -4599,6 +4751,10 @@ async function main() {
   // to find out whether the tile it is on became a counter mid-fight.
   window.__caravanJson = () => JSON.parse(caravan_json());
   window.__bedJson = () => bed_json();
+  window.__stallJson = () => stall_json();
+  window.__stallLegal = (id, slot) => stall_legal_anchors(id, slot);
+  window.__stallPlace = (id, slot, x, y) => stall_place(id, slot, x, y);
+  window.__paintStall = () => paintStall();
   window.__runJson = () => run_json();
   window.__trainHere = () => train_here();
   window.__trees = () => JSON.parse(all_trees_json());

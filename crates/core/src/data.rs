@@ -90,6 +90,7 @@ pub const SUPPLIES_JSON: &str = include_str!("../../../data/supplies.json");
 pub const BREWS_JSON: &str = include_str!("../../../data/brews.json");
 pub const PLOT_JSON: &str = include_str!("../../../data/plot.json");
 pub const KENNEL_JSON: &str = include_str!("../../../data/kennel.json");
+pub const STALL_JSON: &str = include_str!("../../../data/stall.json");
 /// The art manifest, which is also the one place a creature's **family** is
 /// written down.
 ///
@@ -151,6 +152,7 @@ pub const FILES: &[(&str, &str)] = &[
     ("brews.json", BREWS_JSON),
     ("plot.json", PLOT_JSON),
     ("kennel.json", KENNEL_JSON),
+    ("stall.json", STALL_JSON),
     ("enchs.json", ENCHS_JSON),
     ("drops.json", DROPS_JSON),
 ];
@@ -365,6 +367,14 @@ pub fn kennel() -> &'static crate::kennel::KennelData {
     static ONCE: std::sync::OnceLock<crate::kennel::KennelData> = std::sync::OnceLock::new();
     ONCE.get_or_init(|| {
         crate::kennel::KennelData::parse(KENNEL_JSON).expect("the shipped kennel is broken")
+    })
+}
+
+/// The Stall's buyers and their pairs, parsed once.
+pub fn stall() -> &'static crate::stall::StallData {
+    static ONCE: std::sync::OnceLock<crate::stall::StallData> = std::sync::OnceLock::new();
+    ONCE.get_or_init(|| {
+        crate::stall::StallData::parse(STALL_JSON).expect("the shipped stall is broken")
     })
 }
 

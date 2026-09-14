@@ -63,6 +63,21 @@ pub struct Kennelled {
     /// otherwise, and only an out creature eats.
     #[serde(default)]
     pub out: bool,
+    /// Fights it has been out for since it last ate.
+    ///
+    /// **Its own clock, and it had to be.** The first version read
+    /// `world.count("encounters")`, on the principle that a second counter
+    /// meaning nearly the same thing is how two answers get made — and that
+    /// counter is the *shim's*, bumped when a step rolls an encounter and
+    /// never by `fight::settle`. So it was zero in every test and in every
+    /// fight reached any other way, `0 % 2 == 0`, and the creature ate every
+    /// time however the Handler was tuned. Found by a test that asserted it
+    /// stayed out and watched it go in.
+    ///
+    /// *Fights since it last ate* is not a thing anything else in this game
+    /// counts, so counting it here is not a duplicate.
+    #[serde(default)]
+    pub since_fed: u32,
     /// Where it stands in the run, and which way round.
     #[serde(default)]
     pub at: (i8, i8),
@@ -76,7 +91,12 @@ impl Kennelled {
     /// **Every `TALLY_STEP`, not per win**, so the number on the card moves in
     /// steps a player can see rather than by a fraction nobody can check.
     pub fn tally_pct(&self) -> i32 {
-        (self.wins_together / TALLY_STEP) as i32 * TALLY_PCT
+        self.tally_pct_at(TALLY_PCT)
+    }
+
+    /// The same, at a Handler's own rate.
+    pub fn tally_pct_at(&self, per_step: i32) -> i32 {
+        (self.wins_together / TALLY_STEP) as i32 * per_step
     }
 }
 

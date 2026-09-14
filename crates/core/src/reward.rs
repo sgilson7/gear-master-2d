@@ -139,7 +139,8 @@ pub fn bounty_with_class(
             // ingredient is not money and was never in `bounty`.
             | ClassPower::Apothecary { .. }
             | ClassPower::Chef { .. }
-            | ClassPower::Grower { .. } => {}
+            | ClassPower::Grower { .. }
+            | ClassPower::Handler { .. } => {}
             ClassPower::Showstopper { pct: more, under_ms } => {
                 if duration_ms < under_ms {
                     pct += more;

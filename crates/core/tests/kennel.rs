@@ -98,11 +98,14 @@ fn a_creature_out_eats_at_the_bell() {
     let at = *mask.first().expect("the pit has a run");
     g.put_out("the-end-of-all-gears", rat, at, 0, D).expect("it goes out");
 
-    // Fed.
-    let before = g.character.in_larder(&eats);
-    assert!(before > 0, "the fighting should have filled the larder");
-    win(&mut g, rat);
-    assert_eq!(g.character.in_larder(&eats), before + 1 - 1, "it did not eat exactly one");
+    // **Fed, and counted against a larder this test put there.** It used to
+    // read `before + 1 - 1` — the win pays one, the creature eats one — which
+    // encoded the certainty the ingredient drop no longer has. So it stocks
+    // the larder itself and fights **out of the bucket**, and then the only
+    // thing that can move the count is the eating.
+    g.character.larder.insert(eats.clone(), 3);
+    win(&mut g, "Bone Archer");
+    assert_eq!(g.character.in_larder(&eats), 2, "it did not eat exactly one");
     assert!(g.character.kennel[0].out, "a fed creature was put away");
 
     // **And an empty larder keeps it in — but only if you fight something
@@ -178,6 +181,7 @@ fn every_family_stands_somewhere() {
                             eats: String::new(),
                             wins_together: 0,
                             out: false,
+                            since_fed: 0,
                             at: (ax, ay),
                             turn,
                         };
@@ -219,6 +223,7 @@ fn ten_wins_together_pay_five() {
         eats: "toad-ichor".into(),
         wins_together: 0,
         out: true,
+        since_fed: 0,
         at: (0, 0),
         turn: 0,
     };
@@ -298,6 +303,7 @@ fn a_lost_fight_resets_it() {
         eats: "toad-ichor".into(),
         wins_together: 25,
         out: true,
+        since_fed: 0,
         at: (0, 0),
         turn: 0,
     }];
@@ -331,4 +337,128 @@ fn a_win_together_counts_for_what_is_out() {
     g.put_out("the-end-of-all-gears", rat, mask[0], 0, D).expect("out");
     win(&mut g, rat);
     assert_eq!(g.character.kennel[0].wins_together, 1);
+}
+
+// ----------------------------------------------------------- and the Handler
+
+/// **A Second Lead fields two**, and it is the only route to it.
+#[test]
+fn a_second_lead_fields_two() {
+    let mut g = a_fighter(0x5EED_0000_6E00_0020);
+    // Two creatures of two families, both known well enough.
+    let pair = ["Cave Rat", "Bone Archer"];
+    for c in pair {
+        for _ in 0..(OFFER_AT + 1) {
+            g.world.bump(&fight::beat_key(c));
+        }
+        g.take_along(c).unwrap_or_else(|e| panic!("{c}: {e}"));
+    }
+    let mask = g.run_mask("the-third-town", D);
+    assert_eq!(g.mouths(), 1, "everybody leads one");
+    g.put_out("the-third-town", pair[0], mask[0], 0, D).expect("the first goes out");
+    // Somewhere else in the run for the second, so this is about the lead
+    // rather than about the cells.
+    let spot = mask
+        .iter()
+        .find(|&&c| g.put_out("the-third-town", pair[1], c, 0, D).is_err())
+        .copied()
+        .expect("every cell refuses while you lead one");
+    let why = g.put_out("the-third-town", pair[1], spot, 0, D).unwrap_err();
+    assert!(why.contains("lead"), "{why}");
+
+    g.train("Handler").expect("somebody teaches it");
+    for n in ["ha-known-by-name", "ha-fed-from-the-hand", "ha-the-long-yard",
+              "ha-worked-together", "ha-a-second-lead"] {
+        g.character.skills_taken.push(n.to_string());
+    }
+    assert_eq!(g.mouths(), 2, "a second lead did not field two");
+    let mask = g.run_mask("the-third-town", D);
+    let ok = mask.iter().any(|&c| g.put_out("the-third-town", pair[1], c, 0, D).is_ok());
+    assert!(ok, "a handler could not put the second one out anywhere");
+    assert_eq!(g.character.kennel.iter().filter(|k| k.out).count(), 2);
+}
+
+/// **Fed from the hand eats every other fight.**
+#[test]
+fn fed_from_the_hand_eats_every_other_fight() {
+    let mut g = a_fighter(0x5EED_0000_6E00_0021);
+    let rat = "Cave Rat";
+    for _ in 0..OFFER_AT {
+        win(&mut g, rat);
+    }
+    g.take_along(rat).expect("it comes");
+    assert_eq!(g.character.handler().2, gm2d_core::kennel::FEED_EVERY);
+    g.train("Handler").expect("somebody teaches it");
+    g.character.skills_taken.push("ha-fed-from-the-hand".into());
+    assert_eq!(g.character.handler().2, gm2d_core::kennel::FEED_EVERY + 1, "the hand fed nothing");
+
+    // Out, with exactly two of what it eats, and four fights out of its own
+    // bucket: at every-other it eats twice and is still out.
+    let mask = g.run_mask("the-end-of-all-gears", D);
+    g.put_out("the-end-of-all-gears", rat, mask[0], 0, D).expect("out");
+    let eats = g.character.kennel[0].eats.clone();
+    g.character.larder.insert(eats.clone(), 2);
+    for _ in 0..4 {
+        win(&mut g, "Bone Archer");
+    }
+    assert!(g.character.kennel[0].out, "it went in on a handler's clock");
+}
+
+/// **Known By Name offers a win sooner**, which is the promise.
+#[test]
+fn known_by_name_offers_sooner() {
+    let mut g = a_fighter(0x5EED_0000_6E00_0022);
+    let rat = "Cave Rat";
+    for _ in 0..(OFFER_AT - 1) {
+        g.world.bump(&fight::beat_key(rat));
+    }
+    assert!(g.kennel_offer(rat).is_err(), "it came along a win early for everybody");
+    g.train("Handler").expect("somebody teaches it");
+    g.kennel_offer(rat).expect("a handler is offered a win sooner");
+}
+
+/// **The Long Yard is placed by the map**, the bed's own rule.
+#[test]
+fn the_long_yard_is_placed_by_the_map() {
+    let mut g = a_fighter(0x5EED_0000_6E00_0023);
+    let before = g.run_mask("kettleworks", D);
+    g.train("Handler").expect("somebody teaches it");
+    g.character.skills_taken.push("ha-known-by-name".into());
+    g.character.skills_taken.push("ha-the-long-yard".into());
+    let after = g.run_mask("kettleworks", D);
+    assert_eq!(after.len(), before.len() + 3);
+    for c in &before {
+        assert!(after.contains(c), "the run lost {c:?}");
+    }
+    assert_eq!(after, g.run_mask("kettleworks", D), "it is not the same three cells twice");
+}
+
+/// **Every way into the kennel is reachable from the game.**
+///
+/// The lint that was missing. `Game::kennel_offer` and `Game::take_along`
+/// shipped in M21.4 with seven tests between them and **no caller anywhere
+/// outside them**, so the run, the yard and the feed all went live with no way
+/// to put anything in the kennel — the Apothecary's own failure, in the block
+/// that opened by fixing it.
+///
+/// A unit test cannot see a missing screen, so what this asks is the half a
+/// unit test *can*: that the door exists, is public, and answers. The browser
+/// half is `check_a_won_fight_offers_the_creature`, and between them the two
+/// cover *is there a rule* and *can a player reach it*.
+#[test]
+fn every_way_into_the_kennel_is_reachable() {
+    let mut g = a_fighter(0x5EED_0000_6E00_0030);
+    let rat = "Cave Rat";
+    // The offer answers before the wins, and answers after them.
+    assert!(g.kennel_offer(rat).is_err(), "it offered before anything was beaten");
+    for _ in 0..OFFER_AT {
+        g.world.bump(&fight::beat_key(rat));
+    }
+    g.kennel_offer(rat).expect("the offer opens");
+    // And taking it is one call, from the creature's canonical name alone —
+    // which is all a screen has after a fight, because settling clears the
+    // encounter.
+    g.take_along(rat).expect("and it is taken by name");
+    assert_eq!(g.character.kennel.len(), 1);
+    assert_eq!(g.character.kennel[0].spec, rat);
 }

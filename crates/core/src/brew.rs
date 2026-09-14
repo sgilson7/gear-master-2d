@@ -43,6 +43,26 @@ use crate::stats::Stats;
 /// arrangement carries nothing. This is a bent neck into a bulb, so a
 /// three-cell ingredient beside another three-cell ingredient does not always
 /// go, and which pair you can actually make is a fact about the glass.
+/// Per-mille chance a win leaves an ingredient.
+///
+/// **It was a certainty, and the Plot was a second source for something you
+/// already had enough of.** Asked for: *ingredients should be much rarer so
+/// that you have to use the growing system.* Measured rather than chosen — a
+/// crop pays `plot::HARVEST_YIELD` every `plot::STAGES - 1` wins, which is two
+/// a win from one crop and four from two, against a certain one from fighting.
+/// At 250 a win pays a quarter and **two crops growing is sixteen times what
+/// fighting pays**, which is the ask stated as a number.
+///
+/// Not lower, because a brew is a *pair* and the first one has to be reachable
+/// before there is anything in the ground: at a quarter a win, two different
+/// buckets is about eight fights, and the bed is in the first town from the
+/// first afternoon.
+///
+/// **And this is what makes the Kennel's feed cost something.** A creature out
+/// eats one a fight from the same larder, and it used to be fed by the corpse
+/// of whatever it helped kill.
+pub const INGREDIENT_PER_MILLE: u32 = 250;
+
 pub const RETORT: &[(i8, i8)] = &[
     (0, 0),
     (0, 1),

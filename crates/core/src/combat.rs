@@ -6959,7 +6959,8 @@ pub fn simulate_party_holding(
             // through what you drank before the bell, which is `Held`.
             crate::class::ClassPower::Apothecary { .. }
             | crate::class::ClassPower::Chef { .. }
-            | crate::class::ClassPower::Grower { .. } => {}
+            | crate::class::ClassPower::Grower { .. }
+            | crate::class::ClassPower::Handler { .. } => {}
             crate::class::ClassPower::SlowTime(n) => start_player.slow_time = n,
             crate::class::ClassPower::Overflowing(n) => start_player.overflowing = n,
             crate::class::ClassPower::Leeching(pct) => start_player.leech = pct,

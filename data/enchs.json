@@ -170,6 +170,32 @@
           "cap": 40
         }
       }
+    },
+    {
+      "id": "the-tithe-ring",
+      "name": "The Tithe Ring",
+      "blurb": "A tenth of everything, and the ring does not say a tenth of what to. It has been on four hands and none of them was the maker's.",
+      "effect": {
+        "leeches_mana": {
+          "pct": 12
+        }
+      }
+    },
+    {
+      "id": "the-one-page",
+      "name": "The One Page",
+      "blurb": "Torn out, used once, and the book is worth nothing without it. Kaklon's people have been told not to sell the book.",
+      "effect": {
+        "fragile": {
+          "pct": 400
+        }
+      }
+    },
+    {
+      "id": "the-first-word",
+      "name": "The First Word",
+      "blurb": "Said before anybody was ready, which is the whole of what it is for. It only works once and it does not need to work twice.",
+      "effect": "ambush"
     }
   ]
 }

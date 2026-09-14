@@ -88,6 +88,21 @@
         10
       ],
       "hidden_until": "the-shelf-is-open"
+    },
+    {
+      "at": [
+        2,
+        7
+      ],
+      "kind": "bench",
+      "id": "the-one-the-dogs-follow",
+      "name": "somebody sitting down, in the wet",
+      "prose": [
+        "Four floors under the shore, on the one dry shelf, somebody is sitting with their back to the wall and three things asleep against them. None of the three is a dog.",
+        "They say the difficult part was never the leading. It was the second time: the first time anything comes back, it has decided something, and you were not asked.",
+        "They teach, and they sell nothing. What they have is what came back."
+      ],
+      "teaches": "Handler"
     }
   ]
 }

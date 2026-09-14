@@ -30,6 +30,7 @@ pub mod look;
 pub mod naming;
 pub mod kennel;
 pub mod piece;
+pub mod stall;
 pub mod plot;
 pub mod pressure;
 pub mod puzzle;

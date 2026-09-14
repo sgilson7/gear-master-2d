@@ -451,6 +451,30 @@ def in_town(page, buy=True, probe=None):
             live.first.click()
             page.wait_for_timeout(60)
             said.append(f"ordered: {name}")
+    # **Put something out on the counter.** A player with a bag full of things
+    # they will never seat sells one; what makes it worth the walker's time is
+    # that a buyer comes by every won fight, so a transcript that never shelves
+    # anything can never show a sale. One a visit, at the fair ask the page
+    # puts on it — the walker is not a haggler.
+    if page.is_visible("#stall-box"):
+        put = page.evaluate("""() => {
+          const b = JSON.parse(window.__stallJson());
+          if (!b || !b.bag.length) return null;
+          // The cheapest thing in the bag, because a player sells what they are
+          // not going to use — and never a tally, which `Game::shelve` refuses
+          // by name and which the walker reached for first, because a toad eye
+          // is worth twenty-five Fnorp and everything else is worth more.
+          const w = [...b.bag].filter((x) => x.kind !== 'Quest')
+                              .sort((a, c) => a.worth - c.worth)[0];
+          if (!w) return null;
+          const spot = JSON.parse(window.__stallLegal(String(w.id), 'stall'));
+          if (!spot.length) return null;
+          const why = window.__stallPlace(String(w.id), 'stall', spot[0][0], spot[0][1]);
+          window.__paintStall();
+          return why || `${w.name} at ${w.worth}`;
+        }""")
+        if put:
+            said.append(f"counter: {put}")
     # By name, not by "the first enabled one": a taken errand stays clickable
     # on purpose — clicking it says how far along you are, which is
     # information rather than an error — so a loop that keeps pressing the

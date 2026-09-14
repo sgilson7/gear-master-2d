@@ -1,0 +1,313 @@
+{
+  "format": "gm2d-stall",
+  "version": 1,
+  "_note": "Eight buyers and all twenty-eight of their pairs, which is C(8,2) and complete — `every_pair_is_authored` counts it. A buyer wants two grids and has a floor; two kin in a row leave a **bargain**, and three of the twenty-eight leave an ench that nothing in the game sells. Those three are the Stall's own, held back from M21.6 until there was a counter to get them from.",
+  "buyers": [
+    {
+      "id": "the-shift-foreman",
+      "name": "The Shift Foreman",
+      "blurb": "He buys for eleven other people and none of them is here. He has a list and he will not show you the list.",
+      "wants": [
+        "weapon",
+        "gloves"
+      ],
+      "floor": 30
+    },
+    {
+      "id": "the-under-clerk",
+      "name": "The Under-Clerk",
+      "blurb": "She writes down what she paid and then writes down what she should have paid, in a different column, in a different hand.",
+      "wants": [
+        "helmet",
+        "chest"
+      ],
+      "floor": 25
+    },
+    {
+      "id": "the-rind-cutter",
+      "name": "The Rind Cutter",
+      "blurb": "Buys nothing he cannot carry and carries a great deal. He has been doing this since before the works was the works.",
+      "wants": [
+        "greaves",
+        "chest"
+      ],
+      "floor": 20
+    },
+    {
+      "id": "the-tenth-surveyors-boy",
+      "name": "The Tenth Surveyor's Boy",
+      "blurb": "He is not a boy and he was not the tenth surveyor's. He is very particular about the second part.",
+      "wants": [
+        "weapon",
+        "helmet"
+      ],
+      "floor": 45
+    },
+    {
+      "id": "the-quench-hand",
+      "name": "The Quench Hand",
+      "blurb": "Comes in wet, leaves wet, and pays in coins that are warm. Nobody has asked about the coins.",
+      "wants": [
+        "gloves",
+        "greaves"
+      ],
+      "floor": 15
+    },
+    {
+      "id": "the-woman-from-high-wick",
+      "name": "The Woman From High Wick",
+      "blurb": "She says High Wick as though you have been. Nobody has been. She buys the strange things and she buys them quickly.",
+      "wants": [
+        "weapon",
+        "chest"
+      ],
+      "floor": 50
+    },
+    {
+      "id": "the-drover",
+      "name": "The Drover",
+      "blurb": "Buys on the way through and never on the way back, which everybody has noticed and nobody has explained.",
+      "wants": [
+        "greaves",
+        "helmet"
+      ],
+      "floor": 20
+    },
+    {
+      "id": "nine-of-ashes-cousin",
+      "name": "Nine of Ashes' Cousin",
+      "blurb": "Says it like a job title. Pays like one too, and does not haggle, and does not look at what they are buying.",
+      "wants": [
+        "chest",
+        "gloves"
+      ],
+      "floor": 60
+    }
+  ],
+  "kin": [
+    {
+      "a": "the-shift-foreman",
+      "b": "the-under-clerk",
+      "blurb": "Two of them in a row, and the second one leaves something on the counter that was not for sale.",
+      "gives": {
+        "ench": "the-tithe-ring"
+      }
+    },
+    {
+      "a": "the-shift-foreman",
+      "b": "the-rind-cutter",
+      "blurb": "They know each other. Whatever passed between them, something of it stayed on your shelf.",
+      "gives": {
+        "piece": "Drover's Orb"
+      }
+    },
+    {
+      "a": "the-shift-foreman",
+      "b": "the-tenth-surveyors-boy",
+      "blurb": "They know each other. Whatever passed between them, something of it stayed on your shelf.",
+      "gives": {
+        "piece": "Shunter's Orb"
+      }
+    },
+    {
+      "a": "the-shift-foreman",
+      "b": "the-quench-hand",
+      "blurb": "They know each other. Whatever passed between them, something of it stayed on your shelf.",
+      "gives": {
+        "piece": "Signalman's Orb"
+      }
+    },
+    {
+      "a": "the-shift-foreman",
+      "b": "the-woman-from-high-wick",
+      "blurb": "They know each other. Whatever passed between them, something of it stayed on your shelf.",
+      "gives": {
+        "piece": "Gold Chip"
+      }
+    },
+    {
+      "a": "the-shift-foreman",
+      "b": "the-drover",
+      "blurb": "They know each other. Whatever passed between them, something of it stayed on your shelf.",
+      "gives": {
+        "piece": "Drover's Orb"
+      }
+    },
+    {
+      "a": "the-shift-foreman",
+      "b": "nine-of-ashes-cousin",
+      "blurb": "They know each other. Whatever passed between them, something of it stayed on your shelf.",
+      "gives": {
+        "piece": "Shunter's Orb"
+      }
+    },
+    {
+      "a": "the-under-clerk",
+      "b": "the-rind-cutter",
+      "blurb": "They know each other. Whatever passed between them, something of it stayed on your shelf.",
+      "gives": {
+        "piece": "Signalman's Orb"
+      }
+    },
+    {
+      "a": "the-under-clerk",
+      "b": "the-tenth-surveyors-boy",
+      "blurb": "They know each other. Whatever passed between them, something of it stayed on your shelf.",
+      "gives": {
+        "piece": "Gold Chip"
+      }
+    },
+    {
+      "a": "the-under-clerk",
+      "b": "the-quench-hand",
+      "blurb": "Two of them in a row, and the second one leaves something on the counter that was not for sale.",
+      "gives": {
+        "ench": "the-one-page"
+      }
+    },
+    {
+      "a": "the-under-clerk",
+      "b": "the-woman-from-high-wick",
+      "blurb": "They know each other. Whatever passed between them, something of it stayed on your shelf.",
+      "gives": {
+        "piece": "Shunter's Orb"
+      }
+    },
+    {
+      "a": "the-under-clerk",
+      "b": "the-drover",
+      "blurb": "They know each other. Whatever passed between them, something of it stayed on your shelf.",
+      "gives": {
+        "piece": "Signalman's Orb"
+      }
+    },
+    {
+      "a": "the-under-clerk",
+      "b": "nine-of-ashes-cousin",
+      "blurb": "They know each other. Whatever passed between them, something of it stayed on your shelf.",
+      "gives": {
+        "piece": "Gold Chip"
+      }
+    },
+    {
+      "a": "the-rind-cutter",
+      "b": "the-tenth-surveyors-boy",
+      "blurb": "They know each other. Whatever passed between them, something of it stayed on your shelf.",
+      "gives": {
+        "piece": "Drover's Orb"
+      }
+    },
+    {
+      "a": "the-rind-cutter",
+      "b": "the-quench-hand",
+      "blurb": "They know each other. Whatever passed between them, something of it stayed on your shelf.",
+      "gives": {
+        "piece": "Shunter's Orb"
+      }
+    },
+    {
+      "a": "the-rind-cutter",
+      "b": "the-woman-from-high-wick",
+      "blurb": "They know each other. Whatever passed between them, something of it stayed on your shelf.",
+      "gives": {
+        "piece": "Signalman's Orb"
+      }
+    },
+    {
+      "a": "the-rind-cutter",
+      "b": "the-drover",
+      "blurb": "They know each other. Whatever passed between them, something of it stayed on your shelf.",
+      "gives": {
+        "piece": "Gold Chip"
+      }
+    },
+    {
+      "a": "the-rind-cutter",
+      "b": "nine-of-ashes-cousin",
+      "blurb": "They know each other. Whatever passed between them, something of it stayed on your shelf.",
+      "gives": {
+        "piece": "Drover's Orb"
+      }
+    },
+    {
+      "a": "the-tenth-surveyors-boy",
+      "b": "the-quench-hand",
+      "blurb": "Two of them in a row, and the second one leaves something on the counter that was not for sale.",
+      "gives": {
+        "ench": "the-first-word"
+      }
+    },
+    {
+      "a": "the-tenth-surveyors-boy",
+      "b": "the-woman-from-high-wick",
+      "blurb": "They know each other. Whatever passed between them, something of it stayed on your shelf.",
+      "gives": {
+        "piece": "Signalman's Orb"
+      }
+    },
+    {
+      "a": "the-tenth-surveyors-boy",
+      "b": "the-drover",
+      "blurb": "They know each other. Whatever passed between them, something of it stayed on your shelf.",
+      "gives": {
+        "piece": "Gold Chip"
+      }
+    },
+    {
+      "a": "the-tenth-surveyors-boy",
+      "b": "nine-of-ashes-cousin",
+      "blurb": "They know each other. Whatever passed between them, something of it stayed on your shelf.",
+      "gives": {
+        "piece": "Drover's Orb"
+      }
+    },
+    {
+      "a": "the-quench-hand",
+      "b": "the-woman-from-high-wick",
+      "blurb": "They know each other. Whatever passed between them, something of it stayed on your shelf.",
+      "gives": {
+        "piece": "Shunter's Orb"
+      }
+    },
+    {
+      "a": "the-quench-hand",
+      "b": "the-drover",
+      "blurb": "They know each other. Whatever passed between them, something of it stayed on your shelf.",
+      "gives": {
+        "piece": "Signalman's Orb"
+      }
+    },
+    {
+      "a": "the-quench-hand",
+      "b": "nine-of-ashes-cousin",
+      "blurb": "They know each other. Whatever passed between them, something of it stayed on your shelf.",
+      "gives": {
+        "piece": "Gold Chip"
+      }
+    },
+    {
+      "a": "the-woman-from-high-wick",
+      "b": "the-drover",
+      "blurb": "They know each other. Whatever passed between them, something of it stayed on your shelf.",
+      "gives": {
+        "piece": "Drover's Orb"
+      }
+    },
+    {
+      "a": "the-woman-from-high-wick",
+      "b": "nine-of-ashes-cousin",
+      "blurb": "They know each other. Whatever passed between them, something of it stayed on your shelf.",
+      "gives": {
+        "piece": "Shunter's Orb"
+      }
+    },
+    {
+      "a": "the-drover",
+      "b": "nine-of-ashes-cousin",
+      "blurb": "They know each other. Whatever passed between them, something of it stayed on your shelf.",
+      "gives": {
+        "piece": "Signalman's Orb"
+      }
+    }
+  ]
+}

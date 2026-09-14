@@ -111,6 +111,19 @@ fn every_ench_comes_from_somewhere() {
             _ => None,
         })
         .collect();
+    // **And what a sale leaves**, which is the fifth source and is the only one
+    // that is not a counter, a tree, an errand or a crop: three of the Stall's
+    // twenty-eight buyer pairs leave an ench on your own counter. Asked for in
+    // as many words — *you should sometimes receive unique enchs from selling
+    // items in your store front.*
+    let sold_for: Vec<String> = data::stall()
+        .kin
+        .iter()
+        .filter_map(|k| match &k.gives {
+            gm2d_core::stall::Bargain::Ench(id) => Some(id.clone()),
+            _ => None,
+        })
+        .collect();
 
     for e in &enchs.enchs {
         let from: Vec<&str> = [
@@ -119,6 +132,8 @@ fn every_ench_comes_from_somewhere() {
             paid.contains(&e.id).then_some("an errand"),
             by_expert.contains(&e.id).then_some("an expert tree"),
             grown.contains(&e.id).then_some("the Plot"),
+            sold_for.contains(&e.id).then_some("the Stall"),
+
         ]
         .into_iter()
         .flatten()
@@ -140,6 +155,15 @@ fn every_ench_comes_from_somewhere() {
         assert!(!sold.contains(id), "{id} is grown and also for sale");
         assert!(!paid.contains(id), "{id} is grown and also paid for an errand");
     }
+    // **And nothing is a bargain and also for sale**, which `StallData::parse`
+    // refuses at load as well — belt and braces, and this half also asks the
+    // question `parse` cannot, which is whether a *town* stocks it.
+    for id in &sold_for {
+        assert!(!sold.contains(id), "{id} is a bargain and also for sale");
+        assert!(!paid.contains(id), "{id} is a bargain and also paid for an errand");
+        assert!(!granted.contains(id), "{id} is a bargain and also awarded");
+        assert!(!grown.contains(id), "{id} is a bargain and also grown");
+    }
     // **And an expert tree may only ever hand over a second copy.** The other
     // direction of the exemption above, and the half that keeps it honest: an
     // expert node granting an ench nothing else in the game hands out would be
@@ -147,7 +171,11 @@ fn every_ench_comes_from_somewhere() {
     // duplicate and is exactly what the orphan rule exists to stop.
     for id in &by_expert {
         assert!(
-            sold.contains(id) || granted.contains(id) || paid.contains(id),
+            sold.contains(id)
+                || granted.contains(id)
+                || paid.contains(id)
+                || grown.contains(id)
+                || sold_for.contains(id),
             "{id} comes only from an expert tree, which is the far end of the game"
         );
     }

@@ -447,6 +447,16 @@ pub enum ClassPower {
     /// a second power enum would be a second exhaustive match in every place
     /// that already has one.
     Grower { stages: u8, beds: u32, yield_pct: i32, bed_cells: u32, pairs_reach: u32 },
+    /// A creature is offered after `offer_at` wins; you may lead `mouths` at
+    /// once; one out eats every `feed_every` fights; every run has `run_cells`
+    /// more; and every `tally_step` wins together pay `tally_pct`.
+    ///
+    /// **The Kennel's specialization**, and `feed_every` is the plan's
+    /// `feed_pct` renamed: *fed from the hand eats every other fight* is a
+    /// count, and a percentage would make it a roll — which this game does not
+    /// do to a clock. Every other clock in the block is a named count with a
+    /// glossary shelf and this is one more.
+    Handler { offer_at: u32, mouths: u32, feed_every: u32, run_cells: u32, tally_pct: i32 },
     /// A creature whose maximum health you have eaten down to `third` percent
     /// of what it was is unmade — dead, whatever is still in it.
     ///
@@ -627,7 +637,7 @@ impl ClassPower {
             // **Nor is a specialization**, for the same two reasons: it is
             // taken off a tree rather than poured, and there is no fountain in
             // this game to pour one at.
-            Apothecary { .. } | Chef { .. } | Grower { .. } => return None,
+            Apothecary { .. } | Chef { .. } | Grower { .. } | Handler { .. } => return None,
             // **Both doublable, and each doubles the thing it is about.** The
             // Stoker's is the shovel — twice as many points a tick — rather
             // than the clock, because a furnace stoked twice as often is a
@@ -701,6 +711,9 @@ impl ClassPower {
             ClassPower::Chef { .. } => &["draughts"],
             ClassPower::Grower { .. } => {
                 &["stages", "beds", "yield_pct", "bed_cells", "pairs_reach"]
+            }
+            ClassPower::Handler { .. } => {
+                &["offer_at", "mouths", "feed_every", "run_cells", "tally_pct"]
             }
             // **An expert's knobs are its own**, asked through the arm that
             // wraps it rather than duplicated here.
@@ -784,6 +797,38 @@ impl ClassPower {
                     _ => self,
                 }
             }
+            ClassPower::Handler { offer_at, mouths, feed_every, run_cells, tally_pct } => {
+                match knob {
+                    // **Never below one win.** Something that came along the
+                    // first time you met it is not something you beat enough
+                    // times, which is the whole of what the offer means.
+                    "offer_at" => ClassPower::Handler {
+                        offer_at: (offer_at as i32 + by).max(1) as u32,
+                        mouths, feed_every, run_cells, tally_pct,
+                    },
+                    "mouths" => ClassPower::Handler {
+                        offer_at, mouths: (mouths as i32 + by).max(1) as u32,
+                        feed_every, run_cells, tally_pct,
+                    },
+                    // Never below every fight, which is what everybody else
+                    // pays — a knob that made a class *worse* is a point spent
+                    // on making yourself worse.
+                    "feed_every" => ClassPower::Handler {
+                        offer_at, mouths,
+                        feed_every: (feed_every as i32 + by).max(1) as u32,
+                        run_cells, tally_pct,
+                    },
+                    "run_cells" => ClassPower::Handler {
+                        offer_at, mouths, feed_every,
+                        run_cells: (run_cells as i32 + by).max(0) as u32, tally_pct,
+                    },
+                    "tally_pct" => ClassPower::Handler {
+                        offer_at, mouths, feed_every, run_cells,
+                        tally_pct: (tally_pct + by).max(0),
+                    },
+                    _ => self,
+                }
+            }
             ClassPower::Stoker { every_ms, per_stack } => match knob {
                 // **Clamped at a tick, because a furnace that stokes faster
                 // than the clock is a furnace that stokes every tick** — and
@@ -827,6 +872,9 @@ impl ClassPower {
             ClassPower::Chef { draughts } => format!("{draughts} potions in one fight"),
             ClassPower::Grower { stages, yield_pct, .. } => {
                 format!("a crop up in {} wins, paying {yield_pct}%", stages.saturating_sub(1))
+            }
+            ClassPower::Handler { mouths, offer_at, .. } => {
+                format!("{mouths} out at once, offered after {offer_at}")
             }
             ClassPower::Stoker { every_ms, per_stack } => format!(
                 "burn {per_stack} of your biggest pool every {:.1}s",
@@ -938,6 +986,17 @@ impl ClassPower {
                 if bed_cells == 1 { "cell" } else { "cells" },
                 pairs_reach,
             ),
+            ClassPower::Handler { offer_at, mouths, feed_every, run_cells, tally_pct } => {
+                format!(
+                    "Something comes along after {offer_at} wins instead of {}, you lead {}, \
+                     one out eats every {} you fight, every run has {run_cells} more cells, \
+                     and every {} out together pays {tally_pct}%.",
+                    crate::kennel::OFFER_AT,
+                    if mouths == 1 { "one".to_string() } else { format!("{mouths}") },
+                    if feed_every == 1 { "fight".to_string() } else { format!("{feed_every} fights") },
+                    crate::kennel::TALLY_STEP,
+                )
+            }
             // **No stacks.** Upstream handed the same class out over and over
             // and a promise had to say what a second one bought; GM2D asks
             // once, at level five, and the answer does not come off. A
@@ -1259,6 +1318,20 @@ pub static CLASSES: &[ClassDef] = &[
         },
     },
     ClassDef {
+        name: "Handler",
+        blurb: "It came back a second time, which is the only part that is difficult.",
+        requires: &[(Axis::Wrath, 25), (Axis::Ward, 25)],
+        // Untuned: one fewer win to the offer, which is the promise somebody
+        // takes it for, and everything else as everybody has it.
+        power: ClassPower::Handler {
+            offer_at: crate::kennel::OFFER_AT - 1,
+            mouths: 1,
+            feed_every: crate::kennel::FEED_EVERY,
+            run_cells: 0,
+            tally_pct: crate::kennel::TALLY_PCT,
+        },
+    },
+    ClassDef {
         name: "Berserker",
         blurb: "Rage, and something heavy to spend it on.",
         requires: &[(Axis::Wrath, 40), (Axis::Brutality, 40)],
@@ -1549,7 +1622,7 @@ pub const OFFERED: &[&str] =
 /// `expert::EXPERTS`, so no pair reaches it and it pairs with nothing; and it
 /// is not in `Character::classes`, because everything that reads that list
 /// reads it to ask *which pair are you* and the answer must not change.
-pub const SPECIALIZATIONS: &[&str] = &["Apothecary", "Chef", "Grower"];
+pub const SPECIALIZATIONS: &[&str] = &["Apothecary", "Chef", "Grower", "Handler"];
 
 /// `a Chef`, `an Apothecary` — the article a name actually takes.
 ///

@@ -615,3 +615,59 @@ fn a_growers_row_pays_more() {
     assert_eq!(plain, gm2d_core::plot::HARVEST_YIELD);
     assert!(grown > plain, "a grower pulled {grown} and everybody else pulls {plain}");
 }
+
+// ------------------------------------------- the larder is earned, not found
+
+/// A win pays an ingredient **at its rate**, where it used to pay one always.
+#[test]
+fn a_win_pays_an_ingredient_at_its_rate() {
+    let mut got = 0u32;
+    let mut wins = 0u32;
+    for seed in 0..8u64 {
+        let mut g = a_fighter(0x5EED_0000_1A2D_0000 + seed);
+        let before: u32 = g.character.larder.values().sum();
+        for _ in 0..40 {
+            g.character.fatigue = 0;
+            g.encounter = Some(fight::Encounter { enemy: "Cave Rat".into(), at: [1, 18] });
+            let log = fight::run(&g, D).expect("a fight");
+            fight::settle(&mut g, &log, D).expect("it settles");
+            wins += 1;
+        }
+        got += g.character.larder.values().sum::<u32>() - before;
+    }
+    let rate = gm2d_core::brew::INGREDIENT_PER_MILLE;
+    let want = wins * rate / 1_000;
+    let (low, high) = (want * 6 / 10, want * 15 / 10);
+    assert!(
+        (low..=high).contains(&got),
+        "{got} ingredients over {wins} wins; {rate} per mille wants about {want}"
+    );
+    // **And it is not a certainty any more**, which is the whole ask: a win
+    // paying one every time is what made the Plot a second source for
+    // something you already had.
+    assert!(got < wins, "a win still pays an ingredient every time");
+}
+
+/// **Growing out-pays fighting**, which is the ask stated as a number.
+#[test]
+fn growing_out_pays_more_than_fighting_does() {
+    // What a bed pays, per win, from one crop: the yield over the wins it
+    // takes to be ready.
+    let per_crop = gm2d_core::plot::HARVEST_YIELD as f64 / (STAGES - 1) as f64;
+    // What fighting pays, per win.
+    let fighting = gm2d_core::brew::INGREDIENT_PER_MILLE as f64 / 1_000.0;
+    assert!(
+        per_crop > fighting * 4.0,
+        "one crop pays {per_crop} a win and fighting pays {fighting} — growing is not the supply"
+    );
+    // And a bed holds more than one, which is where the multiple comes from.
+    let g = Game::new(0x5EED_0000_1A2D_00FF, "td");
+    let cells = g.bed_mask("the-third-town", D).len();
+    let smallest = data::plot()
+        .seeds
+        .iter()
+        .map(|s| s.harvest_shape().len())
+        .min()
+        .expect("some seed is smallest");
+    assert!(cells / smallest >= 2, "a bed holds {} of the smallest crop", cells / smallest);
+}

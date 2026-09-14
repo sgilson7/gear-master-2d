@@ -561,6 +561,30 @@
           </div>
           <p id="run-says" class="says" hidden></p>
         </div>
+        <!-- **The Stall.** The bed's and the run's third sibling, and the one
+             grid in the game where a `CATALOG` component is placed by shape
+             outside the five worn frames. It comes from the tray and it goes
+             back to the tray: nothing is created, and nothing is destroyed but
+             by a sale. -->
+        <div id="stall-box" hidden>
+          <h3 class="sub-h">The counter</h3>
+          <p class="note" id="stall-note"></p>
+          <div class="benchrow">
+            <div class="glassbox"><canvas id="stall-board" width="360" height="288"></canvas></div>
+            <div class="larderbox">
+              <p class="note" id="stall-holding">Pick something out of your bag and put it on the counter.</p>
+              <div id="stall-price" hidden>
+                <h4 class="sub-h">What you are asking</h4>
+                <div id="stall-prices" class="shelf"></div>
+              </div>
+              <h4 class="sub-h">Sold</h4>
+              <div id="stall-ledger" class="shelf"></div>
+              <h4 class="sub-h">Who comes by</h4>
+              <div id="stall-buyers" class="shelf"></div>
+            </div>
+          </div>
+          <p id="stall-says" class="says" hidden></p>
+        </div>
         <!-- **The ordering, for both shelves at once.** The options are built
              from the rows themselves rather than written here: a stat the
              catalogue starts granting turns up in this menu without anybody
@@ -749,6 +773,13 @@
         <div id="stage-result" hidden>
           <h3 id="result-title">&mdash;</h3>
           <div id="result-receipt" class="receipt"></div>
+          <!-- **The one line on this screen that is a decision.** Offered on a
+               won fight when core says the creature may come along, and showing
+               the count-down while it is close — a refusal that counts is a
+               goal, and *it is not coming with you* on every rat would be noise
+               on the screen a player reads after every fight. -->
+          <button id="take-along" type="button" class="primary" hidden></button>
+          <p id="take-along-why" class="note" hidden></p>
         </div>
         </div><!-- /.stages -->
 

@@ -410,9 +410,15 @@ fn pay_a_win(game: &mut Game, creature: &'static str, receipt: &mut Vec<String>)
     // **Keyed by the art family rather than by the creature**, so a creature
     // added to `enemies.json` cannot arrive without a drop. It already fails a
     // test without a family; this is the second half of that.
+    // **Rolled, where it used to be certain.** Fighting is the trickle and
+    // growing is the supply, which is what the Plot was built to be — and it is
+    // also what makes the Kennel's feed cost something, because a creature out
+    // used to be fed by the corpse of whatever it helped kill.
     if let Some(ing) = ingredient_off(creature) {
-        game.character.gather(&ing.id);
-        receipt.push(format!("{} for the larder.", ing.name));
+        if game.rng.below(1_000) < crate::brew::INGREDIENT_PER_MILLE as usize {
+            game.character.gather(&ing.id);
+            receipt.push(format!("{} for the larder.", ing.name));
+        }
     }
 
     // **And everything in the ground grows, wherever it is.** The clock is the
@@ -437,10 +443,21 @@ fn pay_a_win(game: &mut Game, creature: &'static str, receipt: &mut Vec<String>)
     // the creature quietly doing nothing — a thing that works and cannot be
     // seen is a thing that does not work, and a thing that *stopped* working
     // silently is worse.
+    // **Every `feed_every` fights, counted off the clock this game already
+    // keeps.** `encounters` is bumped on every fight; a second counter meaning
+    // *fights since it last ate* would be a second answer to how often that is.
+    let (_, _, feed_every, _, _) = game.character.handler();
     for i in 0..game.character.kennel.len() {
         if !game.character.kennel[i].out {
             continue;
         }
+        // **Its own clock, counted here.** One more fight out; it eats when it
+        // has been out for `feed_every` of them.
+        game.character.kennel[i].since_fed += 1;
+        if game.character.kennel[i].since_fed < feed_every {
+            continue;
+        }
+        game.character.kennel[i].since_fed = 0;
         let (eats, spec) =
             (game.character.kennel[i].eats.clone(), game.character.kennel[i].spec.clone());
         let name = crate::data::brews()
@@ -451,14 +468,15 @@ fn pay_a_win(game: &mut Game, creature: &'static str, receipt: &mut Vec<String>)
             receipt.push(format!("{spec} ate a {name}."));
         } else {
             game.character.kennel[i].out = false;
+            game.character.kennel[i].since_fed = 0;
             receipt.push(format!("No {name} for {spec}, so it stayed in."));
         }
     }
 
     // **And a seed, sometimes, off the same creature.** Keyed by the same art
     // family the ingredient is, so a creature cannot arrive without one — and
-    // rolled, where the ingredient is certain, because the Plot is a second
-    // source for the larder rather than a doubling of the first.
+    // rolled at its own rate, which is lower than the ingredient's: a seed is
+    // what makes the larder rather than what fills it.
     //
     // **Rolled whether or not the drawer is full**, and refused after. Skipping
     // the draw would make the stream a function of what the player is carrying
@@ -470,6 +488,22 @@ fn pay_a_win(game: &mut Game, creature: &'static str, receipt: &mut Vec<String>)
         if rolled && room {
             game.character.pocket_seed(&seed.id);
             receipt.push(format!("{} for the drawer.", seed.name));
+        }
+    }
+
+    // A buyer comes by the Stall.
+    //
+    // **The bell is the clock**, because *a fight happened* is the one line in
+    // this game that means time passed. A shop on any other clock would be a
+    // shop on a timer, and this game has no timers — the whole of the Plot and
+    // the Kennel run off the same bell for the same reason.
+    //
+    // Rolled whether or not anything is on the counter, for the seed's own
+    // reason: a stream that depends on what a player has put out is a stream
+    // that does not replay.
+    for _ in 0..crate::stall::CUSTOMERS_PER_BELL {
+        if let Some(said) = game.a_buyer_comes_by() {
+            receipt.push(said);
         }
     }
 }

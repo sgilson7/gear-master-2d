@@ -260,6 +260,12 @@ pub struct CharacterSave {
     /// What is growing, by town. Skipped when nothing is.
     #[serde(default, skip_serializing_if = "std::collections::BTreeMap::is_empty")]
     pub beds: std::collections::BTreeMap<String, Vec<crate::plot::Crop>>,
+    /// What is out on the counter, at your prices. Skipped when nothing is.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub stall: Vec<crate::stall::OnShelf>,
+    /// What has been sold, oldest first. Skipped when nothing has.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub ledger: Vec<crate::stall::Sale>,
     /// What is in the kennel. Skipped when nothing is.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub kennel: Vec<crate::kennel::Kennelled>,
@@ -365,6 +371,8 @@ impl SaveFile {
             seed_drawer,
             beds,
             kennel,
+            stall,
+            ledger,
             specialization,
             enchs_owned,
             enchanted,
@@ -466,6 +474,8 @@ impl SaveFile {
                     seed_drawer: seed_drawer.clone(),
                     beds: beds.clone(),
                     kennel: kennel.clone(),
+                    stall: stall.clone(),
+                    ledger: ledger.clone(),
                     specialization: specialization.clone(),
                     enchs_owned: enchs_owned.clone(),
                     bought_licence: *bought_licence,
@@ -600,6 +610,8 @@ impl SaveFile {
             seed_drawer,
             beds,
             kennel,
+            stall,
+            ledger,
             specialization,
             enchs_owned,
             enchanted,
@@ -713,6 +725,8 @@ impl SaveFile {
         character.seed_drawer = seed_drawer;
         character.beds = beds;
         character.kennel = kennel;
+        character.stall = stall;
+        character.ledger = ledger;
         character.specialization = specialization;
         character.enchs_owned = enchs_owned;
         character.bought_licence = bought_licence;

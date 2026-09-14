@@ -2086,6 +2086,12 @@ pub fn settle_fight() -> String {
         let Some(log) = gm2d_core::fight::run(g, DIFFICULTY) else {
             return serde_json::json!({ "error": "there is nothing to settle" }).to_string();
         };
+        // **Read before it settles**, because settling clears the encounter —
+        // which is right, and is why the creature has to travel with the
+        // settlement rather than being asked for afterwards. The first draft
+        // asked `g.encounter` on the result screen and got `None` every time,
+        // so the offer was never made on any fight at all.
+        let fought = g.encounter.as_ref().map(|e| e.enemy.clone());
         let Some(s) = gm2d_core::fight::settle(g, &log, DIFFICULTY) else {
             return serde_json::json!({ "error": "nothing to settle" }).to_string();
         };
@@ -2096,6 +2102,8 @@ pub fn settle_fight() -> String {
         }
         serde_json::json!({
             "outcome": format!("{:?}", s.outcome).to_lowercase(),
+            // What was beaten, so the screen after can offer to keep it.
+            "beaten": fought,
             "gold": s.gold,
             "xp": s.xp,
             "carried": s.carried,
@@ -3107,6 +3115,51 @@ fn turn_of(id: &str) -> u8 {
 /// **`holes` is the one thing a gear grid has never needed.** The five worn
 /// frames are rectangles and the retort is not, which is the whole of what
 /// makes brewing an arrangement rather than a checklist.
+/// Whether the creature just beaten may come along, and what to say if not.
+///
+/// **The decision is core's.** `Game::kennel_offer` answers it, the shim moves
+/// the string — and until this export existed, `kennel_offer` and `take_along`
+/// had seven tests between them and **no caller anywhere in the game**, so the
+/// run, the yard and the feed all shipped with no way to put anything in the
+/// kennel. That is the Apothecary's own failure in the block that opened by
+/// fixing it.
+#[wasm_bindgen]
+pub fn kennel_offer_json(who: String) -> String {
+    with(|g| {
+        if who.is_empty() {
+            return "null".to_string();
+        }
+        let name = g.theme_name(
+            gm2d_core::combat::creature(&who).map(|m| m.name).unwrap_or("it"),
+        );
+        match g.kennel_offer(&who) {
+            Ok(()) => serde_json::json!({ "spec": who, "name": name, "can": true }),
+            Err(why) => serde_json::json!({
+                "spec": who,
+                "name": name,
+                "can": false,
+                // **Shown only while it is close**, because a refusal that
+                // counts down is a goal and *whatever that is, it is not coming
+                // with you* on every rat in the game is noise on the one screen
+                // a player reads after every fight.
+                "why": why.contains("does not know you").then_some(why),
+            }),
+        }
+        .to_string()
+    })
+}
+
+/// Take the creature just beaten along. Empty string, or why not.
+#[wasm_bindgen]
+pub fn take_along_here(who: String) -> String {
+    with_mut(|g| {
+        match g.take_along(&who) {
+            Ok(_) => String::new(),
+            Err(why) => why,
+        }
+    })
+}
+
 /// The run, and the kennel beside it.
 ///
 /// **The bed's own shape**, because it is the same kind of thing: a mask that
@@ -4250,6 +4303,15 @@ pub fn character_json() -> String {
             // nothing was left to put it in. A thing you became that no screen
             // mentions is the Apothecary's own bug, one layer up.
             "specialization": c.specialization.clone(),
+            // **What is in the kennel**, because a thing you own that no
+            // payload carries is a thing no screen can mention — and the sheet
+            // is where *what you are* is read.
+            "kennel": c.kennel.iter().map(|k| serde_json::json!({
+                "spec": k.spec,
+                "out": k.out,
+                "wins": k.wins_together,
+            })).collect::<Vec<_>>(),
+            "seeds": c.seed_drawer.values().sum::<u32>(),
             "specialization_says": c
                 .specialization_def()
                 .map(|d| d.power.describe())
@@ -5261,4 +5323,206 @@ fn answer_the_gate(
     // binding sitting at the end of a function is usually a call somebody
     // meant to keep the effect of.
     (went, shut, wants_instrument, turned, ending)
+}
+
+// ---------------------------------------------------------------- the Stall
+//
+// **The same `Board` contract a fourth time** — the packing screen, the
+// instrument frame, the retort, the bed, the run and now the counter. Core
+// decides every placement and the page draws what it is handed; a second
+// painter would be a second answer to *where may this go*.
+
+/// Whether you are standing somewhere with a counter.
+fn stall_town(g: &gm2d_core::game::Game) -> Option<String> {
+    let allowed = g.character.allowances();
+    map_for(g, |w| {
+        w.place_now(&g.world, g.world.at[0], g.world.at[1], &allowed)
+            .filter(|p| p.kind == gm2d_core::world::PlaceKind::Town)
+            .map(|p| p.id.clone())
+    })
+}
+
+/// The counter, what is on it, and the bag beside it.
+#[wasm_bindgen]
+pub fn stall_json() -> String {
+    with(|g| {
+        if stall_town(g).is_none() {
+            return "null".to_string();
+        }
+        let theme = gm2d_core::theme::by_id(&g.theme);
+        let enchs = gm2d_core::data::enchs();
+        let mask = g.shelf_mask();
+        let cols = mask.iter().map(|c| c.0).max().unwrap_or(0) as u32 + 1;
+        let rows = mask.iter().map(|c| c.1).max().unwrap_or(0) as u32 + 1;
+        let holes: Vec<[i8; 2]> = (0..rows as i8)
+            .flat_map(|y| (0..cols as i8).map(move |x| (x, y)))
+            .filter(|c| !mask.contains(c))
+            .map(|(x, y)| [x, y])
+            .collect();
+        let placed: Vec<_> = g
+            .character
+            .stall
+            .iter()
+            .map(|o| {
+                let def = g.character.registry.def(o.piece);
+                let worth = g.worth_of(o.piece);
+                let mut v = piece_payload(
+                    def,
+                    theme,
+                    ench_json(&g.character, &enchs, o.piece),
+                    serde_json::to_value(g.shelf_cells(o.piece, o.at, o.turn)).unwrap_or_default(),
+                    None,
+                );
+                v["id"] = serde_json::json!(o.piece.0);
+                v["x"] = serde_json::json!(o.at.0);
+                v["y"] = serde_json::json!(o.at.1);
+                v["price"] = serde_json::json!(o.price);
+                v["worth"] = serde_json::json!(worth);
+                // **The one answer**, so the card and the sale cannot disagree.
+                v["ask"] = serde_json::json!(match gm2d_core::stall::ask_of(o.price, worth) {
+                    gm2d_core::stall::Ask::Low => "low",
+                    gm2d_core::stall::Ask::Fair => "fair",
+                    gm2d_core::stall::Ask::High => "high",
+                });
+                v["locked"] = serde_json::json!(false);
+                v["effect"] = serde_json::json!(false);
+                v["trigger"] = serde_json::json!(false);
+                v
+            })
+            .collect();
+        let bag: Vec<_> = g
+            .character
+            .owned
+            .iter()
+            .filter(|&&p| !g.character.is_equipped(p))
+            .map(|&p| {
+                let def = g.character.registry.def(p);
+                let mut v = piece_payload(
+                    def,
+                    theme,
+                    ench_json(&g.character, &enchs, p),
+                    serde_json::to_value(g.character.registry.shape(p).cells()).unwrap_or_default(),
+                    None,
+                );
+                v["id"] = serde_json::json!(p.0);
+                v["slot"] = serde_json::json!("stall");
+                v["worth"] = serde_json::json!(g.worth_of(p));
+                v["locked"] = serde_json::json!(false);
+                v["effect"] = serde_json::json!(false);
+                v["trigger"] = serde_json::json!(false);
+                v
+            })
+            .collect();
+        let data = gm2d_core::data::stall();
+        let ledger: Vec<_> = g
+            .character
+            .ledger
+            .iter()
+            .rev()
+            .take(8)
+            .map(|s| {
+                serde_json::json!({
+                    "buyer": data.get(&s.buyer).map(|b| b.name.clone()).unwrap_or_else(|| s.buyer.clone()),
+                    "item": s.item,
+                    "paid": s.paid,
+                    "worth": s.worth,
+                })
+            })
+            .collect();
+        serde_json::json!({
+            "slots": [{
+                "slot": "stall",
+                "rows": rows, "cols": cols,
+                "holes": holes,
+                "placed": placed,
+                "items": [],
+                "recipes": [],
+            }],
+            "bag": bag,
+            "undoable": false,
+            "ledger": ledger,
+            "fair_pct": gm2d_core::stall::FAIR_PCT,
+            "buyers": data.buyers.iter().map(|b| serde_json::json!({
+                "name": b.name,
+                "blurb": b.blurb,
+                "wants": b.wants.iter().map(|w| w.replace('-', " ")).collect::<Vec<_>>(),
+                "floor": b.floor,
+            })).collect::<Vec<_>>(),
+        })
+        .to_string()
+    })
+}
+
+#[wasm_bindgen]
+pub fn stall_legal_anchors(id: String, _slot: String) -> String {
+    with(|g| {
+        let Ok(n) = id.parse::<u32>() else { return "[]".to_string() };
+        let piece = gm2d_core::piece::PieceId(n);
+        let turn = stall_turn(&id);
+        let mask = g.shelf_mask();
+        let taken: Vec<(i8, i8)> = g
+            .character
+            .stall
+            .iter()
+            .filter(|o| o.piece != piece)
+            .flat_map(|o| g.shelf_cells(o.piece, o.at, o.turn))
+            .collect();
+        let mut out: Vec<[i8; 2]> = Vec::new();
+        for &(x, y) in &mask {
+            let want = g.shelf_cells(piece, (x, y), turn);
+            if !want.is_empty() && want.iter().all(|c| mask.contains(c) && !taken.contains(c)) {
+                out.push([x, y]);
+            }
+        }
+        serde_json::to_string(&out).unwrap_or_else(|_| "[]".into())
+    })
+}
+
+fn stall_turn(id: &str) -> u8 {
+    TURNS.with(|t| *t.borrow().get(&format!("stall:{id}")).unwrap_or(&0))
+}
+
+#[wasm_bindgen]
+pub fn stall_rotate(id: String) {
+    TURNS.with(|t| {
+        let mut t = t.borrow_mut();
+        let e = t.entry(format!("stall:{id}")).or_insert(0);
+        *e = (*e + 1) % 4;
+    })
+}
+
+/// Put something out at the barrel's own figure, which is the fair ask — the
+/// price is then yours to move, and the ledger is how you find out whether you
+/// should have.
+#[wasm_bindgen]
+pub fn stall_place(id: String, _slot: String, x: u32, y: u32) -> String {
+    with_mut(|g| {
+        let Ok(n) = id.parse::<u32>() else { return "that is not a component".into() };
+        let piece = gm2d_core::piece::PieceId(n);
+        let turn = stall_turn(&id);
+        let price = g.worth_of(piece);
+        match g.shelve(piece, (x as i8, y as i8), turn, price) {
+            Ok(_) => String::new(),
+            Err(e) => e,
+        }
+    })
+}
+
+#[wasm_bindgen]
+pub fn stall_pick_up(id: String) -> String {
+    with_mut(|g| {
+        let Ok(n) = id.parse::<u32>() else { return "that is not a component".into() };
+        match g.unshelve(gm2d_core::piece::PieceId(n)) {
+            Ok(_) => String::new(),
+            Err(e) => e,
+        }
+    })
+}
+
+#[wasm_bindgen]
+pub fn stall_reprice(id: u32, price: i32) -> String {
+    with_mut(|g| match g.reprice(gm2d_core::piece::PieceId(id), price) {
+        Ok(_) => String::new(),
+        Err(e) => e,
+    })
 }

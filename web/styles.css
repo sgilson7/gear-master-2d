@@ -165,6 +165,23 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
   font-family: var(--mono); font-size: 13px; }
 .receipt p { margin: 0 0 4px; }
 
+/* ------------------------------------------------------ the after-battle screen
+   Reported from play: *"make all the text in the after battle screen larger and
+   easier to read"*. This is the one screen in the game a player reads **after**
+   the thing it is about has finished — every other panel is glanced at while
+   something is happening — and it was at the same 13px as a hover card.
+
+   Scoped to `#stage-result` rather than raising `.receipt` everywhere: the
+   packing screen's own receipts sit beside a board and want to stay out of the
+   way, which is the opposite problem. A property set on a container for one
+   child is a property every other child gets, and this file has paid for that
+   three times. */
+#stage-result #result-title { font-size: 22px; margin-bottom: 4px; }
+#stage-result .receipt { font-size: 16px; line-height: 1.5; }
+#stage-result .receipt p { margin: 0 0 7px; }
+/* The one line on it that is a decision rather than a record. */
+#take-along { margin-top: 14px; }
+
 @media (max-width: 1040px) {
   .board { grid-template-columns: 1fr; }
   .mapwrap { max-width: 640px; }
@@ -921,3 +938,11 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
   padding: 2px 6px;
 }
 .sortbar select:hover { border-color: var(--brass); }
+
+/* **The counter's asks, coloured by whether they are fair.** Three states and
+   a border rather than a fill: the row already carries a name and two numbers,
+   and a filled row that loud would compete with the ledger beside it. */
+.ask-low { border-left: 3px solid var(--good, #4a8); }
+.ask-fair { border-left: 3px solid var(--ink-dim, #888); }
+.ask-high { border-left: 3px solid var(--bad, #c55); }
+#stall-prices input { width: 6em; }

@@ -74,9 +74,24 @@ def close_fight(page):
     arrived as a Playwright traceback with the failure list never printed at
     all. `try`/`finally` around the body, and this in the `finally`.
     """
-    if page.is_visible("#fight"):
-        page.click("#run")
-        page.wait_for_selector("#fight", state="hidden", timeout=8000)
+    if not page.is_visible("#fight"):
+        return
+    # **Whichever button this stage actually has.** The action bar swaps its
+    # contents per stage: *Walk away* is on the board and the replay, and the
+    # **result** stage has only the advance button — so a `close_fight` that
+    # clicked `#run` alone hung for thirty seconds on any check that ran a
+    # fight to its end, which is every check that reads a receipt. Found by the
+    # first one that did.
+    for sel in ("#run", "#go"):
+        if page.is_visible(sel):
+            try:
+                page.click(sel, timeout=4000)
+                page.wait_for_selector("#fight", state="hidden", timeout=8000)
+                return
+            except Exception:
+                continue
+    page.keyboard.press("Escape")
+    page.wait_for_timeout(150)
 
 
 def dismiss_card(page):
@@ -2392,6 +2407,191 @@ def check_a_trainer_takes_you_on(page, name, fails, base):
         fails.append(f"{name}: became a {t['class']} and the sheet does not say so: {sheet!r}")
     clear_screens(page)
     print(f"ok: a trainer takes you on, and you are {an(became)} afterwards")
+
+
+def check_a_won_fight_offers_the_creature(page, name, fails, _base):
+    """**Beat something enough times and the screen after the fight offers it.**
+
+    Reported mid-block: *"hook the kennel into the game because there is
+    currently no way for an enemy to offered for recruitment into the kennel"*.
+    It was exactly that — `Game::kennel_offer` and `Game::take_along` shipped
+    with seven tests between them and no caller anywhere, so the run, the yard
+    and the feed all went live with no way to put anything in the kennel. The
+    Apothecary's own failure, in the block that opened by fixing it.
+
+    **And the creature has to travel with the settlement.** `fight::settle`
+    clears the encounter — which is right — so the first draft asked
+    `g.encounter` on the result screen, got `None` every time, and offered
+    nothing on any fight at all.
+    """
+    def known_to_it(body):
+        w = body.setdefault("world", {})
+        w["map"] = "west-bambulon"
+        w["at"] = [4, 17]
+        w["counters"] = [c for c in w.get("counters", []) if c[0] != "beat:Cave Rat"] + [
+            ["beat:Cave Rat", 9]
+        ]
+        w["kennel"] = []
+        body.setdefault("character", {})["class"] = "Berserker"
+        body["character"]["kennel"] = []
+
+    # **A board that wins**, because the offer is only ever made on a won
+    # fight: taking something along is a thing you do to a creature you beat.
+    plant(page, ROOT / "testing" / "saves" / "at-the-lip.json", known_to_it, stem="offer")
+    clear_screens(page)
+    if not walk_until_a_fight(page):
+        fails.append(f"{name}: never met anything in 200 steps")
+        return
+    page.click("#go")
+    page.wait_for_timeout(400)
+    for _ in range(40):
+        if page.is_visible("#stage-result"):
+            break
+        if page.is_visible("#skip"):
+            try:
+                page.click("#skip", timeout=1500)
+            except Exception:
+                pass
+        page.wait_for_timeout(400)
+    if not page.is_visible("#stage-result"):
+        fails.append(f"{name}: the fight never reached a result")
+        clear_screens(page)
+        return
+
+    # **The receipt at a size somebody can read**, which is the other half of
+    # the same ask. Measured rather than read off the stylesheet: a rule that
+    # is overridden is a rule that looks right in the file and wrong on screen.
+    px = page.evaluate("""() => [
+        parseFloat(getComputedStyle(document.getElementById('result-title')).fontSize),
+        parseFloat(getComputedStyle(document.querySelector('#stage-result .receipt')).fontSize),
+    ]""")
+    if px[0] < 18 or px[1] < 15:
+        fails.append(f"{name}: the after-battle screen is {px[0]}px / {px[1]}px, which is small")
+
+    won = "It stops moving" in (page.text_content("#result-title") or "")
+    offered = page.evaluate("() => !document.getElementById('take-along').hidden")
+    if won and not offered:
+        fails.append(f"{name}: beat something nine times, won, and it was never offered")
+        clear_screens(page)
+        return
+    if not won:
+        # The walk met something that beat this board — not a fault, and the
+        # offer is correctly absent. Say so rather than passing quietly.
+        print("ok: the after-battle screen reads at 22/16px (the fight was lost, so no offer)")
+        clear_screens(page)
+        return
+    before = page.evaluate("() => (window.__character().kennel ?? []).length")
+    page.click("#take-along")
+    page.wait_for_timeout(400)
+    after = page.evaluate("() => (window.__character().kennel ?? []).length")
+    if after != before + 1:
+        fails.append(f"{name}: took it along and the kennel went {before} -> {after}")
+    # And the sheet says so, because a thing you own that no screen mentions is
+    # a thing you have forgotten you own.
+    sheet = " ".join(page.eval_on_selector_all("#sheet li", "e => e.map(x => x.textContent)"))
+    if "kennel" not in sheet.lower():
+        fails.append(f"{name}: something is in the kennel and the sheet does not say so")
+    clear_screens(page)
+    print(f"ok: a won fight offers the creature, and the receipt reads at {px[0]:.0f}px")
+
+
+def check_the_counter_sells(page, name, fails, base):
+    """**A shelf of your own, and a price that is a decision.**
+
+    Asked for as *you should sometimes receive unique enchs from selling items
+    in your store front.* The counter is the shelf; this asks the three things
+    `cargo test` cannot: that the grid is drawn and is not a rectangle, that a
+    price control reaches it from a keyboard, and that the eight buyers are on
+    the screen so a player can see who they are pricing for.
+
+    **Not the sale itself**, which is core's and is measured by six tests in
+    `tests/stall.rs`. A browser cannot say anything about a per-mille roll that
+    a hundred and fifty milliseconds of `cargo test` does not say better.
+    """
+    def loose_beside_the_pit(body):
+        strip_the_boards(body)
+        w = body.setdefault("world", {})
+        w["map"] = "west-bambulon"
+        w["at"] = [2, 18]
+        body.setdefault("character", {})["class"] = "Berserker"
+
+    plant(page, ROOT / "testing" / "saves" / "at-the-lip.json",
+          loose_beside_the_pit, stem="counter")
+    try:
+        _the_counter(page, name, fails)
+    finally:
+        plant(page, base, lambda body: None, stem="counter-restore")
+        clear_screens(page)
+
+
+def _the_counter(page, name, fails):
+    clear_screens(page)
+    page.focus("#map")
+    page.keyboard.press("ArrowLeft")
+    page.wait_for_timeout(400)
+    if not page.is_visible("#town"):
+        fails.append(f"{name}: stepped onto the pit and no town opened")
+        clear_screens(page)
+        return
+    if not page.is_visible("#stall-box"):
+        fails.append(f"{name}: the town has no counter on it")
+        return
+    b = page.evaluate("() => JSON.parse(window.__stallJson())")
+    slot = b["slots"][0]
+    cells = slot["cols"] * slot["rows"]
+    holes = len(slot["holes"])
+    if holes == 0:
+        fails.append(f"{name}: the counter is a {slot['cols']}x{slot['rows']} "
+                     f"rectangle, which is not a shape")
+    if len(b["buyers"]) != 8:
+        fails.append(f"{name}: {len(b['buyers'])} buyers on the screen, not eight")
+    # **The board has to be drawn**, which means measured rather than counted:
+    # a canvas that is in the document at nought pixels high is the area card's
+    # own bug, and nothing in the source reads wrong when it happens.
+    box = page.eval_on_selector("#stall-board", "e => e.getBoundingClientRect()")
+    if box["width"] < 40 or box["height"] < 40:
+        fails.append(f"{name}: the counter's canvas is {box['width']}x{box['height']}")
+    # Put the first loose thing out, and price it.
+    before = len(slot["placed"])
+    put = page.evaluate("""() => {
+      const b = JSON.parse(window.__stallJson());
+      const spot = JSON.parse(window.__stallLegal(String(b.bag[0].id), 'stall'));
+      if (!spot.length) return 'nowhere to put the first thing in the bag';
+      return window.__stallPlace(String(b.bag[0].id), 'stall', spot[0][0], spot[0][1]);
+    }""")
+    if put:
+        fails.append(f"{name}: putting something on the counter: {put}")
+        return
+    page.evaluate("() => window.__paintStall()")
+    page.wait_for_timeout(120)
+    b = page.evaluate("() => JSON.parse(window.__stallJson())")
+    now = b["slots"][0]["placed"]
+    if len(now) != before + 1:
+        fails.append(f"{name}: put one out and the counter holds {len(now)}")
+        return
+    w = now[0]
+    if w["ask"] != "fair":
+        fails.append(f"{name}: it went out at {w['price']} against {w['worth']} "
+                     f"and that reads as {w['ask']!r}, not a fair ask")
+    boxes = page.eval_on_selector_all("#stall-prices input",
+                                      "e => e.map(i => ({id: i.id, v: i.value}))")
+    if len(boxes) != len(now):
+        fails.append(f"{name}: {len(now)} on the counter and {len(boxes)} price boxes")
+        return
+    # **A keyboard reaches it**, which is the whole reason the price is a list
+    # beside the grid rather than a number typed onto a canvas.
+    sel = f"#{boxes[0]['id']}"
+    page.fill(sel, str(int(w["worth"]) * 4))
+    page.dispatch_event(sel, "change")
+    page.wait_for_timeout(150)
+    b = page.evaluate("() => JSON.parse(window.__stallJson())")
+    after = b["slots"][0]["placed"][0]
+    if after["ask"] != "high":
+        fails.append(f"{name}: asked {after['price']} for something worth "
+                     f"{after['worth']} and the counter still says {after['ask']!r}")
+    else:
+        print(f"ok: the counter is {slot['cols']}x{slot['rows']} with {holes} holes, "
+              f"8 buyers, and {w['worth']} -> {after['price']} turns a fair ask into a high one")
 
 
 def check_the_bank_sorts(page, name, fails, base):
@@ -7779,6 +7979,8 @@ def walk_the_gate(browser, name, fails=None):
     check_the_sand_cart_is_guarded(page, name, fails, path)
     check_a_trainer_takes_you_on(page, name, fails, path)
     check_the_bank_sorts(page, name, fails, path)
+    check_the_counter_sells(page, name, fails, path)
+    check_a_won_fight_offers_the_creature(page, name, fails, path)
     check_the_sands_read_the_other_way_round(page, name, fails, path)
     check_running_away_costs_you(page, name, fails, path)
     check_the_stones_push_and_come_back(page, name, fails, path)

@@ -490,5 +490,31 @@ fn carried() -> Vec<Entry> {
             "The barrel and the order book can be rerolled, and the price goes \
              up each time until the next ten levels.",
         ]),
+        // **Derived, never typed.** Every figure here is read from the
+        // constant that decides it, which is what the whole shelf is for: a
+        // glossary with its numbers written out by hand is a second rulebook
+        // with a slower feedback loop than the first.
+        Entry::new("The counter", &[
+            &format!(
+                "Your own shelf, in every town. It is {} cells and not a \
+                 rectangle, so what you can have out at once is a packing \
+                 decision.",
+                crate::stall::SHELF.len()
+            ),
+            &format!(
+                "Somebody comes by every fight you win. Within {}% of what a \
+                 thing is worth is a fair ask and always sells; over that, {} \
+                 buyers in {} walk away.",
+                crate::stall::FAIR_PCT,
+                crate::stall::HIGH_ODDS - 1,
+                crate::stall::HIGH_ODDS,
+            ),
+            &format!(
+                "There are {} of them and they know each other. Two who are \
+                 kin, buying one after the other, leave something on the \
+                 counter that was not for sale.",
+                crate::data::stall().buyers.len()
+            ),
+        ]),
     ]
 }

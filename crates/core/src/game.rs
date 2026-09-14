@@ -1292,6 +1292,119 @@ impl Game {
         Ok(def.name)
     }
 
+    /// The bed this town has, or nothing.
+    ///
+    /// **The mask is the map's and what is standing in it is the
+    /// character's** — the same division `Allowances` makes for a crossing, and
+    /// the reason a bed can be reshaped in a data file without touching a save.
+    pub fn bed_mask(&self, town: &str, difficulty: crate::combat::Difficulty) -> Vec<(i8, i8)> {
+        for (id, _) in crate::data::MAPS {
+            for p in crate::data::map(id, difficulty).places {
+                if p.id == town {
+                    return p.bed;
+                }
+            }
+        }
+        Vec::new()
+    }
+
+    /// Plant one seed out of the drawer, or say why not.
+    ///
+    /// **It refuses on the *harvest* shape and names the cells it lacks.** A
+    /// crop that fits as a sprout and not as a harvest is a crop you find out
+    /// about three wins later, and a stunted plant is not a thing this game
+    /// has: you are told now, in cells, which is what `Slot::place`'s refusal
+    /// does for a component.
+    ///
+    /// **A refusal spends nothing** — the reroll's rule, the bank's, the
+    /// cart's, the larder's and the drawer's.
+    pub fn plant(
+        &mut self,
+        town: &str,
+        seed: &str,
+        at: (i8, i8),
+        turn: u8,
+        difficulty: crate::combat::Difficulty,
+    ) -> Result<String, String> {
+        let plot = crate::data::plot();
+        let Some(def) = plot.get(seed) else { return Err("there is no such seed".into()) };
+        if self.character.seeds_held(seed) == 0 {
+            return Err(format!("There is no {} in the drawer.", def.name));
+        }
+        let mask = self.bed_mask(town, difficulty);
+        if mask.is_empty() {
+            return Err("There is no bed here.".into());
+        }
+        let want = crate::plot::harvest_cells(plot, seed, at, turn);
+        let taken: Vec<(i8, i8)> = self
+            .character
+            .beds
+            .get(town)
+            .map(|cs| cs.iter().flat_map(|c| crate::plot::harvest_cells(plot, &c.seed, c.at, c.turn)).collect())
+            .unwrap_or_default();
+        // **Off the bed, and named.** TONE 12: a refusal says which cells.
+        let off: Vec<(i8, i8)> = want.iter().copied().filter(|c| !mask.contains(c)).collect();
+        if !off.is_empty() {
+            return Err(format!(
+                "It comes up {} and the bed stops short: {}.",
+                crate::plot::size_of(&want),
+                crate::plot::name_cells(&off)
+            ));
+        }
+        let over: Vec<(i8, i8)> = want.iter().copied().filter(|c| taken.contains(c)).collect();
+        if !over.is_empty() {
+            return Err(format!(
+                "Something is already coming up there: {}.",
+                crate::plot::name_cells(&over)
+            ));
+        }
+        self.character.spend_seed(seed)?;
+        self.character
+            .beds
+            .entry(town.to_string())
+            .or_default()
+            .push(crate::plot::Crop { seed: seed.to_string(), at, stage: 0, turn });
+        Ok(def.name.clone())
+    }
+
+    /// Pull what is ready at a cell, into the larder.
+    pub fn harvest(
+        &mut self,
+        town: &str,
+        at: (i8, i8),
+    ) -> Result<(String, u32), String> {
+        let plot = crate::data::plot();
+        let Some(crops) = self.character.beds.get_mut(town) else {
+            return Err("There is nothing in this bed.".into());
+        };
+        let Some(i) = crops.iter().position(|c| crate::plot::cells_of(plot, c).contains(&at))
+        else {
+            return Err("There is nothing there.".into());
+        };
+        if !crops[i].ready() {
+            let c = &crops[i];
+            let left = crate::plot::STAGES - 1 - c.stage;
+            return Err(format!(
+                "It is not up yet. {} more.",
+                if left == 1 { "One win".into() } else { format!("{left} wins") }
+            ));
+        }
+        let c = crops.remove(i);
+        if crops.is_empty() {
+            self.character.beds.remove(town);
+        }
+        let Some(def) = plot.get(&c.seed) else { return Err("it grew into nothing".into()) };
+        let n = crate::plot::HARVEST_YIELD;
+        for _ in 0..n {
+            self.character.gather(&def.crop);
+        }
+        let name = crate::data::brews()
+            .get(&def.crop)
+            .map(|i| i.name.clone())
+            .unwrap_or_else(|| def.crop.clone());
+        Ok((name, n))
+    }
+
     /// Take the trade this person teaches.
     ///
     /// **One only, and it does not come off** — the fork's own rule, and the
@@ -1775,6 +1888,7 @@ impl PartialEq for Game {
             // fifth, and it is added in the commit that makes it.
             && a.larder == b.larder
             && a.seed_drawer == b.seed_drawer
+            && a.beds == b.beds
             && a.retort == b.retort
             && a.potions == b.potions
             && a.drunk == b.drunk

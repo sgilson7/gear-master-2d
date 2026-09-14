@@ -11,6 +11,7 @@ import init, {
   reroll_barrel, reroll_ledger, buy_paper, use_supply, quests_json, take_quest, hand_in_quest, bank_xp,
   quest_log_json, guide_json, pin_quest,
   retort_json, retort_legal_anchors, retort_place, retort_pick_up,
+  bed_json, bed_legal_anchors, bed_place, bed_pull, bed_rotate, bed_look_over,
   retort_rotate, retort_look_over, brew_it, drink_potion, tip_out,
   character_json, skills_json, take_skill, pressure_json, pools_json,
   class_offer_json, choose_class, choose_second_class, class_name, all_trees_json,
@@ -2649,6 +2650,7 @@ function openTown(id) {
   paintTins();
   paintCarrying();
   paintBank();
+  paintBed();
   $('town').hidden = false;
 }
 
@@ -2712,6 +2714,85 @@ function sortedForBank(rows) {
     if (ka > kb) return 1;
     return na.localeCompare(nb);
   });
+}
+
+// ------------------------------------------------------------------- the bed
+
+let bedBoard = null;
+
+/// The bed, in the town screen, drawn by the same `Board` the retort is.
+///
+/// **Pulling is not picking up.** A crop does not come back to the drawer — it
+/// is either ready, in which case it goes to the larder, or it is not, in which
+/// case the refusal says how many wins are left. So a click on a grown crop
+/// pulls it and the board's own pick-up is never reached for one.
+function paintBed() {
+  const box = $('bed-box');
+  const b = JSON.parse(bed_json());
+  if (!b) { box.hidden = true; return; }
+  box.hidden = false;
+  paintBedText();
+  if (!bedBoard) {
+    // **Created once and refreshed by its own `onchange`.** `paintBed` must
+    // not call `refresh()`: refreshing fires `onchange`, and an `onchange` that
+    // paints and a paint that refreshes is a stack overflow — which is exactly
+    // what it was, and it left the town screen half-opened rather than saying
+    // anything. The bench splits these two for the same reason.
+    bedBoard = new Board($('bed-board'), {
+      boardJson: bed_json,
+      legalAnchors: bed_legal_anchors,
+      place: bed_place,
+      // **The board's pick-up is the pull.** It hands back `ok:N Name` or the
+      // refusal, which is core's sentence either way.
+      pickUp: (id) => {
+        const m = /^crop:(-?\d+),(-?\d+)$/.exec(id);
+        if (!m) return '';
+        const why = bed_pull(Number(m[1]), Number(m[2]));
+        if (why.startsWith('ok:')) {
+          bedSays(`${why.slice(3)} into the larder.`);
+          log(`The row came up: ${why.slice(3)}.`);
+          paintBench?.();
+          return 'pulled';
+        }
+        bedSays(why, true);
+        return why;
+      },
+      rotate: bed_rotate,
+      toggleLock: () => {},
+      look: look_json,
+      lookOver: bed_look_over,
+    });
+    bedBoard.onchange = () => { paintBedText(); autosave(); };
+    bedBoard.onhold = (name) => {
+      $('bed-holding').textContent = name
+        ? `Holding ${name}. Click a cell to plant it, right-click to turn it.`
+        : 'Pick a seed out of the drawer and put it in the bed.';
+    };
+  }
+  bedBoard.refresh();
+  // **The drawer is the board's own bag**, drawn under the grid by the same
+  // painter — which is how the retort does it and is why there is no second
+  // list here. A second list would be a second answer to *what is loose*.
+}
+
+/// The sentence over the bed, without touching the board.
+///
+/// Split off `paintBed` because the board's `onchange` calls it: a paint that
+/// refreshes and a refresh that paints is a stack overflow.
+function paintBedText() {
+  const b = JSON.parse(bed_json());
+  if (!b) return;
+  const s = b.slots[0];
+  $('bed-note').textContent =
+    `${s.cols}×${s.rows} and not a rectangle. A crop grows a stage every fight you win, ` +
+    `anywhere, and comes up after ${b.stages - 1}. ` +
+    (b.growing ? `${b.growing} in the ground, ${b.ready} ready.` : 'Nothing in it.');
+}
+
+function bedSays(text, bad = false) {
+  const el = $('bed-says');
+  el.textContent = text; el.hidden = !text;
+  el.classList.toggle('bad', bad);
 }
 
 function paintBank() {
@@ -4445,6 +4526,7 @@ async function main() {
   // null while somebody is standing in front of it, and what `closeFight` asks
   // to find out whether the tile it is on became a counter mid-fight.
   window.__caravanJson = () => JSON.parse(caravan_json());
+  window.__bedJson = () => bed_json();
   window.__trainHere = () => train_here();
   window.__trees = () => JSON.parse(all_trees_json());
   window.__places = () => world.places;

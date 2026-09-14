@@ -393,6 +393,19 @@ pub struct PlaceDef {
     /// errands' half of the rule and has been since M8.
     #[serde(default)]
     pub sells: Vec<String>,
+    /// `Town`: the bed, as a mask in its own coordinates.
+    ///
+    /// **A bizarre shape per town, and each one is a different puzzle.**
+    /// Kettleworks' is long and gapped like a rind wall; the End of All Gears'
+    /// is round with a stone in it; the third town's is the largest. The retort
+    /// is one shape for everybody because there is one of it; a bed is a place,
+    /// and a place in this game is a thing you go to rather than a thing you
+    /// have.
+    ///
+    /// In the map file because a bed is content, the same as a shelf's stock
+    /// and a gate's prose.
+    #[serde(default)]
+    pub bed: Vec<(i8, i8)>,
     /// `Bench`: the specialization this person will take you on as.
     ///
     /// **Asked for as a trainer**, in as many words: *each specialization has
@@ -1045,6 +1058,11 @@ impl World {
                 && p.teaches.is_none()
             {
                 return Err(format!("{}: a bench with nothing on it", p.id));
+            }
+            // A bed belongs to a town, and a town with no bed is every town
+            // written before the Plot — so the check is one-directional.
+            if !p.bed.is_empty() && p.kind != PlaceKind::Town {
+                return Err(format!("{}: only a town has a bed", p.id));
             }
             if let Some(c) = &p.teaches {
                 if !crate::class::SPECIALIZATIONS.contains(&c.as_str()) {

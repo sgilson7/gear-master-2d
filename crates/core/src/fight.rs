@@ -405,6 +405,11 @@ fn pay_a_win(game: &mut Game, creature: &'static str, receipt: &mut Vec<String>)
         receipt.push(format!("{} for the larder.", ing.name));
     }
 
+    // **And everything in the ground grows, wherever it is.** The clock is the
+    // bell: this game has no days, it has fights, and the Plot is the first
+    // thing in it that pays for what you did between visits to town.
+    crate::plot::tick(&mut game.character.beds, crate::plot::STAGES);
+
     // **And a seed, sometimes, off the same creature.** Keyed by the same art
     // family the ingredient is, so a creature cannot arrive without one — and
     // rolled, where the ingredient is certain, because the Plot is a second

@@ -50,3 +50,28 @@
 | **M19.14** | The Wextreen deep | ten enemies on her board, two TikZ families, `The Unwritten` on the Undercountry | `cc5c0bc` |
 | **M19.15** | Nothing draws magenta | `quick`, `silt` and `tide` had no palette entry; a check now holds the palette against the engine's list | `cc5c0bc` |
 | **M19.16** | A surveying door that asks | the frame opens every time, names its own door, and signs the figure | `cc5c0bc` |
+
+---
+
+# M21 — three benches
+
+*`PLAN-M21.md`: the Plot, the Kennel, the Stall — three systems in brewing's
+shape, each with a specialization, each with a `C(8,2)` table a lint proves
+complete. `SECOND-ORDER-M21.md` is the notebook, and M21.12 onward are read
+off it.*
+
+| # | milestone | deliverables | tests | commit | state |
+|---|---|---|---|---|---|
+| M21.0 | The seed drawer | `plot.rs` · `plot.json` · `seed_drawer` · the drop · 2 lints · 5 acceptance | 1,044 (+7) | `b53964e` | done |
+| M21.1 | The bed | bed masks ×3 · `Game::plant` · `plot::tick` · harvest · the screen | | | pending |
+| M21.2 | Companion planting | 28 pairs · adjacency · six ench seeds · 3 lints | | | pending |
+| M21.3 | The Grower | `SpecPower::Grower` · six nodes · the paper · the fork at two | | | pending |
+| M21.4 | The kennel, and the offer | `kennel.rs` · the offer at six wins · the feed · the yard · the screen | | | pending |
+| M21.5 | The second combatant | `simulate_party` · targeting · the tally · 28 pairs · the replay | | | pending · **deploy** |
+| M21.6 | Six enchs from six games | six `Effect` kinds · `combat.rs` · six shelves on G | | | pending |
+| M21.7 | The Handler | `SpecPower::Handler` · six nodes · three cards | | | pending |
+| M21.8 | The counter, and eight buyers | `stall.rs` · the shelf · pricing · eight buyers · 28 bargains | | | pending |
+| M21.9 | The Factor, and the four papers | `SpecPower::Factor` · six nodes · four cards · a second counter | | | pending |
+| M21.10 | The figures | 25 TikZ figures · `make art` · the palette lint | | | pending |
+| M21.11 | The gate, the walk, the deploy | 9 browser checks · `make play` · the glossary · `HANDOFF-M21.md` | | | pending · **deploy** |
+| notebook | rows open / closed | 0 / 2 | | | |

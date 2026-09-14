@@ -3107,6 +3107,218 @@ fn turn_of(id: &str) -> u8 {
 /// **`holes` is the one thing a gear grid has never needed.** The five worn
 /// frames are rectangles and the retort is not, which is the whole of what
 /// makes brewing an arrangement rather than a checklist.
+/// Which town's bed the player is standing at, if any.
+fn bed_town(g: &gm2d_core::game::Game) -> Option<String> {
+    let allowed = g.character.allowances();
+    map_for(g, |w| {
+        w.place_now(&g.world, g.world.at[0], g.world.at[1], &allowed)
+            .filter(|p| p.kind == gm2d_core::world::PlaceKind::Town && !p.bed.is_empty())
+            .map(|p| p.id.clone())
+    })
+}
+
+/// The bed, drawn the way the retort is: one grid, its holes, what is standing
+/// in it, and a bag beside it.
+///
+/// **The same `Board` contract**, because a bed is the same kind of thing — a
+/// mask that is not a rectangle, a bag of things with footprints, and core
+/// deciding every placement. A second painter would be a second answer to
+/// *where may this go*, which is the thing `legal_anchors` exists to be the
+/// only one of.
+#[wasm_bindgen]
+pub fn bed_json() -> String {
+    with(|g| {
+        let Some(town) = bed_town(g) else { return "null".to_string() };
+        let plot = gm2d_core::data::plot();
+        let mask = g.bed_mask(&town, DIFFICULTY);
+        let cols = mask.iter().map(|c| c.0).max().unwrap_or(0) as u32 + 1;
+        let rows = mask.iter().map(|c| c.1).max().unwrap_or(0) as u32 + 1;
+        let holes: Vec<[i8; 2]> = (0..rows as i8)
+            .flat_map(|y| (0..cols as i8).map(move |x| (x, y)))
+            .filter(|c| !mask.contains(c))
+            .map(|(x, y)| [x, y])
+            .collect();
+        let empty = Vec::new();
+        let crops = g.character.beds.get(&town).unwrap_or(&empty);
+        let placed: Vec<_> = crops
+            .iter()
+            .filter_map(|c| {
+                let def = plot.get(&c.seed)?;
+                let cells = gm2d_core::plot::cells_of(plot, c);
+                Some(serde_json::json!({
+                    "id": format!("crop:{},{}", c.at.0, c.at.1),
+                    "name": def.name,
+                    "kind": "Crop",
+                    "x": c.at.0, "y": c.at.1,
+                    "cells": cells,
+                    "fill": seed_fill(&c.seed),
+                    "motif": "flask",
+                    // **Dimmer the younger it is**, which is the one thing a
+                    // player has to read off this grid at a glance: what is
+                    // ready and what is not.
+                    "ink": "#ffffff",
+                    "ink_alpha": 0.25 + 0.3 * c.stage as f32,
+                    "locked": false, "effect": c.ready(), "trigger": false,
+                }))
+            })
+            .collect();
+        let bag: Vec<_> = g
+            .character
+            .seed_drawer
+            .iter()
+            .filter(|(_, n)| **n > 0)
+            .filter_map(|(id, n)| {
+                let def = plot.get(id)?;
+                let turn = turn_of(id);
+                Some(serde_json::json!({
+                    "id": def.id,
+                    "name": format!("{} ×{n}", def.name),
+                    "kind": "Seed",
+                    "slot": "bed",
+                    // **The harvest shape, not the sprout's**, because that is
+                    // what has to fit and a player choosing a cell is choosing
+                    // for the shape it ends at.
+                    "cells": def.shape_at_turned(gm2d_core::plot::STAGES - 1, turn).cells(),
+                    "fill": seed_fill(&def.id),
+                    "motif": "flask",
+                    "ink": "#ffffff", "ink_alpha": 0.55,
+                    "locked": false, "effect": false, "trigger": false,
+                }))
+            })
+            .collect();
+        serde_json::json!({
+            "town": town,
+            "slots": [{
+                "slot": "bed",
+                "rows": rows, "cols": cols,
+                "holes": holes,
+                "placed": placed,
+                "items": [],
+                "recipes": [],
+            }],
+            "bag": bag,
+            "undoable": false,
+            "stages": gm2d_core::plot::STAGES,
+            "yield": gm2d_core::plot::HARVEST_YIELD,
+            "ready": crops.iter().filter(|c| c.ready()).count(),
+            "growing": crops.len(),
+        })
+        .to_string()
+    })
+}
+
+/// Where a seed may be planted, which is core's answer.
+#[wasm_bindgen]
+pub fn bed_legal_anchors(id: String, _slot: String) -> String {
+    with(|g| {
+        if id.starts_with("crop:") {
+            return "[]".to_string();
+        }
+        let Some(town) = bed_town(g) else { return "[]".to_string() };
+        let plot = gm2d_core::data::plot();
+        let mask = g.bed_mask(&town, DIFFICULTY);
+        let empty = Vec::new();
+        let crops = g.character.beds.get(&town).unwrap_or(&empty);
+        let taken: Vec<(i8, i8)> = crops
+            .iter()
+            .flat_map(|c| gm2d_core::plot::harvest_cells(plot, &c.seed, c.at, c.turn))
+            .collect();
+        let turn = turn_of(&id);
+        let mut out: Vec<[i8; 2]> = Vec::new();
+        for &(x, y) in &mask {
+            let want = gm2d_core::plot::harvest_cells(plot, &id, (x, y), turn);
+            if !want.is_empty()
+                && want.iter().all(|c| mask.contains(c) && !taken.contains(c))
+            {
+                out.push([x, y]);
+            }
+        }
+        serde_json::to_string(&out).unwrap_or_else(|_| "[]".into())
+    })
+}
+
+#[wasm_bindgen]
+pub fn bed_place(id: String, _slot: String, x: u32, y: u32) -> String {
+    with_mut(|g| {
+        let Some(town) = bed_town(g) else { return "there is no bed here".into() };
+        let turn = turn_of(&id);
+        match g.plant(&town, &id, (x as i8, y as i8), turn, DIFFICULTY) {
+            Ok(_) => String::new(),
+            Err(e) => e,
+        }
+    })
+}
+
+/// **Pulling is not picking up.** A crop does not come back to the drawer: it
+/// is either ready, in which case it goes to the larder, or it is not, in which
+/// case the refusal says how many wins are left. So this reports rather than
+/// lifts, and the page's *pull* control is what harvests.
+#[wasm_bindgen]
+pub fn bed_pull(x: u32, y: u32) -> String {
+    with_mut(|g| {
+        let Some(town) = bed_town(g) else { return "there is no bed here".into() };
+        match g.harvest(&town, (x as i8, y as i8)) {
+            Ok((name, n)) => format!("ok:{n} {name}"),
+            Err(e) => e,
+        }
+    })
+}
+
+#[wasm_bindgen]
+pub fn bed_rotate(id: String) {
+    if id.starts_with("crop:") {
+        return;
+    }
+    TURNS.with(|t| {
+        let mut t = t.borrow_mut();
+        let e = t.entry(id).or_insert(0);
+        *e = (*e + 1) % 4;
+    })
+}
+
+#[wasm_bindgen]
+pub fn bed_look_over(id: String, _slot: String) -> String {
+    with(|g| {
+        let plot = gm2d_core::data::plot();
+        let brews = gm2d_core::data::brews();
+        let def = id
+            .strip_prefix("crop:")
+            .and_then(|rest| {
+                let mut n = rest.split(',');
+                let (x, y) = (n.next()?.parse::<i8>().ok()?, n.next()?.parse::<i8>().ok()?);
+                let town = bed_town(g)?;
+                let c = g.character.beds.get(&town)?.iter().find(|c| c.at == (x, y))?;
+                plot.get(&c.seed)
+            })
+            .or_else(|| plot.get(&id));
+        let Some(def) = def else { return "null".to_string() };
+        let crop = brews.get(&def.crop).map(|i| i.name.clone()).unwrap_or_default();
+        serde_json::json!({
+            "name": def.name,
+            "lines": [
+                def.blurb.clone(),
+                format!(
+                    "Comes up {} after {} wins, and pays {} {crop} into the larder.",
+                    gm2d_core::plot::size_of(def.harvest_shape()),
+                    gm2d_core::plot::STAGES - 1,
+                    gm2d_core::plot::HARVEST_YIELD,
+                ),
+            ],
+        })
+        .to_string()
+    })
+}
+
+/// A seed's hue, off the ingredient it grows into, so the bed and the glass
+/// agree about what a family's colour is.
+fn seed_fill(id: &str) -> String {
+    let plot = gm2d_core::data::plot();
+    match plot.get(id).or_else(|| plot.seeds.iter().find(|s| id.starts_with(&s.id))) {
+        Some(def) => ingredient_fill(&def.crop),
+        None => ingredient_fill(id),
+    }
+}
+
 #[wasm_bindgen]
 pub fn retort_json() -> String {
     with(|g| {

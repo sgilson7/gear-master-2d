@@ -359,6 +359,15 @@ pub struct Character {
     /// holding it.
     #[serde(default, skip_serializing_if = "std::collections::BTreeMap::is_empty")]
     pub seed_drawer: std::collections::BTreeMap<String, u32>,
+    /// What is growing, by town id.
+    ///
+    /// **On the character beside the drawer**, for the drawer's own reason and
+    /// one more: a bed is a place and its *mask* is content in the map file,
+    /// but what is standing in it is yours — two players in one town do not
+    /// share a row. Keyed by town because a bed is per town, and the key is the
+    /// town's id for the same reason `bought` is.
+    #[serde(default, skip_serializing_if = "std::collections::BTreeMap::is_empty")]
+    pub beds: std::collections::BTreeMap<String, Vec<crate::plot::Crop>>,
     /// The one specialization, if it has been taken.
     ///
     /// **Its own slot and not a fourth entry in `classes`.** Everything that
@@ -432,6 +441,7 @@ impl Character {
             potions: Vec::new(),
             drunk: Vec::new(),
             seed_drawer: std::collections::BTreeMap::new(),
+            beds: std::collections::BTreeMap::new(),
             specialization: None,
             undo_stack: Vec::new(),
         }

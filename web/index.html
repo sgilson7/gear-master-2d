@@ -532,6 +532,22 @@
           like. Click something in your bag to put it in; click something in the
           bank to take it back out. Anything seated on one of your boards has to
           come off there first.</p>
+        <!-- **The bed.** Drawn by the same `Board` the retort is, because it
+             is the same kind of thing: a mask that is not a rectangle, a bag of
+             things with footprints, and core deciding every placement. Hidden
+             where a town has no bed, which is no town today and is the honest
+             condition rather than a list of three. -->
+        <div id="bed-box" hidden>
+          <h3 class="sub-h">The bed</h3>
+          <p class="note" id="bed-note"></p>
+          <div class="benchrow">
+            <div class="glassbox"><canvas id="bed-board" width="360" height="240"></canvas></div>
+            <div class="larderbox">
+              <p class="note" id="bed-holding">Pick a seed out of the drawer and put it in the bed.</p>
+            </div>
+          </div>
+          <p id="bed-says" class="says" hidden></p>
+        </div>
         <!-- **The ordering, for both shelves at once.** The options are built
              from the rows themselves rather than written here: a stat the
              catalogue starts granting turns up in this menu without anybody

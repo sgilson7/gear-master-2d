@@ -218,3 +218,119 @@ fn a_seed_is_not_a_component() {
         );
     }
 }
+
+// ------------------------------------------------------------------- the bed
+
+const TOWNS: [&str; 3] = ["the-end-of-all-gears", "kettleworks", "the-third-town"];
+
+/// **Every seed can be planted in every bed**, which is the measurement that
+/// put a `turn` on a crop.
+///
+/// Of the twenty-four pairs, **three fit nowhere at all** without one:
+/// `toad-ichor` and `tallow-drip` in Kettleworks' gapped row and `reef-salt` in
+/// the pit's round bed. A seed that is dead in a town for a reason the player
+/// cannot act on is worse than a bed that is too easy, and the retort has
+/// turned its ingredients since M20.
+#[test]
+fn every_seed_fits_every_bed() {
+    let g = Game::new(0x5EED_0000_B3D0_0001, "td");
+    let plot = data::plot();
+    for town in TOWNS {
+        let mask = g.bed_mask(town, D);
+        assert!(!mask.is_empty(), "{town} has no bed");
+        assert!((11..=14).contains(&mask.len()), "{town}'s bed is {} cells", mask.len());
+        for s in &plot.seeds {
+            let ok = (0..4).any(|turn| {
+                (-2..8).any(|ax| {
+                    (-2..8).any(|ay| {
+                        let want = gm2d_core::plot::harvest_cells(plot, &s.id, (ax, ay), turn);
+                        !want.is_empty() && want.iter().all(|c| mask.contains(c))
+                    })
+                })
+            });
+            assert!(ok, "{} fits nowhere in {town}'s bed", s.id);
+        }
+    }
+}
+
+/// A harvest shape that runs off the bed is refused, **by cell**.
+#[test]
+fn a_harvest_shape_that_does_not_fit_is_refused_by_cell() {
+    let mut g = Game::new(0x5EED_0000_B3D0_0002, "td");
+    let seed = "reef-salt-seed";
+    g.character.pocket_seed(seed);
+    // Far off the corner of the bed, so every cell it wants is missing.
+    let why = g.plant("kettleworks", seed, (9, 9), 0, D).unwrap_err();
+    assert!(why.contains('('), "a refusal that names no cell: {why}");
+    assert!(why.contains("stops short"), "{why}");
+    // **And it spent nothing.**
+    assert_eq!(g.character.seeds_held(seed), 1, "a refusal took the seed");
+    assert!(g.character.beds.is_empty(), "a refusal planted it anyway");
+}
+
+/// Two crops cannot stand on one cell, and the refusal says which.
+#[test]
+fn two_crops_do_not_share_a_cell() {
+    let mut g = Game::new(0x5EED_0000_B3D0_0003, "td");
+    g.character.pocket_seed("cairn-dust-seed");
+    g.character.pocket_seed("cairn-dust-seed");
+    g.plant("the-third-town", "cairn-dust-seed", (0, 1), 0, D).expect("the first one goes in");
+    let why = g.plant("the-third-town", "cairn-dust-seed", (0, 1), 0, D).unwrap_err();
+    assert!(why.contains("already coming up"), "{why}");
+    assert_eq!(g.character.seeds_held("cairn-dust-seed"), 1, "a refusal took the seed");
+}
+
+/// **A crop grows one stage per win, anywhere** — and two beds grow at once.
+#[test]
+fn a_crop_grows_one_stage_per_win_anywhere() {
+    let mut g = a_fighter(0x5EED_0000_B3D0_0004);
+    g.character.pocket_seed("cairn-dust-seed");
+    g.character.pocket_seed("cairn-dust-seed");
+    g.plant("kettleworks", "cairn-dust-seed", (0, 0), 0, D).expect("one at the works");
+    g.plant("the-third-town", "cairn-dust-seed", (0, 1), 0, D).expect("one down there");
+    let stage = |g: &Game, t: &str| g.character.beds[t][0].stage;
+    assert_eq!((stage(&g, "kettleworks"), stage(&g, "the-third-town")), (0, 0));
+
+    // One win, on neither map.
+    g.encounter = Some(fight::Encounter { enemy: "Cave Rat".into(), at: [1, 18] });
+    let log = fight::run(&g, D).expect("a fight");
+    fight::settle(&mut g, &log, D).expect("it settles");
+    assert_eq!(
+        (stage(&g, "kettleworks"), stage(&g, "the-third-town")),
+        (1, 1),
+        "the bell did not reach both beds"
+    );
+
+    // And it stops when it is ready rather than running away.
+    for _ in 0..6 {
+        g.character.fatigue = 0;
+        g.encounter = Some(fight::Encounter { enemy: "Cave Rat".into(), at: [1, 18] });
+        let log = fight::run(&g, D).expect("a fight");
+        fight::settle(&mut g, &log, D).expect("it settles");
+    }
+    assert_eq!(stage(&g, "kettleworks"), STAGES - 1, "a crop grew past ready");
+    assert!(g.character.beds["kettleworks"][0].ready());
+}
+
+/// A harvest fills the larder, and an unripe one is refused with the count.
+#[test]
+fn a_harvest_fills_the_larder() {
+    let mut g = a_fighter(0x5EED_0000_B3D0_0005);
+    g.character.pocket_seed("bone-meal-seed");
+    g.plant("the-third-town", "bone-meal-seed", (0, 0), 0, D).expect("it goes in");
+
+    let why = g.harvest("the-third-town", (0, 0)).unwrap_err();
+    assert!(why.contains("not up yet") && why.contains("wins"), "{why}");
+
+    for _ in 0..(STAGES - 1) {
+        g.character.fatigue = 0;
+        g.encounter = Some(fight::Encounter { enemy: "Cave Rat".into(), at: [1, 18] });
+        let log = fight::run(&g, D).expect("a fight");
+        fight::settle(&mut g, &log, D).expect("it settles");
+    }
+    let before = g.character.in_larder("bone-meal");
+    let (name, n) = g.harvest("the-third-town", (0, 0)).expect("it comes up");
+    assert_eq!(n, gm2d_core::plot::HARVEST_YIELD);
+    assert_eq!(g.character.in_larder("bone-meal"), before + n, "{name} did not reach the larder");
+    assert!(g.character.beds.get("the-third-town").is_none(), "the bed kept a pulled crop");
+}

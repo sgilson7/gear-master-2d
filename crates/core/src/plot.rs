@@ -18,6 +18,7 @@
 //! eight buckets — which is what makes the Plot *feed the larder* rather than
 //! open a second economy beside it.
 
+use crate::shape::Shape;
 use serde::{Deserialize, Serialize};
 
 pub const FORMAT: &str = "gm2d-plot";
@@ -66,6 +67,12 @@ pub struct SeedDef {
 }
 
 impl SeedDef {
+    /// Its footprint at `stage`, as a `Shape`, so it turns the way everything
+    /// else with a footprint in this game turns.
+    pub fn shape_at_turned(&self, stage: u8, turn: u8) -> Shape {
+        Shape::new(self.shape_at(stage)).rotated(turn)
+    }
+
     /// Its footprint at `stage`, clamped to the last one it has.
     ///
     /// **Clamped rather than refused**, because a crop past its last stage is
@@ -160,6 +167,20 @@ pub struct Crop {
     pub seed: String,
     pub at: (i8, i8),
     pub stage: u8,
+    /// Which way round it was planted.
+    ///
+    /// **A divergence from `PLAN-M21.md` §M21.1**, which gives
+    /// `Game::plant(town, seed, at)` and no turn — and it was measured rather
+    /// than argued: of the twenty-four seed-and-bed pairs, **three fit nowhere
+    /// at all** without one. A seed that is dead in a town for a reason the
+    /// player cannot act on is worse than a bed that is too easy.
+    ///
+    /// It is also what the template already does. `brew::Seat` is
+    /// `{ id, turn, at }` and the retort tries every rotation, because *a
+    /// heuristic that refuses an arrangement somebody can see with their eyes*
+    /// is the thing `brew::fits` exists not to be.
+    #[serde(default)]
+    pub turn: u8,
 }
 
 impl Crop {
@@ -171,12 +192,56 @@ impl Crop {
 /// The cells a crop covers right now, in bed coordinates.
 pub fn cells_of(data: &PlotData, c: &Crop) -> Vec<(i8, i8)> {
     let Some(def) = data.get(&c.seed) else { return Vec::new() };
-    def.shape_at(c.stage).iter().map(|(x, y)| (c.at.0 + x, c.at.1 + y)).collect()
+    at_of(&def.shape_at_turned(c.stage, c.turn), c.at)
 }
 
 /// The cells a crop will cover when it is ready, which is what must fit before
 /// it may be planted at all.
-pub fn harvest_cells(data: &PlotData, seed: &str, at: (i8, i8)) -> Vec<(i8, i8)> {
+pub fn harvest_cells(data: &PlotData, seed: &str, at: (i8, i8), turn: u8) -> Vec<(i8, i8)> {
     let Some(def) = data.get(seed) else { return Vec::new() };
-    def.harvest_shape().iter().map(|(x, y)| (at.0 + x, at.1 + y)).collect()
+    at_of(&def.shape_at_turned(STAGES - 1, turn), at)
+}
+
+fn at_of(shape: &Shape, at: (i8, i8)) -> Vec<(i8, i8)> {
+    shape.cells().iter().map(|&(x, y)| (x + at.0, y + at.1)).collect()
+}
+
+/// What a harvest pays into the larder, per crop.
+pub const HARVEST_YIELD: u32 = 2;
+
+/// `3 cells` / `one cell`, for a refusal that says how big a thing is.
+pub fn size_of(cells: &[(i8, i8)]) -> String {
+    match cells.len() {
+        1 => "one cell".into(),
+        n => format!("{n} cells"),
+    }
+}
+
+/// Cells as a player reads them, for a refusal that names them.
+///
+/// **TONE 12: a refusal names the thing in the way.** *It will not fit* is a
+/// wall; *the bed stops short at (4, 1) and (5, 1)* is something to do about
+/// it. Capped at four, because a list of nine coordinates is a wall with
+/// numbers on it.
+pub fn name_cells(cells: &[(i8, i8)]) -> String {
+    let mut v: Vec<String> = cells.iter().take(4).map(|(x, y)| format!("({x}, {y})")).collect();
+    if cells.len() > 4 {
+        v.push(format!("and {} more", cells.len() - 4));
+    }
+    v.join(", ")
+}
+
+/// **One stage on every crop everywhere, per fight won.**
+///
+/// *Anywhere*, which is the whole of what makes the Plot the first thing in
+/// this game that pays you for what you did between visits to town: the clock
+/// is the bell, and the bell rings wherever you are.
+pub fn tick(beds: &mut std::collections::BTreeMap<String, Vec<Crop>>, stages: u8) {
+    for crops in beds.values_mut() {
+        for c in crops.iter_mut() {
+            if c.stage + 1 < stages {
+                c.stage += 1;
+            }
+        }
+    }
 }

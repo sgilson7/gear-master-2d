@@ -1958,14 +1958,22 @@ def check_the_mind_lane_is_on_the_bar(page, name, fails):
                      dread: l.entries.filter(e => e.kind === 'dread').length,
                      other: l.entries.filter(e => e.kind === 'other').length };
         }""")
-        # **Counted, not matched by word.** A pool's *name* is the world's and
-        # goes through the theme — insight reads as "mansus-sight" and dread as
-        # "anticipation" — so looking for the engine's words here would be the
-        # check asking the wrong register, which is TONE 13a from the harness's
-        # side. Six columns is the assertion; core owns which six.
+        # **Named the way the glossary names them**, which is the alignment
+        # asked for: *align all stats that have both a turtle and a normal
+        # version, like insight, dread.* The bar said *mansus-sight* while the
+        # glossary said *insight*, and one number with two names is the failure
+        # the character sheet already settled. So this asks for the engine's
+        # words by name — if the bar goes back to the theme's, this is what
+        # says so.
+        want = {"insight", "dread"}
+        got = {n.lower() for n in seen["names"]}
         if len(seen["names"]) < 6:
             fails.append(f"{name}: the pool row is {len(seen['names'])} columns "
                          f"and the mind lane needs two of its own: {seen['names']}")
+        elif want - got:
+            fails.append(f"{name}: the bar calls the mind lane "
+                         f"{sorted(got - {'mana', 'rage', 'faith', 'nature'})} where the "
+                         f"glossary calls it {sorted(want)}: {seen['names']}")
         elif seen["cols"] != len(seen["names"]):
             fails.append(f"{name}: {len(seen['names'])} pools named and "
                          f"{seen['cols']} numbers sent")
@@ -2146,8 +2154,14 @@ def check_the_panel_says_what_a_pool_pays(page, name, fails):
                              f"says {line!r}")
     # The three the catalogue actually grants. A panel that had quietly lost one
     # would still pass everything above.
+    #
+    # **Named the engine's way**, which is the alignment asked for: it was
+    # *fury*, *devotion* and *harvest* here and *rage*, *faith* and *nature* in
+    # the glossary — one number with two names, the failure the character sheet
+    # already settled. The theme keeps the prose; a pool on a number screen is
+    # called what the glossary calls it.
     names = {p["name"] for p in want}
-    for wanted in ("fury", "devotion", "harvest"):
+    for wanted in ("rage", "faith", "nature"):
         if wanted not in names:
             fails.append(f"{name}: {wanted} is not among the pools worth holding: {sorted(names)}")
 
@@ -2845,6 +2859,93 @@ def _the_street(page, name, fails):
               f"{len(doors)} doors, one open at a time — {first[0]!r} then "
               f"{then[0]!r}")
     clear_screens(page)
+
+
+def check_a_pulled_crop_leaves_the_bed(page, name, fails, base):
+    """**Pulling a crop takes it off the bed as well as into the larder.**
+
+    Reported from play as *a visual bug pulling out seeds from the bed*. The
+    pull was wired through the board's `pickUp`, whose contract is **empty means
+    it worked** — and it returned `'pulled'` to mean *handled*, so a successful
+    pull took the refusal path: it printed the word and returned **without
+    refreshing**, leaving the crop drawn on a bed it had already left.
+
+    `onclaim` is the hook for *something else wants this click*, and the board
+    refreshes after it. That is the half that was missing.
+
+    **The bed had no browser check at all**, which is why this shipped: every
+    other board in the game has one, and the two that were added in this block
+    were added because something in them broke first.
+    """
+    def a_row_that_is_up(body):
+        strip_the_boards(body)
+        w = body.setdefault("world", {})
+        w["map"] = "west-bambulon"
+        w["at"] = [2, 18]
+        body.setdefault("character", {})["class"] = "Berserker"
+        # One crop, in the pit's bed, fully grown. `stage` counts from nought
+        # and `STAGES - 1` is up, so this is a row that can be pulled now.
+        body["character"]["beds"] = {
+            "the-end-of-all-gears": [
+                {"seed": "cairn-dust-seed", "at": [0, 1], "stage": 9, "turn": 0}
+            ]
+        }
+        body["character"]["larder"] = {}
+
+    plant(page, ROOT / "testing" / "saves" / "at-the-lip.json",
+          a_row_that_is_up, stem="bed")
+    try:
+        _the_bed(page, name, fails)
+    finally:
+        plant(page, base, lambda body: None, stem="bed-restore")
+        clear_screens(page)
+
+
+def _the_bed(page, name, fails):
+    clear_screens(page)
+    page.focus("#map")
+    page.keyboard.press("ArrowLeft")
+    page.wait_for_timeout(400)
+    if not page.is_visible("#town"):
+        fails.append(f"{name}: stepped onto the pit and no town opened")
+        return
+    enter(page, "#bed-box")
+    if not page.is_visible("#bed-box"):
+        fails.append(f"{name}: the pit has no bed on it")
+        return
+    # **What the board is drawing**, not what core is holding. The bug was
+    # visual — core harvested and the canvas went on showing the crop — so a
+    # check that reads the payload passes on a broken build. Asked of the
+    # board's own last read, which is the thing the pixels come from.
+    before = page.evaluate("() => window.__bedDrawn()")
+    if len(before) != 1:
+        fails.append(f"{name}: planted one crop and the bed draws {len(before)}")
+        return
+    crop = before[0]
+    spot = page.evaluate("(c) => window.__bedCellSpot(c[0], c[1])", [crop["x"], crop["y"]])
+    box = page.eval_on_selector("#bed-board", "e => e.getBoundingClientRect()")
+    geom = page.evaluate("() => { const c = document.getElementById('bed-board');"
+                         " return { w: c.width, h: c.height }; }")
+    sx, sy = box["width"] / geom["w"], box["height"] / geom["h"]
+    px, py = box["x"] + spot["x"] * sx, box["y"] + spot["y"] * sy
+    under = page.evaluate("(p) => { const e = document.elementFromPoint(p[0], p[1]);"
+                          " return e ? (e.id || e.tagName + '.' + e.className) : 'nothing'; }",
+                          [px, py])
+    if under != "bed-board":
+        fails.append(f"{name}: the bed's cell is under {under!r}, not the board")
+        return
+    page.mouse.click(px, py)
+    page.wait_for_timeout(250)
+    after = page.evaluate("() => window.__bedDrawn()")
+    said = (page.text_content("#bed-says") or "").strip()
+    if len(after) != 0:
+        fails.append(f"{name}: pulled {crop['name']!r} and the bed still draws "
+                     f"{len(after)} — it said {said!r}")
+    elif "larder" not in said.lower():
+        fails.append(f"{name}: pulled a crop and the bed said {said!r}")
+    else:
+        print(f"ok: a pulled crop leaves the bed — {crop['name']!r} off the row "
+              f"and {said!r}")
 
 
 def check_the_counter_sells(page, name, fails, base):
@@ -8402,6 +8503,7 @@ def walk_the_gate(browser, name, fails=None):
     check_a_trainer_takes_you_on(page, name, fails, path)
     check_the_bank_sorts(page, name, fails, path)
     check_the_counter_sells(page, name, fails, path)
+    check_a_pulled_crop_leaves_the_bed(page, name, fails, path)
     check_the_town_is_a_street(page, name, fails, path)
     check_a_bench_errand_reads_the_bench(page, name, fails, path)
     check_a_won_fight_offers_the_creature(page, name, fails, path)

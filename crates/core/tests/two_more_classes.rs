@@ -385,11 +385,29 @@ fn the_furnace_reaches_a_board_that_swings() {
 /// is coming the day somebody writes one.
 #[test]
 fn no_promise_is_ungrammatical_about_a_count() {
+    // **Asked as a question, not as a list of nouns.** It was six — `1 enchs`,
+    // `1 stacks`, `1 turns`, `1 curses`, `1 seconds`, `1 items` — and it missed
+    // `1 cells`, `1 points` and `1 cell` written as `1 cells` in three more
+    // promises the moment they existed. A list of six written by hand is a list
+    // that can be five, which is the argument this project has now paid for
+    // eight times.
+    //
+    // So: **one of anything, followed by a word ending in s**, with the words
+    // that are not plural nouns asserted by name — `common::UNWRITTEN`'s own
+    // discipline, because a list that quietly grew is a list that has gone
+    // stale and an exception nobody wrote down is indistinguishable from a bug.
+    const NOT_A_PLURAL: &[&str] = &["less", "as", "plus", "across", "its", "this", "is", "was"];
     let mut bad = Vec::new();
     let mut said = |who: &str, d: String| {
-        for one in ["1 enchs", "1 stacks", "1 turns", "1 curses", "1 seconds", "1 items"] {
-            if d.contains(one) {
-                bad.push(format!("{who}: {one:?} — {d}"));
+        let words: Vec<&str> = d.split_whitespace().collect();
+        for pair in words.windows(2) {
+            if pair[0] != "1" {
+                continue;
+            }
+            let w = pair[1].trim_end_matches(|c: char| !c.is_ascii_alphabetic());
+            let lower = w.to_ascii_lowercase();
+            if lower.ends_with('s') && !NOT_A_PLURAL.contains(&lower.as_str()) {
+                bad.push(format!("{who}: \"1 {w}\" — {d}"));
             }
         }
     };
@@ -398,10 +416,63 @@ fn no_promise_is_ungrammatical_about_a_count() {
     }
     for c in gm2d_core::class::CLASSES {
         said(c.name, c.power.describe());
+        said(c.name, c.power.short());
     }
     assert!(
         bad.is_empty(),
         "a promise is the sentence somebody reads before an irreversible choice:\n  {}",
+        bad.join("\n  ")
+    );
+}
+
+/// **No promise states a figure of nothing.**
+///
+/// Three expert promises read oddly at their *untuned* values — *"a cast
+/// refunds 0% of what it cost"* — because the knob is zero until points are
+/// spent in its tree. `CLAUDE.md` carried that as the human's to decide; they
+/// decided, by asking for every promise to be as mechanically accurate as it
+/// can be. **A clause whose figure is zero is a clause about nothing**, and on
+/// the screen where an irreversible choice is confirmed it reads as broken
+/// rather than as a knob waiting to be turned.
+///
+/// So the sentence is *assembled* rather than formatted: a part whose number is
+/// nothing is left out, and if every part is nothing the promise says what the
+/// class does rather than five zeroes in a row.
+#[test]
+fn no_promise_offers_nothing_at_all() {
+    let mut bad = Vec::new();
+    // **A figure, not a substring.** The first draft looked for `"0%"` and
+    // found it inside *10%*, *50%* and *100%* — which is the same failure as
+    // `contains("4")` matching the cart's forty-Fnorp fare, written down in
+    // `CLAUDE.md` as the reason a glossary figure has to be checked in the
+    // entry that says it. So this splits into tokens and asks whether one of
+    // them *is* nothing.
+    // **The one zero that is the point.** Immense Guilt stops regeneration
+    // dead, so *"your regeneration is 0 a second"* is the promise rather than a
+    // gap in it. Asserted by name the way `common::UNWRITTEN` is: a list that
+    // quietly grew is a list that has gone stale.
+    const A_REAL_NOTHING: &[&str] = &["Immense Guilt"];
+    let mut said = |who: &str, d: String| {
+        if A_REAL_NOTHING.contains(&who) {
+            return;
+        }
+        for tok in d.split_whitespace() {
+            let t = tok.trim_matches(|c: char| !c.is_ascii_alphanumeric() && c != '%' && c != '.');
+            if matches!(t, "0" | "0%" | "0.0" | "0.0%" | "0x") {
+                bad.push(format!("{who}: {t:?} — {d}"));
+            }
+        }
+    };
+    for e in gm2d_core::expert::EXPERTS {
+        said(e.name, e.power.describe());
+    }
+    for c in gm2d_core::class::CLASSES {
+        said(c.name, c.power.describe());
+        said(c.name, c.power.short());
+    }
+    assert!(
+        bad.is_empty(),
+        "a promise of nothing is a promise that reads as broken:\n  {}",
         bad.join("\n  ")
     );
 }

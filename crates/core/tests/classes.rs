@@ -365,17 +365,34 @@ fn the_mvp_checklist() {
 /// somebody reads before an irreversible choice.
 #[test]
 fn no_class_on_offer_promises_a_stack() {
-    // The four the fork deals. Named here rather than read from the shim,
-    // because the shim is wasm and this is the list it holds.
-    const OFFERED: [&str; 4] = ["Berserker", "Hexweaver", "Bloodletter", "Recycler"];
-    for name in OFFERED {
+    // **Every class the fork actually deals**, which is core's list. It was
+    // four written out here with a note saying the shim held the list; the shim
+    // stopped holding it in M10.2, when `class::OFFERED` moved into core, and
+    // this went on asking about four of the seven.
+    for name in gm2d_core::class::OFFERED.iter().copied() {
         let def = gm2d_core::class::CLASSES
             .iter()
             .find(|c| c.name == name)
             .unwrap_or_else(|| panic!("{name} is offered and is not a class"));
         let said = def.power.describe().to_lowercase();
+        // **A stack *of the class*, which is the thing that cannot exist.**
+        // Upstream handed the same class out over and over and a promise had to
+        // say what a second one bought; GM2D asks once and the answer does not
+        // come off. What the promise may not say is *for each stack of
+        // Recycler you are carrying*.
+        //
+        // It refused the bare word `stack` and caught the Hexweaver saying
+        // *"also lands 1 stack of its opposite"* — which is a **curse** stack,
+        // the engine's own unit and exactly the number a player choosing this
+        // is choosing. *A lint that reads a list rather than the behaviour is
+        // the failure it exists to catch*, and the behaviour here is a stack of
+        // yourself.
+        let of_itself = said.contains(&format!("stack of {}", name.to_lowercase()))
+            || said.contains(&format!("stacks of {}", name.to_lowercase()))
+            || said.contains("each stack you")
+            || said.contains("stack of this");
         assert!(
-            !said.contains("stack"),
+            !of_itself,
             "{name} promises {said:?}, and nobody carries two of anything here"
         );
         // A number, in digits or spelled out. Spelling small ones out is the

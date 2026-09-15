@@ -296,6 +296,31 @@ fn at_of(shape: &Shape, at: (i8, i8)) -> Vec<(i8, i8)> {
 /// what `ExpertPower::cast_price` does and for the same reason.
 pub const HARVEST_YIELD: u32 = 4;
 
+/// What a row actually pays at a given percentage.
+///
+/// **One answer, because the promise and the harvest were two.** The
+/// specialization's sentence worked it out with `* pct / 100` — rounding down —
+/// and `Game::harvest` rounds the **payer's** way, so the promise read *120% of
+/// what it would — 4 instead of 4* about a row that actually pays five. A
+/// promise is the sentence somebody reads before an irreversible choice, and
+/// one that disagrees with the sum it describes is worse than one that says
+/// nothing.
+///
+/// Found by writing the sentence out with the number in it, which is the whole
+/// argument for doing so.
+pub fn yield_of(pct: i32) -> u32 {
+    at_pct(HARVEST_YIELD, pct)
+}
+
+/// A count at a percentage, rounded the **payer's** way.
+///
+/// `ExpertPower::cast_price`'s rule, one bench along: a percentage that floors
+/// is a percentage a player cannot see moving, which is the failure this
+/// project found in `SPELL_MANA_COST` and again in `HARVEST_YIELD`.
+pub fn at_pct(n: u32, pct: i32) -> u32 {
+    (((n as i32 * pct) + 99) / 100).max(1) as u32
+}
+
 /// `3 cells` / `one cell`, for a refusal that says how big a thing is.
 pub fn size_of(cells: &[(i8, i8)]) -> String {
     match cells.len() {

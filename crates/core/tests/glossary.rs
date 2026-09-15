@@ -216,3 +216,45 @@ fn every_pool_is_explained_somewhere() {
         "the mind lane's sum does not name DREAD_DIVISOR ({n})"
     );
 }
+
+/// **A pool has one name, and it is the one the glossary uses.**
+///
+/// Asked for: *align all stats that have both a turtle and a normal version,
+/// like insight, dread.* The fight bar said *mansus-sight* and *anticipation*
+/// while the glossary said *insight* and *dread* — **one number with two
+/// names**, which is exactly the failure the character sheet already settled:
+/// *a node reading "start every fight with 12 armor" against a sheet reading
+/// "12 cork" is one number with two names, and the whole job of the line is to
+/// let somebody confirm they got what was promised.*
+///
+/// So this asks the question in core, where it can be asked of every theme at
+/// once: **no theme's word for a pool may be a word the glossary does not
+/// use**, because a player reading one and watching the other cannot tell they
+/// are the same thing. The shim's two number screens print `Resource::name`
+/// now; this is what keeps the glossary agreeing with them.
+#[test]
+fn a_pool_is_called_one_thing_on_every_screen_that_counts() {
+    let text = gm2d_core::glossary::shelves()
+        .iter()
+        .flat_map(|s| s.entries.iter())
+        .flat_map(|e| e.body.iter().cloned())
+        .collect::<Vec<_>>()
+        .join(" ")
+        .to_lowercase();
+    let mut bad = Vec::new();
+    for r in gm2d_core::piece::Resource::SPENDABLE
+        .iter()
+        .copied()
+        .chain(std::iter::once(gm2d_core::piece::Resource::Insight))
+    {
+        // The engine's word is the one the glossary teaches, so the glossary
+        // has to carry it — and the number screens print exactly this.
+        if !text.contains(r.name()) {
+            bad.push(format!("the glossary never says {:?}", r.name()));
+        }
+    }
+    if !text.contains("dread") {
+        bad.push("the glossary never says \"dread\"".into());
+    }
+    assert!(bad.is_empty(), "{}", bad.join("; "));
+}

@@ -1652,21 +1652,29 @@ fn side_items(
 /// there was nowhere at all to learn that the 8 is eight more physical damage
 /// on every swing.
 ///
-/// **Two registers, kept apart, TONE 13a.** The pool's *name* is the world's
-/// word and goes through the theme; what it *pays* is the engine's, unthemed
-/// and with the number in it, because somebody comparing two pools is
-/// comparing numbers.
+/// **One register, and that is the change.** It was two — the pool's *name* the
+/// world's word and what it *pays* the engine's — and once insight and dread
+/// reached the fight bar the bar said *mansus-sight* while the glossary said
+/// *insight*. One number with two names is the failure the character sheet
+/// already settled: *a node reading "start every fight with 12 armor" against
+/// a sheet reading "12 cork" is one number with two names.*
+///
+/// So a pool on a number screen is named the way the glossary names it. The
+/// theme keeps the prose; TONE 13a's split is unchanged, and what moved is
+/// which side of it a pool bar falls on.
 #[wasm_bindgen]
 pub fn pools_json() -> String {
-    with(|g| {
-        let theme = gm2d_core::theme::by_id(&g.theme);
+    with(|_g| {
         let rows: Vec<_> = gm2d_core::combat::Combatant::pools_worth_holding()
             .into_iter()
             .map(|r| {
                 let pays = gm2d_core::combat::Combatant::pool_pays(r);
                 serde_json::json!({
                     "id": r.name(),
-                    "name": theme.retell(r.name()),
+                    // **The engine's word**, so the standing panel, the fight
+                    // bar and the glossary are three screens about one thing
+                    // rather than three names for it. See `fight_json`.
+                    "name": r.name(),
                     // The parts, so a pool that pays two things reads as two
                     // things. `Stats::parts` is the engine's own phrasing and
                     // is what the item card splits on.
@@ -2040,9 +2048,22 @@ pub fn fight_json() -> String {
             "outcome": format!("{:?}", log.outcome).to_lowercase(),
             "duration_ms": log.duration_ms,
             "tallies": { "player": tally(Side::Player), "enemy": tally(Side::Enemy) },
-            // Themed, because a pool's *name* is the world's word — the same
-            // split the standing panel makes. What it pays is the engine's.
-            "pools": pool_ids.iter().map(|n| theme.retell(n)).collect::<Vec<_>>(),
+            // **The engine's word, not the theme's.** Reported from play:
+            // *insight, dread are not explained anywhere or shown as stacks in
+            // battle* — and once they were on the bar, the bar said
+            // *mansus-sight* and *anticipation* while the glossary said
+            // *insight* and *dread*. One number with two names.
+            //
+            // That is the failure the character sheet already settled and
+            // `CLAUDE.md` already states: *a node reading "start every fight
+            // with 12 armor" against a sheet reading "12 cork" is one number
+            // with two names, and the whole job of the line is to let somebody
+            // confirm they got what was promised.* A pool on a bar is a number
+            // you look up, so it is named the way the glossary names it.
+            //
+            // The theme keeps the prose. TONE 13a's split is unchanged — it is
+            // which side of it a pool bar falls on that moved.
+            "pools": pool_ids.clone(),
             "player": {
                 "name": "you", "max_health": log.player.max_health,
                 "armor": log.player.armor,

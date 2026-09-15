@@ -942,12 +942,22 @@ impl ClassPower {
         match self {
             ClassPower::Guilt => "you cannot heal".to_string(),
             ClassPower::Apothecary { potency_pct, extra } => {
-                format!("+{potency_pct}% on every brew, and {extra} more cells of glass")
+                if extra == 0 {
+                    format!("+{potency_pct}% on every brew")
+                } else {
+                    format!("+{potency_pct}% on every brew, and {} more of glass",
+                            crate::expert::many(extra as i32, "cell"))
+                }
             }
             ClassPower::Chef { draughts } => format!("{draughts} potions in one fight"),
-            ClassPower::Factor { customers_per_bell, margin_pct, .. } => format!(
-                "{customers_per_bell} buyers a fight, and every sale pays {margin_pct}% over"
-            ),
+            ClassPower::Factor { customers_per_bell, margin_pct, .. } => {
+                let b = format!("{} a fight", crate::expert::many(customers_per_bell as i32, "buyer"));
+                if margin_pct > 0 {
+                    format!("{b}, and every sale pays {margin_pct}% over")
+                } else {
+                    b
+                }
+            }
             ClassPower::Grower { stages, yield_pct, .. } => {
                 format!("a crop up in {} wins, paying {yield_pct}%", stages.saturating_sub(1))
             }
@@ -1055,43 +1065,117 @@ impl ClassPower {
             // exactly what it was written for: this sentence is read before an
             // irreversible choice and a number wearing a joke has to be
             // translated first.
-            ClassPower::Grower { stages, seed_cap, yield_pct, bed_cells, pairs_reach } => format!(
-                "A crop is up {} wins after you plant it, the drawer holds {seed_cap} of \
-                 each seed, a row pays {yield_pct}% of what it would, every bed has \
-                 {bed_cells} more {}, and two crops count as neighbours {} cells out.",
-                stages.saturating_sub(1),
-                if bed_cells == 1 { "cell" } else { "cells" },
-                pairs_reach,
-            ),
+            // **Assembled, not formatted.** A clause whose figure is nothing is
+            // left out entirely: *every bed has 0 more cells* is a promise of
+            // nothing, on the one screen where a choice does not come off.
+            ClassPower::Grower { stages, seed_cap, yield_pct, bed_cells, pairs_reach } => {
+                let mut parts = vec![
+                    format!(
+                        "A crop is up {} after you plant it",
+                        crate::expert::many(stages.saturating_sub(1) as i32, "win")
+                    ),
+                    format!(
+                        "the drawer holds {} of each seed instead of {}",
+                        seed_cap,
+                        crate::plot::DRAWER_CAP
+                    ),
+                ];
+                if yield_pct != 100 {
+                    parts.push(format!(
+                        "a row pays {} instead of {}",
+                        crate::expert::many(crate::plot::yield_of(yield_pct) as i32, "crop"),
+                        crate::plot::HARVEST_YIELD,
+                    ));
+                }
+                if bed_cells > 0 {
+                    parts.push(format!(
+                        "every bed has {} more",
+                        crate::expert::many(bed_cells as i32, "cell")
+                    ));
+                }
+                if pairs_reach > 1 {
+                    parts.push(
+                        "two crops count as neighbours on the diagonal as well as edge-on"
+                            .to_string(),
+                    );
+                }
+                format!("{}.", crate::expert::sentence(parts))
+            }
             ClassPower::Factor {
                 customers_per_bell,
                 margin_pct,
                 shelf_cells,
                 bargain_pct,
                 patience_pct,
-            } => format!(
-                "{} comes by every fight you win instead of {}, every sale pays {margin_pct}% \
-                 over what you asked, the counter is {shelf_cells} cells, two who know each \
-                 other leave something {}% more often, and a buyer will stretch {patience_pct}% \
-                 past what a thing is worth.",
-                if customers_per_bell == 1 {
-                    "One buyer".to_string()
-                } else {
-                    format!("{customers_per_bell} buyers")
-                },
-                crate::stall::CUSTOMERS_PER_BELL,
-                bargain_pct,
-            ),
+            } => {
+                let mut parts = vec![
+                    format!(
+                        "{} by the counter every fight you win instead of {}",
+                        if customers_per_bell == 1 {
+                            "One buyer comes".to_string()
+                        } else {
+                            format!("{customers_per_bell} buyers come")
+                        },
+                        crate::stall::CUSTOMERS_PER_BELL
+                    ),
+                ];
+                if shelf_cells as usize > crate::stall::SHELF.len() {
+                    parts.push(format!(
+                        "the counter is {shelf_cells} cells instead of {}",
+                        crate::stall::SHELF.len()
+                    ));
+                }
+                if margin_pct > 0 {
+                    parts.push(format!("every sale pays {margin_pct}% over what you asked"));
+                }
+                if patience_pct > 0 {
+                    parts.push(format!(
+                        "a buyer calls an ask fair up to {}% over what a thing is worth, \
+                         where everybody else stops at {}%",
+                        crate::stall::FAIR_PCT + patience_pct,
+                        crate::stall::FAIR_PCT
+                    ));
+                }
+                if bargain_pct > 0 {
+                    parts.push(format!(
+                        "and two buyers who know each other leave something {bargain_pct}% \
+                         more often"
+                    ));
+                }
+                format!("{}.", crate::expert::sentence(parts).replacen(", and and ", ", and ", 1))
+            }
             ClassPower::Handler { offer_at, mouths, feed_every, run_cells, tally_pct } => {
-                format!(
-                    "Something comes along after {offer_at} wins instead of {}, you lead {}, \
-                     one out eats every {} you fight, every run has {run_cells} more cells, \
-                     and every {} out together pays {tally_pct}%.",
-                    crate::kennel::OFFER_AT,
-                    if mouths == 1 { "one".to_string() } else { format!("{mouths}") },
-                    if feed_every == 1 { "fight".to_string() } else { format!("{feed_every} fights") },
-                    crate::kennel::TALLY_STEP,
-                )
+                let mut parts = vec![
+                    format!(
+                        "Something is offered to the kennel after {} instead of {}",
+                        crate::expert::many(offer_at as i32, "win"),
+                        crate::kennel::OFFER_AT
+                    ),
+                    format!(
+                        "you may have {} out at once",
+                        crate::expert::many(mouths as i32, "creature")
+                    ),
+                    format!(
+                        "one out eats one ingredient every {}",
+                        if feed_every == 1 {
+                            "fight".to_string()
+                        } else {
+                            crate::expert::many(feed_every as i32, "fight")
+                        }
+                    ),
+                ];
+                if run_cells > 0 {
+                    parts.push(format!(
+                        "every run has {} more",
+                        crate::expert::many(run_cells as i32, "cell")
+                    ));
+                }
+                parts.push(format!(
+                    "and what one contributes rises {tally_pct}% for every {} you fight \
+                     together",
+                    crate::kennel::TALLY_STEP
+                ));
+                format!("{}.", crate::expert::sentence(parts).replacen(", and and ", ", and ", 1))
             }
             // **No stacks.** Upstream handed the same class out over and over
             // and a promise had to say what a second one bought; GM2D asks
@@ -1168,18 +1252,27 @@ impl ClassPower {
                  regeneration from nature",
                 n, n
             ),
-            ClassPower::Echo(n) => {
-                format!("every {}rd time one of your items fires, it fires again immediately", n)
-            }
+            // **`{n}rd` is right for three and wrong for everything else**, and
+            // the roster ships a three — so it read correctly and could not
+            // survive a retune. An ordinal is a word, not a suffix.
+            ClassPower::Echo(n) => format!(
+                "every {} time one of your items fires, it fires again immediately",
+                crate::expert::ordinal(n as i32)
+            ),
             ClassPower::Bastion(pct) => format!(
                 "whenever your armour soaks a hit, {}% of what it soaked is handed back as \
                  fresh armour",
                 pct
             ),
+            // **What the number is, rather than how often it happens.** It read
+            // *"brings its opposite with it once more"*, which says nothing
+            // about how much of the opposite lands — and a player choosing this
+            // is choosing a number. Asked for as *rewrite all of the class
+            // passive descriptions to be as mechanically accurate as possible*.
             ClassPower::Contagion(n) => format!(
-                "every curse you land brings its opposite with it {} - searing pulls in frost, \
+                "every curse you land also lands {} of its opposite - searing pulls in frost, \
                  a stun pulls in a misfire",
-                if n == 1 { "once more".to_string() } else { format!("{n} times over") }
+                crate::expert::many(n as i32, "stack")
             ),
             ClassPower::Reprisal(n) => {
                 format!("every hit that lands on you banks {} faith", n)

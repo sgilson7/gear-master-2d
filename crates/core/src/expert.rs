@@ -176,6 +176,56 @@ fn tenths(n: i32) -> String {
     format!("{}.{}", n / 10, (n % 10).abs())
 }
 
+/// `1 thing` or `2 things`, for any noun.
+///
+/// **The general form of [`enchs`] and [`stacks`]**, which were written one at
+/// a time because one promise at a time was wrong. Asked for as *rewrite all of
+/// the class passive descriptions to be as mechanically accurate as possible*,
+/// and what the lint found was `1 times`, `1 points` and `1 cells` — three more
+/// of exactly the same thing. A third hand-written pair would have been the
+/// ninth list this project has paid for.
+/// `2nd`, `3rd`, `4th` — the suffix a number actually takes.
+///
+/// **Because `{n}rd` is right for three and wrong for everything else.** The
+/// roster ships a three, so the sentence read correctly and could not have
+/// survived a retune — which is the same shape as a hand-written plural and is
+/// caught by the same reading of the promises.
+pub fn ordinal(n: i32) -> String {
+    let suffix = match (n % 100, n % 10) {
+        (11..=13, _) => "th",
+        (_, 1) => "st",
+        (_, 2) => "nd",
+        (_, 3) => "rd",
+        _ => "th",
+    };
+    format!("{n}{suffix}")
+}
+
+pub fn many(n: i32, one: &str) -> String {
+    if n == 1 { format!("1 {one}") } else { format!("{n} {one}s") }
+}
+
+/// Join clauses into one sentence, with a comma between and an `and` before
+/// the last.
+///
+/// **A promise is assembled rather than formatted**, and that is what lets a
+/// clause whose figure is nothing be left out entirely. Three expert promises
+/// read *"a cast refunds 0% of what it cost"* at their untuned values, which
+/// `CLAUDE.md` carried as the human's to decide — they decided, by asking for
+/// every promise to be as accurate as it can be. **A clause about nothing is a
+/// clause that reads as broken** on the one screen where a choice does not come
+/// off.
+pub fn sentence(parts: Vec<String>) -> String {
+    match parts.len() {
+        0 => String::new(),
+        1 => parts[0].clone(),
+        _ => {
+            let last = parts.last().expect("checked").clone();
+            format!("{}, and {last}", parts[..parts.len() - 1].join(", "))
+        }
+    }
+}
+
 impl ExpertPower {
     /// The knob names this power declares.
     ///
@@ -469,9 +519,11 @@ impl ExpertPower {
     pub fn short(self) -> String {
         use ExpertPower::*;
         match self {
-            BareFurnace { per_frame, .. } => format!("a bare frame is worth {} stacks at the bell", tenths(per_frame)),
+            BareFurnace { per_frame, .. } => {
+                format!("a bare frame is worth {} of a stack at the bell", tenths(per_frame))
+            }
             FiredFunnel { worth, .. } => format!("every stack the furnace buys is {worth} mana"),
-            ColdStoke { per_stack, .. } => format!("a curse you land is {per_stack} stacks"),
+            ColdStoke { per_stack, .. } => format!("a curse you land is {}", stacks(per_stack)),
             PonkeyBoiler { per_spin, .. } => format!("every spin turn is {} of a stack", tenths(per_spin)),
             FlashPowder { all_at_once, .. } => format!("{all_at_once}% of every pool burns before the first tick"),
             LoudDoubt { rate, .. } => format!("bare-handed, {}% of strength counts as mind damage", rate * 25),
@@ -502,7 +554,7 @@ impl ExpertPower {
                 format!("casts cost nothing for {}s", window_ms / 1000)
             }
             CursedLicence { stack } => {
-                format!("an enched component curses its frame, {stack} a hit")
+                format!("an enched component curses its frame, {} a hit", many(stack, "stack"))
             }
             EleventhSeason { pct, count_cap, .. } => {
                 format!("+{pct}% a curse on the fallen, up to {count_cap}")
@@ -528,34 +580,59 @@ impl ExpertPower {
             // ------------------------------------------------- M16's eleven
             BareFurnace { per_frame, every_ms, cap } => format!(
                 "Every frame you left bare is a hopper that never empties: you walk into every \
-                 fight with {} stacks of mana empowerment a bare frame, up to {cap}. The furnace \
-                 runs every {:.1} seconds.",
+                 fight with {} of a stack of mana empowerment a bare frame, up to {}. The \
+                 furnace runs every {:.1} seconds.",
                 tenths(per_frame),
+                many(cap, "stack"),
                 every_ms as f32 / 1000.0
             ),
-            FiredFunnel { worth, per_fight, refund } => format!(
-                "Every stack the furnace buys is also {worth} mana, up to {per_fight} times a \
-                 fight, and a cast refunds {refund}% of what it cost.",
-            ),
+            FiredFunnel { worth, per_fight, refund } => {
+                let mut parts = vec![format!(
+                    "Every stack the furnace buys is also {worth} mana, {}",
+                    if per_fight == 1 {
+                        "once a fight".to_string()
+                    } else {
+                        format!("up to {per_fight} times a fight")
+                    }
+                )];
+                if refund > 0 {
+                    parts.push(format!("a cast refunds {refund}% of what it cost"));
+                }
+                format!("{}.", sentence(parts))
+            }
             ColdStoke { per_stack, every_ms, standing } => format!(
                 "Every curse you land is fuel: {} of mana empowerment, and {} for one that \
                  cannot expire. The furnace runs every {:.1} seconds.",
                 stacks(per_stack),
-                per_stack * (1 + standing.max(0)),
+                stacks(per_stack * (1 + standing.max(0))),
                 every_ms as f32 / 1000.0
             ),
-            PonkeyBoiler { per_spin, keep, licence } => format!(
-                "Every turn a spinning item banks is {} of a stack of mana empowerment. A turning \
-                 item keeps {keep} of its turns when it goes off, and you may hold {} a \
-                 component.",
-                tenths(per_spin),
-                enchs(licence)
-            ),
-            FlashPowder { all_at_once, until_ms, pct } => format!(
-                "{all_at_once}% of every pool you are holding is burned before the first tick. A \
-                 fight won inside {:.0} seconds pays {pct}% more.",
-                until_ms as f32 / 1000.0
-            ),
+            PonkeyBoiler { per_spin, keep, licence } => {
+                let mut parts = vec![format!(
+                    "Every turn a spinning item banks is {} of a stack of mana empowerment",
+                    tenths(per_spin)
+                )];
+                if keep > 0 {
+                    parts.push(format!(
+                        "a turning item keeps {} when it goes off",
+                        many(keep, "turn")
+                    ));
+                }
+                parts.push(format!("you may hold {} a component", enchs(licence)));
+                format!("{}.", sentence(parts))
+            }
+            FlashPowder { all_at_once, until_ms, pct } => {
+                let mut out = format!(
+                    "{all_at_once}% of every pool you are holding is burned before the first tick."
+                );
+                if pct > 0 {
+                    out.push_str(&format!(
+                        " A fight won inside {:.0} seconds pays {pct}% more.",
+                        until_ms as f32 / 1000.0
+                    ));
+                }
+                out
+            }
             LoudDoubt { worn, rate, third } => format!(
                 "Wearing {worn} items or fewer, {}% of your strength is added to every mind hit \
                  you land. Anything unmade at {third}% of its maximum health.",
@@ -567,9 +644,10 @@ impl ExpertPower {
                  of its maximum health.",
             ),
             ToldOnce { per_curse, cap, standing } => format!(
-                "Every curse standing on them raises the unmaking by {per_curse} points, up to \
-                 {cap}, and one that cannot expire counts {}.",
-                1 + standing.max(0)
+                "Every curse standing on them raises the threshold anything is unmade at by \
+                 {}, up to {cap} — and one that cannot expire counts as {}.",
+                many(per_curse, "percentage point"),
+                many(1 + standing.max(0), "curse"),
             ),
             LicensedRumour { pct, racks, third } => format!(
                 "Every activation of an enched component eats {}% of their maximum health. You \
@@ -611,7 +689,8 @@ impl ExpertPower {
             StandingFact { worn, carry, bite, told } => {
                 let mut s = format!(
                     "A curse you land while wearing {worn} finished items or fewer does not \
-                     expire. {carry} may be standing at once."
+                     expire — it stays on for the whole fight. {} may be standing at once.",
+                    many(carry, "such curse")
                 );
                 if bite > 0 {
                     s.push_str(&format!(" A curse that cannot expire bites {bite}% harder."));
@@ -707,7 +786,8 @@ impl ExpertPower {
             }
             CursedLicence { stack } => format!(
                 "A component with an ench on it lands that ench's curse on every activation of \
-                 the item it is part of, {stack} at a time."
+                 the item it is part of, {} at a time.",
+                many(stack, "stack")
             ),
             EleventhSeason { pct, count_cap, distinct, posthumous } => {
                 let mut s = format!(
@@ -855,7 +935,16 @@ pub static EXPERTS: &[ExpertDef] = &[
         pair: ("Showstopper", "Stoker"),
         name: "FlashPowder",
         blurb: "Everything you had, at once, in front of four thousand people.",
-        power: ExpertPower::FlashPowder { all_at_once: 25, until_ms: 10_000, pct: 0 },
+        // **`pct` is 10 and was 0**, which made both of this tree's window
+        // nodes dead: `fp-longer-fuse` has no prerequisite at all and widens a
+        // window that pays nothing, so a player could spend their first point
+        // in this tree on nought. That is M13.6's own failure — thirty-eight
+        // nodes that cost a point and changed nothing — and what found it was
+        // *writing the promise out accurately*: once a clause about nothing is
+        // dropped rather than printed as `0%`, a knob nobody can see moving is
+        // a knob whose sentence does not change, and `tuning_a_knob_changes_
+        // what_the_class_promises` says so.
+        power: ExpertPower::FlashPowder { all_at_once: 25, until_ms: 10_000, pct: 10 },
     },
     ExpertDef {
         pair: ("Berserker", "Whisperer"),

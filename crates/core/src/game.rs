@@ -1461,7 +1461,9 @@ impl Game {
         // everybody else, so this line is the same line it was.
         // **Rounded the payer's way**, which is `ExpertPower::cast_price`'s rule:
         // a percentage that floors is a percentage a player cannot see moving.
-        let n = (((n as i32 * yield_pct) + 99) / 100).max(1) as u32;
+        // **The one answer**, so the promise and the harvest cannot disagree —
+        // they did, and the promise was the one that was wrong.
+        let n = crate::plot::at_pct(n, yield_pct);
         for _ in 0..n {
             self.character.gather(&def.crop);
         }

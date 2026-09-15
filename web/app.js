@@ -2932,26 +2932,39 @@ function paintBed() {
       boardJson: bed_json,
       legalAnchors: bed_legal_anchors,
       place: bed_place,
-      // **The board's pick-up is the pull.** It hands back `ok:N Name` or the
-      // refusal, which is core's sentence either way.
-      pickUp: (id) => {
-        const m = /^crop:(-?\d+),(-?\d+)$/.exec(id);
-        if (!m) return '';
-        const why = bed_pull(Number(m[1]), Number(m[2]));
-        if (why.startsWith('ok:')) {
-          bedSays(`${why.slice(3)} into the larder.`);
-          log(`The row came up: ${why.slice(3)}.`);
-          paintBench?.();
-          return 'pulled';
-        }
-        bedSays(why, true);
-        return why;
-      },
+      // **Pulling is not picking up, so it is not `pickUp`.** A crop does not
+      // come back to the drawer: it is either ready, in which case it goes to
+      // the larder, or it is not, in which case the refusal says how many wins
+      // are left. Either way nothing ends up in hand.
+      //
+      // It *was* `pickUp`, returning `'pulled'` to mean *handled* — and the
+      // board's contract there is **empty means it worked**, so a successful
+      // pull took the refusal path: it printed the word `pulled` and returned
+      // without refreshing, leaving the crop drawn on a bed it had already
+      // left. Reported from play as a visual bug pulling seeds out of the bed.
+      //
+      // `onclaim` is the hook for exactly this — *something else wants this
+      // click* — and the board refreshes after it, which is the half that was
+      // missing.
+      pickUp: () => '',
       rotate: bed_rotate,
       toggleLock: () => {},
       look: look_json,
       lookOver: bed_look_over,
     });
+    bedBoard.onclaim = (id) => {
+      const m = /^crop:(-?\d+),(-?\d+)$/.exec(String(id));
+      if (!m) return false;
+      const why = bed_pull(Number(m[1]), Number(m[2]));
+      if (why.startsWith('ok:')) {
+        bedSays(`${why.slice(3)} into the larder.`);
+        log(`The row came up: ${why.slice(3)}.`);
+        paintBench?.();
+      } else {
+        bedSays(why, true);
+      }
+      return true;
+    };
     bedBoard.onchange = () => { paintBedText(); autosave(); };
     bedBoard.onhold = (name) => {
       $('bed-holding').textContent = name
@@ -4934,6 +4947,15 @@ async function main() {
   // to find out whether the tile it is on became a counter mid-fight.
   window.__caravanJson = () => JSON.parse(caravan_json());
   window.__bedJson = () => bed_json();
+  // Where a bed cell is on the canvas, so a check can click the row rather
+  // than call its payload — the Stall's own lesson, and the bed had no
+  // browser check at all until a visual bug in it was reported from play.
+  window.__bedCellSpot = (x, y) => bedBoard?.cellCentre('bed', x, y) ?? null;
+  // **What the board is actually drawing**, which is not the same question as
+  // what core is holding. The bug reported here was visual: core had harvested
+  // the crop and the canvas went on showing it, so a check that asked the
+  // payload passed on a broken build. `state` is the board's own last read.
+  window.__bedDrawn = () => bedBoard?.state?.slots?.[0]?.placed ?? null;
   window.__stallJson = () => stall_json();
   window.__stallLegal = (id, slot) => stall_legal_anchors(id, slot);
   window.__stallPlace = (id, slot, x, y) => stall_place(id, slot, x, y);

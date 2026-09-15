@@ -42,6 +42,36 @@ def experts() -> tuple[dict, dict]:
     return out, cols
 
 
+def people() -> tuple[dict, dict]:
+    r"""The trainer's cards and the buyers: name -> (slug, TeX defines).
+
+    **Two drawings, thirteen figures.** A specialization is one person on one
+    map taking you on, so its figure is a hand-written card with one seal —
+    the expert paper's opposite number, which is why it is a second drawing
+    rather than `expert.tex` with both seals the same: two identical blobs read
+    as an expert whose parents happen to match.
+
+    A buyer is somebody standing on the other side of your counter, so the
+    eight are one figure with a `\Pose`: what tells them apart is what they
+    carry and how they stand.
+    """
+    raw = json.loads((ROOT / "art" / "people.json").read_text())
+    marks = {k: v for k, v in raw["_marks"].items() if not k.startswith("_")}
+    cards, buyers = {}, {}
+    for name, colour in raw["specializations"].items():
+        if name not in marks:
+            raise SystemExit(f"art/people.json: {name} has no mark")
+        cards[name] = (f"card-{slug(name)}",
+                       f"\\def\\Seal{{{colour}}}\\def\\Mark{{{marks[name]}}}")
+    for bid, spec in raw["buyers"].items():
+        defs = f"\\def\\Pose{{{spec['pose']}}}" + "".join(
+            f"\\def\\{k.capitalize()}{{{spec[k]}}}"
+            for k in ("main", "dark", "accent") if k in spec
+        )
+        buyers[bid] = (f"buyer-{bid}", defs)
+    return cards, buyers
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--build", action="store_true",
@@ -67,6 +97,11 @@ def main() -> int:
             print(f"{slug(name)}\t{fam}\t{defs}")
         for _, (out, defs) in experts()[0].items():
             print(f"{out}\texpert\t{defs}")
+        cards, buyers = people()
+        for _, (out, defs) in cards.items():
+            print(f"{out}\tticket\t{defs}")
+        for _, (out, defs) in buyers.items():
+            print(f"{out}\tbuyer\t{defs}")
         return 0
 
     if args.write_map:
@@ -88,6 +123,13 @@ def main() -> int:
         cls = art.setdefault("classes", {})
         for name, (out, _) in experts()[0].items():
             cls[name] = out
+        # **And the five cards and the eight buyers**, written from the
+        # manifest for the experts' own reason: the map and the files it names
+        # cannot drift when only one of them is written by a person.
+        cards, buyers = people()
+        for name, (out, _) in cards.items():
+            cls[name] = out
+        art["buyers"] = {bid: out for bid, (out, _) in buyers.items()}
         path.write_text(json.dumps(art, indent=2) + "\n")
         return 0
 

@@ -1,0 +1,113 @@
+% The trainer's card — one drawing, five colourways.
+%
+% A specialization is **not a paper**. Every other thing Spike hands over is
+% printed, stamped and filed; this is one person on one map deciding to take
+% you on, and what you leave with is their own card with their own mark pressed
+% into it. So the figure is deliberately the expert paper's opposite number:
+% landscape where that is portrait, hand-written where that is ruled, **one**
+% seal where that has two, and a thumbed corner rather than a folded one.
+%
+% That opposition is the whole of why it is a second drawing rather than
+% `expert.tex` with `SealA` equal to `SealB` — two identical blobs read as an
+% expert whose parents happen to match, which is a sentence about a thing this
+% game does not have.
+%
+% Five colourways, one a specialization: the Apothecary, the Chef, the Grower,
+% the Handler and the Factor. Nothing about the card changes between them but
+% the wax and the one mark scored into it, which is the thirteen-creature
+% families argument a fourth time.
+%
+% Counting is the house tic: three lines of hand, one seal, one thumbprint.
+%
+% Written by filling in tikz_figure_prompt.md.
+%
+% Reads at 64px as a pale card with one coloured blob low and left; at 4x the
+% scored mark in the wax, the uneven hand and the thumbed corner come up.
+\documentclass[tikz,border=4pt]{standalone}
+\usetikzlibrary{calc}
+\newcommand{\Unit}{0.055cm}
+\newcommand{\Edge}{2.4pt}
+
+% The seal's colour, defined on the pdflatex command line — one per
+% specialization. The default is the card's own grey, so a figure compiled with
+% no palette is a blank card rather than a hole.
+\providecommand{\Seal}{7C7568}
+% What is scored into the wax: 0 a pestle, 1 a spoon, 2 a leaf, 3 a collar,
+% 4 a pair of scales. A number, because a mark that varied by mood would be a
+% mark that says nothing.
+\providecommand{\Mark}{0}
+
+\definecolor{seal}{HTML}{\Seal}
+\definecolor{card}{HTML}{DFD8C6}
+\definecolor{carddark}{HTML}{BEB59E}
+\definecolor{hand}{HTML}{5C5344}
+\definecolor{ink}{HTML}{101018}
+
+\begin{document}
+\begin{tikzpicture}[x=\Unit,y=\Unit, line join=round, line cap=round]
+
+  % ---- the card -----------------------------------------------------------
+  % Landscape and wider than it is tall, which is the first thing that tells
+  % it from the paper at a glance.
+  \fill[carddark,draw=ink,line width=\Edge]
+    (8,6) -- (82,6) -- (82,52) -- (8,52) -- cycle;
+  \fill[card,draw=ink,line width=\Edge]
+    (6,9) -- (80,9) -- (80,55) -- (6,55) -- cycle;
+
+  % The thumbed corner, top left. Not folded — worn, because this has been
+  % carried in a hand rather than filed.
+  \fill[carddark,opacity=.7] (6,55) -- (6,46) -- (16,55) -- cycle;
+
+  % ---- the hand -----------------------------------------------------------
+  % Three lines, uneven, none of them reaching the right edge: somebody wrote
+  % this while you stood there. The expert paper's ruling is straight and
+  % stops square; this does not.
+  \draw[hand,line width=2.2pt]
+    (14,46) .. controls (30,48) and (44,44) .. (58,46);
+  \draw[hand,line width=1.8pt]
+    (14,39) .. controls (28,41) and (40,37) .. (52,39);
+  \draw[hand,line width=1.8pt]
+    (14,32) .. controls (26,34) and (36,30) .. (45,32);
+
+  % ---- the seal -----------------------------------------------------------
+  % One blob of wax, low and left, with the trainer's own mark scored into it.
+  % Low and left rather than centred: the card is signed in the corner the way
+  % a person signs, not sealed in the middle the way an office does.
+  \fill[seal,draw=ink,line width=2pt] (24,19) circle (11.5);
+  \draw[ink,line width=1.6pt,opacity=.4] (24,19) circle (6);
+
+  % The mark. Primitives only, and each one is the bench it is about.
+  \ifnum\Mark=0
+    % A pestle: a stem leaning in a bowl.
+    \draw[ink,line width=2.8pt,opacity=.8] (20,15) -- (28,23);
+    \draw[ink,line width=2.8pt,opacity=.8] (19,16) arc (200:340:5 and 3);
+  \fi
+  \ifnum\Mark=1
+    % A spoon: a bowl and a handle.
+    \draw[ink,line width=2.8pt,opacity=.8] (21,22) circle (3);
+    \draw[ink,line width=2.8pt,opacity=.8] (23,20) -- (29,15);
+  \fi
+  \ifnum\Mark=2
+    % A leaf: a vein and two sides.
+    \draw[ink,line width=2.8pt,opacity=.8] (19,14) -- (29,24);
+    \draw[ink,line width=2.4pt,opacity=.8]
+      (19,14) .. controls (20,22) .. (29,24);
+    \draw[ink,line width=2.4pt,opacity=.8]
+      (19,14) .. controls (21,15) and (28,16) .. (29,24);
+  \fi
+  \ifnum\Mark=3
+    % A collar: a ring with a tag hanging off it.
+    \draw[ink,line width=2.8pt,opacity=.8] (24,21) circle (5);
+    \draw[ink,line width=2.8pt,opacity=.8] (24,16) -- (24,13);
+    \draw[ink,line width=2.4pt,opacity=.8] (22,13) -- (26,13);
+  \fi
+  \ifnum\Mark=4
+    % Scales: a beam, a post and two pans.
+    \draw[ink,line width=2.8pt,opacity=.8] (18,22) -- (30,22);
+    \draw[ink,line width=2.8pt,opacity=.8] (24,22) -- (24,15);
+    \draw[ink,line width=2.4pt,opacity=.8] (16,22) arc (180:360:2.4 and 1.6);
+    \draw[ink,line width=2.4pt,opacity=.8] (28,22) arc (180:360:2.4 and 1.6);
+  \fi
+
+\end{tikzpicture}
+\end{document}

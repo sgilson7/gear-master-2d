@@ -2515,6 +2515,15 @@ def check_a_trainer_takes_you_on(page, name, fails, base):
         fails.append(f"{name}: took the training and became {became!r}, not {t['class']!r}")
         clear_screens(page)
         return
+    # **And their card is on the counter**, which is the screen where a choice
+    # that does not come off is confirmed. A specialization is not a paper —
+    # the figure is hand-written with one seal, deliberately the expert paper's
+    # opposite number.
+    card = page.eval_on_selector(
+        "#take-training img",
+        "e => ({ src: e.getAttribute('src'), w: e.naturalWidth })")
+    if not card or not card["w"]:
+        fails.append(f"{name}: the trainer's card did not load: {card}")
     # **And the sheet says so**, which is the half the Apothecary never had: a
     # thing you became that no screen mentions is a thing nobody can tell from
     # a button that did nothing.
@@ -2999,6 +3008,18 @@ def _the_counter(page, name, fails):
                      f"rectangle, which is not a shape")
     if len(b["buyers"]) != 8:
         fails.append(f"{name}: {len(b['buyers'])} buyers on the screen, not eight")
+    # **And each has a face that loaded.** `naturalWidth` rather than a count:
+    # a portrait that 404s is not a portrait, which is what
+    # `check_the_portrait_shows` has said since M11 and is the only question a
+    # browser can answer about art at all.
+    faces = page.eval_on_selector_all(
+        "#stall-buyers img",
+        "e => e.map(i => ({ src: i.getAttribute('src'), w: i.naturalWidth }))")
+    if len(faces) != len(b["buyers"]):
+        fails.append(f"{name}: {len(b['buyers'])} buyers and {len(faces)} faces")
+    blank = [f["src"] for f in faces if not f["w"]]
+    if blank:
+        fails.append(f"{name}: a buyer's figure did not load: {blank[:3]}")
     # **The board has to be drawn**, which means measured rather than counted:
     # a canvas that is in the document at nought pixels high is the area card's
     # own bug, and nothing in the source reads wrong when it happens.

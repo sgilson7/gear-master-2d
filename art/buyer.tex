@@ -1,0 +1,151 @@
+% Somebody who comes by the counter — one drawing, eight of them.
+%
+% The Stall's eight buyers are the first figures in this game that are
+% **people rather than creatures**, and that is why they are one drawing with a
+% pose rather than eight: what a buyer *is* is somebody standing on the other
+% side of your counter, and the whole of what tells them apart is what they
+% carry and how they stand. A second silhouette a buyer would have been eight
+% drawings of the same thing.
+%
+% `\Pose` moves three things and nothing else: what is on the head, what is in
+% the hands, and whether they are leaning in or standing back. A buyer who
+% leans is one whose floor is low.
+%
+% Counting is the house tic: one body, one head, two arms, and exactly one
+% thing carried.
+%
+% Written by filling in tikz_figure_prompt.md.
+%
+% Reads at 64px as a figure with a coloured coat and one silhouette detail; at
+% 4x the hands, the fastening on the coat and what they are holding come up.
+\documentclass[tikz,border=4pt]{standalone}
+\usetikzlibrary{calc}
+\newcommand{\Unit}{0.055cm}
+\newcommand{\Edge}{2.4pt}
+
+\providecommand{\Main}{5E6572}
+\providecommand{\Dark}{3A404B}
+\providecommand{\Accent}{C8952F}
+% 0..7, one a buyer. Anything else draws the plain one, which is what makes
+% this safe to compile with no pose at all.
+\providecommand{\Pose}{0}
+
+\definecolor{main}{HTML}{\Main}
+\definecolor{dark}{HTML}{\Dark}
+\definecolor{accent}{HTML}{\Accent}
+\definecolor{ink}{HTML}{101018}
+\definecolor{skin}{HTML}{C9A88A}
+\definecolor{card}{HTML}{DFD8C6}
+
+\begin{document}
+\begin{tikzpicture}[x=\Unit,y=\Unit, line join=round, line cap=round]
+
+  % ---- the coat -----------------------------------------------------------
+  % A long coat to the shin, because everybody who comes to a counter in this
+  % country came in off a road.
+  \fill[main,draw=ink,line width=\Edge]
+    (26,6) -- (54,6) -- (56,48) -- (24,48) -- cycle;
+  % The shadowed side, so it reads as a body rather than a slab.
+  \fill[dark,opacity=.55] (44,6) -- (54,6) -- (56,48) -- (46,48) -- cycle;
+  % The fastening: three, which is the house tic.
+  \foreach \i in {0,1,2} { \fill[accent] (40,{18 + 9*\i}) circle (1.8); }
+
+  % ---- the head -----------------------------------------------------------
+  \fill[skin,draw=ink,line width=\Edge] (40,56) circle (9);
+
+  % ---- the arms -----------------------------------------------------------
+  % **Over the coat, in the coat's own colour with an outline, ending in a
+  % hand.** The first draft drew them in `dark` *behind* the fill, and the
+  % coat's own shadowed side swallowed them whole: eight figures with no arms
+  % at all, which `make art`'s *draw it, then look at it* found in one contact
+  % sheet. A figure that compiles is not a figure that works.
+  %
+  % Leaning in, or standing back. Which it is, is the one thing about a buyer
+  % you can read across a counter — and the hand is where what they carry goes,
+  % so the two are drawn together rather than a sleeve and a floating object.
+  \ifnum\Pose>3
+    % Standing back: both arms straight down, hands at the hem.
+    \draw[main,draw=ink,line width=\Edge] (28,44) -- (21,20);
+    \draw[main,draw=ink,line width=\Edge] (52,44) -- (59,20);
+    \fill[skin,draw=ink,line width=2pt] (21,18) circle (3.4);
+    \fill[skin,draw=ink,line width=2pt] (59,18) circle (3.4);
+  \else
+    % Leaning in: the near arm folded onto the counter, the far one on the hip.
+    \draw[main,draw=ink,line width=\Edge] (28,44) -- (19,28) -- (33,23);
+    \draw[main,draw=ink,line width=\Edge] (52,44) -- (62,34) -- (62,26);
+    \fill[skin,draw=ink,line width=2pt] (34,22) circle (3.4);
+    \fill[skin,draw=ink,line width=2pt] (62,24) circle (3.4);
+  \fi
+
+  % ---- the head's own detail ----------------------------------------------
+  \ifcase\Pose
+    % 0 — a flat cap, pulled down.
+    \fill[dark,draw=ink,line width=2pt] (30,62) -- (50,62) -- (52,66) -- (28,66) -- cycle;
+    \fill[dark] (28,62) -- (50,62) -- (50,60) -- (30,60) -- cycle;
+  \or
+    % 1 — a high collar and nothing on the head.
+    \fill[dark,draw=ink,line width=2pt] (31,48) -- (49,48) -- (46,56) -- (34,56) -- cycle;
+  \or
+    % 2 — a tall hat, the sort a clerk wears indoors on purpose.
+    \fill[dark,draw=ink,line width=2pt] (33,63) -- (47,63) -- (47,78) -- (33,78) -- cycle;
+    \fill[accent] (33,68) rectangle (47,71);
+  \or
+    % 3 — a hood, back.
+    \fill[dark,draw=ink,line width=2pt]
+      (29,54) .. controls (30,70) and (50,70) .. (51,54) -- cycle;
+  \or
+    % 4 — a scarf wound twice.
+    \fill[accent,draw=ink,line width=2pt] (30,46) rectangle (50,52);
+    \fill[accent,draw=ink,line width=2pt] (46,46) -- (52,46) -- (54,34) -- (48,34) -- cycle;
+  \or
+    % 5 — a visor, pushed up.
+    \fill[dark,draw=ink,line width=2pt] (31,63) -- (49,63) -- (49,67) -- (31,67) -- cycle;
+    \fill[dark,draw=ink,line width=2pt] (49,63) -- (58,68) -- (58,71) -- (49,67) -- cycle;
+  \or
+    % 6 — a band across the brow. It was an ear ring at first and read as a
+    % blemish on the face at tile size, which is what *draw it, then look at
+    % it* is for: a mark that has to be found is not a mark.
+    \fill[accent,draw=ink,line width=2pt] (31,58) rectangle (49,62);
+  \or
+    % 7 — a broad brim under a low crown. Drawn as an ellipse and a box rather
+    % than two beziers: the curved version came out a flat bar with a sliver
+    % over it, which is a hat nobody would call a hat.
+    \fill[dark,draw=ink,line width=2pt] (40,64) ellipse (17 and 4);
+    \fill[dark,draw=ink,line width=2pt] (33,64) rectangle (47,75);
+    \fill[accent] (33,64) rectangle (47,67);
+  \fi
+
+  % ---- what they carry ----------------------------------------------------
+  % **Exactly one thing, and it is in a hand.** The first draft floated each
+  % object off in the corner, so a sack read as a ball on the floor beside
+  % somebody. It hangs from, or rests in, whichever hand the pose put out.
+  \ifnum\Pose<2
+    % A list, held up in the outstretched hand.
+    \fill[card,draw=ink,line width=2pt] (58,26) rectangle (70,42);
+    \foreach \i in {0,1,2} {
+      \draw[ink,opacity=.5,line width=1.4pt] (60,{30 + 5*\i}) -- (68,{30 + 5*\i});
+    }
+  \fi
+  \ifnum\Pose=2
+    % A sack, hanging from the outstretched hand by its neck.
+    \draw[ink,line width=2pt] (62,24) -- (64,18);
+    \fill[accent,draw=ink,line width=2pt] (64,11) circle (7.5);
+    \draw[ink,line width=1.8pt,opacity=.5] (58,14) -- (70,14);
+  \fi
+  \ifnum\Pose=3
+    % A rule, gripped in the folded hand and standing up past the shoulder.
+    \draw[accent,draw=ink,line width=3.4pt] (34,22) -- (26,58);
+    \foreach \i in {0,1,2} {
+      \draw[ink,opacity=.6,line width=1.2pt]
+        ({33 - 2.2*\i},{28 + 10*\i}) -- ({30 - 2.2*\i},{28.6 + 10*\i});
+    }
+  \fi
+  \ifnum\Pose>4
+    % A lamp, hanging from the hand at the hem.
+    \draw[ink,line width=2pt] (59,18) -- (59,15);
+    \fill[accent,draw=ink,line width=2pt] (59,9) circle (6);
+    \draw[ink,line width=1.6pt,opacity=.45] (54,9) -- (64,9);
+  \fi
+
+\end{tikzpicture}
+\end{document}

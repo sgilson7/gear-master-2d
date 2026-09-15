@@ -973,3 +973,12 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
   background: var(--brass); border-color: var(--brass); color: var(--surface);
 }
 #town-street button.primary:hover { filter: brightness(1.1); color: var(--surface); }
+
+/* A buyer's row: their figure, then what they want. The figure is small —
+   these are eight rows on a screen a player is scanning, not a portrait. */
+.whoface { display: flex; gap: 10px; align-items: flex-start; }
+.whoface img { width: 38px; height: 38px; flex: none; }
+.whoface > div { display: flex; flex-direction: column; min-width: 0; }
+/* A trainer's card is wider than a buyer's face — it is the thing being
+   handed over rather than a row in a list. */
+#take-training img { width: 62px; height: 62px; }

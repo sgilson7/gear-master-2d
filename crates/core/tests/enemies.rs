@@ -158,10 +158,19 @@ fn every_creature_has_a_figure_and_every_figure_has_a_file() {
 /// parents. `art/experts.json` is the manifest and `make art` writes the map
 /// from it, so the file and the names cannot drift.
 ///
-/// **Offered classes and experts only.** `class::CLASSES` is the inherited
-/// roster and carries names GM2D offers from nowhere — drawing a portrait for
-/// a class no player can take is art shipped for nobody, which is the failure
-/// the creature half of this file exists for, upside down.
+/// **Everything a player can end up being, and nothing else.** `class::CLASSES`
+/// is the inherited roster and carries names GM2D offers from nowhere —
+/// drawing a portrait for a class no player can take is art shipped for
+/// nobody, which is the failure the creature half of this file exists for,
+/// upside down.
+///
+/// **That is three lists and it was two.** It read `OFFERED` plus the experts,
+/// which was every class there was when it was written; M20 and M21 added five
+/// **specializations**, which are deliberately outside `OFFERED` because they
+/// pair with nothing — and a specialization is very much something a player
+/// can be. It is the same staleness `no_class_on_offer_promises_a_stack` had,
+/// found the same way: by giving the missing thing a figure and watching the
+/// lint call it art for nobody.
 #[test]
 fn every_class_the_game_offers_has_a_figure() {
     let art: serde_json::Value =
@@ -171,6 +180,7 @@ fn every_class_the_game_offers_has_a_figure() {
 
     let mut want: Vec<String> =
         gm2d_core::class::OFFERED.iter().map(|c| c.to_string()).collect();
+    want.extend(gm2d_core::class::SPECIALIZATIONS.iter().map(|c| c.to_string()));
     want.extend(gm2d_core::expert::EXPERTS.iter().map(|e| e.name.to_string()));
 
     let mut bad = Vec::new();

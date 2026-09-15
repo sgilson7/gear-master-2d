@@ -1,0 +1,28 @@
+{
+  "_note": "The people: five trainer's cards and eight buyers. Two drawings, thirteen figures. A specialization is one person on one map taking you on, so its figure is a hand-written card with one seal — deliberately the expert paper's opposite number, which is why it is a second drawing rather than `expert.tex` with both seals the same. A buyer is somebody standing on the other side of your counter, so the eight are one figure with a pose: what tells them apart is what they carry and how they stand. The ids here must match `class::SPECIALIZATIONS` and `data/stall.json`; `every_person_in_the_game_has_a_figure` is what says so.",
+  "_marks": {
+    "_note": "What is scored into the wax, one a bench. A number rather than a name because `\\ifnum` is what TikZ can branch on.",
+    "Apothecary": 0,
+    "Chef": 1,
+    "Grower": 2,
+    "Handler": 3,
+    "Factor": 4
+  },
+  "specializations": {
+    "Apothecary": "6E7450",
+    "Chef": "9C5C60",
+    "Grower": "4F7A4A",
+    "Handler": "7A5B33",
+    "Factor": "2E6E8E"
+  },
+  "buyers": {
+    "the-shift-foreman":        { "pose": 0, "main": "4A5560", "dark": "2C333B", "accent": "C8952F" },
+    "the-under-clerk":          { "pose": 1, "main": "6A6070", "dark": "413A48", "accent": "D9CDB0" },
+    "the-rind-cutter":          { "pose": 2, "main": "7A6A4A", "dark": "4C4230", "accent": "B8863F" },
+    "the-tenth-surveyors-boy":  { "pose": 3, "main": "3F6B74", "dark": "27434A", "accent": "D6C27A" },
+    "the-quench-hand":          { "pose": 4, "main": "55707A", "dark": "33454C", "accent": "9FC6CE" },
+    "the-woman-from-high-wick": { "pose": 5, "main": "5B4A72", "dark": "382D47", "accent": "C9A0D8" },
+    "the-drover":               { "pose": 7, "main": "6E5240", "dark": "443228", "accent": "CBA96B" },
+    "nine-of-ashes-cousin":     { "pose": 6, "main": "3A3A42", "dark": "212127", "accent": "B33146" }
+  }
+}

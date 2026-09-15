@@ -464,3 +464,60 @@ fn open_early_brings_a_second_buyer() {
         gm2d_core::stall::CUSTOMERS_PER_BELL + 2
     );
 }
+
+/// **Everybody in this game who is a person has a figure.**
+///
+/// The eight buyers and the five trainer's cards, asked of the data rather than
+/// of a list: *a list of eight written by hand is a list that can be seven*,
+/// which is the argument `every_creature_has_a_figure_and_every_figure_has_a_
+/// file` already makes about the seventy-seven.
+///
+/// **And the other direction too.** A figure for a buyer who is not in
+/// `stall.json` is art shipped for nobody, which is the creature half of that
+/// file's own failure upside down.
+#[test]
+fn every_person_in_the_game_has_a_figure() {
+    let art: serde_json::Value =
+        serde_json::from_str(include_str!("../../../data/art.json")).expect("art.json");
+    let faces = art["buyers"].as_object().expect("a buyers map");
+    let classes = art["classes"].as_object().expect("a classes map");
+    let mut bad = Vec::new();
+    for b in &data::stall().buyers {
+        if !faces.contains_key(&b.id) {
+            bad.push(format!("{} comes by the counter and has no figure", b.id));
+        }
+    }
+    for id in faces.keys() {
+        if !data::stall().buyers.iter().any(|b| b.id == *id) {
+            bad.push(format!("{id} has a figure and comes by nobody's counter"));
+        }
+    }
+    for s in gm2d_core::class::SPECIALIZATIONS {
+        if !classes.contains_key(*s) {
+            bad.push(format!("{s} is something you can be and has no card"));
+        }
+    }
+    assert!(bad.is_empty(), "{}", bad.join("; "));
+}
+
+/// Every figure the map names is a file that is actually there.
+#[test]
+fn every_persons_figure_is_a_file() {
+    let art: serde_json::Value =
+        serde_json::from_str(include_str!("../../../data/art.json")).expect("art.json");
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../web/assets");
+    let mut missing = Vec::new();
+    for (who, f) in art["buyers"].as_object().expect("buyers").iter().chain(
+        art["classes"]
+            .as_object()
+            .expect("classes")
+            .iter()
+            .filter(|(k, _)| gm2d_core::class::SPECIALIZATIONS.contains(&k.as_str())),
+    ) {
+        let name = f.as_str().unwrap_or_default();
+        if !root.join(format!("{name}.svg")).exists() {
+            missing.push(format!("{who} -> {name}.svg"));
+        }
+    }
+    assert!(missing.is_empty(), "the map names files that are not there: {missing:?}");
+}

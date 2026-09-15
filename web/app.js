@@ -3201,10 +3201,18 @@ function paintStallText() {
   paintStallBag(b);
   $('stall-buyers').replaceChildren(...b.buyers.map((w) => {
     const el = document.createElement('div');
-    el.className = 'wares';
-    el.innerHTML = `<b>${w.name}</b>` +
+    el.className = 'wares whoface';
+    // **A face on each of the eight.** They were eight rows of text on the one
+    // screen where a player is deciding what to price for whom; the figures
+    // are one drawing with a pose, and the pose is what they carry and how
+    // they stand.
+    const img = document.createElement('img');
+    portrait(img, figure('buyers', w.id), w.name);
+    const said = document.createElement('div');
+    said.innerHTML = `<b>${w.name}</b>` +
       `<span class="spec">${w.blurb}</span>` +
       `<span class="cost">buys ${w.wants.join(' and ')} over ${w.floor} Fnorp</span>`;
+    el.append(img, said);
     return el;
   }));
 }
@@ -3577,11 +3585,22 @@ function paintVendor() {
     t.id = 'take-training';
     t.dataset.teaches = v.teaches.class;
     t.disabled = !!v.teaches.why;
-    t.innerHTML = `<b>${v.teaches.name}</b>` +
+    // **Their own card, on the screen where an irreversible choice is
+    // confirmed.** A specialization is not a paper: every other thing anybody
+    // hands over in this game is printed and filed, and this is one person on
+    // one map deciding to take you on. The figure is the expert paper's
+    // opposite number — landscape, hand-written, one seal — and the mark
+    // pressed into the wax is the bench it is about.
+    t.classList.add('whoface');
+    const face = document.createElement('img');
+    portrait(face, figure('classes', v.teaches.class), v.teaches.name);
+    const said = document.createElement('div');
+    said.innerHTML = `<b>${v.teaches.name}</b>` +
       `<span class="spec">${v.teaches.says}</span>` +
       (v.teaches.why ? `<span class="flavour">${v.teaches.why}</span>` : '') +
       `<span class="cost">${v.teaches.taken ? 'you are one'
         : v.teaches.why ? 'not for you' : 'nothing — one only, and it does not come off'}</span>`;
+    t.append(face, said);
     t.onclick = () => {
       const why = train_here();
       // `an Apothecary`, `a Chef` — the themed name can start with either.

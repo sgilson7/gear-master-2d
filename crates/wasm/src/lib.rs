@@ -5575,6 +5575,11 @@ pub fn stall_json() -> String {
             "margin_pct": g.character.factor().1,
             "customers": g.character.factor().0,
             "buyers": data.buyers.iter().map(|b| serde_json::json!({
+                // **The id, so the page can find their figure.** The eight are
+                // one drawing with a pose — what tells them apart is what they
+                // carry and how they stand — and which pose is which is written
+                // in `art/people.json` rather than here.
+                "id": b.id,
                 "name": b.name,
                 "blurb": b.blurb,
                 "wants": b.wants.iter().map(|w| w.replace('-', " ")).collect::<Vec<_>>(),

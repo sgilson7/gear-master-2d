@@ -115,6 +115,21 @@
     "LicensedRumour": "expert-licensedrumour",
     "CurtainLine": "expert-curtainline",
     "AshAndWhisper": "expert-ashandwhisper",
-    "FullBill": "expert-fullbill"
+    "FullBill": "expert-fullbill",
+    "Apothecary": "card-apothecary",
+    "Chef": "card-chef",
+    "Grower": "card-grower",
+    "Handler": "card-handler",
+    "Factor": "card-factor"
+  },
+  "buyers": {
+    "the-shift-foreman": "buyer-the-shift-foreman",
+    "the-under-clerk": "buyer-the-under-clerk",
+    "the-rind-cutter": "buyer-the-rind-cutter",
+    "the-tenth-surveyors-boy": "buyer-the-tenth-surveyors-boy",
+    "the-quench-hand": "buyer-the-quench-hand",
+    "the-woman-from-high-wick": "buyer-the-woman-from-high-wick",
+    "the-drover": "buyer-the-drover",
+    "nine-of-ashes-cousin": "buyer-nine-of-ashes-cousin"
   }
 }

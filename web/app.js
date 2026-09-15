@@ -13,6 +13,7 @@ import init, {
   retort_json, retort_legal_anchors, retort_place, retort_pick_up,
   bed_json, bed_legal_anchors, bed_place, bed_pull, bed_rotate, bed_look_over,
   stall_json, stall_legal_anchors, stall_place, stall_pick_up, stall_rotate, stall_reprice,
+  a_buyer_comes_by,
   run_json, run_legal_anchors, run_place, run_pick_up, run_rotate, run_look_over,
   kennel_offer_json, take_along_here,
   retort_rotate, retort_look_over, brew_it, drink_potion, tip_out,
@@ -4802,6 +4803,7 @@ async function main() {
   window.__stallLegal = (id, slot) => stall_legal_anchors(id, slot);
   window.__stallPlace = (id, slot, x, y) => stall_place(id, slot, x, y);
   window.__paintStall = () => paintStall();
+  window.__buyerComesBy = () => a_buyer_comes_by();
   window.__runJson = () => run_json();
   window.__trainHere = () => train_here();
   window.__trees = () => JSON.parse(all_trees_json());

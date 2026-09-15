@@ -377,6 +377,26 @@ def fight(page, note=None, probe=None):
     return "It stops moving" in (title or "")
 
 
+def enter(page, sel):
+    """Open whichever building in the town holds `sel`.
+
+    M21.14 made the town a street — seven buildings, one visible at a time — so
+    a walker that reaches straight into `#tins` reaches into something hidden.
+    **Derived from the DOM** rather than from a map of id to building, which
+    would be a second copy of the markup; the gate's own helper is the same
+    three lines for the same reason.
+    """
+    page.evaluate("""(sel) => {
+      const el = document.querySelector(sel);
+      const b = el && el.closest && el.closest('#town .building');
+      if (!b) return;
+      const tab = [...document.querySelectorAll('#town-street .tab')]
+        .find((t) => t.textContent === b.dataset.name);
+      if (tab) tab.click();
+    }""", sel)
+    page.wait_for_timeout(50)
+
+
 def in_town(page, buy=True, probe=None):
     """Bank, buy what is affordable, take every errand, drink nothing."""
     said = []
@@ -393,6 +413,7 @@ def in_town(page, buy=True, probe=None):
                     say(f"  town: {x.strip()}")
             return
     if buy:
+        enter(page, "#shelf")
         for _ in range(30):
             live = page.locator("#shelf .wares:not(:disabled)")
             if live.count() == 0:
@@ -410,6 +431,7 @@ def in_town(page, buy=True, probe=None):
             page.wait_for_timeout(40)
             said.append(f"bought {name} (bench)")
         # One tin, so there is something for the road.
+        enter(page, "#tins")
         tins = page.locator("#tins .wares:not(:disabled)")
         if tins.count():
             tins.first.click()
@@ -424,6 +446,7 @@ def in_town(page, buy=True, probe=None):
         # each per visit, cheapest first, keeping enough back for a tin. A
         # walker that bought until it was broke would be measuring a shopping
         # spree rather than a player.
+        enter(page, "#barrel")
         for _ in range(len(page.locator("#barrel .wares").all())):
             live = page.locator("#barrel .wares:not(:disabled)")
             if live.count() == 0 or int(page.text_content("#town-gold")) < 40:
@@ -438,6 +461,7 @@ def in_town(page, buy=True, probe=None):
         # A player with money and an empty order slot places one; a player
         # standing where they ordered picks it up. Collect first, so the slot
         # is free to order into on the same visit.
+        enter(page, "#order-book")
         take = page.locator("#take-order")
         if take.count():
             take.first.click()
@@ -456,22 +480,25 @@ def in_town(page, buy=True, probe=None):
     # that a buyer comes by every won fight, so a transcript that never shelves
     # anything can never show a sale. One a visit, at the fair ask the page
     # puts on it — the walker is not a haggler.
+    enter(page, "#stall-box")
     if page.is_visible("#stall-box"):
         put = page.evaluate("""() => {
           const b = JSON.parse(window.__stallJson());
           if (!b || !b.bag.length) return null;
-          // The cheapest thing in the bag, because a player sells what they are
-          // not going to use — and never a tally, which `Game::shelve` refuses
-          // by name and which the walker reached for first, because a toad eye
-          // is worth twenty-five Fnorp and everything else is worth more.
-          const w = [...b.bag].filter((x) => x.kind !== 'Quest')
-                              .sort((a, c) => a.worth - c.worth)[0];
-          if (!w) return null;
-          const spot = JSON.parse(window.__stallLegal(String(w.id), 'stall'));
-          if (!spot.length) return null;
-          const why = window.__stallPlace(String(w.id), 'stall', spot[0][0], spot[0][1]);
-          window.__paintStall();
-          return why || `${w.name} at ${w.worth}`;
+          // **Cheapest first, and the engine's refusal is the filter.** A
+          // player sells what they are not going to use, and the cheapest
+          // thing in an early bag is a toad eye — which `Game::shelve` refuses
+          // by name, because a tally sold is an errand broken silently. A
+          // `kind !== 'Quest'` test here was the walker keeping its own copy
+          // of what may be sold, and it was wrong about the word: the payload
+          // says "quest item".
+          for (const w of [...b.bag].sort((a, c) => a.worth - c.worth)) {
+            const spot = JSON.parse(window.__stallLegal(String(w.id), 'stall'));
+            if (!spot.length) continue;
+            const why = window.__stallPlace(String(w.id), 'stall', spot[0][0], spot[0][1]);
+            if (!why) { window.__paintStall(); return `${w.name} at ${w.worth}`; }
+          }
+          return null;
         }""")
         if put:
             said.append(f"counter: {put}")
@@ -479,6 +506,7 @@ def in_town(page, buy=True, probe=None):
     # on purpose — clicking it says how far along you are, which is
     # information rather than an error — so a loop that keeps pressing the
     # first live button presses the same one for ever.
+    enter(page, "#quests")
     seen = set()
     for _ in range(10):
         live = None

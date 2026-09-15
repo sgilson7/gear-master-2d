@@ -5590,3 +5590,14 @@ pub fn stall_reprice(id: u32, price: i32) -> String {
         Err(e) => e,
     })
 }
+
+/// One buyer comes by the counter. **The harness's door, and core's own.**
+///
+/// Selling happens on the bell and a browser check cannot fight its way to one
+/// cheaply, so this is the same `Game::a_buyer_comes_by` `pay_a_win` calls —
+/// not a second answer to *who buys what*, which is the thing the shim is not
+/// allowed to be.
+#[wasm_bindgen]
+pub fn a_buyer_comes_by() -> String {
+    with_mut(|g| g.a_buyer_comes_by().unwrap_or_default())
+}

@@ -1,0 +1,1682 @@
+
+--- a new game ----------------------------------------------------------
+  level 1 · 1,18 in The End of All Gears · 140 Fnorp · carrying 0 · worn 0% · no class
+  probe: level 1 · fill 0% (helmet 0% chest 0% gloves 0% greaves 0% weapon 0%) · bench 0 · from nothing yet
+  town at [1, 18], gate at [16, 2]
+
+--- the road ------------------------------------------------------------
+
+--- errand --------------------------------------------------------------
+  level 1 · 1,18 in The End of All Gears · 140 Fnorp · carrying 0 · worn 0% · no class
+  card: THE COUNTED HEAP
+        Somebody has stacked eleven thousand two hundred gear-teeth in a cone on the slag, sorted by pitch, and writte
+        errand: THE COUNT IS WRONG — Taken. go to The End of All Gears, then report back.
+        chose: Take four
+        THE HEAP YOU TOOK FROM. It is in your errands now.
+        +25 Fnorp
+        +8 experience, carried
+  fight: A. Rat (rates 16) with 1 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         11 on you. It is worth nothing until you bank it.
+         It had a Cheese Touch on it. They do not usually.
+         Toad Ichor for the larder.
+         4% more tired. 4% of you is missing until you take something for it.
+  shut: (3, 10) — going to read (4, 12) first
+  shut: (4, 12) is not reachable yet — A Sprocketman with a barrow has stopped where the slag ends. "Everything past here is water and what lives in it," he says. "You are the fourth this month. The other three went anyway." It wants level 5, and you are 1.
+  shut: (3, 10) — going to read (9, 17) first
+  fight: Wallspider Swarm (rates 95) with 1 items -> You stop moving
+         No bounty. Nothing was beaten.
+         The 11 experience you were carrying is gone.
+         You wake up walking, and you have been walking a while.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 1 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         It had a Cheese Finder on it. They do not usually.
+         Toad Ichor for the larder.
+         Toad Ichor Seed for the drawer.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 1 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         6 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        chose: Take a strip
+        THE CORK YOU TOOK. It is in your errands now.
+        +8 experience, carried
+  shut: (3, 10) — going to read (16, 14) first
+  card: THE COUNTED HEAP
+        Somebody has stacked eleven thousand two hundred gear-teeth in a cone on the slag, sorted by pitch, and writte
+        errand: THE HEAP YOU TOOK FROM — You have not been yet.
+  shut: (3, 10) — going to read (12, 5) first
+  shut: (12, 5) is not reachable yet — A Sprocketman with a barrow has stopped where the slag ends. "Everything past here is water and what lives in it," he says. "You are the fourth this month. The other three went anyway." It wants level 5, and you are 1.
+  fight: The Brumpus (rates 114) with 1 items -> You stop moving
+         No bounty. Nothing was beaten.
+         The 14 experience you were carrying is gone.
+         You wake up walking, and you have been walking a while.
+         4% more tired. 12% of you is missing until you take something for it.
+  shut: (3, 10) — going to read (17, 9) first
+  shut: (17, 9) is not reachable yet — A Sprocketman with a barrow has stopped where the slag ends. "Everything past here is water and what lives in it," he says. "You are the fourth this month. The other three went anyway." It wants level 5, and you are 1.
+  shut: (3, 10) — going to read (17, 2) first
+  shut: (17, 2) is not reachable yet — A Sprocketman with a barrow has stopped where the slag ends. "Everything past here is water and what lives in it," he says. "You are the fourth this month. The other three went anyway." It wants level 5, and you are 1.
+  shut: (3, 10) is not reachable yet — A Sprocketman with a barrow has stopped where the slag ends. "Everything past here is water and what lives in it," he says. "You are the fourth this month. The other three went anyway." It wants level 5, and you are 1.
+
+--- grind ---------------------------------------------------------------
+  level 1 · 4,13 in The Slag Flats · 183 Fnorp · carrying 0 · worn 0% · no class
+  fight: A. Rat (rates 16) with 1 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: Bengulon Jungle Toad (rates 80) with 1 items -> It stops moving
+         +8 Fnorp
+         +16 experience, carried
+         19 on you. It is worth nothing until you bank it.
+         Toad Ichor Seed for the drawer.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 1 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         22 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 1 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         25 on you. It is worth nothing until you bank it.
+         Toad Ichor for the larder.
+         Toad Ichor Seed for the drawer.
+         4% more tired. 16% of you is missing until you take something for it.
+
+--- home ----------------------------------------------------------------
+  level 1 · 8,17 in The End of All Gears · 209 Fnorp · carrying 25 · worn 16% · no class
+  in town: level 1 · 1,18 in The End of All Gears · 209 Fnorp · carrying 25 · worn 0% · no class
+  town: 25 experience spent.  ·  Level 2. One point to spend.  ·  A row is bought at the tree, or finished off an errand.
+  town: bought Spindrift-Can Frame
+  town: bought Cork Plating
+  town: bought a tin
+  town: counter: Spindrift-Can Frame at 75
+  town: errand: THE EYES HAVE IT — Taken. beat 5 × Bengulon Jungle Toad, then hand in 5 × Bengulon Toad Eye.
+  town: errand: THE ONES STILL DOWN THERE — Taken. hand over 4 × Long Shift Tin.
+  town: errand: SOMEBODY SHOULD TELL HIM — Taken. go to THE CORK BOUNDARY, then report back.
+  town: errand: THE COUNT IS WRONG — The clerk writes it into the register under a heading she has to invent, reads it back twice, and gets quieter. Then she gives you a strip of the fence out of a drawer, which she says grows back, and which she says the office is aware of. — A Strip of the Fence.
+  town: errand: THE GLASS IN THE CORNER — Taken. brew one that gives at least 1 max health.
+  town: errand: ONE THAT FOLLOWS YOU — Taken. have A. Rat in the kennel.
+  tree: took Frame Sense
+  probe: level 2 · fill 7% (helmet 0% chest 0% gloves 0% greaves 0% weapon 29%) · bench 0 · from shelf 2 drop 2 quest 1
+
+--- errand --------------------------------------------------------------
+  level 2 · 1,18 in The End of All Gears · 49 Fnorp · carrying 0 · worn 0% · no class
+  fight: A. Rat (rates 16) with 1 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         Toad Ichor for the larder.
+         Toad Ichor Seed for the drawer.
+         The Under-Clerk took the Tin Frame for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  fight: A. Rat (rates 16) with 1 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         6 on you. It is worth nothing until you bank it.
+         Toad Ichor for the larder.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 1 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         9 on you. It is worth nothing until you bank it.
+         Toad Ichor Seed for the drawer.
+         4% more tired. 12% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 1 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         12 on you. It is worth nothing until you bank it.
+         It had a Cheesy Fingers on it. They do not usually.
+         Toad Ichor Seed for the drawer.
+         4% more tired. 16% of you is missing until you take something for it.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  fight: A. Rat (rates 16) with 2 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         15 on you. It is worth nothing until you bank it.
+         4% more tired. 20% of you is missing until you take something for it.
+  fight: Bengulon Jungle Toad (rates 80) with 2 items -> It stops moving
+         +8 Fnorp
+         +16 experience, carried
+         31 on you. It is worth nothing until you bank it.
+         Took a Bengulon Toad Eye.
+         4% more tired. 24% of you is missing until you take something for it.
+  drank a tin: Cork Tea. 10% of it comes off; 14% left.
+
+--- home ----------------------------------------------------------------
+  level 2 · 3,17 in The End of All Gears · 162 Fnorp · carrying 31 · worn 14% · no class
+  in town: level 2 · 1,18 in The End of All Gears · 168 Fnorp · carrying 34 · worn 0% · no class
+  town: 34 experience spent.  ·  Level 3. One point to spend.  ·  A row is bought at the tree, or finished off an errand.
+  town: bought Soft Drink Cap
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: counter: Cork Plating at 75
+  town: errand: THE EYES HAVE IT — 1 of 5, and nobody writes down what they are not handed.
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+  town: errand: SOMEBODY SHOULD TELL HIM — He takes it well. He says he had assumed as much and has been cutting on that assumption for nine doorways. Then he gives you the knife, which is not a gift so much as a handover, and starts on the tenth with a piece of the fence. — The Ninth Doorway.
+  town: errand: THE GLASS IN THE CORNER — 0 of 1, and nobody writes down what they are not handed.
+  town: errand: ONE THAT FOLLOWS YOU — 0 of 1, and nobody writes down what they are not handed.
+  tree: took Thick Skull
+  probe: level 3 · fill 15% (helmet 0% chest 0% gloves 44% greaves 0% weapon 29%) · bench 0 · from shelf 3 barrel 1 drop 4 quest 2
+
+--- errand --------------------------------------------------------------
+  level 3 · 1,18 in The End of All Gears · 39 Fnorp · carrying 0 · worn 0% · no class
+  fight: Bengulon Jungle Toad (rates 80) with 3 items -> It stops moving
+         +8 Fnorp
+         +16 experience, carried
+         25 on you. It is worth nothing until you bank it.
+         Took a Bengulon Toad Eye.
+         4% more tired. 4% of you is missing until you take something for it.
+
+--- home ----------------------------------------------------------------
+  level 3 · 6,18 in The End of All Gears · 140 Fnorp · carrying 25 · worn 4% · no class
+  in town: level 3 · 1,18 in The End of All Gears · 140 Fnorp · carrying 25 · worn 0% · no class
+  town: 25 experience spent.  ·  Level 4. One point to spend.  ·  A row is bought at the tree, or finished off an errand.
+  town: bought Boiled Gooster Hide
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: counter: Boiled Gooster Hide at 75
+  town: errand: THE EYES HAVE IT — 2 of 5, and nobody writes down what they are not handed.
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+  town: errand: THE GLASS IN THE CORNER — 0 of 1, and nobody writes down what they are not handed.
+  town: errand: ONE THAT FOLLOWS YOU — 0 of 1, and nobody writes down what they are not handed.
+  tree: took Corked
+  probe: level 4 · fill 21% (helmet 0% chest 0% gloves 44% greaves 0% weapon 54%) · bench 0 · from shelf 4 barrel 2 drop 5 quest 2
+
+--- errand --------------------------------------------------------------
+  level 4 · 1,18 in The End of All Gears · 30 Fnorp · carrying 0 · worn 0% · no class
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  fight: Bengulon Jungle Toad (rates 80) with 3 items -> It stops moving
+         +8 Fnorp
+         +16 experience, carried
+         40 on you. It is worth nothing until you bank it.
+         Took a Bengulon Toad Eye.
+         Toad Ichor for the larder.
+         4% more tired. 4% of you is missing until you take something for it.
+
+--- home ----------------------------------------------------------------
+  level 4 · 12,17 in The End of All Gears · 161 Fnorp · carrying 40 · worn 4% · no class
+  in town: level 4 · 1,18 in The End of All Gears · 161 Fnorp · carrying 40 · worn 0% · no class
+  town: 40 experience spent.  ·  41 of 49 towards the next level.
+  town: bought Crank-Turner's Mold
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  town: errand: THE EYES HAVE IT — 3 of 5, and nobody writes down what they are not handed.
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+  town: errand: THE GLASS IN THE CORNER — 0 of 1, and nobody writes down what they are not handed.
+  town: errand: ONE THAT FOLLOWS YOU — 0 of 1, and nobody writes down what they are not handed.
+
+--- errand --------------------------------------------------------------
+  level 4 · 1,18 in The End of All Gears · 26 Fnorp · carrying 0 · worn 0% · no class
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+
+--- home ----------------------------------------------------------------
+  level 4 · 8,17 in The End of All Gears · 155 Fnorp · carrying 27 · worn 0% · no class
+  fight: Wallspider Swarm (rates 95) with 3 items -> It stops moving
+         +9 Fnorp
+         +19 experience, carried
+         46 on you. It is worth nothing until you bank it.
+         It had a Wallspider Fletch on it. They do not usually.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 3 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         49 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 3 items -> It stops moving
+         +6 Fnorp
+         +3 experience, carried
+         52 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+  in town: level 4 · 1,18 in The End of All Gears · 176 Fnorp · carrying 52 · worn 0% · no class
+  town: 52 experience spent.  ·  Level 5. One point to spend.  ·  A row is bought at the tree, or finished off an errand.
+  probe: level 5 · fill 21% (helmet 0% chest 0% gloves 44% greaves 0% weapon 54%) · bench 0 · from shelf 5 barrel 3 drop 7 quest 3
+  fork: 7 classes offered
+        [0] Gorillathon at [25, 187, 301, 269] clickable=True (Gorillathon)
+        [1] Funnel Sergeant at [335, 187, 301, 269] clickable=True (every curse you land bri)
+        [2] Worm-Fact Keeper at [645, 187, 301, 269] clickable=True (every curse you land on )
+        [3] Kaklon Licensee at [954, 187, 301, 269] clickable=True (Every assembly bonus on )
+        [4] Top of the Bill at [25, 465, 301, 269] clickable=True (A fight won in under 10 )
+        [5] Kettle-Stoker at [335, 465, 301, 269] clickable=True (Every 4.0 seconds, 10 po)
+        [6] Whisperling at [645, 465, 301, 269] clickable=True (A creature whose maximum)
+  fork: took Top of the Bill
+  in town: level 5 · 1,18 in The End of All Gears · 176 Fnorp · carrying 0 · worn 0% · Showstopper
+  town: bought Cork Greave Mold
+  town: bought Slow Trundler Sole
+  town: bought a tin
+  town: counter: Nut Bar Handle at 75
+  town: errand: THE EYES HAVE IT — 3 of 5, and nobody writes down what they are not handed.
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+  town: errand: THE GLASS IN THE CORNER — 0 of 1, and nobody writes down what they are not handed.
+  town: errand: ONE THAT FOLLOWS YOU — 0 of 1, and nobody writes down what they are not handed.
+  tree: took Cave Lungs
+
+--- errand --------------------------------------------------------------
+  level 5 · 1,18 in The End of All Gears · 6 Fnorp · carrying 0 · worn 0% · Showstopper
+  fight: A. Rat (rates 16) with 3 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.5s.
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         Toad Ichor for the larder.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: Wallspider Swarm (rates 95) with 3 items -> It stops moving
+         +9 Fnorp
+         +4 more for the speed of it. 5.4s.
+         +19 experience, carried
+         22 on you. It is worth nothing until you bank it.
+         Bone Meal Seed for the drawer.
+         The Tenth Surveyor's Boy took the Oak Handle for 75 Fnorp. They know each other. Whatever passed between them, something of it stayed on your shelf. They left a Signalman's Orb.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 3 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.5s.
+         +3 experience, carried
+         25 on you. It is worth nothing until you bank it.
+         Toad Ichor for the larder.
+         4% more tired. 12% of you is missing until you take something for it.
+
+--- home ----------------------------------------------------------------
+  level 5 · 3,16 in The End of All Gears · 112 Fnorp · carrying 25 · worn 12% · Showstopper
+  fight: A. Rat (rates 16) with 3 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.5s.
+         +3 experience, carried
+         28 on you. It is worth nothing until you bank it.
+         4% more tired. 16% of you is missing until you take something for it.
+  in town: level 5 · 1,18 in The End of All Gears · 121 Fnorp · carrying 28 · worn 0% · Showstopper
+  town: 28 experience spent.  ·  Level 6. One point to spend.  ·  A row is bought at the tree, or finished off an errand.
+  town: bought Gray Smock
+  town: bought a tin
+  town: counter: Cork Greave Mold at 75
+  town: errand: THE EYES HAVE IT — 3 of 5, and nobody writes down what they are not handed.
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+  town: errand: THE GLASS IN THE CORNER — 0 of 1, and nobody writes down what they are not handed.
+  town: errand: ONE THAT FOLLOWS YOU — 0 of 1, and nobody writes down what they are not handed.
+  tree: took Top Billing
+  probe: level 6 · fill 21% (helmet 0% chest 0% gloves 44% greaves 0% weapon 54%) · bench 0 · from shelf 8 barrel 3 drop 8 quest 3
+
+--- errand --------------------------------------------------------------
+  level 6 · 1,18 in The End of All Gears · 26 Fnorp · carrying 0 · worn 0% · Showstopper
+  fight: Frosty Kev (rates 103) with 4 items -> It stops moving
+         +12 Fnorp
+         +6 more for the speed of it. 3.0s.
+         +20 experience, carried
+         20 on you. It is worth nothing until you bank it.
+         Reef Salt Seed for the drawer.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 4 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.5s.
+         +3 experience, carried
+         23 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: Wallspider Swarm (rates 95) with 4 items -> It stops moving
+         +9 Fnorp
+         +4 more for the speed of it. 5.4s.
+         +19 experience, carried
+         42 on you. It is worth nothing until you bank it.
+         It had a Wallspider Scale on it. They do not usually.
+         Bone Meal Seed for the drawer.
+         4% more tired. 12% of you is missing until you take something for it.
+
+--- home ----------------------------------------------------------------
+  level 6 · 15,15 in The Slag Flats · 66 Fnorp · carrying 42 · worn 12% · Showstopper
+  in town: level 6 · 1,18 in The End of All Gears · 66 Fnorp · carrying 42 · worn 0% · Showstopper
+  town: 42 experience spent.  ·  50 of 82 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: counter: Slow Trundler Sole at 75
+  town: errand: THE EYES HAVE IT — 3 of 5, and nobody writes down what they are not handed.
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+  town: errand: THE GLASS IN THE CORNER — 0 of 1, and nobody writes down what they are not handed.
+  town: errand: ONE THAT FOLLOWS YOU — 0 of 1, and nobody writes down what they are not handed.
+
+--- errand --------------------------------------------------------------
+  level 6 · 1,18 in The End of All Gears · 31 Fnorp · carrying 0 · worn 0% · Showstopper
+  fight: A. Rat (rates 16) with 4 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.5s.
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         The Quench Hand took the Greave Mold for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 4 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.5s.
+         +3 experience, carried
+         6 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: Bengulon Jungle Toad (rates 80) with 4 items -> It stops moving
+         +8 Fnorp
+         +4 more for the speed of it. 2.7s.
+         +16 experience, carried
+         22 on you. It is worth nothing until you bank it.
+         Took a Bengulon Toad Eye.
+         4% more tired. 12% of you is missing until you take something for it.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  fight: A. Rat (rates 16) with 4 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.5s.
+         +3 experience, carried
+         25 on you. It is worth nothing until you bank it.
+         The Drover took the Plain Sole for 75 Fnorp.
+         4% more tired. 16% of you is missing until you take something for it.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  card: THE CORK BOUNDARY
+        The fence is cork. Not cork-coloured, not cork-like. Somebody grew a fence out of it and then stopped attendin
+        errand: THE CORK YOU TOOK — You have not been yet.
+  fight: A. Rat (rates 16) with 4 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.5s.
+         +3 experience, carried
+         28 on you. It is worth nothing until you bank it.
+         4% more tired. 20% of you is missing until you take something for it.
+
+--- home ----------------------------------------------------------------
+  level 6 · 9,16 in The End of All Gears · 229 Fnorp · carrying 28 · worn 20% · Showstopper
+  fight: Wallspider Swarm (rates 95) with 4 items -> It stops moving
+         +9 Fnorp
+         +4 more for the speed of it. 5.4s.
+         +19 experience, carried
+         47 on you. It is worth nothing until you bank it.
+         It had a Wallspider Crown on it. They do not usually.
+         4% more tired. 24% of you is missing until you take something for it.
+  drank a tin: Cork Tea. 10% of it comes off; 14% left.
+  in town: level 6 · 1,18 in The End of All Gears · 242 Fnorp · carrying 47 · worn 0% · Showstopper
+  town: 47 experience spent.  ·  Level 7. One point to spend.  ·  A row is bought at the tree, or finished off an errand.
+  town: bought Robe Scrap
+  town: bought Trillion-Pound Plate
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  town: errand: THE EYES HAVE IT — 4 of 5, and nobody writes down what they are not handed.
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+  town: errand: THE GLASS IN THE CORNER — 0 of 1, and nobody writes down what they are not handed.
+  town: errand: ONE THAT FOLLOWS YOU — 0 of 1, and nobody writes down what they are not handed.
+  tree: took A Warm House
+  probe: level 7 · fill 30% (helmet 0% chest 44% gloves 44% greaves 0% weapon 54%) · bench 0 · from shelf 10 barrel 5 drop 11 quest 3
+
+--- errand --------------------------------------------------------------
+  level 7 · 1,18 in The End of All Gears · 32 Fnorp · carrying 0 · worn 0% · Showstopper
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.5s.
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: Bengulon Jungle Toad (rates 80) with 5 items -> It stops moving
+         +8 Fnorp
+         +4 more for the speed of it. 2.7s.
+         +16 experience, carried
+         19 on you. It is worth nothing until you bank it.
+         Took a Bengulon Toad Eye.
+         Toad Ichor for the larder.
+         4% more tired. 8% of you is missing until you take something for it.
+  card: MARBULON'S DOOR
+        There is a door in the shallows with no house behind it, and an old woman sitting in front of it on a kitchen 
+        errand: THE FIRST THING SHE WANTS — Taken. beat 3 × Nesbit the Asker, then hand in 3 × A Jar of It.
+        chose: Ask what would count
+        WHAT WOULD COUNT. It is in your errands now.
+        +8 experience, carried
+  fight: Wallspider Swarm (rates 95) with 5 items -> It stops moving
+         +9 Fnorp
+         +4 more for the speed of it. 5.4s.
+         +19 experience, carried
+         46 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+
+--- home ----------------------------------------------------------------
+  level 7 · 3,13 in The Slag Flats · 66 Fnorp · carrying 46 · worn 12% · Showstopper
+  fight: The Brumpus (rates 114) with 5 items -> It stops moving
+         +14 Fnorp
+         +7 more for the speed of it. 3.6s.
+         +22 experience, carried
+         68 on you. It is worth nothing until you bank it.
+         4% more tired. 16% of you is missing until you take something for it.
+  in town: level 7 · 1,18 in The End of All Gears · 87 Fnorp · carrying 68 · worn 0% · Showstopper
+  town: 68 experience spent.  ·  83 of 103 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  town: errand: THE EYES HAVE IT — She writes for a while. Then she gives you a ledger with a spine like a brick and a page of counting-out that she says works, and has not said on what. The register now runs to a hundred and nine species and one line that says PENDING. — The Bengulon Tally and Count The Legs.
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+  town: errand: THE FRAME THAT STANDS — Taken. go to THE STANDING FRAME, then report back.
+  town: errand: THE GLASS IN THE CORNER — 0 of 1, and nobody writes down what they are not handed.
+  town: errand: ONE THAT FOLLOWS YOU — 0 of 1, and nobody writes down what they are not handed.
+
+--- errand --------------------------------------------------------------
+  level 7 · 1,18 in The End of All Gears · 49 Fnorp · carrying 0 · worn 0% · Showstopper
+  fight: Wallspider Swarm (rates 95) with 5 items -> It stops moving
+         +9 Fnorp
+         +4 more for the speed of it. 5.4s.
+         +19 experience, carried
+         19 on you. It is worth nothing until you bank it.
+         Bone Meal for the larder.
+         The Shift Foreman took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  card: THE STANDING FRAME
+        A gear-frame, upright in the shallows, empty. Chest height. It has been standing here long enough that the wat
+        chose: Take the frame
+        THE FRAME YOU TOOK. It is in your errands now.
+        +20 Fnorp
+        Gained: Grungo-Elastic Hilt
+        +8 experience, carried
+  fight: Velothi High Guard (rates 161) with 5 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 5.9s.
+         +32 experience, carried
+         59 on you. It is worth nothing until you bank it.
+         Cairn Dust Seed for the drawer.
+         4% more tired. 8% of you is missing until you take something for it.
+
+--- home ----------------------------------------------------------------
+  level 7 · 17,11 in The Burnwarp Shallows · 193 Fnorp · carrying 59 · worn 8% · Showstopper
+  fight: Frosty Kev (rates 103) with 5 items -> It stops moving
+         +12 Fnorp
+         +6 more for the speed of it. 2.4s.
+         +20 experience, carried
+         79 on you. It is worth nothing until you bank it.
+         Reef Salt for the larder.
+         4% more tired. 12% of you is missing until you take something for it.
+  in town: level 7 · 1,18 in The End of All Gears · 211 Fnorp · carrying 79 · worn 0% · Showstopper
+  town: 79 experience spent.  ·  Level 8. One point to spend.  ·  A row is bought at the tree, or finished off an errand.
+  town: bought Rhinestone Inset
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+  town: errand: THE FRAME THAT STANDS — She writes STILL EMPTY, and the date, and looks at it for a while. Then she goes into the back and comes out with a card in a sleeve. It is nine lines of somebody working out what a thing they were holding was for, and it was not filed under gear, and she says the office has no heading it goes under either. — The Yodregar Index.
+  town: errand: THE GLASS IN THE CORNER — 0 of 1, and nobody writes down what they are not handed.
+  town: errand: ONE THAT FOLLOWS YOU — 0 of 1, and nobody writes down what they are not handed.
+  tree: took The Follow-Through
+  probe: level 8 · fill 42% (helmet 50% chest 55% gloves 44% greaves 0% weapon 58%) · bench 0 · from shelf 11 barrel 9 event 1 drop 12 quest 5
+
+--- errand --------------------------------------------------------------
+  level 8 · 1,18 in The End of All Gears · 81 Fnorp · carrying 0 · worn 0% · Showstopper
+  fight: Frosty Kev (rates 103) with 5 items -> It stops moving
+         +12 Fnorp
+         +6 more for the speed of it. 1.5s.
+         +20 experience, carried
+         20 on you. It is worth nothing until you bank it.
+         Reef Salt Seed for the drawer.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: Velothi High Guard (rates 161) with 5 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 4.4s.
+         +32 experience, carried
+         52 on you. It is worth nothing until you bank it.
+         It had a Velothi Standing Plate on it. They do not usually.
+         4% more tired. 8% of you is missing until you take something for it.
+
+--- home ----------------------------------------------------------------
+  level 8 · 3,12 in The Burnwarp Shallows · 135 Fnorp · carrying 52 · worn 8% · Showstopper
+  fight: Wallspider Swarm (rates 95) with 5 items -> It stops moving
+         +9 Fnorp
+         +4 more for the speed of it. 3.6s.
+         +19 experience, carried
+         71 on you. It is worth nothing until you bank it.
+         Bone Meal for the larder.
+         4% more tired. 12% of you is missing until you take something for it.
+  in town: level 8 · 1,18 in The End of All Gears · 148 Fnorp · carrying 71 · worn 0% · Showstopper
+  town: 71 experience spent.  ·  Level 9. One point to spend.  ·  A row is bought at the tree, or finished off an errand.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+  town: errand: THE GLASS IN THE CORNER — 0 of 1, and nobody writes down what they are not handed.
+  town: errand: ONE THAT FOLLOWS YOU — 0 of 1, and nobody writes down what they are not handed.
+  tree: took Handspan
+  probe: level 9 · fill 45% (helmet 61% chest 55% gloves 44% greaves 0% weapon 62%) · bench 0 · from shelf 11 barrel 15 event 1 drop 13 quest 5
+
+--- errand --------------------------------------------------------------
+  level 9 · 1,18 in The End of All Gears · 38 Fnorp · carrying 0 · worn 0% · Showstopper
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.2s.
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         Toad Ichor for the larder.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: Nesbit the Asker (rates 192) with 5 items -> It stops moving
+         +26 Fnorp
+         +13 more for the speed of it. 5.2s.
+         +38 experience, carried
+         41 on you. It is worth nothing until you bank it.
+         Took a A Jar of It.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: Velothi High Guard (rates 161) with 5 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.6s.
+         +32 experience, carried
+         73 on you. It is worth nothing until you bank it.
+         Cairn Dust Seed for the drawer.
+         4% more tired. 12% of you is missing until you take something for it.
+
+--- home ----------------------------------------------------------------
+  level 9 · 2,11 in The Burnwarp Shallows · 122 Fnorp · carrying 73 · worn 12% · Showstopper
+  in town: level 9 · 1,18 in The End of All Gears · 122 Fnorp · carrying 73 · worn 0% · Showstopper
+  town: 73 experience spent.  ·  76 of 154 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+  town: errand: THE GLASS IN THE CORNER — 0 of 1, and nobody writes down what they are not handed.
+  town: errand: ONE THAT FOLLOWS YOU — 0 of 1, and nobody writes down what they are not handed.
+
+--- errand --------------------------------------------------------------
+  level 9 · 1,18 in The End of All Gears · 27 Fnorp · carrying 0 · worn 0% · Showstopper
+  fight: Wallspider Swarm (rates 95) with 5 items -> It stops moving
+         +9 Fnorp
+         +4 more for the speed of it. 3.6s.
+         +19 experience, carried
+         19 on you. It is worth nothing until you bank it.
+         The Woman From High Wick took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: Velothi High Guard (rates 161) with 5 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.6s.
+         +32 experience, carried
+         51 on you. It is worth nothing until you bank it.
+         Cairn Dust for the larder.
+         4% more tired. 8% of you is missing until you take something for it.
+
+--- home ----------------------------------------------------------------
+  level 9 · 2,11 in The Burnwarp Shallows · 151 Fnorp · carrying 51 · worn 8% · Showstopper
+  in town: level 9 · 1,18 in The End of All Gears · 151 Fnorp · carrying 51 · worn 0% · Showstopper
+  town: 51 experience spent.  ·  127 of 154 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+  town: errand: THE GLASS IN THE CORNER — 0 of 1, and nobody writes down what they are not handed.
+  town: errand: ONE THAT FOLLOWS YOU — 0 of 1, and nobody writes down what they are not handed.
+
+--- errand --------------------------------------------------------------
+  level 9 · 1,18 in The End of All Gears · 26 Fnorp · carrying 0 · worn 0% · Showstopper
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.2s.
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         The Shift Foreman took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: Velothi High Guard (rates 161) with 5 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.6s.
+         +32 experience, carried
+         35 on you. It is worth nothing until you bank it.
+         The Tenth Surveyor's Boy took the Oak Handle for 75 Fnorp. They know each other. Whatever passed between them, something of it stayed on your shelf. They left a Shunter's Orb.
+         4% more tired. 8% of you is missing until you take something for it.
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+        chose: Cut your name at the sixth
+        YOUR NAME AT THE SIXTH. It is in your errands now.
+        +8 experience, carried
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+        errand: YOUR NAME AT THE SIXTH — You have not been yet.
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+        errand: YOUR NAME AT THE SIXTH — You have not been yet.
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+        errand: YOUR NAME AT THE SIXTH — You have not been yet.
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+        errand: YOUR NAME AT THE SIXTH — You have not been yet.
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+        errand: YOUR NAME AT THE SIXTH — You have not been yet.
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+        errand: YOUR NAME AT THE SIXTH — You have not been yet.
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+        errand: YOUR NAME AT THE SIXTH — You have not been yet.
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+        errand: YOUR NAME AT THE SIXTH — You have not been yet.
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+        errand: YOUR NAME AT THE SIXTH — You have not been yet.
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+        errand: YOUR NAME AT THE SIXTH — You have not been yet.
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+        errand: YOUR NAME AT THE SIXTH — You have not been yet.
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+        errand: YOUR NAME AT THE SIXTH — You have not been yet.
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+        errand: YOUR NAME AT THE SIXTH — You have not been yet.
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+        errand: YOUR NAME AT THE SIXTH — You have not been yet.
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+        errand: YOUR NAME AT THE SIXTH — You have not been yet.
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+        errand: YOUR NAME AT THE SIXTH — You have not been yet.
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+        errand: YOUR NAME AT THE SIXTH — You have not been yet.
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+        errand: YOUR NAME AT THE SIXTH — You have not been yet.
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+        errand: YOUR NAME AT THE SIXTH — You have not been yet.
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+        errand: YOUR NAME AT THE SIXTH — You have not been yet.
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+        errand: YOUR NAME AT THE SIXTH — You have not been yet.
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+        errand: YOUR NAME AT THE SIXTH — You have not been yet.
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+        errand: YOUR NAME AT THE SIXTH — You have not been yet.
+  fight: Nesbit the Asker (rates 192) with 5 items -> It stops moving
+         +26 Fnorp
+         +13 more for the speed of it. 5.2s.
+         +38 experience, carried
+         81 on you. It is worth nothing until you bank it.
+         Took a A Jar of It.
+         The Woman From High Wick took the Oak Handle for 75 Fnorp. They know each other. Whatever passed between them, something of it stayed on your shelf. They left a Signalman's Orb.
+         4% more tired. 12% of you is missing until you take something for it.
+
+--- home ----------------------------------------------------------------
+  level 9 · 4,11 in The Burnwarp Shallows · 335 Fnorp · carrying 81 · worn 12% · Showstopper
+  in town: level 9 · 1,18 in The End of All Gears · 335 Fnorp · carrying 81 · worn 0% · Showstopper
+  town: 81 experience spent.  ·  Level 10. One point to spend.  ·  A row is bought at the tree, or finished off an errand.  ·  Somebody is at the Kaklon van who was not there before.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+  town: errand: THE GLASS IN THE CORNER — 0 of 1, and nobody writes down what they are not handed.
+  town: errand: ONE THAT FOLLOWS YOU — 0 of 1, and nobody writes down what they are not handed.
+  tree: took Funnel Drill
+  probe: level 10 · fill 45% (helmet 61% chest 55% gloves 44% greaves 0% weapon 62%) · bench 0 · from shelf 11 barrel 43 event 1 drop 17 quest 5
+
+--- errand --------------------------------------------------------------
+  level 10 · 1,18 in The End of All Gears · 75 Fnorp · carrying 0 · worn 0% · Showstopper
+  fight: Velothi High Guard (rates 161) with 5 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.6s.
+         +32 experience, carried
+         32 on you. It is worth nothing until you bank it.
+         Cairn Dust Seed for the drawer.
+         The Tenth Surveyor's Boy took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+        errand: YOUR NAME AT THE SIXTH — You have not been yet.
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+        errand: YOUR NAME AT THE SIXTH — You have not been yet.
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+        errand: YOUR NAME AT THE SIXTH — You have not been yet.
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+        errand: YOUR NAME AT THE SIXTH — You have not been yet.
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+        errand: YOUR NAME AT THE SIXTH — You have not been yet.
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+        errand: YOUR NAME AT THE SIXTH — You have not been yet.
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+        errand: YOUR NAME AT THE SIXTH — You have not been yet.
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+        errand: YOUR NAME AT THE SIXTH — You have not been yet.
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+        errand: YOUR NAME AT THE SIXTH — You have not been yet.
+  card: THE SHALLOWS MARKER
+        A post at the waterline with six depths cut into it and a name beside each. The top five names are crossed thr
+        errand: YOUR NAME AT THE SIXTH — You have not been yet.
+  fight: Nesbit the Asker (rates 192) with 5 items -> It stops moving
+         +26 Fnorp
+         +13 more for the speed of it. 5.2s.
+         +38 experience, carried
+         70 on you. It is worth nothing until you bank it.
+         Took a A Jar of It.
+         4% more tired. 8% of you is missing until you take something for it.
+
+--- home ----------------------------------------------------------------
+  level 10 · 4,11 in The Burnwarp Shallows · 225 Fnorp · carrying 70 · worn 8% · Showstopper
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.2s.
+         +3 experience, carried
+         73 on you. It is worth nothing until you bank it.
+         4% more tired. 12% of you is missing until you take something for it.
+  in town: level 10 · 1,18 in The End of All Gears · 234 Fnorp · carrying 73 · worn 0% · Showstopper
+  town: 73 experience spent.  ·  127 of 184 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+  town: errand: THE GLASS IN THE CORNER — 0 of 1, and nobody writes down what they are not handed.
+  town: errand: ONE THAT FOLLOWS YOU — 0 of 1, and nobody writes down what they are not handed.
+
+--- errand --------------------------------------------------------------
+  level 10 · 1,18 in The End of All Gears · 34 Fnorp · carrying 0 · worn 0% · Showstopper
+  fight: Wallspider Swarm (rates 95) with 5 items -> It stops moving
+         +9 Fnorp
+         +4 more for the speed of it. 3.6s.
+         +19 experience, carried
+         19 on you. It is worth nothing until you bank it.
+         Bone Meal for the larder.
+         Bone Meal Seed for the drawer.
+         The Tenth Surveyor's Boy took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  card: MARBULON'S DOOR
+        There is a door in the shallows with no house behind it, and an old woman sitting in front of it on a kitchen 
+        errand: THE FIRST THING SHE WANTS — "Three," she says. "So there were three." She writes nothing down. Then she gives you a thimble that has been mended twice, and says the first thing is done and the second thing is worse. — Marbulon's Thimble.
+        errand: THE SECOND THING SHE WANTS — Taken. go to THE GATE THAT WAS YOURS, then report back.
+        errand: WHAT WOULD COUNT — You have not been yet.
+  fight: Idol of Marbulon (rates 204) with 5 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 4.5s.
+         +40 experience, carried
+         59 on you. It is worth nothing until you bank it.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: Idol of Marbulon (rates 204) with 5 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 4.5s.
+         +40 experience, carried
+         99 on you. It is worth nothing until you bank it.
+         The Tenth Surveyor's Boy took the Oak Handle for 75 Fnorp.
+         4% more tired. 12% of you is missing until you take something for it.
+
+--- home ----------------------------------------------------------------
+  level 10 · 6,6 in The Bengulon Verge · 312 Fnorp · carrying 99 · worn 12% · Showstopper
+  fight: Wallspider Swarm (rates 95) with 5 items -> It stops moving
+         +9 Fnorp
+         +4 more for the speed of it. 3.6s.
+         +19 experience, carried
+         118 on you. It is worth nothing until you bank it.
+         Bone Meal Seed for the drawer.
+         4% more tired. 16% of you is missing until you take something for it.
+  fight: Wallspider Swarm (rates 95) with 5 items -> It stops moving
+         +9 Fnorp
+         +4 more for the speed of it. 3.6s.
+         +19 experience, carried
+         137 on you. It is worth nothing until you bank it.
+         4% more tired. 20% of you is missing until you take something for it.
+  in town: level 10 · 1,18 in The End of All Gears · 338 Fnorp · carrying 137 · worn 0% · Showstopper
+  town: 137 experience spent.  ·  Level 11. One point to spend.  ·  A row is bought at the tree, or finished off an errand.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+  town: errand: THE GLASS IN THE CORNER — 0 of 1, and nobody writes down what they are not handed.
+  town: errand: ONE THAT FOLLOWS YOU — 0 of 1, and nobody writes down what they are not handed.
+  tree: took The Second Frame
+  probe: level 11 · fill 44% (helmet 61% chest 41% gloves 50% greaves 0% weapon 62%) · bench 0 · from shelf 11 barrel 71 event 1 drop 18 quest 6
+
+--- errand --------------------------------------------------------------
+  level 11 · 1,18 in The End of All Gears · 78 Fnorp · carrying 0 · worn 0% · Showstopper
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.2s.
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.2s.
+         +3 experience, carried
+         6 on you. It is worth nothing until you bank it.
+         The Woman From High Wick took the Oak Handle for 75 Fnorp.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: Wallspider Swarm (rates 95) with 5 items -> It stops moving
+         +9 Fnorp
+         +4 more for the speed of it. 3.6s.
+         +19 experience, carried
+         25 on you. It is worth nothing until you bank it.
+         Bone Meal for the larder.
+         Bone Meal Seed for the drawer.
+         4% more tired. 12% of you is missing until you take something for it.
+  fight: Nesbit the Asker (rates 192) with 5 items -> It stops moving
+         +26 Fnorp
+         +13 more for the speed of it. 5.1s.
+         +38 experience, carried
+         63 on you. It is worth nothing until you bank it.
+         Reef Salt for the larder.
+         Reef Salt Seed for the drawer.
+         4% more tired. 16% of you is missing until you take something for it.
+  card: THE GATE THAT WAS YOURS
+        The Great Gear Cave has a gate on it now. Cork, over sneel, over the old bracket work, which is still there un
+        chose: Read the six notices
+        THE SIX NOTICES. It is in your errands now.
+        +8 experience, carried
+  fight: The Yodregar Archive (rates 227) with 5 items -> It stops moving
+         +34 Fnorp
+         +17 more for the speed of it. 3.6s.
+         +45 experience, carried
+         116 on you. It is worth nothing until you bank it.
+         Reef Salt Seed for the drawer.
+         4% more tired. 20% of you is missing until you take something for it.
+
+--- home ----------------------------------------------------------------
+  level 11 · 5,5 in The Bengulon Verge · 274 Fnorp · carrying 116 · worn 20% · Showstopper
+  fight: Ponkey Dong (rates 306) with 5 items -> It stops moving
+         +44 Fnorp
+         +22 more for the speed of it. 9.0s.
+         +61 experience, carried
+         177 on you. It is worth nothing until you bank it.
+         Cairn Dust for the larder.
+         Cairn Dust Seed for the drawer.
+         4% more tired. 24% of you is missing until you take something for it.
+  drank a tin: Cork Tea. 10% of it comes off; 14% left.
+  fight: Ponkey Dong (rates 306) with 5 items -> It stops moving
+         +44 Fnorp
+         +22 more for the speed of it. 9.0s.
+         +61 experience, carried
+         238 on you. It is worth nothing until you bank it.
+         Cairn Dust Seed for the drawer.
+         4% more tired. 18% of you is missing until you take something for it.
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.2s.
+         +3 experience, carried
+         241 on you. It is worth nothing until you bank it.
+         Toad Ichor for the larder.
+         4% more tired. 22% of you is missing until you take something for it.
+  in town: level 11 · 1,18 in The End of All Gears · 415 Fnorp · carrying 241 · worn 0% · Showstopper
+  town: 241 experience spent.  ·  Level 12. One point to spend.  ·  A row is bought at the tree, or finished off an errand.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  town: errand: THE ONES STILL DOWN THERE — 0 of 4, and nobody writes down what they are not handed.
+  town: errand: THE GLASS IN THE CORNER — 0 of 1, and nobody writes down what they are not handed.
+  town: errand: ONE THAT FOLLOWS YOU — 0 of 1, and nobody writes down what they are not handed.
+  tree: took Flush Fit
+  probe: level 12 · fill 44% (helmet 61% chest 41% gloves 50% greaves 0% weapon 62%) · bench 0 · from shelf 11 barrel 87 event 1 drop 18 quest 6
+
+--- errand --------------------------------------------------------------
+  level 12 · 1,18 in The End of All Gears · 155 Fnorp · carrying 0 · worn 0% · Showstopper
+  fight: A. Rat (rates 16) with 5 items -> It stops moving
+         +6 Fnorp
+         +3 more for the speed of it. 1.2s.
+         +3 experience, carried
+         3 on you. It is worth nothing until you bank it.
+         Toad Ichor for the larder.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: Frosty Kev (rates 103) with 5 items -> It stops moving
+         +12 Fnorp
+         +6 more for the speed of it. 1.5s.
+         +20 experience, carried
+         23 on you. It is worth nothing until you bank it.
+         It had a Kev's Own Ring on it. They do not usually.
+         4% more tired. 8% of you is missing until you take something for it.
+  fight: Nesbit the Asker (rates 192) with 5 items -> It stops moving
+         +26 Fnorp
+         +13 more for the speed of it. 5.1s.
+         +38 experience, carried
+         61 on you. It is worth nothing until you bank it.
+         Reef Salt for the larder.
+         Reef Salt Seed for the drawer.
+         4% more tired. 12% of you is missing until you take something for it.
+  card: MARBULON'S DOOR
+        There is a door in the shallows with no house behind it, and an old woman sitting in front of it on a kitchen 
+        errand: THE SECOND THING SHE WANTS — "Still standing," she repeats, and does not sound surprised. She gives you the key off her apron, and a piece of glass she says is ground for nine planes over and works best on this one. Then she turns the chair to face the door and does not turn it back. — Marbulon's Key and The Bengulon Glass.
+        errand: WHAT WOULD COUNT — You have not been yet.
+
+--- cave ----------------------------------------------------------------
+  level 12 · 3,10 in The Burnwarp Shallows · 251 Fnorp · carrying 61 · worn 12% · Showstopper
+  fight: The Yodregar Archive (rates 227) with 5 items -> It stops moving
+         +34 Fnorp
+         +17 more for the speed of it. 3.6s.
+         +45 experience, carried
+         106 on you. It is worth nothing until you bank it.
+         Reef Salt Seed for the drawer.
+         4% more tired. 16% of you is missing until you take something for it.
+
+--- boss ----------------------------------------------------------------
+  level 12 · 2,1 in The Great Gear Cave · 302 Fnorp · carrying 106 · worn 16% · Showstopper
+  fight: Velothi High Guard (rates 161) with 5 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.6s.
+         +32 experience, carried
+         138 on you. It is worth nothing until you bank it.
+         Cairn Dust for the larder.
+         The Woman From High Wick took the Oak Handle for 75 Fnorp.
+         4% more tired. 20% of you is missing until you take something for it.
+  fight: Ponkey Dong (rates 306) with 5 items -> It stops moving
+         +44 Fnorp
+         +22 more for the speed of it. 9.0s.
+         +61 experience, carried
+         199 on you. It is worth nothing until you bank it.
+         Cairn Dust for the larder.
+         It was carrying The Key to the Deep Chocolate.
+         4% more tired. 24% of you is missing until you take something for it.
+  drank a tin: Cork Tea. 10% of it comes off; 14% left.
+
+--- out -----------------------------------------------------------------
+  level 12 · 7,3 in The Great Gear Cave · 479 Fnorp · carrying 199 · worn 14% · Showstopper
+  fight: Velothi High Guard (rates 161) with 5 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.6s.
+         +32 experience, carried
+         231 on you. It is worth nothing until you bank it.
+         It had a Velothi Legwrap on it. They do not usually.
+         4% more tired. 18% of you is missing until you take something for it.
+  fight: Idol of Marbulon (rates 204) with 5 items -> It stops moving
+         +30 Fnorp
+         +15 more for the speed of it. 4.5s.
+         +40 experience, carried
+         271 on you. It is worth nothing until you bank it.
+         4% more tired. 22% of you is missing until you take something for it.
+  fight: Velothi High Guard (rates 161) with 5 items -> It stops moving
+         +24 Fnorp
+         +12 more for the speed of it. 3.6s.
+         +32 experience, carried
+         303 on you. It is worth nothing until you bank it.
+         4% more tired. 26% of you is missing until you take something for it.
+  drank a tin: Cork Tea. 10% of it comes off; 16% left.
+
+--- door ----------------------------------------------------------------
+  level 12 · 16,2 in West Bambulon · 596 Fnorp · carrying 303 · worn 16% · Showstopper
+  fight: Boucherian Commander (rates 446) with 5 items -> You stop moving
+         No bounty. Nothing was beaten.
+         The 303 experience you were carrying is gone.
+         You wake up walking, and you have been walking a while.
+         4% more tired. 20% of you is missing until you take something for it.
+  card: THE DOOR IN THE WALL
+        The key turns. It turns the whole way, which the Cave's lock did not do, and the door comes off the wall towar
+
+--- the treyway ---------------------------------------------------------
+  level 12 · 13,13 in The First Treyway · 596 Fnorp · carrying 0 · worn 0% · Showstopper
+  16x16, 3 regions: The First Treyway, The Kolok Downs, The Wextreen Heights
+  card: THE KETTLEWORKS ROAD
+        The road goes west and there is a milestone at the turn with two numbers cut into it. The top one says eleven 
+        chose: Ask what they want
+        THE ROAD THEY ASKED ABOUT. It is in your errands now.
+        +8 experience, carried
+  card: THE TIDELINE
+        A post driven into the coast where the plain stops, with the water eleven feet out and the notches cut into th
+  shut: (5, 1) — going to read (4, 12) first
+  card: THE WEXTREEN REACH
+        The plain stops. It does not stop at anything — no cliff, no water, no fence — it simply stops being the sort 
+        errand: THE ROAD THEY ASKED ABOUT — You have not been yet.
+        chose: Read the five
+        THE FIVE ON THE REACH. It is in your errands now.
+        +8 experience, carried
+Traceback (most recent call last):
+  File "/Users/samgilson/Documents/GearMaster2D/testing/playthrough.py", line 1682, in <module>
+    main()
+    ~~~~^^
+  File "/Users/samgilson/Documents/GearMaster2D/testing/playthrough.py", line 834, in main
+    card(page, probe=probe)
+    ~~~~^^^^^^^^^^^^^^^^^^^
+  File "/Users/samgilson/Documents/GearMaster2D/testing/playthrough.py", line 603, in card
+    page.click("#card-close")
+    ~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/samgilson/Documents/GearMaster2D/.venv-test/lib/python3.14/site-packages/playwright/sync_api/_generated.py", line 11065, in click
+    self._sync(
+    ~~~~~~~~~~^
+        self._impl_obj.click(
+        ^^^^^^^^^^^^^^^^^^^^^
+    ...<12 lines>...
+        )
+        ^
+    )
+    ^
+  File "/Users/samgilson/Documents/GearMaster2D/.venv-test/lib/python3.14/site-packages/playwright/_impl/_sync_base.py", line 115, in _sync
+    return task.result()
+           ~~~~~~~~~~~^^
+  File "/Users/samgilson/Documents/GearMaster2D/.venv-test/lib/python3.14/site-packages/playwright/_impl/_page.py", line 887, in click
+    return await self._main_frame._click(**locals_to_params(locals()))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/samgilson/Documents/GearMaster2D/.venv-test/lib/python3.14/site-packages/playwright/_impl/_frame.py", line 593, in _click
+    await self._channel.send("click", self._timeout, locals_to_params(locals()))
+  File "/Users/samgilson/Documents/GearMaster2D/.venv-test/lib/python3.14/site-packages/playwright/_impl/_connection.py", line 76, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/samgilson/Documents/GearMaster2D/.venv-test/lib/python3.14/site-packages/playwright/_impl/_connection.py", line 632, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.TimeoutError: Page.click: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator("#card-close")
+    - locator resolved to <button type="button" id="card-close" class="primary advance">Walk on</button>
+  - attempting click action
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div class="actionbar">…</div> from <div class="screen" id="instrument">…</div> subtree intercepts pointer events
+    - retrying click action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div class="actionbar">…</div> from <div class="screen" id="instrument">…</div> subtree intercepts pointer events
+    - retrying click action
+      - waiting 100ms
+    58 × waiting for element to be visible, enabled and stable
+       - element is visible, enabled and stable
+       - scrolling into view if needed
+       - done scrolling
+       - <div class="actionbar">…</div> from <div class="screen" id="instrument">…</div> subtree intercepts pointer events
+     - retrying click action
+       - waiting 500ms
+
+PLAY_EXIT=1

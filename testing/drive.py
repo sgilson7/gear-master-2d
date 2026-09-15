@@ -2588,6 +2588,110 @@ def check_a_won_fight_offers_the_creature(page, name, fails, _base):
     print(f"ok: a won fight offers the creature, and the receipt reads at {px[0]:.0f}px")
 
 
+def check_a_bench_errand_reads_the_bench(page, name, fails, base):
+    """**A rung goes from carrying to ready when you use the bench.**
+
+    Asked for: *a quest chain for each new system, that the quests are
+    predicated upon using the system.* Four benches shipped in M20 and M21 and
+    the quest log — the one screen in this game that says *something has opened
+    and it is somewhere else* — had never once pointed at one.
+
+    The engine half is `tests/bench_errands.rs`, four lints over the twelve
+    errands. This is the half only a browser can answer: that the rung is drawn
+    on the errand board, that its foot names the bench rather than a place, and
+    that **using the bench moves it** — which is `stage()` reading the character
+    fresh rather than a counter, seen from the outside.
+    """
+    def at_the_counter(body):
+        strip_the_boards(body)
+        w = body.setdefault("world", {})
+        w["map"] = "west-bambulon"
+        w["at"] = [2, 18]
+        body.setdefault("character", {})["class"] = "Berserker"
+        # Taken, and nothing sold: the rung is carrying.
+        w.setdefault("quests_taken", []).append("a-shelf-of-your-own")
+        body["character"].pop("ledger", None)
+
+    plant(page, ROOT / "testing" / "saves" / "at-the-lip.json",
+          at_the_counter, stem="rung")
+    try:
+        _the_rung(page, name, fails)
+    finally:
+        plant(page, base, lambda body: None, stem="rung-restore")
+        clear_screens(page)
+
+
+def _the_rung(page, name, fails):
+    clear_screens(page)
+    page.focus("#map")
+    page.keyboard.press("ArrowLeft")
+    page.wait_for_timeout(400)
+    if not page.is_visible("#town"):
+        fails.append(f"{name}: stepped onto the pit and no town opened")
+        return
+    def rung():
+        return page.evaluate("""() => {
+          // **The list is `errands`, not `quests`.** Second time in this
+          // block a check has read a payload's rows under the wrong key and
+          // found an empty list, which passes as *nothing is there* rather
+          // than as *you asked the wrong question*. A `?? []` is what turns
+          // the second into the first.
+          return (window.__log().errands ?? [])
+            .find(x => x.id === 'a-shelf-of-your-own') ?? null;
+        }""")
+    before = rung()
+    if not before:
+        ids = page.evaluate("() => (window.__log().errands ?? []).map(x => x.id)")
+        fails.append(f"{name}: the counter's first rung is not in the log at all; "
+                     f"it holds {ids}")
+        return
+    if before["stage"] == "ready" or before["stage"] == "done":
+        fails.append(f"{name}: the rung is {before['stage']!r} with nothing sold")
+        return
+    # **Its foot names the bench**, which is the whole of what this errand is
+    # for: a log that says *go to the pit* about a thing you do at a counter is
+    # a log pointing at a place instead of at a system.
+    foot = (before.get("where") or "").lower()
+    if "counter" not in foot:
+        fails.append(f"{name}: the rung's foot does not name the bench: {foot!r}")
+    # Now use the bench: put something out and sell it.
+    sold = page.evaluate("""() => {
+      const b = JSON.parse(window.__stallJson());
+      if (!b || !b.bag.length) return 'nothing loose to sell';
+      // **Try each until one goes out.** A bag holds tallies and seated
+      // pieces as well as goods, and core refuses both by name — so filtering
+      // on a `kind` string here would be the harness keeping its own copy of
+      // what may be sold. The engine's refusal is the filter.
+      let last = 'nothing in the bag went out';
+      let put = false;
+      for (const w of [...b.bag].sort((a, c) => a.worth - c.worth)) {
+        const spot = JSON.parse(window.__stallLegal(String(w.id), 'stall'));
+        if (!spot.length) { last = 'nowhere on the counter'; continue; }
+        const why = window.__stallPlace(String(w.id), 'stall', spot[0][0], spot[0][1]);
+        if (!why) { put = true; break; }
+        last = why;
+      }
+      if (!put) return last;
+      // Somebody buys it. Core's own door, on the bell.
+      for (let i = 0; i < 60; i++) {
+        window.__buyerComesBy();
+        if (!JSON.parse(window.__stallJson()).slots[0].placed.length) return '';
+      }
+      return 'nobody ever bought it';
+    }""")
+    if sold:
+        fails.append(f"{name}: selling from the counter: {sold}")
+        return
+    after = rung()
+    if after["stage"] != "ready":
+        fails.append(f"{name}: sold something and the rung is still "
+                     f"{after['stage']!r}")
+    else:
+        print(f"ok: a bench errand reads the bench — {before['stage']!r} with "
+              f"nothing sold, {after['stage']!r} after one sale, and its foot "
+              f"says {foot!r}")
+
+
 def check_the_town_is_a_street(page, name, fails, base):
     """**Seven buildings, one open at a time.**
 
@@ -8174,6 +8278,7 @@ def walk_the_gate(browser, name, fails=None):
     check_the_bank_sorts(page, name, fails, path)
     check_the_counter_sells(page, name, fails, path)
     check_the_town_is_a_street(page, name, fails, path)
+    check_a_bench_errand_reads_the_bench(page, name, fails, path)
     check_a_won_fight_offers_the_creature(page, name, fails, path)
     check_the_sands_read_the_other_way_round(page, name, fails, path)
     check_running_away_costs_you(page, name, fails, path)

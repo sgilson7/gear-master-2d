@@ -20,7 +20,14 @@
 /// How long a component wobbles after its item goes off.
 const SHAKE_MS = 260;
 
-const POOL_COLOUR = ['#5aa8d8', '#c0553f', '#c8a33f', '#4f9e63'];
+// **Six, and the list comes from core.** It was four — mana, fury, devotion,
+// harvest — and insight and dread had no column at all, so the Whisperling's
+// whole lane moved and nothing drew it. Reported from play.
+//
+// The last two are a pair and read as one: insight is the fuel and dread is
+// what turns it into damage, so they take the two ends of the same violet and
+// nothing else on this canvas is violet.
+const POOL_COLOUR = ['#5aa8d8', '#c0553f', '#c8a33f', '#4f9e63', '#8a6fc0', '#5e3f8a'];
 
 /// One colour a curse. Four kinds, and the chip names itself in words as well,
 /// so the hue is a second channel rather than the only one.
@@ -60,12 +67,12 @@ export class Replay {
     this.t = 0;
     this.playing = false;
     const p = log.player, e = log.enemy;
-    // [t, health, max, armour, [four pools]] for each side.
+    // [t, health, max, armour, [six pools]] for each side.
     //
     // The opening row is what each fighter *began* holding, off the log's own
     // starting combatants — not zero. A character who had taken Corked watched
     // the bar open empty and concluded the skill did nothing.
-    const zero = [0, 0, 0, 0];
+    const zero = [0, 0, 0, 0, 0, 0];
     // The sixth column is the curses up on that side. Read off `Cursed` and
     // `Stunned`, which carry the stack count and the whole time left; nothing
     // here works one out.
@@ -323,7 +330,11 @@ export class Replay {
     // what you swing.
     const pools = (y, held, burn) => {
       let x = 0;
-      const names = this.log.pools ?? ['the Funny', 'fury', 'devotion', 'harvest'];
+      // **Core's list, and never a copy of it.** The fallback is only for a
+      // log from a build that predates the row; a hand-written list here is
+      // how insight fell off the bar in the first place.
+      const names = this.log.pools
+        ?? ['the Funny', 'fury', 'devotion', 'harvest', 'insight', 'dread'];
       held.forEach((v, i) => {
         if (!v) return;
         g.fillStyle = POOL_COLOUR[i];

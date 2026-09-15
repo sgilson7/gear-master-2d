@@ -1155,7 +1155,18 @@ impl Character {
                 id,
                 &self.skills_taken,
                 self.skill_points,
-                &self.classes().collect::<Vec<_>>(),
+                // **`spendable_trees`, not `classes`** — a specialization is
+                // not one of the three classes and has a tree all the same.
+                // `all_trees_json` has drawn the tab off this since M21.3 and
+                // this decided off the other, so an Apothecary was handed a
+                // tree in which every node refused: *"that is Apothecary's,
+                // and you are not one."* Reported from play on a live build.
+                //
+                // **A rule with two answers**, and the tell is the one this
+                // file keeps recording: the two did not disagree about the
+                // rule, they disagreed about which list *is* the rule. One
+                // function, and every caller asks it.
+                &self.spendable_trees().collect::<Vec<_>>(),
             )?
             .cost;
         self.skill_points -= cost;

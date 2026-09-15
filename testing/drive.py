@@ -1911,6 +1911,76 @@ def check_every_terrain_has_a_colour(page, name, fails):
     print(f"ok: every terrain has a colour in both palettes, so nothing draws magenta")
 
 
+def check_the_mind_lane_is_on_the_bar(page, name, fails):
+    """A Whisperling can see insight and dread.
+
+    **Reported from play: *I have chosen the whisperling class and insight,
+    dread are not explained anywhere or shown as stacks in battle / in the
+    character sheet.*** Both halves were true. The pool row was four columns —
+    mana, fury, devotion, harvest — behind a hand-written `pool_index` that
+    answered `None` to everything else, and `Event::Dreading` sat in
+    `fight_json`'s `_ => ("other")` arm, **exactly where `Event::Burned` was
+    until M19 and `Cursed`, `Warded` and `Stunned` were until M8.2.**
+
+    The seventh hand-written list this project has paid for, and the sixth time
+    *a derived number needs somewhere it is shown* has been the answer — twice
+    now for a class whose whole identity is a number.
+
+    Two things, and only a browser can answer either: that the row core sends
+    has a column for both, and that the replay draws six rather than four.
+    """
+    base = download_save(page)
+
+    def a_whisperer_in_a_long_fight(body):
+        body["character"]["class"] = "Whisperer"
+        w = body.setdefault("world", {})
+        w["map"] = "west-bambulon"
+        w["at"] = [9, 16]
+        # **The Kettle Wight, because it is a wall.** The mind lane needs a
+        # fight long enough for a stack to arrive, and a fight that ends in
+        # three seconds shows an empty row correctly.
+        body["encounter"] = {"enemy": "Kettle Wight", "at": [9, 16]}
+
+    plant(page, base, a_whisperer_in_a_long_fight, stem="mind")
+    try:
+        if page.is_hidden("#fight"):
+            fails.append(f"{name}: the planted fight did not open")
+            return
+        seen = page.evaluate("""() => {
+            const l = JSON.parse(window.__fightJson());
+            return { names: l.pools ?? [],
+                     cols: (l.player?.pools ?? []).length,
+                     dread: l.entries.filter(e => e.kind === 'dread').length,
+                     other: l.entries.filter(e => e.kind === 'other').length };
+        }""")
+        # **Counted, not matched by word.** A pool's *name* is the world's and
+        # goes through the theme — insight reads as "mansus-sight" and dread as
+        # "anticipation" — so looking for the engine's words here would be the
+        # check asking the wrong register, which is TONE 13a from the harness's
+        # side. Six columns is the assertion; core owns which six.
+        if len(seen["names"]) < 6:
+            fails.append(f"{name}: the pool row is {len(seen['names'])} columns "
+                         f"and the mind lane needs two of its own: {seen['names']}")
+        elif seen["cols"] != len(seen["names"]):
+            fails.append(f"{name}: {len(seen['names'])} pools named and "
+                         f"{seen['cols']} numbers sent")
+        else:
+            # **The columns are the assertion and the events are the report.**
+            # Whether *this* fight banks dread depends on the board, and four
+            # components in the catalogue grant it — so a run that banks none
+            # is a fight, not a fault. What must never be true again is a
+            # `Dreading` event with nowhere to land: `other` counts the arm it
+            # used to fall into, and it is printed so a build that put it back
+            # reads differently here.
+            print(f"ok: the fight bar carries {len(seen['names'])} pools — "
+                  f"{', '.join(seen['names'])} — with a column each for the "
+                  f"mind lane's two ({seen['dread']} dread events, "
+                  f"{seen['other']} in the 'other' arm)")
+    finally:
+        plant(page, base, lambda body: None, stem="mind-restore")
+        clear_screens(page)
+
+
 def check_the_furnace_shows_on_the_bar(page, name, fails):
     """A Kettle-Stoker can see what the furnace bought.
 
@@ -3470,10 +3540,15 @@ def check_the_replay_shows_both_sides(page, name, fails):
       return {
         you: rows('ticks-you'), them: rows('ticks-them'),
         wantYou: log.player.items.length, wantThem: log.enemy?.items?.length ?? 0,
-        // The four pools and both armours have to arrive as numbers, whatever
-        // this particular fight happened to bank.
+        // Both armours have to arrive as numbers and both pool rows as
+        // arrays, whatever this particular fight happened to bank — and
+        // **as many numbers as core named pools**, rather than a literal
+        // four. M21 put insight and dread on the row and a hardcoded 4
+        // here is the same hand-written list that kept them off it.
+        pools: log.pools.length,
         shape: ['pa', 'ea'].every(k => typeof last[k] === 'number')
-            && ['pp', 'ep'].every(k => Array.isArray(last[k]) && last[k].length === 4),
+            && ['pp', 'ep'].every(k => Array.isArray(last[k])
+                                    && last[k].length === log.pools.length),
       };
     }""")
     if len(got["you"]) != got["wantYou"]:
@@ -3483,7 +3558,8 @@ def check_the_replay_shows_both_sides(page, name, fails):
     if not got["them"]:
         fails.append(f"{name}: the creature's side of the replay is empty")
     if not got["shape"]:
-        fails.append(f"{name}: the replay is not carrying armour and pools")
+        fails.append(f"{name}: the replay is not carrying armour and all "
+                     f"{got['pools']} pools")
 
     # Pointing at a row with gear behind it opens that item's card, in the same
     # two halves the packing panel uses.
@@ -8415,6 +8491,7 @@ def walk_the_gate(browser, name, fails=None):
     check_the_cue_shows_where_the_ball_will_stop(page, name, fails)
     check_a_shut_crossing_says_so_when_you_land_beside_it(page, name, fails)
     check_the_furnace_shows_on_the_bar(page, name, fails)
+    check_the_mind_lane_is_on_the_bar(page, name, fails)
     check_a_word_errand_lands_on_a_table(page, name, fails)
     check_the_bench_brews_a_pair(page, name, fails)
     check_a_potion_is_drunk_before_the_bell(page, name, fails)

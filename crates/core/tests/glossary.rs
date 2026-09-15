@@ -184,3 +184,35 @@ fn every_curse_says_what_it_does() {
         assert!(!e.aside.is_empty(), "{:?} says nothing about how long it lasts", k.name());
     }
 }
+
+/// **Every pool the game has is explained**, including the two that pay nothing
+/// for being held.
+///
+/// Reported from play: *I have chosen the whisperling class and insight, dread
+/// are not explained anywhere or shown as stacks in battle.* The pools entry is
+/// built from `pools_worth_holding`, which is exactly the pools that pay a
+/// *wearer* — so it was right to leave insight and dread off that list and
+/// wrong to be the only screen that mentions them.
+#[test]
+fn every_pool_is_explained_somewhere() {
+    let text = gm2d_core::glossary::shelves()
+        .iter()
+        .flat_map(|s| s.entries.iter())
+        .flat_map(|e| e.body.iter().cloned().chain(std::iter::once(e.term.clone())))
+        .collect::<Vec<_>>()
+        .join(" ")
+        .to_lowercase();
+    for r in gm2d_core::piece::Resource::SPENDABLE {
+        assert!(text.contains(r.name()), "nothing says what {} is", r.name());
+    }
+    for word in ["insight", "dread"] {
+        assert!(text.contains(word), "nothing says what {word} is");
+    }
+    // **And dread's figure is read, not typed.** A hand-written divisor here is
+    // the seventh of those this project has paid for.
+    let n = gm2d_core::combat::DREAD_DIVISOR;
+    assert!(
+        text.contains(&format!("÷ {n}")),
+        "the mind lane's sum does not name DREAD_DIVISOR ({n})"
+    );
+}

@@ -539,3 +539,66 @@ pub fn one_item_dealing_mind() -> Vec<gm2d_core::loadout::ItemProfile> {
         aligned_items: Vec::new(),
     }]
 }
+
+/// Make a `Goal::Show` true, by doing to the character what the bench would.
+///
+/// **A fixture for the four benches**, so a test that wants a finished errand
+/// does not have to brew, grow, kennel and sell its way there — and so that
+/// every test wanting one asks the same way. It writes the *result* of using a
+/// bench, which is what `stage()` reads: the benches themselves have their own
+/// tests, and a test about an errand's reward should not be a second test of
+/// the retort.
+#[allow(dead_code)]
+pub fn satisfy(g: &mut gm2d_core::game::Game, what: &gm2d_core::quest::Shown) {
+    use gm2d_core::quest::Shown;
+    let brews = gm2d_core::data::brews();
+    match what {
+        Shown::Brew { stat, at_least } => {
+            if let Some(b) = brews.brews.iter().find(|b| b.gives.of(stat) >= *at_least) {
+                g.character.potions.push(b.id());
+            }
+        }
+        Shown::BrewOf { cells, each } => {
+            let big = |id: &str| {
+                brews.get(id).map(|d| d.shape().cells().len() as u32).unwrap_or(0)
+            };
+            if let Some(b) = brews.brews.iter().find(|b| {
+                b.of.iter().all(|p| big(p) >= *each)
+                    && b.of.iter().map(|p| big(p)).sum::<u32>() >= *cells
+            }) {
+                g.character.potions.push(b.id());
+            }
+        }
+        Shown::Grown { crop, n } => {
+            g.character.larder.insert(crop.clone(), *n);
+        }
+        Shown::Kennelled { creatures } | Shown::Together { creatures } => {
+            let out = matches!(what, Shown::Together { .. });
+            let fams = gm2d_core::data::art_families();
+            for c in creatures {
+                g.character.kennel.push(gm2d_core::kennel::Kennelled {
+                    spec: c.clone(),
+                    family: fams.get(c).cloned().unwrap_or_default(),
+                    eats: String::new(),
+                    wins_together: 0,
+                    out,
+                    since_fed: 0,
+                    at: (0, 0),
+                    turn: 0,
+                });
+            }
+        }
+        Shown::Sold { at_least } => g.character.ledger.push(gm2d_core::stall::Sale {
+            buyer: "the-drover".into(),
+            item: "Iron Blade".into(),
+            paid: *at_least,
+            worth: *at_least,
+        }),
+        Shown::SoldHigh => g.character.ledger.push(gm2d_core::stall::Sale {
+            buyer: "the-drover".into(),
+            item: "Iron Blade".into(),
+            paid: 1_000,
+            worth: 10,
+        }),
+    }
+}

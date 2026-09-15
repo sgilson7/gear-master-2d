@@ -274,3 +274,80 @@ fn every_point_in_a_spec_tree_buys_something() {
         }
     }
 }
+
+/// **Every tree a character is offered is a tree they can spend in.**
+///
+/// Reported from play on a live build: *got the specialization from the guy in
+/// the wextreen reach dungeon, and the skill tree I got was the apothecary but
+/// whenever I try and put points into it, I get a message saying "that is
+/// Apothecary's, and you are not one".*
+///
+/// `Character::spendable_trees` is `classes()` **plus the specialization**, and
+/// `all_trees_json` has drawn the tabs off it since M21.3. `take_skill` was
+/// still passing `classes()` — so an Apothecary got a tree in which every node
+/// refused. **A rule with two answers**, and the tell is the one this project
+/// keeps recording: the two did not disagree about the rule, they disagreed
+/// about which list *is* the rule.
+///
+/// So the lint is not *can an Apothecary spend* — a list of one is a list. It
+/// is the general property, asked over **every specialization and every class**
+/// and over the first node of each of their trees: if a tree is offered, its
+/// roots are takeable.
+#[test]
+fn every_tree_a_character_is_offered_can_be_spent_in() {
+    let data = gm2d_core::data::skills();
+    let mut bad = Vec::new();
+    for spec in gm2d_core::class::SPECIALIZATIONS {
+        let mut ch = gm2d_core::character::Character::new();
+        ch.specialization = Some((*spec).to_string());
+        ch.skill_points = 9;
+        check(&data, &ch, &mut bad, spec);
+    }
+    for class in gm2d_core::class::OFFERED {
+        let mut ch = gm2d_core::character::Character::new();
+        ch.class = Some((*class).to_string());
+        ch.skill_points = 9;
+        check(&data, &ch, &mut bad, class);
+    }
+    assert!(bad.is_empty(), "{}", bad.join("; "));
+}
+
+fn check(
+    data: &gm2d_core::skills::SkillsData,
+    ch: &gm2d_core::character::Character,
+    bad: &mut Vec<String>,
+    who: &str,
+) {
+    let offered: Vec<&str> = ch.spendable_trees().collect();
+    for t in data.trees.iter().filter(|t| {
+        t.class.as_deref().is_some_and(|c| offered.contains(&c))
+    }) {
+        // The roots: every node with nothing before it. One of them must be
+        // takeable, or the whole tree is a tab that refuses.
+        let roots: Vec<&gm2d_core::skills::Node> =
+            t.nodes.iter().filter(|n| n.requires.is_empty()).collect();
+        if roots.is_empty() {
+            bad.push(format!("{}'s tree {:?} has no root at all", who, t.name));
+            continue;
+        }
+        let mut c = ch.clone();
+        for r in &roots {
+            match c.take_skill(data, &r.id) {
+                Ok(()) => return,
+                Err(e) => {
+                    if matches!(
+                        e,
+                        gm2d_core::skills::Refusal::WrongClass(_)
+                            | gm2d_core::skills::Refusal::NoClassYet
+                    ) {
+                        bad.push(format!(
+                            "{who} is offered {:?} and {:?} refuses: {e}",
+                            t.name, r.name
+                        ));
+                        return;
+                    }
+                }
+            }
+        }
+    }
+}

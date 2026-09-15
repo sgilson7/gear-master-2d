@@ -297,6 +297,21 @@ fn the_fight() -> Vec<Entry> {
         "Mana and insight pay nothing for sitting on a pile. They are spent."
             .to_string(),
     );
+    // **The mind lane, said out loud.** Reported from play: *I have chosen the
+    // whisperling class and insight, dread are not explained anywhere or shown
+    // as stacks in battle.* The list above is `pools_worth_holding`, which is
+    // pools that pay a *wearer* for sitting on them — so it is right to drop
+    // these two and wrong to be the only thing that mentions them. Derived off
+    // `DREAD_DIVISOR`, like every other figure on this screen.
+    lines.push(format!(
+        "Insight is the mind lane's fuel and dread is what turns it into \
+         damage. Every mind hit gains dread × insight ÷ {}, so {} dread \
+         against 20 insight is {} more a hit — and either of them alone is \
+         nothing at all.",
+        crate::combat::DREAD_DIVISOR,
+        1,
+        20 / crate::combat::DREAD_DIVISOR,
+    ));
     out.push(Entry {
         term: "Pools".to_string(),
         body: lines,

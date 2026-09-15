@@ -67,6 +67,131 @@ pub enum Goal {
     /// when it is cleared, and this reads that set. There is no counter, no
     /// token and nothing to drop.
     Clear { place: String },
+    /// **Use a bench, and show what came out of it.**
+    ///
+    /// Asked for: *a quest chain for each new system, that the quests are
+    /// predicated upon using the system.* Four benches shipped in M20 and M21 —
+    /// the retort, the bed, the run and the counter — and the quest log, which
+    /// is the one screen in this game that says *something has opened and it is
+    /// somewhere else*, had never pointed at one.
+    ///
+    /// **One arm with five variants and not five arms**, because four goal
+    /// kinds asking four nearly-identical questions is how two answers get
+    /// made — the reason `Clear` exists at all rather than a second `Word`.
+    ///
+    /// **And none of the four existing kinds can ask it.** A `Bring` is
+    /// answered by a component in the bag and a potion is not a component; a
+    /// `Slay` is answered by a creature dying and a companion is a creature
+    /// that did not; a `Word` is answered by standing somewhere; a `Clear`
+    /// reads a boss's tile id.
+    ///
+    /// **Read, never banked.** Every variant is a question asked of what the
+    /// character is holding *now*, the way `Clear` reads `answered` — so an
+    /// errand taken after the fact is `Ready` the moment it is taken, which is
+    /// right: you did the thing.
+    Show { what: Shown },
+}
+
+/// What a bench can be asked to have produced.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case", deny_unknown_fields)]
+pub enum Shown {
+    /// A potion in the pack that gives at least this much of a stat.
+    ///
+    /// **The figure is derived**, off the same `brew::gives` the pack's own
+    /// card prints from — a threshold checked against a second sum would be a
+    /// second rulebook, which is what this project has paid for six times.
+    Brew { stat: String, at_least: i32 },
+    /// A brew made out of ingredients this large, which is the retort's own
+    /// puzzle: seven cells and two three-cell ingredients is a tight fit.
+    BrewOf { cells: u32, each: u32 },
+    /// This many of one crop in the larder at once.
+    Grown { crop: String, n: u32 },
+    /// Every one of these creatures in the kennel.
+    Kennelled { creatures: Vec<String> },
+    /// Every one of these creatures **out** at once.
+    Together { creatures: Vec<String> },
+    /// One sale at or over this figure.
+    Sold { at_least: i32 },
+    /// One sale at a high ask, which somebody had to be willing to pay.
+    SoldHigh,
+}
+
+impl Shown {
+    /// The bench it is about, which is what the log points at.
+    pub fn bench(&self) -> &'static str {
+        match self {
+            Shown::Brew { .. } | Shown::BrewOf { .. } => "the retort",
+            Shown::Grown { .. } => "the bed",
+            Shown::Kennelled { .. } | Shown::Together { .. } => "the run",
+            Shown::Sold { .. } | Shown::SoldHigh => "the counter",
+        }
+    }
+
+    /// Whether the character has done it. **Read fresh, every time.**
+    pub fn met(&self, ch: &crate::character::Character) -> bool {
+        match self {
+            Shown::Brew { stat, at_least } => {
+                let brews = crate::data::brews();
+                ch.potions.iter().any(|id| {
+                    brews.by_id(id).map(|b| b.gives.of(stat) >= *at_least).unwrap_or(false)
+                })
+            }
+            Shown::BrewOf { cells, each } => {
+                let brews = crate::data::brews();
+                ch.potions.iter().any(|id| {
+                    let Some(b) = brews.by_id(id) else { return false };
+                    let sizes: Vec<u32> = b
+                        .of
+                        .iter()
+                        .filter_map(|p| brews.get(p))
+                        .map(|d| d.shape().cells().len() as u32)
+                        .collect();
+                    sizes.len() >= 2
+                        && sizes.iter().all(|n| n >= each)
+                        && sizes.iter().sum::<u32>() >= *cells
+                })
+            }
+            Shown::Grown { crop, n } => ch.larder.get(crop).copied().unwrap_or(0) >= *n,
+            Shown::Kennelled { creatures } => creatures
+                .iter()
+                .all(|c| ch.kennel.iter().any(|k| k.spec == *c)),
+            Shown::Together { creatures } => creatures
+                .iter()
+                .all(|c| ch.kennel.iter().any(|k| k.spec == *c && k.out)),
+            Shown::Sold { at_least } => ch.ledger.iter().any(|s| s.paid >= *at_least),
+            Shown::SoldHigh => ch
+                .ledger
+                .iter()
+                .any(|s| crate::stall::ask_of(s.paid, s.worth) == crate::stall::Ask::High),
+        }
+    }
+
+    /// The engine's own sentence for it. Unthemed, TONE 13a: somebody reading
+    /// this is working out what to go and do.
+    pub fn ask(&self) -> String {
+        match self {
+            Shown::Brew { stat, at_least } => {
+                format!("brew one that gives at least {at_least} {}", stat.replace('_', " "))
+            }
+            Shown::BrewOf { cells, each } => format!(
+                "brew one out of {cells} cells of ingredients, none under {each}"
+            ),
+            Shown::Grown { crop, n } => {
+                let brews = crate::data::brews();
+                let name = brews.get(crop).map(|d| d.name.clone()).unwrap_or_else(|| crop.replace('-', " "));
+                format!("hold {n} × {name} at once")
+            }
+            Shown::Kennelled { creatures } => {
+                format!("have {} in the kennel", creatures.join(" and "))
+            }
+            Shown::Together { creatures } => {
+                format!("have {} out together", creatures.join(" and "))
+            }
+            Shown::Sold { at_least } => format!("sell one thing for {at_least} Fnorp"),
+            Shown::SoldHigh => "sell something at a high ask".to_string(),
+        }
+    }
 }
 
 impl Goal {
@@ -83,7 +208,7 @@ impl Goal {
         match self {
             Goal::Slay { token, .. } => Some(token),
             Goal::Bring { item, .. } => Some(item),
-            Goal::Word { .. } | Goal::Clear { .. } => None,
+            Goal::Word { .. } | Goal::Clear { .. } | Goal::Show { .. } => None,
         }
     }
 
@@ -99,7 +224,7 @@ impl Goal {
         match self {
             Goal::Slay { count, .. } => *count,
             Goal::Bring { count, .. } => *count,
-            Goal::Word { .. } | Goal::Clear { .. } => 1,
+            Goal::Word { .. } | Goal::Clear { .. } | Goal::Show { .. } => 1,
         }
     }
 
@@ -423,6 +548,17 @@ pub fn stage(game: &Game, q: &Quest) -> Stage {
                 Stage::Carrying { have: 0, want: 1 }
             }
         }
+        // **Asked of what the character is holding now.** No token, no counter
+        // and no mark of the errand's own — the same *derived, never banked*
+        // `Clear` follows, so an errand taken after the fact is `Ready` the
+        // moment it is taken.
+        Goal::Show { what } => {
+            if what.met(&game.character) {
+                Stage::Ready
+            } else {
+                Stage::Carrying { have: 0, want: 1 }
+            }
+        }
         _ => {
             let want = q.goal.count();
             let have = q.goal.token().map(|t| holding(game, t)).unwrap_or(0);
@@ -596,6 +732,12 @@ pub fn guide(game: &Game, q: &Quest, worlds: &[crate::world::World]) -> Guide {
         Stage::Ready => out.places.push(QuestsData::turn_in_of(q).to_string()),
         Stage::Carrying { .. } => match &q.goal {
             Goal::Word { place } | Goal::Clear { place } => out.places.push(place.clone()),
+            // **A bench is in a town, so it points at the town that asked.**
+            // Every bench in the game is in every town — the retort, the bed,
+            // the run and the counter all open wherever you are standing — so
+            // there is no *other* place to send somebody, and sending them
+            // back to the giver is both true and the shortest walk.
+            Goal::Show { .. } => out.places.push(q.giver.clone()),
             Goal::Slay { creature, .. } => {
                 for w in worlds {
                     for r in w.regions_holding(creature) {

@@ -283,33 +283,50 @@ impl Gives {
     /// the same reason: a sentence written into the data file goes stale the
     /// first time the numbers are tuned, and nothing would say so. Unthemed,
     /// TONE 13a: somebody choosing between two brews is comparing numbers.
+    /// One of them by the name `Gives::line` prints it under.
+    ///
+    /// **Derived from the same table `line` reads**, so an errand asking for
+    /// *300 max health* and the card printing *+300 max health* are the same
+    /// sum with the same name on it. A `match` written out separately would be
+    /// a second answer, which is the mistake this project has paid for six
+    /// times — and `named()` is the one table both go through.
+    pub fn of(&self, what: &str) -> i32 {
+        self.named().into_iter().find(|(_, n)| *n == what).map(|(v, _)| v).unwrap_or(0)
+    }
+
+    /// Every figure with the name a player reads it under, in reading order.
+    pub fn named(&self) -> Vec<(i32, &'static str)> {
+        vec![
+            (self.health, "max health"),
+            (self.strength, "strength"),
+            (self.magic_damage, "magic damage"),
+            (self.physical_damage, "physical damage"),
+            (self.power, "power"),
+            (self.regen, "regen"),
+            (self.physical_pierce, "physical piercing"),
+            (self.magic_pierce, "magic piercing"),
+            (self.physical_resist, "physical resist"),
+            (self.magic_resist, "magic resist"),
+            (self.curse_resist, "curse resist"),
+            (self.mind_resist, "mind resist"),
+            (self.mind, "mind damage"),
+            (self.armor, "armour at the bell"),
+            (self.mana, "mana at the bell"),
+            (self.rage, "fury at the bell"),
+            (self.faith, "devotion at the bell"),
+            (self.nature, "harvest at the bell"),
+            (self.insight, "insight at the bell"),
+            (self.dread, "dread at the bell"),
+        ]
+    }
+
     pub fn line(&self) -> String {
-        let mut parts: Vec<String> = Vec::new();
-        let add = |n: i32, what: &str, parts: &mut Vec<String>| {
-            if n != 0 {
-                parts.push(format!("{n:+} {what}"));
-            }
-        };
-        add(self.health, "max health", &mut parts);
-        add(self.strength, "strength", &mut parts);
-        add(self.magic_damage, "magic damage", &mut parts);
-        add(self.physical_damage, "physical damage", &mut parts);
-        add(self.power, "power", &mut parts);
-        add(self.regen, "regen", &mut parts);
-        add(self.physical_pierce, "physical piercing", &mut parts);
-        add(self.magic_pierce, "magic piercing", &mut parts);
-        add(self.physical_resist, "physical resist", &mut parts);
-        add(self.magic_resist, "magic resist", &mut parts);
-        add(self.curse_resist, "curse resist", &mut parts);
-        add(self.mind_resist, "mind resist", &mut parts);
-        add(self.mind, "mind damage", &mut parts);
-        add(self.armor, "armour at the bell", &mut parts);
-        add(self.mana, "mana at the bell", &mut parts);
-        add(self.rage, "fury at the bell", &mut parts);
-        add(self.faith, "devotion at the bell", &mut parts);
-        add(self.nature, "harvest at the bell", &mut parts);
-        add(self.insight, "insight at the bell", &mut parts);
-        add(self.dread, "dread at the bell", &mut parts);
+        let parts: Vec<String> = self
+            .named()
+            .into_iter()
+            .filter(|(n, _)| *n != 0)
+            .map(|(n, what)| format!("{n:+} {what}"))
+            .collect();
         if parts.is_empty() {
             return "nothing at all".to_string();
         }
@@ -423,6 +440,16 @@ impl BrewsData {
     }
 
     /// What this pair brews to, in either order.
+    /// The brew one potion id names.
+    ///
+    /// **One answer.** The shim was doing this inline — `brews.iter().find(|d|
+    /// d.id() == id)` — which is a second copy of *how a potion id is made*,
+    /// and the id is derived from the pair sorted and joined. Two of those
+    /// would part the first time the joining changed.
+    pub fn by_id(&self, id: &str) -> Option<&BrewDef> {
+        self.brews.iter().find(|d| d.id() == id)
+    }
+
     pub fn pair(&self, a: &str, b: &str) -> Option<&BrewDef> {
         let mut want = [a, b];
         want.sort_unstable();

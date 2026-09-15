@@ -925,6 +925,264 @@
       },
       "reward": [],
       "gold": 900
+    },
+    {
+      "id": "the-glass-in-the-corner",
+      "giver": "the-end-of-all-gears",
+      "name": "THE GLASS IN THE CORNER",
+      "brief": "There is a bench in the back of every town with a glass on it shaped like nothing anybody would blow on purpose. The woman who keeps the pit's says four people have asked her what it is for and none of them has put anything in it. Put two things in it and press the thing that says brew. She does not care what you make. She wants to be able to say somebody has.",
+      "thanks": "She writes it in the book she keeps for this, which has one entry in it and now two. She gives you the ingredient she has been saving on the grounds that she cannot pair it with anything.",
+      "goal": {
+        "show": {
+          "what": {
+            "brew": {
+              "stat": "max health",
+              "at_least": 1
+            }
+          }
+        }
+      },
+      "reward": [],
+      "gold": 180
+    },
+    {
+      "id": "three-hundred-and-not-a-point-under",
+      "giver": "the-end-of-all-gears",
+      "requires": [
+        "the-glass-in-the-corner"
+      ],
+      "granted": true,
+      "name": "THREE HUNDRED AND NOT A POINT UNDER",
+      "brief": "Somebody is going down the Stack on Tuesday and has been told what is at the bottom of it. They want a draught that puts three hundred on them and they have been very clear that two hundred and ninety is a different number. Bring it to the bench and they will take it off you there.",
+      "thanks": "They read the label twice, drink half of it, put the cork back in, and go. The bench keeps the bottle. You get the ink that was under it.",
+      "goal": {
+        "show": {
+          "what": {
+            "brew": {
+              "stat": "max health",
+              "at_least": 300
+            }
+          }
+        }
+      },
+      "reward": [],
+      "gold": 420
+    },
+    {
+      "id": "both-hands-in-the-glass",
+      "giver": "the-end-of-all-gears",
+      "requires": [
+        "three-hundred-and-not-a-point-under"
+      ],
+      "granted": true,
+      "name": "BOTH HANDS IN THE GLASS",
+      "brief": "The bench keeper has an argument with the man at Kettleworks about whether the glass will take two big things at once. He says it will not. She says it depends who is holding it. Settle it: six cells of ingredients in one brew, and nothing in it under three.",
+      "thanks": "She writes the whole arrangement down, including which way round you turned them, and posts it east. She says he will not read it, and she is going to send it anyway.",
+      "goal": {
+        "show": {
+          "what": {
+            "brew_of": {
+              "cells": 6,
+              "each": 3
+            }
+          }
+        }
+      },
+      "reward": [],
+      "gold": 600
+    },
+    {
+      "id": "something-in-the-ground",
+      "giver": "kettleworks",
+      "name": "SOMETHING IN THE GROUND",
+      "brief": "The bed behind the works has been turned over every spring for eleven years and nobody has put anything in it since the fourth. The man who turns it says he will keep turning it either way. Put a seed in it and let it come up, and he will stop having to explain what the bed is for.",
+      "thanks": "He looks at it for rather a long time. Then he gives you the second seed out of his coat, which he has been carrying since the fourth spring and has never planted.",
+      "goal": {
+        "show": {
+          "what": {
+            "grown": {
+              "crop": "kettle-scale",
+              "n": 1
+            }
+          }
+        }
+      },
+      "reward": [],
+      "gold": 200
+    },
+    {
+      "id": "four-of-one-thing",
+      "giver": "kettleworks",
+      "requires": [
+        "something-in-the-ground"
+      ],
+      "granted": true,
+      "name": "FOUR OF ONE THING",
+      "brief": "One is a curiosity. The works wants a supply. Four of the same crop in the larder at one time, which is one good row, and he will believe the bed works.",
+      "thanks": "He counts them onto the bench in a line and then puts them back in your larder, which he says is the correct place for them and he only wanted to see them together.",
+      "goal": {
+        "show": {
+          "what": {
+            "grown": {
+              "crop": "kettle-scale",
+              "n": 4
+            }
+          }
+        }
+      },
+      "reward": [],
+      "gold": 380
+    },
+    {
+      "id": "what-grows-beside-what",
+      "giver": "kettleworks",
+      "requires": [
+        "four-of-one-thing"
+      ],
+      "granted": true,
+      "name": "WHAT GROWS BESIDE WHAT",
+      "brief": "There is a sheet nailed inside the shed door with twenty-eight lines on it and a tick against eleven. Two crops that touch pay something the two of them apart do not. Pull a pair that are touching and tell him which two, and he will put another tick on the sheet.",
+      "thanks": "He ticks it, and then reads the whole column again from the top, which he says he does every time and has never once found what he is looking for.",
+      "goal": {
+        "show": {
+          "what": {
+            "grown": {
+              "crop": "rust-bloom",
+              "n": 4
+            }
+          }
+        }
+      },
+      "reward": [],
+      "gold": 520
+    },
+    {
+      "id": "one-that-follows-you",
+      "giver": "the-end-of-all-gears",
+      "name": "ONE THAT FOLLOWS YOU",
+      "brief": "The run at the back of the pit has been empty since the kennel was a kennel. Beat something enough times and it stops running, and after that it will come if you feed it. Get one in there. Anything. The man who sweeps the run has been sweeping an empty run.",
+      "thanks": "He sweeps round it rather than under it, which he says is the difference, and gives you what he has been keeping in the corner for the day something was in there.",
+      "goal": {
+        "show": {
+          "what": {
+            "kennelled": {
+              "creatures": [
+                "Cave Rat"
+              ]
+            }
+          }
+        }
+      },
+      "reward": [],
+      "gold": 220
+    },
+    {
+      "id": "a-rat-and-a-toad",
+      "giver": "the-end-of-all-gears",
+      "requires": [
+        "one-that-follows-you"
+      ],
+      "granted": true,
+      "name": "A RAT AND A TOAD",
+      "brief": "Somebody in the office has a theory about which of the two is worse and has written four pages on it. What she has not got is both of them in one place. A rat and a toad, in your kennel, at the same time, and she will come and look at them.",
+      "thanks": "She looks at them for a minute and a half, writes one line, and tears up the four pages. The line says: THEY IGNORE EACH OTHER.",
+      "goal": {
+        "show": {
+          "what": {
+            "kennelled": {
+              "creatures": [
+                "Cave Rat",
+                "Bog Toad"
+              ]
+            }
+          }
+        }
+      },
+      "reward": [],
+      "gold": 400
+    },
+    {
+      "id": "both-of-them-out",
+      "giver": "the-end-of-all-gears",
+      "requires": [
+        "a-rat-and-a-toad"
+      ],
+      "granted": true,
+      "name": "BOTH OF THEM OUT",
+      "brief": "In the run is not the same as out with you. She wants the pair of them out on the same walk, both of them fed, both of them standing in the yard at once. She says the theory is not about the kennel.",
+      "thanks": "They stand in the yard at once, and they do ignore each other. She writes a second line under the first. It says: AND THEY BOTH WATCH YOU.",
+      "goal": {
+        "show": {
+          "what": {
+            "together": {
+              "creatures": [
+                "Cave Rat",
+                "Bog Toad"
+              ]
+            }
+          }
+        }
+      },
+      "reward": [],
+      "gold": 640
+    },
+    {
+      "id": "a-shelf-of-your-own",
+      "giver": "kettleworks",
+      "name": "A SHELF OF YOUR OWN",
+      "brief": "The counter in the market has been empty for as long as there has been a market, and the clerk who keeps the pitch list would like it not to be. Put something on it, put a price on the thing, and let somebody buy it. He does not care what or for how much.",
+      "thanks": "He crosses the pitch off the list of empty ones, which is the only list he keeps, and hands you the thing that was holding the page down.",
+      "goal": {
+        "show": {
+          "what": {
+            "sold": {
+              "at_least": 1
+            }
+          }
+        }
+      },
+      "reward": [],
+      "gold": 240
+    },
+    {
+      "id": "four-hundred-for-one-thing",
+      "giver": "kettleworks",
+      "requires": [
+        "a-shelf-of-your-own"
+      ],
+      "granted": true,
+      "name": "FOUR HUNDRED FOR ONE THING",
+      "brief": "Anybody can sell a handle. The pitch list has a second column nobody has ever written in, which is the largest single sale off that counter. He would like a number in it. Four hundred Fnorp, one thing, one buyer.",
+      "thanks": "He writes the number in the second column in a hand about four times the size of the first, and then rules a line under it so nobody can add to it later.",
+      "goal": {
+        "show": {
+          "what": {
+            "sold": {
+              "at_least": 400
+            }
+          }
+        }
+      },
+      "reward": [],
+      "gold": 460
+    },
+    {
+      "id": "over-the-odds",
+      "giver": "kettleworks",
+      "requires": [
+        "four-hundred-for-one-thing"
+      ],
+      "granted": true,
+      "name": "OVER THE ODDS",
+      "brief": "The barrel's figure is what a thing is worth. What somebody will pay for it is a different question and the clerk says nobody in this town has ever got an honest answer to it. Ask more than a thing is worth, and find the buyer who pays it anyway.",
+      "thanks": "He asks who it was. You tell him. He says that explains it, and does not say what it explains.",
+      "goal": {
+        "show": {
+          "what": "sold_high"
+        }
+      },
+      "reward": [],
+      "gold": 800
     }
   ],
   "_rows": "At most one row per questline and only on its last errand - a row from the world stays an event that way, and one per errand would be the level schedule M12.3 retired wearing a different hat. Rows are never in a drop table: a row is a decision or an achievement, never a lottery ticket."

@@ -13,6 +13,8 @@ use gm2d_core::game::Game;
 use gm2d_core::piece::{PieceId, SlotKind};
 use gm2d_core::save;
 
+mod common;
+
 const D: Difficulty = Difficulty::Easy;
 
 /// A licensee with a packed board and both enchs in the rack.
@@ -632,6 +634,11 @@ fn an_errand_pays_its_ench_to_a_character_who_cannot_use_one() {
                     }
                 }
             }
+            // The bench errands: write what using the bench would have left,
+            // which is what `stage()` reads. `common::satisfy` is the one
+            // door, so a test about a reward is not a second test of the
+            // retort.
+            gm2d_core::quest::Goal::Show { what } => common::satisfy(&mut g, what),
         }
 
         let given = quest::hand_in(&mut g, &q.id)

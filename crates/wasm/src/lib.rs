@@ -1751,11 +1751,34 @@ pub fn fight_json() -> String {
         // Read and never derived, like everything else here: the event carries
         // the stack count it took the total to.
         let (mut pburn, mut eburn) = (0u32, 0u32);
-        // mana, rage, faith, nature — the four a board actually banks.
-        let mut pp = [log.player.mana, log.player.rage, log.player.faith, log.player.nature];
-        let mut ep = e0
-            .map(|c| [c.mana, c.rage, c.faith, c.nature])
-            .unwrap_or([0; 4]);
+        // **Every pool a board can bank, plus dread — six, not four.**
+        //
+        // Reported from play: *I have chosen the whisperling class and insight,
+        // dread are not explained anywhere or shown as stacks in battle.* They
+        // were not: this row was `[mana, rage, faith, nature]` with a
+        // hand-written `pool_index` that answered `None` to everything else, so
+        // the mind lane's fuel and its stack — the whole of what a Whisperling
+        // *is* — moved and nothing drew them.
+        //
+        // **Seventh hand-written list this project has paid for**, and the
+        // sixth time *a derived number needs somewhere it is shown* has been
+        // the answer. It is `Resource::SPENDABLE` plus insight now — the
+        // engine's own list — with dread on the end, which is not a `Resource`
+        // at all: it is a **stack**, gained by `Action::GainDread` and reported
+        // by `Event::Dreading`, and it is on this row rather than as a chip for
+        // the reason empowerment is — a chip is a thing that is *on* you with a
+        // clock running, and dread is a thing you *have*.
+        let pool_ids: Vec<&'static str> = gm2d_core::piece::Resource::SPENDABLE
+            .iter()
+            .map(|r| r.name())
+            .chain(std::iter::once(gm2d_core::piece::Resource::Insight.name()))
+            .chain(std::iter::once("dread"))
+            .collect();
+        let of = |c: &gm2d_core::combat::Combatant| -> Vec<i32> {
+            vec![c.mana, c.rage, c.faith, c.nature, c.insight, c.dread as i32]
+        };
+        let mut pp = of(&log.player);
+        let mut ep = e0.map(of).unwrap_or_else(|| vec![0; 6]);
         // **The chips, read and never derived.** `Event::Cursed` carries the
         // stack count *after* this one landed and the whole time left on the
         // clock; `Event::Stunned` carries the whole time that item is now
@@ -1776,13 +1799,10 @@ pub fn fight_json() -> String {
                 "effect": effect, "item": item,
             })
         };
-        let pool_index = |what: &str| match what {
-            "mana" => Some(0),
-            "rage" => Some(1),
-            "faith" => Some(2),
-            "nature" => Some(3),
-            _ => None,
-        };
+        // **Derived from the list above**, so a pool that goes on the row goes
+        // into the index with it. The hand-written pair was how insight fell
+        // off: the event carried it and nothing had a slot for it.
+        let pool_index = |what: &str| pool_ids.iter().position(|n| *n == what);
 
         let entries: Vec<_> = log
             .entries
@@ -1937,6 +1957,15 @@ pub fn fight_json() -> String {
                         if *side == Side::Player { pburn = *stacks; } else { eburn = *stacks; }
                         ("burned", *side, (*what).to_string(), -1, *points as i64)
                     }
+                    // **Dread is a stack and it has a slot on the pool row.**
+                    // It fell into the `_` arm below — exactly where `Burned`
+                    // was until M19 and `Cursed`, `Warded` and `Stunned` were
+                    // until M8.2 — so a Whisperling's own number moved and no
+                    // screen anywhere drew it. Reported from play.
+                    Event::Dreading { side, total, mind_bonus } => {
+                        set_pool(*side, "dread", *total as i32);
+                        ("dread", *side, String::new(), -1, *mind_bonus as i64)
+                    }
                     _ => ("other", Side::Player, String::new(), -1, 0),
                 };
                 serde_json::json!({
@@ -1989,18 +2018,20 @@ pub fn fight_json() -> String {
             "outcome": format!("{:?}", log.outcome).to_lowercase(),
             "duration_ms": log.duration_ms,
             "tallies": { "player": tally(Side::Player), "enemy": tally(Side::Enemy) },
-            "pools": ["the Funny", "fury", "devotion", "harvest"],
+            // Themed, because a pool's *name* is the world's word — the same
+            // split the standing panel makes. What it pays is the engine's.
+            "pools": pool_ids.iter().map(|n| theme.retell(n)).collect::<Vec<_>>(),
             "player": {
                 "name": "you", "max_health": log.player.max_health,
                 "armor": log.player.armor,
-                "pools": [log.player.mana, log.player.rage, log.player.faith, log.player.nature],
+                "pools": of(&log.player),
                 "items": mine, "slots": my_board,
             },
             "enemy": log.enemies.first().map(|c| serde_json::json!({
                 "name": g.theme_name(gm2d_core::combat::creature(&c.name).map(|s| s.name).unwrap_or("")),
                 "max_health": c.max_health,
                 "armor": c.armor,
-                "pools": [c.mana, c.rage, c.faith, c.nature],
+                "pools": of(c),
                 "items": theirs,
                 "slots": their_board,
             })),
@@ -3039,6 +3070,29 @@ fn quest_ask(g: &gm2d_core::game::Game, q: &gm2d_core::quest::Quest) -> String {
         gm2d_core::quest::Goal::Clear { place } => {
             format!("clear {}", place_name(g, place))
         }
+        // **Core's own sentence, and the creature names themed in it.** The
+        // figures are the engine's — somebody reading *300 max health* is
+        // working out what to go and brew — and a creature is a proper noun the
+        // world has its own word for, which is TONE 13a's split with two things
+        // in one line. `Shown::ask` writes it; this swaps the nouns, the same
+        // way `Entry::pair` does for a class name on the glossary.
+        gm2d_core::quest::Goal::Show { what } => {
+            let mut line = what.ask();
+            if let gm2d_core::quest::Shown::Kennelled { creatures }
+            | gm2d_core::quest::Shown::Together { creatures } = what
+            {
+                for c in creatures {
+                    line = line.replace(c.as_str(), &g.theme_name(
+                        gm2d_core::combat::LADDER
+                            .iter()
+                            .find(|s| s.name == *c)
+                            .map(|s| s.name)
+                            .unwrap_or(""),
+                    ));
+                }
+            }
+            line
+        }
     }
 }
 
@@ -3689,7 +3743,7 @@ fn potions_json(g: &gm2d_core::game::Game) -> Vec<serde_json::Value> {
         .potions
         .iter()
         .filter_map(|id| {
-            let d = brews.brews.iter().find(|d| d.id() == *id)?;
+            let d = brews.by_id(id)?;
             Some(serde_json::json!({
                 "id": id, "name": d.name, "blurb": d.blurb,
                 "gives": d.gives.scaled(mine).line(),
@@ -3935,6 +3989,13 @@ fn where_to(
             Goal::Word { place } => format!("go to {}", place_name(g, place)),
             Goal::Clear { place } => {
                 format!("it is still standing, at {}", place_name(g, place))
+            }
+            // **It names the bench**, which is the whole of what this errand
+            // is for: the log is the one screen that says *something has
+            // opened and it is somewhere else*, and until M21.16 it had never
+            // once said it about a bench.
+            Goal::Show { what } => {
+                format!("{}, in any town", what.bench())
             }
             Goal::Slay { creature, .. } => {
                 let names: Vec<String> = guide
@@ -4374,7 +4435,10 @@ pub fn skills_json() -> String {
                     &n.id,
                     &g.character.skills_taken,
                     g.character.skill_points,
-                    &g.character.classes().collect::<Vec<_>>(),
+                    // Every tree they may spend in, which is the classes *plus
+                    // the specialization*. The same one answer `take_skill` and
+                    // `all_trees_json` ask.
+                    &g.character.spendable_trees().collect::<Vec<_>>(),
                 );
                 serde_json::json!({
                     "id": n.id,

@@ -5076,6 +5076,83 @@ costs nothing is not a decision.
 - Drinkable **from the standing panel**, not in town. The decision this exists
   to create is the one on the road: another fight, open the tin, or turn round.
 
+## Three benches, and what they all turned out to be
+
+**M21.** The Plot, the Kennel and the Stall, built in that order because the
+Kennel eats what the Plot grows and a Kennel that shipped first would be hungry
+on the day it shipped.
+
+**Every one of them is the retort's shape again**, which is what made three
+systems affordable in one block: a bag that opens in town, a bench that is not
+a rectangle, a `C(n,2)` table a lint proves complete, one door into the
+character, and the **bell** as the only clock. No days, no timers, no real
+time — *a fight happened* is the one line in this game that means time passed.
+
+| | the bag | the bench | the table | what the pairs pay |
+|---|---|---|---|---|
+| the retort | `larder` | 7 cells of 12 | `C(8,2)` = 28 brews | a potion |
+| the bed | `seed_drawer` | the map file's mask | `C(8,2)` = 28 companions | double, potency, a second crop, an ench seed |
+| the run | `kennel` | the map file's mask | `C(8,2)` = 28 diets | a `Rule` |
+| the counter | your own bag | 14 cells of 20 | `C(8,2)` = 28 bargains | an ench, or a component |
+
+- **A creature out fights as gear**, and that is the block's largest
+  divergence. `PLAN-M21.md` §M21.5 asks for a second `Combatant` through
+  `simulate_party`; that slice is the **enemy** party, and the player side is a
+  single `&mut Combatant` threaded through **101 `pick(p, foes, …)` call sites,
+  9 signatures and 16 `Side::Player` matches** in an 11,482-line file whose own
+  rules say *inherited on purpose — do not simplify*. It also rewrites the
+  golden fixture. The board's door costs none of that, and the measurement is
+  what decided it — see the divergence table.
+- **Only the Cave Rat has innate attacks**, so a companion built from gear
+  alone gave the first thing anybody kennels *nothing*. Its teeth are a profile
+  with one trigger now, which is what `RunningItem::from_attack` already makes
+  of one.
+- **The counter is one shelf reachable from every town**, which is the bank's
+  shape — and it is why the Factor's planned *a second stall in Kettleworks*
+  node had to become something else. **Shelved is not carried**: a component on
+  the counter leaves `owned`, so it does not pack, does not bench, is not a key
+  you are holding and cannot be handed over a counter. Four consumers, right
+  for free, for the third time after `banked` and `larder`.
+- **Every town's bed works.** It was one at a time and that was reported as a
+  bug rather than met as a decision — a bed is a place, its cells are the
+  puzzle and the wins a crop takes are the cost, and restricting *which* town
+  you may work adds a walk home before you may plant.
+- **An ingredient is a roll at 250‰ and was a certainty**, which closed the
+  Kennel's feed problem for free: a creature out was being fed by its own kin,
+  because a win paid a family-matched ingredient before the feed ran. **Two
+  systems sharing one resource means a rate set for one of them tunes the
+  other.**
+- **`Held` is the one door a brew reaches a fight through**, so a potion cost
+  zero new combat code and expires when the fight does for free. It grew its
+  first *rate* for it — everything else in `Held` is a quantity.
+
+### A bench is four things, and the fourth is an errand
+
+`Goal::Show { what: Shown }` is the fifth goal kind, and none of the four that
+existed could ask about a bench: a `Bring` is answered by a component in the
+bag and a potion is not a component; a `Slay` by a creature dying and a
+companion is a creature that did not; a `Word` by standing somewhere; a `Clear`
+reads a boss's tile id. **One arm with seven variants and not five arms**,
+because four goal kinds asking four nearly-identical questions is how two
+answers get made.
+
+Twelve errands, four chains of three, all `granted` — and **the quest log is
+the one screen in this game that says *something has opened and it is somewhere
+else***, which until M21.16 it had never once said about a bench.
+
+### The town is a street
+
+Seven buildings and four doors, one open at a time, because by M21.8 the town
+was every system in the game stacked down one scrolling column. The strip is
+`.treetabs` — the skill tree's and the errand log's — and a building with
+nothing in it is not on it, read off the rendered panel rather than off a list
+of which towns have what.
+
+**It cost every tool that drives the page one function.** `enter(page, sel)` is
+in the gate and in the walker, derived from the DOM in both: it asks a selector
+which `.building` it is inside and presses that tab. Neither carries a map of
+id to building, which would be a second copy of the markup.
+
 ---
 
 # Part five — how it looks
@@ -6392,6 +6469,10 @@ about a string. Every one caught something on its first run:
 | 21.0 | **The seed drawer is on `Character`, not `WorldState`.** Every other bag in this game is on the character — `owned`, `banked`, `larder`, `potions`, `retort` — and `WorldState` holds what has *happened*: what is answered, what has drained, what a shop has sold. A drawer in the world would be the only bag not on the person holding it. | `crates/core/src/character.rs`, `seed_drawer` |
 | 21.5 | **A creature out fights as gear, not as a second `Combatant`.** `PLAN-M21.md` §M21.5 asks for one through `simulate_party`; that slice is the **enemy** party, and the player side is a single `&mut Combatant` threaded through **101 `pick(p, foes, …)` call sites, 9 signatures and 16 `Side::Player` matches** in an 11,482-line file whose own rules say *inherited on purpose — do not simplify*. It also rewrites the golden combat fixture, which is a character-for-character comparison against upstream and exists to catch exactly that drift. The block's constraint is *no new combat code except this one*, and the measurement says this one costs more than the rest of M21 together while the board's door costs none. What is lost is a separate health bar and a companion that can be killed mid-fight; what is kept is its damage, the region cap, the tally, the pairs and a group on the replay. **And only the Cave Rat has innate attacks**, so a companion built from gear alone gave the first creature anybody kennels *nothing* — its teeth are a profile with one trigger now, which is what `RunningItem::from_attack` already makes of one. | `crates/core/src/character.rs`, `companion_items` |
 | 21.6 | **Four of the six "new" ench kinds already existed, and M21.6 and M21.2 swapped.** *Before adding a system, grep for it*: `the-bramble-coat` is `Stats::reflect` (in the engine since the fork and granted by nothing, so this is the first way a player gets any), `the-first-word` is `RunningItem::overtakes`, `the-one-page` is `Effect::Fragile` and needs **no new variant at all**, and `the-slow-match` is `Trigger::OnActivate(Action::Curse)`. Only the mana leech and the ramp are new. And M21.2's ench seeds pay enchs M21.6 defines while the M21.5 deploy falls between them, so the enchs are built first — three of the six ship with the Plot that grows them and three wait for the Stall that trades them, because an ench with no source is refused by `every_ench_comes_from_somewhere` and is the Apothecary's own bug one system along. | `crates/core/src/ench.rs`, `Effect` |
+| 21.9a | **The Factor's *second stall* node buys nothing, so it is `patience_pct`.** `SYSTEMS-PITCH.md` §3.2 gives `stalls +1` — *a stall in Kettleworks too* — and the counter is **one shelf reachable from every town**, which is the bank's shape and was the right call for the bank's reason. A node that buys nothing is the thing M13.6 spent a milestone finding sixty of. Patience is how far over the odds a buyer will stretch, which is a different axis from the margin: the margin pays you over on a sale you were always going to make. | `crates/core/src/class.rs`, `ClassPower::Factor` |
+| 21.9b | **`shelf_cells: 9` is `stall::SHELF.len()`.** The pitch names the mask the counter *nearly* had — nine cells in a four-by-three, which refused the Iron Blade, the weapon every character starts holding. Read rather than typed. | `crates/core/src/class.rs` |
+| 21.10 | **Thirteen figures, not twenty-five, and they are the other ones.** §M21.10 lists eight crops, two growth stages, an ench seed, three benches and three papers. The benches **draw themselves** — they are `Board`s, and a crop is already a coloured polyomino with a motif. What had nowhere at all was the people: eight buyers as rows of plain text, and **five specializations with no art of any kind**, the plan having said three because it predates the Grower, the Handler and the Factor. | `art/ticket.tex`, `art/buyer.tex` |
+| 21.16 | **Every town's bed works, and the Grower's `beds` node is `seed_cap`.** One bed at a time was the plan's and was reported from play as a bug rather than met as a decision. A bed is a place; its cells are the puzzle and the wins a crop takes are the cost. The node moved rather than being deleted. | `crates/core/src/game.rs`, `plant` |
 | 20.7 | **A specialization is its own slot, not a fourth entry in `classes`.** Everything that walks that list walks it to ask *which pair are you*, and a specialization pairs with nothing. | `crates/core/src/character.rs`, `specialization` |
 | 14.9 | **The wading shortcut on the Gallery is drawn, and saves eight tiles.** §9 decision 4 leaves it to the recon — *"if it saves nothing it is cut"*. The chains are in opposite walls, so a flooded gallery is seventeen tiles round and nine across. **Flooding the room makes the walk worse**, which is the design rather than an accident: chain A costs you the crossing you had and the Toad's Own Frame is what gives it back. | `data/maps/the-silt-stair-3.tiles.json` |
 

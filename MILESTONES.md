@@ -126,3 +126,19 @@ file that records it.
 Browser gate: **107 `ok:` lines**, chromium. Suite green in **100 binaries**
 across the workspace, `cargo test --workspace` exit 0.
 Notebook: **43 rows, 38 closed, 5 open.**
+
+### after M21.11 — the figures, the glossary, the record
+
+| milestone | what it is | commit |
+|---|---|---|
+| M21.0–M21.8 | drawer, bed, enchs, pairs, Grower, kennel, companion, Handler, counter | `1d13985` |
+| M21.14 | the town is a street of seven buildings and four doors | `cfc9f14` |
+| M21.16 | an errand for every bench — `Goal::Show`, twelve errands, four chains | `f3c75f0` |
+| M21.9 | the Factor, and four things reported from play | `ed86846` |
+| — | promises rewritten mechanically, and the pools called one thing | `2479a80` |
+| **M21.10** | **thirteen figures from two drawings** | **`7c18b73`** |
+| **M21.11** | **the glossary's sixth shelf, the divergences, the record** | this |
+
+`packaging/count-tests.sh` is the only way to get a test total back. Browser
+gate: **108 `ok:` lines**, chromium. Suite green, `cargo test -p gm2d-core`
+exit 0.

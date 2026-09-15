@@ -22,8 +22,17 @@ fn every_class_a_player_can_be_is_in_the_glossary() {
         .expect("there is a class shelf");
     let terms: Vec<&str> = shelf.entries.iter().filter_map(|e| e.key).collect();
 
+    // **Three lists, and it was two.** The specializations are deliberately
+    // outside `OFFERED` because they pair with nothing — and being outside that
+    // list is exactly how a thing goes unmentioned: the Apothecary shipped with
+    // no door at all for the same reason, and had no glossary entry either
+    // until somebody went looking for one. Third lint in this block whose copy
+    // of *what a player can be* had gone stale.
     let mut missing = Vec::new();
-    for c in gm2d_core::class::OFFERED {
+    for c in gm2d_core::class::OFFERED
+        .iter()
+        .chain(gm2d_core::class::SPECIALIZATIONS.iter())
+    {
         if !terms.contains(c) {
             missing.push(c.to_string());
         }
@@ -36,7 +45,9 @@ fn every_class_a_player_can_be_is_in_the_glossary() {
     assert!(missing.is_empty(), "not in the glossary: {missing:?}");
     assert_eq!(
         terms.len(),
-        gm2d_core::class::OFFERED.len() + gm2d_core::expert::EXPERTS.len(),
+        gm2d_core::class::OFFERED.len()
+            + gm2d_core::class::SPECIALIZATIONS.len()
+            + gm2d_core::expert::EXPERTS.len(),
         "the class shelf has entries for things nobody can become"
     );
 }
@@ -257,4 +268,65 @@ fn a_pool_is_called_one_thing_on_every_screen_that_counts() {
         bad.push("the glossary never says \"dread\"".into());
     }
     assert!(bad.is_empty(), "{}", bad.join("; "));
+}
+
+/// **Every bench has a shelf, and every figure on it is read.**
+///
+/// M20 shipped the retort and M21 the bed, the run and the counter — **four
+/// systems a player can use, and until now the glossary mentioned one of
+/// them**. That is this project's most-repeated finding at the reference
+/// screen: *a derived number needs somewhere it is shown*, and the glossary is
+/// the somewhere.
+///
+/// Asked over `Shown::bench` rather than over a list of four, so the day a
+/// fifth bench exists this is what says it has nothing explaining it — the same
+/// argument `every_bench_has_a_chain` makes about the errands.
+#[test]
+fn every_bench_has_a_shelf() {
+    let shelf = glossary::shelves()
+        .into_iter()
+        .find(|s| s.name == "The benches")
+        .expect("there is a bench shelf");
+    let terms: Vec<String> = shelf.entries.iter().map(|e| e.term.to_lowercase()).collect();
+    // The benches, as the errands name them — one answer, so a bench that is
+    // renamed is renamed here too.
+    let benches: Vec<&'static str> = {
+        let mut v = Vec::new();
+        for q in &gm2d_core::data::quests().quests {
+            if let gm2d_core::quest::Goal::Show { what } = &q.goal {
+                if !v.contains(&what.bench()) {
+                    v.push(what.bench());
+                }
+            }
+        }
+        v
+    };
+    assert_eq!(benches.len(), 4, "four benches: {benches:?}");
+    let mut bad = Vec::new();
+    for b in &benches {
+        if !terms.iter().any(|t| t == &b.to_lowercase()) {
+            bad.push(format!("{b} has no shelf: the shelf holds {terms:?}"));
+        }
+    }
+    assert!(bad.is_empty(), "{}", bad.join("; "));
+
+    // **And the figures are read rather than typed**, which is what the whole
+    // screen is for. Broken by hardcoding one, this names the entry.
+    let text = shelf
+        .entries
+        .iter()
+        .flat_map(|e| e.body.iter().cloned())
+        .collect::<Vec<_>>()
+        .join(" ");
+    for (what, n) in [
+        ("the glass", gm2d_core::brew::RETORT.len()),
+        ("the counter", gm2d_core::stall::SHELF.len()),
+        ("the drawer", gm2d_core::plot::DRAWER_CAP as usize),
+        ("the offer", gm2d_core::kennel::OFFER_AT as usize),
+    ] {
+        assert!(
+            text.contains(&n.to_string()),
+            "the bench shelf never says {n}, which is {what}"
+        );
+    }
 }

@@ -99,6 +99,7 @@ pub fn shelves() -> Vec<Shelf> {
         Shelf { name: "The board", entries: the_board() },
         Shelf { name: "The fight", entries: the_fight() },
         Shelf { name: "What you can become", entries: classes() },
+        Shelf { name: "The benches", entries: benches() },
         Shelf { name: "What you carry", entries: carried() },
     ]
 }
@@ -465,7 +466,120 @@ fn classes() -> Vec<Entry> {
             )]),
         );
     }
+    // **The five specializations, which had no shelf at all.** They are
+    // outside `OFFERED` because they pair with nothing, and being outside that
+    // list is exactly how a thing goes unmentioned — the Apothecary shipped
+    // with no door at all for the same reason.
+    for name in crate::class::SPECIALIZATIONS {
+        let Some(def) = crate::class::CLASSES.iter().find(|c| c.name == *name) else { continue };
+        out.push(
+            Entry::new(def.name, &[&def.power.describe()])
+                .of_class(def.name)
+                .with_aside(&[
+                    "Taken from one person on one map, and you may have one. \
+                     It pairs with nothing and forms no expert."
+                        .to_string(),
+                ]),
+        );
+    }
     out
+}
+
+/// The three benches, and the shelf they never had.
+///
+/// **Derived, never typed**, like everything else on this screen: every figure
+/// is read from the constant that decides it, so a bench that is retuned
+/// retunes its own entry.
+fn benches() -> Vec<Entry> {
+    let brews = crate::data::brews();
+    let plot = crate::data::plot();
+    let kennel = crate::data::kennel();
+    let stall = crate::data::stall();
+    vec![
+        Entry::new("The bench", &[
+            &format!(
+                "Every town has one. {} ingredients, and all {} of their pairs — \
+                 each pair is one brew and the table is complete.",
+                brews.ingredients.iter().filter(|i| !i.ink_only).count(),
+                brews.brews.len(),
+            ),
+            &format!(
+                "The glass is {} cells and is not a rectangle, so what goes in \
+                 together is a packing decision. A third ingredient is an ink: \
+                 it multiplies the pair rather than adding to it.",
+                crate::brew::RETORT.len(),
+            ),
+            "Brewing makes a potion; drinking one is a second decision and it \
+             lands at the next bell. It is spent whether you win or lose.",
+            &format!(
+                "An ingredient falls off about {} wins in ten, which is why the \
+                 bed is not optional.",
+                crate::brew::INGREDIENT_PER_MILLE / 100,
+            ),
+        ]),
+        Entry::new("The bed", &[
+            &format!(
+                "Every town has one, and they all work. A seed falls off about \
+                 {} wins in a hundred; the drawer holds {} of each.",
+                crate::plot::SEED_PER_MILLE / 10,
+                crate::plot::DRAWER_CAP,
+            ),
+            &format!(
+                "A crop grows a stage every fight you win **anywhere**, and \
+                 comes up after {}. A row pays {}.",
+                crate::expert::many(crate::plot::STAGES as i32 - 1, "win"),
+                crate::expert::many(crate::plot::HARVEST_YIELD as i32, "crop"),
+            ),
+            &format!(
+                "Two crops that are both ready and touching edge-on are a pair, \
+                 and all {} of them pay something the two apart do not.",
+                plot.companions.len(),
+            ),
+        ]),
+        Entry::new("The run", &[
+            &format!(
+                "Beat something {} times and it is offered to the kennel. One a \
+                 family, and a boss never.",
+                crate::kennel::OFFER_AT,
+            ),
+            &format!(
+                "What is **out** fights with you, as gear on your own board — \
+                 capped at what it is worth where you are standing. Every {} \
+                 you win together adds {}% to what it contributes.",
+                crate::kennel::TALLY_STEP,
+                crate::kennel::TALLY_PCT,
+            ),
+            &format!(
+                "One out eats one ingredient every {}, and stays in if the \
+                 larder is empty. Two out and touching is a pair, and all {} of \
+                 them grant a rule.",
+                crate::expert::many(crate::kennel::FEED_EVERY as i32, "fight"),
+                kennel.pairs.len(),
+            ),
+        ]),
+        Entry::new("The counter", &[
+            &format!(
+                "Your own shelf, in every town. It is {} cells and not a \
+                 rectangle, so what you can have out at once is a packing \
+                 decision.",
+                crate::stall::SHELF.len()
+            ),
+            &format!(
+                "Somebody comes by every fight you win. Within {}% of what a \
+                 thing is worth is a fair ask and always sells; over that, {} \
+                 buyers in {} walk away.",
+                crate::stall::FAIR_PCT,
+                crate::stall::HIGH_ODDS - 1,
+                crate::stall::HIGH_ODDS,
+            ),
+            &format!(
+                "There are {} of them and they know each other. Two who are kin, \
+                 buying one after the other, leave something on the counter that \
+                 was not for sale.",
+                stall.buyers.len()
+            ),
+        ]),
+    ]
 }
 
 fn carried() -> Vec<Entry> {
@@ -504,32 +618,6 @@ fn carried() -> Vec<Entry> {
              once.",
             "The barrel and the order book can be rerolled, and the price goes \
              up each time until the next ten levels.",
-        ]),
-        // **Derived, never typed.** Every figure here is read from the
-        // constant that decides it, which is what the whole shelf is for: a
-        // glossary with its numbers written out by hand is a second rulebook
-        // with a slower feedback loop than the first.
-        Entry::new("The counter", &[
-            &format!(
-                "Your own shelf, in every town. It is {} cells and not a \
-                 rectangle, so what you can have out at once is a packing \
-                 decision.",
-                crate::stall::SHELF.len()
-            ),
-            &format!(
-                "Somebody comes by every fight you win. Within {}% of what a \
-                 thing is worth is a fair ask and always sells; over that, {} \
-                 buyers in {} walk away.",
-                crate::stall::FAIR_PCT,
-                crate::stall::HIGH_ODDS - 1,
-                crate::stall::HIGH_ODDS,
-            ),
-            &format!(
-                "There are {} of them and they know each other. Two who are \
-                 kin, buying one after the other, leave something on the \
-                 counter that was not for sale.",
-                crate::data::stall().buyers.len()
-            ),
         ]),
     ]
 }

@@ -121,7 +121,13 @@ impl Shown {
     /// The bench it is about, which is what the log points at.
     pub fn bench(&self) -> &'static str {
         match self {
-            Shown::Brew { .. } | Shown::BrewOf { .. } => "the retort",
+            // **"the bench", not "the retort".** The retort is the *glass*;
+            // the bench is the thing in the town, and it is what the button,
+            // the screen heading and the glossary all call it. An errand's foot
+            // saying *the retort, in any town* was one place with two names —
+            // the failure the pools had on the fight bar, found here by
+            // `every_bench_has_a_shelf` the moment the glossary got one.
+            Shown::Brew { .. } | Shown::BrewOf { .. } => "the bench",
             Shown::Grown { .. } => "the bed",
             Shown::Kennelled { .. } | Shown::Together { .. } => "the run",
             Shown::Sold { .. } | Shown::SoldHigh => "the counter",

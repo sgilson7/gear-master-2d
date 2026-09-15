@@ -231,6 +231,48 @@ export class Board {
     return null;
   }
 
+  /// Put something in hand from outside the board.
+  ///
+  /// **For a bag that is not on the canvas.** The counter's bag is every loose
+  /// component a run owns — eighty-eight of them on a real save — and drawing
+  /// that many on the canvas made it two thousand pixels tall, which put the
+  /// bag behind the town's own pinned action bar. Reported from play as
+  /// *nothing is able to be dragged over*. So the Stall draws its bag as an
+  /// HTML shelf the way the bank does, and hands the board what was clicked.
+  ///
+  /// The board still owns *where it may go*: this only says what is in hand.
+  hold(id, name, slot) {
+    this.held = { id, from: null, name, slot };
+    this.askLegal(slot);
+    this.onhold(name);
+    this.draw();
+  }
+
+  /// The middle of one grid cell, in canvas pixels. The inverse of `cellAt`.
+  ///
+  /// **For a harness that has to click rather than call.** A check that drives
+  /// the payload asks the rulebook; a check that clicks asks the page, and the
+  /// Stall shipped a build where the payload was right and no click could
+  /// reach it. Working these out in the harness would be a second answer to
+  /// *where is that cell*.
+  cellCentre(slot, x, y) {
+    const b = this.boxes[slot];
+    if (!b) return null;
+    return {
+      x: b.x + PAD + x * (CELL + GAP) + CELL / 2,
+      y: b.y + PAD + y * (CELL + GAP) + CELL / 2,
+    };
+  }
+
+  /// The middle of one bag slot. The inverse of `bagAt`.
+  bagCentre(i = 0) {
+    const perRow = Math.max(1, Math.floor((this.c.width - PAD * 2) / BAG_COL));
+    return {
+      x: PAD + (i % perRow) * BAG_COL + BAG_COL / 2,
+      y: this.bagY + Math.floor(i / perRow) * BAG_ROW + BAG_ROW / 2,
+    };
+  }
+
   bagAt(px, py) {
     if (py < this.bagY) return null;
     const COL = BAG_COL, ROW = BAG_ROW;

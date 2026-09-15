@@ -434,6 +434,7 @@ pub static TURTLE_DICK: Theme = Theme {
         ("Chef", "Kettle Cook"),
         ("Grower", "Kettle Gardener"),
         ("Handler", "Kettle Drover"),
+        ("Factor", "Kettle Broker"),
         ("Avenged", "Sprocket Avenged"),
         ("Wanderer", "Plane Tourist"),          // half-tourist, half-catastrophe
         ("Warpriest", "Acolyte of Dobira"),     // the Master and Baylon, pp. 46-50

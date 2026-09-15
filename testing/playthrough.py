@@ -484,7 +484,7 @@ def in_town(page, buy=True, probe=None):
     if page.is_visible("#stall-box"):
         put = page.evaluate("""() => {
           const b = JSON.parse(window.__stallJson());
-          if (!b || !b.bag.length) return null;
+          if (!b || !b.slots_bag.length) return null;
           // **Cheapest first, and the engine's refusal is the filter.** A
           // player sells what they are not going to use, and the cheapest
           // thing in an early bag is a toad eye — which `Game::shelve` refuses
@@ -492,10 +492,10 @@ def in_town(page, buy=True, probe=None):
           // `kind !== 'Quest'` test here was the walker keeping its own copy
           // of what may be sold, and it was wrong about the word: the payload
           // says "quest item".
-          for (const w of [...b.bag].sort((a, c) => a.worth - c.worth)) {
-            const spot = JSON.parse(window.__stallLegal(String(w.id), 'stall'));
+          for (const w of [...b.slots_bag].sort((a, c) => a.worth - c.worth)) {
+            const spot = JSON.parse(window.__stallLegal(w.id, 'stall'));
             if (!spot.length) continue;
-            const why = window.__stallPlace(String(w.id), 'stall', spot[0][0], spot[0][1]);
+            const why = window.__stallPlace(w.id, 'stall', spot[0][0], spot[0][1]);
             if (!why) { window.__paintStall(); return `${w.name} at ${w.worth}`; }
           }
           return null;

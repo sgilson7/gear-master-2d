@@ -210,10 +210,20 @@ pub enum Ask {
 /// §C.3's rule (*the price shown is the price taken*) read from the other side
 /// of the counter.
 pub fn ask_of(price: i32, worth: i32) -> Ask {
+    ask_of_with(price, worth, 0)
+}
+
+/// The same, with a Factor's patience added to the band.
+///
+/// **A different axis from the margin.** The margin pays you over on a sale you
+/// were always going to make; patience makes a sale you were not — somebody
+/// stretching past what a thing is worth. So the two nodes are not two names
+/// for one number, which is the constraint every expert tree is written to.
+pub fn ask_of_with(price: i32, worth: i32, patience_pct: i32) -> Ask {
     if worth <= 0 {
         return Ask::Fair;
     }
-    let margin = worth * FAIR_PCT / 100;
+    let margin = worth * (FAIR_PCT + patience_pct.max(0)) / 100;
     if price > worth + margin {
         Ask::High
     } else if price < worth - margin {

@@ -611,6 +611,8 @@
             <div class="glassbox"><canvas id="stall-board" width="360" height="288"></canvas></div>
             <div class="larderbox">
               <p class="note" id="stall-holding">Pick something out of your bag and put it on the counter.</p>
+              <h4 class="sub-h">Your bag</h4>
+              <div id="stall-bag" class="shelf"></div>
               <div id="stall-price" hidden>
                 <h4 class="sub-h">What you are asking</h4>
                 <div id="stall-prices" class="shelf"></div>
@@ -701,6 +703,12 @@
         </header>
 
         <div class="stages">
+        <!-- **Who is out of the kennel with you.** A companion fights as gear
+             and therefore has rows on the bar and no cells on the board, so
+             without this there is nothing on any screen saying what those rows
+             belong to. Reported from play. Hidden when the run is empty, which
+             is the rack's own rule. -->
+        <div id="fight-out" class="outrow" hidden></div>
         <div id="stage-board">
           <p class="note">Click a piece to pick it up, click a cell to seat it, right-click to turn it.
             Shift-click a finished item to lock it. Green is where it fits &mdash; core decides that, not the page.</p>

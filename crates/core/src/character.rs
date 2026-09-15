@@ -1479,6 +1479,37 @@ impl Character {
         }
     }
 
+    /// What the factor in you is worth, as the five numbers the counter reads.
+    ///
+    /// **The defaults are the constants**, not zeroes, so everything below
+    /// reads this unconditionally and the old behaviour is the untrained case —
+    /// the shape `draughts`, `grower` and `handler` all take, and the reason
+    /// none of them branches on a class.
+    pub fn factor(&self) -> (u32, i32, u32, i32, i32) {
+        match self.specialization_def().map(|d| d.power) {
+            Some(crate::class::ClassPower::Factor {
+                customers_per_bell,
+                margin_pct,
+                shelf_cells,
+                bargain_pct,
+                patience_pct,
+            }) => (
+                customers_per_bell.max(1),
+                margin_pct.clamp(0, crate::class::MARGIN_CAP),
+                shelf_cells.max(crate::stall::SHELF.len() as u32),
+                bargain_pct.max(0),
+                patience_pct.max(0),
+            ),
+            _ => (
+                crate::stall::CUSTOMERS_PER_BELL,
+                0,
+                crate::stall::SHELF.len() as u32,
+                0,
+                0,
+            ),
+        }
+    }
+
     /// What two kennelled creatures standing touching pay, as rules.
     ///
     /// **Expressed in the rule vocabulary that already exists**, which is the
@@ -1533,12 +1564,12 @@ impl Character {
         match self.specialization_def().map(|d| d.power) {
             Some(crate::class::ClassPower::Grower {
                 stages,
-                beds,
+                seed_cap,
                 yield_pct,
                 bed_cells,
                 pairs_reach,
-            }) => (stages.max(2), beds.max(1), yield_pct, bed_cells, pairs_reach.clamp(1, 2)),
-            _ => (crate::plot::STAGES, 1, 100, 0, 1),
+            }) => (stages.max(2), seed_cap.max(1), yield_pct, bed_cells, pairs_reach.clamp(1, 2)),
+            _ => (crate::plot::STAGES, crate::plot::DRAWER_CAP, 100, 0, 1),
         }
     }
 

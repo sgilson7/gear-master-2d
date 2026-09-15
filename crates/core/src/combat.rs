@@ -6960,7 +6960,13 @@ pub fn simulate_party_holding(
             crate::class::ClassPower::Apothecary { .. }
             | crate::class::ClassPower::Chef { .. }
             | crate::class::ClassPower::Grower { .. }
-            | crate::class::ClassPower::Handler { .. } => {}
+            | crate::class::ClassPower::Handler { .. }
+            // **And the Factor reaches a fight through nothing at all**, which
+            // makes it the first class in this game with no path to the bell:
+            // the Apothecary and the Chef arrive through what you drank, the
+            // Grower through what the Chef drank, the Handler through what is
+            // out on the board. A counter is the one bench that never fights.
+            | crate::class::ClassPower::Factor { .. } => {}
             crate::class::ClassPower::SlowTime(n) => start_player.slow_time = n,
             crate::class::ClassPower::Overflowing(n) => start_player.overflowing = n,
             crate::class::ClassPower::Leeching(pct) => start_player.leech = pct,

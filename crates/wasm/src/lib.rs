@@ -1703,13 +1703,35 @@ pub fn fight_json() -> String {
         let theme = gm2d_core::theme::by_id(&g.theme);
         let mprofiles = g.character.combat_items();
         let mstats = g.character.player_stats();
-        let mine = side_items(
+        // **What is out of the kennel fights, so it has to tick.** A companion
+        // fights as gear — M21.5's divergence, measured — and its profiles
+        // reach the fight through `simulate_holding` rather than through the
+        // board, so they were in the *transcript* and on no row at all.
+        // Reported from play: *you currently cannot see your creature in the
+        // kennel during battle, but you can see their effects in the log.*
+        //
+        // They are rows with no cells, which is what an innate attack already
+        // is on the other side of the screen — so nothing on the board shakes
+        // for them, and that is right: there is no gear behind a companion.
+        let out_with_me =
+            g.character.companion_items(g.here_danger(DIFFICULTY), DIFFICULTY);
+        let mut mine = side_items(
             &g.character.registry,
             &g.character.loadout,
             &mprofiles,
             mstats,
             &[],
         );
+        mine.extend(out_with_me.iter().map(|p| {
+            serde_json::json!({
+                "name": p.name,
+                "cooldown_ms": p.cooldown_ms,
+                "hit_for": p.hit_for(mstats.strength),
+                "slot": "the run",
+                "card": serde_json::Value::Null,
+                "cells": Vec::<[u8; 2]>::new(),
+            })
+        }));
         let my_board =
             side_slots(&g.character.registry, &g.character.loadout, &mprofiles, mstats, theme);
         let (ereg, elo) = spec.loadout_at(DIFFICULTY);
@@ -2035,6 +2057,17 @@ pub fn fight_json() -> String {
                 "items": theirs,
                 "slots": their_board,
             })),
+            // **Who is out with you**, so a player can see the thing whose rows
+            // those are. Name, what it eats and its figure — the same three the
+            // run's own list shows, because a creature out is the same creature.
+            "out": g.character.kennel.iter().filter(|k| k.out).map(|k| {
+                serde_json::json!({
+                    "name": g.theme_name(
+                        gm2d_core::combat::creature(&k.spec).map(|s| s.name).unwrap_or("")),
+                    "canonical": k.spec,
+                    "wins": k.wins_together,
+                })
+            }).collect::<Vec<_>>(),
             // Kept under its old name so nothing that read the player's list
             // has to change; `player.items` is the same array.
             "items": mine,
@@ -5502,10 +5535,24 @@ pub fn stall_json() -> String {
                 "items": [],
                 "recipes": [],
             }],
-            "bag": bag,
+            // **The counter's bag is not on the canvas.** Eighty-eight loose
+            // components made the board two thousand pixels tall and put the
+            // bag behind the town's pinned action bar — reported from play as
+            // *nothing is able to be dragged over*. The page draws it as a
+            // shelf, the way the bank draws its two, and hands the board what
+            // was clicked through `Board#hold`.
+            "slots_bag": bag,
+            "bag": [],
             "undoable": false,
             "ledger": ledger,
-            "fair_pct": gm2d_core::stall::FAIR_PCT,
+            // **The character's band, not the constant.** A Factor's buyers
+            // stretch further, and a screen printing the general figure would
+            // be telling them something that is not true of their counter —
+            // which is the *a derived number needs somewhere it is shown*
+            // rule, with the wrong number shown.
+            "fair_pct": gm2d_core::stall::FAIR_PCT + g.character.factor().4,
+            "margin_pct": g.character.factor().1,
+            "customers": g.character.factor().0,
             "buyers": data.buyers.iter().map(|b| serde_json::json!({
                 "name": b.name,
                 "blurb": b.blurb,
@@ -5518,11 +5565,10 @@ pub fn stall_json() -> String {
 }
 
 #[wasm_bindgen]
-pub fn stall_legal_anchors(id: String, _slot: String) -> String {
+pub fn stall_legal_anchors(id: u32, _slot: String) -> String {
     with(|g| {
-        let Ok(n) = id.parse::<u32>() else { return "[]".to_string() };
-        let piece = gm2d_core::piece::PieceId(n);
-        let turn = stall_turn(&id);
+        let piece = gm2d_core::piece::PieceId(id);
+        let turn = stall_turn(id);
         let mask = g.shelf_mask();
         let taken: Vec<(i8, i8)> = g
             .character
@@ -5542,12 +5588,12 @@ pub fn stall_legal_anchors(id: String, _slot: String) -> String {
     })
 }
 
-fn stall_turn(id: &str) -> u8 {
+fn stall_turn(id: u32) -> u8 {
     TURNS.with(|t| *t.borrow().get(&format!("stall:{id}")).unwrap_or(&0))
 }
 
 #[wasm_bindgen]
-pub fn stall_rotate(id: String) {
+pub fn stall_rotate(id: u32) {
     TURNS.with(|t| {
         let mut t = t.borrow_mut();
         let e = t.entry(format!("stall:{id}")).or_insert(0);
@@ -5559,11 +5605,10 @@ pub fn stall_rotate(id: String) {
 /// price is then yours to move, and the ledger is how you find out whether you
 /// should have.
 #[wasm_bindgen]
-pub fn stall_place(id: String, _slot: String, x: u32, y: u32) -> String {
+pub fn stall_place(id: u32, _slot: String, x: u32, y: u32) -> String {
     with_mut(|g| {
-        let Ok(n) = id.parse::<u32>() else { return "that is not a component".into() };
-        let piece = gm2d_core::piece::PieceId(n);
-        let turn = stall_turn(&id);
+        let piece = gm2d_core::piece::PieceId(id);
+        let turn = stall_turn(id);
         let price = g.worth_of(piece);
         match g.shelve(piece, (x as i8, y as i8), turn, price) {
             Ok(_) => String::new(),
@@ -5573,10 +5618,9 @@ pub fn stall_place(id: String, _slot: String, x: u32, y: u32) -> String {
 }
 
 #[wasm_bindgen]
-pub fn stall_pick_up(id: String) -> String {
+pub fn stall_pick_up(id: u32) -> String {
     with_mut(|g| {
-        let Ok(n) = id.parse::<u32>() else { return "that is not a component".into() };
-        match g.unshelve(gm2d_core::piece::PieceId(n)) {
+        match g.unshelve(gm2d_core::piece::PieceId(id)) {
             Ok(_) => String::new(),
             Err(e) => e,
         }

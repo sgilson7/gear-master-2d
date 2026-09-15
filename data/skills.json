@@ -3857,15 +3857,15 @@
           }
         },
         {
-          "id": "gr-second-bed",
-          "name": "A Second Bed",
-          "blurb": "There was always a second one. What there was not was anybody minding both, which is a different thing from land.",
+          "id": "gr-a-deeper-drawer",
+          "name": "A Deeper Drawer",
+          "blurb": "Three more of each, kept dry, in a drawer that was a drawer for something else first.",
           "cost": 1,
           "requires": [],
           "effect": {
             "tunes": {
-              "knob": "beds",
-              "by": 1
+              "knob": "seed_cap",
+              "by": 3
             }
           }
         },
@@ -3890,7 +3890,7 @@
           "blurb": "Three more cells at the end of every bed, and the works has never once asked where the ground came from.",
           "cost": 2,
           "requires": [
-            "gr-second-bed"
+            "gr-a-deeper-drawer"
           ],
           "effect": {
             "tunes": {
@@ -4021,6 +4021,115 @@
             "tunes": {
               "knob": "tally_pct",
               "by": 5
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "factor",
+      "name": "Factor",
+      "class": "Factor",
+      "nodes": [
+        {
+          "id": "fa-open-early",
+          "name": "Open Early",
+          "blurb": "The counter is out before the shift bell and somebody is always leaning on it when it goes.",
+          "cost": 1,
+          "requires": [],
+          "effect": {
+            "tunes": {
+              "knob": "customers_per_bell",
+              "by": 1
+            }
+          }
+        },
+        {
+          "id": "fa-the-thumb-on-the-scale",
+          "name": "The Thumb On The Scale",
+          "blurb": "Nobody has ever said anything. Four people have looked, and one of them looked twice.",
+          "cost": 1,
+          "requires": [],
+          "effect": {
+            "tunes": {
+              "knob": "margin_pct",
+              "by": 10
+            }
+          }
+        },
+        {
+          "id": "fa-a-longer-shelf",
+          "name": "A Longer Shelf",
+          "blurb": "Four more cells of counter, made out of a door that was not being a door.",
+          "cost": 2,
+          "requires": [
+            "fa-open-early"
+          ],
+          "effect": {
+            "tunes": {
+              "knob": "shelf_cells",
+              "by": 4
+            }
+          }
+        },
+        {
+          "id": "fa-known-in-the-trade",
+          "name": "Known In The Trade",
+          "blurb": "Two who know each other come by together more often than two who do not, which nobody has ever been able to explain to the clerk.",
+          "cost": 2,
+          "requires": [
+            "fa-the-thumb-on-the-scale"
+          ],
+          "effect": {
+            "tunes": {
+              "knob": "bargain_pct",
+              "by": 25
+            }
+          }
+        },
+        {
+          "id": "fa-the-long-price",
+          "name": "The Long Price",
+          "blurb": "You name a number over the odds and wait. Most of them wait with you.",
+          "cost": 2,
+          "requires": [
+            "fa-a-longer-shelf"
+          ],
+          "effect": {
+            "tunes": {
+              "knob": "patience_pct",
+              "by": 20
+            }
+          }
+        },
+        {
+          "id": "fa-the-whole-ledger",
+          "name": "The Whole Ledger",
+          "blurb": "Every sale in one hand, in one book, going back further than anybody else's. What it is worth is not what is written in it.",
+          "cost": 3,
+          "requires": [
+            "fa-known-in-the-trade",
+            "fa-the-long-price"
+          ],
+          "effect": {
+            "tunes": {
+              "knob": "margin_pct",
+              "by": 15
+            }
+          }
+        },
+        {
+          "id": "fa-second-hand",
+          "name": "Second Hand",
+          "blurb": "Two a fight, and the second one always arrives while the first is still deciding.",
+          "cost": 3,
+          "requires": [
+            "fa-the-whole-ledger"
+          ],
+          "effect": {
+            "tunes": {
+              "knob": "customers_per_bell",
+              "by": 1
             }
           }
         }

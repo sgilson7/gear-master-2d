@@ -337,3 +337,130 @@ fn the_counter_survives_a_round_trip() {
     assert_eq!(back.character.stall.len(), 1);
     assert_eq!(back.character.ledger.len(), 1);
 }
+
+// ---------------------------------------------------------------- the Factor
+
+fn a_factor(seed: u64, nodes: &[&str]) -> Game {
+    let mut g = a_fighter(seed);
+    g.character.specialization = Some("Factor".into());
+    g.character.skill_points = 20;
+    let tree = data::skills();
+    for n in nodes {
+        g.character.take_skill(&tree, n).unwrap_or_else(|e| panic!("{n}: {e}"));
+    }
+    g
+}
+
+/// **The thumb on the scale pays a tenth over, and it is paid at the sale.**
+///
+/// Not in `bounty_with_class`: a percentage there would pay it on every fight,
+/// which is the third voice arguing about what Fnorp is worth that
+/// `SYSTEMS-PITCH.md` §3.3 names as this specialization's whole risk.
+#[test]
+fn the_thumb_on_the_scale_pays_a_tenth_over() {
+    let sell = |g: &mut Game| -> i32 {
+        let id = g.character.give("Iron Blade").expect("a blade");
+        let worth = g.worth_of(id);
+        g.shelve(id, (0, 0), 1, worth).expect("out it goes");
+        let purse = g.character.gold;
+        for _ in 0..60 {
+            g.a_buyer_comes_by();
+            if g.character.stall.is_empty() {
+                break;
+            }
+        }
+        assert!(g.character.stall.is_empty(), "nobody bought it");
+        g.character.gold - purse
+    };
+    let plain = sell(&mut a_fighter(9));
+    let thumbed = sell(&mut a_factor(9, &["fa-the-thumb-on-the-scale"]));
+    assert!(
+        thumbed > plain,
+        "a Factor's sale paid {thumbed} and everybody else's paid {plain}"
+    );
+    assert_eq!(thumbed, plain + plain / 10, "the thumb is a tenth");
+    // And the ledger says what was actually taken, which is what makes the
+    // receipt a receipt.
+    let mut g = a_factor(9, &["fa-the-thumb-on-the-scale"]);
+    let got = sell(&mut g);
+    assert_eq!(g.character.ledger.last().expect("a row").paid, got);
+}
+
+/// **The margin is capped, and the cap is exactly what the tree sells.**
+///
+/// A knob that can be authored past its cap is a node that quietly buys
+/// nothing — M13.6's own finding, and the reason this cap is a constant rather
+/// than a number in one match arm.
+#[test]
+fn the_margin_is_capped_at_what_the_tree_reaches() {
+    let whole = a_factor(
+        1,
+        &[
+            "fa-the-thumb-on-the-scale",
+            "fa-known-in-the-trade",
+            "fa-open-early",
+            "fa-a-longer-shelf",
+            "fa-the-long-price",
+            "fa-the-whole-ledger",
+        ],
+    );
+    let (_, margin, _, _, _) = whole.character.factor();
+    assert_eq!(
+        margin,
+        gm2d_core::class::MARGIN_CAP,
+        "a finished margin spine reaches {margin} and the cap is {}",
+        gm2d_core::class::MARGIN_CAP
+    );
+}
+
+/// **A longer shelf only ever grows**, and it grows the way the bed does.
+#[test]
+fn a_longer_shelf_only_ever_grows() {
+    let plain = a_fighter(2).shelf_mask().len();
+    assert_eq!(plain, SHELF.len());
+    let longer = a_factor(2, &["fa-open-early", "fa-a-longer-shelf"]).shelf_mask();
+    assert_eq!(longer.len(), SHELF.len() + 4, "four more cells");
+    // Every cell the counter had, it still has — the bed's rule and
+    // `resize_boards`'s: a bench that shrank would tip off what was on it.
+    for c in SHELF {
+        assert!(longer.contains(c), "the counter lost {c:?}");
+    }
+}
+
+/// **Patience is a different axis from the margin.**
+///
+/// The margin pays you over on a sale you were always going to make; patience
+/// makes a sale you were not. Two nodes that moved one number would be one knob
+/// with two names, which is what `expert_nodes_touch_only_the_expert` refuses
+/// one tree along.
+#[test]
+fn patience_sells_what_a_fair_band_would_not() {
+    let worth = 100;
+    let over = worth + worth * (gm2d_core::stall::FAIR_PCT + 5) / 100;
+    assert_eq!(gm2d_core::stall::ask_of(over, worth), Ask::High);
+    assert_eq!(
+        gm2d_core::stall::ask_of_with(over, worth, 20),
+        Ask::Fair,
+        "a patient buyer still calls it high"
+    );
+    // And the margin does not widen the band, which is what makes them two.
+    let g = a_factor(3, &["fa-the-thumb-on-the-scale"]);
+    let (_, margin, _, _, patience) = g.character.factor();
+    assert!(margin > 0 && patience == 0, "margin {margin}, patience {patience}");
+}
+
+/// **Two a bell, and it is asked of the character.**
+#[test]
+fn open_early_brings_a_second_buyer() {
+    assert_eq!(a_fighter(4).character.factor().0, gm2d_core::stall::CUSTOMERS_PER_BELL);
+    // Untuned, a Factor already gets one more — that is the promise somebody
+    // takes the specialization for, the way the Handler's offer is.
+    assert_eq!(
+        a_factor(4, &[]).character.factor().0,
+        gm2d_core::stall::CUSTOMERS_PER_BELL + 1
+    );
+    assert_eq!(
+        a_factor(4, &["fa-open-early"]).character.factor().0,
+        gm2d_core::stall::CUSTOMERS_PER_BELL + 2
+    );
+}

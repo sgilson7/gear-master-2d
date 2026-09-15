@@ -140,7 +140,13 @@ pub fn bounty_with_class(
             | ClassPower::Apothecary { .. }
             | ClassPower::Chef { .. }
             | ClassPower::Grower { .. }
-            | ClassPower::Handler { .. } => {}
+            | ClassPower::Handler { .. }
+            // **And the Factor's margin is a sale's, not a fight's.** It is
+            // paid in `Game::a_buyer_comes_by`, where the money actually
+            // changes hands — a percentage here would pay it on every bounty,
+            // which is a third voice arguing about what Fnorp is worth and is
+            // the risk `SYSTEMS-PITCH.md` §3.3 names.
+            | ClassPower::Factor { .. } => {}
             ClassPower::Showstopper { pct: more, under_ms } => {
                 if duration_ms < under_ms {
                     pct += more;

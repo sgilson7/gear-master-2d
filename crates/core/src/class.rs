@@ -446,7 +446,7 @@ pub enum ClassPower {
     /// `ClassPower` and not the plan's `SpecPower`: there is no such type, and
     /// a second power enum would be a second exhaustive match in every place
     /// that already has one.
-    Grower { stages: u8, beds: u32, yield_pct: i32, bed_cells: u32, pairs_reach: u32 },
+    Grower { stages: u8, seed_cap: u32, yield_pct: i32, bed_cells: u32, pairs_reach: u32 },
     /// A creature is offered after `offer_at` wins; you may lead `mouths` at
     /// once; one out eats every `feed_every` fights; every run has `run_cells`
     /// more; and every `tally_step` wins together pay `tally_pct`.
@@ -457,6 +457,30 @@ pub enum ClassPower {
     /// do to a clock. Every other clock in the block is a named count with a
     /// glossary shelf and this is one more.
     Handler { offer_at: u32, mouths: u32, feed_every: u32, run_cells: u32, tally_pct: i32 },
+    /// The counter's own specialization: more buyers, a better margin, a
+    /// longer shelf, kin who come round more often, and an ask people will
+    /// stretch to.
+    ///
+    /// **Two of `SYSTEMS-PITCH.md` §3.2's six nodes did not survive the
+    /// recon**, and both because the Stall shipped differently from the pitch.
+    /// `shelf_cells: 9` is the mask the counter *nearly* had — nine cells in a
+    /// four-by-three, which refused the Iron Blade — so the base is
+    /// `stall::SHELF.len()`, read rather than typed. And `stalls +1`, *a stall
+    /// in Kettleworks too*, buys nothing at all: the counter is **one shelf
+    /// reachable from every town**, which is the bank's shape and was the right
+    /// call for the reason the bank's was. A node that buys nothing is the
+    /// thing M13.6 spent a whole milestone finding sixty of, so it is
+    /// `patience_pct` instead — how far over the odds a buyer will still
+    /// stretch, which is the most Factor-ish axis there is and is a different
+    /// one from `margin_pct`: the margin pays you over on a sale you were
+    /// always going to make, and patience makes a sale you were not.
+    Factor {
+        customers_per_bell: u32,
+        margin_pct: i32,
+        shelf_cells: u32,
+        bargain_pct: i32,
+        patience_pct: i32,
+    },
     /// A creature whose maximum health you have eaten down to `third` percent
     /// of what it was is unmade — dead, whatever is still in it.
     ///
@@ -637,7 +661,8 @@ impl ClassPower {
             // **Nor is a specialization**, for the same two reasons: it is
             // taken off a tree rather than poured, and there is no fountain in
             // this game to pour one at.
-            Apothecary { .. } | Chef { .. } | Grower { .. } | Handler { .. } => return None,
+            Apothecary { .. } | Chef { .. } | Grower { .. } | Handler { .. }
+            | Factor { .. } => return None,
             // **Both doublable, and each doubles the thing it is about.** The
             // Stoker's is the shovel — twice as many points a tick — rather
             // than the clock, because a furnace stoked twice as often is a
@@ -710,10 +735,13 @@ impl ClassPower {
             ClassPower::Apothecary { .. } => &["potency_pct", "extra"],
             ClassPower::Chef { .. } => &["draughts"],
             ClassPower::Grower { .. } => {
-                &["stages", "beds", "yield_pct", "bed_cells", "pairs_reach"]
+                &["stages", "seed_cap", "yield_pct", "bed_cells", "pairs_reach"]
             }
             ClassPower::Handler { .. } => {
                 &["offer_at", "mouths", "feed_every", "run_cells", "tally_pct"]
+            }
+            ClassPower::Factor { .. } => {
+                &["customers_per_bell", "margin_pct", "shelf_cells", "bargain_pct", "patience_pct"]
             }
             // **An expert's knobs are its own**, asked through the arm that
             // wraps it rather than duplicated here.
@@ -767,31 +795,35 @@ impl ClassPower {
                 "draughts" => ClassPower::Chef { draughts: (draughts as i32 + by).max(1) as u32 },
                 _ => self,
             },
-            ClassPower::Grower { stages, beds, yield_pct, bed_cells, pairs_reach } => {
+            ClassPower::Grower { stages, seed_cap, yield_pct, bed_cells, pairs_reach } => {
                 match knob {
                     // **Never below two.** A crop that came up the moment it
                     // was planted would make the bed a button rather than a
                     // clock, and the clock is what the whole system is.
                     "stages" => ClassPower::Grower {
                         stages: (stages as i32 + by).max(2) as u8,
-                        beds, yield_pct, bed_cells, pairs_reach,
+                        seed_cap, yield_pct, bed_cells, pairs_reach,
                     },
-                    "beds" => ClassPower::Grower {
-                        stages, beds: (beds as i32 + by).max(1) as u32,
+                    // **How deep the drawer is**, which is a different axis
+                    // from everything else in this tree: the others are about
+                    // one row, and this is about how much you may keep back
+                    // between them.
+                    "seed_cap" => ClassPower::Grower {
+                        stages, seed_cap: (seed_cap as i32 + by).max(1) as u32,
                         yield_pct, bed_cells, pairs_reach,
                     },
                     "yield_pct" => ClassPower::Grower {
-                        stages, beds, yield_pct: (yield_pct + by).max(0), bed_cells, pairs_reach,
+                        stages, seed_cap, yield_pct: (yield_pct + by).max(0), bed_cells, pairs_reach,
                     },
                     // A bed that got smaller would tip out whatever was
                     // growing in it, which is `resize_boards`'s rule one
                     // system along: this only ever grows.
                     "bed_cells" => ClassPower::Grower {
-                        stages, beds, yield_pct,
+                        stages, seed_cap, yield_pct,
                         bed_cells: (bed_cells as i32 + by).max(0) as u32, pairs_reach,
                     },
                     "pairs_reach" => ClassPower::Grower {
-                        stages, beds, yield_pct, bed_cells,
+                        stages, seed_cap, yield_pct, bed_cells,
                         pairs_reach: (pairs_reach as i32 + by).clamp(1, 2) as u32,
                     },
                     _ => self,
@@ -829,6 +861,49 @@ impl ClassPower {
                     _ => self,
                 }
             }
+            ClassPower::Factor {
+                customers_per_bell,
+                margin_pct,
+                shelf_cells,
+                bargain_pct,
+                patience_pct,
+            } => match knob {
+                // **Never below one.** A counter nobody comes to is a counter,
+                // and a knob that made the class *worse* is a point spent on
+                // making yourself worse — the Handler's own clamp, one bench
+                // along.
+                "customers_per_bell" => ClassPower::Factor {
+                    customers_per_bell: (customers_per_bell as i32 + by).max(1) as u32,
+                    margin_pct, shelf_cells, bargain_pct, patience_pct,
+                },
+                // **Capped, and the cap is the economy's.** `SYSTEMS-PITCH.md`
+                // §3.3 names the risk out loud: `bounty_with_class` and the
+                // barrel already argue about what Fnorp is worth and a stall
+                // that prints it is a third voice. Twenty-five is both of the
+                // tree's margin nodes and not a point more.
+                "margin_pct" => ClassPower::Factor {
+                    customers_per_bell,
+                    margin_pct: (margin_pct + by).clamp(0, MARGIN_CAP),
+                    shelf_cells, bargain_pct, patience_pct,
+                },
+                // A counter that got smaller would tip off whatever was
+                // standing on it — the bed's rule and `resize_boards`'s, so
+                // this only ever grows.
+                "shelf_cells" => ClassPower::Factor {
+                    customers_per_bell, margin_pct,
+                    shelf_cells: (shelf_cells as i32 + by).max(crate::stall::SHELF.len() as i32) as u32,
+                    bargain_pct, patience_pct,
+                },
+                "bargain_pct" => ClassPower::Factor {
+                    customers_per_bell, margin_pct, shelf_cells,
+                    bargain_pct: (bargain_pct + by).max(0), patience_pct,
+                },
+                "patience_pct" => ClassPower::Factor {
+                    customers_per_bell, margin_pct, shelf_cells, bargain_pct,
+                    patience_pct: (patience_pct + by).max(0),
+                },
+                _ => self,
+            },
             ClassPower::Stoker { every_ms, per_stack } => match knob {
                 // **Clamped at a tick, because a furnace that stokes faster
                 // than the clock is a furnace that stokes every tick** — and
@@ -870,6 +945,9 @@ impl ClassPower {
                 format!("+{potency_pct}% on every brew, and {extra} more cells of glass")
             }
             ClassPower::Chef { draughts } => format!("{draughts} potions in one fight"),
+            ClassPower::Factor { customers_per_bell, margin_pct, .. } => format!(
+                "{customers_per_bell} buyers a fight, and every sale pays {margin_pct}% over"
+            ),
             ClassPower::Grower { stages, yield_pct, .. } => {
                 format!("a crop up in {} wins, paying {yield_pct}%", stages.saturating_sub(1))
             }
@@ -977,14 +1055,32 @@ impl ClassPower {
             // exactly what it was written for: this sentence is read before an
             // irreversible choice and a number wearing a joke has to be
             // translated first.
-            ClassPower::Grower { stages, beds, yield_pct, bed_cells, pairs_reach } => format!(
-                "A crop is up {} wins after you plant it, you work {}, a row pays \
-                 {yield_pct}% of what it would, every bed has {bed_cells} more \
-                 {}, and two crops count as neighbours {} cells out.",
+            ClassPower::Grower { stages, seed_cap, yield_pct, bed_cells, pairs_reach } => format!(
+                "A crop is up {} wins after you plant it, the drawer holds {seed_cap} of \
+                 each seed, a row pays {yield_pct}% of what it would, every bed has \
+                 {bed_cells} more {}, and two crops count as neighbours {} cells out.",
                 stages.saturating_sub(1),
-                if beds == 1 { "one bed".to_string() } else { format!("{beds} beds") },
                 if bed_cells == 1 { "cell" } else { "cells" },
                 pairs_reach,
+            ),
+            ClassPower::Factor {
+                customers_per_bell,
+                margin_pct,
+                shelf_cells,
+                bargain_pct,
+                patience_pct,
+            } => format!(
+                "{} comes by every fight you win instead of {}, every sale pays {margin_pct}% \
+                 over what you asked, the counter is {shelf_cells} cells, two who know each \
+                 other leave something {}% more often, and a buyer will stretch {patience_pct}% \
+                 past what a thing is worth.",
+                if customers_per_bell == 1 {
+                    "One buyer".to_string()
+                } else {
+                    format!("{customers_per_bell} buyers")
+                },
+                crate::stall::CUSTOMERS_PER_BELL,
+                bargain_pct,
             ),
             ClassPower::Handler { offer_at, mouths, feed_every, run_cells, tally_pct } => {
                 format!(
@@ -1311,7 +1407,10 @@ pub static CLASSES: &[ClassDef] = &[
         // same as no specialization is a paper with nothing on it.
         power: ClassPower::Grower {
             stages: crate::plot::STAGES,
-            beds: 1,
+            // Untuned: two more of each seed in the drawer, which is the
+            // promise somebody takes it for, and everything else as everybody
+            // has it.
+            seed_cap: crate::plot::DRAWER_CAP + 2,
             yield_pct: 120,
             bed_cells: 0,
             pairs_reach: 1,
@@ -1329,6 +1428,22 @@ pub static CLASSES: &[ClassDef] = &[
             feed_every: crate::kennel::FEED_EVERY,
             run_cells: 0,
             tally_pct: crate::kennel::TALLY_PCT,
+        },
+    },
+    ClassDef {
+        name: "Factor",
+        blurb: "Everybody's price is a number they arrived with. Yours is a question.",
+        requires: &[(Axis::Ward, 25), (Axis::Attunement, 25)],
+        // Untuned: one more buyer a bell, which is the promise somebody takes
+        // it for, and everything else as everybody has it. The shelf is read
+        // off `stall::SHELF` rather than typed, for the reason every figure on
+        // the glossary is.
+        power: ClassPower::Factor {
+            customers_per_bell: crate::stall::CUSTOMERS_PER_BELL + 1,
+            margin_pct: 0,
+            shelf_cells: crate::stall::SHELF.len() as u32,
+            bargain_pct: 0,
+            patience_pct: 0,
         },
     },
     ClassDef {
@@ -1622,7 +1737,17 @@ pub const OFFERED: &[&str] =
 /// `expert::EXPERTS`, so no pair reaches it and it pairs with nothing; and it
 /// is not in `Character::classes`, because everything that reads that list
 /// reads it to ask *which pair are you* and the answer must not change.
-pub const SPECIALIZATIONS: &[&str] = &["Apothecary", "Chef", "Grower", "Handler"];
+/// The most a Factor's margin can reach, in percentage points.
+///
+/// **The economy is the risk this specialization carries** and
+/// `SYSTEMS-PITCH.md` §3.3 says so: `bounty_with_class` and the barrel already
+/// argue about what Fnorp is worth, and a stall that prints it is a third
+/// voice. Twenty-five is exactly both of the tree's margin nodes, so a finished
+/// tree reaches the cap and nothing past it can be authored by accident.
+pub const MARGIN_CAP: i32 = 25;
+
+pub const SPECIALIZATIONS: &[&str] =
+    &["Apothecary", "Chef", "Grower", "Handler", "Factor"];
 
 /// `a Chef`, `an Apothecary` — the article a name actually takes.
 ///

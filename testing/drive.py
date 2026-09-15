@@ -2709,17 +2709,17 @@ def _the_rung(page, name, fails):
     # Now use the bench: put something out and sell it.
     sold = page.evaluate("""() => {
       const b = JSON.parse(window.__stallJson());
-      if (!b || !b.bag.length) return 'nothing loose to sell';
+      if (!b || !b.slots_bag.length) return 'nothing loose to sell';
       // **Try each until one goes out.** A bag holds tallies and seated
       // pieces as well as goods, and core refuses both by name — so filtering
       // on a `kind` string here would be the harness keeping its own copy of
       // what may be sold. The engine's refusal is the filter.
       let last = 'nothing in the bag went out';
       let put = false;
-      for (const w of [...b.bag].sort((a, c) => a.worth - c.worth)) {
-        const spot = JSON.parse(window.__stallLegal(String(w.id), 'stall'));
+      for (const w of [...b.slots_bag].sort((a, c) => a.worth - c.worth)) {
+        const spot = JSON.parse(window.__stallLegal(w.id, 'stall'));
         if (!spot.length) { last = 'nowhere on the counter'; continue; }
-        const why = window.__stallPlace(String(w.id), 'stall', spot[0][0], spot[0][1]);
+        const why = window.__stallPlace(w.id, 'stall', spot[0][0], spot[0][1]);
         if (!why) { put = true; break; }
         last = why;
       }
@@ -2789,11 +2789,20 @@ def _the_street(page, name, fails):
         clear_screens(page)
         return
     tabs = page.eval_on_selector_all(
-        "#town-street .tab", "e => e.map(t => t.textContent)")
+        "#town-street .tab:not(.door)", "e => e.map(t => t.textContent)")
     if len(tabs) < 4:
         fails.append(f"{name}: the street has {len(tabs)} buildings on it: {tabs}")
         clear_screens(page)
         return
+    # **And the four doors.** Asked for: *the brewing table should be a tab
+    # along the top, as well as leveling up and, inventory, and the long cart.*
+    # They are the real buttons moved into the strip rather than copies, so
+    # this asks for them by id — anything that reached for `#bank` before still
+    # does, which is the whole reason they were moved rather than rebuilt.
+    doors = page.eval_on_selector_all("#town-street .door", "e => e.map(b => b.id)")
+    missing = {"pack", "bank", "bench", "cart"} - set(doors)
+    if missing:
+        fails.append(f"{name}: not on the street: {sorted(missing)} (doors are {doors})")
     # **Laid out, not merely un-hidden.** A panel with `display` set on it by a
     # container rule stays laid out through `hidden`, which is what the
     # `.screen.framed` collision was and what the area card's nought-pixel
@@ -2827,8 +2836,9 @@ def _the_street(page, name, fails):
     elif then[0] != want:
         fails.append(f"{name}: pressed {want!r} and got {then[0]!r}")
     else:
-        print(f"ok: the town is a street of {len(tabs)} buildings, one open at a "
-              f"time — {first[0]!r} then {then[0]!r}")
+        print(f"ok: the town is a street of {len(tabs)} buildings and "
+              f"{len(doors)} doors, one open at a time — {first[0]!r} then "
+              f"{then[0]!r}")
     clear_screens(page)
 
 
@@ -2889,19 +2899,65 @@ def _the_counter(page, name, fails):
     box = page.eval_on_selector("#stall-board", "e => e.getBoundingClientRect()")
     if box["width"] < 40 or box["height"] < 40:
         fails.append(f"{name}: the counter's canvas is {box['width']}x{box['height']}")
-    # Put the first loose thing out, and price it.
+    # **Clicked on the canvas, not driven through the payload.**
+    #
+    # The first version of this check called `window.__stallPlace` directly and
+    # was green on a build where **nothing could be dragged onto the counter at
+    # all**: the payload's `id` is a number and the exports took a `String`, so
+    # `stall_legal_anchors` threw on wasm-bindgen's own argument check the
+    # moment a player picked something up. Reported from play.
+    #
+    # *A check that drives the payload is asking the rulebook; a check that
+    # clicks is asking the page.* The Stall needed the second and had the
+    # first — which is this project's *the page decides nothing about the
+    # board* rule from the other side: the page decides nothing, and something
+    # still has to prove the page can **ask**.
     before = len(slot["placed"])
-    put = page.evaluate("""() => {
-      const b = JSON.parse(window.__stallJson());
-      const spot = JSON.parse(window.__stallLegal(String(b.bag[0].id), 'stall'));
-      if (!spot.length) return 'nowhere to put the first thing in the bag';
-      return window.__stallPlace(String(b.bag[0].id), 'stall', spot[0][0], spot[0][1]);
-    }""")
-    if put:
-        fails.append(f"{name}: putting something on the counter: {put}")
+    # **Clicked, not driven.** The first version of this check called
+    # `window.__stallPlace` directly and was green on a build where **nothing
+    # could be put on the counter at all** — two faults at once: the payload's
+    # `id` is a number and the exports took a `String`, so wasm-bindgen threw on
+    # the first pick-up; and the bag was drawn on the canvas, which an
+    # eighty-eight-component run made two thousand pixels tall, putting it
+    # behind the town's own pinned action bar. Reported from play.
+    #
+    # *A check that drives the payload asks the rulebook; a check that clicks
+    # asks the page.* The Stall needed the second and had the first.
+    rows = page.eval_on_selector_all("#stall-bag .wares", "e => e.length")
+    if rows == 0:
+        fails.append(f"{name}: the counter's bag shelf is empty")
         return
-    page.evaluate("() => window.__paintStall()")
-    page.wait_for_timeout(120)
+    page.locator("#stall-bag .wares").first.click()
+    page.wait_for_timeout(150)
+    held = page.text_content("#stall-holding") or ""
+    if "Holding" not in held:
+        fails.append(f"{name}: clicked the bag shelf and nothing was picked up: {held!r}")
+        return
+    at = page.evaluate("""() => {
+      const b = JSON.parse(window.__stallJson());
+      const a = JSON.parse(window.__stallLegal(b.slots_bag[0].id, 'stall'));
+      return a.length ? a[0] : null;
+    }""")
+    if at is None:
+        fails.append(f"{name}: nowhere on the counter for the first thing in the bag")
+        return
+    box = page.eval_on_selector("#stall-board", "e => e.getBoundingClientRect()")
+    geom = page.evaluate("() => { const c = document.getElementById('stall-board');"
+                         " return { w: c.width, h: c.height }; }")
+    sx, sy = box["width"] / geom["w"], box["height"] / geom["h"]
+    cell = page.evaluate("(a) => window.__stallCellSpot(a[0], a[1])", at)
+    # **Measure what is actually under the point.** A click that lands on a
+    # pinned bar is the failure this check exists for, and Playwright reports it
+    # as a timeout rather than as a finding.
+    px, py = box["x"] + cell["x"] * sx, box["y"] + cell["y"] * sy
+    under = page.evaluate("(p) => { const e = document.elementFromPoint(p[0], p[1]);"
+                          " return e ? (e.id || e.tagName + '.' + e.className) : 'nothing'; }",
+                          [px, py])
+    if under != "stall-board":
+        fails.append(f"{name}: the counter's cell is under {under!r}, not the board")
+        return
+    page.mouse.click(px, py)
+    page.wait_for_timeout(250)
     b = page.evaluate("() => JSON.parse(window.__stallJson())")
     now = b["slots"][0]["placed"]
     if len(now) != before + 1:

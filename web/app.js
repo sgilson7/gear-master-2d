@@ -1374,6 +1374,7 @@ function openFight() {
   $('fight-rating').textContent = m.rating;
   $('fight-bounty').textContent = m.bounty;
   paintTheirs(m);
+  paintWhoIsOut();
   showTab('yours');
   $('fight').hidden = false;
   stage('board');
@@ -1409,6 +1410,35 @@ function paintDefences(rows, listId, headId) {
     .map((d) => `<li><b>${d.value}${d.unit}</b> ${d.what}` +
       (d.raw ? ` <span class="dim">capped, from ${d.raw}${d.unit}</span>` : '') + `</li>`)
     .join('');
+}
+
+/// Who is out of the kennel with you, over your own board.
+///
+/// **A companion fights as gear**, which is M21.5's measured divergence — so
+/// it has rows on the tick bar and no cells on any board, and without this
+/// there is nothing on any screen saying what those rows belong to. Reported
+/// from play: *you currently cannot see your creature in the kennel during
+/// battle, but you can see their effects in the log.*
+///
+/// Hidden when the run is empty, which is the rack's own rule: a list you
+/// cannot use is worse than no list.
+function paintWhoIsOut() {
+  const box = $('fight-out');
+  const out = JSON.parse(fight_json()).out ?? [];
+  if (!out.length) { box.hidden = true; return; }
+  box.hidden = false;
+  box.replaceChildren(...out.map((k) => {
+    const el = document.createElement('div');
+    el.className = 'outone';
+    const img = document.createElement('img');
+    portrait(img, figure('creatures', k.canonical), k.name);
+    const lab = document.createElement('span');
+    lab.textContent = k.wins
+      ? `${k.name} is out with you — ${k.wins} together`
+      : `${k.name} is out with you`;
+    el.append(img, lab);
+    return el;
+  }));
 }
 
 function paintTheirs(m) {
@@ -2744,7 +2774,36 @@ function paintStreet() {
     return t;
   }));
   for (const b of all) b.hidden = b.id !== street;
+  // **And the doors.** Asked for: *the brewing table should be a tab along the
+  // top, as well as leveling up and, inventory, and the long cart.* These four
+  // open a screen rather than showing a panel, which is a second behaviour in
+  // one strip — and from the player's side pressing a building and going into
+  // it is the same gesture either way, which is what was asked for.
+  //
+  // **The real buttons are moved into the strip**, not copies of them: their
+  // ids, their handlers and their `disabled` state are what they always were,
+  // so nothing that reaches for `#bank` has to learn a new name and a door
+  // that is shut still greys itself.
+  //
+  // **Held by reference, and never looked up again.** `replaceChildren` above
+  // wipes the strip, and a node moved into a container is a node that container
+  // owns — so the second paint deleted all four buttons and `$('pack')` was
+  // `null` from then on, with no error anywhere. *A node you moved is a node
+  // you have to keep hold of.*
+  if (!doors) {
+    doors = DOORS.map($).filter(Boolean);
+    for (const b of doors) b.classList.add('tab', 'door');
+  }
+  for (const b of doors) strip.appendChild(b);
 }
+
+/// The door buttons themselves, captured once. See `paintStreet`.
+let doors = null;
+
+/// The four that open a screen rather than showing a panel, in the order a
+/// player wants them: what you came to do, then what you came to spend, then
+/// the two benches that are rooms of their own.
+const DOORS = ['pack', 'bank', 'bench', 'cart'];
 
 /// The bank: your bag on one shelf, the vault on the other.
 ///
@@ -2995,17 +3054,53 @@ function paintStall() {
   stallBoard.refresh();
 }
 
+/// The bag, as a shelf rather than as canvas rows.
+///
+/// **Eighty-eight loose components is not a thing to draw on a board.** The
+/// packing screen's bag is a handful; a run's whole bag made the counter's
+/// canvas two thousand pixels tall, which put it behind the town's own pinned
+/// action bar — reported from play as *nothing is able to be dragged over*.
+/// So it is a shelf, ordered the way the bank's is, and clicking a row puts
+/// the thing in hand. **Where it may then go is still the board's**, which is
+/// core's answer and the reason there is no second opinion here.
+function paintStallBag(b) {
+  const box = $('stall-bag');
+  const rows = sortedForBank(b.slots_bag ?? []);
+  if (!rows.length) {
+    box.replaceChildren(Object.assign(document.createElement('p'), {
+      className: 'note', textContent: 'Nothing loose to sell.',
+    }));
+    return;
+  }
+  box.replaceChildren(...rows.map((w) => {
+    const el = document.createElement('button');
+    el.type = 'button';
+    el.className = 'wares';
+    el.innerHTML = `<b>${w.name}</b><span class="spec">${w.kind}</span>` +
+      `<span class="cost">worth ${w.worth}</span>`;
+    el.onclick = () => {
+      stallBoard.hold(w.id, w.name, 'stall');
+      stallSays('');
+    };
+    return el;
+  }));
+}
+
 /// The sentence over the counter, the ledger and the eight buyers.
 function paintStallText() {
   const b = JSON.parse(stall_json());
   if (!b) return;
   const s = b.slots[0];
   const out = s.placed.length;
+  // **Every figure is the character's, not the constant's.** A Factor's
+  // buyers stretch further and come by oftener, and a sentence printing the
+  // general numbers would be true of the game and false of their counter.
   $('stall-note').textContent =
     `${s.cols}×${s.rows} and not a rectangle. Put something out, set a price, ` +
-    `and somebody comes by every fight you win. Within ${b.fair_pct}% of what ` +
-    `it is worth is a fair ask and always sells; over that, two buyers in ` +
-    `three walk away. ` +
+    `and ${b.customers === 1 ? 'somebody comes' : `${b.customers} people come`} ` +
+    `by every fight you win. Within ${b.fair_pct}% of what it is worth is a ` +
+    `fair ask and always sells; over that, two buyers in three walk away. ` +
+    (b.margin_pct ? `Every sale pays you ${b.margin_pct}% over. ` : '') +
     (out ? `${out} on the counter.` : 'Nothing on it.');
   // **One price control a row, beside the grid.** A number typed into a canvas
   // is a control a keyboard cannot reach, and a box that follows the pointer is
@@ -3051,6 +3146,7 @@ function paintStallText() {
     : [Object.assign(document.createElement('p'), {
         className: 'note', textContent: 'Nothing has sold yet.',
       })]));
+  paintStallBag(b);
   $('stall-buyers').replaceChildren(...b.buyers.map((w) => {
     const el = document.createElement('div');
     el.className = 'wares';
@@ -4803,6 +4899,13 @@ async function main() {
   window.__stallLegal = (id, slot) => stall_legal_anchors(id, slot);
   window.__stallPlace = (id, slot, x, y) => stall_place(id, slot, x, y);
   window.__paintStall = () => paintStall();
+  // **Where a cell and a bag slot actually are on the canvas**, so a check can
+  // click the counter rather than call its payload. The board owns its own
+  // layout — `cellAt` and `bagAt` are the inverse of these two — and a harness
+  // that worked the coordinates out itself would be a second answer to *where
+  // is that cell*, which is the thing the board exists to be the only one of.
+  window.__stallCellSpot = (x, y) => stallBoard.cellCentre('stall', x, y);
+  window.__stallBagSpot = (i = 0) => stallBoard.bagCentre(i);
   window.__buyerComesBy = () => a_buyer_comes_by();
   window.__runJson = () => run_json();
   window.__trainHere = () => train_here();

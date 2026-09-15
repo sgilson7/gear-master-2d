@@ -484,7 +484,11 @@ fn pay_a_win(game: &mut Game, creature: &'static str, receipt: &mut Vec<String>)
     // has followed since M9.1 and the reason a seeded walk replays at all.
     if let Some(seed) = seed_off(creature) {
         let rolled = game.rng.below(1_000) < crate::plot::SEED_PER_MILLE as usize;
-        let room = game.character.seeds_held(&seed.id) < crate::plot::DRAWER_CAP;
+        // **How deep the drawer is, asked of the character.** `DRAWER_CAP` for
+        // everybody and a Grower's own number for a Grower — read
+        // unconditionally rather than branched on a class, which is the shape
+        // `draughts`, `handler` and `factor` all take.
+        let room = game.character.seeds_held(&seed.id) < game.character.grower().1;
         if rolled && room {
             game.character.pocket_seed(&seed.id);
             receipt.push(format!("{} for the drawer.", seed.name));
@@ -501,7 +505,11 @@ fn pay_a_win(game: &mut Game, creature: &'static str, receipt: &mut Vec<String>)
     // Rolled whether or not anything is on the counter, for the seed's own
     // reason: a stream that depends on what a player has put out is a stream
     // that does not replay.
-    for _ in 0..crate::stall::CUSTOMERS_PER_BELL {
+    // **How many, asked of the character.** One for everybody and a Factor's
+    // own number for a Factor — read unconditionally rather than branched on a
+    // class, so the old behaviour is the untrained case.
+    let customers = game.character.factor().0;
+    for _ in 0..customers {
         if let Some(said) = game.a_buyer_comes_by() {
             receipt.push(said);
         }

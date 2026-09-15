@@ -952,3 +952,15 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
    next screen that wants one does not get. */
 #town-street { margin: 0 0 12px; flex-wrap: wrap; }
 #town .building[hidden] { display: none !important; }
+
+/* **Who is out of the kennel.** Over your board, because that is where its
+   rows are and a companion has no cells of its own to stand in. */
+.outrow { display: flex; flex-wrap: wrap; gap: 14px; margin: 0 0 10px; }
+.outone { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.outone img { width: 34px; height: 34px; }
+#fight-out[hidden] { display: none !important; }
+
+/* A door on the street: it opens a screen rather than showing a panel, so it
+   reads as a way out of the row rather than as one of its stops. */
+#town-street .door { margin-left: 10px; font-style: italic; }
+#town-street .door:first-of-type { margin-left: 22px; }

@@ -290,7 +290,7 @@ fn a_crop_grows_one_stage_per_win_anywhere() {
     // is whether the bell reaches *every* bed, which needs two of them — and
     // two beds is what `A Second Bed` is for.
     g.train("Grower").expect("somebody teaches it");
-    g.character.skills_taken.push("gr-second-bed".into());
+    g.character.skills_taken.push("gr-a-deeper-drawer".into());
     g.plant("kettleworks", "cairn-dust-seed", (0, 0), 0, D).expect("one at the works");
     g.plant("the-third-town", "cairn-dust-seed", (0, 1), 0, D).expect("one down there");
     let stage = |g: &Game, t: &str| g.character.beds[t][0].stage;
@@ -550,24 +550,36 @@ fn forced_under_glass_harvests_at_two() {
     g.harvest("the-third-town", (0, 1)).expect("a grower's row is up a win early");
 }
 
-/// **A second bed is two towns**, and one bed is one.
+/// **Every town's bed works**, and the drawer is what a Grower deepens.
+///
+/// It was one bed at a time and the Grower bought a second, and that was
+/// reported from play as a bug rather than met as a decision: *in the kettle
+/// works i cant have something in the bed while the end of all gears has
+/// something in the bed.* A bed is a place, its cells are the puzzle and the
+/// wins it takes to come up are the cost; restricting *which* town you may
+/// work adds a walk home before you may plant, which is bookkeeping.
+///
+/// The node moved to `seed_cap` rather than being deleted — a node that buys
+/// nothing is the thing M13.6 spent a whole milestone finding sixty of.
 #[test]
-fn a_second_bed_is_two_towns() {
+fn every_towns_bed_works_and_a_grower_keeps_more_seed() {
     let mut g = a_fighter(0x5EED_0000_6207_0002);
     for _ in 0..2 {
         g.character.pocket_seed("cairn-dust-seed");
     }
     g.plant("the-third-town", "cairn-dust-seed", (0, 1), 0, D).expect("the first row");
-    // Everybody else keeps one.
-    let why = g.plant("kettleworks", "cairn-dust-seed", (0, 0), 0, D).unwrap_err();
-    assert!(why.contains("only keep"), "{why}");
-    assert_eq!(g.character.seeds_held("cairn-dust-seed"), 1, "a refusal took the seed");
+    g.plant("kettleworks", "cairn-dust-seed", (0, 0), 0, D).expect("and the second town's");
+    assert_eq!(g.character.beds.len(), 2, "two towns, two rows");
 
-    g.train("Grower").expect("somebody teaches it");
-    g.character.skills_taken.push("gr-second-bed".into());
-    assert_eq!(g.beds_allowed(), 2);
-    g.plant("kettleworks", "cairn-dust-seed", (0, 0), 0, D).expect("a grower keeps two");
-    assert_eq!(g.character.beds.len(), 2);
+    // And the drawer is the Grower's axis now.
+    let plain = a_fighter(1).character.grower().1;
+    assert_eq!(plain, gm2d_core::plot::DRAWER_CAP);
+    let mut gr = a_fighter(2);
+    gr.train("Grower").expect("somebody teaches it");
+    let untuned = gr.character.grower().1;
+    assert!(untuned > plain, "a Grower keeps {untuned} and everybody else {plain}");
+    gr.character.skills_taken.push("gr-a-deeper-drawer".into());
+    assert_eq!(gr.character.grower().1, untuned + 3, "three more of each");
 }
 
 /// **The Long Row is placed by the map**, so the same node gives the same cells
@@ -577,7 +589,7 @@ fn the_long_row_is_placed_by_the_map() {
     let mut g = a_fighter(0x5EED_0000_6207_0003);
     let before = g.bed_mask("kettleworks", D);
     g.train("Grower").expect("somebody teaches it");
-    g.character.skills_taken.push("gr-second-bed".into());
+    g.character.skills_taken.push("gr-a-deeper-drawer".into());
     g.character.skills_taken.push("gr-the-long-row".into());
     let after = g.bed_mask("kettleworks", D);
     assert_eq!(after.len(), before.len() + 3, "the long row added {} cells", after.len() - before.len());

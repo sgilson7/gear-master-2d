@@ -1315,16 +1315,6 @@ impl Game {
         Vec::new()
     }
 
-    /// How many towns this character may have something growing in at once.
-    ///
-    /// **A bed is a place and this is a licence to use one.** The masks are in
-    /// the map files and every town has one; what the Grower buys is being
-    /// allowed to keep more than one going, which is the difference between a
-    /// bed and a plot.
-    pub fn beds_allowed(&self) -> u32 {
-        self.character.grower().1
-    }
-
     /// Plant one seed out of the drawer, or say why not.
     ///
     /// **It refuses on the *harvest* shape and names the cells it lacks.** A
@@ -1352,27 +1342,22 @@ impl Game {
         if mask.is_empty() {
             return Err("There is no bed here.".into());
         }
-        // **One bed at a time, unless you are a Grower.** Counted over towns
-        // that have something in them rather than over crops, because the
-        // licence is to work a *bed*.
-        let working: Vec<&String> = self
-            .character
-            .beds
-            .iter()
-            .filter(|(t, cs)| !cs.is_empty() && t.as_str() != town)
-            .map(|(t, _)| t)
-            .collect();
-        if working.len() as u32 >= self.beds_allowed() {
-            return Err(format!(
-                "You have a row going at {}, and you can only keep {}.",
-                working.iter().map(|s| s.replace('-', " ")).collect::<Vec<_>>().join(" and "),
-                if self.beds_allowed() == 1 {
-                    "one".to_string()
-                } else {
-                    format!("{}", self.beds_allowed())
-                },
-            ));
-        }
+        // **Every town's bed works, always.** It was one at a time — a licence
+        // the Grower widened — and it was reported from play as a bug rather
+        // than met as a decision: *in the kettle works i cant have something in
+        // the bed while the end of all gears has something in the bed.*
+        //
+        // Which is right. A bed is a place, its mask is in the map file, and
+        // what is standing in it is yours per town. Restricting *which* town
+        // you may work adds bookkeeping — walk back to harvest before you may
+        // plant — rather than a decision, and what a bed already costs you is
+        // its own cells and the wins a crop takes to come up. The bank is one
+        // vault in every town and the counter is one shelf in every town; a bed
+        // is the one bench that is genuinely per-place, and that is enough.
+        //
+        // The Grower's node moved to `seed_cap` rather than being deleted,
+        // because a node that buys nothing is the thing M13.6 spent a milestone
+        // finding sixty of.
         let want = crate::plot::harvest_cells(plot, seed, at, turn);
         let taken: Vec<(i8, i8)> = self
             .character
@@ -2184,7 +2169,16 @@ impl Game {
     /// The shelf's mask, widened by nothing — it is the same nine cells for
     /// everybody, because a counter is a counter.
     pub fn shelf_mask(&self) -> Vec<(i8, i8)> {
-        crate::stall::SHELF.to_vec()
+        let (_, _, cells, _, _) = self.character.factor();
+        // **Widened by the same function the bed's is**, so a longer counter
+        // and a longer row grow the same way: cells the mask's own bounding box
+        // has room for, in reading order, so the same node gives the same cells
+        // to everybody. A second widener would be a second answer to *where
+        // does an extra cell go*.
+        crate::plot::widened(
+            crate::stall::SHELF,
+            cells.saturating_sub(crate::stall::SHELF.len() as u32),
+        )
     }
 
     /// What the barrel would charge for a component, which is what a fair ask
@@ -2329,21 +2323,30 @@ impl Game {
         }
         let (piece, price, worth) = best?;
         let high_ok = self.rng.below(crate::stall::HIGH_ODDS as usize) == 0;
-        let ask = crate::stall::ask_of(price, worth);
+        let (_, margin_pct, _, _, patience_pct) = self.character.factor();
+        let ask = crate::stall::ask_of_with(price, worth, patience_pct);
         let name = self.character.registry.def(piece).name.to_string();
         if ask == crate::stall::Ask::High && !high_ok {
             return Some(format!("{bname} looked at the {name}, and then at the price."));
         }
-        // Sold.
+        // Sold. **The margin is paid here and nowhere else** — a percentage in
+        // `bounty_with_class` would pay it on every fight, which is the third
+        // voice arguing about what Fnorp is worth that `SYSTEMS-PITCH.md` §3.3
+        // names as this specialization's risk.
+        let paid = price + price * margin_pct / 100;
         self.character.stall.retain(|o| o.piece != piece);
-        self.character.gold += price;
+        self.character.gold += paid;
         self.character.ledger.push(crate::stall::Sale {
             buyer: bid.clone(),
             item: name.clone(),
-            paid: price,
+            paid,
             worth,
         });
-        let mut said = format!("{bname} took the {name} for {price} Fnorp.");
+        let mut said = if paid > price {
+            format!("{bname} took the {name} for {price} Fnorp, and rounded up to {paid}.")
+        } else {
+            format!("{bname} took the {name} for {price} Fnorp.")
+        };
         if let Some(extra) = self.a_bargain_off_the_last_two() {
             said.push(' ');
             said.push_str(&extra);
@@ -2369,7 +2372,10 @@ impl Game {
             return None;
         }
         let kin = data.kin_of(&a, &b)?;
-        if self.rng.below(1000) as u32 >= crate::stall::BARGAIN_PER_MILLE {
+        let (_, _, _, bargain_pct, _) = self.character.factor();
+        let rate = crate::stall::BARGAIN_PER_MILLE as i32
+            + crate::stall::BARGAIN_PER_MILLE as i32 * bargain_pct / 100;
+        if (self.rng.below(1000) as i32) >= rate {
             return None;
         }
         match kin.gives.clone() {

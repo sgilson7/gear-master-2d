@@ -2456,6 +2456,11 @@ def check_a_trainer_takes_you_on(page, name, fails, base):
         body["character"]["gold"] = 50_000
         body["character"]["class"] = "Berserker"
         body["character"]["xp"] = 9_000
+        # **A point to spend**, because the check goes on to spend one: the
+        # reported bug is that the tree a specialization hands you refuses
+        # every node, and a character with nothing to spend cannot tell that
+        # from a tree that works.
+        body["character"]["skill_points"] = 4
         body["character"].pop("specialization", None)
 
     plant(page, base, at_the_kiln, stem="trainer")
@@ -2498,8 +2503,55 @@ def check_a_trainer_takes_you_on(page, name, fails, base):
         "#sheet li", "e => e.map(x => x.textContent.trim())"))
     if t["class"].lower() not in sheet.lower():
         fails.append(f"{name}: became a {t['class']} and the sheet does not say so: {sheet!r}")
+    # **And the tree it hands you can be spent in**, which is the whole point of
+    # being one and is what shipped broken. Reported from play on a live build:
+    # *the skill tree I got was the apothecary but whenever I try and put points
+    # into it, I get a message saying "that is Apothecary's, and you are not
+    # one".* `spendable_trees` drew the tab and `take_skill` decided off
+    # `classes()` — **a rule with two answers**, and the two did not disagree
+    # about the rule, they disagreed about which list *is* the rule.
+    #
+    # The engine half is `every_tree_a_character_is_offered_can_be_spent_in`.
+    # This is the half only a browser can ask: that the tab is drawn **and** a
+    # point spent in it lands.
     clear_screens(page)
-    print(f"ok: a trainer takes you on, and you are {an(became)} afterwards")
+    page.click("#skills")
+    page.wait_for_selector("#tree", timeout=8000)
+    tabs = page.eval_on_selector_all("#tree-tabs button", "e => e.map(b => b.textContent)")
+    i = next((n for n, x in enumerate(tabs) if t["class"].lower() in x.lower()), None)
+    if i is None:
+        fails.append(f"{name}: no {t['class']} tab in the tree: {tabs}")
+        clear_screens(page)
+        return
+    page.locator("#tree-tabs button").nth(i).click()
+    page.wait_for_timeout(300)
+    # **`taken`, which is the payload's name for it.** `skills_taken` is the
+    # engine's field and `character_json` prints it as `taken` — reading the
+    # wrong key gives an empty list twice and `0 != 1` fails a build that
+    # works, which is the check lying in the direction that looks like a bug.
+    before = page.evaluate("() => (window.__character().taken ?? []).length")
+    # **Open, not merely present.** `.open` is the class the tree puts on a
+    # node you could take right now — the few open doors are what wants
+    # finding, and a locked one refuses for a reason that is not this bug.
+    node = page.locator("#nodes .wares.open").first
+    if node.count() == 0:
+        node = page.locator("#nodes .wares:not([disabled])").first
+    if node.count() == 0:
+        fails.append(f"{name}: the {t['class']} tree has no node that can be taken")
+        clear_screens(page)
+        return
+    picked = node.locator("b").text_content()
+    node.click()
+    page.wait_for_timeout(400)
+    after = page.evaluate("() => (window.__character().taken ?? []).length")
+    clear_screens(page)
+    if after != before + 1:
+        said = (page.text_content("#tree-says") or "").strip()
+        fails.append(f"{name}: spent a point on {picked!r} in the {t['class']} "
+                     f"tree and nothing was taken: {said!r}")
+        return
+    print(f"ok: a trainer takes you on, you are {an(became)} afterwards, and "
+          f"a point goes into {picked!r} in their own tree")
 
 
 def check_a_won_fight_offers_the_creature(page, name, fails, _base):

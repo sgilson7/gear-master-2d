@@ -100,3 +100,21 @@ off it.*
 
 Browser gate: **104 `ok:` lines**, chromium. Suite green in **99 binaries**.
 Notebook: **29 rows, 22 closed, 7 open.**
+
+### after M21.16 — an errand for every bench
+
+| milestone | what it is | tests | Δ | commit |
+|---|---|---|---|---|
+| M21.0–M21.5 | drawer, bed, enchs, pairs, Grower, kennel, companion | 1,053 | | `572796d` |
+| M21.7 · .12 · .13 | Handler · the offer and the result screen · a rarer ingredient | 1,055 | +2 | `1d13985` |
+| M21.8 | the counter, eight buyers, twenty-eight bargains | 1,069 | +14 | `1d13985` |
+| M21.14 | the town is a street of seven buildings | 1,069 | — | `cfc9f14` |
+| — | **reported from play**: a specialization tree that refused every node, and a class lane no screen drew | 1,071 | +2 | `093e851` |
+| **M21.16** | **an errand for every bench — `Goal::Show`, twelve errands, four chains** | **1,075** | **+4** | **`f3c75f0`** |
+| — | the specialization bug, as a gate check in its own words | 1,075 | — | `84fcfda` |
+| M21.9 | the Factor | pending | | |
+| M21.10 | twenty-five figures | pending | | |
+| M21.11 | gate, walk, glossary, deploy | pending | | |
+
+Browser gate: **107 `ok:` lines**, chromium. Suite green in **100 binaries**.
+Notebook: **43 rows, 40 closed, 3 open.**

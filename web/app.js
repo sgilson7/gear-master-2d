@@ -1331,6 +1331,12 @@ let theirs = null;
 /// Packing in a town rather than in front of something. There is nothing to
 /// fight, so the advance slot belongs to the way out.
 let packingOnly = false;
+/// Which town the inventory screen was opened from, if it was. See `#pack`.
+let packedFromTown = null;
+/// The town the player is standing in, as `openTown` was last told. Written
+/// there and read by the inventory screen's way back, which is the one place
+/// that has to know where it came from.
+let townOpen = null;
 
 /// Which stage is showing, and what the one action row holds while it does.
 ///
@@ -1566,6 +1572,21 @@ function closeFight() {
   $('take-along-why').hidden = true;
   $('fight').hidden = true;
   paintPanel(); draw(); autosave();
+  // **Back into the town you packed from.** The inventory screen is the fight
+  // screen with the fight taken out, and closing it put the player on the map —
+  // out of the town they were standing in. Reported from play: *the character
+  // sheet inventory screen should also return you to town when you press done
+  // instead of kicking you out of town.*
+  //
+  // **Cleared before it is used**, so a later close cannot walk back into a
+  // town nobody is standing in — the flag is about *this* trip through the
+  // packing screen and nothing else.
+  if (packedFromTown) {
+    const back = packedFromTown;
+    packedFromTown = null;
+    openTown(back);
+    return;
+  }
   // A fight is where a level lands, so it is where the fork is offered.
   if (offerClass()) return;
   // **And a bodyguard is the one fight whose tile answers differently
@@ -2713,6 +2734,7 @@ function portrait(el, src, alt) {
 }
 
 function openTown(id) {
+  townOpen = id;
   const place = world.places.find((p) => p.id === id);
   $('town-name').textContent = place?.name ?? id;
   portrait($('town-art'), figure('places', id), place?.name ?? id);
@@ -2791,19 +2813,36 @@ function paintStreet() {
   // `null` from then on, with no error anywhere. *A node you moved is a node
   // you have to keep hold of.*
   if (!doors) {
-    doors = DOORS.map($).filter(Boolean);
-    for (const b of doors) b.classList.add('tab', 'door');
+    doors = {
+      first: DOORS_FIRST.map($).filter(Boolean),
+      last: DOORS_LAST.map($).filter(Boolean),
+    };
+    for (const b of [...doors.first, ...doors.last]) b.classList.add('tab', 'door');
   }
-  for (const b of doors) strip.appendChild(b);
+  // **What you came to do is first.** Asked for: *the character sheet / level
+  // up should be the first two options in town.* A player walks into a town to
+  // pack and to spend what they are carrying; the shelves and the benches are
+  // what they do while they are there.
+  //
+  // **Every use goes through the capture**, and that is the whole of the fix
+  // rather than half of it: `replaceChildren` above wipes the strip, so after
+  // the first paint these nodes are detached and `getElementById` answers
+  // `null` for all four. Capturing them and then still looking them up by id is
+  // the same bug with a variable beside it — which is how it came back.
+  for (const b of [...doors.first].reverse()) strip.prepend(b);
+  for (const b of doors.last) strip.appendChild(b);
 }
 
 /// The door buttons themselves, captured once. See `paintStreet`.
 let doors = null;
 
-/// The four that open a screen rather than showing a panel, in the order a
-/// player wants them: what you came to do, then what you came to spend, then
-/// the two benches that are rooms of their own.
-const DOORS = ['pack', 'bank', 'bench', 'cart'];
+/// The four that open a screen rather than showing a panel.
+///
+/// **Two of them come before the street and two after it.** What you came into
+/// a town to do is pack and to spend what you are carrying; the shelves and the
+/// benches are what you do while you are there.
+const DOORS_FIRST = ['pack', 'bank'];
+const DOORS_LAST = ['bench', 'cart'];
 
 /// The bank: your bag on one shelf, the vault on the other.
 ///
@@ -5039,6 +5078,11 @@ async function main() {
     // packed in a town.
     portrait($('fight-art'), null, '');
     packingOnly = true;
+    // **Where to go back to.** Packing in a town opens the fight screen with
+    // the fight taken out of it, and closing it used to put the player on the
+    // map — out of the town they were standing in, with the shelf and the
+    // counter behind them. Reported from play.
+    packedFromTown = townOpen;
     $('run').textContent = 'Done';
     $('fight').hidden = false;
     stage('board');

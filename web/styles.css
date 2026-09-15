@@ -964,3 +964,12 @@ kbd { font-family: var(--mono); font-size: .85em; border: 1px solid var(--line);
    reads as a way out of the row rather than as one of its stops. */
 #town-street .door { margin-left: 10px; font-style: italic; }
 #town-street .door:first-of-type { margin-left: 22px; }
+
+/* **A door that is lit stays lit.** `.treetabs button` and `button.primary`
+   have the same specificity, so source order was deciding — and the strip is
+   further down this file, which quietly took the brass off Level up the moment
+   it became a tab. Reported from play. */
+#town-street button.primary {
+  background: var(--brass); border-color: var(--brass); color: var(--surface);
+}
+#town-street button.primary:hover { filter: brightness(1.1); color: var(--surface); }

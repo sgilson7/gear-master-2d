@@ -82,6 +82,11 @@ def close_fight(page):
     # clicked `#run` alone hung for thirty seconds on any check that ran a
     # fight to its end, which is every check that reads a receipt. Found by the
     # first one that did.
+    # **And packing in a town comes back to the town**, which a check that
+    # opened the screen from a town is entitled to but one that only wanted the
+    # screen shut is not. So this clears whatever it finds afterwards: the
+    # caller asked for the fight screen to be gone, not for a particular place
+    # to be underneath it.
     for sel in ("#run", "#go"):
         if page.is_visible(sel):
             try:
@@ -3673,7 +3678,11 @@ def check_the_shelf_is_the_shelf(page, name, fails):
             break
         step("ArrowLeft")
     if not page.is_visible("#town"):
-        fails.append(f"{name}: could not get back into the town")
+        up = page.evaluate("() => [...document.querySelectorAll('.screen')]"
+                           ".filter(e => !e.hidden).map(e => e.id)")
+        pos = page.evaluate("() => JSON.parse(window.__position())")
+        fails.append(f"{name}: could not get back into the town "
+                     f"(at [{pos['x']}, {pos['y']}] on {pos['map']}, screens {up})")
         return
     after = page.evaluate("""() => [...document.querySelectorAll('#shelf .wares')].map(b => ({
       name: b.querySelector('b').textContent,
@@ -8237,6 +8246,14 @@ def walk_the_gate(browser, name, fails=None):
         check_a_grid_says_what_it_takes(page, name, fails)
         page.click("#run")
         page.wait_for_selector("#fight", state="hidden", timeout=8000)
+        # **Closing the inventory screen puts you back in the town now.**
+        # Reported from play — *the character sheet inventory screen should also
+        # return you to town when you press done instead of kicking you out of
+        # town* — so the walk has to leave on purpose rather than being put on
+        # the map by the packing screen's own exit.
+        if page.is_visible("#town"):
+            page.click("#leave")
+            page.wait_for_selector("#town", state="hidden", timeout=8000)
 
     # --- an event that says what it pays ------------------------------------
     # Stood on rather than walked into: the box is the milestone's whole

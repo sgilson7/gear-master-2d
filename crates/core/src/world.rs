@@ -461,6 +461,33 @@ pub struct PlaceDef {
     /// not — which the ordering enforces rather than a condition stating it.
     #[serde(default)]
     pub floors: Vec<Floor>,
+    /// A name this place does not have yet.
+    ///
+    /// **The third town's post, and the only way anything in this game changes
+    /// what a place is called.** It ships as *a town with no name on the post
+    /// yet* — which M14 wrote because the name was the human's and nobody had
+    /// chosen one — and the day somebody cuts the post it says the name.
+    ///
+    /// Read by [`crate::data::map_read_through`] and nowhere else, which is
+    /// what makes it safe: that function is the one door every *game* question
+    /// goes through, the same door the drains already come in at, and `map` is
+    /// the file. So a place is named by the game and unnamed in the file, and
+    /// the split is `place_at`/`place_now`'s exactly. Eleven readers in the
+    /// shim print `p.name` and not one of them had to be touched.
+    #[serde(default)]
+    pub named: Option<Named>,
+}
+
+/// A name a place takes once something has happened.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Named {
+    /// What has to have happened. Anything [`met`] accepts, which includes a
+    /// `done:` errand — and the third town's name is exactly that: it is cut
+    /// into the post when the errand to cut it is handed in.
+    pub when: String,
+    /// What it is called afterwards.
+    pub name: String,
 }
 
 /// Terrain that becomes other terrain once a mark is in `answered`.

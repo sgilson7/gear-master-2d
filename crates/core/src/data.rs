@@ -243,6 +243,18 @@ pub fn map_read_through(
 ) -> crate::world::World {
     let mut w = map(id, difficulty);
     w.drain(state);
+    // **A place that has been given its name has it.** One door, here, beside
+    // the drains and for the same reason: this function is what a *game* asks
+    // and `map` is the file, so a lint that read the file still sees the post
+    // with nothing on it and every screen in the shim prints `p.name` and is
+    // right without being touched.
+    for p in &mut w.places {
+        if let Some(n) = &p.named {
+            if crate::world::met(state, &n.when) {
+                p.name = n.name.clone();
+            }
+        }
+    }
     if let Some((surveyed, kind)) = &state.active_survey {
         if surveyed == &w.id {
             w.survey = crate::survey::mods_for(&w.id, kind, items_assembled);

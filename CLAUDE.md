@@ -3922,6 +3922,59 @@ draws each one under its own heading.
   that lived only in `theme.rs` prints a hyphenated id under any theme that has
   not been told about it.
 
+### High Wick comes down, and the post gets its name
+
+**M22.** The third town is settled in three rungs off Kettleworks' own counter:
+`nobody-has-named-it` sends you to confirm the post is empty, `send-for-the-clerk`
+brings the High Wick clerk down, `the-long-mirror-inventory` opens volume ten and
+brings the arcane shelf down with it, and `cut-the-post` puts the name on the
+post. **Two wings, thirteen shelf lines, two commissions, three errands and one
+name.**
+
+- **The town keeps its own id and its own empty shelf.** High Wick's shelf is a
+  *wing* of it — `high-wick` is still `high-wick`, its stock is keyed by its own
+  id, and `bought`'s `(id, index)` contract is untouched. What the third town
+  sells is what is standing in it, and `shop::counters_at` is the one answer.
+- **The shelf lost three lines coming down, and that is what changed about it.**
+  Its note called it *the only one that sells a book, an ink and a spell in the
+  same room, which is the whole of what makes a caster weapon buildable at all*
+  — written when High Wick was a town somebody would reach early. It is at the
+  far end of two dungeons now, and the thing that makes a caster weapon
+  buildable **from the first afternoon** is the barrel, which has carried a
+  book, two spells and an orb since M20 for exactly that reason. So the
+  `Chapbook`, the `Mirrorcast` and both `Rime Nova`s came off:
+  `on_a_shelf_you_can_reach` read from the shelf's side. Nothing was ever
+  bought there — it has been on no map since the fork — so the renumbering
+  costs nobody anything, and **it can only be free once.**
+- **What the clerk is sent for is a fight down there and a word about it**, and
+  the plan asked for a `Bring` of *something the Undercountry drops*: nothing
+  down there drops anything. A `Slay`'s token is created by the errand and
+  cannot be had before it is asked for or after it is done, which is what *go
+  down and come back with proof* wants. The token is `A Word About the Cellar`,
+  one of six rumours the cut campaign left behind — on no shelf, granted by
+  nothing, unreachable since the fork — so **no new component and no
+  fingerprint move.**
+- **`cut-the-post` is the first errand that has ever pointed at The
+  Unwritten**, the longest fight in the game, which had no errand and no drops
+  and nothing anywhere pointing at it. It pays a velvet-rope piece that was
+  reachable from nowhere, which is the same move again.
+- **A post can be given a name, and it is applied where the drains are.**
+  `PlaceDef::named` is `{ when, name }` and `data::map_read_through` reads it —
+  the one door every *game* question goes through. So `data::map` is the file
+  and still says *a town with no name on the post yet*, `data::map_now` says
+  **Low Wick**, and the eleven places in the shim that print `p.name` are right
+  without being touched. That is `place_at`/`place_now`'s split, one field
+  along; a `World::name_of` with one caller would have meant finding all eleven
+  with no help from the compiler, because both are strings.
+- **`UNWRITTEN` and `STAGED` are emptied and asserted empty, never deleted.**
+  The assertion is what turns *nothing is staged* into a claim rather than an
+  absence — a shelf that grew no ground under it, or a town that grew no shelf,
+  would read as an oversight again, which is what both lists were written to
+  stop. And four lints that asked *does this town trade* of the town's own
+  shelf id had to learn to ask it of **the town and every wing of it**,
+  arrived or not: that is a question about what a town is rather than about a
+  particular afternoon.
+
 ### A finished errand is a thing that has happened
 
 **`world::met` is the one predicate**, lifted out of `place_is_there`'s own
@@ -6587,6 +6640,9 @@ about a string. Every one caught something on its first run:
 | 21.10 | **Thirteen figures, not twenty-five, and they are the other ones.** §M21.10 lists eight crops, two growth stages, an ench seed, three benches and three papers. The benches **draw themselves** — they are `Board`s, and a crop is already a coloured polyomino with a motif. What had nowhere at all was the people: eight buyers as rows of plain text, and **five specializations with no art of any kind**, the plan having said three because it predates the Grower, the Handler and the Factor. | `art/ticket.tex`, `art/buyer.tex` |
 | 21.16 | **Every town's bed works, and the Grower's `beds` node is `seed_cap`.** One bed at a time was the plan's and was reported from play as a bug rather than met as a decision. A bed is a place; its cells are the puzzle and the wins a crop takes are the cost. The node moved rather than being deleted. | `crates/core/src/game.rs`, `plant` |
 | 20.7 | **A specialization is its own slot, not a fourth entry in `classes`.** Everything that walks that list walks it to ask *which pair are you*, and a specialization pairs with nothing. | `crates/core/src/character.rs`, `specialization` |
+| 22.4 | **The way south is a `Door` in M22.3 and a `Gate` in M22.6.** `PLAN-M22.md` §M22.3 turns it into a gate three milestones before `the-lower-table` exists, and `data::map` **falls back to the overworld** for a map this build has not got — so the gate led to West Bambulon and `every_gate_lands_beside_its_door` said so on the first run. `needs_all` is a `Door`'s field as much as a `Gate`'s, so the refusal and the naming ship in M22.3 and only the kind waits. | `data/maps/the-undercountry.tiles.json` |
+| 22.5 | **A name is applied in `data::map_read_through`, not by a `World::name_of` reader.** Decision 7 gives one reader; the shim prints `p.name` in **eleven** places and both are strings, so the compiler helps with none of them. That function already rewrites the map the game sees — it applies the drains — so it applies `named` too: the file has the post with nothing on it and the game has the name, which is `place_at`/`place_now`'s split, and no reader moved. | `crates/core/src/data.rs` |
+| 22.6 | **The arcane shelf lost the three lines the barrel carries, and the plan says its index order is untouched.** Placing `high-wick` made `on_a_shelf_you_can_reach` count it and `parse` refused the file. Taking them off the *barrel* was measured and rejected — the only unclaimed replacements rate 13 and 12 against the 8 and 5 they replace, which is +0.75 on a mean `the_barrel_is_a_floor_and_not_a_ceiling` holds at 3.87 under 3.90, so the opening barrel would be re-tuned to protect a counter nobody reaches until level forty-five. The shelf's own note called it *what makes a caster weapon buildable at all*, written when High Wick was an early town; the thing that does that from the first afternoon is the barrel. 17 → 13, and it costs nobody anything because the shelf has been on no map since the fork and no `(id, index)` has ever been recorded. | `data/shops.json` |
 | 22.1 | **A cup of rock is not sealed, so the cup is a map.** `PLAN-M22.md` decision 9 stands the table's boss in a sealed cup and makes a pocket the only way in. Measured before a map was authored: **6,546 of the shots taken from the 278 walkable tiles outside the draft cup come to rest inside it**, through eight tiles of solid rock — `shot::shoot_with` tests the tile a tick *landed on* and never the tiles it crossed, and one tick is 18.75 tiles at power ten. A two-thick wall is transparent too and nineteen tiles would be needed. So the cup is a **map of its own**, reached by the far pocket's `to`/`at_to`, which is exactly what decision 8 already builds — `warp_to`, the call the sunk arm makes. Maps go to 31, not 30, and *the boss stands nowhere but the cup* becomes true by construction. | `data/maps/`, `crates/core/src/shot.rs` |
 | 22.2 | **The boss is dressed against `common::geared_from` and the plan says `common::from_save(common::THE_RUN)`.** The run is 974 health and 9 strength over 11 items at level 45 and **beats nothing at that depth** — it loses to The Unwritten in 7.7s and to all ten of the Wextreen deep — so *a win in 20–28 seconds* against it is a bracket only something shallower than the map's own pool could meet. `every_region_has_a_fight_you_can_win_and_every_boss_can_be_beaten` has required `geared_from` of every boss on a tile since M11.7 and the Tenth Surveyor was bracketed against it for this reason. The run stays as the **floor** and is asserted to lose. | `crates/core/tests/common/mod.rs` |
 | 22.3 | **`TownShelf` gains three fields and the plan costed two.** `wing_of` and `arrives` are the plan's; `name` is the third, because a wing is drawn under its own heading on a counter and every other counter in the game reads its name out of the map file it stands in. A wing stands in none, and a name that lived only in `theme.rs` prints a hyphenated id under any theme that has not been told about it — which is the fall-through `place_name` already ends at. `ShopsData::parse` refuses a nameless wing; the shim still asks the theme first. | `crates/core/src/shop.rs`, `TownShelf` |

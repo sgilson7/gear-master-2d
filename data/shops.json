@@ -101,13 +101,12 @@
     },
     {
       "id": "high-wick",
-      "_note": "The arcane shelf, and the only one that sells a book, an ink and a spell in the same room — which is the whole of what makes a caster weapon buildable at all.",
+      "wing_of": "the-third-town",
+      "arrives": "done:the-long-mirror-inventory",
+      "name": "what came down from High Wick",
+      "_note": "The arcane shelf, and the counter a caster board is **finished** at. **A wing of the third town since M22.3, and still `high-wick`**: a sale is `(id, index)` and the index is the identity, so the shelf comes down one country without the id moving. It arrives when volume ten is open, which is the clerk's own errand.\n\n**It lost three lines coming down, and that is what changed about it.** Its note used to say it was *the only one that sells a book, an ink and a spell in the same room, which is the whole of what makes a caster weapon buildable at all* — written when High Wick was a town somebody would reach early. It is the Undercountry's now, at the far end of two dungeons, and the thing that makes a caster weapon buildable from the first afternoon is the **barrel**, which has carried a book, two spells and an orb since M20 for exactly that reason. So the Chapbook, both Rime Novas and the Mirrorcast came off: a counter at the end of the game stocking what the barrel under it has sold for eleven years is `on_a_shelf_you_can_reach` read from the shelf's side. **Nothing was ever bought here** — it has been on no map since the fork — so no index has ever been recorded and the renumbering costs nobody anything. It can only be free once, and this is the once.",
       "stock": [
-        "Chapbook",
         "Soot Ink",
-        "Rime Nova",
-        "Rime Nova",
-        "Mirrorcast",
         "Mage's Circlet",
         "Mirrored Visor",
         "Third Eye",

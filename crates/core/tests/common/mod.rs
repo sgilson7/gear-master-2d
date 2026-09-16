@@ -386,7 +386,17 @@ pub fn two_items_that_touch(ch: &mut Character) {
 /// copies of a list of exceptions is two places for it to go stale — which is
 /// the sixth time this project has paid for a hand-written list and the first
 /// time it was caught before it was written twice.
-pub const UNWRITTEN: &[&str] = &["the-third-town"];
+pub const UNWRITTEN: &[&str] = &[];
+
+/// **Emptied in M22.3 and asserted empty rather than deleted.** The list is
+/// what turned *nothing is staged* from an absence into a claim, and deleting
+/// it would turn it back — a town with no shelf and no errands would be an
+/// oversight again rather than a decision somebody wrote down.
+/// `no_town_is_unwritten_and_nothing_is_staged` is where the assertion lives,
+/// beside `avail.rs`'s `STAGED`, which emptied in the same commit for the same
+/// reason: High Wick came down as a wing of the third town and the third town
+/// started trading.
+pub const NOTHING_IS_UNWRITTEN: () = ();
 
 /// **The run**, off disk, as a `Character`.
 ///

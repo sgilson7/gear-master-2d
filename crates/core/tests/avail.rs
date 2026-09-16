@@ -44,9 +44,16 @@ fn every_town_stocks_something_and_stocks_it_from_the_catalogue() {
             );
             continue;
         }
+        // **A town's shelf is the town's and its wings'.** The third town sells
+        // nothing under its own id and has two counters standing in it — the
+        // clerk's desk and what came down from High Wick — which is what a
+        // player walks up to. `UNWRITTEN` is empty and asserted empty since
+        // M22.3, so the exemption that used to carry this town is gone and the
+        // question is asked of every town there is.
         assert!(
-            !t.stock.is_empty() || UNWRITTEN.contains(&t.id.as_str()),
-            "{} sells nothing",
+            !stocked_between_them(&shops, &t.id).is_empty()
+                || UNWRITTEN.contains(&t.id.as_str()),
+            "{} sells nothing, and neither does anything standing in it",
             t.id
         );
         for name in &t.stock {
@@ -78,7 +85,26 @@ fn every_town_stocks_something_and_stocks_it_from_the_catalogue() {
 /// for: it had a shelf and two errands for three blocks and no ground under it,
 /// and the field map is `PLAN.md` §6a row 1 finally paid. High Wick is still
 /// waiting, on purpose.
-const STAGED: &[&str] = &["high-wick"];
+/// **Emptied in M22.3 and asserted empty rather than deleted.** High Wick came
+/// down as a wing of the third town, so there is nothing staged — and the
+/// assertion is what keeps that a claim rather than an absence. A shelf that
+/// quietly grew no ground under it would read as an oversight again.
+const STAGED: &[&str] = &[];
+
+/// What a town and everything standing in it sell between them.
+///
+/// **Whether or not a wing has arrived**, because this is a question about what
+/// the town *is* rather than about a particular afternoon. The third town sells
+/// nothing under its own id and has two counters in it, which is what a player
+/// walks up to and is not a thing a state can be planted to hide.
+fn stocked_between_them(shops: &gm2d_core::shop::ShopsData, town: &str) -> Vec<String> {
+    shops
+        .towns
+        .iter()
+        .filter(|t| t.id == town || t.wing_of.as_deref() == Some(town))
+        .flat_map(|t| t.stock.clone())
+        .collect()
+}
 
 // `UNWRITTEN` lives in `common`, because `quests.rs` asks the same question of
 // the same town — see the const.
@@ -101,6 +127,11 @@ fn towns_anywhere_in_the_world_all_trade_and_all_want_something() {
 
     let shops = data::shops();
     let quests = data::quests();
+    // **Everything that can ever stand in this town**, which is the town's own
+    // shelf and every wing of it — *whether or not it has arrived*. A wing that
+    // arrives on the last rung of a chain is still what this town trades in;
+    // asking with an empty state would say the third town sells nothing, which
+    // is true on the first afternoon and is not what this lint is about.
     for t in &towns {
         if UNWRITTEN.contains(&t.as_str()) {
             // And the exception is asserted rather than skipped: an unwritten
@@ -112,8 +143,18 @@ fn towns_anywhere_in_the_world_all_trade_and_all_want_something() {
             assert!(quests.at(t).is_empty(), "{t} is listed as unwritten and wants something");
             continue;
         }
-        assert!(shops.town(t).is_some(), "{t} is on a map and sells nothing");
-        assert!(!quests.at(t).is_empty(), "{t} is on a map and wants nothing");
+        assert!(
+            !stocked_between_them(&shops, t).is_empty(),
+            "{t} is on a map and nothing standing in it sells anything"
+        );
+        let counters: Vec<String> = std::iter::once(t.clone())
+            .chain(shops.towns.iter().filter(|w| w.wing_of.as_deref() == Some(t.as_str()))
+                   .map(|w| w.id.clone()))
+            .collect();
+        assert!(
+            counters.iter().any(|c| !quests.at(c).is_empty()),
+            "{t} is on a map and nothing standing in it wants anything"
+        );
     }
     let mut written: Vec<&str> =
         UNWRITTEN.iter().copied().filter(|id| !towns.contains(*id)).collect();

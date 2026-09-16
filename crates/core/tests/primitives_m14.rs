@@ -326,6 +326,7 @@ fn sealed(id: &str, wants: &[&str]) -> PlaceDef {
         guards: None,
         needs_level: None,
         floors: Vec::new(),
+        named: None,
     }
 }
 

@@ -331,7 +331,7 @@ fn the_wings_are_the_ones_this_block_authored() {
     let mut wings: Vec<&str> =
         shops.towns.iter().filter(|t| t.wing_of.is_some()).map(|t| t.id.as_str()).collect();
     wings.sort();
-    assert_eq!(wings, vec!["the-clerks-desk"], "the wings are {wings:?}");
+    assert_eq!(wings, vec!["high-wick", "the-clerks-desk"], "the wings are {wings:?}");
     for w in &wings {
         let t = shops.town(w).expect("a wing that exists");
         assert_eq!(t.wing_of.as_deref(), Some("the-third-town"), "{w} stands somewhere else");
@@ -482,4 +482,146 @@ fn the_clerk_is_sent_for_with_a_word_from_down_there() {
     // And it pays money and no gear, so `common::geared_from` does not move.
     assert!(q.reward.is_empty() && q.enchs.is_empty() && q.rows.is_none(), "it pays gear");
     assert!(q.gold > 0);
+}
+
+// ------------------------------------------- M22.3, the shelf and the post
+
+/// **The arcane shelf arrives when volume ten is open.**
+///
+/// `high-wick` keeps its id, because a sale is `(id, index)` and the index is
+/// the identity. What it lost is the three lines the barrel already carried —
+/// see `shops.json`'s own note, and `nothing_in_the_barrel_is_on_a_shelf_you_
+/// can_reach`, which is what said so the moment the shelf had ground under it.
+#[test]
+fn the_shelf_arrives_when_volume_ten_is_open() {
+    let shops = data::shops();
+    let hw = shops.town("high-wick").expect("the arcane shelf");
+    assert_eq!(hw.wing_of.as_deref(), Some("the-third-town"));
+    assert_eq!(hw.arrives.as_deref(), Some("done:the-long-mirror-inventory"));
+    assert!(!hw.stock.is_empty() && !hw.commissions.is_empty());
+
+    let mut state = WorldState::default();
+    state.quests_done.push("send-for-the-clerk".into());
+    let open: Vec<&str> =
+        shop::wings(&shops, "the-third-town", &state).iter().map(|w| w.id.as_str()).collect();
+    assert_eq!(open, vec!["the-clerks-desk"], "the shelf is down before the inventory");
+    state.quests_done.push("the-long-mirror-inventory".into());
+    let mut open: Vec<&str> =
+        shop::wings(&shops, "the-third-town", &state).iter().map(|w| w.id.as_str()).collect();
+    open.sort();
+    assert_eq!(open, vec!["high-wick", "the-clerks-desk"]);
+
+    // **And nothing the barrel carries is on it.** The rule read from the
+    // shelf's side: an endgame counter stocking what the opening barrel has
+    // sold for eleven years is a line nobody takes.
+    for n in &shops.barrel {
+        assert!(!hw.stock.contains(n), "the barrel and the arcane shelf both carry {n}");
+    }
+}
+
+/// **The post is named when it is cut, and not before.**
+///
+/// `PlaceDef::named`, and the whole of why it is safe is where it is read:
+/// `data::map_read_through`, which is the door every *game* question goes
+/// through and the same door the drains come in at. `data::map` is the file, so
+/// a lint still sees the post with nothing on it — and eleven readers in the
+/// shim print `p.name` and not one of them had to be touched.
+#[test]
+fn the_post_is_named_when_it_is_cut() {
+    let file = data::map("the-undercountry", D);
+    let post = file.places.iter().find(|p| p.id == "the-third-town").expect("the town");
+    assert_eq!(post.name, "a town with no name on the post yet", "the file names it");
+    let named = post.named.as_ref().expect("no name is waiting");
+    assert_eq!(named.when, "done:cut-the-post");
+    assert!(!named.name.is_empty());
+
+    let mut st = WorldState::default();
+    st.map = "the-undercountry".into();
+    let name_now = |st: &WorldState| {
+        data::map_now("the-undercountry", D, st)
+            .places
+            .iter()
+            .find(|p| p.id == "the-third-town")
+            .expect("the town")
+            .name
+            .clone()
+    };
+    assert_eq!(name_now(&st), post.name, "the game names it before it is cut");
+    // Taking the errand is not finishing it.
+    st.quests_taken.push("cut-the-post".into());
+    assert_eq!(name_now(&st), post.name, "taking the errand cut the post");
+    st.quests_done.push("cut-the-post".into());
+    assert_eq!(name_now(&st), named.name);
+    // **And the file never moves**, which is the split.
+    assert_eq!(
+        data::map("the-undercountry", D)
+            .places
+            .iter()
+            .find(|p| p.id == "the-third-town")
+            .unwrap()
+            .name,
+        post.name,
+        "the file learned the name"
+    );
+}
+
+/// **The way south refuses naming The Unwritten.**
+///
+/// `Game::sealed_because`, two registers on one line: `shut` is the world's and
+/// is in the map file, and *which thing is still standing* is derived off the
+/// places so it cannot go stale when a boss is renamed.
+///
+/// **It is a `Door` and not a `Gate` in M22.3, which the plan writes the other
+/// way round.** A gate names the map it opens onto and `the-lower-table` does
+/// not exist until M22.6 — a gate to a map this build has not got falls back to
+/// the overworld, which is `every_gate_lands_beside_its_door`'s own finding
+/// arriving three milestones early. `needs_all` is a `Door`'s field as much as
+/// a `Gate`'s, so the refusal and the naming ship here and the kind changes
+/// when there is somewhere for it to lead.
+#[test]
+fn the_way_south_refuses_naming_the_unwritten() {
+    let w = data::map("the-undercountry", D);
+    let way = w.places.iter().find(|p| p.id == "the-way-on-from-here").expect("the way on");
+    assert_eq!(way.needs_all, vec!["the-unwritten".to_string()]);
+    assert!(!way.shut.is_empty(), "it refuses without a sentence of its own");
+    // Drawn from the first visit: a door you cannot see cannot show a refusal.
+    assert!(way.hidden_until.is_none() && way.hidden_until_all.is_empty(), "it is hidden");
+
+    let mut g = gm2d_core::game::Game::default();
+    g.world.go_to("the-undercountry");
+    let why = g.sealed_because(way, D).expect("a shut way says why");
+    assert!(
+        why.to_lowercase().contains("post with nothing on it"),
+        "the refusal does not name what is standing: {why}"
+    );
+    // And it opens once the post is down.
+    g.world.answered.push("the-unwritten".into());
+    assert!(g.sealed_because(way, D).is_none(), "it is beaten and still refuses");
+}
+
+/// **No town is unwritten and nothing is staged, and both lists are asserted
+/// empty rather than deleted.**
+///
+/// The assertion is what turns *nothing is staged* from an absence into a
+/// claim. A shelf that grew no ground under it, or a town that grew no shelf,
+/// would read as an oversight again — which is exactly what both lists were
+/// written to stop.
+#[test]
+fn no_town_is_unwritten_and_nothing_is_staged() {
+    assert!(common::UNWRITTEN.is_empty(), "{:?} is still unwritten", common::UNWRITTEN);
+    // `STAGED` is `avail.rs`'s and cannot be imported across test binaries;
+    // what it *means* is asked here instead, of the file: every shelf is a town
+    // on a map or a wing of one.
+    let towns = data::towns_on_the_map();
+    let reachable = data::shelves_on_the_map();
+    let shops = data::shops();
+    let mut orphans: Vec<&str> = shops
+        .towns
+        .iter()
+        .map(|t| t.id.as_str())
+        .filter(|id| !reachable.iter().any(|r| r == id))
+        .collect();
+    orphans.sort();
+    assert!(orphans.is_empty(), "shelves for nowhere: {orphans:?}");
+    assert!(towns.contains(&"the-third-town".to_string()));
 }

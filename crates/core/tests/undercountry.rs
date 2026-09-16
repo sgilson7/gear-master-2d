@@ -163,7 +163,7 @@ fn every_gate_lands_beside_its_door() {
 /// to go — so the town ships with a name, a start tile, a region and nothing to
 /// buy, and `avail.rs`'s `UNWRITTEN` is where that is written down.
 #[test]
-fn the_third_town_has_no_shelves_and_says_so() {
+fn the_third_town_fills_up() {
     let w = data::map(HERE, D);
     let town = w
         .places
@@ -173,11 +173,48 @@ fn the_third_town_has_no_shelves_and_says_so() {
     assert_eq!(town.id, "the-third-town");
     assert!(!town.name.is_empty(), "a town with no name at all");
 
+    // **Its own shelf is still empty, and two counters stand in it.** That is
+    // what a wing is for: High Wick's shelf came down without High Wick
+    // becoming the town it is sold in, and the town keeps its id and its
+    // never-recorded index. `UNWRITTEN` is empty since M22.3.
     let shops = data::shops();
     let shelf = shops.town(&town.id).expect("no counter at all");
-    assert!(shelf.stock.is_empty(), "the empty town sells {} things", shelf.stock.len());
-    assert!(shelf.commissions.is_empty(), "the empty town takes orders");
-    assert!(data::quests().at(&town.id).is_empty(), "the empty town wants something");
+    assert!(shelf.stock.is_empty(), "the town grew a shelf of its own");
+    assert!(shelf.commissions.is_empty(), "the town grew an order book of its own");
+    assert!(data::quests().at(&town.id).is_empty(), "the town wants something of its own");
+    let mut wings: Vec<&str> = shops
+        .towns
+        .iter()
+        .filter(|t| t.wing_of.as_deref() == Some(town.id.as_str()))
+        .map(|t| t.id.as_str())
+        .collect();
+    wings.sort();
+    assert_eq!(wings, vec!["high-wick", "the-clerks-desk"], "the wings are {wings:?}");
+    let quests = data::quests();
+    assert!(wings.iter().any(|w| !quests.at(w).is_empty()), "nothing standing here wants anything");
+    assert!(
+        wings.iter().any(|w| !shops.town(w).expect("a wing").stock.is_empty()),
+        "nothing standing here sells anything"
+    );
+
+    // **And the post gets its name when it is cut.** The file says *a town with
+    // no name on the post yet* and the game says otherwise once the errand is
+    // handed in, which is `PlaceDef::named` and the `map`/`map_now` split.
+    let named = town.named.as_ref().expect("the post takes no name");
+    assert_eq!(named.when, "done:cut-the-post");
+    let mut st = gm2d_core::world::WorldState::default();
+    st.map = HERE.into();
+    assert_eq!(
+        data::map_now(HERE, D, &st).places.iter().find(|p| p.id == town.id).unwrap().name,
+        town.name,
+        "the post is named before anybody cut it"
+    );
+    st.quests_done.push("cut-the-post".into());
+    assert_eq!(
+        data::map_now(HERE, D, &st).places.iter().find(|p| p.id == town.id).unwrap().name,
+        named.name,
+        "the post was cut and says the same thing"
+    );
 
     // **And the sentence that says so is on the map**, one tile south of the
     // town, where the door under the lake used to carry it.

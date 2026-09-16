@@ -99,10 +99,32 @@ fn every_town_has_an_errand() {
                 .map(|p| p.id.clone())
                 .collect::<Vec<_>>()
         })
-        .filter(|id| q.quests.iter().all(|e| &e.giver != id))
+        // **The town and everything standing in it**, since M22.1: a wing is a
+        // counter inside somebody else's town, and the guild lists what
+        // everybody at this town wants. The third town hands out nothing under
+        // its own id and has a clerk at a desk in it who hands out two.
+        //
+        // Whether or not the wing has arrived, because this is a question about
+        // what the town *is* rather than about a particular afternoon.
+        .filter(|id| {
+            let shops = data::shops();
+            let counters: Vec<String> = std::iter::once(id.clone())
+                .chain(
+                    shops
+                        .towns
+                        .iter()
+                        .filter(|w| w.wing_of.as_deref() == Some(id.as_str()))
+                        .map(|w| w.id.clone()),
+                )
+                .collect();
+            !q.quests.iter().any(|e| counters.contains(&e.giver))
+        })
         // **Except the one that is empty on purpose**, and the list is in
         // `common` because `avail.rs` asks the same question of the same town.
-        // See `common::UNWRITTEN`.
+        // `common::UNWRITTEN` is **empty** since M22.3 — the third town trades
+        // and wants something now — and it is asserted empty rather than
+        // deleted, because a list that means *nothing is unwritten* is a claim
+        // only while something checks it.
         .filter(|id| !common::UNWRITTEN.contains(&id.as_str()))
         .collect();
     bare.sort();

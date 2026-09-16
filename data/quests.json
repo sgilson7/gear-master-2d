@@ -152,6 +152,25 @@
       ]
     },
     {
+      "id": "cut-the-post",
+      "giver": "the-clerks-desk",
+      "requires": [
+        "the-long-mirror-inventory"
+      ],
+      "name": "CUT THE POST",
+      "brief": "The post at the middle of the town has a face planed flat on it and nothing cut into the face, and the clerk will not write a name in volume ten for a place that has not got one. She says the thing to do about that is to go and look at the other post — the one out in the scrub with the same flat face and the same nothing on it — and settle which of the two is waiting on the other. She has been down here eleven days and will not go and look herself.",
+      "thanks": "She rules a line across the top of volume ten, writes the name on it, and then writes it a second time on a card and walks out and nails the card to the post. It is the first thing anybody has cut into that face. She says the cart will need the name to find the place, which is the only reason she gives for any of it.",
+      "goal": {
+        "clear": {
+          "place": "the-unwritten"
+        }
+      },
+      "reward": [
+        "Lamplighter's Cage"
+      ],
+      "gold": 480
+    },
+    {
       "id": "the-frame-that-stands",
       "giver": "the-end-of-all-gears",
       "requires": [

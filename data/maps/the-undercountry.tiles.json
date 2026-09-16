@@ -176,7 +176,11 @@
           4,
           2
         ]
-      ]
+      ],
+      "named": {
+        "when": "done:cut-the-post",
+        "name": "Low Wick"
+      }
     },
     {
       "at": [
@@ -228,6 +232,10 @@
       "kind": "door",
       "id": "the-way-on-from-here",
       "name": "the way on",
+      "needs_all": [
+        "the-unwritten"
+      ],
+      "shut": "The road runs south out of the town for four miles and then stops, and what it stops at is not a wall and not a coast and not an edge. It is a lip, and under the lip the floor of the country goes on without the country on top of it.",
       "prose": [
         "The road runs south out of the town for four miles and then stops, and what it stops at is not a wall and not a coast and not an edge.",
         "This is where the writing stops. Not the game — the writing. What is past this is not hidden and not locked and not saved for later: nobody has decided it yet.",

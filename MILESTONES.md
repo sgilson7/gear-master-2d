@@ -159,3 +159,19 @@ Suite green, `cargo test -p gm2d-core` exit 0. Browser gate: **108 `ok:` lines**
 chromium. `packaging/count-tests.sh` is the only way to get a test total back.
 
 Notebook: **63 rows, 0 open.**
+
+## M22 — High Wick, and the table
+
+| # | milestone | deliverables | tests | commit | state |
+|---|---|---|---|---|---|
+| M22.0 | The measure | 6 numbers; 4 of them disagree with the plan and it is corrected | 1107 (+0) | this | done |
+| M22.1 | A wing is a shelf with a host | wing_of · arrives · met · shelves_on_the_map · 3 lints | | | pending |
+| M22.2 | The clerk comes down | send-for-the-clerk · the-clerks-desk · the mirror errand re-keyed | | | pending |
+| M22.3 | The arcane shelf, and the post gets its name | high-wick as a wing · cut-the-post · PlaceDef::named · the gate south | | | pending |
+| M22.4 | The gate, the walk, the deploy — the town | check_the_third_town_fills_up · in-the-third-town.json · deploy | | | pending |
+| M22.5 | A pocket can go somewhere | Pocket honours to/at_to · the tape · the table's id in the lint | | | pending |
+| M22.6 | The table | the-lower-table · the cup as a map of its own · 4 lints | | | pending |
+| M22.7 | What stands on it | The Twelfth Name · one art colourway · the pool | | | pending |
+| M22.8 | Three errands you do with a cue | a chain of three off the desk | | | pending |
+| M22.9 | The gate, the walk, the glossary, the deploy — the table | 5 browser checks · on-the-lower-table.json · the stale rows · deploy | | | pending |
+| notebook | rows open / closed | 8 open / 1 closed | | | |

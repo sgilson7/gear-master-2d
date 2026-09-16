@@ -5004,7 +5004,15 @@ pub fn try_shoot(angle: u16, power: u8) -> String {
                     / 100
             })
         };
-        let said = flight.tape(g.world.count("shots-taken"), &terrain, per_mille);
+        // **Which sunk sentence, said by core.** A pocket that names where it
+        // goes is the way *into* somewhere; one that does not sinks you home.
+        // The page prints what it is handed.
+        let said = flight.tape_into(
+            g.world.count("shots-taken"),
+            &terrain,
+            per_mille,
+            s.into.as_deref(),
+        );
         // An encounter becomes state the moment it is rolled, the same as a
         // step's — a player who saved with a creature on screen must not come
         // back with a free shot.

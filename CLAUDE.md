@@ -3975,6 +3975,32 @@ name.**
   arrived or not: that is a question about what a town is rather than about a
   particular afternoon.
 
+### A pocket may say where it goes
+
+**M22.5.** `PlaceDef::to` and `at_to` are the gate's own fields and a
+**`Pocket`** reads them now. A pocket without them sinks you home to the last
+town you stood in, which is what every pocket in the game did before and what
+the lower table's two gutters still do; one with them puts you down there
+instead. `Game::shoot`'s sunk arm is `warp_to(to, at_to)` — **the same call the
+home arm already made** — so the only thing that is new is the destination.
+
+- **It is the one thing Yoku's holes do that this engine did not: a hole is how
+  you go *into* a room.** And it is what makes a sealed room expressible at all
+  without touching the physics — see divergence 22.1.
+- **It costs the same twelve wherever it goes.** *A pocket has to be worse than
+  a spike or nobody aims around it* is `PLAN-M17.md` §10.4's choice and it is
+  still true of a pocket that is a door: a cheaper way into a boss's room is a
+  discount on the hardest shot on the map. `Flight::tiring` reads the contact
+  and not the place, so there is one number and nowhere for a second.
+- **The tape says which kind took you**, and core picks: `Flight::tape_into`
+  names the place for a pocket that goes somewhere, because a player who has
+  just been dropped through the floor of a table is owed the name of the floor.
+  `Step::into` is the field; the page prints what it is handed.
+- **`only_the_country_maps_are_tables` gains the table's id before the file
+  exists**, which is the order enforcing itself: the lint refuses the map until
+  it is there rather than after, so the milestone that authors it cannot ship a
+  walked map by accident.
+
 ### A town on a table, and the four things that found
 
 **M22.4.** The third town is the first town this game has ever put on a **shot**
@@ -6705,6 +6731,7 @@ about a string. Every one caught something on its first run:
 | 22.5 | **A name is applied in `data::map_read_through`, not by a `World::name_of` reader.** Decision 7 gives one reader; the shim prints `p.name` in **eleven** places and both are strings, so the compiler helps with none of them. That function already rewrites the map the game sees — it applies the drains — so it applies `named` too: the file has the post with nothing on it and the game has the name, which is `place_at`/`place_now`'s split, and no reader moved. | `crates/core/src/data.rs` |
 | 22.6 | **The arcane shelf lost the three lines the barrel carries, and the plan says its index order is untouched.** Placing `high-wick` made `on_a_shelf_you_can_reach` count it and `parse` refused the file. Taking them off the *barrel* was measured and rejected — the only unclaimed replacements rate 13 and 12 against the 8 and 5 they replace, which is +0.75 on a mean `the_barrel_is_a_floor_and_not_a_ceiling` holds at 3.87 under 3.90, so the opening barrel would be re-tuned to protect a counter nobody reaches until level forty-five. The shelf's own note called it *what makes a caster weapon buildable at all*, written when High Wick was an early town; the thing that does that from the first afternoon is the barrel. 17 → 13, and it costs nobody anything because the shelf has been on no map since the fork and no `(id, index)` has ever been recorded. | `data/shops.json` |
 | 22.7 | **The block ships two start-line saves, and `PLAN-M22.md` decision 10 is the reason rather than a divergence.** No save in the repository opened the Undercountry — all fourteen read, not one with both `the-ninth-surveyor` and `the-bottom-of-the-bottom` in `answered`, and **the human's own has the second and not the first** — and the walker never gets there. `testing/saves/in-the-third-town.json` stands on the tee four tiles up the lane with the Kettleworks chain done to `nobody-has-named-it` and all three towns stood in, so the long cart runs. | `testing/saves/README.md` |
+| 22.8 | **A `to` with no `at_to` is refused on a **pocket** and not on any kind, which is what `PLAN-M22.md` decision 5 asks for.** The shipped maps said so on the first run: `the-door-in-the-wall` has a `to` and no `at_to`, and a gate with no landing tile lands you **where you left off** — `WorldState::positions` plus `World::arrival` — which is what makes the Treyway a country rather than a chute. A pocket has no bookmark: it is not a door you walk through, it is a hole you fall down, and falling down it twice has to put you in the same place both times. | `crates/core/src/world.rs`, `World::load` |
 | 22.1 | **A cup of rock is not sealed, so the cup is a map.** `PLAN-M22.md` decision 9 stands the table's boss in a sealed cup and makes a pocket the only way in. Measured before a map was authored: **6,546 of the shots taken from the 278 walkable tiles outside the draft cup come to rest inside it**, through eight tiles of solid rock — `shot::shoot_with` tests the tile a tick *landed on* and never the tiles it crossed, and one tick is 18.75 tiles at power ten. A two-thick wall is transparent too and nineteen tiles would be needed. So the cup is a **map of its own**, reached by the far pocket's `to`/`at_to`, which is exactly what decision 8 already builds — `warp_to`, the call the sunk arm makes. Maps go to 31, not 30, and *the boss stands nowhere but the cup* becomes true by construction. | `data/maps/`, `crates/core/src/shot.rs` |
 | 22.2 | **The boss is dressed against `common::geared_from` and the plan says `common::from_save(common::THE_RUN)`.** The run is 974 health and 9 strength over 11 items at level 45 and **beats nothing at that depth** — it loses to The Unwritten in 7.7s and to all ten of the Wextreen deep — so *a win in 20–28 seconds* against it is a bracket only something shallower than the map's own pool could meet. `every_region_has_a_fight_you_can_win_and_every_boss_can_be_beaten` has required `geared_from` of every boss on a tile since M11.7 and the Tenth Surveyor was bracketed against it for this reason. The run stays as the **floor** and is asserted to lose. | `crates/core/tests/common/mod.rs` |
 | 22.3 | **`TownShelf` gains three fields and the plan costed two.** `wing_of` and `arrives` are the plan's; `name` is the third, because a wing is drawn under its own heading on a counter and every other counter in the game reads its name out of the map file it stands in. A wing stands in none, and a name that lived only in `theme.rs` prints a hyphenated id under any theme that has not been told about it — which is the fall-through `place_name` already ends at. `ShopsData::parse` refuses a nameless wing; the shim still asks the theme first. | `crates/core/src/shop.rs`, `TownShelf` |

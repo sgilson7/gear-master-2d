@@ -579,7 +579,29 @@ impl Game {
         // **A pocket is the drain, and it is the only thing on a table that
         // moves you off the map.** Nothing here kills you and nothing takes
         // your carried experience: a pocket is a bad shot, not a lost fight.
-        if flight.sunk().is_some() {
+        if let Some(id) = flight.sunk() {
+            // **A pocket may say where it goes**, and then it is the way *into*
+            // somewhere rather than the way out of everywhere. `to`/`at_to` are
+            // the gate's own fields and this is `warp_to` — the same call the
+            // arm below makes — so the only thing that is new is the
+            // destination. It costs the same twelve either way: *a pocket has
+            // to be worse than a spike or nobody aims around it* is still true
+            // of a pocket that is a door, and a cheaper way into a boss's room
+            // would be a discount on the hardest shot on the map.
+            let says = w.places.iter().find(|p| p.id == id).and_then(|p| {
+                p.to.clone().zip(p.at_to).map(|(m, at)| (m, at, p.name.clone()))
+            });
+            if let Some((map, at, name)) = says {
+                self.warp_to(&map, at, difficulty);
+                let mut out = Step::nowhere("sunk");
+                // **Where you went, by name.** The tape's sunk sentence says
+                // *back to the last town you stood in* for a pocket that goes
+                // home; one that goes somewhere names it, because a player who
+                // has just been dropped through the floor of a table is owed
+                // the name of the floor.
+                out.into = Some(name);
+                return (flight, out);
+            }
             let town = self.world.last_town.clone();
             let home = crate::data::all_maps(difficulty)
                 .into_iter()

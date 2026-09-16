@@ -282,7 +282,22 @@ pub struct PlaceDef {
     pub id: String,
     #[serde(default)]
     pub name: String,
-    /// `Gate`: the map it opens onto, and where you arrive on it.
+    /// `Gate` **and `Pocket`**: the map it opens onto, and where you arrive on
+    /// it.
+    ///
+    /// **A pocket that says where it goes is the one thing Yoku's holes do that
+    /// this engine did not: a hole is how you go *into* a room.** A pocket
+    /// without a `to` sinks you home to the last town you stood in, which is
+    /// what every pocket in the game did before M22.5 and what the two gutters
+    /// on the lower table still do. One with a `to` puts you down there
+    /// instead — and it costs the same [`crate::shot::POCKET_TIRES`] either
+    /// way, because a cheaper way into a boss's room is a discount on the
+    /// hardest shot on the map.
+    ///
+    /// `ShopsData`'s sibling rule lives in `World::load`: **a `to` with no
+    /// `at_to` is refused on any kind**, because a warp with no landing tile is
+    /// a warp to wherever the map's start happens to be, which is a different
+    /// place from the one somebody meant.
     #[serde(default)]
     pub to: Option<String>,
     #[serde(default)]
@@ -1013,6 +1028,27 @@ impl World {
                 return Err(format!(
                     "{:?} is a {:?} on a map you walk across, and an obstacle is the ball's",
                     p.id, p.kind
+                ));
+            }
+            // **A pocket that says where it goes must say where it puts you**,
+            // and a **gate** must not be held to that — which is the opposite
+            // of what `PLAN-M22.md` decision 5 writes, and the shipped maps
+            // said so on the first run.
+            //
+            // A gate with no `at_to` lands you **where you left off**:
+            // `WorldState::positions` remembers your tile on each map you have
+            // walked off, and `World::arrival` falls through to it. That is
+            // what makes the Treyway a country rather than a chute, and the
+            // door in the wall is the first gate in the game that uses it. So
+            // an absent `at_to` on a gate is a feature with a name.
+            //
+            // A pocket has no bookmark: it is not a door you walk through, it
+            // is a hole you fall down, and falling down it twice has to put you
+            // in the same place both times.
+            if p.kind == PlaceKind::Pocket && p.to.is_some() && p.at_to.is_none() {
+                return Err(format!(
+                    "{:?} says where it goes and not where it puts you",
+                    p.id
                 ));
             }
             // **A bumper is solid and a pocket is not a place.** Both are
@@ -2100,6 +2136,13 @@ pub struct Step {
     /// nothing about it is written into `answered`, and what it costs the save
     /// is nothing at all.
     pub guard: Option<String>,
+    /// Where a pocket that says where it goes put you, by name.
+    ///
+    /// **Only a pocket with a `to` fills this in.** A pocket without one sinks
+    /// you home and fills in [`Step::town`] instead, which is what every pocket
+    /// in the game did before M22.5 and what the two gutters on the lower table
+    /// still do. The page prints one sentence or the other; core decides which.
+    pub into: Option<String>,
     /// The **place** that refused this step, if a place did rather than the
     /// ground.
     ///
@@ -2158,6 +2201,7 @@ impl Step {
             bench: None,
         caravan: None,
             guard: None,
+            into: None,
             refused_by: None,
             encounter: None,
         }
@@ -2338,6 +2382,7 @@ pub fn here(
         bench: None,
         caravan: None,
             guard: None,
+            into: None,
         refused_by: None,
         encounter: None,
     };
@@ -2647,6 +2692,7 @@ pub fn arrive_at(
         bench: None,
         caravan: None,
             guard: None,
+            into: None,
         refused_by: None,
         encounter: None,
     };

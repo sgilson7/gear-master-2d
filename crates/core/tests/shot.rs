@@ -295,7 +295,11 @@ fn only_the_country_maps_are_tables() {
         .collect();
     assert_eq!(
         tables,
-        vec!["the-treyway", "the-undercountry"],
+        // **The lower table joins the list in M22.5 and its file arrives in
+        // M22.6**, which is the order enforcing itself: this refuses the map
+        // until it exists rather than after, so the milestone that authors it
+        // cannot ship a walked map by accident.
+        vec!["the-treyway", "the-undercountry", "the-lower-table"],
         "the tables are {tables:?}"
     );
 }
@@ -1048,4 +1052,203 @@ fn the_diamond_you_are_standing_on_does_not_catch_you() {
     }
     assert!(left > 0, "no shot from {:?} goes anywhere", gate.id);
     println!("{:?}: {left} of 720 shots leave its tile", gate.id);
+}
+
+// ------------------------------------------- M22.5, a pocket that goes somewhere
+
+/// A game standing on the Undercountry, with a pocket rewritten to say where it
+/// goes.
+///
+/// **Built by editing the shipped map rather than by writing one**, because a
+/// hand-written table is a second copy of what a table is — and what is being
+/// proved here is a rule, not a file.
+fn a_pocket_that_goes(to: Option<(&str, [u8; 2])>) -> (gm2d_core::world::World, String) {
+    let text = gm2d_core::data::UNDERCOUNTRY_JSON.to_string();
+    let mut v: serde_json::Value = serde_json::from_str(&text).expect("the map parses");
+    let places = v["places"].as_array_mut().expect("places");
+    let mut id = String::new();
+    for p in places.iter_mut() {
+        if p["kind"] == "pocket" {
+            id = p["id"].as_str().expect("an id").to_string();
+            match to {
+                Some((map, at)) => {
+                    p["to"] = serde_json::json!(map);
+                    p["at_to"] = serde_json::json!(at);
+                }
+                None => {
+                    p.as_object_mut().expect("an object").remove("to");
+                    p.as_object_mut().expect("an object").remove("at_to");
+                }
+            }
+            break;
+        }
+    }
+    assert!(!id.is_empty(), "the Undercountry has no pocket on it");
+    let w = gm2d_core::world::World::load(
+        gm2d_core::data::TERRAIN_JSON,
+        &v.to_string(),
+        D,
+    )
+    .expect("the edited map loads");
+    (w, id)
+}
+
+/// **A pocket with a `to` lands you where it says, and one without still goes
+/// home.**
+///
+/// `PlaceDef::to`/`at_to` are the gate's own fields and the sunk arm is
+/// `Game::warp_to` — the same call the home arm already made — so the only
+/// thing M22.5 adds is a destination. It is the one thing Yoku's holes do that
+/// this engine did not: **a hole is how you go *into* a room.**
+#[test]
+fn a_pocket_with_a_to_lands_where_it_says() {
+    let (w, id) = a_pocket_that_goes(Some(("the-great-gear-cave", [1, 2])));
+    let p = w.places.iter().find(|p| p.id == id).expect("the pocket");
+    assert_eq!(p.to.as_deref(), Some("the-great-gear-cave"));
+    assert_eq!(p.at_to, Some([1, 2]));
+    // And the same map with the pair taken off still loads, which is what the
+    // gutters are.
+    let (bare, id2) = a_pocket_that_goes(None);
+    assert_eq!(id, id2);
+    assert!(bare.places.iter().find(|p| p.id == id).expect("the pocket").to.is_none());
+}
+
+/// **A `to` with no `at_to` is refused at load, on any kind.**
+///
+/// A warp with no landing tile puts you wherever the far map's `start` happens
+/// to be, which is a different place from the one somebody meant — and since a
+/// pocket can carry the pair, the rule is stated over the **field** rather than
+/// over the gate that used to be its only reader. `ShopsData::parse`'s
+/// division, one file along: this is what a map file can be asked about itself.
+#[test]
+fn a_pocket_that_says_where_without_saying_onto_what_is_refused() {
+    let text = gm2d_core::data::UNDERCOUNTRY_JSON.to_string();
+    let mut v: serde_json::Value = serde_json::from_str(&text).expect("the map parses");
+    for p in v["places"].as_array_mut().expect("places").iter_mut() {
+        if p["kind"] == "pocket" {
+            p["to"] = serde_json::json!("the-great-gear-cave");
+            break;
+        }
+    }
+    let why = gm2d_core::world::World::load(
+        gm2d_core::data::TERRAIN_JSON,
+        &v.to_string(),
+        D,
+    )
+    .expect_err("a pocket with nowhere to put you loaded");
+    assert!(
+        format!("{why}").contains("where it puts you"),
+        "the refusal does not say what is missing: {why}"
+    );
+}
+
+/// **A pocket that goes somewhere costs the same twelve.**
+///
+/// *A pocket has to be worse than a spike or nobody aims around it* is
+/// `PLAN-M17.md` §10.4's choice and it is still true of a pocket that is a
+/// door: a cheaper way into a boss's room is a discount on the hardest shot on
+/// the map. `Flight::tiring` reads the contact and not the place, so there is
+/// one number and nowhere for a second to be written.
+#[test]
+fn a_pocket_that_goes_somewhere_costs_the_same_twelve() {
+    // **Called, not read.** The first draft of this counted the arm in
+    // `shot.rs`'s source and passed with the arm changed to `POCKET_TIRES / 2`,
+    // because the text it matched was still there — *a lint that reads a list
+    // rather than the behaviour is the failure it exists to catch, one level
+    // up*, in a test written in the same afternoon as the rule it guards.
+    let a = Allowances::default();
+    for goes in [false, true] {
+        let (w, _) = a_pocket_that_goes(if goes {
+            Some(("the-great-gear-cave", [1, 2]))
+        } else {
+            None
+        });
+        let at = w
+            .places
+            .iter()
+            .find(|p| p.kind == gm2d_core::world::PlaceKind::Pocket)
+            .expect("a pocket")
+            .at;
+        let mut sank = false;
+        // **From everywhere it can be fired from**, because a pocket that a
+        // two-tile tee happens to miss is a pocket this proves nothing about —
+        // and the Undercountry's is in the corner of the map with nothing on
+        // it, which is the corner it would be a shame to end up in.
+        let froms: Vec<(u8, u8)> = (0..w.width)
+            .flat_map(|x| (0..w.height).map(move |y| (x, y)))
+            .filter(|(x, y)| w.walkable(*x, *y, &a))
+            .collect();
+        for from in &froms {
+            for angle in (0..STEPS as u16).step_by(3) {
+                let power = 4u8;
+                let f = shot::shoot(&w, *from, Shot::new(angle, power), &a);
+                if f.sunk().is_some() {
+                    assert_eq!(
+                        f.tiring(),
+                        shot::POCKET_TIRES,
+                        "a pocket that {} cost {} rather than {}",
+                        if goes { "goes somewhere" } else { "goes home" },
+                        f.tiring(),
+                        shot::POCKET_TIRES
+                    );
+                    sank = true;
+                }
+            }
+            if sank {
+                break;
+            }
+        }
+        assert!(sank, "no shot on this table ever found the pocket");
+        let _ = at;
+    }
+    assert_eq!(shot::POCKET_TIRES, 12, "the number itself moved");
+}
+
+/// **The tape says which kind of pocket took you.**
+///
+/// Two sentences and core picks between them: a pocket that sinks you home has
+/// said so since M17, and one that is the way *into* somewhere names where,
+/// because a player who has just been dropped through the floor of a table is
+/// owed the name of the floor. The page prints what it is handed.
+#[test]
+fn the_tape_names_where_a_pocket_put_you() {
+    // **Found rather than guessed.** The first draft fired one shot at the
+    // pocket's own tile and wrapped every assertion in `if sunk`, and that shot
+    // never sank — so the whole check was a `compares zero with zero`, green on
+    // a build with the second sentence deleted. It sweeps for a flight that
+    // actually sinks and asserts unconditionally.
+    let (w, _) = a_pocket_that_goes(None);
+    let a = Allowances::default();
+    let froms: Vec<(u8, u8)> = (0..w.width)
+        .flat_map(|x| (0..w.height).map(move |y| (x, y)))
+        .filter(|(x, y)| w.walkable(*x, *y, &a))
+        .collect();
+    let sweep = |want_sunk: bool| -> shot::Flight {
+        for from in &froms {
+            for angle in (0..STEPS as u16).step_by(3) {
+                let f = shot::shoot(&w, *from, Shot::new(angle, 4), &a);
+                if f.sunk().is_some() == want_sunk {
+                    return f;
+                }
+            }
+        }
+        panic!("no shot on this table ever {}", if want_sunk { "sank" } else { "missed" });
+    };
+    let sunk = sweep(true);
+
+    let home = sunk.tape(1, "slag", 0);
+    let into = sunk.tape_into(1, "slag", 0, Some("the cup"));
+    assert!(home.contains("last town you stood in"), "the home sentence moved: {home}");
+    assert!(!home.contains("down into"), "the home sentence names somewhere: {home}");
+    assert!(into.contains("down into the cup"), "the named sentence does not name it: {into}");
+    assert!(
+        !into.contains("last town you stood in"),
+        "the named sentence still says you went home: {into}"
+    );
+    assert!(into.contains("12%"), "the cost left the sentence: {into}");
+
+    // And a flight that did **not** sink says neither, whichever is asked.
+    let missed = sweep(false);
+    assert!(!missed.tape_into(1, "slag", 0, Some("the cup")).contains("down into"));
+    assert!(!missed.tape(1, "slag", 0).contains("sunk"));
 }

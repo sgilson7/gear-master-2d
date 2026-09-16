@@ -249,6 +249,23 @@ impl Flight {
     /// Named things are named: a bumper and a chute have ids and a wall does
     /// not, so a run of walls is *two off the range* rather than two sentences.
     pub fn tape(&self, n: u32, terrain: &str, per_mille: i32) -> String {
+        self.tape_into(n, terrain, per_mille, None)
+    }
+
+    /// The same, when the pocket that took you said where it was going.
+    ///
+    /// **Two sentences, and core picks which.** A pocket without a `to` sinks
+    /// you home and the sentence has said so since M17; one with a `to` is the
+    /// way *into* somewhere, and a player who has just been dropped through the
+    /// floor of a table is owed the name of the floor. The page prints what it
+    /// is handed, which is the rule this file has held since M8.
+    pub fn tape_into(
+        &self,
+        n: u32,
+        terrain: &str,
+        per_mille: i32,
+        into: Option<&str>,
+    ) -> String {
         let mut bits: Vec<String> = Vec::new();
         let walls = self.bounces();
         if walls > 0 {
@@ -265,12 +282,18 @@ impl Flight {
                 _ => {}
             }
         }
-        if let Some(_) = self.sunk() {
-            return format!(
-                "Shot {n}. {} — sunk, and back to the last town you stood in with \
-                 {POCKET_TIRES}% off you.",
-                if bits.is_empty() { "Straight in".to_string() } else { bits.join(", ") }
-            );
+        if self.sunk().is_some() {
+            let how = if bits.is_empty() { "Straight in".to_string() } else { bits.join(", ") };
+            return match into {
+                Some(where_to) => format!(
+                    "Shot {n}. {how} — sunk, and down into {where_to} with \
+                     {POCKET_TIRES}% off you."
+                ),
+                None => format!(
+                    "Shot {n}. {how} — sunk, and back to the last town you stood in with \
+                     {POCKET_TIRES}% off you."
+                ),
+            };
         }
         let how = if bits.is_empty() { String::new() } else { format!("{}, and ", bits.join(", ")) };
         format!(

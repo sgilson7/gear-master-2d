@@ -535,6 +535,47 @@ impl PlaceDef {
     }
 }
 
+/// What a key has to be prefixed with to mean *this errand is finished*.
+///
+/// **The prefix is on the reading side and not the writing side**, which is the
+/// whole of why there is one. `quests_done` holds errand ids and it already
+/// round-trips; writing `done:<id>` into `answered` at hand-in would have
+/// needed a backfill for every save that finished the errand before this block.
+/// Reading with a prefix needs none.
+///
+/// **And an unprefixed key must never match an errand, because the namespaces
+/// collide.** The way under the Wextreen flat wants `the-tenth-survey`, which
+/// is an **event** — the tenth surveyor's sheet on a folding table — and there
+/// is an *errand* of exactly that name. `CLAUDE.md` records the collision and
+/// the confusion it caused a player; teaching `met` to read `quests_done`
+/// unprefixed made the confusion true, and the shipped door opened for somebody
+/// who had finished the errand and never found the sheet.
+/// `the_way_under_the_flat_is_shut_and_says_what_it_wants` is what said so, on
+/// the save that reported it.
+pub const DONE: &str = "done:";
+
+/// **Has this happened?** The one predicate every condition in the game reads.
+///
+/// `hidden_until`, `hidden_until_all`, `needs_all`, a floor's `cleared`, a
+/// drain's `when`, a wing's `arrives` and a post's `named.when` all ask this,
+/// and they ask it here rather than each carrying their own two-line closure —
+/// *a rule with two homes is a rule with two answers*, which is the thing this
+/// project has now paid for seven times.
+///
+/// **Three lists, and the third is M22's.** `answered` is what a boss's tile
+/// and an event have written down; `flags` is what a choice raised; and
+/// `quests_done` is what somebody handed in, which is read **only** through
+/// [`DONE`]. Until M22 an errand could not open anything — nothing but the
+/// quest log read `quests_done`, so *go down, come back, and the clerk moves
+/// in* had no way to be expressed. It is one more list here and **no new save
+/// field**: all three already round-trip.
+pub fn met(state: &WorldState, key: &str) -> bool {
+    if let Some(id) = key.strip_prefix(DONE) {
+        return state.quests_done.iter().any(|q| q == id);
+    }
+    state.answered.iter().any(|a| a == key) || state.flags.iter().any(|f| f == key)
+}
+
 /// Is this place there yet?
 ///
 /// A free function rather than a method, so the check is one place and every
@@ -545,9 +586,7 @@ pub fn place_is_there(p: &PlaceDef, state: &WorldState, allowed: &Allowances) ->
     if p.hidden_until_level.is_some_and(|n| allowed.level < n) {
         return false;
     }
-    let met = |k: &String| {
-        state.answered.iter().any(|a| a == k) || state.flags.iter().any(|f| f == k)
-    };
+    let met = |k: &String| crate::world::met(state, k);
     // **ANDed, both of them.** `hidden_until` is the one-id case and
     // `hidden_until_all` is the list; a place naming both wants both, which is
     // the only reading of two conditions on one place that cannot surprise
@@ -1878,13 +1917,29 @@ impl WorldState {
 
     /// Everything that has happened, as one list.
     ///
-    /// `answered` and `flags` are two lists for two reasons — one is written by
-    /// places and events, the other by an event's outcome — and every reader
-    /// that asks *has this happened* has always checked both. This is that
-    /// question with the two halves already joined, for a caller that cannot
-    /// hold a borrow of the state while it asks.
+    /// `answered`, `flags` and `quests_done` are three lists for three reasons
+    /// — one is written by places and events, one by an event's outcome, one by
+    /// handing an errand over a counter — and every reader that asks *has this
+    /// happened* has to check all of them. This is that question with the
+    /// halves already joined, for a caller that cannot hold a borrow of the
+    /// state while it asks.
+    ///
+    /// **It is [`met`] as a list, and the two must agree**, which
+    /// `met_is_marks_with_one_key_in_it` asserts: a predicate and a list that
+    /// answer the same question from two bodies of code is the *rule with two
+    /// homes* this project keeps paying for. `quests_done` joined both in M22,
+    /// for the reason written at `met`.
     pub fn marks(&self) -> Vec<String> {
-        self.answered.iter().chain(self.flags.iter()).cloned().collect()
+        self.answered
+            .iter()
+            .chain(self.flags.iter())
+            .cloned()
+            // **Prefixed, because the namespaces collide.** An errand and an
+            // event share the name `the-tenth-survey`, so a bare errand id in
+            // this list opens the door under the Wextreen flat for somebody who
+            // never found the sheet. See [`met`] and [`DONE`].
+            .chain(self.quests_done.iter().map(|q| format!("{}{q}", crate::world::DONE)))
+            .collect()
     }
 }
 

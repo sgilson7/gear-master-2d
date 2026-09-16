@@ -3878,6 +3878,94 @@ one design: **luck is cheap, choice is dear, and the middle is a shelf.**
   rule *When a test disagrees with a cost, suspect the test's idea of income
   first.*
 
+### A wing is a shelf with a host, and the id is the identity
+
+**M22.** A wing is a counter standing inside somebody else's town.
+`TownShelf::wing_of` names the host's place id and `TownShelf::arrives` names
+what has to have happened; `shop::wings` answers which are open and the market
+draws each one under its own heading.
+
+- **A wing keeps its own id, and that is the whole reason it is a wing rather
+  than a merge.** A sale is `(id, index)` in `WorldState::bought` and
+  `shop::shelf` greys a sold entry rather than dropping it, *because the index
+  is the identity* — so appending seventeen lines to the host's own stock moves
+  what somebody already bought, and renaming `high-wick` loses it. **No save
+  field, no seam, and `high-wick` is still `high-wick`.**
+- **A wing arrives on something, and a town does not.** A wing that is always
+  there is the host's own stock wearing a second name, which is two answers to
+  *what does this town sell*; and a town that arrives is a town that is not on
+  the map yet, which is what `hidden_until` is for. `ShopsData::parse` refuses
+  both, and refuses a wing of itself and a wing with no name.
+- **`parse` owns what the file can be asked about itself and a lint owns the
+  rest.** Whether the *host* is a town on a map reads the map files, which is
+  not `parse`'s business — `a_wing_has_a_host_on_a_map` is the lint and its
+  negative test hands a mutated `SHOPS_JSON` to `parse` and asserts the
+  refusal. That split is `4a3ae9a`'s finding taken before it cost anything:
+  `StallData::parse` and `a_bargain_is_never_on_the_barrel` asked one question
+  between them, so a mutation written to break the lint panicked in `data.rs`
+  before the assertion ran.
+- **`data::shelves_on_the_map` is the question the cheap tiers have always
+  meant.** `towns_on_the_map` answers *which towns exist*, and until a wing
+  existed that was the same question. The exclusion is about **undercutting**,
+  so it is about shelves a player can walk up to, and a wing is one. A wing
+  whose host is on no map is still staged and still undercuts nothing.
+- **And the rule was taken apart from the lookup so that it could be varied.**
+  `shelves_on_the_map` reads a compiled-in constant, so a check written against
+  it passes with the wing arm replaced by `false &&` — the shipped file has no
+  wings and the answer is *the towns* whatever the rule says.
+  `shop::shelves_among(shops, towns)` is the rule with the file handed to it.
+  *A check whose negative test cannot be made to fail through the check is a
+  check nobody has proved*, in a third costume.
+- **`TownShelf::name` is a third field the plan did not cost.** Every other
+  counter in the game reads its name out of the map file it is drawn in and
+  lets a theme override it by id; a wing is drawn in no map file, and a name
+  that lived only in `theme.rs` prints a hyphenated id under any theme that has
+  not been told about it.
+
+### A finished errand is a thing that has happened
+
+**`world::met` is the one predicate**, lifted out of `place_is_there`'s own
+closure and given a name. `hidden_until`, `hidden_until_all`, `needs_all`, a
+floor's `cleared`, a drain's `when`, a wing's `arrives` and `Requirement::Flag`
+all ask it.
+
+- **It reads `quests_done`, and that is the whole of what M22 added.** Nothing
+  but the quest log had ever read that list, so *go down, come back, and the
+  clerk moves in* had no way to be expressed — **an errand could not open
+  anything**. It is one more list here and **no new save field**: all three
+  already round-trip.
+- **It is read through a `done:` prefix, and the unprefixed version opened a
+  shipped door.** `quests_done` holds errand ids and `answered` holds event and
+  place ids, and **the two namespaces collide**: the way under the Wextreen flat
+  wants `the-tenth-survey`, which is the *sheet on the folding table*, and there
+  is an errand of exactly that name. `CLAUDE.md` already records that collision
+  as the reason a player stood on bare silt waiting for a door — and a `met`
+  that read errand ids bare made their confusion **true**, opening the way under
+  for somebody who had finished the errand and never found the sheet. It was
+  caught by `the_way_under_the_flat_is_shut_and_says_what_it_wants`, which is
+  the check that save became.
+- **The prefix is on the reading side, which is why there is no backfill.**
+  Writing `done:<id>` into `answered` at hand-in was the other way and is
+  refused: a save that finished the errand before this block would need one.
+  Reading with a prefix needs none, and it makes a map file say which list it
+  means. `every_done_key_names_an_errand` refuses a `done:` key that points at
+  nothing, and asserts the one collision **by name** — a list that quietly grew
+  is a list that has gone stale.
+- **`WorldState::marks` learned it in the same commit, and that is the point.**
+  `marks()` is `met` as a list and nine places read it — `sealed_because`,
+  `still_wanted`, `opens_onto`, `Floor::cleared`, the drains,
+  `unlock::sentence`. Teaching only the closure would have left every one of
+  them reading a shorter list, which is *a rule with two homes is a rule with
+  two answers* arriving by accretion. `met_is_marks_with_one_key_in_it` is what
+  keeps them one question.
+- **`shop::counters_at` is the same discipline one screen along.** Which shelf
+  you may buy off, which errands the guild lists, and whether an errand may be
+  taken or handed in here are all *is this counter in this town right now*, and
+  the shim was about to answer it three times — `take_quest` compares where you
+  are standing against an errand's `giver`, and a wing's giver is the wing. One
+  function, in core. Same shape as `quest::shown_at`, which was assembled in
+  two crates until twenty-one chain errands could be taken and none handed in.
+
 ### The barrel could not hold a book, and nothing said so
 
 Reported as *"make spells generally more available, so spells, crystal balls,
@@ -6499,6 +6587,9 @@ about a string. Every one caught something on its first run:
 | 21.10 | **Thirteen figures, not twenty-five, and they are the other ones.** §M21.10 lists eight crops, two growth stages, an ench seed, three benches and three papers. The benches **draw themselves** — they are `Board`s, and a crop is already a coloured polyomino with a motif. What had nowhere at all was the people: eight buyers as rows of plain text, and **five specializations with no art of any kind**, the plan having said three because it predates the Grower, the Handler and the Factor. | `art/ticket.tex`, `art/buyer.tex` |
 | 21.16 | **Every town's bed works, and the Grower's `beds` node is `seed_cap`.** One bed at a time was the plan's and was reported from play as a bug rather than met as a decision. A bed is a place; its cells are the puzzle and the wins a crop takes are the cost. The node moved rather than being deleted. | `crates/core/src/game.rs`, `plant` |
 | 20.7 | **A specialization is its own slot, not a fourth entry in `classes`.** Everything that walks that list walks it to ask *which pair are you*, and a specialization pairs with nothing. | `crates/core/src/character.rs`, `specialization` |
+| 22.1 | **A cup of rock is not sealed, so the cup is a map.** `PLAN-M22.md` decision 9 stands the table's boss in a sealed cup and makes a pocket the only way in. Measured before a map was authored: **6,546 of the shots taken from the 278 walkable tiles outside the draft cup come to rest inside it**, through eight tiles of solid rock — `shot::shoot_with` tests the tile a tick *landed on* and never the tiles it crossed, and one tick is 18.75 tiles at power ten. A two-thick wall is transparent too and nineteen tiles would be needed. So the cup is a **map of its own**, reached by the far pocket's `to`/`at_to`, which is exactly what decision 8 already builds — `warp_to`, the call the sunk arm makes. Maps go to 31, not 30, and *the boss stands nowhere but the cup* becomes true by construction. | `data/maps/`, `crates/core/src/shot.rs` |
+| 22.2 | **The boss is dressed against `common::geared_from` and the plan says `common::from_save(common::THE_RUN)`.** The run is 974 health and 9 strength over 11 items at level 45 and **beats nothing at that depth** — it loses to The Unwritten in 7.7s and to all ten of the Wextreen deep — so *a win in 20–28 seconds* against it is a bracket only something shallower than the map's own pool could meet. `every_region_has_a_fight_you_can_win_and_every_boss_can_be_beaten` has required `geared_from` of every boss on a tile since M11.7 and the Tenth Surveyor was bracketed against it for this reason. The run stays as the **floor** and is asserted to lose. | `crates/core/tests/common/mod.rs` |
+| 22.3 | **`TownShelf` gains three fields and the plan costed two.** `wing_of` and `arrives` are the plan's; `name` is the third, because a wing is drawn under its own heading on a counter and every other counter in the game reads its name out of the map file it stands in. A wing stands in none, and a name that lived only in `theme.rs` prints a hyphenated id under any theme that has not been told about it — which is the fall-through `place_name` already ends at. `ShopsData::parse` refuses a nameless wing; the shim still asks the theme first. | `crates/core/src/shop.rs`, `TownShelf` |
 | 14.9 | **The wading shortcut on the Gallery is drawn, and saves eight tiles.** §9 decision 4 leaves it to the recon — *"if it saves nothing it is cut"*. The chains are in opposite walls, so a flooded gallery is seventeen tiles round and nine across. **Flooding the room makes the walk worse**, which is the design rather than an accident: chain A costs you the crossing you had and the Toad's Own Frame is what gives it back. | `data/maps/the-silt-stair-3.tiles.json` |
 
 Also true, and not in the brief because it could not have been:

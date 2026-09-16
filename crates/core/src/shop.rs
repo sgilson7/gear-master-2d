@@ -247,6 +247,51 @@ pub struct CommissionDef {
 pub struct TownShelf {
     /// The place id from `data/tiles.json`.
     pub id: String,
+    /// **This is not a town, it is a wing of one** — the host's place id.
+    ///
+    /// A wing is a counter that stands inside somebody else's town: the
+    /// clerk's desk and the arcane shelf are both wings of the third town, and
+    /// High Wick's seventeen lines come down one country without High Wick
+    /// becoming the town they are sold in.
+    ///
+    /// **It keeps its own id, and that is the whole reason it is a wing rather
+    /// than a merge.** A sale is `(id, index)` in `WorldState::bought` and
+    /// `shop::shelf` marks sold entries rather than dropping them, *because the
+    /// index is the identity* — so appending seventeen lines to the host's own
+    /// stock would move what somebody already bought, and renaming `high-wick`
+    /// would lose it. A wing's stock is keyed by the wing, and the contract is
+    /// untouched.
+    ///
+    /// `None` is a town. `ShopsData::parse` refuses a wing with no
+    /// [`TownShelf::arrives`]; whether the **host** is a town on a map is a
+    /// lint's question, because `parse` does not read map files.
+    #[serde(default)]
+    pub wing_of: Option<String>,
+    /// What has to have happened before this wing is on the host's counter.
+    ///
+    /// An id [`crate::world::met`] will accept: something answered, a flag
+    /// raised, **or an errand finished**. The last of those is the one
+    /// predicate this block adds — see that function.
+    ///
+    /// **Required of a wing, and refused on a town.** A wing that is always
+    /// there is the host's own stock wearing a second name, which is two
+    /// answers to *what does this town sell*; and a town that arrives is a town
+    /// that is not on the map yet, which is what `hidden_until` is for.
+    #[serde(default)]
+    pub arrives: Option<String>,
+    /// What a wing is called, under its own heading on the host's counter.
+    ///
+    /// **A third field, where the plan costed two, and a `PlaceDef` is the
+    /// argument.** Every other counter in the game takes its name from the map
+    /// file it is drawn in, and the theme overrides it by id; a wing is drawn
+    /// in no map file, so the name has to live where the wing does. Putting it
+    /// in `theme.rs` alone was the other option and prints a hyphenated id
+    /// under any theme that has not been told about it, which is the failure
+    /// `place_name` already falls through to.
+    ///
+    /// Empty on a town, which reads its name off the map.
+    #[serde(default)]
+    pub name: String,
     /// What this town will make to order.
     ///
     /// **Gated by being this town, and by nothing else.** The frame asks for
@@ -349,6 +394,48 @@ impl ShopsData {
                 }
             }
         }
+        // **What a shops file can be asked about itself, and nothing more.**
+        // The split is `4a3ae9a`'s finding taken before it costs anything:
+        // `StallData::parse` and `a_bargain_is_never_on_the_barrel` asked one
+        // question between them, so a mutation written to break the lint
+        // panicked in `data.rs` before the assertion ran. So `parse` owns what
+        // is answerable from this file alone and **the lint owns what needs the
+        // map files** — whether a wing's host is a town on a map is
+        // `a_wing_has_a_host_on_a_map`'s, and its negative test hands a mutated
+        // `SHOPS_JSON` to this function and makes the refusal the assertion.
+        for t in &d.towns {
+            match (&t.wing_of, &t.arrives) {
+                // A wing that is always there is the host's own stock wearing a
+                // second name, which is two answers to *what does this town
+                // sell*.
+                (Some(host), None) => {
+                    return Err(format!(
+                        "{} is a wing of {host} and arrives on nothing; a wing that is always                          there is the host's own stock",
+                        t.id
+                    ))
+                }
+                // And a town that arrives is a town that is not on the map yet,
+                // which is what `hidden_until` is for.
+                (None, Some(k)) => {
+                    return Err(format!(
+                        "{} is a town and says it arrives on {k:?}; a town arrives by being drawn \
+                         on a map",
+                        t.id
+                    ))
+                }
+                // A wing of itself is a shelf that can never be reached, and it
+                // is the one shape the host lint below cannot see.
+                (Some(host), Some(_)) if *host == t.id => {
+                    return Err(format!("{} is a wing of itself", t.id))
+                }
+                // A wing draws under its own heading, so it is called
+                // something. A town's name is the map's.
+                (Some(_), Some(_)) if t.name.is_empty() => {
+                    return Err(format!("{} is a wing and has no name to draw", t.id))
+                }
+                _ => {}
+            }
+        }
         for t in &d.towns {
             for c in &t.commissions {
                 let Some(i) = def_named(&c.piece) else {
@@ -387,7 +474,18 @@ impl ShopsData {
             // designed curve that has quietly stopped existing.
             // **On the map**, for the reason `on_a_shelf_you_can_reach` gives:
             // a shelf with no ground under it is a counter nobody has stood at.
-            let placed = crate::data::towns_on_the_map();
+            //
+            // **And a wing counts as ground**, which is why this is worked out
+            // from `d` rather than by calling `data::shelves_on_the_map` — that
+            // function parses this file, and a parse that asks a parser about
+            // itself is a stack overflow. The list is in hand here; the wings
+            // are the entries whose host is a placed town.
+            let mut placed = crate::data::towns_on_the_map();
+            for t in &d.towns {
+                if t.wing_of.as_ref().is_some_and(|h| placed.iter().any(|p| p == h)) {
+                    placed.push(t.id.clone());
+                }
+            }
             if let Some(t) = d
                 .towns
                 .iter()
@@ -557,7 +655,14 @@ fn what_an_errand_pays() -> Vec<String> {
 /// working rather than a change to it.
 fn on_a_shelf_you_can_reach() -> Vec<String> {
     let shops = crate::data::shops();
-    let placed = crate::data::towns_on_the_map();
+    // **Wings included, since M22.** A wing is a counter standing in somebody
+    // else's town and a player walks up to it exactly as they walk up to the
+    // host's own shelf, so `shelves_on_the_map` is the question this has always
+    // meant. High Wick's seventeen lines came down as a wing of the third town
+    // and left the cheap tiers on the day they did — which is this rule working
+    // rather than a change to it, the same sentence this function already
+    // carried about the day High Wick is placed.
+    let placed = crate::data::shelves_on_the_map();
     shops
         .towns
         .iter()
@@ -804,6 +909,73 @@ pub fn commissions_of(rolled: &[CommissionDef]) -> Vec<CommissionOffer> {
             Some(CommissionOffer { index: i, def, price: commission_price(def), fights: c.fights })
         })
         .collect()
+}
+
+/// Every wing standing in this town that has arrived.
+///
+/// **A wing is core's list and the street is the page's picture.** The market
+/// draws the host's shelf and then each of these under its own heading; the
+/// guild draws each one's errands. Nothing in the shim decides which — *any
+/// `if` you find yourself writing in `crates/wasm` is a rule that belongs in
+/// core* — and the street strip already reads the rendered panel rather than a
+/// list of which towns have what, so a building appears because a panel stopped
+/// being empty.
+///
+/// Order is the file's, which is the display order, which is also the order
+/// `bought` indexes into. Append.
+pub fn wings<'a>(
+    shops: &'a ShopsData,
+    town: &str,
+    state: &crate::world::WorldState,
+) -> Vec<&'a TownShelf> {
+    shops
+        .towns
+        .iter()
+        .filter(|t| t.wing_of.as_deref() == Some(town))
+        .filter(|t| t.arrives.as_ref().is_some_and(|k| crate::world::met(state, k)))
+        .collect()
+}
+
+/// The shelves a player can reach, given which towns are drawn.
+///
+/// **Taken apart from `data::shelves_on_the_map` so that it can be varied.**
+/// That function reads `SHOPS_JSON`, which is a compiled-in constant, so a
+/// check written against it could only ever assert what the shipped file
+/// happens to say — and while no wing is authored that is *the towns*,
+/// whatever the rule is. A check that cannot be made to fail is a check nobody
+/// has proved, which is `4a3ae9a`'s finding, and the answer is the same one:
+/// hand the function the file.
+pub fn shelves_among(shops: &ShopsData, towns: &[String]) -> Vec<String> {
+    let mut out: Vec<String> = towns.to_vec();
+    for t in &shops.towns {
+        if t.wing_of.as_ref().is_some_and(|h| towns.iter().any(|p| p == h))
+            && !out.contains(&t.id)
+        {
+            out.push(t.id.clone());
+        }
+    }
+    out
+}
+
+/// Every counter you are standing in front of in this town: the town itself,
+/// and its open wings.
+///
+/// **One question, three callers.** Which shelf you can buy off, which errands
+/// the guild lists, and whether an errand may be taken or handed in here are
+/// all *is this counter in this town right now* — and the shim was about to
+/// answer that three times. `take_quest` compares `place_here` against an
+/// errand's `giver`, and a wing's giver is the wing, so a desk standing in the
+/// third town would have had errands nobody could take.
+///
+/// The host is first, because the host is the town.
+pub fn counters_at(
+    shops: &ShopsData,
+    town: &str,
+    state: &crate::world::WorldState,
+) -> Vec<String> {
+    let mut out = vec![town.to_string()];
+    out.extend(wings(shops, town, state).into_iter().map(|w| w.id.clone()));
+    out
 }
 
 /// A town's whole shelf, sold entries included.

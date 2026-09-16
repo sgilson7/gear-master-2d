@@ -6,7 +6,8 @@
 import init, {
   world_json, position, try_step, event_json, answer,
   save_json, load_json, new_game, apply_preset,
-  shop_json, bench_json, buy, buy_barrel, order, collect_order, buy_supply, buy_ench,
+  shop_json, bench_json, buy, buy_wing, buy_barrel, order, order_wing, collect_order,
+  collect_order_wing, buy_supply, buy_ench,
   train_here, buy_ingredient,
   reroll_barrel, reroll_ledger, buy_paper, use_supply, quests_json, take_quest, hand_in_quest, bank_xp,
   quest_log_json, guide_json, pin_quest,
@@ -2739,6 +2740,7 @@ function openTown(id) {
   $('town-name').textContent = place?.name ?? id;
   portrait($('town-art'), figure('places', id), place?.name ?? id);
   paintShelf();
+  paintWings();
   paintBarrel();
   paintOrders();
   paintQuests();
@@ -3337,9 +3339,107 @@ function paintShelf() {
       townSays(why || `Bought ${w.name}.`, !!why);
       // The barrel repaints too: what you can afford there just changed, and
       // a button that greys out one screen late reads as a broken button.
-      paintShelf(); paintBarrel(); paintOrders(); paintPanel(); autosave();
+      paintShelf(); paintWings(); paintBarrel(); paintOrders(); paintPanel(); autosave();
     };
     box.appendChild(b);
+  }
+}
+
+/// One ware button, wherever it is standing.
+///
+/// **One builder, because there are four shelves now.** The host's, each
+/// wing's, the barrel's and the order book's were three near-copies before a
+/// wing made it four, and four copies of *what a component looks like on a
+/// counter* is four places for a price to disagree with the one that charges
+/// you.
+function wareButton(w, extra, go) {
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'wares' + (w.sold ? ' sold' : '');
+  b.disabled = !w.afford;
+  b.innerHTML = `<span class="ware-top"></span><b>${w.name}</b>` +
+    `<span class="meta">${w.for} · ${w.kind} · ${extra}</span>` +
+    `<span class="cost">${w.sold ? 'yours' : `${w.price} Fnorp`}</span>`;
+  b.querySelector('.ware-top').appendChild(shapeCanvas(w));
+  const read = () => showPiece(b, w);
+  b.onpointerenter = read;
+  b.onfocus = read;
+  b.onpointerleave = hidePiece;
+  b.onblur = hidePiece;
+  b.onclick = go;
+  return b;
+}
+
+/// The wings, each under its own heading.
+///
+/// **Core says which and the page draws them.** `shop::wings` answers whether a
+/// wing has arrived — a question about what the character has done, which is
+/// not a question a screen gets to answer — and this reads that list. An empty
+/// list is an empty box, and an empty box is a building with no tab, which is
+/// how the guild and the market grow a counter without anybody keeping a
+/// second list of which towns have what.
+function paintWings() {
+  const s = JSON.parse(shop_json());
+  const box = $('wings');
+  box.replaceChildren();
+  for (const wing of s.wings ?? []) {
+    const h = document.createElement('h3');
+    h.className = 'sub-h';
+    h.textContent = wing.name;
+    box.appendChild(h);
+    const shelf = document.createElement('div');
+    shelf.className = 'shelf';
+    shelf.dataset.wing = wing.id;
+    for (const w of wing.shelf ?? []) {
+      shelf.appendChild(wareButton(w, `rates ${w.rating}`, () => {
+        const why = buy_wing(wing.id, w.slot);
+        townSays(why || `Bought ${w.name}.`, !!why);
+        paintShelf(); paintWings(); paintBarrel(); paintOrders(); paintPanel(); autosave();
+      }));
+    }
+    box.appendChild(shelf);
+    // **A wing keeps its own order book**, because `Game::order` has been keyed
+    // by place id since M12.2 and a wing is one. One order a counter.
+    if ((wing.commissions ?? []).length) {
+      const oh = document.createElement('h3');
+      oh.className = 'sub-h';
+      oh.textContent = `${wing.name} — made to order`;
+      box.appendChild(oh);
+      const open = wing.on_order;
+      if (open) {
+        const line = document.createElement('p');
+        line.className = 'says';
+        line.textContent = open.ready
+          ? `${open.piece} is finished and on the counter.`
+          : `${open.piece}, after ${open.fights_left} more ${open.fights_left === 1 ? 'fight' : 'fights'}.`;
+        box.appendChild(line);
+      }
+      const book = document.createElement('div');
+      book.className = 'shelf';
+      if (open && open.ready) {
+        const take = document.createElement('button');
+        take.type = 'button';
+        take.className = 'wares';
+        take.innerHTML = `<b>Take it</b><span class="meta">${open.piece}</span>` +
+          `<span class="cost">paid for</span>`;
+        take.onclick = () => {
+          const r = JSON.parse(collect_order_wing(wing.id));
+          townSays(r.error || `${r.piece}. They had it under the counter.`, !!r.error);
+          paintWings(); paintPanel(); autosave();
+        };
+        book.appendChild(take);
+      }
+      for (const w of wing.commissions) {
+        const b = wareButton(w, `after ${w.fights} fights`, () => {
+          const why = order_wing(wing.id, w.slot);
+          townSays(why || `Ordered. ${w.name}, after ${w.fights} fights.`, !!why);
+          paintWings(); paintShelf(); paintBarrel(); paintPanel(); autosave();
+        });
+        b.disabled = !w.afford || !!open;
+        book.appendChild(b);
+      }
+      box.appendChild(book);
+    }
   }
 }
 

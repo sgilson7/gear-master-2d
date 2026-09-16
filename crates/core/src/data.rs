@@ -324,6 +324,33 @@ pub fn towns_on_the_map() -> Vec<String> {
     out
 }
 
+/// Every shelf a player can walk up to: the towns on the map, and the wings
+/// standing in them.
+///
+/// **The question the cheap tiers actually mean.** `towns_on_the_map` answers
+/// *which towns exist*, and until M22 that was the same question — every shelf
+/// was a town's. A wing is a counter inside somebody else's town, so a wing
+/// whose host is on the map is a shelf a player can reach, and the barrel and
+/// the order book have to step round it for the reason they step round
+/// Kettleworks: **the exclusion is about undercutting, and it is about shelves
+/// a player can walk up to.** A wing whose host is on no map is still staged
+/// and still undercuts nothing, which is the same rule.
+///
+/// **It says nothing about whether the wing has arrived**, and that is
+/// deliberate: a wing that arrives on the last rung of a chain is a shelf that
+/// exists and is not yet open, and a cheap tier that undercuts a counter right
+/// up until the counter opens is worse than one that never did, because it is
+/// the same shelf either way.
+///
+/// The rule is [`crate::shop::shelves_among`] and this is the lookup — that
+/// split is what makes the rule checkable, because this half reads a
+/// compiled-in constant and a check written against it could only assert what
+/// the shipped file happens to say.
+pub fn shelves_on_the_map() -> Vec<String> {
+    let Ok(shops) = crate::shop::ShopsData::parse(SHOPS_JSON) else { return towns_on_the_map() };
+    crate::shop::shelves_among(&shops, &towns_on_the_map())
+}
+
 /// The errands the towns hand out.
 pub fn quests() -> crate::quest::QuestsData {
     crate::quest::QuestsData::parse(QUESTS_JSON).expect("the shipped errands are broken")

@@ -526,6 +526,13 @@
           <div id="order-roll" class="rollbar" hidden></div>
           <div id="order-book" class="shelf"></div>
         </div>
+        <!-- **The wings.** A wing is a counter standing inside somebody else's
+             town — the clerk's desk and the arcane shelf are both the third
+             town's — and each one draws under its own heading, keyed by its own
+             id, because a sale is `(id, index)` and the index is the identity.
+             Which wings are open is core's (`shop::wings`) and this box is
+             empty until one is. -->
+        <div id="wings"></div>
         </div>
         <div class="building" id="town-guild" data-name="The guild">
         <!-- The errands. Hidden entirely where a town has none, rather than

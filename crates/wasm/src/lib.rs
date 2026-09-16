@@ -2467,6 +2467,22 @@ fn place_here(g: &gm2d_core::game::Game) -> Option<String> {
     })
 }
 
+/// The counters standing where the player is: the place itself, and — if it is
+/// a town — every wing of it that has arrived.
+///
+/// **The rule is `shop::counters_at` and this is the lookup**, which is the
+/// division every other question in this file makes: the shim finds the place
+/// and core says what is standing in it.
+fn counters_here(g: &gm2d_core::game::Game, here: &str) -> Vec<String> {
+    let shops = gm2d_core::data::shops();
+    gm2d_core::shop::counters_at(&shops, here, &g.world)
+}
+
+/// Is `counter` one of the counters standing at `here`?
+fn standing_at(g: &gm2d_core::game::Game, here: &str, counter: &str) -> bool {
+    here == counter || counters_here(g, here).iter().any(|c| c == counter)
+}
+
 fn town_here(g: &gm2d_core::game::Game) -> Option<String> {
     map_for(g, |w| {
         w.place_at(g.world.at[0], g.world.at[1])
@@ -2726,8 +2742,74 @@ pub fn shop_json() -> String {
             "fights_left": c.fights_left,
             "ready": c.fights_left == 0,
         }));
+        // **The wings, each under its own heading.** A wing is a counter
+        // standing in somebody else's town — the clerk's desk and the arcane
+        // shelf are both the third town's — and which ones are open is
+        // `shop::wings`, in core. The page draws this list and decides nothing:
+        // whether a wing has arrived is a question about what the character has
+        // done, and that is not a question a shim gets to answer.
+        //
+        // **Keyed by the wing's own id**, because a sale is `(id, index)` and
+        // the index is the identity. Folding seventeen lines into the host's
+        // stock would move what somebody already bought.
+        let wings: Vec<_> = gm2d_core::shop::wings(&shops, &town, &g.world)
+            .into_iter()
+            .map(|wing| {
+                let rows: Vec<_> = gm2d_core::shop::shelf(&shops, &wing.id, &g.world.bought)
+                    .into_iter()
+                    .map(|o| {
+                        let mut v = piece_payload(o.def, theme, serde_json::Value::Null,
+                                                  serde_json::json!(o.def.cells), None);
+                        let m = v.as_object_mut().expect("an object");
+                        m.insert("slot".into(), o.index.into());
+                        m.insert("for".into(), slot_name(o.def.slot).into());
+                        m.insert("price".into(), o.price.into());
+                        m.insert("rating".into(), gm2d_core::rating::piece_rating(o.def).into());
+                        m.insert("afford".into(), (!o.sold && g.character.gold >= o.price).into());
+                        m.insert("sold".into(), o.sold.into());
+                        v
+                    })
+                    .collect();
+                let book: Vec<_> = g
+                    .ledger_at(&wing.id)
+                    .into_iter()
+                    .map(|o| {
+                        let mut v = piece_payload(o.def, theme, serde_json::Value::Null,
+                                                  serde_json::json!(o.def.cells), None);
+                        let m = v.as_object_mut().expect("an object");
+                        m.insert("slot".into(), o.index.into());
+                        m.insert("for".into(), slot_name(o.def.slot).into());
+                        m.insert("price".into(), o.price.into());
+                        m.insert("fights".into(), o.fights.into());
+                        m.insert("rating".into(), gm2d_core::rating::piece_rating(o.def).into());
+                        m.insert("afford".into(), (g.character.gold >= o.price).into());
+                        v
+                    })
+                    .collect();
+                serde_json::json!({
+                    "id": wing.id,
+                    // **The wing's own name, and the theme may still override it.**
+                    // A `PlaceDef` reads its name out of the map file and
+                    // `place_name` lets a theme replace it by id; a wing is
+                    // drawn in no map file, so its name is in `shops.json` and
+                    // goes through the same door.
+                    "name": {
+                        let told = gm2d_core::theme::by_id(&g.theme).place(&wing.id, "");
+                        if told.is_empty() { wing.name.clone() } else { told.to_string() }
+                    },
+                    "shelf": rows,
+                    "commissions": book,
+                    "on_order": g.order_at(&wing.id).map(|c| serde_json::json!({
+                        "piece": g.theme_piece(&c.piece),
+                        "fights_left": c.fights_left,
+                        "ready": c.fights_left == 0,
+                    })),
+                })
+            })
+            .collect();
         serde_json::json!({
             "gold": g.character.gold, "town": town, "shelf": shelf,
+            "wings": wings,
             "barrel": barrel,
             "commissions": book,
             "on_order": on_order,
@@ -2820,8 +2902,34 @@ pub fn buy_ench(id: &str) -> String {
 /// Buy the entry at `index` on the shelf of the town you are standing in.
 #[wasm_bindgen]
 pub fn buy(index: usize) -> String {
+    buy_at("", index)
+}
+
+/// Buy off a **wing**'s shelf — a counter standing in the town you are in.
+///
+/// **One function, and `buy` is the empty-string case.** Two copies of *take
+/// the money, give the thing, write down the index* is two answers to what a
+/// purchase is, and the one that got it wrong would be the one nobody reads.
+/// Which shelf is decided in core: `shop::wings` says which wings are open
+/// here, and a shelf id this call does not recognise is refused rather than
+/// looked up.
+#[wasm_bindgen]
+pub fn buy_wing(wing: &str, index: usize) -> String {
+    buy_at(wing, index)
+}
+
+fn buy_at(wing: &str, index: usize) -> String {
     with_mut(|g| {
-        let Some(town) = town_here(g) else { return "you are not in a town".into() };
+        // **The wing has to be open, and that is core's answer.** A page that
+        // posted a wing id the character has not earned would be buying off a
+        // counter that is not there.
+        let Some(town) = counter_for(g, wing) else {
+            return if wing.is_empty() {
+                "you are not in a town".into()
+            } else {
+                "there is no such counter here".into()
+            };
+        };
         let shops = gm2d_core::data::shops();
         let shelf = gm2d_core::shop::shelf(&shops, &town, &g.world.bought);
         let Some(o) = shelf.iter().find(|o| o.index == index) else {
@@ -2874,8 +2982,29 @@ pub fn buy_barrel(index: usize) -> String {
 /// decided any of them would be a second rulebook.
 #[wasm_bindgen]
 pub fn order(index: usize) -> String {
+    order_at("", index)
+}
+
+/// The same, at a wing's own counter.
+///
+/// **A wing keeps its own order book**, because `Game::order` and
+/// `Game::collect` have been keyed by place id since M12.2 and a wing is a
+/// place id — *one order per town at a time* becomes one per counter, which is
+/// what a second counter in the same town is. The empty string is the host.
+#[wasm_bindgen]
+pub fn order_wing(wing: &str, index: usize) -> String {
+    order_at(wing, index)
+}
+
+fn order_at(wing: &str, index: usize) -> String {
     with_mut(|g| {
-        let Some(town) = town_here(g) else { return "you are not in a town".into() };
+        let Some(town) = counter_for(g, wing) else {
+            return if wing.is_empty() {
+                "you are not in a town".into()
+            } else {
+                "there is no such counter here".into()
+            };
+        };
         match g.order(&town, index) {
             Ok(_) => String::new(),
             Err(why) => why,
@@ -2886,13 +3015,38 @@ pub fn order(index: usize) -> String {
 /// Take delivery of what this town is holding for you.
 #[wasm_bindgen]
 pub fn collect_order() -> String {
+    collect_at("")
+}
+
+/// The same, at a wing's own counter.
+#[wasm_bindgen]
+pub fn collect_order_wing(wing: &str) -> String {
+    collect_at(wing)
+}
+
+fn collect_at(wing: &str) -> String {
     with_mut(|g| {
-        let Some(town) = town_here(g) else { return "you are not in a town".into() };
+        let Some(town) = counter_for(g, wing) else {
+            return serde_json::json!({ "error": "you are not in a town" }).to_string();
+        };
         match g.collect(&town) {
             Ok(name) => serde_json::json!({ "piece": g.theme_piece(&name) }).to_string(),
             Err(why) => serde_json::json!({ "error": why }).to_string(),
         }
     })
+}
+
+/// The counter a page has named: the town you are in, or one of its open wings.
+///
+/// **`None` is the refusal**, so a page that posts a wing id the character has
+/// not earned is buying off a counter that is not there rather than off the
+/// host's shelf by accident.
+fn counter_for(g: &gm2d_core::game::Game, wing: &str) -> Option<String> {
+    let town = town_here(g)?;
+    if wing.is_empty() {
+        return Some(town);
+    }
+    standing_at(g, &town, wing).then(|| wing.to_string())
 }
 
 /// Turn the barrel over. Empty string, or why not.
@@ -3028,13 +3182,19 @@ pub fn quests_json() -> String {
         // they are in.
         let Some(town) = place_here(g) else { return "[]".into() };
         let quests = gm2d_core::data::quests();
+        // **The counters standing here, not the tile.** A wing is a counter
+        // inside somebody else's town, so the guild lists what everybody at
+        // this town wants — and which wings are open is core's. Without it the
+        // clerk's desk would be a building with errands nobody could see.
+        let counters = counters_here(g, &town);
         // **Which errands this place will talk to you about is core's.** It was
         // half here and half in `QuestsData::at`, and the half that was here
         // could not see the other — so a chain errand was filtered out of its
         // own hand-in and twenty-one of them could never be finished. One
         // function answers it now: `quest::shown_at`.
-        let out: Vec<_> = gm2d_core::quest::shown_at(g, &quests, &town)
-            .into_iter()
+        let out: Vec<_> = counters
+            .iter()
+            .flat_map(|c| gm2d_core::quest::shown_at(g, &quests, c))
             .map(|q| {
                 let stage = gm2d_core::quest::stage(g, q);
                 let (have, want) = match stage {
@@ -3049,9 +3209,9 @@ pub fn quests_json() -> String {
                     "brief": q.brief,
                     "stage": stage.name(),
                     "giver": place_name(g, &q.giver),
-                    "here_gives": q.giver == town,
+                    "here_gives": counters.contains(&q.giver),
                     "back_to": place_name(g, gm2d_core::quest::QuestsData::turn_in_of(q)),
-                    "here_takes": gm2d_core::quest::QuestsData::turn_in_of(q) == town,
+                    "here_takes": counters.iter().any(|c| c == gm2d_core::quest::QuestsData::turn_in_of(q)),
                     "have": have,
                     "want": want,
                     // Unthemed, and derived from the goal — the same rule the
@@ -4100,7 +4260,7 @@ pub fn take_quest(id: &str) -> String {
         let here = place_here(g);
         let quests = gm2d_core::data::quests();
         match quests.get(id) {
-            Some(q) if here.as_deref() != Some(q.giver.as_str()) => {
+            Some(q) if !here.as_deref().is_some_and(|h| standing_at(g, h, &q.giver)) => {
                 format!("{} is not here.", q.name)
             }
             _ => gm2d_core::quest::take(g, id).err().unwrap_or_default(),
@@ -4116,7 +4276,7 @@ pub fn hand_in_quest(id: &str) -> String {
         let quests = gm2d_core::data::quests();
         if let Some(q) = quests.get(id) {
             let back = gm2d_core::quest::QuestsData::turn_in_of(q);
-            if here.as_deref() != Some(back) {
+            if !here.as_deref().is_some_and(|h| standing_at(g, h, back)) {
                 return serde_json::json!({
                     "error": format!("That is not handed in here.")
                 })

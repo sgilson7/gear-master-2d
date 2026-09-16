@@ -5497,15 +5497,22 @@ def check_the_chair_refuses_the_wrong_move(page, name, fails, base):
         print("ok: the chair is three moves in an order, and it comes back")
 
 
-def check_the_third_town_is_empty_on_purpose(page, name, fails, base):
-    """**A town drawn honestly, and the screen after it that says so.**
+def check_the_third_town_fills_up(page, name, fails, base):
+    """**The town that was empty on purpose, settled.**
 
-    `PLAN-M14.md` §1.5 says the *town's* prose carries the stop-line; a town has
-    no prose field and never has, so the sentence is on the one kind the game
-    already has for a screen that is not a loop — a `Door`, one tile south of
-    the counter, which you walk onto on the way out.
+    **A rewrite of `check_the_third_town_is_empty_on_purpose`, not a second walk
+    to the same tile.** That check planted at [10, 5], shot to [10, 10], and
+    asserted five things: `#shelf` has nought buttons, the box says *nothing for
+    sale*, the tile south opens `#ending`, and its prose says *decided*. Every
+    one of those is a line M22.3 turned over, and a check *about* a thing is an
+    arm of the check that already reaches that thing.
+
+    What it asks now is the half `cargo test` cannot: that the two **wings**
+    draw on the host's counter under their own headings, that the guild is on
+    the street, and that the post says the name. Which wings are open is core's
+    (`shop::wings`); whether the page draws them is only answerable here.
     """
-    def down_there(body):
+    def down_there(body, done):
         strip_the_boards(body)
         w = body.setdefault("world", {})
         w["map"] = "the-undercountry"
@@ -5516,35 +5523,107 @@ def check_the_third_town_is_empty_on_purpose(page, name, fails, base):
         w["at"] = [10, 5]
         w["answered"] = list(w.get("answered", [])) + [
             "the-ninth-surveyor", "the-bottom-of-the-bottom"]
+        w["quests_done"] = list(w.get("quests_done", [])) + done
 
-    plant(page, base, down_there, stem="third-town")
-    # **Shot, since M17 made the Undercountry a table.** The town and the screen
-    # after it are where M14 put them; what changed is how you get to a tile.
+    # --- nothing sent for yet: one counter, and it sells nothing -------------
+    clear_screens(page)
+    plant(page, base, lambda b: down_there(b, []), stem="third-town-before")
     cross(page, 10, 10)
     page.wait_for_timeout(400)
-    close_fight(page)
+    clear_screens(page) if page.is_hidden("#town") else None
     if page.is_hidden("#town"):
         fails.append(f"{name}: walked into the third town and no counter opened")
-    else:
-        # **Count the buttons, because a line on the shelf is a thing you can
-        # press.** `.ware` is the packing screen's class and this box does not
-        # use it — the first version counted zero of them on a shelf with a
-        # book on it and was saved only by the sentence below.
-        shelf = page.evaluate("() => document.querySelectorAll('#shelf button').length")
-        if shelf:
-            fails.append(f"{name}: the empty town has {shelf} things on the shelf")
-        # **And it says so rather than drawing nothing.** An empty box is
-        # indistinguishable from a box that failed to draw.
-        said = (page.text_content("#shelf") or "").lower()
-        if "nothing for sale" not in said:
-            fails.append(f"{name}: the empty shelf is blank rather than saying so: {said[:80]!r}")
-        page.click("#leave")
-        page.wait_for_selector("#town", state="hidden", timeout=5000)
+        return
+    said = (page.text_content("#shelf") or "").lower()
+    if "nothing for sale" not in said:
+        fails.append(f"{name}: the town sells something before the clerk came down: {said[:80]!r}")
+    if page.evaluate("() => document.querySelectorAll('#wings .wares').length"):
+        fails.append(f"{name}: a wing is on the counter before anybody sent for the clerk")
+    posted = page.text_content("#town-name") or ""
+    if "no name on the post" not in posted:
+        fails.append(f"{name}: the post is cut before anybody cut it: {posted!r}")
+    page.click("#leave")
+    page.wait_for_selector("#town", state="hidden", timeout=5000)
+
+    # --- the whole chain done: two wings, a guild, and a name ----------------
+    clear_screens(page)
+    plant(page, base, lambda b: down_there(b, [
+        "nobody-has-named-it", "send-for-the-clerk",
+        "the-long-mirror-inventory", "cut-the-post"]), stem="third-town-after")
+    cross(page, 10, 10)
+    page.wait_for_timeout(400)
+    if page.is_hidden("#town"):
+        fails.append(f"{name}: the settled town has no counter")
+        return
+    posted = page.text_content("#town-name") or ""
+    if "no name on the post" in posted or not posted.strip():
+        fails.append(f"{name}: the post was cut and still has nothing on it: {posted!r}")
+    # **Under its own heading, and keyed by its own id.** `#wings` is one box
+    # per wing; the arcane shelf is `high-wick` and still is.
+    wings = page.evaluate("""() => [...document.querySelectorAll('#wings .shelf')]
+        .map((s) => ({ wing: s.dataset.wing || '', wares: s.querySelectorAll('.wares').length }))""")
+    stocked = [w for w in wings if w["wares"]]
+    if not stocked:
+        fails.append(f"{name}: the wings drew no wares at all: {wings}")
+    elif not any(w["wing"] == "high-wick" for w in stocked):
+        fails.append(f"{name}: the arcane shelf is not drawn under its own id: {wings}")
+    heads = page.evaluate("""() => [...document.querySelectorAll('#wings h3')]
+        .map((h) => h.textContent)""")
+    if not any("High Wick" in h for h in heads):
+        fails.append(f"{name}: no heading says where the shelf came from: {heads}")
+    # **The guild is on the street**, because the panel stopped being empty —
+    # which is `paintStreet` reading the rendered panel and not a list of towns.
+    tabs = page.evaluate("""() => [...document.querySelectorAll('#town-street .tab')]
+        .map((t) => t.textContent)""")
+    if not any("guild" in t.lower() for t in tabs):
+        fails.append(f"{name}: the clerk is down and the guild is not on the street: {tabs}")
+    page.click("#leave")
+    page.wait_for_selector("#town", state="hidden", timeout=5000)
+    print(f"ok: the third town fills up — {posted.strip()}, "
+          f"{sum(w['wares'] for w in stocked)} on the wings, {len(tabs)} buildings")
+
+
+def check_the_way_south_names_the_boss(page, name, fails, base):
+    """**The tile the ending screen used to be on refuses, and names what is
+    standing.**
+
+    Its own check rather than an arm of the one above, because it is a different
+    tile — [10, 11], one shot further down the lane — and because what it asks
+    is `Game::sealed_because`, which was written in M14 and called by nothing at
+    all for four blocks.
+    """
+    def down_there(body, answered):
+        strip_the_boards(body)
+        w = body.setdefault("world", {})
+        w["map"] = "the-undercountry"
+        w["at"] = [10, 7]
+        w["answered"] = list(w.get("answered", [])) + [
+            "the-ninth-surveyor", "the-bottom-of-the-bottom"] + answered
+
+    clear_screens(page)
+    plant(page, base, lambda b: down_there(b, []), stem="way-south-shut")
     cross(page, 10, 11)
     page.wait_for_timeout(400)
-    close_fight(page)
+    # **The whole strip, not a slice of it.** `#tape` keeps the last four lines
+    # and drops the rest into the history, so `tape(page)[before:]` returns
+    # nothing at all once four have been said — which is this file's own *a
+    # slice of a capped list is a comparison that quietly stops being about
+    # anything*, and it took a deliberate effort not to write it again and the
+    # effort failed. The refusal is the last thing said either way.
+    said = " ".join(tape(page)).lower()
+    if page.is_visible("#ending"):
+        fails.append(f"{name}: the way south opened with the post still blank")
+        page.click("#ending-close")
+    elif "post with nothing on it" not in said:
+        fails.append(f"{name}: the way south refuses without naming what stands: {said[-160:]!r}")
+
+    # And once it is down, the screen is there.
+    clear_screens(page)
+    plant(page, base, lambda b: down_there(b, ["the-unwritten"]), stem="way-south-open")
+    cross(page, 10, 11)
+    page.wait_for_timeout(400)
     if page.is_hidden("#ending"):
-        fails.append(f"{name}: nothing south of the town says where the writing stops")
+        fails.append(f"{name}: the post is down and nothing south of the town opens")
     else:
         prose = page.evaluate("""() => [...document.querySelectorAll('#ending-prose p')]
             .map(p => p.textContent).join(' ')""")
@@ -5552,7 +5631,7 @@ def check_the_third_town_is_empty_on_purpose(page, name, fails, base):
             fails.append(f"{name}: the last screen does not say what it is: {prose[:80]!r}")
         page.click("#ending-close")
         page.wait_for_selector("#ending", state="hidden", timeout=5000)
-    print("ok: the third town is empty, and the screen after it says so")
+    print("ok: the way south names the post with nothing on it, and opens once it is down")
 
 
 def check_an_errand_can_be_handed_in_where_it_was_taken(page, name, fails):
@@ -8534,7 +8613,8 @@ def walk_the_gate(browser, name, fails=None):
     check_the_sump_refuses_without_an_instrument(page, name, fails, path)
     check_a_wheel_says_what_it_wants(page, name, fails, path)
     check_the_chair_refuses_the_wrong_move(page, name, fails, path)
-    check_the_third_town_is_empty_on_purpose(page, name, fails, path)
+    check_the_third_town_fills_up(page, name, fails, path)
+    check_the_way_south_names_the_boss(page, name, fails, path)
     # Put the walk's own game back, or every check after this reads a stranger's.
     page.set_input_files("#file", str(path))
     page.wait_for_function(

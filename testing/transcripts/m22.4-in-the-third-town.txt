@@ -1,0 +1,4984 @@
+  started from testing/saves/in-the-third-town.json
+
+--- a walk in progress --------------------------------------------------
+  level 45 · 10,5 in The Undercountry · 33904 Fnorp · carrying 0 · worn 0% · Berserker
+  probe: level 45 · fill 43% (helmet 35% chest 47% gloves 35% greaves 37% weapon 62%) · bench 0 · from nothing yet
+  town at [10, 10], gate at [3, 17]
+
+--- the road ------------------------------------------------------------
+
+--- the undercountry ----------------------------------------------------
+  level 45 · 10,5 in The Undercountry · 33904 Fnorp · carrying 0 · worn 0% · Berserker
+  20x20, 1 regions: The Undercountry
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 45 · 10,10 in The Undercountry · 34210 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  306 of 3015 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  probe: level 45 · fill 44% (helmet 35% chest 47% gloves 33% greaves 39% weapon 66%) · bench 0 · from barrel 16
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 45 · 10,10 in The Undercountry · 34234 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  605 of 3015 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         The Shift Foreman took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 45 · 10,10 in The Undercountry · 34355 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  911 of 3015 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 45 · 10,10 in The Undercountry · 34379 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  1210 of 3015 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         The Woman From High Wick took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 45 · 10,10 in The Undercountry · 34478 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  1509 of 3015 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  in town: level 45 · 10,10 in The Undercountry · 34218 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  in town: level 45 · 10,10 in The Undercountry · 33958 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 45 · 10,10 in The Undercountry · 33698 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 45 · 10,10 in The Undercountry · 33744 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  1815 of 3015 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         Bone Meal for the larder.
+         The Woman From High Wick took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 45 · 10,10 in The Undercountry · 33843 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  2114 of 3015 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  in town: level 45 · 10,10 in The Undercountry · 33583 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 45 · 10,10 in The Undercountry · 33607 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  2413 of 3015 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 45 · 10,10 in The Undercountry · 33347 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 45 · 10,10 in The Undercountry · 33087 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 45 · 10,10 in The Undercountry · 33111 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  2712 of 3015 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Sea of Cleveland (rates 1889) with 12 items -> It stops moving
+         +361 Fnorp
+         +377 experience, carried
+         377 on you. It is worth nothing until you bank it.
+         Bone Meal Seed for the drawer.
+         The Woman From High Wick took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 45 · 10,10 in The Undercountry · 33287 Fnorp · carrying 377 · worn 0% · Berserker
+  town: 377 experience spent.  ·  Level 46. One point to spend.  ·  A row is bought at the tree, or finished off an errand.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  tree: took Frame Sense
+  probe: level 46 · fill 44% (helmet 35% chest 47% gloves 33% greaves 39% weapon 66%) · bench 0 · from barrel 256
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         Cairn Dust Seed for the drawer.
+         The Woman From High Wick took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 46 · 10,10 in The Undercountry · 33408 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  380 of 3147 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 46 · 10,10 in The Undercountry · 33454 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  686 of 3147 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 46 · 10,10 in The Undercountry · 33500 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  992 of 3147 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         Bone Meal Seed for the drawer.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 46 · 10,10 in The Undercountry · 33524 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  1291 of 3147 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 46 · 10,10 in The Undercountry · 33264 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         Cairn Dust for the larder.
+         The Shift Foreman took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 46 · 10,10 in The Undercountry · 33385 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  1597 of 3147 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         Cairn Dust Seed for the drawer.
+         The Shift Foreman took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 46 · 10,10 in The Undercountry · 33506 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  1903 of 3147 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         The Tenth Surveyor's Boy took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 46 · 10,10 in The Undercountry · 33605 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  2202 of 3147 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 46 · 10,10 in The Undercountry · 33629 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  2501 of 3147 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Sea of Cleveland (rates 1889) with 12 items -> It stops moving
+         +361 Fnorp
+         +377 experience, carried
+         377 on you. It is worth nothing until you bank it.
+         Bone Meal for the larder.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 46 · 10,10 in The Undercountry · 33730 Fnorp · carrying 377 · worn 0% · Berserker
+  town: 377 experience spent.  ·  2878 of 3147 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         Cairn Dust for the larder.
+         Cairn Dust Seed for the drawer.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 46 · 10,10 in The Undercountry · 33776 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  Level 47. One point to spend.  ·  A row is bought at the tree, or finished off an errand.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  tree: took Thick Skull
+  probe: level 47 · fill 44% (helmet 35% chest 47% gloves 33% greaves 39% weapon 66%) · bench 0 · from barrel 432
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         Bone Meal for the larder.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 47 · 10,10 in The Undercountry · 33800 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  336 of 3282 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         The Shift Foreman took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 47 · 10,10 in The Undercountry · 33899 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  635 of 3282 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  fight: The Sea of Cleveland (rates 1889) with 12 items -> It stops moving
+         +361 Fnorp
+         +377 experience, carried
+         377 on you. It is worth nothing until you bank it.
+         Bone Meal for the larder.
+         Bone Meal Seed for the drawer.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 47 · 10,10 in The Undercountry · 34000 Fnorp · carrying 377 · worn 0% · Berserker
+  town: 377 experience spent.  ·  1012 of 3282 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         The Shift Foreman took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 47 · 10,10 in The Undercountry · 34099 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  1311 of 3282 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 47 · 10,10 in The Undercountry · 34145 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  1617 of 3282 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 47 · 10,10 in The Undercountry · 34191 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  1923 of 3282 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         Bone Meal for the larder.
+         The Tenth Surveyor's Boy took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 47 · 10,10 in The Undercountry · 34290 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  2222 of 3282 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 47 · 10,10 in The Undercountry · 34314 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  2521 of 3282 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Sea of Cleveland (rates 1889) with 12 items -> It stops moving
+         +361 Fnorp
+         +377 experience, carried
+         377 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 47 · 10,10 in The Undercountry · 34415 Fnorp · carrying 377 · worn 0% · Berserker
+  town: 377 experience spent.  ·  2898 of 3282 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         Cairn Dust Seed for the drawer.
+         The Tenth Surveyor's Boy took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 47 · 10,10 in The Undercountry · 34536 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  3204 of 3282 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  fight: The Sea of Cleveland (rates 1889) with 12 items -> It stops moving
+         +361 Fnorp
+         +377 experience, carried
+         377 on you. It is worth nothing until you bank it.
+         Bone Meal Seed for the drawer.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 47 · 10,10 in The Undercountry · 34637 Fnorp · carrying 377 · worn 0% · Berserker
+  town: 377 experience spent.  ·  Level 48. One point to spend.  ·  A row is bought at the tree, or finished off an errand.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  tree: took Corked
+  probe: level 48 · fill 44% (helmet 35% chest 47% gloves 33% greaves 39% weapon 66%) · bench 0 · from barrel 608
+  in town: level 48 · 10,10 in The Undercountry · 34377 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 48 · 10,10 in The Undercountry · 34117 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         Bone Meal for the larder.
+         Bone Meal Seed for the drawer.
+         The Tenth Surveyor's Boy took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 48 · 10,10 in The Undercountry · 34216 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  598 of 3420 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  in town: level 48 · 10,10 in The Undercountry · 33956 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 48 · 10,10 in The Undercountry · 33696 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 48 · 10,10 in The Undercountry · 33436 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 48 · 10,10 in The Undercountry · 33176 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         Bone Meal for the larder.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 48 · 10,10 in The Undercountry · 33200 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  897 of 3420 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         Bone Meal for the larder.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 48 · 10,10 in The Undercountry · 33224 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  1196 of 3420 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         Bone Meal Seed for the drawer.
+         The Shift Foreman took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 48 · 10,10 in The Undercountry · 33323 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  1495 of 3420 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         Cairn Dust for the larder.
+         Cairn Dust Seed for the drawer.
+         The Tenth Surveyor's Boy took the Oak Handle for 75 Fnorp. They know each other. Whatever passed between them, something of it stayed on your shelf. They left a Shunter's Orb.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 48 · 10,10 in The Undercountry · 33444 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  1801 of 3420 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         Cairn Dust for the larder.
+         Cairn Dust Seed for the drawer.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 48 · 10,10 in The Undercountry · 33490 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  2107 of 3420 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Sea of Cleveland (rates 1889) with 12 items -> It stops moving
+         +361 Fnorp
+         +377 experience, carried
+         377 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 48 · 10,10 in The Undercountry · 33591 Fnorp · carrying 377 · worn 0% · Berserker
+  town: 377 experience spent.  ·  2484 of 3420 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         The Shift Foreman took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 48 · 10,10 in The Undercountry · 33690 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  2783 of 3420 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 48 · 10,10 in The Undercountry · 33736 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  3089 of 3420 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 48 · 10,10 in The Undercountry · 33476 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 48 · 10,10 in The Undercountry · 33522 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  3395 of 3420 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Sea of Cleveland (rates 1889) with 12 items -> It stops moving
+         +361 Fnorp
+         +377 experience, carried
+         377 on you. It is worth nothing until you bank it.
+         The Shift Foreman took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 48 · 10,10 in The Undercountry · 33698 Fnorp · carrying 377 · worn 0% · Berserker
+  town: 377 experience spent.  ·  Level 49. One point to spend.  ·  A row is bought at the tree, or finished off an errand.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  tree: took Cave Lungs
+  probe: level 49 · fill 44% (helmet 35% chest 47% gloves 33% greaves 39% weapon 66%) · bench 0 · from barrel 896 drop 1
+  in town: level 49 · 10,10 in The Undercountry · 33438 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Sea of Cleveland (rates 1889) with 12 items -> It stops moving
+         +361 Fnorp
+         +377 experience, carried
+         377 on you. It is worth nothing until you bank it.
+         The Shift Foreman took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 49 · 10,10 in The Undercountry · 33614 Fnorp · carrying 377 · worn 0% · Berserker
+  town: 377 experience spent.  ·  729 of 3561 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  in town: level 49 · 10,10 in The Undercountry · 33354 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 49 · 10,10 in The Undercountry · 33400 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  1035 of 3561 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 49 · 10,10 in The Undercountry · 33140 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 49 · 10,10 in The Undercountry · 32880 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 49 · 10,10 in The Undercountry · 32926 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  1341 of 3561 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: THE ONE WHO WENT DOWN (rates 2053) with 12 items -> You stop moving
+         No bounty. Nothing was beaten.
+         You wake up walking, and you have been walking a while.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 49 · 10,10 in The Undercountry · 32666 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         Bone Meal for the larder.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 49 · 10,10 in The Undercountry · 32690 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  1640 of 3561 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 49 · 10,10 in The Undercountry · 32736 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  1946 of 3561 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 49 · 10,10 in The Undercountry · 32476 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Sea of Cleveland (rates 1889) with 12 items -> It stops moving
+         +361 Fnorp
+         +377 experience, carried
+         377 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 49 · 10,10 in The Undercountry · 32577 Fnorp · carrying 377 · worn 0% · Berserker
+  town: 377 experience spent.  ·  2323 of 3561 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 49 · 10,10 in The Undercountry · 32601 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  2622 of 3561 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: THE ONE WHO WENT DOWN (rates 2053) with 12 items -> You stop moving
+         No bounty. Nothing was beaten.
+         You wake up walking, and you have been walking a while.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: The Sea of Cleveland (rates 1889) with 12 items -> It stops moving
+         +361 Fnorp
+         +377 experience, carried
+         377 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 49 · 10,10 in The Undercountry · 32702 Fnorp · carrying 377 · worn 0% · Berserker
+  town: 377 experience spent.  ·  2999 of 3561 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: THE ONE WHO WENT DOWN (rates 2053) with 12 items -> You stop moving
+         No bounty. Nothing was beaten.
+         You wake up walking, and you have been walking a while.
+         4% more tired. 4% of you is missing until you take something for it.
+  fight: The Sea of Cleveland (rates 1889) with 12 items -> It stops moving
+         +361 Fnorp
+         +377 experience, carried
+         377 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 49 · 10,10 in The Undercountry · 32803 Fnorp · carrying 377 · worn 0% · Berserker
+  town: 377 experience spent.  ·  3376 of 3561 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 49 · 10,10 in The Undercountry · 32543 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 49 · 10,10 in The Undercountry · 32283 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 49 · 10,10 in The Undercountry · 32023 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Sea of Cleveland (rates 1889) with 12 items -> It stops moving
+         +361 Fnorp
+         +377 experience, carried
+         377 on you. It is worth nothing until you bank it.
+         The Woman From High Wick took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 49 · 10,10 in The Undercountry · 32199 Fnorp · carrying 377 · worn 0% · Berserker
+  town: 377 experience spent.  ·  Level 50. One point to spend.  ·  A row is bought at the tree, or finished off an errand.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  tree: took Handspan
+  probe: level 50 · fill 44% (helmet 35% chest 47% gloves 33% greaves 39% weapon 66%) · bench 0 · from barrel 1200 drop 1
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 50 · 10,10 in The Undercountry · 32245 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  498 of 3705 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 50 · 10,10 in The Undercountry · 31985 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 50 · 10,10 in The Undercountry · 31725 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         The Shift Foreman took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 50 · 10,10 in The Undercountry · 31846 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  804 of 3705 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         The Woman From High Wick took the Oak Handle for 75 Fnorp. They know each other. Whatever passed between them, something of it stayed on your shelf. They left a Gold Chip.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 50 · 10,10 in The Undercountry · 31967 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  1110 of 3705 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Fnorp Chip at 25
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         Bone Meal for the larder.
+         The Tenth Surveyor's Boy took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 50 · 10,10 in The Undercountry · 32066 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  1409 of 3705 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  fight: The Sea of Cleveland (rates 1889) with 12 items -> It stops moving
+         +361 Fnorp
+         +377 experience, carried
+         377 on you. It is worth nothing until you bank it.
+         Bone Meal for the larder.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 50 · 10,10 in The Undercountry · 32167 Fnorp · carrying 377 · worn 0% · Berserker
+  town: 377 experience spent.  ·  1786 of 3705 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         The Shift Foreman took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 50 · 10,10 in The Undercountry · 32266 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  2085 of 3705 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         Bone Meal for the larder.
+         The Shift Foreman took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 50 · 10,10 in The Undercountry · 32365 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  2384 of 3705 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  fight: The Sea of Cleveland (rates 1889) with 12 items -> It stops moving
+         +361 Fnorp
+         +377 experience, carried
+         377 on you. It is worth nothing until you bank it.
+         Bone Meal for the larder.
+         The Woman From High Wick took the Oak Handle for 75 Fnorp. They know each other. Whatever passed between them, something of it stayed on your shelf. They left a Gold Chip.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 50 · 10,10 in The Undercountry · 32541 Fnorp · carrying 377 · worn 0% · Berserker
+  town: 377 experience spent.  ·  2761 of 3705 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Fnorp Chip at 25
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 50 · 10,10 in The Undercountry · 32565 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  3060 of 3705 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Exotic Juice at 300
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 50 · 10,10 in The Undercountry · 32589 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  3359 of 3705 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 50 · 10,10 in The Undercountry · 32613 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  3658 of 3705 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 50 · 10,10 in The Undercountry · 32637 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  Level 51. One point to spend.  ·  A row is bought at the tree, or finished off an errand.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  tree: took Funnel Drill
+  probe: level 51 · fill 44% (helmet 35% chest 47% gloves 33% greaves 39% weapon 66%) · bench 0 · from barrel 1424 drop 3
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         Bone Meal for the larder.
+         The Shift Foreman took the Quicksilver Ink for 300 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 51 · 10,10 in The Undercountry · 32961 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  551 of 5002 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Sea of Cleveland (rates 1889) with 12 items -> It stops moving
+         +361 Fnorp
+         +377 experience, carried
+         377 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 51 · 10,10 in The Undercountry · 33062 Fnorp · carrying 377 · worn 0% · Berserker
+  town: 377 experience spent.  ·  928 of 5002 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 51 · 10,10 in The Undercountry · 33108 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  1234 of 5002 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         Cairn Dust for the larder.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 51 · 10,10 in The Undercountry · 33154 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  1540 of 5002 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 51 · 10,10 in The Undercountry · 32894 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 51 · 10,10 in The Undercountry · 32634 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         Bone Meal for the larder.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 51 · 10,10 in The Undercountry · 32658 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  1839 of 5002 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         The Tenth Surveyor's Boy took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 51 · 10,10 in The Undercountry · 32779 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  2145 of 5002 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         The Woman From High Wick took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 51 · 10,10 in The Undercountry · 32900 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  2451 of 5002 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 51 · 10,10 in The Undercountry · 32946 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  2757 of 5002 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 51 · 10,10 in The Undercountry · 32686 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 51 · 10,10 in The Undercountry · 32426 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 51 · 10,10 in The Undercountry · 32166 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Sea of Cleveland (rates 1889) with 12 items -> It stops moving
+         +361 Fnorp
+         +377 experience, carried
+         377 on you. It is worth nothing until you bank it.
+         The Tenth Surveyor's Boy took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 51 · 10,10 in The Undercountry · 32342 Fnorp · carrying 377 · worn 0% · Berserker
+  town: 377 experience spent.  ·  3134 of 5002 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  in town: level 51 · 10,10 in The Undercountry · 32082 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 51 · 10,10 in The Undercountry · 31822 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 51 · 10,10 in The Undercountry · 31868 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  3440 of 5002 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         The Shift Foreman took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 51 · 10,10 in The Undercountry · 31989 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  3746 of 5002 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  in town: level 51 · 10,10 in The Undercountry · 31729 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: THE ONE WHO WENT DOWN (rates 2053) with 12 items -> You stop moving
+         No bounty. Nothing was beaten.
+         You wake up walking, and you have been walking a while.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 51 · 10,10 in The Undercountry · 31469 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         The Tenth Surveyor's Boy took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 51 · 10,10 in The Undercountry · 31568 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  4045 of 5002 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         The Tenth Surveyor's Boy took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 51 · 10,10 in The Undercountry · 31667 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  4344 of 5002 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  in town: level 51 · 10,10 in The Undercountry · 31407 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 51 · 10,10 in The Undercountry · 31147 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 51 · 10,10 in The Undercountry · 30887 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 51 · 10,10 in The Undercountry · 30627 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 51 · 10,10 in The Undercountry · 30367 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         The Tenth Surveyor's Boy took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 51 · 10,10 in The Undercountry · 30488 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  4650 of 5002 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  in town: level 51 · 10,10 in The Undercountry · 30228 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 51 · 10,10 in The Undercountry · 29968 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         Cairn Dust for the larder.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 51 · 10,10 in The Undercountry · 30014 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  4956 of 5002 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         Bone Meal for the larder.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 51 · 10,10 in The Undercountry · 30038 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  Level 52. One point to spend.  ·  A row is bought at the tree, or finished off an errand.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  tree: took The Second Frame
+  probe: level 52 · fill 44% (helmet 35% chest 47% gloves 33% greaves 39% weapon 66%) · bench 0 · from barrel 1936 drop 3
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 52 · 10,10 in The Undercountry · 30084 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  559 of 6752 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 52 · 10,10 in The Undercountry · 29824 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         The Tenth Surveyor's Boy took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 52 · 10,10 in The Undercountry · 29945 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  865 of 6752 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         Bone Meal for the larder.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 52 · 10,10 in The Undercountry · 29969 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  1164 of 6752 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 52 · 10,10 in The Undercountry · 29709 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         Bone Meal for the larder.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 52 · 10,10 in The Undercountry · 29733 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  1463 of 6752 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         Bone Meal for the larder.
+         The Tenth Surveyor's Boy took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 52 · 10,10 in The Undercountry · 29832 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  1762 of 6752 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  in town: level 52 · 10,10 in The Undercountry · 29572 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 52 · 10,10 in The Undercountry · 29618 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  2068 of 6752 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 52 · 10,10 in The Undercountry · 29664 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  2374 of 6752 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         The Tenth Surveyor's Boy took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 52 · 10,10 in The Undercountry · 29785 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  2680 of 6752 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  in town: level 52 · 10,10 in The Undercountry · 29525 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 52 · 10,10 in The Undercountry · 29549 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  2979 of 6752 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: THE ONE WHO WENT DOWN (rates 2053) with 12 items -> You stop moving
+         No bounty. Nothing was beaten.
+         You wake up walking, and you have been walking a while.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 52 · 10,10 in The Undercountry · 29289 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         The Shift Foreman took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 52 · 10,10 in The Undercountry · 29388 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  3278 of 6752 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         The Shift Foreman took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 52 · 10,10 in The Undercountry · 29509 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  3584 of 6752 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  in town: level 52 · 10,10 in The Undercountry · 29249 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         Bone Meal for the larder.
+         The Tenth Surveyor's Boy took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 52 · 10,10 in The Undercountry · 29348 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  3883 of 6752 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  in town: level 52 · 10,10 in The Undercountry · 29088 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         The Shift Foreman took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 52 · 10,10 in The Undercountry · 29209 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  4189 of 6752 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  in town: level 52 · 10,10 in The Undercountry · 28949 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Sea of Cleveland (rates 1889) with 12 items -> It stops moving
+         +361 Fnorp
+         +377 experience, carried
+         377 on you. It is worth nothing until you bank it.
+         The Tenth Surveyor's Boy took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 52 · 10,10 in The Undercountry · 29125 Fnorp · carrying 377 · worn 0% · Berserker
+  town: 377 experience spent.  ·  4566 of 6752 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  fight: THE ONE WHO WENT DOWN (rates 2053) with 12 items -> You stop moving
+         No bounty. Nothing was beaten.
+         You wake up walking, and you have been walking a while.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 52 · 10,10 in The Undercountry · 28865 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Sea of Cleveland (rates 1889) with 12 items -> It stops moving
+         +361 Fnorp
+         +377 experience, carried
+         377 on you. It is worth nothing until you bank it.
+         Bone Meal for the larder.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 52 · 10,10 in The Undercountry · 28966 Fnorp · carrying 377 · worn 0% · Berserker
+  town: 377 experience spent.  ·  4943 of 6752 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 52 · 10,10 in The Undercountry · 28706 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 52 · 10,10 in The Undercountry · 28446 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 52 · 10,10 in The Undercountry · 28492 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  5249 of 6752 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         The Tenth Surveyor's Boy took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 52 · 10,10 in The Undercountry · 28591 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  5548 of 6752 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  fight: THE ONE WHO WENT DOWN (rates 2053) with 12 items -> You stop moving
+         No bounty. Nothing was beaten.
+         You wake up walking, and you have been walking a while.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 52 · 10,10 in The Undercountry · 28331 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         Cairn Dust for the larder.
+         The Woman From High Wick took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 52 · 10,10 in The Undercountry · 28452 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  5854 of 6752 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  fight: The Sea of Cleveland (rates 1889) with 12 items -> It stops moving
+         +361 Fnorp
+         +377 experience, carried
+         377 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 52 · 10,10 in The Undercountry · 28553 Fnorp · carrying 377 · worn 0% · Berserker
+  town: 377 experience spent.  ·  6231 of 6752 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 52 · 10,10 in The Undercountry · 28293 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 52 · 10,10 in The Undercountry · 28033 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         Bone Meal for the larder.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 52 · 10,10 in The Undercountry · 28057 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  6530 of 6752 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 52 · 10,10 in The Undercountry · 28103 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  Level 53. One point to spend.  ·  A row is bought at the tree, or finished off an errand.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  tree: took Flush Fit
+  probe: level 53 · fill 44% (helmet 35% chest 47% gloves 33% greaves 39% weapon 66%) · bench 0 · from barrel 2496 drop 3
+  in town: level 53 · 10,10 in The Undercountry · 27843 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 53 · 10,10 in The Undercountry · 27889 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  390 of 9115 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 53 · 10,10 in The Undercountry · 27913 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  689 of 9115 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 53 · 10,10 in The Undercountry · 27653 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         The Shift Foreman took the Oak Handle for 75 Fnorp. They know each other. Whatever passed between them, something of it stayed on your shelf. They left a Gold Chip.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 53 · 10,10 in The Undercountry · 27774 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  995 of 9115 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Fnorp Chip at 25
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 53 · 10,10 in The Undercountry · 27798 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  1294 of 9115 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: P-Minor Extract at 350
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 53 · 10,10 in The Undercountry · 27822 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  1593 of 9115 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 53 · 10,10 in The Undercountry · 27846 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  1892 of 9115 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 53 · 10,10 in The Undercountry · 27586 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 53 · 10,10 in The Undercountry · 27326 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         Bone Meal for the larder.
+         The Shift Foreman took the Runewash Ink for 350 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 53 · 10,10 in The Undercountry · 27700 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  2191 of 9115 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         The Tenth Surveyor's Boy took the Oak Handle for 75 Fnorp. They know each other. Whatever passed between them, something of it stayed on your shelf. They left a Shunter's Orb.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 53 · 10,10 in The Undercountry · 27799 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  2490 of 9115 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 53 · 10,10 in The Undercountry · 27823 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  2789 of 9115 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         The Shift Foreman took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 53 · 10,10 in The Undercountry · 27922 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  3088 of 9115 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  in town: level 53 · 10,10 in The Undercountry · 27662 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Sea of Cleveland (rates 1889) with 12 items -> It stops moving
+         +361 Fnorp
+         +377 experience, carried
+         377 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 53 · 10,10 in The Undercountry · 27763 Fnorp · carrying 377 · worn 0% · Berserker
+  town: 377 experience spent.  ·  3465 of 9115 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         The Tenth Surveyor's Boy took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 53 · 10,10 in The Undercountry · 27884 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  3771 of 9115 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  in town: level 53 · 10,10 in The Undercountry · 27624 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 53 · 10,10 in The Undercountry · 27648 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  4070 of 9115 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 53 · 10,10 in The Undercountry · 27388 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 53 · 10,10 in The Undercountry · 27128 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         Cairn Dust for the larder.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 53 · 10,10 in The Undercountry · 27174 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  4376 of 9115 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 53 · 10,10 in The Undercountry · 27198 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  4675 of 9115 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Sea of Cleveland (rates 1889) with 12 items -> It stops moving
+         +361 Fnorp
+         +377 experience, carried
+         377 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 53 · 10,10 in The Undercountry · 27299 Fnorp · carrying 377 · worn 0% · Berserker
+  town: 377 experience spent.  ·  5052 of 9115 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 53 · 10,10 in The Undercountry · 27039 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 53 · 10,10 in The Undercountry · 26779 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 53 · 10,10 in The Undercountry · 26519 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 53 · 10,10 in The Undercountry · 26259 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         The Tenth Surveyor's Boy took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 53 · 10,10 in The Undercountry · 26358 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  5351 of 9115 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         Cairn Dust for the larder.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 53 · 10,10 in The Undercountry · 26404 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  5657 of 9115 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         Bone Meal for the larder.
+         The Woman From High Wick took the Oak Handle for 75 Fnorp.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 53 · 10,10 in The Undercountry · 26503 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  5956 of 9115 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Nut Bar Handle at 75
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         The Shift Foreman took the Oak Handle for 75 Fnorp. They know each other. Whatever passed between them, something of it stayed on your shelf. They left a Gold Chip.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 53 · 10,10 in The Undercountry · 26602 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  6255 of 9115 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: counter: Fnorp Chip at 25
+  fight: The Sea of Cleveland (rates 1889) with 12 items -> It stops moving
+         +361 Fnorp
+         +377 experience, carried
+         377 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 53 · 10,10 in The Undercountry · 26703 Fnorp · carrying 377 · worn 0% · Berserker
+  town: 377 experience spent.  ·  6632 of 9115 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 53 · 10,10 in The Undercountry · 26749 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  6938 of 9115 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 53 · 10,10 in The Undercountry · 26489 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 53 · 10,10 in The Undercountry · 26535 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  7244 of 9115 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 53 · 10,10 in The Undercountry · 26275 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 53 · 10,10 in The Undercountry · 26321 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  7550 of 9115 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 53 · 10,10 in The Undercountry · 26061 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         Bone Meal for the larder.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 53 · 10,10 in The Undercountry · 26085 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  7849 of 9115 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 53 · 10,10 in The Undercountry · 25825 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 53 · 10,10 in The Undercountry · 25871 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  8155 of 9115 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         Bone Meal for the larder.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 53 · 10,10 in The Undercountry · 25895 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  8454 of 9115 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Sea of Cleveland (rates 1889) with 12 items -> It stops moving
+         +361 Fnorp
+         +377 experience, carried
+         377 on you. It is worth nothing until you bank it.
+         Bone Meal for the larder.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 53 · 10,10 in The Undercountry · 25996 Fnorp · carrying 377 · worn 0% · Berserker
+  town: 377 experience spent.  ·  8831 of 9115 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 53 · 10,10 in The Undercountry · 26020 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  Level 54. One point to spend.  ·  A row is bought at the tree, or finished off an errand.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  tree: took The Hat Band
+  probe: level 54 · fill 44% (helmet 35% chest 47% gloves 33% greaves 39% weapon 66%) · bench 0 · from barrel 3216 drop 6
+  fight: The Sea of Cleveland (rates 1889) with 12 items -> It stops moving
+         +361 Fnorp
+         +377 experience, carried
+         377 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 54 · 10,10 in The Undercountry · 26121 Fnorp · carrying 377 · worn 0% · Berserker
+  town: 377 experience spent.  ·  392 of 12306 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 54 · 10,10 in The Undercountry · 25861 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Sea of Cleveland (rates 1889) with 12 items -> It stops moving
+         +361 Fnorp
+         +377 experience, carried
+         377 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 54 · 10,10 in The Undercountry · 25962 Fnorp · carrying 377 · worn 0% · Berserker
+  town: 377 experience spent.  ·  769 of 12306 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: Mumu Lelonde (rates 1534) with 12 items -> It stops moving
+         +306 Fnorp
+         +306 experience, carried
+         306 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 54 · 10,10 in The Undercountry · 26008 Fnorp · carrying 306 · worn 0% · Berserker
+  town: 306 experience spent.  ·  1075 of 12306 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 54 · 10,10 in The Undercountry · 26032 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  1374 of 12306 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         Bone Meal for the larder.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 54 · 10,10 in The Undercountry · 26056 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  1673 of 12306 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 54 · 10,10 in The Undercountry · 25796 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 54 · 10,10 in The Undercountry · 25536 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Sea of Cleveland (rates 1889) with 12 items -> It stops moving
+         +361 Fnorp
+         +377 experience, carried
+         377 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 54 · 10,10 in The Undercountry · 25637 Fnorp · carrying 377 · worn 0% · Berserker
+  town: 377 experience spent.  ·  2050 of 12306 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Sea of Cleveland (rates 1889) with 12 items -> It stops moving
+         +361 Fnorp
+         +377 experience, carried
+         377 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 54 · 10,10 in The Undercountry · 25738 Fnorp · carrying 377 · worn 0% · Berserker
+  town: 377 experience spent.  ·  2427 of 12306 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 54 · 10,10 in The Undercountry · 25478 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 54 · 10,10 in The Undercountry · 25502 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  2726 of 12306 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 54 · 10,10 in The Undercountry · 25526 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  3025 of 12306 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 54 · 10,10 in The Undercountry · 25550 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  3324 of 12306 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 54 · 10,10 in The Undercountry · 25290 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  in town: level 54 · 10,10 in The Undercountry · 25030 Fnorp · carrying 0 · worn 0% · Berserker
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  fight: The Morning Rush (rates 1496) with 12 items -> It stops moving
+         +284 Fnorp
+         +299 experience, carried
+         299 on you. It is worth nothing until you bank it.
+         4% more tired. 4% of you is missing until you take something for it.
+  in town: level 54 · 10,10 in The Undercountry · 25054 Fnorp · carrying 299 · worn 0% · Berserker
+  town: 299 experience spent.  ·  3623 of 12306 towards the next level.
+  town: bought a tin
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle
+  town: barrel: Nut Bar Handle

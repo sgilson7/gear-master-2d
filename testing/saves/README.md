@@ -12,7 +12,18 @@ makes, made for a human.
 | `at-the-lip.json` | the Low Water, at the mouth of the Wextreen Sump |
 | `at-the-reefs.json` | the first floor of the Eleven Reefs |
 | `under-the-lake.json` | what the lake was on top of |
-| `the-run-20260910.json` | the run fixture `crates/lab` rebuilds — a full board, for recon |
+| `the-run-20260910.json` | the run fixture `crates/lab` rebuilds — a full board, for recon. **It is a yardstick and not a start line**: its world is empty (`map: ""`, nothing answered), so it is what a board is measured against and never somewhere to stand |
+| `in-the-third-town.json` | **the Undercountry, on the tee four tiles up the lane from the town.** Both bottoms answered, so Marbulon's door is open the way it was written to be; `nobody-has-named-it` handed in, so Kettleworks will talk about the post; and all three towns stood in, so the long cart runs. What is left is the chain that settles the place — send for the clerk, do the inventory, cut the post |
+
+**No save in this repository opened the Undercountry until M22.** All fourteen
+were read: not one had both `the-ninth-surveyor` and `the-bottom-of-the-bottom`
+in `answered`, which is what `hidden_until_all` on Marbulon's door wants — and
+**the human's own has the second and not the first**. The walker will not get
+there either: from a new game it runs 977 fights to level thirteen and ends in
+the loop `PLAN.md` §6d row 3 names. So the block ships its own start lines, and
+`GM2D_FROM=` is what walks from one:
+
+    GM2D_FROM=testing/saves/in-the-third-town.json make play
 
 **A save carries the catalogue's fingerprint**, so one written before a block
 that moved `CATALOG` is refused by name rather than loaded wrong. If one of

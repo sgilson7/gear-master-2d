@@ -135,11 +135,20 @@ fn map_in<T>(id: &str, seen: &Seen, f: impl FnOnce(&World) -> T) -> T {
     WORLDS.with(|ws| {
         let w = ws.iter().find(|w| w.id == id).unwrap_or(&ws[0]);
         let surveyed = seen.survey.as_ref().is_some_and(|(m, _)| m == &w.id);
-        if w.drains.is_empty() && !surveyed {
+        // **`reads_marks`, not `drains.is_empty()`.** This fast path was *is
+        // there anything to drain*, and the moment a place could be **named**
+        // that was the wrong question: the third town's post has no drain on
+        // its map, so the map went out uncloned and the post stayed blank on
+        // every screen while `cargo test` said it was cut. Found by the browser
+        // gate, which is the only thing that could have.
+        if !w.reads_marks() && !surveyed {
             return f(w);
         }
         let mut read = w.clone();
-        read.drain_by(&seen.marks);
+        // **One body**, shared with `data::map_read_through`: this function and
+        // that one are the same job in two crates, which was harmless while
+        // both only drained.
+        read.read_by(&seen.marks);
         if let Some((_, kind)) = &seen.survey {
             if surveyed {
                 read.survey = gm2d_core::survey::mods_for(&read.id, kind, seen.items);
@@ -2786,17 +2795,17 @@ pub fn shop_json() -> String {
                         v
                     })
                     .collect();
+                // **The wing's own name, and the theme may still override it.**
+                // A `PlaceDef` reads its name out of the map file and
+                // `place_name` lets a theme replace it by id; a wing is drawn
+                // in no map file, so its name is in `shops.json` and goes
+                // through the same door.
+                let told = gm2d_core::theme::by_id(&g.theme).place(&wing.id, "");
+                let name =
+                    if told.is_empty() { wing.name.clone() } else { told.to_string() };
                 serde_json::json!({
                     "id": wing.id,
-                    // **The wing's own name, and the theme may still override it.**
-                    // A `PlaceDef` reads its name out of the map file and
-                    // `place_name` lets a theme replace it by id; a wing is
-                    // drawn in no map file, so its name is in `shops.json` and
-                    // goes through the same door.
-                    "name": {
-                        let told = gm2d_core::theme::by_id(&g.theme).place(&wing.id, "");
-                        if told.is_empty() { wing.name.clone() } else { told.to_string() }
-                    },
+                    "name": name,
                     "shelf": rows,
                     "commissions": book,
                     "on_order": g.order_at(&wing.id).map(|c| serde_json::json!({

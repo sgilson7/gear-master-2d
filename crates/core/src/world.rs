@@ -1528,6 +1528,48 @@ impl World {
         self.drain_by(&marks);
     }
 
+    /// The map as the game has left it: drained, and with every name that has
+    /// been earned on it.
+    ///
+    /// **One body, two callers, because the shim keeps its own copy.**
+    /// `data::map_read_through` is what core asks and `map_in` in `crates/wasm`
+    /// is what the page asks, and they are two functions doing the same job —
+    /// the shim's exists because it caches the loaded maps and must not reload
+    /// one a frame. That was harmless while the only thing either did was
+    /// drain; the moment a place could be **named** it was *a rule with two
+    /// homes is a rule with two answers*, and the post stayed blank on the
+    /// screen while `cargo test` said it was cut. Found by the browser gate,
+    /// which is the only thing that could have.
+    ///
+    /// Marks rather than a state, for `drain_by`'s reason: nearly every call
+    /// site is inside a closure that then mutates the state.
+    pub fn read_by(&mut self, marks: &[String]) {
+        self.drain_by(marks);
+        self.name_by(marks);
+    }
+
+    /// Give every place that has earned its name its name.
+    ///
+    /// See [`PlaceDef::named`]. The file keeps *a town with no name on the post
+    /// yet* and this is what the game says instead.
+    pub fn name_by(&mut self, marks: &[String]) {
+        for p in self.places.iter_mut() {
+            if let Some(n) = &p.named {
+                if marks.iter().any(|m| *m == n.when) {
+                    p.name = n.name.clone();
+                }
+            }
+        }
+    }
+
+    /// Is there anything here a mark would change?
+    ///
+    /// The shim's fast path asks this: a map with no drains and no names to
+    /// earn is a map it can hand out without cloning.
+    pub fn reads_marks(&self) -> bool {
+        !self.drains.is_empty() || self.places.iter().any(|p| p.named.is_some())
+    }
+
     /// The same, against a list of what has happened rather than a whole state.
     ///
     /// **The shim needs this and the borrow checker is why.** Draining takes

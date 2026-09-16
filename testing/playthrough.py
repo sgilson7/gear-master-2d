@@ -277,13 +277,43 @@ def cross_to(page, world, here, target, press):
         if aim.get("angle") is not None:
             page.evaluate("([a, p]) => window.__shoot(a, p)",
                           [aim["angle"], aim["power"]])
-            page.wait_for_timeout(60)
+            settle(page)
             return f"shot {aim['angle']}/{aim['power']}"
     # **Nowhere to aim is not nowhere to go.** A ball with no shot to the target
     # takes the longest one it has, which is a player breaking for the open.
     page.evaluate("() => window.__shoot(Math.floor(Math.random() * 72), 8)")
-    page.wait_for_timeout(60)
+    settle(page)
     return "shot, blind"
+
+
+def settle(page):
+    """Wait for the ball to stop, which is not the same as the shot being over.
+
+    **`Game::shoot` runs the whole flight in core and the page then animates
+    it.** `TICK_MS` is 55 and a flight is four to forty-seven ticks, so a
+    shot takes up to two and a half seconds to *draw* — and the walker waited
+    sixty milliseconds and then read `#coords`, which `paintPanel` has not
+    written yet. So it read the tile it fired **from**.
+
+    On a table with nothing on it that costs a wasted press. On a table with
+    a **town** on it, it costs the walk: the shot lands on the counter, the
+    town opens, the walker reads the old tile, decides the town is not
+    reachable, bars it, fires again — and does that until the press budget
+    runs out. The third town is the first town this game has ever put on a
+    table, so M22 is the first block that could have found it.
+
+    Waits for the **page** to agree with **core**, which is exact and is
+    usually immediate; a bounded fallback keeps a missed frame from ending a
+    walk.
+    """
+    try:
+        page.wait_for_function(
+            """() => { const p = JSON.parse(window.__position());
+                 const c = document.getElementById('coords');
+                 return c && c.textContent === `${p.x}, ${p.y}`; }""",
+            timeout=4000)
+    except Exception:
+        page.wait_for_timeout(300)
 
 
 def toward(world, here, target, barred=()):
@@ -365,11 +395,33 @@ def fight(page, note=None, probe=None):
     # waited ten seconds for a screen this fight was never going to have. The
     # result is the thing every fight reaches; wait for that and skip the
     # replay only if there is one.
+    #
+    # **And a replay that has not appeared in four seconds has not not
+    # appeared.** The four-second window was written for the fights a walker
+    # from a new game has, which are over in a second or two. A level-45 board
+    # meeting the Undercountry's own pool is the longest fight in the game —
+    # `geared_from` beats what stands down there at thirty-eight to forty-four
+    # seconds of *simulated* time — and a replay that turns up at 4.1s was
+    # never skipped, so it played at 1x into a twenty-second wait for the
+    # result. The walk reached those fights for the first time in M22, from the
+    # third town's own start line, and this is what it found.
+    #
+    # So: wait for **whichever stage this fight has**, and press skip whenever
+    # the replay is the one that is up. Instant Battle draws no replay at all
+    # and falls straight through.
     try:
-        page.wait_for_selector("#stage-replay", state="visible", timeout=4000)
-        page.click("#skip")
+        page.wait_for_selector("#stage-replay, #stage-result", state="visible", timeout=20000)
     except Exception:
         pass
+    for _ in range(40):
+        if page.is_visible("#stage-result"):
+            break
+        if page.is_visible("#stage-replay"):
+            try:
+                page.click("#skip", timeout=1500)
+            except Exception:
+                pass
+        page.wait_for_timeout(250)
     page.wait_for_selector("#stage-result", state="visible", timeout=20000)
     title = page.text_content("#result-title")
     lines = page.locator("#result-receipt p").all_text_contents()
@@ -609,8 +661,46 @@ def in_town(page, buy=True, probe=None):
     for s in said:
         if s.strip():
             say(f"  town: {s.strip()}")
-    page.click("#leave")
-    page.wait_for_selector("#town", state="hidden", timeout=5000)
+    # **Clear at the door, not at the scene — and the door here is the way
+    # out.** Everything above this opens something: the bank, the shelf, the
+    # barrel, the counter, the guild. Any one of them can leave a `.screen`
+    # over the town, and then `#leave` is visible, enabled, stable and
+    # un-clickable — which Playwright reports as a thirty-second timeout on
+    # the *town* rather than on whatever opened. `clear_screens_above` cannot
+    # be used: it presses `#leave` itself, and the town is the screen being
+    # left.
+    #
+    # **And a walk must not end on a raced click.** The outer loop knows what
+    # to do with a fight screen; what it cannot do is come back from a
+    # traceback. Found in the third town, which is the first town this walker
+    # has ever been able to stand in.
+    for _ in range(3):
+        up = page.evaluate(
+            """() => [...document.querySelectorAll('.screen')]
+                    .filter(e => !e.hidden && e.id !== 'town').map(e => e.id)""")
+        if not up:
+            break
+        say(f"  town: something was over the counter: {up}")
+        for sel in ("#done", "#close-fight", "#instrument-close", "#tree-done",
+                    "#log-close", "#bestiary-close", "#brew-close", "#vendor-close"):
+            try:
+                if page.is_visible(sel):
+                    page.click(sel, timeout=1500)
+                    page.wait_for_timeout(80)
+            except Exception:
+                pass
+        page.keyboard.press("Escape")
+        page.wait_for_timeout(80)
+    try:
+        page.click("#leave", timeout=4000)
+        page.wait_for_selector("#town", state="hidden", timeout=5000)
+    except Exception:
+        up = page.evaluate(
+            """() => [...document.querySelectorAll('.screen')]
+                    .filter(e => !e.hidden).map(e => e.id)""")
+        say(f"  town: could not leave — {up} are up")
+        page.keyboard.press("Escape")
+        page.wait_for_timeout(120)
 
 
 # Which choice has been taken at which card, by title and label.
@@ -914,6 +1004,28 @@ def main():
                     fork(page)
                     continue
                 if page.is_visible("#fight"):
+                    # **The packing screen in a town is not a fight**, and
+                    # the walk spent three runs treating it as one. `#pack`
+                    # opens `#fight` with the fight taken out of it —
+                    # `packingOnly`, no creature, no rating, and `#run`
+                    # relabelled *Done* — so `fight()` pressed Fight at
+                    # nothing, the screen came back, the town came back
+                    # under it, and `#leave` was un-clickable for ever.
+                    # What it looks like from outside is a twenty-minute
+                    # loop in a town and then a Playwright timeout on a
+                    # button, which is this file's oldest failure mode.
+                    #
+                    # Told apart by the rating, which is the one thing a
+                    # fight always has and this never does.
+                    if (page.text_content("#fight-rating") or "").strip() in ("", "\u2014"):
+                        say("  packing screen, not a fight — backing out")
+                        try:
+                            page.click("#run", timeout=3000)
+                            page.wait_for_timeout(150)
+                        except Exception:
+                            page.keyboard.press("Escape")
+                            page.wait_for_timeout(150)
+                        continue
                     won_it = fight(page, probe=probe)
                     recent.append(won_it)
                     if won_it:

@@ -137,6 +137,14 @@
       "_note": "**Empty on purpose, and `avail.rs`'s `UNWRITTEN` is where that is written down.** PLAN-M14.md §1.5: the third town ships with a name, a start tile and a region, and nothing to buy — a shelf invented to keep a lint quiet would be content nobody asked for standing where the content that was asked for has to go.",
       "stock": [],
       "commissions": []
+    },
+    {
+      "id": "the-clerks-desk",
+      "wing_of": "the-third-town",
+      "arrives": "done:send-for-the-clerk",
+      "name": "the clerk's desk",
+      "_note": "**A wing with nothing on it, which is what a desk is.** She came down to keep the inventory and not to trade; what she has is errands, and the guild draws them because the panel stopped being empty. The arcane shelf is the second wing and arrives one rung later — see `high-wick`.",
+      "stock": []
     }
   ]
 }

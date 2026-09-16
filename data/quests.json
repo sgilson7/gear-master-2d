@@ -131,9 +131,9 @@
     },
     {
       "id": "the-long-mirror-inventory",
-      "giver": "high-wick",
+      "giver": "the-clerks-desk",
       "name": "THE LONG MIRROR INVENTORY",
-      "brief": "High Wick keeps an inventory of everything the Yodregar Archive has reflected, on the grounds that a thing seen twice has been in the world twice. The inventory is nine volumes and none of them agree. Three shards, and the clerk will start volume ten, which she says will be the last one, as she has said of the previous four.",
+      "brief": "The clerk keeps an inventory of everything the Yodregar Archive has reflected, on the grounds that a thing seen twice has been in the world twice. The inventory is nine volumes and none of them agree. Three shards, and she will start volume ten, which she says will be the last one, as she has said of the previous four. The shards are on the first map and she is aware of how far that is.",
       "thanks": "She holds a shard up, looks at what is behind her in it, and writes for eleven minutes. Volume ten is open. Then she hands you an ink and a word she says goes with it, and adds that neither is in the inventory and she would rather they stayed out of it.",
       "goal": {
         "slay": {
@@ -146,7 +146,10 @@
         "Mercurial Ink",
         "Warding Sigil"
       ],
-      "gold": 35
+      "gold": 280,
+      "requires": [
+        "send-for-the-clerk"
+      ]
     },
     {
       "id": "the-frame-that-stands",
@@ -908,6 +911,24 @@
         "The Wrong Sense"
       ],
       "gold": 260
+    },
+    {
+      "id": "send-for-the-clerk",
+      "giver": "kettleworks",
+      "requires": [
+        "nobody-has-named-it"
+      ],
+      "name": "SEND FOR THE CLERK",
+      "brief": "NOTHING THERE, CONFIRMED is not a thing Kettleworks can put a clerk on a cart for. What it wants next is the other half of the report: that there is something down there worth writing down, and that whatever is doing the writing-down can be got past. Beat one of them and bring back a word about it. The High Wick clerk has said she will come on that and on nothing less, and she has said it nine times.",
+      "thanks": "He reads the word twice, folds it, and writes THE CELLAR under NOTHING THERE, CONFIRMED, which leaves the two facts stacked. The clerk goes down on the next cart with nine volumes and a tenth that is open. She sets the desk up a yard from the post and does not look at the post.",
+      "goal": {
+        "slay": {
+          "creature": "Hollowmarch",
+          "count": 1,
+          "token": "A Word About the Cellar"
+        }
+      },
+      "gold": 320
     },
     {
       "id": "what-the-works-put-by",

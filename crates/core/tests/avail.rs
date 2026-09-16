@@ -27,6 +27,23 @@ fn every_town_stocks_something_and_stocks_it_from_the_catalogue() {
     for t in &shops.towns {
         // **An unwritten town is an empty room on purpose**, and the list is
         // where that is said. See `UNWRITTEN`.
+        //
+        // **And a wing need not sell anything, because a wing is a counter
+        // rather than a town.** The clerk's desk came down to keep an
+        // inventory: it has errands and no stock at all, and a desk with
+        // nothing on it is what that looks like. What it may *not* be is a
+        // shelf with nothing and nobody — so a wing that sells nothing has to
+        // want something, which is the same question this asks of a town one
+        // field along.
+        if t.wing_of.is_some() {
+            assert!(
+                !t.stock.is_empty() || !data::quests().at(&t.id).is_empty(),
+                "{} is a wing that sells nothing and wants nothing, which is a counter \
+                 nobody stands at",
+                t.id
+            );
+            continue;
+        }
         assert!(
             !t.stock.is_empty() || UNWRITTEN.contains(&t.id.as_str()),
             "{} sells nothing",
@@ -105,7 +122,18 @@ fn towns_anywhere_in_the_world_all_trade_and_all_want_something() {
 
     // Anything shelved for a place that is on no map is staged, and has to be
     // named as such.
-    let shelves: HashSet<&str> = shops.towns.iter().map(|t| t.id.as_str()).collect();
+    //
+    // **A wing is neither a town nor staged**, and before M22 there was no
+    // third thing to be: a wing is a counter standing inside somebody else's
+    // town, so where it is written down is its host. A wing whose host is on no
+    // map is *still* an orphan, and this is what says so — the host is checked
+    // rather than assumed, in `a_wing_has_a_host_on_a_map`.
+    let shelves: HashSet<&str> = shops
+        .towns
+        .iter()
+        .filter(|t| t.wing_of.is_none())
+        .map(|t| t.id.as_str())
+        .collect();
     let mut orphans: Vec<&str> = shelves
         .iter()
         .copied()
@@ -140,6 +168,15 @@ fn no_two_towns_are_the_same_shop() {
             }
             // Nought of nought is not one shop in two costumes.
             if UNWRITTEN.contains(&a.id.as_str()) || UNWRITTEN.contains(&b.id.as_str()) {
+                continue;
+            }
+            // **Nor is a desk.** A wing may carry errands and no stock — the
+            // clerk came down to keep an inventory rather than to trade — and
+            // an empty shelf shares nought of nought with everybody. A wing
+            // that *does* stock something is asked the question, because two
+            // counters in one town dealing the same components is the same
+            // failure one street along.
+            if a.stock.is_empty() || b.stock.is_empty() {
                 continue;
             }
             let sa: HashSet<&str> = a.stock.iter().map(|s| s.as_str()).collect();

@@ -313,97 +313,173 @@ fn counters_at_is_the_town_and_what_has_arrived() {
     );
 }
 
-/// **Nothing about the block's rule changed what is on sale today.**
+/// **The wings this block authored, by name.**
 ///
-/// M22.1 is the rule with no content behind it, so every counter in the game
-/// sells exactly what it sold before — which is the only way to tell a rule
-/// that is not yet used from one that is quietly in use.
+/// **This replaced `no_wing_is_authored_yet` in the commit that made it
+/// false**, which is what a test pinning the behaviour you are changing is
+/// for. That one asserted the rule was unused, because the only way to tell a
+/// rule that is not yet used from one that is quietly in use is to say so; M22.2
+/// put the clerk's desk on the third town's counter and it went red, correctly.
+///
+/// Named rather than counted, the way `common::UNWRITTEN` is: a list that
+/// quietly grew is a list that has gone stale, and a wing is a counter appearing
+/// in somebody's town — which is not a thing that should appear without anybody
+/// deciding to put it there.
 #[test]
-fn no_wing_is_authored_yet() {
+fn the_wings_are_the_ones_this_block_authored() {
     let shops = data::shops();
-    let wings: Vec<&str> =
+    let mut wings: Vec<&str> =
         shops.towns.iter().filter(|t| t.wing_of.is_some()).map(|t| t.id.as_str()).collect();
-    assert!(wings.is_empty(), "M22.1 authors no wing and found {wings:?}");
-    assert_eq!(
-        data::shelves_on_the_map(),
-        data::towns_on_the_map(),
-        "there are no wings, so the two questions have the same answer"
-    );
+    wings.sort();
+    assert_eq!(wings, vec!["the-clerks-desk"], "the wings are {wings:?}");
+    for w in &wings {
+        let t = shops.town(w).expect("a wing that exists");
+        assert_eq!(t.wing_of.as_deref(), Some("the-third-town"), "{w} stands somewhere else");
+    }
     let _ = common::geared_from(&["the-end-of-all-gears"]);
     let _ = D;
 }
 
-/// **Every `done:` key names an errand that exists, and every errand id that
-/// collides with a mark is harmless because of the prefix.**
-///
-/// The lint the collision earned. `quests_done` holds errand ids and
-/// `answered` holds event and place ids, and the two namespaces overlap —
-/// `the-tenth-survey` is an event *and* an errand, which `CLAUDE.md` records as
-/// the reason a player stood on bare silt waiting for a door. So the prefix is
-/// what keeps them apart, and this is what stops a `done:` key pointing at
-/// nothing: a condition that can never be met is a door that will not open and
-/// says it is waiting on something that does not exist.
-#[test]
-fn every_done_key_names_an_errand() {
-    let quests = data::quests();
-    let known = |k: &str| -> bool {
-        k.strip_prefix(world::DONE).is_some_and(|id| quests.get(id).is_some())
-    };
-    let mut bad: Vec<String> = Vec::new();
-    // The maps: every condition a place carries.
-    for (id, _) in data::MAPS {
-        let w = data::map(id, D);
-        for p in &w.places {
-            for k in p
-                .hidden_until
-                .iter()
-                .chain(p.hidden_until_all.iter())
-                .chain(p.needs_all.iter())
-                .chain(p.floors.iter().map(|f| &f.cleared))
-            {
-                if k.starts_with(world::DONE) && !known(k) {
-                    bad.push(format!("{id}/{}: {k}", p.id));
-                }
-            }
-        }
-        for d in &w.drains {
-            if d.when.starts_with(world::DONE) && !known(&d.when) {
-                bad.push(format!("{id}: a drain waits on {}", d.when));
-            }
-        }
-    }
-    // And the shelves.
-    for t in &data::shops().towns {
-        if let Some(k) = &t.arrives {
-            if k.starts_with(world::DONE) && !known(k) {
-                bad.push(format!("{}: arrives on {k}", t.id));
-            }
-        }
-    }
-    assert!(bad.is_empty(), "{} names no errand: {bad:?}", world::DONE);
+// ------------------------------------------------------------ M22.2, the desk
 
-    // **And the collision is real**, which is what the prefix is for. Asserted
-    // by name rather than counted: the day it stops being true this test says
-    // so, and the day a second one appears it says that too.
-    let ids: Vec<&str> = quests.quests.iter().map(|q| q.id.as_str()).collect();
-    let mut clash: Vec<&str> = Vec::new();
-    for (id, _) in data::MAPS {
-        let w = data::map(id, D);
-        for p in &w.places {
-            if ids.contains(&p.id.as_str()) && !clash.contains(&p.id.as_str()) {
-                clash.push(Box::leak(p.id.clone().into_boxed_str()));
-            }
-        }
-    }
-    for e in &data::events().events {
-        if ids.contains(&e.id.as_str()) && !clash.iter().any(|c| *c == e.id) {
-            clash.push(Box::leak(e.id.clone().into_boxed_str()));
-        }
-    }
-    clash.sort();
+/// **The clerk is not there until she is sent for.**
+///
+/// The wing's whole point, asked of the shipped file rather than of a fixture:
+/// before `send-for-the-clerk` is handed in the third town has one counter, and
+/// after it there are two.
+#[test]
+fn the_clerk_is_not_there_until_sent_for() {
+    let shops = data::shops();
+    let mut state = WorldState::default();
     assert_eq!(
-        clash,
-        vec!["the-tenth-survey"],
-        "the errand/mark namespace collisions are {clash:?}"
+        shop::counters_at(&shops, "the-third-town", &state),
+        vec!["the-third-town".to_string()],
+        "the desk is on the counter before anybody sent for the clerk"
     );
+    // **Taken and not finished is still not there**, which is the second visit
+    // this project keeps forgetting to check: `quests_taken` is not
+    // `quests_done`.
+    state.quests_taken.push("send-for-the-clerk".into());
+    assert_eq!(
+        shop::counters_at(&shops, "the-third-town", &state).len(),
+        1,
+        "taking the errand brought the clerk down"
+    );
+    state.quests_done.push("send-for-the-clerk".into());
+    assert_eq!(
+        shop::counters_at(&shops, "the-third-town", &state),
+        vec!["the-third-town".to_string(), "the-clerks-desk".to_string()]
+    );
+}
+
+/// **The third town wants something once the clerk is down, and nothing until
+/// then.**
+///
+/// The lint `avail.rs` holds over a town, asked of the **counters** standing in
+/// it — which is what a player sees. `the-third-town` itself is still
+/// `UNWRITTEN` in M22.2 and hands out nothing of its own; what changes is that
+/// there is now somebody at a desk in it who does.
+#[test]
+fn the_third_town_wants_something_once_the_clerk_is_down() {
+    let shops = data::shops();
+    let quests = data::quests();
+    let wants = |state: &WorldState| -> usize {
+        shop::counters_at(&shops, "the-third-town", state)
+            .iter()
+            .map(|c| quests.at(c).len())
+            .sum()
+    };
+    let mut state = WorldState::default();
+    assert_eq!(wants(&state), 0, "the empty town wants something before the clerk");
+    state.quests_done.push("send-for-the-clerk".into());
+    assert!(wants(&state) > 0, "the clerk came down and wants nothing");
+}
+
+/// **The mirror inventory is given at the desk and nowhere else.**
+///
+/// Re-keyed from `high-wick`, which is on no map, to the counter that came down
+/// off it. **Seam-free**: a save carries quest *ids* and not givers, so a
+/// character who had taken it — nobody has, because High Wick has never been
+/// stood in — keeps it.
+#[test]
+fn the_mirror_errand_is_given_at_the_desk_and_nowhere_else() {
+    let quests = data::quests();
+    let q = quests.get("the-long-mirror-inventory").expect("the errand");
+    assert_eq!(q.giver, "the-clerks-desk");
+    assert_eq!(
+        gm2d_core::quest::QuestsData::turn_in_of(q),
+        "the-clerks-desk",
+        "it is handed back somewhere else"
+    );
+    assert_eq!(q.requires, vec!["send-for-the-clerk".to_string()]);
+    // And nobody else offers it.
+    let shops = data::shops();
+    for t in &shops.towns {
+        if t.id == "the-clerks-desk" {
+            continue;
+        }
+        assert!(
+            !quests.at(&t.id).iter().any(|x| x.id == q.id),
+            "{} also offers the mirror inventory",
+            t.id
+        );
+    }
+}
+
+/// **What the clerk is sent for is a fight down there and a word about it.**
+///
+/// A `Slay` rather than a `Bring`, and the plan says *of something the
+/// Undercountry drops*: **nothing down there drops anything**, and a `Bring` is
+/// answered by a component that already exists in the world. A `Slay`'s token is
+/// created by the errand and cannot be got before it is asked for or after it is
+/// finished, which is what *go down and come back with proof* wants.
+///
+/// The token is `A Word About the Cellar` — one of six rumour components the cut
+/// campaign left behind, on no shelf and granted by nothing, which is the same
+/// move M20 made with four dead casting pieces. **No new component**, so the
+/// catalogue fingerprint does not move.
+#[test]
+fn the_clerk_is_sent_for_with_a_word_from_down_there() {
+    use gm2d_core::quest::Goal;
+    let quests = data::quests();
+    let q = quests.get("send-for-the-clerk").expect("the errand");
+    assert_eq!(q.giver, "kettleworks", "an empty town cannot ask for its own clerk");
+    assert_eq!(q.requires, vec!["nobody-has-named-it".to_string()]);
+    let Goal::Slay { creature, count, token } = &q.goal else {
+        panic!("{:?} is not a slaying", q.goal)
+    };
+    assert_eq!(*count, 1);
+    // **Something the Undercountry deals**, and the commonest of them, because
+    // this errand is the arrival tale rather than the wall.
+    let w = data::map("the-undercountry", D);
+    let pool = &w.regions[0].enemies;
+    assert!(
+        pool.iter().any(|m| m.name == creature),
+        "{creature} does not stand in the Undercountry's pool"
+    );
+    let commonest = pool
+        .iter()
+        .min_by_key(|m| gm2d_core::rating::creature_rating(m, D))
+        .expect("a pool");
+    assert_eq!(
+        commonest.name, creature,
+        "the errand asks for {creature} where the commonest draw is {}",
+        commonest.name
+    );
+    // **A token nothing else wants**, which is the no-two-errands-share-a-tally
+    // rule, and one the catalogue already had.
+    assert!(
+        gm2d_core::piece::CATALOG.iter().any(|d| d.name == token),
+        "{token} is not in the catalogue"
+    );
+    let others = quests
+        .quests
+        .iter()
+        .filter(|x| x.id != q.id)
+        .filter(|x| x.goal.token() == Some(token.as_str()))
+        .count();
+    assert_eq!(others, 0, "{token} is somebody else's tally too");
+    // And it pays money and no gear, so `common::geared_from` does not move.
+    assert!(q.reward.is_empty() && q.enchs.is_empty() && q.rows.is_none(), "it pays gear");
+    assert!(q.gold > 0);
 }

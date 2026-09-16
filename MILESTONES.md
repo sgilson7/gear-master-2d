@@ -167,11 +167,11 @@ Notebook: **63 rows, 0 open.**
 | M22.0 | The measure | 6 numbers; 4 of them disagree with the plan and it is corrected | 1107 (+0) | this | done |
 | M22.1 | A wing is a shelf with a host | wing_of · arrives · name · met/DONE · counters_at · shelves_among · 10 checks | 1117 (+10) | `9d2434a` | done |
 | M22.2 | The clerk comes down | send-for-the-clerk (a Slay, not a Bring) · the-clerks-desk · the mirror errand re-keyed · 3 avail lints widened | 1120 (+3) | `c2060ba` | done |
-| M22.3 | The arcane shelf, and the post gets its name | high-wick as a wing · cut-the-post · PlaceDef::named · the gate south | | | pending |
+| M22.3 | The arcane shelf, and the post gets its name | high-wick as a wing (17→13 lines) · cut-the-post · PlaceDef::named · the way south refuses · UNWRITTEN/STAGED empty | 1124 (+4) | `64fbac1` | done |
 | M22.4 | The gate, the walk, the deploy — the town | check_the_third_town_fills_up · in-the-third-town.json · deploy | | | pending |
 | M22.5 | A pocket can go somewhere | Pocket honours to/at_to · the tape · the table's id in the lint | | | pending |
 | M22.6 | The table | the-lower-table · the cup as a map of its own · 4 lints | | | pending |
 | M22.7 | What stands on it | The Twelfth Name · one art colourway · the pool | | | pending |
 | M22.8 | Three errands you do with a cue | a chain of three off the desk | | | pending |
 | M22.9 | The gate, the walk, the glossary, the deploy — the table | 5 browser checks · on-the-lower-table.json · the stale rows · deploy | | | pending |
-| notebook | rows open / closed | 6 open / 14 closed | | | |
+| notebook | rows open / closed | 6 open / 19 closed | | | |

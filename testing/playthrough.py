@@ -359,8 +359,17 @@ def fight(page, note=None, probe=None):
     creature = page.text_content("#fight-name")
     rating = page.text_content("#fight-rating")
     page.click("#go")
-    page.wait_for_selector("#stage-replay", state="visible", timeout=10000)
-    page.click("#skip")
+    # **A fight does not always have a replay.** Instant Battle settles a
+    # creature you have marked where it stands — simulated in full, banked in
+    # full and **never drawn** — so `#stage-replay` never appears and the walk
+    # waited ten seconds for a screen this fight was never going to have. The
+    # result is the thing every fight reaches; wait for that and skip the
+    # replay only if there is one.
+    try:
+        page.wait_for_selector("#stage-replay", state="visible", timeout=4000)
+        page.click("#skip")
+    except Exception:
+        pass
     page.wait_for_selector("#stage-result", state="visible", timeout=20000)
     title = page.text_content("#result-title")
     lines = page.locator("#result-receipt p").all_text_contents()
@@ -375,6 +384,79 @@ def fight(page, note=None, probe=None):
     if probe is not None:
         probe.took("drop")
     return "It stops moving" in (title or "")
+
+
+def clear_screens_above(page):
+    """Shut every `.screen` and leave anything else alone.
+
+    **Narrower than `clear_over_the_map` on purpose.** A card is a `.card`, not
+    a `.screen`, and the walker reads a card's choices *before* it closes it —
+    so the thing that has to come off first is whatever `.screen` is pinned
+    over it, and the card itself must survive.
+
+    The case is real and it is the Reach's frame: `#instrument` is a screen
+    whose canvas is 900px wide, it opens while walking and the walker's card
+    branch runs before its own, so the card's buttons were visible, enabled,
+    stable and un-clickable. Playwright calls that a thirty-second timeout.
+    """
+    for _ in range(3):
+        up = page.evaluate("""() => [...document.querySelectorAll('.screen')]
+                                .filter(e => !e.hidden).map(e => e.id)""")
+        if not up:
+            return
+        for sel in ("#instrument-close", "#tree-done", "#log-close",
+                    "#bestiary-close", "#brew-close", "#vendor-close", "#leave"):
+            try:
+                if page.is_visible(sel):
+                    page.click(sel, timeout=1200)
+                    page.wait_for_timeout(60)
+            except Exception:
+                pass
+        page.keyboard.press("Escape")
+        page.wait_for_timeout(90)
+    # **A screen with no way out is hidden outright rather than left to eat the
+    # next click.** Saying so is the finding; leaving it up is a traceback
+    # thirty steps away that names nothing.
+    left = page.evaluate("""() => [...document.querySelectorAll('.screen')]
+                              .filter(e => !e.hidden).map(e => e.id)""")
+    if left:
+        say(f"  a screen would not close and was forced shut: {left}")
+        page.evaluate("""() => [...document.querySelectorAll('.screen')]
+                            .forEach(e => { e.hidden = true; })""")
+
+
+def clear_over_the_map(page):
+    """Shut anything pinned over the map, so the next click can land.
+
+    **One door, because the failure is never where the screen was opened.** A
+    `.screen` or a `.card` left up eats keypresses and intercepts clicks, and
+    what that looks like is a timeout somewhere else entirely — which is how
+    two blocks of this walk ended. The gate's `clear_screens` is the same three
+    lines for the same reason.
+
+    It presses each screen's own way out where there is one and Escape
+    otherwise, twice, because screens stack: the tree opens over the vendor and
+    the vendor has no Escape handler at all.
+    """
+    for _ in range(2):
+        # **Deepest first.** Screens stack — the tree opens over the vendor,
+        # and the Reach's frame opens over a card — so the thing on top has to
+        # go before the thing under it can be clicked. `#instrument` has no
+        # button at all and comes off on Escape, which is the sweep below.
+        for sel in ("#instrument-close", "#tree-done", "#log-close",
+                    "#bestiary-close", "#brew-close", "#vendor-close",
+                    "#card-close", "#leave"):
+            try:
+                if page.is_visible(sel):
+                    page.click(sel, timeout=1500)
+                    page.wait_for_timeout(60)
+            except Exception:
+                pass
+        if not page.evaluate("""() => [...document.querySelectorAll('.screen, .card')]
+                                   .some(e => !e.hidden)"""):
+            return
+        page.keyboard.press("Escape")
+        page.wait_for_timeout(80)
 
 
 def enter(page, sel):
@@ -540,6 +622,11 @@ TAKEN: set = set()
 
 def card(page, probe=None):
     """Read an event card, take a choice it has not taken here, take any errand."""
+    # **Nothing over the card before its buttons are pressed.** The walker's
+    # card branch runs before its instrument branch, so the Reach's frame can be
+    # pinned over a card the whole time it is being read — and a click blocked
+    # by a screen is a timeout rather than a finding.
+    clear_screens_above(page)
     title = page.text_content("#card-title")
     # The title rather than the id, because the id is not on the screen — and a
     # card is identified to a player by what it says at the top of it.
@@ -599,7 +686,16 @@ def card(page, probe=None):
             say(f"        {g}")
         if probe is not None:
             probe.took("event")
+    # **Whatever is over the card comes off first.** `#card-close` can be
+    # visible, enabled and stable and still un-clickable, because a `.screen` —
+    # the Reach's frame, whose canvas is 900px wide — is pinned over the whole
+    # page on top of it. Playwright reports that as a thirty-second timeout
+    # rather than as a finding, which is how this walk ended three times.
+    #
+    # The walk's one door, called here as well as at the top of the step loop,
+    # because the card is read in a branch that runs before that.
     page.wait_for_selector("#card-close", state="visible", timeout=5000)
+    clear_screens_above(page)
     page.click("#card-close")
     page.wait_for_selector("#card", state="hidden", timeout=5000)
 
@@ -912,8 +1008,30 @@ def main():
                         # Nothing to read it with. Back out; the road is shut
                         # and the walk gives up on a shut road like any other.
                         page.keyboard.press("Escape")
-                        page.wait_for_selector("#instrument", state="hidden", timeout=5000)
                         say("  nothing to read it with")
+                    # **However it went, this screen has to be gone.**
+                    #
+                    # A `.screen` that is still up eats every keypress and
+                    # intercepts every click — `#instrument-board` is a 900px
+                    # canvas over the whole page — so a walk that leaves one
+                    # open does not fail *here*, it fails thirty steps later on
+                    # a click somewhere else, as a thirty-second Playwright
+                    # timeout rather than a finding. That is exactly how this
+                    # walk ended for two blocks.
+                    #
+                    # Going in is the case that bit: pressing the button does
+                    # not always close the screen — a refusal leaves it up with
+                    # its sentence on it, which is what the screen is *for*.
+                    for _ in range(3):
+                        if page.is_hidden("#instrument"):
+                            break
+                        page.keyboard.press("Escape")
+                        page.wait_for_timeout(120)
+                    if page.is_visible("#instrument"):
+                        say(f"  the frame would not close: "
+                            f"{page.text_content('#instrument-says') or ''}")
+                        page.evaluate("() => { const e = document.getElementById('instrument');"
+                                      " if (e) e.hidden = true; }")
                     page.wait_for_timeout(80)
                     phase = ""
                     continue
@@ -954,6 +1072,22 @@ def main():
                     barred.add(here_now)
                     town_shut_until = step + 60
                     continue
+
+                # **Nothing over the map before anything is clicked on it.**
+                #
+                # Every screen in this game is a `.screen` or a `.card` pinned
+                # over the page, and one left up does not fail *here* — it
+                # fails on the next click, thirty steps later, as a thirty-second
+                # Playwright timeout rather than a finding. This walk died that
+                # way twice: once on `#instrument-board`, a 900px canvas over
+                # the whole page, and once on `#card`, when a tin was reached
+                # for with an event still open.
+                #
+                # The gate learned this twice and its answer is one door,
+                # `clear_screens`. This is the walker's, and it is deliberately
+                # *after* every branch that wants a screen: those `continue`
+                # before they reach it.
+                clear_over_the_map(page)
 
                 c = page.evaluate("() => window.__character()")
                 world = page.evaluate("() => window.__world()")

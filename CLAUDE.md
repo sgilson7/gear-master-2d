@@ -5126,6 +5126,31 @@ time — *a fight happened* is the one line in this game that means time passed.
   zero new combat code and expires when the fight does for free. It grew its
   first *rate* for it — everything else in `Held` is a quantity.
 
+### Adjacency on a bed is usually forced, and that is a measurement
+
+**Worth the human's eye before anybody calls the bed tuned.** `SYSTEMS-PITCH.md`
+calls companion planting *the puzzle*, and a puzzle you cannot fail is not one.
+Measured over all three beds, with the number of pairs that can be planted
+**apart** at all:
+
+| bed | pairs that fit apart | of 28 |
+|---|---|---|
+| Kettleworks | 10 | |
+| the third town | 15 | |
+| the pit | 17 | |
+
+So for most pairs, two crops that both fit **must** touch. The defensible
+reading is that the decision is *which two seeds*, not *whether they touch* —
+which is still twenty-eight choices — and the Grower's `bed_cells +3` opens it
+up. It is recorded rather than tuned because tuning it is a content call.
+
+**And one cell took the pit from 11 to 25.** The pit's round-with-a-stone shape
+— not its size — blocked seventeen pairs from ever touching edge-on, while
+Kettleworks at the *same* eleven cells reached twenty-five. The pit is the only
+town for the first hour, so the Plot's whole second door would have been shut
+where every new player is. **A bench whose shape is the puzzle wants its pair
+table measured, not its cell count.**
+
 ### A bench is four things, and the fourth is an errand
 
 `Goal::Show { what: Shown }` is the fifth goal kind, and none of the four that

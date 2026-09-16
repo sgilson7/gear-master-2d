@@ -142,3 +142,20 @@ Notebook: **43 rows, 38 closed, 5 open.**
 `packaging/count-tests.sh` is the only way to get a test total back. Browser
 gate: **108 `ok:` lines**, chromium. Suite green, `cargo test -p gm2d-core`
 exit 0.
+
+### M21 — done
+
+| milestone | what it is | commit |
+|---|---|---|
+| M21.0–M21.8 | the drawer, the bed, the enchs, the pairs, the Grower, the kennel, the companion, the Handler, the counter | `1d13985` |
+| M21.14 | the town is a street of seven buildings and four doors | `cfc9f14` |
+| M21.16 | an errand for every bench — `Goal::Show`, twelve errands, four chains | `f3c75f0` |
+| M21.9 | the Factor, and four things reported from play | `ed86846` |
+| M21.10 | thirteen figures from two drawings | `7c18b73` |
+| M21.11 | the glossary's sixth shelf, the divergences, the record | `0043982` |
+| **M21.17** | **the notebook emptied: the walk, the bargain's owner, three findings written down** | this |
+
+Suite green, `cargo test -p gm2d-core` exit 0. Browser gate: **108 `ok:` lines**,
+chromium. `packaging/count-tests.sh` is the only way to get a test total back.
+
+Notebook: **63 rows, 0 open.**

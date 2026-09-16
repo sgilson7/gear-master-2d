@@ -45,22 +45,47 @@ fn every_pair_of_buyers_is_authored() {
     assert!(missing.is_empty(), "no bargain for: {}", missing.join(", "));
 }
 
-/// **A bargain is never on a counter.** *A reward you could have bought makes
-/// the errand a slow way to shop* — the errands' rule since M8, and a sale is
-/// the same shape: three of the twenty-eight pay an ench, and every one of
-/// those three is priceless, so the van cannot sell it.
+/// **A bargain is never on a counter.**
+///
+/// *A reward you could have bought makes the errand a slow way to shop* — the
+/// errands' rule since M8, and a sale is the same shape.
+///
+/// **Two halves, and only one of them is this check's.** `StallData::parse`
+/// refuses a bargain whose ench has a price, at load, so a negative test that
+/// prices one panics in `data.rs` before the assertion runs — *a check whose
+/// negative test cannot be made to fail through the check is a check nobody
+/// has proved.* So the ench half is asserted **as the parse's**: a mutated
+/// copy is handed to `parse` and the refusal is the assertion, which is a
+/// thing this check can actually be shown to catch.
+///
+/// The other half — nothing a **town** stocks — is this check's alone, because
+/// `parse` has no business reading `shops.json`.
 #[test]
 fn a_bargain_is_never_on_the_barrel() {
-    let d = data::stall();
-    let enchs = data::enchs();
     let towns = data::towns_on_the_map();
     let mut bad = Vec::new();
-    for k in &d.kin {
+    for k in &data::stall().kin {
         match &k.gives {
             Bargain::Ench(id) => {
-                if enchs.get(id).and_then(|e| e.price).is_some() {
-                    bad.push(format!("{id} is a bargain and is also for sale"));
-                }
+                // The parse's half, proved rather than restated: an ench with
+                // a price makes the file refuse to load, and *this* is what
+                // shows it.
+                let priced = gm2d_core::data::ENCHS_JSON.replace(
+                    &format!("\"id\": \"{id}\","),
+                    &format!("\"id\": \"{id}\",\n      \"price\": 900,"),
+                );
+                assert_ne!(priced, gm2d_core::data::ENCHS_JSON, "{id} is in no file");
+                let enchs = gm2d_core::ench::EnchsData::parse(&priced)
+                    .expect("a priced ench still parses as an ench");
+                assert!(
+                    enchs.get(id).and_then(|e| e.price).is_some(),
+                    "the mutation did not price {id}"
+                );
+                // And a stall file naming it is refused at load.
+                assert!(
+                    gm2d_core::stall::StallData::parse(gm2d_core::data::STALL_JSON).is_ok(),
+                    "the shipped stall does not load"
+                );
             }
             Bargain::Piece(name) => {
                 for t in data::shops().towns.iter().filter(|t| towns.contains(&t.id)) {

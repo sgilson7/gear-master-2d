@@ -171,7 +171,7 @@ Notebook: **63 rows, 0 open.**
 | M22.4 | The gate, the walk — the town | check_the_third_town_fills_up · check_the_way_south_names_the_boss · in-the-third-town.json · 148-fight walk · 4 walker fixes | 1124 (+0) | `1faf329` | done, **deploy blocked** |
 | M22.5 | A pocket can go somewhere | Pocket honours to/at_to · Step::into · tape_into · the table's id in the lint · 4 checks | — | `47f6ae3` | done, **1 red on purpose** |
 | M22.6 | The table | the-lower-table · **the-cup** (31 maps) · 17+4 places · 6 events · 4 lints · 2 rounds | 1132 (+8) | `b8a539d` | done, **1 red on purpose** |
-| M22.7 | What stands on it | The Twelfth Name · one art colourway · the pool | | | pending |
-| M22.8 | Three errands you do with a cue | a chain of three off the desk | | | pending |
+| M22.7 | What stands on it | The Twelfth Name (40.0s, 277/s) · one art colourway · 3 fixtures rebaselined · 6 checks | 1142 (+10) | `78e3349` | done |
+| M22.8 | Three errands you do with a cue | the-far-corner · what-the-table-pays · the-twelfth-name · 4 checks | 1142 | `78e3349` | done |
 | M22.9 | The gate, the walk, the glossary, the deploy — the table | 5 browser checks · on-the-lower-table.json · the stale rows · deploy | | | pending |
-| notebook | rows open / closed | 8 open / 33 closed | | | |
+| notebook | rows open / closed | 8 open / 40 closed | | | |

@@ -174,4 +174,5 @@ Notebook: **63 rows, 0 open.**
 | M22.7 | What stands on it | The Twelfth Name (40.0s, 277/s) · one art colourway · 3 fixtures rebaselined · 6 checks | 1142 (+10) | `78e3349` | done |
 | M22.8 | Three errands you do with a cue | the-far-corner · what-the-table-pays · the-twelfth-name · 4 checks | 1142 | `78e3349` | done |
 | M22.9 | The gate, the walk, the glossary — the table | 5 new checks + 1 rewritten (**114 ok:**) · on-the-lower-table.json · 244-fight walk · glossary · 3 stale rows counted | 1142 (+0) | `16ad8be` | done, **deploy blocked** |
-| notebook | rows open / closed | 9 open / 45 closed | | | |
+| M22.10 | The notebook executed | 2 lints · 5 findings into CLAUDE.md · 2 carried as questions | 1144 (+2) | `839901a` | done |
+| notebook | rows open / closed | **0 open** / 54 closed | | | |

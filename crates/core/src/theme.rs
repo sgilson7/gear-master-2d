@@ -694,7 +694,6 @@ pub static TURTLE_DICK: Theme = Theme {
         ("Hooked Edge", "Cake-Knife Edge"),
         ("Hymnal", "The Eight Hymns"),
         ("Iron Band", "Cork Band"),
-        ("Iron Blade", "Jigno Technoknife"),
         ("Iron Fang", "Death-Leopard Fang"),
         ("Iron Plating", "Gray Smock Plating"),
         ("Ironbark Layer", "Nautilus Shell"),
@@ -741,7 +740,6 @@ pub static TURTLE_DICK: Theme = Theme {
         ("Mirrorplate Ring", "Mog Mirror Ring"),
         ("Multi-Handle", "Crank Assembly"),
         ("Nimble Mold", "Fast Roller Mold"),
-        ("Oak Handle", "Nut Bar Handle"),
         ("Oathbound Ink", "Petal Elixir"),
         ("Oathkeeper Mold", "Union Mold"),
         ("Oathplate", "Union Plate"),
@@ -2111,11 +2109,16 @@ mod tests {
     /// in one piece at a time without ever breaking the game.
     #[test]
     fn an_unthemed_name_falls_through_unchanged() {
+        // The first name has to be one the shipped theme actually renames, or
+        // the lookup half of this stops being tested and the assertion below
+        // quietly becomes a second copy of the fallback one. "Gold Chip" is
+        // the anchor because Fnorp is fixed by TONE rule 13.
+        assert_ne!(TURTLE_DICK.piece("Gold Chip"), "Gold Chip");
         for t in THEMES {
-            assert_eq!(t.piece("Oak Handle"), t.pieces.iter()
-                .find(|(k, _)| *k == "Oak Handle")
+            assert_eq!(t.piece("Gold Chip"), t.pieces.iter()
+                .find(|(k, _)| *k == "Gold Chip")
                 .map(|(_, v)| *v)
-                .unwrap_or("Oak Handle"));
+                .unwrap_or("Gold Chip"));
             assert_eq!(t.monster("A Creature That Does Not Exist"),
                        "A Creature That Does Not Exist");
         }
@@ -2187,9 +2190,18 @@ mod tests {
         //   Green Crown, Wandering Root - already read as Nut Metropolis
         //   Worldeye Orb - the Mansus sun-being's gaze
         //   The Money Jacket - it *is* Francis's coat
+        //   Oak Handle, Iron Blade - the starting kit, and the only two
+        //                components a player holds before the world has said
+        //                anything to them. The blade is one cell wide and
+        //                four tall on a three-row frame, so it has to end up
+        //                turned; somebody reading their own opening board
+        //                needs the name to say which piece is the blade
+        //                before it can afford to say anything else.
         const KEPT: &[&str] = &[
             "Ratchet Cog",
             "Flywheel Cog",
+            "Oak Handle",
+            "Iron Blade",
             "Anvil Frame",
             "Hollow Weave",
             "Witch's Hat",

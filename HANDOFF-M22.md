@@ -32,20 +32,23 @@ and `PLAN-M22.md`'s last section costs it out so nobody measures it again.
 | M22.1 | A wing is a shelf with a host | done |
 | M22.2 | The clerk comes down | done |
 | M22.3 | The arcane shelf, and the post gets its name | done |
-| M22.4 | The gate, the walk — the town | done, **deploy blocked** |
+| M22.4 | The gate, the walk — the town | done, live |
 | M22.5 | A pocket can go somewhere | done |
 | M22.6 | The table | done |
 | M22.7 | What stands on it | done |
 | M22.8 | Three errands you do with a cue | done |
-| M22.9 | The gate, the walk, the glossary — the table | done, **deploy blocked** |
+| M22.9 | The gate, the walk, the glossary — the table | done, live |
 | M22.10 | The notebook executed | done |
 
-**The block is finished and not deployed, and the deploy is not the block's
-fault.** `make publish` runs `git push` and this session's permission classifier
-refuses it. Everything the deploy would carry is green: the core suite at
-**1,144 tests in 96 binaries**, and the browser gate at **114 `ok:` lines** in
-chromium, exit 0. Fifteen commits sit unpushed on `main`. A human runs `make publish` — or allows the rule — and the live walk
-(`GM2D_ORIGIN=… testing/drive.py`) is the step after it.
+**The block is finished and live at `dbd692d9`.** It went out on the human's
+explicit word after sitting finished for a block — `make publish` runs
+`git push` and this session's permission classifier refused it, which is the
+first time a deploy here has been stopped by the session rather than by a red
+gate. Nineteen commits in one push, `4a3ae9a..175e0c1`. The core suite is
+**1,144 tests in 96 binaries** and the browser gate walked **all 114 `ok:`
+lines against the deployed page**, exit 0, with the pair agreeing —
+`index.html` asks `app.js?v=dbd692d9` and that `app.js` carries
+`BUILD='dbd692d9'`.
 
 ---
 
@@ -248,14 +251,17 @@ files, which decision 5 says it must not — pre-existing and left where it is
 
 ## Where to pick up
 
-**The deploy, and nothing else.** A human's `make publish`, then
-`GM2D_ORIGIN=… testing/drive.py` against the live page — the *verify against the
-live page* step this project has demanded since M8, and the one thing M22 has
-not done.
+**Nothing in M22.** Every milestone is closed, the block is deployed and the
+live page was walked: **M22.0 → M22.10**, 1,144 tests in 96 binaries, 114 `ok:`
+lines against `dbd692d9` at exit 0, and a notebook at fifty-four rows with none
+open.
 
-Everything the deploy would carry is green and every milestone is closed:
-**M22.0 → M22.10**, 1,144 tests in 96 binaries, 114 `ok:` lines in chromium at
-exit 0, and a notebook at fifty-four rows with none open.
+**What is carried is two questions and they are both the human's.** Whether to
+sweep the shot collision — it seals a cup and costs the Wextreen Reach its
+one-shot entry from the Treyway's start — and what to do about the packing
+board's unbounded canvas, which a 148-fight walk took to 7,242 pixels and put
+Auto-pack off the bottom of the screen. Both are measured in `CLAUDE.md`; both
+are content and interface calls rather than bugs.
 
 Two rules that will bite:
 

@@ -168,11 +168,12 @@ Notebook: **63 rows, 0 open.**
 | M22.1 | A wing is a shelf with a host | wing_of · arrives · name · met/DONE · counters_at · shelves_among · 10 checks | 1117 (+10) | `9d2434a` | done |
 | M22.2 | The clerk comes down | send-for-the-clerk (a Slay, not a Bring) · the-clerks-desk · the mirror errand re-keyed · 3 avail lints widened | 1120 (+3) | `c2060ba` | done |
 | M22.3 | The arcane shelf, and the post gets its name | high-wick as a wing (17→13 lines) · cut-the-post · PlaceDef::named · the way south refuses · UNWRITTEN/STAGED empty | 1124 (+4) | `64fbac1` | done |
-| M22.4 | The gate, the walk — the town | check_the_third_town_fills_up · check_the_way_south_names_the_boss · in-the-third-town.json · 148-fight walk · 4 walker fixes | 1124 (+0) | `1faf329` | done, **deploy blocked** |
+| M22.4 | The gate, the walk — the town | check_the_third_town_fills_up · check_the_way_south_names_the_boss · in-the-third-town.json · 148-fight walk · 4 walker fixes | 1124 (+0) | `1faf329` | done, live |
 | M22.5 | A pocket can go somewhere | Pocket honours to/at_to · Step::into · tape_into · the table's id in the lint · 4 checks | — | `47f6ae3` | done, **1 red on purpose** |
 | M22.6 | The table | the-lower-table · **the-cup** (31 maps) · 17+4 places · 6 events · 4 lints · 2 rounds | 1132 (+8) | `b8a539d` | done, **1 red on purpose** |
 | M22.7 | What stands on it | The Twelfth Name (40.0s, 277/s) · one art colourway · 3 fixtures rebaselined · 6 checks | 1142 (+10) | `78e3349` | done |
 | M22.8 | Three errands you do with a cue | the-far-corner · what-the-table-pays · the-twelfth-name · 4 checks | 1142 | `78e3349` | done |
-| M22.9 | The gate, the walk, the glossary — the table | 5 new checks + 1 rewritten (**114 ok:**) · on-the-lower-table.json · 244-fight walk · glossary · 3 stale rows counted | 1142 (+0) | `16ad8be` | done, **deploy blocked** |
+| M22.9 | The gate, the walk, the glossary — the table | 5 new checks + 1 rewritten (**114 ok:**) · on-the-lower-table.json · 244-fight walk · glossary · 3 stale rows counted | 1142 (+0) | `16ad8be` | done, live |
 | M22.10 | The notebook executed | 2 lints · 5 findings into CLAUDE.md · 2 carried as questions | 1144 (+2) | `839901a` | done |
+| **deploy** | live at `dbd692d9` | 19 commits `4a3ae9a..175e0c1` · Actions green · **114 ok: against the deployed page**, exit 0 · pair agrees · no console errors | 1144 | `175e0c1` | **live** |
 | notebook | rows open / closed | **0 open** / 54 closed | | | |

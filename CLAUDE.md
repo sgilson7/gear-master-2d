@@ -14,11 +14,14 @@ was arranged until it was long enough that the arrangement mattered.
 
 ## Where it is right now
 
-**M22 is nine milestones in and not deployed**, and the deploy is the only
-thing missing: `make publish` runs `git push`, which the session's permission
-classifier refused. Everything it would carry is green — the core suite, and the
-browser gate at **109 `ok:` lines** in chromium. `HANDOFF-M22.md` is the block's
-own record, `PLAN-M22.md` is the plan and `SECOND-ORDER-M22.md` is the notebook.
+**M22 is done and live**, deployed at `dbd692d9` on the human's explicit word
+and verified the way this file has demanded since M8: `GM2D_ORIGIN=… drive.py`
+walked **all 114 checks against the deployed page**, and the pair agrees.
+Eleven milestones, `591ee0d` through `175e0c1`, **pushed in one go of nineteen
+commits** because the block had finished before a session was allowed to deploy
+it — see *M22's deploy is the first a session could not make*.
+`HANDOFF-M22.md` is the block's own record, `PLAN-M22.md` is the plan and
+`SECOND-ORDER-M22.md` is the notebook — **fifty-four rows, all closed**.
 
 **The third town is settled and there is a table under it.** The block in one
 paragraph: the High Wick clerk comes down on an errand, her desk is a **wing** of
@@ -6227,6 +6230,38 @@ the bar. It measures the rects now — un-hidden, laid out, inside the window �
 and returns before the clicks if any of them is unreachable, because a click
 that times out ends a check with a Playwright traceback instead of the sentence
 that says what is wrong.
+
+**M22's deploy is the first a session could not make.** `make publish` runs
+`git push`, and the session's permission classifier refused it — so nine
+milestones sat finished and green on `main` for a whole block, which is *the
+work was never deployed at all* arriving by a new route.
+It went out on the human's explicit word, nineteen commits in one push,
+`4a3ae9a..175e0c1`. **The table is one line an ask because the gate asked all
+hundred and fourteen of them.**
+
+```
+live build dbd692d9
+  index.html asks app.js?v=dbd692d9   app.js carries BUILD='dbd692d9'
+  chromium walked the gate    ok      114 ok lines, no failures
+  the third town              Low Wick, 15 lines on two wings, 11 buildings
+  the way south               names the post with nothing on it, and opens
+                              onto the-lower-table — aimed rather than walked
+  a shot on the table         flew the path core returned, and stopped on [16, 6]
+  the far pocket              dropped you in the cup, said so, and charged twelve
+  the gutter                  put you back in the last town you stood in
+  the stop-line               moved into the cup, behind the twelfth name
+  both new figures            served, 200, 4,763B and 4,783B
+  console errors: none                off-origin requests: none
+```
+
+**Seven of the hundred and fourteen are M22's and every one was watched
+failing**, which is the only thing that makes an `ok:` line mean anything.
+**And the deploy is the third thing, not the second**: the push went green,
+Actions walked the gate in three browsers before it uploaded the artifact, and
+*then* a person pointed the gate at the live page — which is the step this file
+has demanded since M8 and which found nothing this time, because M22.4 and
+M22.9 had already found it all locally.
+
 
 **The deploy after that is the one that answered a question with a bug.** Asked
 *how do I get the first specialization?* — and the answer was that you could

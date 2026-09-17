@@ -170,8 +170,8 @@ Notebook: **63 rows, 0 open.**
 | M22.3 | The arcane shelf, and the post gets its name | high-wick as a wing (17→13 lines) · cut-the-post · PlaceDef::named · the way south refuses · UNWRITTEN/STAGED empty | 1124 (+4) | `64fbac1` | done |
 | M22.4 | The gate, the walk — the town | check_the_third_town_fills_up · check_the_way_south_names_the_boss · in-the-third-town.json · 148-fight walk · 4 walker fixes | 1124 (+0) | `1faf329` | done, **deploy blocked** |
 | M22.5 | A pocket can go somewhere | Pocket honours to/at_to · Step::into · tape_into · the table's id in the lint · 4 checks | — | `47f6ae3` | done, **1 red on purpose** |
-| M22.6 | The table | the-lower-table · the cup as a map of its own · 4 lints | | | pending |
+| M22.6 | The table | the-lower-table · **the-cup** (31 maps) · 17+4 places · 6 events · 4 lints · 2 rounds | 1132 (+8) | `b8a539d` | done, **1 red on purpose** |
 | M22.7 | What stands on it | The Twelfth Name · one art colourway · the pool | | | pending |
 | M22.8 | Three errands you do with a cue | a chain of three off the desk | | | pending |
 | M22.9 | The gate, the walk, the glossary, the deploy — the table | 5 browser checks · on-the-lower-table.json · the stale rows · deploy | | | pending |
-| notebook | rows open / closed | 8 open / 28 closed | | | |
+| notebook | rows open / closed | 8 open / 33 closed | | | |

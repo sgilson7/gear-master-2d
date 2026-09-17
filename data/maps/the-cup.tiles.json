@@ -1,0 +1,95 @@
+{
+  "format": "gm2d-tiles",
+  "version": 1,
+  "id": "the-cup",
+  "_note": "**The cup, and it is a map because a cup of rock is not sealed.** `PLAN-M22.md` decision 9 stands the boss in a sealed cup on the lower table; M22.0 measured 6,546 shots from outside a draft cup coming to rest inside it, through eight tiles of solid rock, because `shot::shoot_with` tests the tile a tick landed on and one tick is 18.75 tiles at power ten. No thickness seals it and nineteen would be the map.\n\nSo the room is its own map and **the only way onto it is the far pocket** at [17, 2] on the table above — `to`/`at_to` on a `Pocket`, which M22.5 built and which is the same `warp_to` a gate makes. *The boss stands nowhere but the cup* is then true by construction rather than by a lint over a flood.\n\n**Walked, not shot.** Seven by three of silt: there is nothing to aim at in a room this size, and a cue in it would be a dungeon nobody can walk out of. The crack in the west wall is the way back up and it lands you beside the way back up the lip, which is the rule `every_gate_lands_beside_its_door` holds over every gate there is.\n\n**The card is not on the tile the pocket drops you on**, and that is M16's rule rather than a taste: `Game::warp_to` **resolves no place**, on purpose — every warp in the game lands you on ground, and a warp that opened a card would make a fall into a conversation. So the landing is [3, 3] and the drift is at [2, 1], one step off it. *An alcove is two tiles*, one map along.",
+  "width": 9,
+  "height": 5,
+  "start": [
+    3,
+    3
+  ],
+  "rows": [
+    "^^^^^^^^^",
+    "^sssssss^",
+    "^sssssss^",
+    "^sssssss^",
+    "^^^^^^^^^"
+  ],
+  "regions": [
+    {
+      "id": "the-cup",
+      "name": "The Cup",
+      "bounds": [
+        [
+          0,
+          0,
+          8,
+          4
+        ]
+      ],
+      "enemies": [
+        "Backsight",
+        "The Levelling Staff"
+      ],
+      "_note": "Two, and the commonest is the one the board beats — the same rule the table above obeys. Twenty-one tiles of silt at 200 per mille, and four of them are the walk from where the pocket drops you to the plank."
+    }
+  ],
+  "places": [
+    {
+      "at": [
+        2,
+        1
+      ],
+      "kind": "event",
+      "id": "what-you-fell-through",
+      "name": "WHAT YOU FELL THROUGH"
+    },
+    {
+      "at": [
+        5,
+        2
+      ],
+      "kind": "boss",
+      "id": "the-twelfth-name",
+      "name": "the twelfth name",
+      "creature": "The Twelfth Name",
+      "prose": [
+        "A plank set upright in the silt with eleven names burned into it and a twelfth cut fresh, and the twelfth is not burned and is not finished.",
+        "Something has been standing in front of it for eleven years keeping the rest of the plank clear."
+      ]
+    },
+    {
+      "at": [
+        7,
+        2
+      ],
+      "kind": "door",
+      "id": "the-writing-stops-here",
+      "name": "the writing stops here",
+      "needs_all": [
+        "the-twelfth-name"
+      ],
+      "shut": "The plank is in the way and the thing in front of it has not moved.",
+      "prose": [
+        "Behind the plank the room ends, and what it ends at is not a wall and not a coast and not an edge.",
+        "This is where the writing stops. Not the game — the writing. What is past this is not hidden and not locked and not saved for later: nobody has decided it yet.",
+        "You dropped a tower, drained a lake, took two dungeons apart from the inside, came up under a door an old woman had been sitting in front of for eleven years, settled the town on the other side of it and had the post cut. Then you went over the lip and down a hole in the rock. The last fact this game has for you is that somebody had already been here and had got as far as the twelfth name."
+      ]
+    },
+    {
+      "at": [
+        1,
+        2
+      ],
+      "kind": "gate",
+      "id": "the-way-out-of-the-cup",
+      "name": "the crack in the west wall",
+      "to": "the-lower-table",
+      "at_to": [
+        9,
+        10
+      ]
+    }
+  ]
+}

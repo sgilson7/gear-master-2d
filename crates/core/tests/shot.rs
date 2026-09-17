@@ -324,10 +324,12 @@ fn every_obstacle_is_on_a_table() {
             }
         }
     }
-    // Nine on the Treyway and six on the Undercountry. A number rather than a
-    // range, because an obstacle that appeared without anybody deciding to put
-    // it there is exactly what this is watching for.
-    assert_eq!(seen, 15, "the game has {seen} obstacles on it");
+    // Nine on the Treyway, six on the Undercountry and **eleven on the lower
+    // table** — three pockets, three stones, two teeth, a drove way and two
+    // drifts. A number rather than a range, because an obstacle that appeared
+    // without anybody deciding to put it there is exactly what this is watching
+    // for.
+    assert_eq!(seen, 26, "the game has {seen} obstacles on it");
 }
 
 /// **A bumper adds thirty percent and never more than a full-power shot.**
@@ -1251,4 +1253,175 @@ fn the_tape_names_where_a_pocket_put_you() {
     let missed = sweep(false);
     assert!(!missed.tape_into(1, "slag", 0, Some("the cup")).contains("down into"));
     assert!(!missed.tape(1, "slag", 0).contains("sunk"));
+}
+
+// -------------------------------------------------- M22.6, the lower table
+
+const TABLE: &str = "the-lower-table";
+const CUP: &str = "the-cup";
+
+/// **The boss has no straight line to it, and the reason is that it is not on
+/// the table at all.**
+///
+/// `PLAN-M22.md` decision 9 puts it in a sealed cup of rock on the table and
+/// makes this a lint over the **flood**. M22.0 measured that cup: **6,546 of
+/// the shots taken from the 278 walkable tiles outside a draft one came to rest
+/// inside it**, through eight tiles of solid rock with no mouth, because
+/// `shot::shoot_with` tests the tile a tick *landed on* and never the tiles it
+/// crossed — one tick is 1.875 tiles at power one and **18.75 at power ten**. A
+/// two-tile wall is transparent too and nineteen would be the map.
+///
+/// So the cup is a **map**, and the property is true by construction: there is
+/// nothing on the table to aim at, and the only way onto the cup is a pocket.
+/// That is what M22.5's `to`/`at_to` is for and it is the one thing Yoku's
+/// holes do that this engine did not.
+#[test]
+fn the_boss_has_no_straight_line() {
+    let table = data::map(TABLE, D);
+    assert!(
+        table.places.iter().all(|p| p.creature.is_none()),
+        "something stands on the lower table, and the cup is supposed to be a map"
+    );
+    let cup = data::map(CUP, D);
+    let boss = cup
+        .places
+        .iter()
+        .find(|p| p.kind == gm2d_core::world::PlaceKind::Boss)
+        .expect("the cup has nothing on the plank");
+    // **One way onto the cup, and it is a pocket.** Every gate in the game is
+    // walked through; this is fallen down.
+    let ways: Vec<String> = data::MAPS
+        .iter()
+        .flat_map(|(id, _)| {
+            data::map(id, D)
+                .places
+                .into_iter()
+                .filter(|p| p.to.as_deref() == Some(CUP))
+                .map(move |p| format!("{id}/{}:{:?}", p.id, p.kind))
+        })
+        .collect();
+    assert_eq!(
+        ways,
+        vec![format!("{TABLE}/the-far-pocket:Pocket")],
+        "the ways into the cup are {ways:?}"
+    );
+    let _ = boss;
+}
+
+/// **Every pocket on the table is named, and the one that goes somewhere says
+/// where.**
+///
+/// A pocket is a refusal the ball cannot make for itself, so it is the one kind
+/// of place a player meets without having aimed at it — and an unnamed one is
+/// *sunk, and* nothing. The two gutters go home, which is what a gutter is; the
+/// far pocket goes into the cup.
+#[test]
+fn every_pocket_on_the_table_goes_somewhere_named() {
+    let w = data::map(TABLE, D);
+    let pockets: Vec<&gm2d_core::world::PlaceDef> = w
+        .places
+        .iter()
+        .filter(|p| p.kind == gm2d_core::world::PlaceKind::Pocket)
+        .collect();
+    assert_eq!(pockets.len(), 3, "the table has {} pockets", pockets.len());
+    let mut went = 0;
+    for p in &pockets {
+        assert!(!p.name.is_empty(), "{} is a pocket with no name", p.id);
+        assert!(!p.shut.is_empty(), "{} is a pocket with nothing to say", p.id);
+        if let Some(to) = &p.to {
+            went += 1;
+            assert_eq!(to, CUP, "{} goes to {to}, which is not the cup", p.id);
+            let at = p.at_to.expect("a pocket that says where and not where onto");
+            let far = data::map(to, D);
+            assert!(
+                far.walkable(at[0], at[1], &Allowances::default()),
+                "{} puts you on ({}, {}), which is not ground",
+                p.id, at[0], at[1]
+            );
+        }
+    }
+    assert_eq!(went, 1, "{went} pockets go somewhere, and one is the design");
+}
+
+/// **`PlaceKind::Door` still has exactly one user, and it is the stop-line.**
+///
+/// It has had one since M14 put the sentence on a `Door` one tile south of the
+/// third town — *a `TownShelf` is an id, a stock list and a commission list and
+/// has never had prose* — and M22.6 moves that sentence to the far end of the
+/// cup rather than adding a second. **There is one screen in the game that says
+/// the writing stops**, and this is what keeps it one.
+#[test]
+fn the_stop_line_is_still_one_door() {
+    let mut doors: Vec<String> = Vec::new();
+    for (id, _) in data::MAPS {
+        for p in data::map(id, D).places {
+            if p.kind == gm2d_core::world::PlaceKind::Door {
+                doors.push(format!("{id}/{}", p.id));
+            }
+        }
+    }
+    assert_eq!(doors, vec![format!("{CUP}/the-writing-stops-here")], "the doors are {doors:?}");
+}
+
+/// **Everything on the table can be reached, and it takes three rounds.**
+///
+/// The plan guesses two, which is the Treyway's number. Whatever it comes out
+/// at is written down here rather than left to the flood's own `println`,
+/// because a number a design stakes itself on wants somewhere it is asserted —
+/// and the far pocket is the whole of that design: if no shot reaches it, the
+/// cup is a room nobody can get into.
+#[test]
+fn the_far_pocket_is_reachable_and_the_table_takes_three_rounds() {
+    let w = data::map(TABLE, D);
+    let a = Allowances::default();
+    let mut ring: std::collections::BTreeSet<(u8, u8)> =
+        [(w.start.0, w.start.1)].into_iter().collect();
+    let mut hit: std::collections::BTreeSet<String> = Default::default();
+    let mut rounds = 0;
+    for _ in 0..4 {
+        rounds += 1;
+        let mut next = ring.clone();
+        for from in &ring {
+            for angle in 0..STEPS as u16 {
+                for power in 1..=10u8 {
+                    let f = shot::shoot(&w, *from, Shot::new(angle, power), &a);
+                    for c in &f.contacts {
+                        match c {
+                            Contact::Bumper { id, .. }
+                            | Contact::Spike { id, .. }
+                            | Contact::Chute { id, .. }
+                            | Contact::Sand { id, .. }
+                            | Contact::Sunk { id, .. } => {
+                                hit.insert(id.clone());
+                            }
+                            _ => {}
+                        }
+                    }
+                    next.insert(f.rest);
+                }
+            }
+        }
+        ring = next;
+        let missing: Vec<&str> = w
+            .places
+            .iter()
+            .filter(|p| {
+                if p.kind.is_obstacle() {
+                    !hit.contains(&p.id)
+                } else {
+                    !ring.contains(&(p.at[0], p.at[1]))
+                }
+            })
+            .map(|p| p.id.as_str())
+            .collect();
+        if missing.is_empty() {
+            break;
+        }
+    }
+    assert!(
+        hit.contains("the-far-pocket"),
+        "no shot on the table ever finds the far pocket, so the cup is a room with no way in"
+    );
+    assert!(rounds <= 3, "the table takes {rounds} rounds of shots, and three is the ceiling");
+    println!("the lower table: everything in {rounds} rounds of shots");
 }

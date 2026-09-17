@@ -1,0 +1,236 @@
+{
+  "format": "gm2d-tiles",
+  "version": 1,
+  "id": "the-lower-table",
+  "_note": "**The table under the writing**, and the third table in the game. `traversal: \"shot\"` — the arrow keys aim a cue, space fires, and where you stop is where you are.\n\n**The cup is not on it.** `PLAN-M22.md` decision 9 stands the boss in a sealed cup of rock here; M22.0 measured that and a cup of rock is not sealed — `shot::shoot_with` tests the tile a tick landed on and never the tiles it crossed, and one tick is 18.75 tiles at power ten, so 6,546 of the shots taken from outside a draft cup came to rest inside it through eight tiles of solid rock. No thickness fixes that. So the cup is `the-cup`, a map of its own, and **the only way onto it is the far pocket** — `to`/`at_to` on a `Pocket`, which is what M22.5 built. A hole is how you go into a room.\n\n**Five obstacles down each rail and nothing in the middle**, which is what makes the far pocket a shot rather than a walk: it is at [17, 2], behind the north range, and the drove way up the east rail is the lane that gets a ball up there with speed left. The two gutters at the bottom are the price of missing.",
+  "width": 20,
+  "height": 20,
+  "start": [
+    9,
+    18
+  ],
+  "rows": [
+    "^^^^^^^^^^^^^^^^^^^^",
+    "^A,,,,,,,,,,,,,,,,A^",
+    "^A,,,,,,,,,,,,,,,,A^",
+    "^,,,,,,,,,,,,,,,,,,^",
+    "^,,,,,,,,,,,,,,,,,,^",
+    "^,,,,,,,,,,,,,,,,,,^",
+    "^,,%%,,,,,,,,,,%%,,^",
+    "^,,%%,,,,,,,,,,%%,,^",
+    "^,,,,,,,,,,,,,,,,,,^",
+    "^,,,,,,,%%%%,,,,,,,^",
+    "^,,,,,,,%%%%,,,,,,,^",
+    "^,,,,,,,,,,,,,,,,,,^",
+    "^,%%,,,,,,,,,,,,%%,^",
+    "^,%%,,,,,,,,,,,,%%,^",
+    "^,,,,,,,,,,,,,,,,,,^",
+    "^,,,,,,,,,,,,,,,,,,^",
+    "^^,,,,,,,,,,,,,,,,^^",
+    "^^^,,,,,,,,,,,,,,^^^",
+    "^^^^,,,,,,,,,,,,^^^^",
+    "^^^^^^^^^^^^^^^^^^^^"
+  ],
+  "regions": [
+    {
+      "id": "the-lower-table",
+      "name": "The Lower Table",
+      "bounds": [
+        [
+          0,
+          0,
+          19,
+          19
+        ]
+      ],
+      "enemies": [
+        "Backsight",
+        "The Eleventh Notch",
+        "Iron Under It",
+        "The Levelling Staff"
+      ],
+      "_note": "**Four of the Wextreen deep, and the commonest of them is the one the board can beat.** `draw_enemy` weights a pool so its easiest member is its commonest and its hardest its rarest, so what a region *deals* you is not what it contains — and `every_region_has_a_fight_you_can_win_and_every_boss_can_be_beaten` asks about the commonest. Measured against `common::geared_from`: Backsight is a win at 39 seconds and the other three are defeats at 20.4, 31.2 and 17.8. That is the deep's own shape — mostly survivable with rare lethal draws — and it is why Chainman is not here: it is rated *below* Backsight at 1624 and kills that board anyway, so it would have been the commonest draw and a wall. **A rating predicts nothing about whether a fight is winnable.**"
+    }
+  ],
+  "places": [
+    {
+      "at": [
+        9,
+        17
+      ],
+      "kind": "gate",
+      "id": "the-way-back-up",
+      "name": "the way back up the lip",
+      "to": "the-undercountry",
+      "at_to": [
+        10,
+        12
+      ]
+    },
+    {
+      "at": [
+        17,
+        2
+      ],
+      "kind": "pocket",
+      "id": "the-far-pocket",
+      "name": "the far pocket",
+      "to": "the-cup",
+      "at_to": [
+        3,
+        3
+      ],
+      "shut": "A hole in the rock at the top of the range, and the only thing anybody has ever seen come out of it is air."
+    },
+    {
+      "at": [
+        4,
+        17
+      ],
+      "kind": "pocket",
+      "id": "the-left-gutter",
+      "name": "the left gutter",
+      "shut": "The floor goes away under the rail. Eleven years of things that came down this side are somewhere under it."
+    },
+    {
+      "at": [
+        15,
+        17
+      ],
+      "kind": "pocket",
+      "id": "the-right-gutter",
+      "name": "the right gutter",
+      "shut": "Its twin, and no deeper. Whoever cut the second one had already cut the first."
+    },
+    {
+      "at": [
+        9,
+        5
+      ],
+      "kind": "bumper",
+      "id": "the-post-stone",
+      "name": "the standing stone",
+      "shut": "A stone stood on end in the middle of the floor, and the floor round it is worn in a ring."
+    },
+    {
+      "at": [
+        5,
+        9
+      ],
+      "kind": "bumper",
+      "id": "the-left-stone",
+      "name": "the left stone",
+      "shut": "A second one, off the line of the first, and the ring round it is the same depth."
+    },
+    {
+      "at": [
+        14,
+        9
+      ],
+      "kind": "bumper",
+      "id": "the-right-stone",
+      "name": "the right stone",
+      "shut": "A third. Somebody counted, and then stopped counting."
+    },
+    {
+      "at": [
+        2,
+        14
+      ],
+      "kind": "spike",
+      "id": "the-left-teeth",
+      "name": "the left teeth",
+      "shut": "Split rock, on end, in a line. It is not a wall — it is a thing you go through and are the worse for."
+    },
+    {
+      "at": [
+        17,
+        14
+      ],
+      "kind": "spike",
+      "id": "the-right-teeth",
+      "name": "the right teeth",
+      "shut": "The same split rock down the other rail, and the same going-through."
+    },
+    {
+      "at": [
+        18,
+        15
+      ],
+      "kind": "chute",
+      "id": "the-plunger",
+      "name": "the drove way up the rail",
+      "at_to": [
+        18,
+        6
+      ],
+      "shut": "A cut lane up the east wall, roofed for most of its length. What goes in at the bottom comes out at the top still going."
+    },
+    {
+      "at": [
+        1,
+        4
+      ],
+      "kind": "sand",
+      "id": "the-north-drift",
+      "name": "the drift under the range",
+      "shut": "Grit banked against the rock, a foot of it. Whatever rolls in stops."
+    },
+    {
+      "at": [
+        18,
+        5
+      ],
+      "kind": "sand",
+      "id": "the-east-drift",
+      "name": "the drift at the head of the way",
+      "shut": "The same grit at the top of the drove way, and it is what the drove way is for."
+    },
+    {
+      "at": [
+        3,
+        8
+      ],
+      "kind": "event",
+      "id": "the-first-course",
+      "name": "THE FIRST COURSE"
+    },
+    {
+      "at": [
+        16,
+        8
+      ],
+      "kind": "event",
+      "id": "the-tally-stone",
+      "name": "THE TALLY STONE"
+    },
+    {
+      "at": [
+        9,
+        11
+      ],
+      "kind": "event",
+      "id": "the-middle-of-it",
+      "name": "THE MIDDLE OF IT"
+    },
+    {
+      "at": [
+        2,
+        12
+      ],
+      "kind": "event",
+      "id": "what-the-rail-kept",
+      "name": "WHAT THE RAIL KEPT"
+    },
+    {
+      "at": [
+        17,
+        12
+      ],
+      "kind": "event",
+      "id": "the-last-course",
+      "name": "THE LAST COURSE"
+    }
+  ],
+  "traversal": "shot"
+}

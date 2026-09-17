@@ -81,6 +81,8 @@ pub const CAIRNWORKS_1_JSON: &str = include_str!("../../../data/maps/the-cairnwo
 pub const CAIRNWORKS_2_JSON: &str = include_str!("../../../data/maps/the-cairnworks-2.tiles.json");
 pub const CAIRNWORKS_3_JSON: &str = include_str!("../../../data/maps/the-cairnworks-3.tiles.json");
 pub const CAIRNWORKS_4_JSON: &str = include_str!("../../../data/maps/the-cairnworks-4.tiles.json");
+pub const LOWER_TABLE_JSON: &str = include_str!("../../../data/maps/the-lower-table.tiles.json");
+pub const CUP_JSON: &str = include_str!("../../../data/maps/the-cup.tiles.json");
 pub const EVENTS_JSON: &str = include_str!("../../../data/events.json");
 pub const THEME_TD_JSON: &str = include_str!("../../../data/theme.td.json");
 pub const SKILLS_JSON: &str = include_str!("../../../data/skills.json");
@@ -143,6 +145,8 @@ pub const FILES: &[(&str, &str)] = &[
     ("maps/the-cairnworks-2.tiles.json", CAIRNWORKS_2_JSON),
     ("maps/the-cairnworks-3.tiles.json", CAIRNWORKS_3_JSON),
     ("maps/the-cairnworks-4.tiles.json", CAIRNWORKS_4_JSON),
+    ("maps/the-lower-table.tiles.json", LOWER_TABLE_JSON),
+    ("maps/the-cup.tiles.json", CUP_JSON),
     ("events.json", EVENTS_JSON),
     ("theme.td.json", THEME_TD_JSON),
     ("skills.json", SKILLS_JSON),
@@ -197,6 +201,11 @@ pub const MAPS: &[(&str, &str)] = &[
     ("the-cairnworks-2", CAIRNWORKS_2_JSON),
     ("the-cairnworks-3", CAIRNWORKS_3_JSON),
     ("the-cairnworks-4", CAIRNWORKS_4_JSON),
+    // **The table under the writing, and the cup under it.** Thirty and
+    // thirty-one: the cup is a map rather than a room on the table because a
+    // cup of rock is not sealed — see its own note and divergence 22.1.
+    ("the-lower-table", LOWER_TABLE_JSON),
+    ("the-cup", CUP_JSON),
 ];
 
 /// One map by id, falling back to the overworld.

@@ -229,17 +229,17 @@
         10,
         11
       ],
-      "kind": "door",
+      "kind": "gate",
       "id": "the-way-on-from-here",
       "name": "the way on",
       "needs_all": [
         "the-unwritten"
       ],
       "shut": "The road runs south out of the town for four miles and then stops, and what it stops at is not a wall and not a coast and not an edge. It is a lip, and under the lip the floor of the country goes on without the country on top of it.",
-      "prose": [
-        "The road runs south out of the town for four miles and then stops, and what it stops at is not a wall and not a coast and not an edge.",
-        "This is where the writing stops. Not the game — the writing. What is past this is not hidden and not locked and not saved for later: nobody has decided it yet.",
-        "You dropped a tower, drained a lake, took two dungeons apart from the inside and came up under a door an old woman has been sitting in front of for eleven years. The last fact this game has for you is that she was right about the number."
+      "to": "the-lower-table",
+      "at_to": [
+        9,
+        18
       ]
     },
     {

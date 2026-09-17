@@ -123,9 +123,12 @@ fn every_gate_lands_beside_its_door() {
     let here = data::map(HERE, D);
     let ways: Vec<&gm2d_core::world::PlaceDef> =
         here.places.iter().filter(|p| p.kind == PlaceKind::Gate).collect();
-    assert_eq!(ways.len(), 3, "the Undercountry has {} ways off it", ways.len());
+    // **Four since M22.6**: three back up, and the way on over the lip. The way
+    // on is the odd one out and is skipped below — it is a one-way door with
+    // nothing coming back through it, which is what a *way on* is.
+    assert_eq!(ways.len(), 4, "the Undercountry has {} ways off it", ways.len());
 
-    for out in &ways {
+    for out in ways.iter().filter(|p| p.id != "the-way-on-from-here") {
         let to = out.to.as_deref().expect("a gate to nowhere");
         let far = data::map(to, D);
         let landing = out.at_to.expect("a way back that names no tile");
@@ -218,13 +221,24 @@ fn the_third_town_fills_up() {
 
     // **And the sentence that says so is on the map**, one tile south of the
     // town, where the door under the lake used to carry it.
-    let stop = w
+    // **And it moved again in M22.6.** The Undercountry's own tile is the way
+    // *on* now — a gate over the lip onto the lower table — and the sentence is
+    // at the far end of the cup under it, behind the thing on the plank. The
+    // door under the lake was the first to carry it and gave it up in M14;
+    // this is the second time it has moved and the rule is the same both
+    // times: **there is one screen in the game that says the writing stops.**
+    let cup = data::map("the-cup", D);
+    let stop = cup
         .places
         .iter()
         .find(|p| p.kind == PlaceKind::Door)
-        .expect("nothing here says the writing stops");
+        .expect("nothing in the cup says the writing stops");
     let said = stop.prose.join(" ").to_lowercase();
     assert!(said.contains("nobody has decided"), "the last screen does not say what it is");
+    assert!(
+        w.places.iter().all(|p| p.kind != PlaceKind::Door),
+        "the Undercountry still carries a door of its own"
+    );
     // It moved rather than being copied: the lake's door is a way on now.
     let lake = data::map("under-the-lake", D);
     let was = lake
@@ -252,7 +266,10 @@ fn reachability_derives_over_every_map() {
     // Sands; twenty-three to twenty-five are the three floors of the Eleven
     // Reefs under it; twenty-six to twenty-nine are the four floors of the
     // Cairnworks under the Wextreen Reach.
-    assert_eq!(data::MAPS.len(), 29, "the game ships {} maps", data::MAPS.len());
+    // Thirty is the lower table and thirty-one is the cup under it, which is a
+    // **map** rather than a room on that table because a cup of rock is not
+    // sealed — see `the-cup`'s own note and divergence 22.1.
+    assert_eq!(data::MAPS.len(), 31, "the game ships {} maps", data::MAPS.len());
     for (id, _) in data::MAPS {
         let mut opened = WorldState::default();
         opened.map = (*id).to_string();

@@ -113,7 +113,13 @@ fn there_is_one_door_in_the_game_and_it_is_the_last_thing() {
         doors.iter().map(|(m, i, _)| (m, i)).collect::<Vec<_>>()
     );
     let (map, _, said) = &doors[0];
-    assert_eq!(*map, "the-undercountry", "the last screen is on {map}");
+    // **It has moved twice and the rule has not.** M14 took it off the door
+    // under the lake and put it one tile south of the third town; M22.6 takes
+    // that tile for the way *on* — a gate over the lip onto the lower table —
+    // and puts the sentence at the far end of the cup under it, behind the
+    // thing on the plank. **There is one screen in the game that says the
+    // writing stops**, and where it is is the last place a player can get to.
+    assert_eq!(*map, "the-cup", "the last screen is on {map}");
     assert!(
         said.to_lowercase().contains("nobody has decided"),
         "the last screen does not say what it is"

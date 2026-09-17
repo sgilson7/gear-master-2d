@@ -3975,6 +3975,41 @@ name.**
   arrived or not: that is a question about what a town is rather than about a
   particular afternoon.
 
+### The table under the writing, and the cup under that
+
+**M22.6.** Over the lip south of the third town is **the lower table**, the
+third table in the game — twenty by twenty, `traversal: "shot"`, five obstacles
+down each rail and nothing in the middle. Under it is **the cup**, seven by
+three of silt, with a plank in it.
+
+- **The cup is a map and not a room on the table, because a cup of rock is not
+  sealed.** `PLAN-M22.md` decision 9 stands the boss in one; M22.0 measured
+  **6,546 of the shots taken from the 278 tiles outside a draft cup coming to
+  rest inside it**, through eight tiles of solid rock, because `shot::shoot_with`
+  tests the tile a tick *landed on* and one tick is 18.75 tiles at power ten. A
+  two-tile wall is transparent too and nineteen would be the map. So the room is
+  its own map and **the only way onto it is the far pocket** — which is what
+  M22.5 built, and is the same `warp_to` a gate makes. *The boss stands nowhere
+  but the cup* is then true by construction rather than by a lint over a flood.
+- **The cup is walked and the table is shot.** There is nothing to aim at in a
+  room seven tiles across, and a cue in one would be a dungeon nobody can walk
+  out of — which is `check_a_floor_still_steps`'s whole subject.
+- **The pool's commonest member is the one the board beats, and it is rated
+  *above* the one it replaced.** `draw_enemy` makes a pool's easiest member its
+  commonest, so `every_region_has_a_fight_you_can_win_and_every_boss_can_be_
+  beaten` asks about the lowest-rated one. The first draft led with **Chainman
+  at 1624**, which `geared_from` loses to at 37.8 seconds, while **Backsight at
+  1807** is a win at 39. A rating predicts nothing about whether a fight is
+  winnable — fourth instance, and the first where the lower rating was the
+  harder fight.
+- **The stop-line has moved twice and the rule has not.** M14 took it off the
+  door under the lake; M22.6 takes the third town's tile for the way *on* and
+  puts the sentence at the far end of the cup. `PlaceKind::Door` has exactly one
+  user before and after.
+- **Two rounds of shots reaches everything**, which is the plan's guess and the
+  Treyway's number — and the far pocket is among them, asserted rather than
+  printed, because a cup nothing can reach is a room with no way into it.
+
 ### A pocket may say where it goes
 
 **M22.5.** `PlaceDef::to` and `at_to` are the gate's own fields and a

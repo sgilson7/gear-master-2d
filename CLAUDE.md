@@ -4100,6 +4100,34 @@ three of silt, with a plank in it.
   Treyway's number — and the far pocket is among them, asserted rather than
   printed, because a cup nothing can reach is a room with no way into it.
 
+### Two start lines, because nothing in the repository opened the Undercountry
+
+**M22.4 and M22.9.** All fourteen saves were read and not one had both
+`the-ninth-surveyor` and `the-bottom-of-the-bottom` in `answered`, which is what
+`hidden_until_all` on Marbulon's door wants — and **the human's own has the
+second and not the first**. The walker does not get there either: from a new
+game it runs 977 fights to level thirteen and ends in the loop `PLAN.md` §6d row
+3 names.
+
+So the block ships its own: `testing/saves/in-the-third-town.json` stands on the
+tee with the Kettleworks chain done to `nobody-has-named-it`, and
+`on-the-lower-table.json` stands on the table's tee with the whole settling done
+behind it. `GM2D_FROM=` walks from either.
+
+**Both walks go to the town and stay there**, which is the walker being a
+walker: it aims at the nearest thing, and on the lower table the nearest thing
+is the gate back over the lip. 148 fights from the first and 244 from the
+second, levels 45 → 54 and 45 → 56, all of them in the Undercountry. It **does**
+take `THE FAR CORNER` off the desk and report *You have not been yet* — the
+`Word` stage working, and the walker having no model of *go to a named tile to
+finish an errand*.
+
+**What walks the table is the gate.** `check_the_far_pocket_drops_you_in_the_cup`
+sinks it in two aimed shots — `aim_at` both times, so what it fires is what a
+player could have fired — and `check_the_stop_line_moved` reads the screen
+behind the plank. *A walker with a destination stops being a player*, and a
+check with one is exactly what a gate is for.
+
 ### A pocket may say where it goes
 
 **M22.5.** `PlaceDef::to` and `at_to` are the gate's own fields and a
@@ -7023,8 +7051,8 @@ content*, and one check now measures what a range used to guess at.
 | wasm | **1660 KB**, up from 1539 KB at M13 — `dist/web/pkg/gm2d_wasm_bg.wasm` after `make web`. CI builds its own and the two are not bit-identical, which is why the *stamp* is checked against itself and never against a number |
 | Save format | v1. **No seam, still, and M14 adds no field at all** — nine maps, eight floors, two creatures, two terrains and four new `Requirement`/`Outcome` arms, and not one of them is in the save: a map is content, an event's shape is content, and what a run has done was already `answered` and `flags`. Every save that opened on M11 opens on this. Before it: **M13 is the first block to take a field *out*.** Five new `Character` fields, every one `#[serde(default)]` and skipped when empty — `second_class`, `expert`, `second_paper`, `fast_wins`, `told_curses` — so an older file opens as one class with no paper and nothing following it out of the last fight, which is what those characters had. **`assembly_pct` is gone from the file**: it was written and then thrown away on the way in, and *a number that is stored and ignored is a number somebody will one day believe*. A save now carries **six boards**; one naming five gets an instrument frame at the base height, and `repair_boards` lifts an old build's instrument out of the weapon grid on the way in — the loader is where a field carried across a build change is caught. `banked`, `commissions`, `rolled_barrel`, `rolled_ledgers`, `rerolls` and `bought_licence` all default the same way |
 | Tables | **2** — the Treyway and the Undercountry, `traversal: "shot"` in the map file. Everything on either is reachable in **two** rounds of shots and `make play` crosses the Treyway in **three**, against `PLAN-M17.md` §2.7's ceiling of nine. `only_the_country_maps_are_tables` asserts the list, so a third is a decision somebody makes there |
-| Maps | **25**, in `data/maps/*.tiles.json` — west-bambulon 20×20, the-great-gear-cave 9×5, the-treyway 16×16, kettleworks-field 20×20, five Drambus Stack floors 10×10, under-the-lake 13×9, the-reach 20×20, **the-low-water 16×11, four Wextreen Sump floors 12×12, four Silt Stair floors 12×12, the-undercountry 20×20** |
-| Places | **215 over twenty-five maps**: 3 towns, 107 events, 51 gates, 21 bosses, **14 caravan stops** — eight on the Kettleworks field and six on the Wextreen Sands, which is the second cart and the first one anybody is standing in front of — 2 crossings, 1 bench, 1 door, and **15 obstacles**: 4 bumpers, 5 drifts of sand, 3 spikes, 2 pockets and a chute, which are M17's and are the first places in the game that a *foot* never touches. The one door is the last screen in the game, on the Undercountry |
+| Maps | **31**, in `data/maps/*.tiles.json` — the twenty-nine of M21 plus **the-lower-table** 20×20 and **the-cup** 9×5, which is a map rather than a room on that table because a cup of rock is not sealed (divergence 22.1). Counted with `data::MAPS.len()`, which `reachability_derives_over_every_map` asserts |
+| Places | **241 over thirty-one maps**: 3 towns, 113 events, 54 gates, 22 bosses, 14 caravan stops, 2 crossings, 6 benches, **1 door** and 26 obstacles — 7 bumpers, 7 sand, 5 spikes, 5 pockets and 2 chutes. **`PlaceKind::Door` has exactly one user** and has since M14; M22.6 moved the sentence it carries from the third town's own tile to the far end of the cup rather than adding a second. **One of the five pockets says where it goes**, which is M22.5 and is the only way onto the cup |
 | Events | **80 placed: 64 ask something and 16 are notes, over 102 choices.** **21 chains from 10 roots**, every root choice handing over an errand. **One of the eighty repeats** — the chair at the bottom of the Silt Stair, which is three moves at one object and the only event in the game that is not spent when it is answered |
 | `PlaceKind` | **13**: town, event, gate, boss, door, crossing, bench, caravan, **bumper, spike, pocket, chute, sand**. The five new ones are M17's and `is_obstacle()` is what separates them: an obstacle is hit **in flight**, which is the one thing a step has nowhere to happen. `catches()` is the other question, and it is a different five: a gate or a boss **stops the ball**, so hitting a diamond is entering it. Each of the thirteen has its own mark on the map, which for a milestone the five obstacles did not — they wore the event's. The Stack is still `PlaceDef::floors` on a gate rather than a kind |
 | Effect kinds | **7**: stat, start_with, grow_slot_rows, assembly_pct, grants, gives_ench, **tunes** — the seventh is M13.2's, and the knob it names is checked at parse time against the tree's own class |
@@ -7032,7 +7060,7 @@ content*, and one check now measures what a range used to guess at.
 | `Rule` kinds | **16**: curse_on_activate, spin_extra, spin_keep, spin_every, scout, rout, wade, survey, homeward, **spread**, **row_harvest**, **beacon**, **productivity**, **burn_keeps_bonus**, **burn_carries**, **mind_pierce**. The last three are M16's and each is granted by more than one expert tree; the four before them are M13.3's and are the first since M9 that needed code in the fight rather than a translation at the bell |
 | Surveyable maps | **2** — the Wextreen Reach and **the Wextreen Sands**, and `survey::mods_for`'s `map` argument is finally read. There is iron under the sand, so **the instrument that reads the Reach best reads the Sands worst**: a compass quiets the Reach by 20% and is 25% *louder* on the flat, and the atlas is the other way round. That is the whole return on a second one — *which* instrument you built becomes a question about where you are going. The door states the trade in these numbers before you take it, because `kit_reading_json` runs `mods_for` against the map on the far side |
 | Instruments | 3 — compass, atlas, survey golem, all three on **their own frame**: `SlotKind::Instrument`, six by three, outside `SlotKind::ALL` so nothing that asks what a board is worth ever counts it. It never grows, and one instrument is what it holds |
-| Data files | **29** — 9 in `data/` and 20 in `data/maps/`; `data::FILES` is the list `data_is_current` walks, and adding a file to it is the second half of adding one to `data::MAPS` |
+| Data files | **44** — 13 in `data/` and 31 in `data/maps/`; `data::FILES` is the list `data_is_current` walks, and adding a file to it is the second half of adding one to `data::MAPS`. The figure carried here said 29 for four blocks, which is why M22.9 counted all three of these rather than carrying them |
 | Starting kit | 2 components, **140 Fnorp**, 1 assembled weapon. The purse moved ×5 with the prices; at 28 a beginner could afford three of thirteen barrel lines and no helmet, and both M4 soft-lock guards said so |
 | Towns | **3 placed** (the pit, Kettleworks and the third town) and 1 staged, and **the third one is empty on purpose** — `common::UNWRITTEN` is where that is declared, the mirror of `avail.rs`'s `STAGED`: a shelf with no ground under it and ground with no shelf on it, and both are fine only because somebody wrote the name down. Of the two that sell anything: fixed shelves of 11 / 15 / 17 that **still never reroll**; none sells an ench, and neither placed one sells arcana — a town is its character. Under each counter: a **16-line barrel** and an **order book** (8 lines over 3 towns), and those two *do* turn over. **High Wick is the arcane shelf and it is the staged one**, which is why the barrel had to be what carries the casting family |
 | Errands | **50** — 29 authored, and **21 chain errands a choice hands over**. A chain errand is `granted`: never offered at a counter, because the branch you did not take must not be sitting on the tile a moment later. **Six of them clear a dungeon**, one arrives at the Undercountry's town and three are the Wextreen Sands' — see *An errand for finishing a dungeon* |

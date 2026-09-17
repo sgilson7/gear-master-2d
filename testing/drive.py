@@ -5497,6 +5497,343 @@ def check_the_chair_refuses_the_wrong_move(page, name, fails, base):
         print("ok: the chair is three moves in an order, and it comes back")
 
 
+def check_the_way_south_names_the_boss(page, name, fails, base):
+    """**The tile the ending screen used to be on refuses, and names what is
+    standing.**
+
+    What it asks is `Game::sealed_because`, which was written in M14 and called
+    by nothing at all for four blocks.
+
+    **And what it opens onto moved under it.** M22.4 wrote this when the tile
+    was a `Door` and the sentence behind it was the ending screen; M22.6 made it
+    a **gate** over the lip onto the lower table and put the sentence at the far
+    end of the cup instead. So the second half asks for the table rather than
+    for `#ending` — which is a check going stale *inside its own block* and
+    being caught by the run rather than by rereading it.
+    """
+    def down_there(body, answered):
+        strip_the_boards(body)
+        w = body.setdefault("world", {})
+        w["map"] = "the-undercountry"
+        w["at"] = [10, 7]
+        w["answered"] = list(w.get("answered", [])) + [
+            "the-ninth-surveyor", "the-bottom-of-the-bottom"] + answered
+
+    clear_screens(page)
+    plant(page, base, lambda b: down_there(b, []), stem="way-south-shut")
+    cross(page, 10, 11)
+    page.wait_for_timeout(400)
+    # **The whole strip, not a slice of it.** `#tape` keeps the last four lines
+    # and drops the rest into the history, so `tape(page)[before:]` returns
+    # nothing at all once four have been said — this file's own *a slice of a
+    # capped list is a comparison that quietly stops being about anything*, and
+    # it took a deliberate effort not to write it again and the effort failed.
+    # A refusal is not a shot, so `shot_said` is the wrong reader for it.
+    said = " ".join(tape(page)).lower()
+    here = json.loads(page.evaluate("() => window.__position()"))
+    if here.get("map") != "the-undercountry":
+        fails.append(f"{name}: the way south opened with the post still blank")
+    elif "post with nothing on it" not in said:
+        fails.append(f"{name}: the way south refuses without naming what stands: {said[-160:]!r}")
+
+    # And once it is down, it is a way on rather than a screen.
+    clear_screens(page)
+    plant(page, base, lambda b: down_there(b, ["the-unwritten"]), stem="way-south-open")
+    cross(page, 10, 11)
+    page.wait_for_timeout(500)
+    clear_screens(page)
+    here = json.loads(page.evaluate("() => window.__position()"))
+    if here.get("map") != "the-lower-table":
+        fails.append(
+            f"{name}: the post is down and the way south left you on {here.get('map')!r}")
+    print("ok: the way south names the post with nothing on it, and opens onto the table")
+
+
+def shot_said(page):
+    """The strip's last line about a shot, which is the one a shot just wrote.
+
+    **Neither the whole strip nor a slice of it.** `#tape` keeps the last four
+    lines, so `tape(page)[before:]` returns nothing once four have been said —
+    this file's own *a slice of a capped list is a comparison that quietly stops
+    being about anything* — and reading **all** four picks up whatever the check
+    before this one said, which is how a gutter that went home was reported as
+    naming somewhere: the far-pocket check two plants earlier had written *down
+    into the far pocket* and it was still on the strip.
+
+    So: the last line that is about a shot. `Flight::tape` starts every one with
+    `Shot N.`, which is the only thing on the strip that does.
+    """
+    for line in reversed(tape(page)):
+        if line.lower().startswith("shot "):
+            return line.lower()
+    return ""
+
+
+def check_the_way_south_opens_onto_a_table(page, name, fails, base):
+    """**Over the lip and onto the third table in the game.**
+
+    The tile the ending screen used to be on is a gate now. What only a browser
+    can say is that going through it lands you on a map the page draws as a
+    **table** — the arrow keys aim a cue rather than taking a step — because
+    which of the two a map is rides in the payload and nothing in `cargo test`
+    can see what the page did with it.
+    """
+    clear_screens(page)
+
+    def over_the_lip(body):
+        strip_the_boards(body)
+        w = body.setdefault("world", {})
+        w["map"] = "the-undercountry"
+        w["at"] = [10, 7]
+        w["answered"] = ["the-ninth-surveyor", "the-bottom-of-the-bottom", "the-unwritten"]
+        w["quests_done"] = ["nobody-has-named-it", "send-for-the-clerk",
+                            "the-long-mirror-inventory", "cut-the-post"]
+
+    plant(page, base, over_the_lip, stem="over-the-lip")
+    cross(page, 10, 11)
+    page.wait_for_timeout(500)
+    clear_screens(page)
+    here = json.loads(page.evaluate("() => window.__position()"))
+    if here.get("map") != "the-lower-table":
+        fails.append(f"{name}: the way south left you on {here.get('map')!r}")
+        return
+    if not here.get("is_table"):
+        fails.append(f"{name}: the lower table is drawn as a map you walk")
+    # **And the cup is not on it**, which is the whole of divergence 22.1: a cup
+    # of rock is not sealed, so the room is a map and the only way onto it is a
+    # pocket.
+    plank = page.evaluate(
+        """() => (window.__world().places ?? []).filter((p) => p.kind === 'boss').length""")
+    if plank:
+        fails.append(f"{name}: {plank} things stand on the lower table itself")
+    print(f"ok: the way south opens onto a table — {here['map']}, aimed rather than walked")
+
+
+def check_the_far_pocket_drops_you_in_the_cup(page, name, fails, base):
+    """**A hole is how you go into a room.**
+
+    `PlaceDef::to`/`at_to` on a `Pocket`, which M22.5 built and which is the
+    same `warp_to` a gate makes. Only a browser can say the page followed it:
+    core returns a `Step` with `into` on it and the page has to move.
+    """
+    clear_screens(page)
+
+    def on_the_table(body, at):
+        strip_the_boards(body)
+        w = body.setdefault("world", {})
+        w["map"] = "the-lower-table"
+        w["at"] = at
+        w["answered"] = ["the-ninth-surveyor", "the-bottom-of-the-bottom", "the-unwritten"]
+
+    # **Aimed by core, not by hand.** `shot::aim_at` is the one answer to where
+    # a ball goes, so what this fires is what a player could have fired.
+    plant(page, base, lambda b: on_the_table(b, [9, 18]), stem="far-pocket")
+    aim_at_it = """() => {
+        for (const p of (window.__world().places ?? [])) {
+          if (p.id !== 'the-far-pocket') continue;
+          for (const near of [false, true]) {
+            const a = window.__aimAt(p.at[0], p.at[1], near);
+            if (a && a.angle !== null && a.angle !== undefined) return a;
+          }
+        }
+        return null; }"""
+    # **Two shots, because the table takes two rounds.** No shot from the tee
+    # comes to rest on the far pocket — it is behind the north range, which is
+    # what makes it the hardest shot on the map — and 173 of the 235 tiles the
+    # first round reaches do. `the_far_pocket_is_reachable_and_the_table_takes_
+    # three_rounds` measures that in core; this is the same thing from a chair,
+    # and both shots are aimed by `aim_at`, so what it fires is what a player
+    # could have fired.
+    got = page.evaluate(aim_at_it)
+    if not got:
+        page.evaluate("() => window.__shoot(27, 6)")
+        page.wait_for_timeout(2500)
+        clear_screens(page)
+        got = page.evaluate(aim_at_it)
+    if not got:
+        where = page.evaluate("() => window.__position()")
+        fails.append(f"{name}: nothing aims at the far pocket in two rounds, from {where}")
+        return
+    page.evaluate("([a, p]) => window.__shoot(a, p)", [got["angle"], got["power"]])
+    page.wait_for_timeout(2500)
+    clear_screens(page)
+    here = json.loads(page.evaluate("() => window.__position()"))
+    said = shot_said(page)
+    if here.get("map") != "the-cup":
+        fails.append(
+            f"{name}: sinking the far pocket left you on {here.get('map')!r}: {said[-140:]!r}")
+        return
+    if "down into" not in said:
+        fails.append(f"{name}: the tape does not say where the pocket took you: {said[-140:]!r}")
+    if "12%" not in said:
+        fails.append(f"{name}: a pocket that goes somewhere charged nothing: {said[-140:]!r}")
+    print("ok: the far pocket drops you in the cup, and says so, and charges twelve")
+
+
+def check_the_gutter_pocket_sends_you_home(page, name, fails, base):
+    """**And a pocket that says nothing still goes home**, which is what a
+    gutter is and what every pocket in the game did before M22.5."""
+    clear_screens(page)
+
+    def on_the_table(body):
+        strip_the_boards(body)
+        w = body.setdefault("world", {})
+        w["map"] = "the-lower-table"
+        w["at"] = [9, 18]
+        w["last_town"] = "the-third-town"
+        w["answered"] = ["the-ninth-surveyor", "the-bottom-of-the-bottom", "the-unwritten"]
+
+    plant(page, base, on_the_table, stem="gutter")
+    got = page.evaluate("""() => {
+        for (const p of (window.__world().places ?? [])) {
+          if (p.id !== 'the-left-gutter') continue;
+          for (const near of [false, true]) {
+            const a = window.__aimAt(p.at[0], p.at[1], near);
+            if (a && a.angle !== null && a.angle !== undefined) return a;
+          }
+        }
+        return null; }""")
+    if not got:
+        fails.append(f"{name}: nothing aims at the left gutter from the tee")
+        return
+    page.evaluate("([a, p]) => window.__shoot(a, p)", [got["angle"], got["power"]])
+    page.wait_for_timeout(2500)
+    clear_screens(page)
+    here = json.loads(page.evaluate("() => window.__position()"))
+    said = shot_said(page)
+    if here.get("map") == "the-lower-table":
+        # It may simply not have sunk; that is a fact about the shot, not a bug.
+        if "sunk" in said:
+            fails.append(f"{name}: sunk in the gutter and stayed on the table: {said[-140:]!r}")
+            return
+        print("ok: the gutter was not sunk this run, and nothing claimed it was")
+        return
+    if here.get("map") != "the-undercountry":
+        fails.append(f"{name}: the gutter put you on {here.get('map')!r} rather than home")
+    if "down into" in said:
+        fails.append(f"{name}: a gutter named somewhere it goes: {said[-140:]!r}")
+    print("ok: the gutter sends you back to the last town you stood in")
+
+
+def check_the_stop_line_moved(page, name, fails, base):
+    """**There is one screen in the game that says the writing stops**, and it
+    is behind the plank now.
+
+    It has moved twice: off the door under the lake in M14, off the third town's
+    own tile in M22.6. What a browser has to say is that the tile which used to
+    carry it is a **gate** now and the sentence is where the map says it is.
+    """
+    clear_screens(page)
+
+    def in_the_cup(body, beaten):
+        strip_the_boards(body)
+        w = body.setdefault("world", {})
+        w["map"] = "the-cup"
+        # **One step from the door.** The cup is floored with silt, which rolls
+        # at 200 per mille, so a three-step walk across it meets something about
+        # half the time — the fight screen eats the rest of the presses and the
+        # door is never reached.
+        w["at"] = [6, 2]
+        w["answered"] = ["the-ninth-surveyor", "the-bottom-of-the-bottom", "the-unwritten"] + beaten
+
+    def walk_onto_the_door():
+        """Get onto the door's tile, whatever is in the way.
+
+        **Clear at the door, and the door here is the tile.** Two things stop a
+        step and neither is a bug: a `.screen` left over from the check before
+        eats every keypress, and the silt rolls. **Proved by the tile rather
+        than by a screen** — asking whether `#ending` is up cannot tell *the
+        door refused* from *the step never happened*, and those are the two
+        outcomes this check is about.
+        """
+        for _ in range(5):
+            # **The screen first, and the clear after it.** The first draft
+            # cleared and *then* looked, which closes the very thing it is
+            # waiting for: a step onto the door opens `#ending`, `clear_screens`
+            # presses its own close button, and the check then reports that
+            # nothing opened while standing on the tile. A loop that tidies
+            # before it reads is a loop that can never see what it is for.
+            if page.is_visible("#ending"):
+                return
+            clear_screens(page)
+            here = json.loads(page.evaluate("() => window.__position()"))
+            if [here["x"], here["y"]] == [7, 2]:
+                # Already on it with nothing up — a fight interrupted the
+                # arrival. Step off and back on, which is what a player does.
+                cross(page, 6, 2)
+                page.wait_for_timeout(300)
+            cross(page, 7, 2)
+            page.wait_for_timeout(400)
+
+    # Not beaten: the door refuses and names the plank.
+    plant(page, base, lambda b: in_the_cup(b, []), stem="cup-shut")
+    walk_onto_the_door()
+    said = " ".join(tape(page)).lower()
+    where = page.evaluate("() => window.__position()")
+    if page.is_visible("#ending"):
+        fails.append(f"{name}: the last screen opened with the plank still standing")
+        page.click("#ending-close")
+    elif "twelfth name" not in said:
+        fails.append(
+            f"{name}: the door refuses without naming the plank — at {where}, "
+            f"tape {said[-160:]!r}")
+
+    # Beaten: it opens, and it is the one screen that says so.
+    clear_screens(page)
+    plant(page, base, lambda b: in_the_cup(b, ["the-twelfth-name"]), stem="cup-open")
+    walk_onto_the_door()
+    if page.is_hidden("#ending"):
+        where = page.evaluate("() => window.__position()")
+        fails.append(f"{name}: the plank is down and nothing behind it opens — at {where}")
+        return
+    prose = page.evaluate("""() => [...document.querySelectorAll('#ending-prose p')]
+        .map((p) => p.textContent).join(' ')""")
+    if "decided" not in prose.lower():
+        fails.append(f"{name}: the last screen does not say what it is: {prose[:90]!r}")
+    page.click("#ending-close")
+    page.wait_for_selector("#ending", state="hidden", timeout=5000)
+    print("ok: the stop-line moved into the cup, behind the twelfth name")
+
+
+def check_a_shot_on_the_lower_table_flies_where_core_said(page, name, fails, base):
+    """**The page animates what core returned and integrates nothing.**
+
+    `check_a_shot_animates_to_where_core_said` asks this of the Treyway; the
+    lower table is a third table and a page that had started computing its own
+    physics would be the first thing here that ran differently in three engines.
+    Compared against `preview_shot`, which is the same `shot::shoot` the fire
+    button runs.
+    """
+    clear_screens(page)
+
+    def on_the_table(body):
+        strip_the_boards(body)
+        w = body.setdefault("world", {})
+        w["map"] = "the-lower-table"
+        w["at"] = [9, 18]
+        w["answered"] = ["the-ninth-surveyor", "the-bottom-of-the-bottom", "the-unwritten"]
+
+    plant(page, base, on_the_table, stem="lower-flight")
+    # **A shot the gate does not catch.** `PlaceKind::catches` is gates and
+    # bosses, so a ball that touches the way back over the lip is *let in* and
+    # the flight ends on another map — which is the rule working and is not a
+    # resting place to compare against. 18/6 does exactly that; 27/6 clears it.
+    said = page.evaluate("""() => {
+        const p = window.__preview(27, 6);
+        return p && p.rest ? p.rest : null; }""")
+    if not said:
+        fails.append(f"{name}: the cue previewed nothing on the lower table")
+        return
+    page.evaluate("() => window.__shoot(27, 6)")
+    page.wait_for_timeout(2500)
+    clear_screens(page)
+    here = json.loads(page.evaluate("() => window.__position()"))
+    if [here["x"], here["y"]] != list(said):
+        fails.append(
+            f"{name}: the cue said {said} and the ball stopped at [{here['x']}, {here['y']}]")
+    print(f"ok: a shot on the lower table flies where core said — {said}")
+
+
 def check_the_third_town_fills_up(page, name, fails, base):
     """**The town that was empty on purpose, settled.**
 
@@ -5581,57 +5918,6 @@ def check_the_third_town_fills_up(page, name, fails, base):
     page.wait_for_selector("#town", state="hidden", timeout=5000)
     print(f"ok: the third town fills up — {posted.strip()}, "
           f"{sum(w['wares'] for w in stocked)} on the wings, {len(tabs)} buildings")
-
-
-def check_the_way_south_names_the_boss(page, name, fails, base):
-    """**The tile the ending screen used to be on refuses, and names what is
-    standing.**
-
-    Its own check rather than an arm of the one above, because it is a different
-    tile — [10, 11], one shot further down the lane — and because what it asks
-    is `Game::sealed_because`, which was written in M14 and called by nothing at
-    all for four blocks.
-    """
-    def down_there(body, answered):
-        strip_the_boards(body)
-        w = body.setdefault("world", {})
-        w["map"] = "the-undercountry"
-        w["at"] = [10, 7]
-        w["answered"] = list(w.get("answered", [])) + [
-            "the-ninth-surveyor", "the-bottom-of-the-bottom"] + answered
-
-    clear_screens(page)
-    plant(page, base, lambda b: down_there(b, []), stem="way-south-shut")
-    cross(page, 10, 11)
-    page.wait_for_timeout(400)
-    # **The whole strip, not a slice of it.** `#tape` keeps the last four lines
-    # and drops the rest into the history, so `tape(page)[before:]` returns
-    # nothing at all once four have been said — which is this file's own *a
-    # slice of a capped list is a comparison that quietly stops being about
-    # anything*, and it took a deliberate effort not to write it again and the
-    # effort failed. The refusal is the last thing said either way.
-    said = " ".join(tape(page)).lower()
-    if page.is_visible("#ending"):
-        fails.append(f"{name}: the way south opened with the post still blank")
-        page.click("#ending-close")
-    elif "post with nothing on it" not in said:
-        fails.append(f"{name}: the way south refuses without naming what stands: {said[-160:]!r}")
-
-    # And once it is down, the screen is there.
-    clear_screens(page)
-    plant(page, base, lambda b: down_there(b, ["the-unwritten"]), stem="way-south-open")
-    cross(page, 10, 11)
-    page.wait_for_timeout(400)
-    if page.is_hidden("#ending"):
-        fails.append(f"{name}: the post is down and nothing south of the town opens")
-    else:
-        prose = page.evaluate("""() => [...document.querySelectorAll('#ending-prose p')]
-            .map(p => p.textContent).join(' ')""")
-        if "decided" not in prose.lower():
-            fails.append(f"{name}: the last screen does not say what it is: {prose[:80]!r}")
-        page.click("#ending-close")
-        page.wait_for_selector("#ending", state="hidden", timeout=5000)
-    print("ok: the way south names the post with nothing on it, and opens once it is down")
 
 
 def check_an_errand_can_be_handed_in_where_it_was_taken(page, name, fails):
@@ -8615,6 +8901,11 @@ def walk_the_gate(browser, name, fails=None):
     check_the_chair_refuses_the_wrong_move(page, name, fails, path)
     check_the_third_town_fills_up(page, name, fails, path)
     check_the_way_south_names_the_boss(page, name, fails, path)
+    check_the_way_south_opens_onto_a_table(page, name, fails, path)
+    check_a_shot_on_the_lower_table_flies_where_core_said(page, name, fails, path)
+    check_the_far_pocket_drops_you_in_the_cup(page, name, fails, path)
+    check_the_gutter_pocket_sends_you_home(page, name, fails, path)
+    check_the_stop_line_moved(page, name, fails, path)
     # Put the walk's own game back, or every check after this reads a stranger's.
     page.set_input_files("#file", str(path))
     page.wait_for_function(

@@ -134,11 +134,25 @@ fn getting_about() -> Vec<Entry> {
         Entry::new("Obstacles", &[
             "On a table, five things are in the ball's way and each has its own \
              mark.",
-            "A boulder is solid and throws the ball back harder than it \
-             arrived. A hole swallows it, and you wake up in the last town you \
-             stood in.",
-            "Spikes cost you fatigue and let the ball through. A drift of sand \
-             stops it dead. A chute carries it somewhere else at the same speed.",
+            &format!(
+                "A boulder is solid and throws the ball back harder than it \
+                 arrived. A hole swallows it, and costs you {}%.",
+                crate::shot::POCKET_TIRES
+            ),
+            // **The second sentence a hole has**, which is M22.5: a hole that
+            // says where it goes is the way *into* somewhere rather than the
+            // way out of everywhere. Both cost the same, and saying the number
+            // once and then saying it is the same is what stops a player
+            // reading the second kind as a discount.
+            "Most holes put you back in the last town you stood in. One or two \
+             go somewhere instead, and the strip says which — the cost is the \
+             same either way, so a hole that is a door is not a cheap one.",
+            &format!(
+                "Spikes cost you {}% and let the ball through. A drift of sand \
+                 stops it dead. A chute carries it somewhere else at the same \
+                 speed.",
+                crate::shot::SPIKE_TIRES
+            ),
         ]),
         Entry::new("Towns", &[
             "A town is the only place experience becomes a level, and the only \

@@ -13,6 +13,7 @@ makes, made for a human.
 | `at-the-reefs.json` | the first floor of the Eleven Reefs |
 | `under-the-lake.json` | what the lake was on top of |
 | `the-run-20260910.json` | the run fixture `crates/lab` rebuilds — a full board, for recon. **It is a yardstick and not a start line**: its world is empty (`map: ""`, nothing answered), so it is what a board is measured against and never somewhere to stand |
+| `on-the-lower-table.json` | **the lower table, on the tee.** The whole settling done — the clerk down, volume ten open, the post cut, The Unwritten beaten — so the way over the lip is open behind you and the post says Low Wick. Pull back and fire: five obstacles down each rail, five cards, two gutters at the bottom, and **the far pocket** behind the north range, which is the only way into the cup |
 | `in-the-third-town.json` | **the Undercountry, on the tee four tiles up the lane from the town.** Both bottoms answered, so Marbulon's door is open the way it was written to be; `nobody-has-named-it` handed in, so Kettleworks will talk about the post; and all three towns stood in, so the long cart runs. What is left is the chain that settles the place — send for the clerk, do the inventory, cut the post |
 
 **No save in this repository opened the Undercountry until M22.** All fourteen

@@ -37,14 +37,14 @@ and `PLAN-M22.md`'s last section costs it out so nobody measures it again.
 | M22.6 | The table | done |
 | M22.7 | What stands on it | done |
 | M22.8 | Three errands you do with a cue | done |
-| M22.9 | The gate, the walk, the glossary, the deploy — the table | **next** |
+| M22.9 | The gate, the walk, the glossary — the table | done, **deploy blocked** |
 | M22.10 → | whatever the notebook says | not written yet |
 
 **The deploy is the one thing that has not happened and it is not the block's
 fault.** `make publish` runs `git push` and this session's permission classifier
-refuses it. Everything the deploy would carry is green: the core suite, and the
-browser gate at **109 `ok:` lines** in chromium. Nine commits sit unpushed on
-`main`. A human runs `make publish` — or allows the rule — and the live walk
+refuses it. Everything the deploy would carry is green: the core suite at
+**1,142 tests in 96 binaries**, and the browser gate at **114 `ok:` lines** in
+chromium, exit 0. Thirteen commits sit unpushed on `main`. A human runs `make publish` — or allows the rule — and the live walk
 (`GM2D_ORIGIN=… testing/drive.py`) is the step after it.
 
 ---
@@ -158,6 +158,23 @@ at forty seconds into a loss at thirty-nine. It sits at 96, one notch under the
 cliff, and is the longest fight in the game by one second over The Unwritten's
 39.0s, dealing 277/s against 245/s.
 
+### 7. A patch script spliced backwards and shadowed six checks
+
+`s[:start] + new + s[end:]` with `end < start` is not an error — it is a **copy**.
+Three hundred and thirty-six lines of `testing/drive.py` were duplicated, every
+one of the block's browser checks existed twice, and Python's later definition
+won: the gate ran a *stale* copy of each. The failure was **byte-identical across
+four runs**, which is the tell — a race varies and a shadow does not — and three
+rounds of fixes went into a function nobody was calling. What finally named it
+was instrumentation that never printed.
+
+Two more in the same check, both worth keeping: it **cleared the screen it was
+waiting for** (a step onto the door opens `#ending`, and `clear_screens` presses
+its close button — a loop that tidies before it reads can never see what it is
+for), and it **read the whole strip**, which picks up what the check before it
+said. `shot_said` reads the last line beginning *Shot N.*, which is the only
+thing on a four-line strip that a shot writes.
+
 ---
 
 ## What is new, mechanically
@@ -191,8 +208,8 @@ still 568 and there is a player mid-run at level 45.
 | shelves | 4 | 5, of which **2 are wings** |
 | High Wick's shelf | 17 lines | **13** — it lost the three the barrel carries |
 | `UNWRITTEN` / `STAGED` | 1 / 1 | **0 / 0**, both asserted empty |
-| save fixtures | 14 | **15**, and 0 of the 14 opened the Undercountry |
-| browser gate | 108 | **109 `ok:`** |
+| save fixtures | 14 | **16**, and 0 of the 14 opened the Undercountry |
+| browser gate | 108 | **114 `ok:`** |
 | tests | 1107 | **1142** |
 
 ---
@@ -222,9 +239,9 @@ walker does not take the third town's errands, because they are Kettleworks's).
 
 ## Where to pick up
 
-**M22.9**: five browser checks, `testing/saves/on-the-lower-table.json` and its
-README row, the walk with `GM2D_FROM=`, the glossary's pocket sentence, and
-`CLAUDE.md`'s three stale rows (Maps, Places, Data files). Then the deploy.
+**The deploy**, which is a human's `make publish` and then
+`GM2D_ORIGIN=… testing/drive.py` against the live page — the *verify against the
+live page* step this project has demanded since M8.
 
 **Then M22.10 onward**, which do not exist yet: read `SECOND-ORDER-M22.md`, take
 every `open` row, group them into milestones, append them to `PLAN-M22.md`, and

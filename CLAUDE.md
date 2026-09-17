@@ -14,10 +14,37 @@ was arranged until it was long enough that the arrangement mattered.
 
 ## Where it is right now
 
-**Live at `263641a8`**, and the whole of M17, M18 and M19 is in it. The last
-session's own record is in the sections below rather than in a block note —
-what follows is only what somebody arriving with no context needs before they
-touch anything.
+**M22 is nine milestones in and not deployed**, and the deploy is the only
+thing missing: `make publish` runs `git push`, which the session's permission
+classifier refused. Everything it would carry is green — the core suite, and the
+browser gate at **109 `ok:` lines** in chromium. `HANDOFF-M22.md` is the block's
+own record, `PLAN-M22.md` is the plan and `SECOND-ORDER-M22.md` is the notebook.
+
+**The third town is settled and there is a table under it.** The block in one
+paragraph: the High Wick clerk comes down on an errand, her desk is a **wing** of
+the third town, the arcane shelf follows as a second wing, cutting the post names
+the place **Low Wick**, and the way south is then a gate over the lip onto **the
+lower table** — the third table in the game. Sink the far pocket behind its north
+range and you are in **the cup**, where a plank carries eleven names burned and a
+twelfth cut fresh. **The Twelfth Name** is the longest fight in the game and the
+screen behind it is where the writing stops.
+
+- **A wing is a shelf with a host**, and it keeps its own id — a sale is
+  `(id, index)` and the index is the identity, so `high-wick` is still
+  `high-wick` and no save moved.
+- **An errand can open something**, through `world::met` and a `done:` prefix.
+  The unprefixed version opened a shipped door; see *A finished errand is a
+  thing that has happened*.
+- **A pocket may say where it goes**, which is what makes a sealed room
+  expressible without touching the physics — because **a cup of rock is not
+  sealed**. See divergence 22.1; it is the block's largest finding.
+- **31 maps, 78 creatures, 68 errands, 1,142 tests.** No new components, no new
+  save fields, no fingerprint move: there is a player mid-run at level 45.
+
+**Before it, live at `263641a8`**, and the whole of M17, M18 and M19 is in it.
+The last session's own record is in the sections below rather than in a block
+note — what follows is only what somebody arriving with no context needs before
+they touch anything.
 
 - **The overworld is a table.** The Treyway and the Undercountry carry
   `traversal: "shot"`: the arrow keys aim a cue, space fires, and the ball runs
@@ -3975,6 +4002,69 @@ name.**
   arrived or not: that is a question about what a town is rather than about a
   particular afternoon.
 
+### Three errands you do with a cue
+
+**M22.8.** The desk's second chain, after the one that settled the town: go and
+read the tally stone, bring back an end block, and get the twelfth name. All
+three are given and handed in at the clerk's desk, one country up, and **not one
+of them needed a mechanic that was not already on the map.**
+
+| rung | goal | answered by |
+|---|---|---|
+| `the-far-corner` | `Word` | **a landing**, which has been an arrival since M19 |
+| `what-the-table-pays` | `Bring` | an event's `Give`, carried back up |
+| `the-twelfth-name` | `Clear` | the plank, by the far pocket |
+
+- **Not `granted`, which the plan asks for and which means something else.**
+  `Quest::granted` is *handed over by a choice* and `Outcome::Errand` is the
+  only door into it; nothing on the table hands these over. Marked both
+  `granted` and behind a `requires` they read as `Locked` for ever, and
+  `a_chain_errand_nobody_gave_you_is_not_on_offer` said so on the first run.
+- **A `Clear` and not a `Slay`**, for divergence 15.1's reason: eight of the
+  nine creatures standing on a boss tile also stand in some region's pool, and a
+  boss **tile** is the one thing in this game there is exactly one of.
+- **The door wants the same mark the errand does**, so the errand and the last
+  screen open together — which makes it a pointer rather than a second lock.
+- **The quest log is the one screen in this game that says *something has
+  opened and it is somewhere else***, and until M22 it had never once pointed at
+  The Unwritten. `cut-the-post` fixed that; this is the same move one map down.
+
+### The Twelfth Name, and the fifth time health did nothing
+
+**M22.7.** A plank set upright in the silt with eleven names burned into it and
+a twelfth cut fresh. The first thing on the first map has been a plank burning
+through names since M6; this is what is at the end of the list, and it is the
+last creature in the game.
+
+- **Dressed against `common::geared_from`, and the plan says the run.** M22.0
+  measured the run at level 45: **974 health and 9 strength over 11 items**,
+  losing to The Unwritten in 7.7 seconds and to all ten of the Wextreen deep. A
+  bracket against it is one only something rated below this map's own pool could
+  meet, and `every_region_has_a_fight_you_can_win_and_every_boss_can_be_beaten`
+  has required `geared_from` of every boss on a tile since M11.7. The run stays
+  as the **floor** and is asserted to lose.
+- **Health moved the fight not once and four points of strength decided it.**
+  13,000 to 15,500 health all came back *Victory at 40,000ms, 266/s* — the same
+  clock to the millisecond — and strength 96 → 100 turned a win at forty seconds
+  into a loss at thirty-nine. **Fifth time**, after the Kettleworks, the Ninth
+  Surveyor, the Tenth and the Tailgate, and the first where the health sweep was
+  flat to the *millisecond*. It sits at 96, one notch under the cliff, because
+  what is behind it is the end of the writing rather than a counter.
+- **It is the longest fight in the game by one second**: 40.0s at 277/s against
+  The Unwritten's 39.0s at 245/s. Both are decided inside the sudden-death ramp,
+  which is where everything at this depth is decided — so *never at
+  `SUDDEN_DEATH_MS`* has to be read as **never on the buzzer's own second**
+  rather than *before it*, and the plan's twenty-to-twenty-eight window
+  describes a fight two bands shallower.
+- **Two slots of The Unwritten's board, so it invents no component.** The
+  Tailgate's rule and The Unwritten's, for the reason this file has now found
+  five times: *what a creature deals is mostly how many items its board makes*.
+  The catalogue is still 568 and there is a player mid-run.
+- **One colourway of `unwritten`**, which is the one figure in this game whose
+  subject is an absence — a signpost with a planed face and nothing cut into it.
+  This is the same post **burnt**, with the twelfth cut fresh as the accent.
+  Rasterised side by side and looked at: planed grey against burnt amber.
+
 ### The table under the writing, and the cup under that
 
 **M22.6.** Over the lip south of the third town is **the lower table**, the
@@ -6767,6 +6857,7 @@ about a string. Every one caught something on its first run:
 | 22.6 | **The arcane shelf lost the three lines the barrel carries, and the plan says its index order is untouched.** Placing `high-wick` made `on_a_shelf_you_can_reach` count it and `parse` refused the file. Taking them off the *barrel* was measured and rejected — the only unclaimed replacements rate 13 and 12 against the 8 and 5 they replace, which is +0.75 on a mean `the_barrel_is_a_floor_and_not_a_ceiling` holds at 3.87 under 3.90, so the opening barrel would be re-tuned to protect a counter nobody reaches until level forty-five. The shelf's own note called it *what makes a caster weapon buildable at all*, written when High Wick was an early town; the thing that does that from the first afternoon is the barrel. 17 → 13, and it costs nobody anything because the shelf has been on no map since the fork and no `(id, index)` has ever been recorded. | `data/shops.json` |
 | 22.7 | **The block ships two start-line saves, and `PLAN-M22.md` decision 10 is the reason rather than a divergence.** No save in the repository opened the Undercountry — all fourteen read, not one with both `the-ninth-surveyor` and `the-bottom-of-the-bottom` in `answered`, and **the human's own has the second and not the first** — and the walker never gets there. `testing/saves/in-the-third-town.json` stands on the tee four tiles up the lane with the Kettleworks chain done to `nobody-has-named-it` and all three towns stood in, so the long cart runs. | `testing/saves/README.md` |
 | 22.8 | **A `to` with no `at_to` is refused on a **pocket** and not on any kind, which is what `PLAN-M22.md` decision 5 asks for.** The shipped maps said so on the first run: `the-door-in-the-wall` has a `to` and no `at_to`, and a gate with no landing tile lands you **where you left off** — `WorldState::positions` plus `World::arrival` — which is what makes the Treyway a country rather than a chute. A pocket has no bookmark: it is not a door you walk through, it is a hole you fall down, and falling down it twice has to put you in the same place both times. | `crates/core/src/world.rs`, `World::load` |
+| 22.9 | **`PlaceDef::named` is applied where the drains are, and the plan gives one reader.** See divergence 22.5; recorded twice because the shape is the same both times — *a rule with two homes is a rule with two answers*, and the second home was the shim's own `map_in`. | `crates/wasm/src/lib.rs`, `map_in` |
 | 22.1 | **A cup of rock is not sealed, so the cup is a map.** `PLAN-M22.md` decision 9 stands the table's boss in a sealed cup and makes a pocket the only way in. Measured before a map was authored: **6,546 of the shots taken from the 278 walkable tiles outside the draft cup come to rest inside it**, through eight tiles of solid rock — `shot::shoot_with` tests the tile a tick *landed on* and never the tiles it crossed, and one tick is 18.75 tiles at power ten. A two-thick wall is transparent too and nineteen tiles would be needed. So the cup is a **map of its own**, reached by the far pocket's `to`/`at_to`, which is exactly what decision 8 already builds — `warp_to`, the call the sunk arm makes. Maps go to 31, not 30, and *the boss stands nowhere but the cup* becomes true by construction. | `data/maps/`, `crates/core/src/shot.rs` |
 | 22.2 | **The boss is dressed against `common::geared_from` and the plan says `common::from_save(common::THE_RUN)`.** The run is 974 health and 9 strength over 11 items at level 45 and **beats nothing at that depth** — it loses to The Unwritten in 7.7s and to all ten of the Wextreen deep — so *a win in 20–28 seconds* against it is a bracket only something shallower than the map's own pool could meet. `every_region_has_a_fight_you_can_win_and_every_boss_can_be_beaten` has required `geared_from` of every boss on a tile since M11.7 and the Tenth Surveyor was bracketed against it for this reason. The run stays as the **floor** and is asserted to lose. | `crates/core/tests/common/mod.rs` |
 | 22.3 | **`TownShelf` gains three fields and the plan costed two.** `wing_of` and `arrives` are the plan's; `name` is the third, because a wing is drawn under its own heading on a counter and every other counter in the game reads its name out of the map file it stands in. A wing stands in none, and a name that lived only in `theme.rs` prints a hyphenated id under any theme that has not been told about it — which is the fall-through `place_name` already ends at. `ShopsData::parse` refuses a nameless wing; the shim still asks the theme first. | `crates/core/src/shop.rs`, `TownShelf` |

@@ -171,6 +171,58 @@
       "gold": 480
     },
     {
+      "id": "the-far-corner",
+      "giver": "the-clerks-desk",
+      "requires": [
+        "cut-the-post"
+      ],
+      "name": "THE FAR CORNER",
+      "brief": "The clerk has the shape of the floor under the lip off the man who cut the post, who paced what he could and stopped at the north range. What she wants is the corner past it — somebody to get to the tally stone on the east side and read what is cut into the face of it, which he says is a number and nothing else.",
+      "thanks": "Two hundred and six. She writes it down, looks at it, and does not ask what of. Volume ten has a page for the floor under the lip now, and one line on it.",
+      "goal": {
+        "word": {
+          "place": "the-tally-stone"
+        }
+      },
+      "gold": 360
+    },
+    {
+      "id": "what-the-table-pays",
+      "giver": "the-clerks-desk",
+      "requires": [
+        "the-far-corner"
+      ],
+      "name": "WHAT THE TABLE PAYS",
+      "brief": "Somebody laid the bottom course of a wall at each end of that floor and then stopped, and the two courses do not line up and never would have. The clerk would like one of the end blocks up here where she can look at it, on the grounds that a thing cut square and bedded true is a thing somebody meant.",
+      "thanks": "She puts it on the desk, turns it over twice, and leaves it there. It is the only object in the room that is not paper. She says it will do for holding volume nine open.",
+      "goal": {
+        "bring": {
+          "item": "Bulwark Base",
+          "count": 1
+        }
+      },
+      "gold": 400
+    },
+    {
+      "id": "the-twelfth-name",
+      "giver": "the-clerks-desk",
+      "requires": [
+        "what-the-table-pays"
+      ],
+      "name": "THE TWELFTH NAME",
+      "brief": "There is a hole in the rock at the top of the north range that a ball goes into and nothing comes out of, and under it, the man who cut the post says, is a room with a plank in it. Eleven names burned and a twelfth cut fresh, and something standing in front of it that has been keeping the rest of the plank clear for eleven years. The clerk wants the twelfth name. She is aware that getting it means going in the hole.",
+      "thanks": "She rules a line under the eleventh and writes the twelfth on it, and then sits with volume ten open in front of her for a while and does not say anything. The thing she hands over is off the desk, and she says it came down in the same cart she did and has been no use to her since.",
+      "goal": {
+        "clear": {
+          "place": "the-twelfth-name"
+        }
+      },
+      "reward": [
+        "Foreman's Harness"
+      ],
+      "gold": 600
+    },
+    {
       "id": "the-frame-that-stands",
       "giver": "the-end-of-all-gears",
       "requires": [

@@ -4562,6 +4562,76 @@ pub const LADDER: &[MonsterSpec] = &[
         drops: &[],
         enchs: &[],
     },
+    // ---- the cup, under the lower table -----------------------------------
+    //
+    // **The plank with eleven names burned into it and a twelfth cut fresh.**
+    // The first thing on the first map has been a plank burning through names
+    // since M6; this is what is at the end of the list, and it is the last
+    // creature in the game.
+    //
+    // **Dressed against `common::geared_from` and not against the run**, which
+    // is divergence 22.2 and is the plan's decision 12 reversed on a
+    // measurement. `PLAN-M22.md` §M22.7 brackets it by damage a second against
+    // `common::from_save(common::THE_RUN)`, and M22.0 measured that board:
+    // **974 health and 9 strength over 11 items at level 45**, losing to The
+    // Unwritten in 7.7 seconds and to all ten of the Wextreen deep. A bracket
+    // against it is one only a creature rated below the map's own pool could
+    // meet — and `every_region_has_a_fight_you_can_win_and_every_boss_can_be_
+    // beaten` has required `geared_from` of every boss on a tile since M11.7,
+    // which is also what the Tenth Surveyor was actually bracketed against.
+    //
+    // **And the window the plan asks for is two bands too shallow anyway.**
+    // Every fight `geared_from` wins at this depth is decided inside the
+    // sudden-death ramp — The Unwritten 38.0s, the Ninth Surveyor 44.0s, the
+    // Tenth 43.0s, against a `SUDDEN_DEATH_MS` of 30,000 — and the only
+    // creature it beats between twenty and twenty-eight seconds is The Tailgate
+    // at 24.3s, rated 1336, which is the sand cart's guard. So the bracket is a
+    // victory that is **not the buzzer's** and longer than The Unwritten's
+    // thirty-eight seconds, which makes this the longest fight in the game.
+    //
+    // **Two slots, which is the one shape in this set a player survives.** The
+    // Unwritten's own, and for its reason: *what a creature deals is mostly how
+    // many items its board makes*, which this file has found five times. It
+    // invents no component, so the catalogue and the save fingerprint are
+    // untouched.
+    MonsterSpec {
+        name: "The Twelfth Name",
+        health: 13_500,
+        strength: 96,
+        regen: 20,
+        mind_resist: 64,
+        curse_resist: 64,
+        physical_resist: 44,
+        magic_resist: 48,
+        attacks: &[],
+        gear: &[
+            ("Hymnal", SlotKind::Weapon, 0, 0, 0),
+            ("Bulwark Vial", SlotKind::Weapon, 1, 0, 2),
+            ("Runewash Ink", SlotKind::Weapon, 0, 2, 2),
+            ("Emberburst", SlotKind::Weapon, 2, 2, 0),
+            ("Cosmic Alignment", SlotKind::Weapon, 2, 0, 0),
+            ("Cinderscript Ink", SlotKind::Weapon, 2, 1, 1),
+            ("The Bog Census", SlotKind::Weapon, 3, 0, 0),
+            ("Census Bolt", SlotKind::Weapon, 4, 2, 1),
+            ("Cinderscript Ink", SlotKind::Weapon, 5, 0, 1),
+            ("Flywheel Cog", SlotKind::Weapon, 0, 4, 1),
+            ("Cinderscript Ink", SlotKind::Weapon, 2, 4, 0),
+            ("Azure Alignment", SlotKind::Weapon, 4, 4, 0),
+            ("Bone Crown", SlotKind::Helmet, 0, 0, 3),
+            ("Bone Scale", SlotKind::Helmet, 1, 1, 2),
+            ("Bone Fletch", SlotKind::Helmet, 2, 2, 3),
+            ("Idol's Crest", SlotKind::Helmet, 3, 0, 0),
+            ("Tin Frame", SlotKind::Helmet, 4, 1, 0),
+            ("Tin Plating", SlotKind::Helmet, 4, 0, 0),
+        ],
+        items: &[4, 5, 3, 3, 3],
+        gear_offset: 0,
+        bounty: 1600,
+        sprite: MonsterSprite::Null,
+        rank: Rank::Boss,
+        drops: &[],
+        enchs: &[],
+    },
 ];
 
 // ----------------------------------------------------------- combatants

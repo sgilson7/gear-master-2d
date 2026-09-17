@@ -1203,6 +1203,11 @@ pub static TURTLE_DICK: Theme = Theme {
         ("The Traverse", "The Long Way Round"),
         // The Undercountry's, and the only one whose name is the absence.
         ("The Unwritten", "THE POST WITH NOTHING ON IT"),
+        // The same post burnt, at the bottom of the hole in the rock:
+        // eleven names burned into it and a twelfth cut fresh. The plank
+        // on the first map has been burning through names since M6 and
+        // this is what is at the end of the list.
+        ("The Twelfth Name", "ELEVEN BURNED AND ONE CUT"),
         // The Cairnworks. Each name says which lane is open without naming a
         // number, which is the register a creature's name is in.
         ("The Unslaked Kiln", "THE KILN THAT NEVER LIT"),

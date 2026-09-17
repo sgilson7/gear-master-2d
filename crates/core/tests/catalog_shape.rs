@@ -984,6 +984,17 @@ fn gear_at_every_difficulty() -> String {
 /// seventy-eight placements" are the same sentence and this is where the
 /// second half of it gets checked.
 ///
+/// **Re-baselined for the cup, and it is the fourth legitimate one.** 18,752
+/// lines became 18,896 and **nothing was removed**: `diff` reports 0 lines
+/// gone and 144 added, which is **72 placements** — the eighteen pieces of
+/// **The Twelfth Name**'s board at each of the four settings, two lines a
+/// placement. It had no board until M22.7 gave it The Unwritten's two slots.
+/// No creature that had a board changed what it wears, on any of the four
+/// settings — which is the whole of what a re-baseline has to prove, because
+/// a flat list of placements shifts wholesale when anything is *inserted* and
+/// the line count alone cannot tell an insertion from a re-sort. It is
+/// appended at the end of `LADDER` for that reason as much as for being the
+/// last creature in the game.
 #[test]
 fn no_creature_changed_what_it_wears() {
     let want = include_str!("fixtures/gear_at.txt");

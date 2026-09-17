@@ -12215,6 +12215,148 @@
       "rank": "boss",
       "rating": 1336,
       "items": 4
+    },
+    {
+      "name": "The Twelfth Name",
+      "health": 13500,
+      "strength": 96,
+      "regen": 20,
+      "mind_resist": 64,
+      "curse_resist": 64,
+      "physical_resist": 44,
+      "magic_resist": 48,
+      "gear": [
+        [
+          "War Ledger",
+          "weapon",
+          0,
+          0,
+          0
+        ],
+        [
+          "Ratchet Cog",
+          "weapon",
+          1,
+          0,
+          2
+        ],
+        [
+          "Runewash Ink",
+          "weapon",
+          0,
+          2,
+          2
+        ],
+        [
+          "Emberburst",
+          "weapon",
+          2,
+          2,
+          0
+        ],
+        [
+          "Cosmic Alignment",
+          "weapon",
+          2,
+          0,
+          0
+        ],
+        [
+          "Prismatic Ink",
+          "weapon",
+          2,
+          1,
+          1
+        ],
+        [
+          "The Bog Census",
+          "weapon",
+          3,
+          0,
+          0
+        ],
+        [
+          "Census Bolt",
+          "weapon",
+          4,
+          2,
+          1
+        ],
+        [
+          "Prismatic Ink",
+          "weapon",
+          5,
+          0,
+          1
+        ],
+        [
+          "Flywheel Cog",
+          "weapon",
+          0,
+          4,
+          1
+        ],
+        [
+          "Prismatic Ink",
+          "weapon",
+          2,
+          4,
+          0
+        ],
+        [
+          "Azure Alignment",
+          "weapon",
+          4,
+          4,
+          0
+        ],
+        [
+          "Bone Crown",
+          "helmet",
+          0,
+          0,
+          3
+        ],
+        [
+          "Bone Scale",
+          "helmet",
+          1,
+          1,
+          2
+        ],
+        [
+          "Bone Fletch",
+          "helmet",
+          2,
+          2,
+          3
+        ],
+        [
+          "Idol's Crest",
+          "helmet",
+          3,
+          0,
+          0
+        ],
+        [
+          "Tin Frame",
+          "helmet",
+          4,
+          1,
+          0
+        ],
+        [
+          "Tin Plating",
+          "helmet",
+          4,
+          0,
+          0
+        ]
+      ],
+      "bounty": 1600,
+      "rank": "boss",
+      "rating": 2182,
+      "items": 4
     }
   ]
 }

@@ -12510,6 +12510,150 @@ LADDER[76] The Tailgate INSANE Helmet 4,1 r0
     Warded Frame
 LADDER[76] The Tailgate INSANE Helmet 4,0 r0
     Layered Plating
+LADDER[77] The Twelfth Name EASY Weapon 0,0 r0
+    War Ledger
+LADDER[77] The Twelfth Name EASY Weapon 1,0 r2
+    Ratchet Cog
+LADDER[77] The Twelfth Name EASY Weapon 0,2 r2
+    Runewash Ink
+LADDER[77] The Twelfth Name EASY Weapon 2,2 r0
+    Emberburst
+LADDER[77] The Twelfth Name EASY Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[77] The Twelfth Name EASY Weapon 2,1 r1
+    Prismatic Ink
+LADDER[77] The Twelfth Name EASY Weapon 3,0 r0
+    The Bog Census
+LADDER[77] The Twelfth Name EASY Weapon 4,2 r1
+    Census Bolt
+LADDER[77] The Twelfth Name EASY Weapon 5,0 r1
+    Prismatic Ink
+LADDER[77] The Twelfth Name EASY Weapon 0,4 r1
+    Flywheel Cog
+LADDER[77] The Twelfth Name EASY Weapon 2,4 r0
+    Prismatic Ink
+LADDER[77] The Twelfth Name EASY Weapon 4,4 r0
+    Azure Alignment
+LADDER[77] The Twelfth Name EASY Helmet 0,0 r3
+    Bone Crown
+LADDER[77] The Twelfth Name EASY Helmet 1,1 r2
+    Bone Scale
+LADDER[77] The Twelfth Name EASY Helmet 2,2 r3
+    Bone Fletch
+LADDER[77] The Twelfth Name EASY Helmet 3,0 r0
+    Idol's Crest
+LADDER[77] The Twelfth Name EASY Helmet 4,1 r0
+    Tin Frame
+LADDER[77] The Twelfth Name EASY Helmet 4,0 r0
+    Tin Plating
+LADDER[77] The Twelfth Name MEDIUM Weapon 0,0 r0
+    Hymnal
+LADDER[77] The Twelfth Name MEDIUM Weapon 1,0 r2
+    Bulwark Vial
+LADDER[77] The Twelfth Name MEDIUM Weapon 0,2 r2
+    Runewash Ink
+LADDER[77] The Twelfth Name MEDIUM Weapon 2,2 r0
+    Emberburst
+LADDER[77] The Twelfth Name MEDIUM Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[77] The Twelfth Name MEDIUM Weapon 2,1 r1
+    Cinderscript Ink
+LADDER[77] The Twelfth Name MEDIUM Weapon 3,0 r0
+    The Bog Census
+LADDER[77] The Twelfth Name MEDIUM Weapon 4,2 r1
+    Census Bolt
+LADDER[77] The Twelfth Name MEDIUM Weapon 5,0 r1
+    Cinderscript Ink
+LADDER[77] The Twelfth Name MEDIUM Weapon 0,4 r1
+    Flywheel Cog
+LADDER[77] The Twelfth Name MEDIUM Weapon 2,4 r0
+    Cinderscript Ink
+LADDER[77] The Twelfth Name MEDIUM Weapon 4,4 r0
+    Azure Alignment
+LADDER[77] The Twelfth Name MEDIUM Helmet 0,0 r3
+    Bone Crown
+LADDER[77] The Twelfth Name MEDIUM Helmet 1,1 r2
+    Bone Scale
+LADDER[77] The Twelfth Name MEDIUM Helmet 2,2 r3
+    Bone Fletch
+LADDER[77] The Twelfth Name MEDIUM Helmet 3,0 r0
+    Idol's Crest
+LADDER[77] The Twelfth Name MEDIUM Helmet 4,1 r0
+    Tin Frame
+LADDER[77] The Twelfth Name MEDIUM Helmet 4,0 r0
+    Tin Plating
+LADDER[77] The Twelfth Name HARD Weapon 0,0 r0
+    Herbal
+LADDER[77] The Twelfth Name HARD Weapon 1,0 r2
+    Chain Coil
+LADDER[77] The Twelfth Name HARD Weapon 0,2 r2
+    Bloodletter's Ink
+LADDER[77] The Twelfth Name HARD Weapon 2,2 r0
+    Emberburst
+LADDER[77] The Twelfth Name HARD Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[77] The Twelfth Name HARD Weapon 2,1 r1
+    Quicksilver Ink
+LADDER[77] The Twelfth Name HARD Weapon 3,0 r0
+    The Bog Census
+LADDER[77] The Twelfth Name HARD Weapon 4,2 r1
+    Census Bolt
+LADDER[77] The Twelfth Name HARD Weapon 5,0 r1
+    Quicksilver Ink
+LADDER[77] The Twelfth Name HARD Weapon 0,4 r1
+    Ratchet Cog
+LADDER[77] The Twelfth Name HARD Weapon 2,4 r0
+    Quicksilver Ink
+LADDER[77] The Twelfth Name HARD Weapon 4,4 r0
+    Crimson Alignment
+LADDER[77] The Twelfth Name HARD Helmet 0,0 r3
+    Bone Crown
+LADDER[77] The Twelfth Name HARD Helmet 1,1 r2
+    Bone Scale
+LADDER[77] The Twelfth Name HARD Helmet 2,2 r3
+    Bone Fletch
+LADDER[77] The Twelfth Name HARD Helmet 3,0 r0
+    Idol's Crest
+LADDER[77] The Twelfth Name HARD Helmet 4,1 r0
+    Bronze Frame
+LADDER[77] The Twelfth Name HARD Helmet 4,0 r0
+    Bronze Plating
+LADDER[77] The Twelfth Name INSANE Weapon 0,0 r0
+    Herbal
+LADDER[77] The Twelfth Name INSANE Weapon 1,0 r2
+    Grimoire Rack
+LADDER[77] The Twelfth Name INSANE Weapon 0,2 r2
+    Bloodletter's Ink
+LADDER[77] The Twelfth Name INSANE Weapon 2,2 r0
+    Emberburst
+LADDER[77] The Twelfth Name INSANE Weapon 2,0 r0
+    Cosmic Alignment
+LADDER[77] The Twelfth Name INSANE Weapon 2,1 r1
+    Quicksilver Ink
+LADDER[77] The Twelfth Name INSANE Weapon 3,0 r0
+    The Bog Census
+LADDER[77] The Twelfth Name INSANE Weapon 4,2 r1
+    Census Bolt
+LADDER[77] The Twelfth Name INSANE Weapon 5,0 r1
+    Quicksilver Ink
+LADDER[77] The Twelfth Name INSANE Weapon 0,4 r1
+    Bulwark Vial
+LADDER[77] The Twelfth Name INSANE Weapon 2,4 r0
+    Quicksilver Ink
+LADDER[77] The Twelfth Name INSANE Weapon 4,4 r0
+    Crimson Alignment
+LADDER[77] The Twelfth Name INSANE Helmet 0,0 r3
+    Bone Crown
+LADDER[77] The Twelfth Name INSANE Helmet 1,1 r2
+    Bone Scale
+LADDER[77] The Twelfth Name INSANE Helmet 2,2 r3
+    Bone Fletch
+LADDER[77] The Twelfth Name INSANE Helmet 3,0 r0
+    Idol's Crest
+LADDER[77] The Twelfth Name INSANE Helmet 4,1 r0
+    Warded Frame
+LADDER[77] The Twelfth Name INSANE Helmet 4,0 r0
+    Layered Plating
 ALTERNATES[0] The Dreaming Idiot EASY Helmet 0,0 r0
     Reliquary Frame of Nine
 ALTERNATES[0] The Dreaming Idiot EASY Helmet 3,0 r0

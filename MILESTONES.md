@@ -173,5 +173,5 @@ Notebook: **63 rows, 0 open.**
 | M22.6 | The table | the-lower-table · **the-cup** (31 maps) · 17+4 places · 6 events · 4 lints · 2 rounds | 1132 (+8) | `b8a539d` | done, **1 red on purpose** |
 | M22.7 | What stands on it | The Twelfth Name (40.0s, 277/s) · one art colourway · 3 fixtures rebaselined · 6 checks | 1142 (+10) | `78e3349` | done |
 | M22.8 | Three errands you do with a cue | the-far-corner · what-the-table-pays · the-twelfth-name · 4 checks | 1142 | `78e3349` | done |
-| M22.9 | The gate, the walk, the glossary, the deploy — the table | 5 browser checks · on-the-lower-table.json · the stale rows · deploy | | | pending |
-| notebook | rows open / closed | 8 open / 40 closed | | | |
+| M22.9 | The gate, the walk, the glossary — the table | 5 new checks + 1 rewritten (**114 ok:**) · on-the-lower-table.json · 244-fight walk · glossary · 3 stale rows counted | 1142 (+0) | `16ad8be` | done, **deploy blocked** |
+| notebook | rows open / closed | 9 open / 45 closed | | | |

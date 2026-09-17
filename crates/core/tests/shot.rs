@@ -1425,3 +1425,67 @@ fn the_far_pocket_is_reachable_and_the_table_takes_three_rounds() {
     assert!(rounds <= 3, "the table takes {rounds} rounds of shots, and three is the ceiling");
     println!("the lower table: everything in {rounds} rounds of shots");
 }
+
+// ------------------------------------------- M22.10, the notebook executed
+
+/// **No ball ever comes to rest on ground nobody can stand on.**
+///
+/// **A guarantee where there was a measurement, and the measurement is the
+/// interesting half.** A ball *does* go through rock: `shoot_with` tests the
+/// tile a tick landed on and never the tiles it crossed, and at `POWER_UNIT` 30
+/// one tick is 1.875 tiles at power one and **18.75 at power ten**. M22.0
+/// measured it — 6,546 of the shots taken from outside a one-tile-walled draft
+/// cup came to rest **inside** it, and a two-tile wall is transparent too.
+///
+/// It has never cost anything, and this is why: the **destination** tile is
+/// tested, so tunnelling only ever happens *on the way* to somewhere legal.
+/// Nothing asserted that. Now something does — over every tile of every table,
+/// wet and dry, because a map is not one grid.
+///
+/// **What this does not do is make rock solid.** Whether to sweep the
+/// collision is the human's: it seals a cup and it stops the Wextreen Reach
+/// being reachable in one shot from the Treyway's start, which is a
+/// player-visible change to a shipped map. `SECOND-ORDER-M22.md` rows 1–3.
+#[test]
+fn no_ball_comes_to_rest_on_impassable_ground() {
+    use gm2d_core::world::Traversal;
+    let a = Allowances::default();
+    let mut fired = 0usize;
+    for (id, _) in data::MAPS {
+        let w = data::map(id, D);
+        if w.traversal != Traversal::Shot {
+            continue;
+        }
+        // **Both grounds**, for `every_place_on_a_shot_map_is_reachable_by_shots`'
+        // own reason: a drain turns `tide` into `coast`, so a tile nothing can
+        // stop on today is one a ball rests on the moment something opens it.
+        let mut state = gm2d_core::world::WorldState::default();
+        state.map = id.to_string();
+        for d in &w.drains {
+            state.flags.push(d.when.clone());
+        }
+        for w in [&w, &data::map_now(id, D, &state)] {
+            for x in 0..w.width {
+                for y in 0..w.height {
+                    if !w.walkable(x, y, &a) {
+                        continue;
+                    }
+                    for angle in (0..STEPS as u16).step_by(2) {
+                        for power in 1..=10u8 {
+                            let f = shot::shoot(w, (x, y), Shot::new(angle, power), &a);
+                            fired += 1;
+                            assert!(
+                                w.walkable(f.rest.0, f.rest.1, &a),
+                                "{id}: a shot from [{x},{y}] at {angle}/{power} came to rest \
+                                 on {:?}, which is {:?} and nobody can stand on it",
+                                f.rest,
+                                w.terrain_name(f.rest.0, f.rest.1)
+                            );
+                        }
+                    }
+                }
+            }
+        }
+    }
+    assert!(fired > 20_000, "only {fired} shots were fired, so this proves little");
+}

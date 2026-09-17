@@ -38,13 +38,13 @@ and `PLAN-M22.md`'s last section costs it out so nobody measures it again.
 | M22.7 | What stands on it | done |
 | M22.8 | Three errands you do with a cue | done |
 | M22.9 | The gate, the walk, the glossary — the table | done, **deploy blocked** |
-| M22.10 → | whatever the notebook says | not written yet |
+| M22.10 | The notebook executed | done |
 
-**The deploy is the one thing that has not happened and it is not the block's
+**The block is finished and not deployed, and the deploy is not the block's
 fault.** `make publish` runs `git push` and this session's permission classifier
 refuses it. Everything the deploy would carry is green: the core suite at
-**1,142 tests in 96 binaries**, and the browser gate at **114 `ok:` lines** in
-chromium, exit 0. Thirteen commits sit unpushed on `main`. A human runs `make publish` — or allows the rule — and the live walk
+**1,144 tests in 96 binaries**, and the browser gate at **114 `ok:` lines** in
+chromium, exit 0. Fifteen commits sit unpushed on `main`. A human runs `make publish` — or allows the rule — and the live walk
 (`GM2D_ORIGIN=… testing/drive.py`) is the step after it.
 
 ---
@@ -210,11 +210,16 @@ still 568 and there is a player mid-run at level 45.
 | `UNWRITTEN` / `STAGED` | 1 / 1 | **0 / 0**, both asserted empty |
 | save fixtures | 14 | **16**, and 0 of the 14 opened the Undercountry |
 | browser gate | 108 | **114 `ok:`** |
-| tests | 1107 | **1142** |
+| tests | 1107 | **1144** |
 
 ---
 
 ## What is carried, and whose it is
+
+**The notebook is fifty-four rows and none of them is open.** Two were closed by
+being **carried**: they are decisions this block has no mandate to take, the
+measurement behind each is in `CLAUDE.md`, and nothing is waiting on either
+answer.
 
 **The human's**, written into the status table and carried:
 
@@ -230,22 +235,27 @@ still 568 and there is a player mid-run at level 45.
 3. **Three names**, shipped as defaults: **Low Wick**, *the table under the
    writing*, **The Twelfth Name**. A theme entry is not a seam.
 
-**Open in the notebook and the builder's**: row 14 (`ShopsData::parse` reads the
-map files, which decision 5 says it must not — pre-existing, left where it is),
-row 17 (ninety-six test binaries is fifty minutes on this machine), row 31 (the
-walker does not take the third town's errands, because they are Kettleworks's).
+**Written into `CLAUDE.md` rather than carried**: a ball goes through rock and
+what that has cost so far is nothing (rows 1–2, now guaranteed by
+`no_ball_comes_to_rest_on_impassable_ground`); the casting count (row 5, now
+`the_casting_family_is_still_reachable`); `ShopsData::parse` reading the map
+files, which decision 5 says it must not — pre-existing and left where it is
+(row 14); ninety-six test binaries being fifty minutes on a busy machine
+(row 17); and the walker's two blind spots about *going somewhere on purpose*
+(rows 31 and 54).
 
 ---
 
 ## Where to pick up
 
-**The deploy**, which is a human's `make publish` and then
+**The deploy, and nothing else.** A human's `make publish`, then
 `GM2D_ORIGIN=… testing/drive.py` against the live page — the *verify against the
-live page* step this project has demanded since M8.
+live page* step this project has demanded since M8, and the one thing M22 has
+not done.
 
-**Then M22.10 onward**, which do not exist yet: read `SECOND-ORDER-M22.md`, take
-every `open` row, group them into milestones, append them to `PLAN-M22.md`, and
-execute. **The block ends when the notebook has no open rows.**
+Everything the deploy would carry is green and every milestone is closed:
+**M22.0 → M22.10**, 1,144 tests in 96 binaries, 114 `ok:` lines in chromium at
+exit 0, and a notebook at fifty-four rows with none open.
 
 Two rules that will bite:
 

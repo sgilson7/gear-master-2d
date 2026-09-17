@@ -453,3 +453,80 @@ fn a_mark_up_never_rounds_a_price_to_nothing() {
     assert_eq!(shop::at_pct(15, shop::SHELF_PCT), 75, "the pit's cheapest line");
     assert_eq!(shop::at_pct(15, shop::COMMISSION_PCT), 150);
 }
+
+/// **Eighty-nine of the hundred and six casting components are buyable, and the
+/// arcane shelf coming down did not move it.**
+///
+/// **The number is the point and so is the fact that it did not move.** M20
+/// found **six** reachable — all errand rewards — because `roll_barrel` named
+/// its kinds by hand and covered the blade, and the arcane shelf was on no map.
+/// What fixed it was the barrel: `shop::barrel_wants` is derived from the
+/// recipe table, and the authored barrel carries a book, two spells and an orb
+/// so all three ways of building a weapon finish out of it from the first
+/// afternoon.
+///
+/// M22.3 put that shelf on the map as a wing of the third town, and the count
+/// came back **89 → 89** against a guess of 92: everything it stocks was
+/// already reachable through the rolled pools, and it gave up the three lines
+/// the barrel carries. So the shelf is where a caster board is *finished* and
+/// the barrel is where one is *started*.
+///
+/// Nothing asserted the figure. A shelf edit that took the Chapbook off the
+/// barrel would put it back near where M20 found it and no test would say so.
+#[test]
+fn the_casting_family_is_still_reachable() {
+    use gm2d_core::piece::{PieceKind, CATALOG};
+    let casting: Vec<&'static str> = CATALOG
+        .iter()
+        .filter(|d| {
+            matches!(
+                d.kind,
+                PieceKind::Spell
+                    | PieceKind::Book
+                    | PieceKind::Ink
+                    | PieceKind::Orb
+                    | PieceKind::Alignment
+            )
+        })
+        .map(|d| d.name)
+        .collect();
+    assert_eq!(casting.len(), 106, "the casting family is {} components", casting.len());
+
+    // Everywhere a player can buy one: the shelves they can walk up to —
+    // **wings included**, which is what `shelves_on_the_map` is for — the
+    // barrel and the cart as authored, and both rolled pools.
+    let shops = gm2d_core::data::shops();
+    let reachable = gm2d_core::data::shelves_on_the_map();
+    let mut buyable: std::collections::BTreeSet<&str> = Default::default();
+    for t in shops.towns.iter().filter(|t| reachable.iter().any(|r| *r == t.id)) {
+        for n in &t.stock {
+            buyable.insert(n.as_str());
+        }
+        for c in &t.commissions {
+            buyable.insert(c.piece.as_str());
+        }
+    }
+    for n in shops.barrel.iter().chain(shops.caravan.iter()) {
+        buyable.insert(n.as_str());
+    }
+    for d in gm2d_core::shop::barrel_pool().into_iter().chain(gm2d_core::shop::ledger_pool()) {
+        buyable.insert(d.name);
+    }
+
+    let got = casting.iter().filter(|n| buyable.contains(*n)).count();
+    assert_eq!(
+        got, 89,
+        "{got} of the {} casting components are buyable, and it was 89",
+        casting.len()
+    );
+    // **And the barrel is what carries the cores**, which is the half that
+    // makes a caster weapon buildable at all before the Undercountry.
+    let in_barrel: Vec<&str> = shops.barrel.iter().map(|s| s.as_str()).collect();
+    for kind in [PieceKind::Book, PieceKind::Spell, PieceKind::Orb] {
+        let n = in_barrel
+            .iter()
+            .filter(|b| CATALOG.iter().any(|d| d.name == **b && d.kind == kind))
+            .count();
+        assert!(n > 0, "the barrel carries no {kind:?}, so no caster weapon finishes out of it");
+    }
+}

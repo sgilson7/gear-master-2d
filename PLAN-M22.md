@@ -436,7 +436,23 @@ Acceptance: `the_far_corner_is_answered_by_a_landing`;
 | `HANDOFF-M22.md`, `CLAUDE.md` | *The table under the writing* as a section; three tables; the divergences; the numbers |
 | **deploy** | `make publish`, report the hash |
 
-### M22.10 → — Whatever the notebook says
+### M22.10 — The notebook executed
+
+*Written after M22.9, off `SECOND-ORDER-M22.md`'s twelve open rows. Two of them
+are work, five are findings that want writing down where somebody will meet
+them, and two are the human's and are carried rather than closed.*
+
+| deliverable | what | rows |
+|---|---|---|
+| `no_ball_comes_to_rest_on_impassable_ground` | **the tunnelling made a guarantee instead of a note.** A ball goes through rock and it has never cost anything, because the destination tile *is* tested — so no flight has ever ended on ground nobody can stand on. That is measured (0 of the 720-shot fan from every walkable tile of all three tables) and nothing asserts it. A lint does, so the day a map is drawn that makes it false, somebody is told rather than a player standing in rock | 1, 2 |
+| `the_casting_family_is_still_reachable` | **89 of 106, asserted.** The count did not move when the arcane shelf came down, and what makes that safe is that the barrel carries the casting cores. Nothing checks it: a shelf edit that took the Chapbook off the barrel would put the count back where M20 found it — six — and no test would say so | 5 |
+| `CLAUDE.md` | the five findings that want a home: a ball goes through rock and what that costs; the casting count; `ShopsData::parse` reading the map files; ninety-six binaries being fifty minutes; and the walker's two blind spots | 8, 14, 17, 31, 54 |
+| the status table | the two that are the human's, carried as questions: **whether to sweep the physics**, and **what to do about the packing board's canvas** | 3, 32 |
+
+Acceptance: both lints, each negative-tested; `SECOND-ORDER-M22.md` at **0
+open**; and the last status table's notes carrying the two questions.
+
+### M22.11 → — Whatever the notebook says
 
 **These milestones do not exist yet, and nothing is carried in.** M21's
 notebook closed at sixty-three rows with none open, so `SECOND-ORDER-M22.md`

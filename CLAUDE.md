@@ -709,6 +709,16 @@ something cost a day.
     make test-ui-setup # one-time: venv + headless chromium
     packaging/count-tests.sh  # how many tests there are, countably
 
+**The suite is ninety-six binaries and a change to `crates/core` relinks every
+one of them.** On an idle machine that is the ~three minutes `SECOND-ORDER-M16.md`
+row 17 measured; on a machine with other work on it — thirteen sessions, a
+browser, a leftover Playwright Firefox — M22 measured **fifty**, at 22 binaries in
+eleven minutes with the tests themselves at 0.06s each. `cargo test` interleaves
+building and running, so the transcript looks like a hang at whichever binary is
+next. **And editing source while it runs restarts it**, which cost one whole pass
+before the cause was clear. The working rule: **one full suite a milestone, in
+the background, and `--test <name>` while iterating.**
+
 **Two environment variables, both added in M11 and both about *which page*.**
 
     GM2D_WEB=dist/web-gate ./packaging/package-web.sh   # build somewhere else
@@ -732,6 +742,17 @@ chosen to exercise checks and asserts; the second starts a new game and plays
 it, and its output is a transcript rather than a verdict. The second is the one
 that found an Auto-pack seating the starting kit for the whole game and a class
 fork opening underneath the town — both of which the first was green through.
+
+**Two more things the walker does not do, both found in M22 and both about
+*going somewhere on purpose*.** It does not **take an errand in one town to
+finish in another**: `send-for-the-clerk` is given and handed in at Kettleworks
+and done in the Undercountry, which is four cart rides, and the walker takes what
+is on the counter in front of it. And it does not **go to a named tile to finish
+a `Word`**: it took `THE FAR CORNER` off the desk and reported *You have not been
+yet* on every visit for two hundred and forty-four fights, which is the stage
+working and the walker having no model of the errand. Both are *a walker with a
+destination stops being a player* from the other side — and what walks that
+content instead is the **gate**, which plants the state and asserts on it.
 
 **And `make play` is not the instrument the pacing bands are set with**, which
 M15.3 had to find out. `level_five_lands_where_the_plan_says` walks a **fixed
@@ -3931,6 +3952,15 @@ draws each one under its own heading.
   `StallData::parse` and `a_bargain_is_never_on_the_barrel` asked one question
   between them, so a mutation written to break the lint panicked in `data.rs`
   before the assertion ran.
+- **`ShopsData::parse` reads the map files, and the split says it should not.**
+  The barrel's *a barrel entry must not also be on a shelf* check has called
+  `data::towns_on_the_map` since M13 — which loads every map's places — and M22
+  taught it about wings from the list already in hand rather than through
+  `data::shelves_on_the_map`, because that function parses this file and a
+  parser asking a parser about itself is a stack overflow. **The pre-existing
+  violation is left where it is**: moving a shipped refusal into a lint is a
+  change this block had no reason to make, and it is written down so the next
+  person does not find it and assume it was an oversight.
 - **`data::shelves_on_the_map` is the question the cheap tiers have always
   meant.** `towns_on_the_map` answers *which towns exist*, and until a wing
   existed that was the same question. The exclusion is about **undercutting**,
@@ -4099,6 +4129,38 @@ three of silt, with a plank in it.
 - **Two rounds of shots reaches everything**, which is the plan's guess and the
   Treyway's number — and the far pocket is among them, asserted rather than
   printed, because a cup nothing can reach is a room with no way into it.
+
+### A ball goes through rock, and what that has cost so far is nothing
+
+**M22.0 measured it and M22.10 made it a guarantee rather than a note.**
+`shot::shoot_with` tests the tile a tick *landed on* and never the tiles it
+crossed, and at `POWER_UNIT` 30 one tick is 1.875 tiles at power one and
+**18.75 at power ten**. So a one-tile wall is transparent to a ball, and so is
+a two-tile one: **6,546 of the shots taken from the 278 walkable tiles outside
+a draft cup came to rest inside it**, through eight tiles of solid rock with no
+mouth. A probe corridor passes a ball through one column at seven of ten powers
+and through two at six of ten. **Nineteen tiles would seal it, which is the
+map.**
+
+- **It has never cost anything, and the reason is the destination test.**
+  Tunnelling only happens *on the way* to somewhere legal, because the tile the
+  tick ends on **is** checked — so no flight has ever ended on ground nobody can
+  stand on. `no_ball_comes_to_rest_on_impassable_ground` is what says so now,
+  over every tile of every table, wet and dry, and it breaks the moment that
+  destination test does.
+- **Neither shipped table has a room to seal**, which is why it stayed. The
+  Treyway's twenty interior impassable tiles and the Undercountry's sixteen are
+  ranges along the border or blocks in open country, where a ball going through
+  one reads as a lucky bounce.
+- **A swept collision was prototyped and is the human's.** Taking the first
+  solid tile the segment crosses seals a cup (6,546 ways in → **0**) and leaves
+  the table whole in two rounds, at 1.6s → 2.8s of flood. What it breaks is
+  content: **`the-reach-edge` and `the-wextreen-reach` stop being reachable in
+  one shot from the Treyway's start** — the way into the Wextreen Reach has been
+  entered *through a range* since M17 — and `one_shot_reaches_most_of_the_
+  treyway` falls from ≥80% to 78%.
+- **So a sealed room is a map, not a cup**, which is what a pocket's
+  `to`/`at_to` is for and is divergence 22.1.
 
 ### Two start lines, because nothing in the repository opened the Undercountry
 

@@ -3,7 +3,26 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Gear Master 2D</title>
+<title>Gear Master 2D — Sam Gilson</title>
+<meta name="description" content="Explore a tile-based world and assemble equipment for automatic battles.">
+<link rel="canonical" href="https://sgilson7.github.io/gear-master-2d/">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Gear Master 2D">
+<meta property="og:description" content="Explore a tile-based world and assemble equipment for automatic battles.">
+<meta property="og:url" content="https://sgilson7.github.io/gear-master-2d/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Gear Master 2D">
+<meta name="twitter:description" content="Explore a tile-based world and assemble equipment for automatic battles.">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Gear Master 2D",
+  "description": "Explore a tile-based world and assemble equipment for automatic battles.",
+  "url": "https://sgilson7.github.io/gear-master-2d/"
+}
+</script>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -11,6 +30,10 @@
     <header>
       <p class="eyebrow">v0.1.0 &middot; MVP</p>
       <h1>Gear Master 2D</h1>
+      <p class="blurb">Explore a tile-based world and assemble equipment for automatic battles.</p>
+      <p class="links"><a href="/projects/gear-master-2d/">About Gear Master 2D</a>
+         &middot; <a href="/projects/">Tools and games</a></p>
+      <noscript><p class="blurb">This game requires JavaScript and WebAssembly.</p></noscript>
       <!-- **The controls blurb is gone.** It was read once and then held that
            space for the rest of the sitting, and it had started to lie: "every
            level adds a row to one frame" is what M12.3 retires on purpose. The
@@ -108,8 +131,7 @@
 
         <div class="panel">
           <h3>The save</h3>
-          <p class="note">Walk somewhere, download, reload, load it back. Your position, what you
-            have answered and the random stream all come back together.</p>
+          <p class="note">Download a save to keep your progress. Choose Load to restore it after reopening the page.</p>
           <div class="row">
             <button id="download" type="button" class="primary">Download save</button>
             <label class="btn">Load<input type="file" id="file" accept="application/json,.json" hidden></label>
@@ -349,9 +371,7 @@
             <h2>The tree</h2>
             <!-- Generic, because there is a tab a tree now and this line used
                  to describe the base one on all of them. -->
-            <p class="note">One point a level. Nothing on the top row asks for anything
-              first; everything below it sits under whatever it needs. What you take
-              does not come off.</p>
+            <p class="note">You earn one skill point per level. Top-row skills have no prerequisites; later skills require the skills above them. Skill choices are permanent.</p>
           </div>
           <dl class="figures">
             <div><dt>level</dt><dd id="tree-level">&mdash;</dd></div>
@@ -717,8 +737,7 @@
              is the rack's own rule. -->
         <div id="fight-out" class="outrow" hidden></div>
         <div id="stage-board">
-          <p class="note">Click a piece to pick it up, click a cell to seat it, right-click to turn it.
-            Shift-click a finished item to lock it. Green is where it fits &mdash; core decides that, not the page.</p>
+          <p class="note">Click a piece to pick it up, then click a cell to place it. Right-click to rotate it. Shift-click a finished item to lock it. Green cells show valid placements.</p>
           <div class="packing">
             <div>
               <!-- The board, and over it the layer of `?` controls that stand
@@ -853,7 +872,7 @@
     </div>
 
     <footer>
-      <span id="status">loading the engine&hellip;</span>
+      <span id="status">Loading Gear Master 2D…</span>
       <span class="build">build __BUILD__</span>
     </footer>
   </main>

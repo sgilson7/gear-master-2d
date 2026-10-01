@@ -4743,7 +4743,7 @@ function watchForNewBuild() {
 async function main() {
   if (!(await freshEnough())) return;
   try { await init(); } catch (e) {
-    $('status').textContent = `the engine did not load: ${e}`;
+    $('status').textContent = `The game could not load. Reload the page and try again. (${e})`;
     $('status').classList.add('bad');
     throw e;
   }
